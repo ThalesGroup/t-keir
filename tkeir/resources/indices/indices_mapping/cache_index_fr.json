@@ -1,0 +1,250 @@
+{
+    "settings": {
+        "index.mapping.nested_objects.limit": 200000,
+        "analysis": {
+            "analyzer": {
+                "lc_stop_stem": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "french_stop",
+                        "preserve_ascii_folding",
+                        "stemmer"
+                    ]
+                },
+                "lc_lemma": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "preserve_ascii_folding"
+                    ]
+                },
+                "std_stop": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "french_stop",
+                        "preserve_ascii_folding"
+                    ]
+                },
+                "stop_syn": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "french_stop",
+                        "preserve_ascii_folding"
+                    ]
+                },
+                "stop_stems": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "french_stop",
+                        "preserve_ascii_folding",
+                        "stemmer"
+                    ]
+                }
+            },
+            "filter": {
+                "synonym": {
+                    "type": "synonym",
+                    "format": "wordnet",
+                    "synonyms_path": "analysis/wn_s.pl"
+                },
+                "french_stop": {
+                    "type": "stop",
+                    "stopwords": "_french_"
+                },
+                "french_stemmer": {
+                    "type": "stemmer",
+                    "language": "french"
+                },
+                "preserve_ascii_folding" : {
+          "type" : "asciifolding",
+          "preserve_original" : true
+        }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "data_source" : {
+                "type": "keyword"
+            },
+            "source_doc_id": {
+                "type": "keyword"
+            },
+            "indexed_document": {
+                "type": "keyword"
+            },
+            "title": {
+                "type": "text",
+                "term_vector": "yes",
+                "analyzer": "stop_stems",
+                "search_analyzer": "stop_stems",
+                "search_quote_analyzer": "stop_stems"
+            },
+            "lemma_title": {
+                "type": "text",
+                "term_vector": "yes",
+                "analyzer": "lc_lemma",
+                "search_analyzer": "lc_lemma",
+                "search_quote_analyzer": "lc_lemma"
+            },
+            "content": {
+                "type": "text",
+                "term_vector": "yes",
+                "analyzer": "stop_stems",
+                "search_analyzer": "stop_stems",
+                "search_quote_analyzer": "stop_stems"
+            },
+            "lemma_content": {
+                "type": "text",
+                "term_vector": "yes",
+                "analyzer": "lc_lemma",
+                "search_analyzer": "lc_lemma",
+                "search_quote_analyzer": "lc_lemma"
+            },
+            "summary":{
+                "type": "nested",
+                "properties":{
+                    "block":{
+                        "type":"text",
+                        "analyzer": "stop_stems",
+                        "search_analyzer": "stop_stems",
+                        "search_quote_analyzer": "stop_stems"
+                    },
+                    "summary":{
+                        "type":"text",
+                        "term_vector": "yes",
+                        "analyzer": "stop_stems",
+                        "search_analyzer": "stop_stems",
+                        "search_quote_analyzer": "stop_stems"
+                    }
+                }
+            },
+            "sentiment":{
+                "type":"nested"
+            },
+            "categories": {
+                "type":"nested"
+             },
+            "text_suggester": {
+                "analyzer": "std_stop",
+                "max_input_length": 50,
+                "preserve_position_increments": true,
+                "preserve_separators": true,
+                "type": "completion"
+            },
+            "plugin_name": {
+                "type": "keyword"
+            },
+            "kg": {
+                "type": "nested",
+                "properties": {
+                    "subject": {
+                        "type":"nested",
+                        "properties":{
+                            "content":{
+                                "type": "text",
+                                "term_vector": "yes",
+                                "analyzer": "stop_stems",
+                                "search_analyzer": "stop_stems",
+                                "search_quote_analyzer": "stop_stems"
+                            },
+                            "lemma_content": {
+                                "type": "text",
+                                "term_vector": "yes",
+                                "analyzer": "lc_lemma",
+                                "search_analyzer": "lc_lemma",
+                                "search_quote_analyzer": "lc_lemma"
+                            },
+                            "label":{
+                                "type":"keyword"
+                            },
+                            "positions":{
+                                "type":"long"
+                            },
+                            "class":{
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "property": {
+                        "type":"nested",
+                        "properties":{
+                            "content":{
+                                "type": "text",
+                                "term_vector": "yes",
+                                "analyzer": "stop_stems",
+                                "search_analyzer": "stop_stems",
+                                "search_quote_analyzer": "stop_stems"
+                            },
+                            "lemma_content": {
+                                "type": "text",
+                                "term_vector": "yes",
+                                "analyzer": "lc_lemma",
+                                "search_analyzer": "lc_lemma",
+                                "search_quote_analyzer": "lc_lemma"
+                            },
+                            "label":{
+                                "type":"keyword"
+                            },
+                            "positions":{
+                                "type":"long"
+                            },
+                            "class":{
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "value": {
+                        "type":"nested",
+                        "properties":{
+                            "content":{
+                                "type": "text",
+                                "term_vector": "yes",
+                                "analyzer": "stop_stems",
+                                "search_analyzer": "stop_stems",
+                                "search_quote_analyzer": "stop_stems"
+                            },
+                            "lemma_content": {
+                                "type": "text",
+                                "term_vector": "yes",
+                                "analyzer": "lc_lemma",
+                                "search_analyzer": "lc_lemma",
+                                "search_quote_analyzer": "lc_lemma"
+                            },
+                            "label":{
+                                "type":"keyword"
+                            },
+                            "positions":{
+                                "type":"long"
+                            },
+                            "class":{
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "automatically_fill": {
+                        "type": "boolean"
+                    },
+                    "confidence":{
+                        "type":"float"
+                    },
+                    "weight": {
+                        "type":"float"
+                    },
+                    "field_type":{
+                        "type":"keyword"
+                    }
+                }
+            }
+        }
+    }
+}

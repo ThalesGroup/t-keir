@@ -1,0 +1,328 @@
+{
+  "content": [
+    "IMPORTANT- THE IDS BELOW WILL BE YOUR PERMANENT ACCESS TO PRODUCTION Your\nPRODUCTION User ID and Password has been set up on UBSWenergy. Please follow\nthe steps below to access the new environment: From Internet Explorer connect\nto the UBSWenergy Production Cluster through the following link:\nhttp://remoteservices.netco.enron.com/ica/ubswenergy.ica (use your\nUBSWenergy/Enron NT Log In & Password) From the second Start menu, select\nappropriate application: STACK MANAGER User ID: JZUFFER Password: q 9M npX\n(Please Change) Below is a special internal use only link for the simulation\npurposes only to get to the trading area of the website. DO NOT PROVIDE THIS\nLINK TO ANYONE NOT PART OF THE SIMULATION. (customers should be directed to go\nto the direct link www.ubsenergy.com).\nhttp://www.ubswenergy.com/site_index.html (FOR SIMULATION ONLY) WEBSITE - Book\n(ALBERTA LONG TERM POWER) User ID: MUS93962 Password: WELCOME! WEBSITE - Book\n(ALBERTA ORIGINATION) User ID: MUS93124 Password: WELCOME! WEBSITE - Book\n(ALBERTA TRANSFER BOOK) User ID: MUS52346 Password: WELCOME! PLEASE DO NOT\nTRANSACT BEFORE SIMULATION TOMORROW! Should you have any questions or issues,\nplease contact me at x33465 or the Call Center at 713-584-4444 Thank you,\nStephanie Sever 713-853-3465\n\n"
+  ],
+  "data_source": "converter-service",
+  "error": false,
+  "kg": [
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "stephanie.sever@enron.com",
+        "label_content": "",
+        "lemma_content": "stephanie.sever@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "email",
+        "label_content": "",
+        "lemma_content": "email",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Sever, Stephanie",
+        "label_content": "",
+        "lemma_content": "Sever, Stephanie",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "person",
+        "label_content": "",
+        "lemma_content": "person",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailto",
+        "label_content": "",
+        "lemma_content": "rel:mailto",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "stephanie.sever@enron.com",
+        "label_content": "",
+        "lemma_content": "stephanie.sever@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "john.zufferli@enron.com",
+        "label_content": "",
+        "lemma_content": "john.zufferli@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailto",
+        "label_content": "",
+        "lemma_content": "rel:mailto",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Sever",
+        "label_content": "",
+        "lemma_content": "Sever",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "Zufferli",
+        "label_content": "",
+        "lemma_content": "Zufferli",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailto",
+        "label_content": "",
+        "lemma_content": "rel:mailto",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Sever",
+        "label_content": "",
+        "lemma_content": "Sever",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "John",
+        "label_content": "",
+        "lemma_content": "John",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailto",
+        "label_content": "",
+        "lemma_content": "rel:mailto",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": " Stephanie",
+        "label_content": "",
+        "lemma_content": " Stephanie",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "Zufferli",
+        "label_content": "",
+        "lemma_content": "Zufferli",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailto",
+        "label_content": "",
+        "lemma_content": "rel:mailto",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": " Stephanie",
+        "label_content": "",
+        "lemma_content": " Stephanie",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "John",
+        "label_content": "",
+        "lemma_content": "John",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Zufferli",
+        "label_content": "",
+        "lemma_content": "Zufferli",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "person",
+        "label_content": "",
+        "lemma_content": "person",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "John",
+        "label_content": "",
+        "lemma_content": "John",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "person",
+        "label_content": "",
+        "lemma_content": "person",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Wed, 06 Feb 2002 14:04:29 -0800",
+        "label_content": "",
+        "lemma_content": "Wed, 06 Feb 2002 14:04:29 -0800",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "date",
+        "label_content": "",
+        "lemma_content": "date",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    }
+  ],
+  "source_doc_id": "file:///home/tkeir_svc/tkeir/thot/tests/data/test-raw/mail/mail1.txt",
+  "tasks-info": [
+    {
+      "execution-date": "Jul 09 2021 08:48:07",
+      "host": "172.20.0.3",
+      "hostname": "a6c6950c51a2",
+      "os": [
+        "Linux",
+        "a6c6950c51a2",
+        "5.8.0-48-generic",
+        "#54~20.04.1-Ubuntu SMP Sat Mar 20 13:40:25 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/05",
+      "task-name": "converter",
+      "task-version": "1.0.0"
+    }
+  ],
+  "title": "Access to UBSWenergy Production Environment"
+}

@@ -1,0 +1,27 @@
+{
+    "content": [
+        "The delice is a town in city 5000.\n\n"
+    ],
+    "data_source": "converter-service",
+    "error": false,
+    "kg": [],
+    "source_doc_id": "file:///home/tkeir_svc/tkeir/thot/tests/data/test-raw/raw-target/ner.txt",
+    "tasks-info": [
+        {
+            "execution-date": "May 12 2021 06:57:29",
+            "host": "172.18.0.3",
+            "hostname": "34f872a9f26a",
+            "os": [
+                "Linux",
+                "34f872a9f26a",
+                "5.8.0-48-generic",
+                "#54~20.04.1-Ubuntu SMP Sat Mar 20 13:40:25 UTC 2021",
+                "x86_64"
+            ],
+            "task-development-date": "2021/05",
+            "task-name": "converter",
+            "task-version": "1.0.0"
+        }
+    ],
+    "title": ""
+}

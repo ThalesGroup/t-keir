@@ -1,0 +1,3861 @@
+{
+  "content": [
+    "Based on our discussion last week, here is some information under the\nLackawanna letter of credit. Under the letter of credit, the stated amount is\nincreased $4.5 million upon receipt from the trustee of notification of the\nCompletion Date. Completion Date is defined in the LC as in the Indenture.\nHowever, this definition is exactly the same as used in the subordinated loan\nagreement. I have attached my analysis of the requirements for the Completion\nDate under the Loan Agreement. Completion requires, among other things, the\nproduction within a 24 day period of 3,000 units with certain quality\nspecifications. Approval of these specifications must be made by the\nindependent engineer. To date, we have taken a wait and see approach regarding\ncompletion. Please review and advise on your thoughts on strategy going\nforward. Obviously, we want to hold them to the letter of the agreement. The\nLC expires on June 30 and it does not appear that under the loan agreement\nthat we are required to fund after the expiration of the letter of credit. If\nyou need the pertinent documents, I have them in my office. .\n\n"
+  ],
+  "content_morphosyntax": [
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "base",
+      "pos": "VERB",
+      "text": "Based"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "on",
+      "pos": "ADP",
+      "text": "on"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "our",
+      "pos": "PRON",
+      "text": "our"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "discussion",
+      "pos": "NOUN",
+      "text": "discussion"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "last",
+      "pos": "ADJ",
+      "text": "last"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "week",
+      "pos": "NOUN",
+      "text": "week"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "here",
+      "pos": "ADV",
+      "text": "here"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "some",
+      "pos": "DET",
+      "text": "some"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "information",
+      "pos": "NOUN",
+      "text": "information"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "under",
+      "pos": "ADP",
+      "text": "under"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Lackawanna",
+      "pos": "PROPN",
+      "text": "Lackawanna"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "letter",
+      "pos": "NOUN",
+      "text": "letter"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "credit",
+      "pos": "NOUN",
+      "text": "credit"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "under",
+      "pos": "ADP",
+      "text": "Under"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "letter",
+      "pos": "NOUN",
+      "text": "letter"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "credit",
+      "pos": "NOUN",
+      "text": "credit"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "state",
+      "pos": "VERB",
+      "text": "stated"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "amount",
+      "pos": "NOUN",
+      "text": "amount"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "increase",
+      "pos": "VERB",
+      "text": "increased"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "$",
+      "pos": "SYM",
+      "text": "$"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "4.5",
+      "pos": "NUM",
+      "text": "4.5"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "million",
+      "pos": "NUM",
+      "text": "million"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "upon",
+      "pos": "SCONJ",
+      "text": "upon"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "receipt",
+      "pos": "NOUN",
+      "text": "receipt"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "from",
+      "pos": "ADP",
+      "text": "from"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "trustee",
+      "pos": "NOUN",
+      "text": "trustee"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "notification",
+      "pos": "NOUN",
+      "text": "notification"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Completion",
+      "pos": "PROPN",
+      "text": "Completion"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Date",
+      "pos": "PROPN",
+      "text": "Date"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "completion",
+      "pos": "NOUN",
+      "text": "Completion"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Date",
+      "pos": "PROPN",
+      "text": "Date"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "define",
+      "pos": "VERB",
+      "text": "defined"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "LC",
+      "pos": "PROPN",
+      "text": "LC"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Indenture",
+      "pos": "PROPN",
+      "text": "Indenture"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "however",
+      "pos": "ADV",
+      "text": "However"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "this",
+      "pos": "DET",
+      "text": "this"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "definition",
+      "pos": "NOUN",
+      "text": "definition"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "exactly",
+      "pos": "ADV",
+      "text": "exactly"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "same",
+      "pos": "ADJ",
+      "text": "same"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "use",
+      "pos": "VERB",
+      "text": "used"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "subordinated",
+      "pos": "ADJ",
+      "text": "subordinated"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "loan",
+      "pos": "NOUN",
+      "text": "loan"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "agreement",
+      "pos": "NOUN",
+      "text": "agreement"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "I",
+      "pos": "PRON",
+      "text": "I"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "have",
+      "pos": "VERB",
+      "text": "have"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "attach",
+      "pos": "VERB",
+      "text": "attached"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "my",
+      "pos": "PRON",
+      "text": "my"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "analysis",
+      "pos": "NOUN",
+      "text": "analysis"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "requirement",
+      "pos": "NOUN",
+      "text": "requirements"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "for",
+      "pos": "ADP",
+      "text": "for"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Completion",
+      "pos": "PROPN",
+      "text": "Completion"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Date",
+      "pos": "PROPN",
+      "text": "Date"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "under",
+      "pos": "ADP",
+      "text": "under"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Loan",
+      "pos": "PROPN",
+      "text": "Loan"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Agreement",
+      "pos": "PROPN",
+      "text": "Agreement"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "completion",
+      "pos": "NOUN",
+      "text": "Completion"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "require",
+      "pos": "VERB",
+      "text": "requires"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "among",
+      "pos": "ADP",
+      "text": "among"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "other",
+      "pos": "ADJ",
+      "text": "other"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "thing",
+      "pos": "NOUN",
+      "text": "things"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "production",
+      "pos": "NOUN",
+      "text": "production"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "within",
+      "pos": "ADP",
+      "text": "within"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "24",
+      "pos": "NUM",
+      "text": "24"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "day",
+      "pos": "NOUN",
+      "text": "day"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "period",
+      "pos": "NOUN",
+      "text": "period"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "3",
+      "pos": "NUM",
+      "text": "3"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "000",
+      "pos": "NUM",
+      "text": "000"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "unit",
+      "pos": "NOUN",
+      "text": "units"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "with",
+      "pos": "ADP",
+      "text": "with"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "certain",
+      "pos": "ADJ",
+      "text": "certain"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "quality",
+      "pos": "NOUN",
+      "text": "quality"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "specification",
+      "pos": "NOUN",
+      "text": "specifications"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "approval",
+      "pos": "NOUN",
+      "text": "Approval"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "these",
+      "pos": "DET",
+      "text": "these"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "specification",
+      "pos": "NOUN",
+      "text": "specifications"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "must",
+      "pos": "AUX",
+      "text": "must"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "be"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "make",
+      "pos": "VERB",
+      "text": "made"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "by",
+      "pos": "ADP",
+      "text": "by"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "independent",
+      "pos": "ADJ",
+      "text": "independent"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "engineer",
+      "pos": "NOUN",
+      "text": "engineer"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "To"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "date",
+      "pos": "NOUN",
+      "text": "date"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "we",
+      "pos": "PRON",
+      "text": "we"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "have",
+      "pos": "VERB",
+      "text": "have"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "take",
+      "pos": "VERB",
+      "text": "taken"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "wait",
+      "pos": "NOUN",
+      "text": "wait"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "see",
+      "pos": "VERB",
+      "text": "see"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "approach",
+      "pos": "NOUN",
+      "text": "approach"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "regard",
+      "pos": "VERB",
+      "text": "regarding"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "completion",
+      "pos": "NOUN",
+      "text": "completion"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "please",
+      "pos": "INTJ",
+      "text": "Please"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "review",
+      "pos": "VERB",
+      "text": "review"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "advise",
+      "pos": "VERB",
+      "text": "advise"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "on",
+      "pos": "ADP",
+      "text": "on"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "your",
+      "pos": "PRON",
+      "text": "your"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "thought",
+      "pos": "NOUN",
+      "text": "thoughts"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "on",
+      "pos": "ADP",
+      "text": "on"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "strategy",
+      "pos": "NOUN",
+      "text": "strategy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "go",
+      "pos": "VERB",
+      "text": "going"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "forward",
+      "pos": "ADV",
+      "text": "forward"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "obviously",
+      "pos": "ADV",
+      "text": "Obviously"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "we",
+      "pos": "PRON",
+      "text": "we"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "want",
+      "pos": "VERB",
+      "text": "want"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "hold",
+      "pos": "VERB",
+      "text": "hold"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "they",
+      "pos": "PRON",
+      "text": "them"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "letter",
+      "pos": "NOUN",
+      "text": "letter"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "agreement",
+      "pos": "NOUN",
+      "text": "agreement"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "LC",
+      "pos": "PROPN",
+      "text": "LC"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "expire",
+      "pos": "VERB",
+      "text": "expires"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "on",
+      "pos": "ADP",
+      "text": "on"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "June",
+      "pos": "PROPN",
+      "text": "June"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "30",
+      "pos": "NUM",
+      "text": "30"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "it",
+      "pos": "PRON",
+      "text": "it"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "do",
+      "pos": "VERB",
+      "text": "does"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "not",
+      "pos": "PART",
+      "text": "not"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "appear",
+      "pos": "VERB",
+      "text": "appear"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "SCONJ",
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "under",
+      "pos": "ADP",
+      "text": "under"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "loan",
+      "pos": "NOUN",
+      "text": "loan"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "agreement",
+      "pos": "NOUN",
+      "text": "agreement"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "we",
+      "pos": "PRON",
+      "text": "we"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "require",
+      "pos": "VERB",
+      "text": "required"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "fund",
+      "pos": "VERB",
+      "text": "fund"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "after",
+      "pos": "ADP",
+      "text": "after"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "expiration",
+      "pos": "NOUN",
+      "text": "expiration"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "letter",
+      "pos": "NOUN",
+      "text": "letter"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "credit",
+      "pos": "NOUN",
+      "text": "credit"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "if",
+      "pos": "SCONJ",
+      "text": "If"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "you",
+      "pos": "PRON",
+      "text": "you"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "need",
+      "pos": "VERB",
+      "text": "need"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "pertinent",
+      "pos": "ADJ",
+      "text": "pertinent"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "document",
+      "pos": "NOUN",
+      "text": "documents"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "I",
+      "pos": "PRON",
+      "text": "I"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "have",
+      "pos": "VERB",
+      "text": "have"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "they",
+      "pos": "PRON",
+      "text": "them"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "my",
+      "pos": "PRON",
+      "text": "my"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "office",
+      "pos": "NOUN",
+      "text": "office"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    }
+  ],
+  "content_tokens": [
+    [
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Based"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "on"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "our"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "discussion"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "last"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "week"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "here"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "is"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "some"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "information"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "under"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Lackawanna"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "letter"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "credit"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Under"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "letter"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "credit"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "stated"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "amount"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "is"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "increased"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "$"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "4.5"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "million"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "upon"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "receipt"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "from"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "trustee"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "notification"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Completion"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Date"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Completion"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Date"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "is"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "defined"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "LC"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Indenture"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "However"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "this"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "definition"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "is"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "exactly"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "same"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "used"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "subordinated"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "loan"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "agreement"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "I"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "have"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "attached"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "my"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "analysis"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "requirements"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "for"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Completion"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Date"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "under"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Loan"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Agreement"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Completion"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "requires"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "among"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "other"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "things"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "production"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "within"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "24"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "day"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "period"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "3"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "000"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "units"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "with"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "certain"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "quality"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "specifications"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Approval"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "these"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "specifications"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "must"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "be"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "made"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "by"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "independent"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "engineer"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "To"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "date"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "we"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "have"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "taken"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "wait"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "see"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "approach"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "regarding"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "completion"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Please"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "review"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "advise"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "on"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "your"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "thoughts"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "on"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "strategy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "going"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "forward"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Obviously"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "we"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "want"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "hold"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "them"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "letter"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "agreement"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "The"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "LC"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "expires"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "on"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "June"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "30"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "it"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "does"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "not"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "appear"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "that"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "under"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "loan"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "agreement"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "that"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "we"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "are"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "required"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "fund"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "after"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "expiration"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "letter"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "credit"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "If"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "you"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "need"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "pertinent"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "documents"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "I"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "have"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "them"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "my"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "office"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "."
+        }
+      ]
+    ]
+  ],
+  "data_source": "converter-service",
+  "error": false,
+  "kg": [
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "john.enerson@enron.com",
+        "label_content": "",
+        "lemma_content": "john.enerson@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "email",
+        "label_content": "",
+        "lemma_content": "email",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "John Enerso",
+        "label_content": "",
+        "lemma_content": "John Enerso",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "person",
+        "label_content": "",
+        "lemma_content": "person",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailto",
+        "label_content": "",
+        "lemma_content": "rel:mailto",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "john.enerson@enron.com",
+        "label_content": "",
+        "lemma_content": "john.enerson@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "richard.sanders@enron.com",
+        "label_content": "",
+        "lemma_content": "richard.sanders@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailto",
+        "label_content": "",
+        "lemma_content": "rel:mailto",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "John Enerso",
+        "label_content": "",
+        "lemma_content": "John Enerso",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "Richard B Sander",
+        "label_content": "",
+        "lemma_content": "Richard B Sander",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Richard B Sander",
+        "label_content": "",
+        "lemma_content": "Richard B Sander",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "person",
+        "label_content": "",
+        "lemma_content": "person",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailcc",
+        "label_content": "",
+        "lemma_content": "rel:mailcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "john.enerson@enron.com",
+        "label_content": "",
+        "lemma_content": "john.enerson@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "richard.lydecker@enron.com",
+        "label_content": "",
+        "lemma_content": "richard.lydecker@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailcc",
+        "label_content": "",
+        "lemma_content": "rel:mailcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "john.enerson@enron.com",
+        "label_content": "",
+        "lemma_content": "john.enerson@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "randy.petersen@enron.com",
+        "label_content": "",
+        "lemma_content": "randy.petersen@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailcc",
+        "label_content": "",
+        "lemma_content": "rel:mailcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "john.enerson@enron.com",
+        "label_content": "",
+        "lemma_content": "john.enerson@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "dan.lyons@enron.com",
+        "label_content": "",
+        "lemma_content": "dan.lyons@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailcc",
+        "label_content": "",
+        "lemma_content": "rel:mailcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "John Enerso",
+        "label_content": "",
+        "lemma_content": "John Enerso",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "Richard Lydecker",
+        "label_content": "",
+        "lemma_content": "Richard Lydecker",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailcc",
+        "label_content": "",
+        "lemma_content": "rel:mailcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "John Enerso",
+        "label_content": "",
+        "lemma_content": "John Enerso",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "Randy Petersen",
+        "label_content": "",
+        "lemma_content": "Randy Petersen",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailcc",
+        "label_content": "",
+        "lemma_content": "rel:mailcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "John Enerso",
+        "label_content": "",
+        "lemma_content": "John Enerso",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "Dan Lyon",
+        "label_content": "",
+        "lemma_content": "Dan Lyon",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Richard Lydecker",
+        "label_content": "",
+        "lemma_content": "Richard Lydecker",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "person",
+        "label_content": "",
+        "lemma_content": "person",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Randy Petersen",
+        "label_content": "",
+        "lemma_content": "Randy Petersen",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "person",
+        "label_content": "",
+        "lemma_content": "person",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Dan Lyon",
+        "label_content": "",
+        "lemma_content": "Dan Lyon",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "person",
+        "label_content": "",
+        "lemma_content": "person",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailbcc",
+        "label_content": "",
+        "lemma_content": "rel:mailbcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "john.enerson@enron.com",
+        "label_content": "",
+        "lemma_content": "john.enerson@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "richard.lydecker@enron.com",
+        "label_content": "",
+        "lemma_content": "richard.lydecker@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailbcc",
+        "label_content": "",
+        "lemma_content": "rel:mailbcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "john.enerson@enron.com",
+        "label_content": "",
+        "lemma_content": "john.enerson@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "randy.petersen@enron.com",
+        "label_content": "",
+        "lemma_content": "randy.petersen@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:mailbcc",
+        "label_content": "",
+        "lemma_content": "rel:mailbcc",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "john.enerson@enron.com",
+        "label_content": "",
+        "lemma_content": "john.enerson@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "dan.lyons@enron.com",
+        "label_content": "",
+        "lemma_content": "dan.lyons@enron.com",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "mail-header",
+      "property": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "Tue, 30 Jan 2001 02:35:00 -0800",
+        "label_content": "",
+        "lemma_content": "Tue, 30 Jan 2001 02:35:00 -0800",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "date",
+        "label_content": "",
+        "lemma_content": "date",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    }
+  ],
+  "source_doc_id": "file:///home/tkeir_svc/tkeir/thot/tests/data/test-raw/mail/mail3.txt",
+  "tasks-info": [
+    {
+      "execution-date": "Jul 09 2021 08:48:07",
+      "host": "172.20.0.3",
+      "hostname": "a6c6950c51a2",
+      "os": [
+        "Linux",
+        "a6c6950c51a2",
+        "5.8.0-48-generic",
+        "#54~20.04.1-Ubuntu SMP Sat Mar 20 13:40:25 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/05",
+      "task-name": "converter",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:35:25",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/09",
+      "task-name": "tokenizer",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:37:24",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "morphosyntax",
+      "task-version": "1.0.0"
+    }
+  ],
+  "title": "Lackawanna Letter of Credit",
+  "title_morphosyntax": [
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "Lackawanna",
+      "pos": "PROPN",
+      "text": "Lackawanna"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Letter",
+      "pos": "PROPN",
+      "text": "Letter"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Credit",
+      "pos": "PROPN",
+      "text": "Credit"
+    }
+  ],
+  "title_tokens": [
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "Lackawanna"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "Letter"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "of"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "Credit"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,4899 @@
+{
+  "content": [
+    "Enron. Enron Corporation was an American energy, commodities, and services\ncompany based in Houston, Texas. It was founded by Kenneth Lay in 1985 as a\nmerger between Lay's Houston Natural Gas and InterNorth, both relatively small\nregional companies. Before its bankruptcy on December 3, 2001, Enron employed\napproximately 29,000 staff and was a major electricity, natural gas,\ncommunications, and pulp and paper company, with claimed revenues of nearly\n$101 billion during 2000. Fortune named Enron \"America's Most Innovative\nCompany\" for six consecutive years. At the end of 2001, it was revealed that\nEnron's reported financial condition was sustained by an institutionalized,\nsystemic, and creatively planned accounting fraud, known since as the Enron\nscandal. Enron has become synonymous of willful corporate fraud and\ncorruption. The scandal also brought into question the accounting practices\nand activities of many corporations in the United States and was a factor in\nthe enactment of the Sarbanes–Oxley Act of 2002. The scandal also affected the\ngreater business world by causing the dissolution of the Arthur Andersen\naccounting firm, which had been Enron's main auditor for years. Enron filed\nfor bankruptcy in the Southern District of New York in late 2001 and selected\nWeil, Gotshal & Manges as its bankruptcy counsel. It ended its bankruptcy\nduring November 2004, pursuant to a court-approved plan of reorganization. A\nnew board of directors changed the name of Enron to Enron Creditors Recovery\nCorp., and emphasized reorganizing and liquidating certain operations and\nassets of the pre-bankruptcy Enron. On September 7, 2006, Enron sold its last\nremaining subsidiary, Prisma Energy International Inc., to Ashmore Energy\nInternational Ltd. (now AEI).\n\n"
+  ],
+  "content_morphosyntax": [
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Corporation",
+      "pos": "PROPN",
+      "text": "Corporation"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "was"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "an",
+      "pos": "DET",
+      "text": "an"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "american",
+      "pos": "ADJ",
+      "text": "American"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "energy",
+      "pos": "NOUN",
+      "text": "energy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "commodity",
+      "pos": "NOUN",
+      "text": "commodities"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "service",
+      "pos": "NOUN",
+      "text": "services"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "company",
+      "pos": "NOUN",
+      "text": "company"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "base",
+      "pos": "VERB",
+      "text": "based"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Houston",
+      "pos": "PROPN",
+      "text": "Houston"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Texas",
+      "pos": "PROPN",
+      "text": "Texas"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "it",
+      "pos": "PRON",
+      "text": "It"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "was"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "found",
+      "pos": "VERB",
+      "text": "founded"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "by",
+      "pos": "ADP",
+      "text": "by"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Kenneth",
+      "pos": "PROPN",
+      "text": "Kenneth"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Lay",
+      "pos": "PROPN",
+      "text": "Lay"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "1985",
+      "pos": "NUM",
+      "text": "1985"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "merger",
+      "pos": "NOUN",
+      "text": "merger"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "between",
+      "pos": "ADP",
+      "text": "between"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Lay",
+      "pos": "PROPN",
+      "text": "Lay"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "'s",
+      "pos": "PART",
+      "text": "'s"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Houston",
+      "pos": "PROPN",
+      "text": "Houston"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Natural",
+      "pos": "PROPN",
+      "text": "Natural"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Gas",
+      "pos": "PROPN",
+      "text": "Gas"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "InterNorth",
+      "pos": "PROPN",
+      "text": "InterNorth"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "both",
+      "pos": "CCONJ",
+      "text": "both"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "relatively",
+      "pos": "ADV",
+      "text": "relatively"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "small",
+      "pos": "ADJ",
+      "text": "small"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "regional",
+      "pos": "ADJ",
+      "text": "regional"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "company",
+      "pos": "NOUN",
+      "text": "companies"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "before",
+      "pos": "ADP",
+      "text": "Before"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "its",
+      "pos": "PRON",
+      "text": "its"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "bankruptcy",
+      "pos": "NOUN",
+      "text": "bankruptcy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "on",
+      "pos": "ADP",
+      "text": "on"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "December",
+      "pos": "PROPN",
+      "text": "December"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "3",
+      "pos": "NUM",
+      "text": "3"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2001",
+      "pos": "NUM",
+      "text": "2001"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "employ",
+      "pos": "VERB",
+      "text": "employed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "approximately",
+      "pos": "ADV",
+      "text": "approximately"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "29",
+      "pos": "NUM",
+      "text": "29"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "000",
+      "pos": "NUM",
+      "text": "000"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "staff",
+      "pos": "NOUN",
+      "text": "staff"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "was"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "major",
+      "pos": "ADJ",
+      "text": "major"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "electricity",
+      "pos": "NOUN",
+      "text": "electricity"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "natural",
+      "pos": "ADJ",
+      "text": "natural"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "gas",
+      "pos": "NOUN",
+      "text": "gas"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "communication",
+      "pos": "NOUN",
+      "text": "communications"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "pulp",
+      "pos": "NOUN",
+      "text": "pulp"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "paper",
+      "pos": "NOUN",
+      "text": "paper"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "company",
+      "pos": "NOUN",
+      "text": "company"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "with",
+      "pos": "ADP",
+      "text": "with"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "claim",
+      "pos": "VERB",
+      "text": "claimed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "revenue",
+      "pos": "NOUN",
+      "text": "revenues"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "nearly",
+      "pos": "ADV",
+      "text": "nearly"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "$",
+      "pos": "SYM",
+      "text": "$"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "101",
+      "pos": "NUM",
+      "text": "101"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "billion",
+      "pos": "NUM",
+      "text": "billion"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "during",
+      "pos": "ADP",
+      "text": "during"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2000",
+      "pos": "NUM",
+      "text": "2000"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "Fortune",
+      "pos": "PROPN",
+      "text": "Fortune"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "name",
+      "pos": "VERB",
+      "text": "named"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "\"",
+      "pos": "PUNCT",
+      "text": "\""
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "America",
+      "pos": "PROPN",
+      "text": "America"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "'s",
+      "pos": "PART",
+      "text": "'s"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Most",
+      "pos": "PROPN",
+      "text": "Most"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Innovative",
+      "pos": "PROPN",
+      "text": "Innovative"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Company",
+      "pos": "PROPN",
+      "text": "Company"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "\"",
+      "pos": "PUNCT",
+      "text": "\""
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "for",
+      "pos": "ADP",
+      "text": "for"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "six",
+      "pos": "NUM",
+      "text": "six"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "consecutive",
+      "pos": "ADJ",
+      "text": "consecutive"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "year",
+      "pos": "NOUN",
+      "text": "years"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "at",
+      "pos": "ADP",
+      "text": "At"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "end",
+      "pos": "NOUN",
+      "text": "end"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2001",
+      "pos": "NUM",
+      "text": "2001"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "it",
+      "pos": "PRON",
+      "text": "it"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "was"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reveal",
+      "pos": "VERB",
+      "text": "revealed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "SCONJ",
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "'s",
+      "pos": "PART",
+      "text": "'s"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "report",
+      "pos": "VERB",
+      "text": "reported"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "financial",
+      "pos": "ADJ",
+      "text": "financial"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "condition",
+      "pos": "NOUN",
+      "text": "condition"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "was"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "sustain",
+      "pos": "VERB",
+      "text": "sustained"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "by",
+      "pos": "ADP",
+      "text": "by"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "an",
+      "pos": "DET",
+      "text": "an"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "institutionalize",
+      "pos": "VERB",
+      "text": "institutionalized"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "systemic",
+      "pos": "ADJ",
+      "text": "systemic"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "creatively",
+      "pos": "ADV",
+      "text": "creatively"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plan",
+      "pos": "VERB",
+      "text": "planned"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "accounting",
+      "pos": "NOUN",
+      "text": "accounting"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "fraud",
+      "pos": "NOUN",
+      "text": "fraud"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "know",
+      "pos": "VERB",
+      "text": "known"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "since",
+      "pos": "SCONJ",
+      "text": "since"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "scandal",
+      "pos": "NOUN",
+      "text": "scandal"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "have",
+      "pos": "VERB",
+      "text": "has"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "become",
+      "pos": "VERB",
+      "text": "become"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "synonymous",
+      "pos": "ADJ",
+      "text": "synonymous"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "willful",
+      "pos": "ADJ",
+      "text": "willful"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "corporate",
+      "pos": "ADJ",
+      "text": "corporate"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "fraud",
+      "pos": "NOUN",
+      "text": "fraud"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "corruption",
+      "pos": "NOUN",
+      "text": "corruption"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "scandal",
+      "pos": "NOUN",
+      "text": "scandal"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "also",
+      "pos": "ADV",
+      "text": "also"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "bring",
+      "pos": "VERB",
+      "text": "brought"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "into",
+      "pos": "ADP",
+      "text": "into"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "question",
+      "pos": "NOUN",
+      "text": "question"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "accounting",
+      "pos": "NOUN",
+      "text": "accounting"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "practice",
+      "pos": "NOUN",
+      "text": "practices"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "activity",
+      "pos": "NOUN",
+      "text": "activities"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "many",
+      "pos": "ADJ",
+      "text": "many"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "corporation",
+      "pos": "NOUN",
+      "text": "corporations"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "United States",
+      "pos": "PROPN",
+      "text": "United States"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "was"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "a factor",
+      "pos": "NOUN",
+      "text": "a factor"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "enactment",
+      "pos": "NOUN",
+      "text": "enactment"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "Sarbanes–Oxley",
+      "pos": "PROPN",
+      "text": "Sarbanes–Oxley"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Act",
+      "pos": "PROPN",
+      "text": "Act"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2002",
+      "pos": "NUM",
+      "text": "2002"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "scandal",
+      "pos": "NOUN",
+      "text": "scandal"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "also",
+      "pos": "ADV",
+      "text": "also"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "affect",
+      "pos": "VERB",
+      "text": "affected"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "great",
+      "pos": "ADJ",
+      "text": "greater"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "business",
+      "pos": "NOUN",
+      "text": "business"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "world",
+      "pos": "NOUN",
+      "text": "world"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "by",
+      "pos": "ADP",
+      "text": "by"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "cause",
+      "pos": "VERB",
+      "text": "causing"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "dissolution",
+      "pos": "NOUN",
+      "text": "dissolution"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Arthur",
+      "pos": "PROPN",
+      "text": "Arthur"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Andersen",
+      "pos": "PROPN",
+      "text": "Andersen"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "accounting",
+      "pos": "NOUN",
+      "text": "accounting"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "firm",
+      "pos": "NOUN",
+      "text": "firm"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "which",
+      "pos": "DET",
+      "text": "which"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "have",
+      "pos": "VERB",
+      "text": "had"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "been"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "'s",
+      "pos": "PART",
+      "text": "'s"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "main",
+      "pos": "ADJ",
+      "text": "main"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "auditor",
+      "pos": "NOUN",
+      "text": "auditor"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "for",
+      "pos": "ADP",
+      "text": "for"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "year",
+      "pos": "NOUN",
+      "text": "years"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "file",
+      "pos": "VERB",
+      "text": "filed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "for",
+      "pos": "ADP",
+      "text": "for"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "bankruptcy",
+      "pos": "NOUN",
+      "text": "bankruptcy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Southern",
+      "pos": "PROPN",
+      "text": "Southern"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "District",
+      "pos": "PROPN",
+      "text": "District"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "New York",
+      "pos": "PROPN",
+      "text": "New York"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "late",
+      "pos": "ADJ",
+      "text": "late"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2001",
+      "pos": "NUM",
+      "text": "2001"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "select",
+      "pos": "VERB",
+      "text": "selected"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Weil",
+      "pos": "PROPN",
+      "text": "Weil"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "Gotshal",
+      "pos": "PROPN",
+      "text": "Gotshal"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "&",
+      "pos": "CCONJ",
+      "text": "&"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Manges",
+      "pos": "PROPN",
+      "text": "Manges"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "its",
+      "pos": "PRON",
+      "text": "its"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "bankruptcy",
+      "pos": "NOUN",
+      "text": "bankruptcy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "counsel",
+      "pos": "NOUN",
+      "text": "counsel"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "it",
+      "pos": "PRON",
+      "text": "It"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "end",
+      "pos": "VERB",
+      "text": "ended"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "its",
+      "pos": "PRON",
+      "text": "its"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "bankruptcy",
+      "pos": "NOUN",
+      "text": "bankruptcy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "during",
+      "pos": "ADP",
+      "text": "during"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "November",
+      "pos": "PROPN",
+      "text": "November"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2004",
+      "pos": "NUM",
+      "text": "2004"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "pursuant",
+      "pos": "ADJ",
+      "text": "pursuant"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "court-approved",
+      "pos": "ADJ",
+      "text": "court-approved"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plan",
+      "pos": "NOUN",
+      "text": "plan"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reorganization",
+      "pos": "NOUN",
+      "text": "reorganization"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "A"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "new",
+      "pos": "ADJ",
+      "text": "new"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "board",
+      "pos": "NOUN",
+      "text": "board"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "director",
+      "pos": "NOUN",
+      "text": "directors"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "change",
+      "pos": "VERB",
+      "text": "changed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "name",
+      "pos": "NOUN",
+      "text": "name"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Creditors",
+      "pos": "PROPN",
+      "text": "Creditors"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Recovery",
+      "pos": "PROPN",
+      "text": "Recovery"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "corp.",
+      "pos": "NOUN",
+      "text": "Corp."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "emphasize",
+      "pos": "VERB",
+      "text": "emphasized"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reorganize",
+      "pos": "VERB",
+      "text": "reorganizing"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "liquidate",
+      "pos": "VERB",
+      "text": "liquidating"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "certain",
+      "pos": "ADJ",
+      "text": "certain"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "operation",
+      "pos": "NOUN",
+      "text": "operations"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "asset",
+      "pos": "NOUN",
+      "text": "assets"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "pre-bankruptcy",
+      "pos": "NOUN",
+      "text": "pre-bankruptcy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "on",
+      "pos": "ADP",
+      "text": "On"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "September",
+      "pos": "PROPN",
+      "text": "September"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "7",
+      "pos": "NUM",
+      "text": "7"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2006",
+      "pos": "NUM",
+      "text": "2006"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Enron",
+      "pos": "PROPN",
+      "text": "Enron"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "sell",
+      "pos": "VERB",
+      "text": "sold"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "its",
+      "pos": "PRON",
+      "text": "its"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "last",
+      "pos": "ADJ",
+      "text": "last"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "remain",
+      "pos": "VERB",
+      "text": "remaining"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "subsidiary",
+      "pos": "NOUN",
+      "text": "subsidiary"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Prisma",
+      "pos": "PROPN",
+      "text": "Prisma"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Energy",
+      "pos": "PROPN",
+      "text": "Energy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "International",
+      "pos": "PROPN",
+      "text": "International"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Inc.",
+      "pos": "PROPN",
+      "text": "Inc."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Ashmore",
+      "pos": "PROPN",
+      "text": "Ashmore"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Energy",
+      "pos": "PROPN",
+      "text": "Energy"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "International",
+      "pos": "PROPN",
+      "text": "International"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "ltd.",
+      "pos": "NOUN",
+      "text": "Ltd."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "(",
+      "pos": "PUNCT",
+      "text": "("
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "now",
+      "pos": "ADV",
+      "text": "now"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "AEI",
+      "pos": "PROPN",
+      "text": "AEI"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ")",
+      "pos": "PUNCT",
+      "text": ")"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    }
+  ],
+  "content_tokens": [
+    [
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Corporation"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "was"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "an"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "American"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "energy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "commodities"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "services"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "company"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "based"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Houston"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Texas"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "It"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "was"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "founded"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "by"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Kenneth"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Lay"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "1985"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "merger"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "between"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Lay"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "'s"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Houston"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Natural"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Gas"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "InterNorth"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "both"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "relatively"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "small"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "regional"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "companies"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Before"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "its"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "bankruptcy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "on"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "December"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "3"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2001"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "employed"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "approximately"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "29"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "000"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "staff"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "was"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "major"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "electricity"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "natural"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "gas"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "communications"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "pulp"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "paper"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "company"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "with"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "claimed"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "revenues"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "nearly"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "$"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "101"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "billion"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "during"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2000"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Fortune"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "named"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "\""
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "America"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "'s"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Most"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Innovative"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Company"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "\""
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "for"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "six"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "consecutive"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "years"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "At"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "end"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2001"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "it"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "was"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "revealed"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "that"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "'s"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reported"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "financial"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "condition"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "was"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "sustained"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "by"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "an"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "institutionalized"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "systemic"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "creatively"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "planned"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "accounting"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "fraud"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "known"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "since"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "scandal"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "has"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "become"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "synonymous"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "willful"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "corporate"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "fraud"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "corruption"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "The"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "scandal"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "also"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "brought"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "into"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "question"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "accounting"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "practices"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "activities"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "many"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "corporations"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {
+              "location.country": {
+                "data": [
+                  {
+                    "type": "named-entity"
+                  }
+                ],
+                "pos": "PROPN",
+                "weight": 10
+              }
+            },
+            "is-compound": true
+          },
+          "start_sentence": false,
+          "token": "United States"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "was"
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "A-factor",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": true
+          },
+          "start_sentence": false,
+          "token": "a factor"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "enactment"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Sarbanes–Oxley"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Act"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2002"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "The"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "scandal"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "also"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "affected"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "greater"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "business"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "world"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "by"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "causing"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "dissolution"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Arthur"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Andersen"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "accounting"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "firm"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "which"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "had"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "been"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "'s"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "main"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "auditor"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "for"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "years"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "filed"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "for"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "bankruptcy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Southern"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "District"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {
+              "location.city": {
+                "data": [
+                  {
+                    "type": "named-entity"
+                  }
+                ],
+                "pos": "PROPN",
+                "weight": 10
+              }
+            },
+            "is-compound": true
+          },
+          "start_sentence": false,
+          "token": "New York"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "late"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2001"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "selected"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Weil"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Gotshal"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "&"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Manges"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "its"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "bankruptcy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "counsel"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "It"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "ended"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "its"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "bankruptcy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "during"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "November"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2004"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "pursuant"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "court-approved"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "plan"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reorganization"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "A"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "new"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "board"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "directors"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "changed"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "name"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Creditors"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Recovery"
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "corporation",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Corp."
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "emphasized"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reorganizing"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "liquidating"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "certain"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "operations"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "assets"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "pre-bankruptcy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "On"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "September"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "7"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2006"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Enron"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "sold"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "its"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "last"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "remaining"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "subsidiary"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Prisma"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Energy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "International"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Inc."
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Ashmore"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Energy"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "International"
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "Leu-Thr-Asp",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Ltd."
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "("
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "now"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "AEI"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ")"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ]
+    ]
+  ],
+  "data_source": "converter-service",
+  "error": false,
+  "kg": [
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "a factor",
+        "lemma_content": "a factor",
+        "positions": [
+          171
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "A-factor"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "A-factor"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "Corp.",
+        "lemma_content": "corp.",
+        "positions": [
+          266
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "corporation"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "corporation"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "Ltd.",
+        "lemma_content": "ltd.",
+        "positions": [
+          304
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "Leu-Thr-Asp"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "Leu-Thr-Asp"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    }
+  ],
+  "source_doc_id": "file:///home/tkeir_svc/tkeir/thot/tests/data/test-raw/raw/enron.txt",
+  "tasks-info": [
+    {
+      "execution-date": "Jul 09 2021 08:48:30",
+      "host": "172.20.0.3",
+      "hostname": "a6c6950c51a2",
+      "os": [
+        "Linux",
+        "a6c6950c51a2",
+        "5.8.0-48-generic",
+        "#54~20.04.1-Ubuntu SMP Sat Mar 20 13:40:25 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/05",
+      "task-name": "converter",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:35:26",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/09",
+      "task-name": "tokenizer",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:37:23",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "morphosyntax",
+      "task-version": "1.0.0"
+    }
+  ],
+  "title": "",
+  "title_morphosyntax": []
+}

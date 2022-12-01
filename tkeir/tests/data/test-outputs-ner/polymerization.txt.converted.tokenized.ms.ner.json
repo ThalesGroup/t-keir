@@ -1,0 +1,5743 @@
+{
+  "content": [
+    "Polymerization. Contents. 1 Overview 2 Step-growth vs. chain-growth\npolymerization 2.1 Step-growth 2.2 Chain-growth 2.3 Photopolymerization 3\nPolymer ratio 4 See also 5 References Overview. In chemical compounds,\npolymerization can occur via a variety of reaction mechanisms that vary in\ncomplexity due to the functional groups present in the reactants and their\ninherent steric effects. In more straightforward polymerizations, alkenes form\npolymers through relatively simple radical reactions; in contrast, reactions\ninvolving substitution at a carbonyl group require more complex synthesis due\nto the way in which reactants polymerize. Alkanes can also be polymerized, but\nonly with the help of strong acids. As alkenes can polymerize in somewhat\nstraightforward radical reactions, they form useful compounds such as\npolyethylene and polyvinyl chloride (PVC), which are produced in high tonnages\neach year due to their usefulness in manufacturing processes of commercial\nproducts, such as piping, insulation and packaging. In general, polymers such\nas PVC are referred to as \"homopolymers,\" as they consist of repeated long\nchains or structures of the same monomer unit, whereas polymers that consist\nof more than one monomer unit are referred to as copolymers (or co-polymers).\nOther monomer units, such as formaldehyde hydrates or simple aldehydes, are\nable to polymerize themselves at quite low temperatures (ca. −80 °C) to form\ntrimers; molecules consisting of 3 monomer units, which can cyclize to form\nring cyclic structures, or undergo further reactions to form tetramers, or 4\nmonomer-unit compounds. Such small polymers are referred to as oligomers.\nGenerally, because formaldehyde is an exceptionally reactive electrophile it\nallows nucleophilic addition of hemiacetal intermediates, which are in general\nshort-lived and relatively unstable \"mid-stage\" compounds that react with\nother molecules present to form more stable polymeric compounds.\nPolymerization that is not sufficiently moderated and proceeds at a fast rate\ncan be very hazardous. This phenomenon is known as hazardous polymerization\nand can cause fires and explosions.\n\n"
+  ],
+  "content_morphosyntax": [
+    {
+      "is_oov": true,
+      "is_sent_start": true,
+      "lemma": "polymerization.",
+      "pos": "NOUN",
+      "text": "Polymerization."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "content",
+      "pos": "NOUN",
+      "text": "Contents"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "1",
+      "pos": "NUM",
+      "text": "1"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Overview",
+      "pos": "PROPN",
+      "text": "Overview"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2",
+      "pos": "NUM",
+      "text": "2"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "step-growth",
+      "pos": "NOUN",
+      "text": "Step-growth"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "vs.",
+      "pos": "X",
+      "text": "vs."
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "chain-growth",
+      "pos": "NOUN",
+      "text": "chain-growth"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymerization",
+      "pos": "NOUN",
+      "text": "polymerization"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2.1",
+      "pos": "NUM",
+      "text": "2.1"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "step-growth",
+      "pos": "NOUN",
+      "text": "Step-growth"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2.2",
+      "pos": "NUM",
+      "text": "2.2"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "chain-growth",
+      "pos": "NOUN",
+      "text": "Chain-growth"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "2.3",
+      "pos": "NUM",
+      "text": "2.3"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Photopolymerization",
+      "pos": "PROPN",
+      "text": "Photopolymerization"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "3 polymer",
+      "pos": "NOUN",
+      "text": "3 Polymer"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "ratio",
+      "pos": "NOUN",
+      "text": "ratio"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "4",
+      "pos": "NUM",
+      "text": "4"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "see",
+      "pos": "VERB",
+      "text": "See"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "also",
+      "pos": "ADV",
+      "text": "also"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "5",
+      "pos": "NUM",
+      "text": "5"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "References",
+      "pos": "PROPN",
+      "text": "References"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Overview",
+      "pos": "PROPN",
+      "text": "Overview"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "In"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "chemical",
+      "pos": "ADJ",
+      "text": "chemical"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "compound",
+      "pos": "NOUN",
+      "text": "compounds"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymerization",
+      "pos": "NOUN",
+      "text": "polymerization"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "can",
+      "pos": "AUX",
+      "text": "can"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "occur",
+      "pos": "VERB",
+      "text": "occur"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "via",
+      "pos": "ADP",
+      "text": "via"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "variety",
+      "pos": "NOUN",
+      "text": "variety"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reaction",
+      "pos": "NOUN",
+      "text": "reaction"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "mechanism",
+      "pos": "NOUN",
+      "text": "mechanisms"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "vary",
+      "pos": "VERB",
+      "text": "vary"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "complexity",
+      "pos": "NOUN",
+      "text": "complexity"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "due",
+      "pos": "ADP",
+      "text": "due"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "functional",
+      "pos": "ADJ",
+      "text": "functional"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "group",
+      "pos": "NOUN",
+      "text": "groups"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "present",
+      "pos": "ADJ",
+      "text": "present"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reactant",
+      "pos": "NOUN",
+      "text": "reactants"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "their",
+      "pos": "PRON",
+      "text": "their"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "inherent",
+      "pos": "ADJ",
+      "text": "inherent"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "steric",
+      "pos": "ADJ",
+      "text": "steric"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "effect",
+      "pos": "NOUN",
+      "text": "effects"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "In"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "more",
+      "pos": "ADV",
+      "text": "more"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "straightforward",
+      "pos": "ADJ",
+      "text": "straightforward"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "polymerization",
+      "pos": "NOUN",
+      "text": "polymerizations"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "alkene",
+      "pos": "NOUN",
+      "text": "alkenes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "form",
+      "pos": "VERB",
+      "text": "form"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymer",
+      "pos": "NOUN",
+      "text": "polymers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "through",
+      "pos": "ADP",
+      "text": "through"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "relatively",
+      "pos": "ADV",
+      "text": "relatively"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "simple",
+      "pos": "ADJ",
+      "text": "simple"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "radical",
+      "pos": "ADJ",
+      "text": "radical"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reaction",
+      "pos": "NOUN",
+      "text": "reactions"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ";",
+      "pos": "PUNCT",
+      "text": ";"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "contrast",
+      "pos": "NOUN",
+      "text": "contrast"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reaction",
+      "pos": "NOUN",
+      "text": "reactions"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "involve",
+      "pos": "VERB",
+      "text": "involving"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "substitution",
+      "pos": "NOUN",
+      "text": "substitution"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "at",
+      "pos": "ADP",
+      "text": "at"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "carbonyl group",
+      "pos": "NOUN",
+      "text": "carbonyl group"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "require",
+      "pos": "VERB",
+      "text": "require"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "more",
+      "pos": "ADV",
+      "text": "more"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "complex",
+      "pos": "ADJ",
+      "text": "complex"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "synthesis",
+      "pos": "NOUN",
+      "text": "synthesis"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "due",
+      "pos": "ADP",
+      "text": "due"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "way",
+      "pos": "NOUN",
+      "text": "way"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "which",
+      "pos": "DET",
+      "text": "which"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reactant",
+      "pos": "NOUN",
+      "text": "reactants"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymerize",
+      "pos": "VERB",
+      "text": "polymerize"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": true,
+      "lemma": "Alkanes",
+      "pos": "PROPN",
+      "text": "Alkanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "can",
+      "pos": "AUX",
+      "text": "can"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "also",
+      "pos": "ADV",
+      "text": "also"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "be"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymerize",
+      "pos": "VERB",
+      "text": "polymerized"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "but",
+      "pos": "CCONJ",
+      "text": "but"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "only",
+      "pos": "ADV",
+      "text": "only"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "with",
+      "pos": "ADP",
+      "text": "with"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "help",
+      "pos": "NOUN",
+      "text": "help"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "strong",
+      "pos": "ADJ",
+      "text": "strong"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "acids.",
+      "pos": "NOUN",
+      "text": "acids."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "As"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "alkene",
+      "pos": "NOUN",
+      "text": "alkenes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "can",
+      "pos": "AUX",
+      "text": "can"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymerize",
+      "pos": "VERB",
+      "text": "polymerize"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "somewhat",
+      "pos": "ADV",
+      "text": "somewhat"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "straightforward",
+      "pos": "ADJ",
+      "text": "straightforward"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "radical",
+      "pos": "ADJ",
+      "text": "radical"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reaction",
+      "pos": "NOUN",
+      "text": "reactions"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "they",
+      "pos": "PRON",
+      "text": "they"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "form",
+      "pos": "VERB",
+      "text": "form"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "useful",
+      "pos": "ADJ",
+      "text": "useful"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "compound",
+      "pos": "NOUN",
+      "text": "compounds"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "such",
+      "pos": "ADJ",
+      "text": "such"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polyethylene",
+      "pos": "NOUN",
+      "text": "polyethylene"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "polyvinyl chloride(pvc)",
+      "pos": "NOUN",
+      "text": "polyvinyl chloride(PVC)"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "which",
+      "pos": "DET",
+      "text": "which"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "produce",
+      "pos": "VERB",
+      "text": "produced"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "high",
+      "pos": "ADJ",
+      "text": "high"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "tonnage",
+      "pos": "NOUN",
+      "text": "tonnages"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "each",
+      "pos": "DET",
+      "text": "each"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "year",
+      "pos": "NOUN",
+      "text": "year"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "due",
+      "pos": "ADP",
+      "text": "due"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "their",
+      "pos": "PRON",
+      "text": "their"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "usefulness",
+      "pos": "NOUN",
+      "text": "usefulness"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "manufacturing",
+      "pos": "NOUN",
+      "text": "manufacturing"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "process",
+      "pos": "NOUN",
+      "text": "processes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "commercial",
+      "pos": "ADJ",
+      "text": "commercial"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "product",
+      "pos": "NOUN",
+      "text": "products"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "such",
+      "pos": "ADJ",
+      "text": "such"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "piping",
+      "pos": "NOUN",
+      "text": "piping"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "insulation",
+      "pos": "NOUN",
+      "text": "insulation"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "packaging",
+      "pos": "NOUN",
+      "text": "packaging"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "In"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "general",
+      "pos": "ADJ",
+      "text": "general"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymer",
+      "pos": "NOUN",
+      "text": "polymers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "such",
+      "pos": "ADJ",
+      "text": "such"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "pvc",
+      "pos": "NOUN",
+      "text": "PVC"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "refer",
+      "pos": "VERB",
+      "text": "referred"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "\"",
+      "pos": "PUNCT",
+      "text": "\""
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "homopolymer",
+      "pos": "NOUN",
+      "text": "homopolymers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "\"",
+      "pos": "PUNCT",
+      "text": "\""
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "they",
+      "pos": "PRON",
+      "text": "they"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "consist",
+      "pos": "VERB",
+      "text": "consist"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "repeat",
+      "pos": "VERB",
+      "text": "repeated"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "long",
+      "pos": "ADJ",
+      "text": "long"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "chain",
+      "pos": "NOUN",
+      "text": "chains"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "or",
+      "pos": "CCONJ",
+      "text": "or"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "structure",
+      "pos": "NOUN",
+      "text": "structures"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "same",
+      "pos": "ADJ",
+      "text": "same"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "monomer",
+      "pos": "NOUN",
+      "text": "monomer"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "unit",
+      "pos": "NOUN",
+      "text": "unit"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "whereas",
+      "pos": "SCONJ",
+      "text": "whereas"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymer",
+      "pos": "NOUN",
+      "text": "polymers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "consist",
+      "pos": "VERB",
+      "text": "consist"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "more",
+      "pos": "ADJ",
+      "text": "more"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "than",
+      "pos": "SCONJ",
+      "text": "than"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "one",
+      "pos": "NUM",
+      "text": "one"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "monomer",
+      "pos": "NOUN",
+      "text": "monomer"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "unit",
+      "pos": "NOUN",
+      "text": "unit"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "refer",
+      "pos": "VERB",
+      "text": "referred"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "copolymer",
+      "pos": "NOUN",
+      "text": "copolymers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "(",
+      "pos": "PUNCT",
+      "text": "("
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "or",
+      "pos": "CCONJ",
+      "text": "or"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "co-polymers",
+      "pos": "NOUN",
+      "text": "co-polymers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ")",
+      "pos": "PUNCT",
+      "text": ")"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "other",
+      "pos": "ADJ",
+      "text": "Other"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "monomer",
+      "pos": "NOUN",
+      "text": "monomer"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "unit",
+      "pos": "NOUN",
+      "text": "units"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "such",
+      "pos": "ADJ",
+      "text": "such"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "formaldehyde",
+      "pos": "NOUN",
+      "text": "formaldehyde"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "hydrate",
+      "pos": "NOUN",
+      "text": "hydrates"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "or",
+      "pos": "CCONJ",
+      "text": "or"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "simple",
+      "pos": "ADJ",
+      "text": "simple"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "aldehyde",
+      "pos": "NOUN",
+      "text": "aldehydes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "able",
+      "pos": "ADJ",
+      "text": "able"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymerize",
+      "pos": "VERB",
+      "text": "polymerize"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "themselves",
+      "pos": "PRON",
+      "text": "themselves"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "at",
+      "pos": "ADP",
+      "text": "at"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "quite",
+      "pos": "ADV",
+      "text": "quite"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "low",
+      "pos": "ADJ",
+      "text": "low"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "temperature",
+      "pos": "NOUN",
+      "text": "temperatures"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "(",
+      "pos": "PUNCT",
+      "text": "("
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "ca.",
+      "pos": "NOUN",
+      "text": "ca."
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": true,
+      "lemma": "−80",
+      "pos": "NOUN",
+      "text": "−80"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "°",
+      "pos": "NUM",
+      "text": "°"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "C",
+      "pos": "PROPN",
+      "text": "C"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ")",
+      "pos": "PUNCT",
+      "text": ")"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "form",
+      "pos": "VERB",
+      "text": "form"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "trimer",
+      "pos": "NOUN",
+      "text": "trimers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ";",
+      "pos": "PUNCT",
+      "text": ";"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "molecule",
+      "pos": "NOUN",
+      "text": "molecules"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "consist",
+      "pos": "VERB",
+      "text": "consisting"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "3",
+      "pos": "NUM",
+      "text": "3"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "monomer",
+      "pos": "NOUN",
+      "text": "monomer"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "unit",
+      "pos": "NOUN",
+      "text": "units"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "which",
+      "pos": "DET",
+      "text": "which"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "can",
+      "pos": "AUX",
+      "text": "can"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "cyclize",
+      "pos": "VERB",
+      "text": "cyclize"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "form",
+      "pos": "VERB",
+      "text": "form"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "ring",
+      "pos": "NOUN",
+      "text": "ring"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "cyclic",
+      "pos": "ADJ",
+      "text": "cyclic"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "structure",
+      "pos": "NOUN",
+      "text": "structures"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "or",
+      "pos": "CCONJ",
+      "text": "or"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "undergo",
+      "pos": "VERB",
+      "text": "undergo"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "further",
+      "pos": "ADJ",
+      "text": "further"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reaction",
+      "pos": "NOUN",
+      "text": "reactions"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "form",
+      "pos": "VERB",
+      "text": "form"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "tetramer",
+      "pos": "NOUN",
+      "text": "tetramers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "or",
+      "pos": "CCONJ",
+      "text": "or"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "4",
+      "pos": "NUM",
+      "text": "4"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "monomer-unit",
+      "pos": "ADJ",
+      "text": "monomer-unit"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "compound",
+      "pos": "NOUN",
+      "text": "compounds"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "such",
+      "pos": "ADJ",
+      "text": "Such"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "small",
+      "pos": "ADJ",
+      "text": "small"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymer",
+      "pos": "NOUN",
+      "text": "polymers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "refer",
+      "pos": "VERB",
+      "text": "referred"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "oligomer",
+      "pos": "NOUN",
+      "text": "oligomers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "generally",
+      "pos": "ADV",
+      "text": "Generally"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "because",
+      "pos": "SCONJ",
+      "text": "because"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "formaldehyde",
+      "pos": "NOUN",
+      "text": "formaldehyde"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "an",
+      "pos": "DET",
+      "text": "an"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "exceptionally",
+      "pos": "ADV",
+      "text": "exceptionally"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reactive",
+      "pos": "ADJ",
+      "text": "reactive"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "electrophile",
+      "pos": "NOUN",
+      "text": "electrophile"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "it",
+      "pos": "PRON",
+      "text": "it"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "allow",
+      "pos": "VERB",
+      "text": "allows"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "nucleophilic",
+      "pos": "ADJ",
+      "text": "nucleophilic"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "addition",
+      "pos": "NOUN",
+      "text": "addition"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "text": "of"
+    },
+    {
+      "is_oov": true,
+      "is_sent_start": false,
+      "lemma": "hemiacetal",
+      "pos": "ADJ",
+      "text": "hemiacetal"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "intermediate",
+      "pos": "NOUN",
+      "text": "intermediates"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "which",
+      "pos": "DET",
+      "text": "which"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "general",
+      "pos": "ADJ",
+      "text": "general"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "short-lived",
+      "pos": "ADJ",
+      "text": "short-lived"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "relatively",
+      "pos": "ADV",
+      "text": "relatively"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "unstable",
+      "pos": "ADJ",
+      "text": "unstable"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "\"",
+      "pos": "PUNCT",
+      "text": "\""
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "mid-stage",
+      "pos": "NOUN",
+      "text": "mid-stage"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "\"",
+      "pos": "PUNCT",
+      "text": "\""
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "compound",
+      "pos": "NOUN",
+      "text": "compounds"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "react",
+      "pos": "VERB",
+      "text": "react"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "with",
+      "pos": "ADP",
+      "text": "with"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "other",
+      "pos": "ADJ",
+      "text": "other"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "molecule",
+      "pos": "NOUN",
+      "text": "molecules"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "present",
+      "pos": "ADJ",
+      "text": "present"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "form",
+      "pos": "VERB",
+      "text": "form"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "more",
+      "pos": "ADV",
+      "text": "more"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "stable",
+      "pos": "ADJ",
+      "text": "stable"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymeric",
+      "pos": "ADJ",
+      "text": "polymeric"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "compound",
+      "pos": "NOUN",
+      "text": "compounds"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "polymerization",
+      "pos": "NOUN",
+      "text": "Polymerization"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "not",
+      "pos": "PART",
+      "text": "not"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "sufficiently",
+      "pos": "ADV",
+      "text": "sufficiently"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "moderate",
+      "pos": "VERB",
+      "text": "moderated"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "proceed",
+      "pos": "VERB",
+      "text": "proceeds"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "at",
+      "pos": "ADP",
+      "text": "at"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "fast",
+      "pos": "ADJ",
+      "text": "fast"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "rate",
+      "pos": "NOUN",
+      "text": "rate"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "can",
+      "pos": "AUX",
+      "text": "can"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "be"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "very",
+      "pos": "ADV",
+      "text": "very"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "hazardous",
+      "pos": "ADJ",
+      "text": "hazardous"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "this",
+      "pos": "DET",
+      "text": "This"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "phenomenon",
+      "pos": "NOUN",
+      "text": "phenomenon"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "know",
+      "pos": "VERB",
+      "text": "known"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "as",
+      "pos": "ADP",
+      "text": "as"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "hazardous",
+      "pos": "ADJ",
+      "text": "hazardous"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "polymerization",
+      "pos": "NOUN",
+      "text": "polymerization"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "can",
+      "pos": "AUX",
+      "text": "can"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "cause",
+      "pos": "VERB",
+      "text": "cause"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "fire",
+      "pos": "NOUN",
+      "text": "fires"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "explosion",
+      "pos": "NOUN",
+      "text": "explosions"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    }
+  ],
+  "content_ner": [
+    {
+      "end": 135,
+      "label": "date",
+      "start": 133,
+      "text": "each year"
+    },
+    {
+      "end": 158,
+      "label": "chemistry-terminology",
+      "start": 157,
+      "text": "polymers"
+    },
+    {
+      "end": 161,
+      "label": "chemistry-terminology",
+      "start": 160,
+      "text": "PVC"
+    },
+    {
+      "end": 167,
+      "label": "chemistry-terminology",
+      "start": 166,
+      "text": "homopolymers"
+    },
+    {
+      "end": 186,
+      "label": "chemistry-terminology",
+      "start": 185,
+      "text": "polymers"
+    },
+    {
+      "end": 199,
+      "label": "chemistry-terminology",
+      "start": 198,
+      "text": "copolymers"
+    },
+    {
+      "end": 202,
+      "label": "chemistry-terminology",
+      "start": 201,
+      "text": "co-polymers"
+    },
+    {
+      "end": 211,
+      "label": "chemistry-terminology",
+      "start": 210,
+      "text": "formaldehyde"
+    },
+    {
+      "end": 215,
+      "label": "chemistry-terminology",
+      "start": 214,
+      "text": "aldehydes"
+    },
+    {
+      "end": 227,
+      "label": "chemistry-terminology",
+      "start": 226,
+      "text": "ca."
+    },
+    {
+      "end": 236,
+      "label": "chemistry-terminology",
+      "start": 235,
+      "text": "molecules"
+    },
+    {
+      "end": 267,
+      "label": "chemistry-terminology",
+      "start": 266,
+      "text": "polymers"
+    },
+    {
+      "end": 272,
+      "label": "chemistry-terminology",
+      "start": 271,
+      "text": "oligomers"
+    },
+    {
+      "end": 277,
+      "label": "chemistry-terminology",
+      "start": 276,
+      "text": "formaldehyde"
+    },
+    {
+      "end": 282,
+      "label": "chemistry-terminology",
+      "start": 281,
+      "text": "electrophile"
+    },
+    {
+      "end": 288,
+      "label": "chemistry-terminology",
+      "start": 287,
+      "text": "hemiacetal"
+    },
+    {
+      "end": 307,
+      "label": "chemistry-terminology",
+      "start": 306,
+      "text": "molecules"
+    },
+    {
+      "end": 316,
+      "label": "chemistry-terminology",
+      "start": 315,
+      "text": "Polymerization"
+    },
+    {
+      "end": 326,
+      "label": "chemistry-terminology",
+      "start": 325,
+      "text": "fast"
+    },
+    {
+      "end": 339,
+      "label": "chemistry-terminology",
+      "start": 338,
+      "text": "polymerization"
+    }
+  ],
+  "content_tokens": [
+    [
+      [
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "polymerisation",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Polymerization."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Contents"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "1"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Overview"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Step-growth"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "vs."
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "chain-growth"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymerization"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2.1"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Step-growth"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2.2"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Chain-growth"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "2.3"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Photopolymerization"
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "macromolecule",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": true
+          },
+          "start_sentence": false,
+          "token": "3 Polymer"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "ratio"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "4"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "See"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "also"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "5"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "References"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "Overview"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "In"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "chemical"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "compounds"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymerization"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "can"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "occur"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "via"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "variety"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reaction"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "mechanisms"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "that"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "vary"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "complexity"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "due"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "functional"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "groups"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "present"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reactants"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "their"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "inherent"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "steric"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "effects"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "In"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "more"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "straightforward"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymerizations"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "alkenes"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "form"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "through"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "relatively"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "simple"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "radical"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reactions"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ";"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "contrast"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reactions"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "involving"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "substitution"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "at"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "carbonyl group",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": true
+          },
+          "start_sentence": false,
+          "token": "carbonyl group"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "require"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "more"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "complex"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "synthesis"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "due"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "way"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "which"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reactants"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymerize"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Alkanes"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "can"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "also"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "be"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymerized"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "but"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "only"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "with"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "help"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "strong"
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "acid",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "acids."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "As"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "alkenes"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "can"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymerize"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "somewhat"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "straightforward"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "radical"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reactions"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "they"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "form"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "useful"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "compounds"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "such"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polyethylene"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "poly(vinyl chloride)",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": true
+          },
+          "start_sentence": false,
+          "token": "polyvinyl chloride(PVC)"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "which"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "are"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "produced"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "high"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "tonnages"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "each"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "year"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "due"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "their"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "usefulness"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "manufacturing"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "processes"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "commercial"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "products"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "such"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "piping"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "insulation"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "packaging"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "In"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "general"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "such"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "PVC"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "are"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "referred"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "\""
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "homopolymers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "\""
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "they"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "consist"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "repeated"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "long"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "chains"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "or"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "structures"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "the"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "same"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "monomer"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "unit"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "whereas"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "that"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "consist"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "more"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "than"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "one"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "monomer"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "unit"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "are"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "referred"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "copolymers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "("
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "or"
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "copolymer macromolecule",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "co-polymers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ")"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Other"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "monomer"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "units"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "such"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "formaldehyde"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "hydrates"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "or"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "simple"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "aldehydes"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "are"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "able"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymerize"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "themselves"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "at"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "quite"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "low"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "temperatures"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "("
+        },
+        {
+          "mwe": {
+            "data": {
+              "chemistry-terminology": {
+                "data": [
+                  {
+                    "concept": "calcium(2+)",
+                    "type": "concept"
+                  }
+                ],
+                "pos": "NOUN",
+                "weight": 10
+              }
+            },
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "ca."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "−80"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "°"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "C"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ")"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "form"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "trimers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ";"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "molecules"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "consisting"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "3"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "monomer"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "units"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "which"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "can"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "cyclize"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "form"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "ring"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "cyclic"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "structures"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "or"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "undergo"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "further"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reactions"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "form"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "tetramers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "or"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "4"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "monomer-unit"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "compounds"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Such"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "small"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "are"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "referred"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "oligomers"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Generally"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "because"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "formaldehyde"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "is"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "an"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "exceptionally"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "reactive"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "electrophile"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "it"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "allows"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "nucleophilic"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "addition"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "of"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "hemiacetal"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "intermediates"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": ","
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "which"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "are"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "general"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "short-lived"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "relatively"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "unstable"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "\""
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "mid-stage"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "\""
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "compounds"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "that"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "react"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "with"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "other"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "molecules"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "present"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "to"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "form"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "more"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "stable"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymeric"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "compounds"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "Polymerization"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "that"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "is"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "not"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "sufficiently"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "moderated"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "proceeds"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "at"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "fast"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "rate"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "can"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "be"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "very"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "hazardous"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ],
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "This"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "phenomenon"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "is"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "known"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "as"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "hazardous"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "polymerization"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "can"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "cause"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "fires"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "and"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "explosions"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ]
+    ]
+  ],
+  "data_source": "converter-service",
+  "error": false,
+  "kg": [
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "Polymerization.",
+        "lemma_content": "polymerization.",
+        "positions": [
+          0
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "polymerisation"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "polymerisation"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "3 Polymer",
+        "lemma_content": "3 polymer",
+        "positions": [
+          16
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "macromolecule"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "macromolecule"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "carbonyl group",
+        "lemma_content": "carbonyl group",
+        "positions": [
+          79
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "carbonyl group"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "carbonyl group"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "acids.",
+        "lemma_content": "acids.",
+        "positions": [
+          106
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "acid"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "acid"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "polyvinyl chloride(PVC)",
+        "lemma_content": "polyvinyl chloride(pvc)",
+        "positions": [
+          125
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "poly(vinyl chloride)"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "poly(vinyl chloride)"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "co-polymers",
+        "lemma_content": "co-polymers",
+        "positions": [
+          201
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "copolymer macromolecule"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "copolymer macromolecule"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "concept",
+      "property": {
+        "class": -1,
+        "content": "rel:has-concept",
+        "lemma_content": "rel:has-concept",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "class": -1,
+        "content": "ca.",
+        "lemma_content": "ca.",
+        "positions": [
+          226
+        ]
+      },
+      "value": {
+        "class": -1,
+        "content": [
+          "calcium(2+)"
+        ],
+        "label": "chemistry-terminology",
+        "lemma_content": [
+          "calcium(2+)"
+        ],
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    }
+  ],
+  "source_doc_id": "file:///home/tkeir_svc/tkeir/thot/tests/data/test-raw/raw/polymerization.txt",
+  "tasks-info": [
+    {
+      "execution-date": "Jul 09 2021 08:48:30",
+      "host": "172.20.0.3",
+      "hostname": "a6c6950c51a2",
+      "os": [
+        "Linux",
+        "a6c6950c51a2",
+        "5.8.0-48-generic",
+        "#54~20.04.1-Ubuntu SMP Sat Mar 20 13:40:25 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/05",
+      "task-name": "converter",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:35:26",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/09",
+      "task-name": "tokenizer",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:37:24",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "morphosyntax",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:39:38",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "ner",
+      "task-version": "1.0.0"
+    }
+  ],
+  "title": "",
+  "title_morphosyntax": [],
+  "title_ner": []
+}

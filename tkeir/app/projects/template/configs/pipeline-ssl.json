@@ -1,0 +1,190 @@
+{
+    "logger": {
+        "logging-level": "{{ project.loglevel }}"
+    },
+    "pipeline": {
+        "settings":{
+            "strategy":"serial",
+            "max-time-loop":-1,
+            "max-time-per-task":6,
+            "zip-results":true
+        },  
+        "tasks":[{
+                    "task":"converter",
+                    "previous-task":"input",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":true,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "configuration": "converter.json",                    
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/test-inputs",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"tokenizer",
+                    "previous-task":"converter",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":true,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "configuration": "tokenizer.json",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/test-outputs-tokenizer",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {                    
+                    "task":"morphosyntax",
+                    "previous-task":"tokenizer",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":true,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "configuration": "mstagger.json",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/test-outputs-ms",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"ner",
+                    "previous-task":"morphosyntax",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":true,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "configuration": "nertagger.json",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/test-outputs-ner",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"syntax",
+                    "previous-task":"ner",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":true,                    
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/test-outputs-syntax",
+                    "configuration": "syntactic-tagger.json",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"keywords",
+                    "previous-task":"syntax",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":true,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/test-outputs-kw",
+                    "configuration": "keywords.json",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"zeroshotclassifier",
+                    "previous-task":"keywords",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":true,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/output-zsc",
+                    "configuration": "zeroshotclassifier.json",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"sentiment",
+                    "previous-task":"zeroshotclassifier",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":true,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/output-sentiment",
+                    "configuration": "sentiment.json",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"summarizer",
+                    "previous-task":"sentiment",
+                    "save-output":false,
+                    "clean-input-folder-after-analysis":false,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/output-summarizer",
+                    "configuration": "summarizer.json",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"clusterinfer",
+                    "previous-task":"summarizer",
+                    "save-output":true,
+                    "clean-input-folder-after-analysis":true,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/output-ci",
+                    "configuration": "relations.json",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   },
+                   {
+                    "task":"index",
+                    "previous-task":"clusterinfer",
+                    "save-output":true,
+                    "clean-input-folder-after-analysis":false,
+                    "resources-base-path":"{{ project.path }}/configs/",
+                    "input-dir":"{{ project.data }}/raw-inputs",
+                    "output-dir":"{{ project.data }}/test-outputs-index",
+                    "configuration": "indexing.json",
+                    "network":{
+                        "use-ssl":true,
+                        "no-ssl-verify":true
+                    }
+                   }
+                ],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10006,
+            "associate-environment": {
+                "host":"PIPELINE_HOST",
+                "port":"PIPELINE_PORT"
+            },
+            "ssl":{
+                "cert":"{{ project.path }}/ssl/certificate.crt",
+                "key":"{{ project.path }}/ssl/privateKey.key"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    }
+}

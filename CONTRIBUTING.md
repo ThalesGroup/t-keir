@@ -1,30 +1,26 @@
-Describe in this file:
+# Contribution guidelines
 
-- team organization, roles, communication
-- the rules to be respected by your future contributors
+When contributing to this repository, please first discuss the change you wish to make via an issue by email (Eric Blaudez) or any other method with the owners of this repository.
 
-# Contributing guidelines
+## Contributing
 
-## Team organization
+In order to contribute to this project, please take the following actions:
 
-### Roles
+1. Fork all the required modules for the project
+1. Do the changes in your forked repository
+1. Commit your changes
+1. Create a merge request against the develop branch
 
-## How to become a contributor
+### How to install TKEIR tools
+```shell
+$ git clone TKEIR_URL_REPO
+```
 
-### Contributor License Agreements
+Then follow the instruction of the README.md
 
-### Contributing code
+### Necessary build tools
 
-## Pull Request Checklist
+* Python
+* Docker
+* Docker compose
 
-### License
-
-### Coding style
-
-### Testing
-
-#### Running sanity check
-
-#### Running unit tests
-
-### Issues management

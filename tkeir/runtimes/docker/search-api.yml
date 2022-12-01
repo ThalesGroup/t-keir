@@ -1,0 +1,205 @@
+version: '3.2'
+
+# declare volume names
+# each volume is associated to a service, the configuration
+# and the models are copied in the volumes
+volumes:
+  kong_data: {}
+  kong_prefix_vol:
+    driver_opts:
+     type: tmpfs
+     device: tmpfs
+  kong_tmp_vol:
+    driver_opts:
+     type: tmpfs
+     device: tmpfs
+  volume_theresis_tkeir_qa:
+    external: true
+  volume_theresis_tkeir_search:
+    external: true
+  volume_theresis_tkeir_full:
+    external: true
+  volume_theresis_tkeir_web:
+      external: true
+  kong-vol:
+      external: true
+  
+# declare services
+services:
+  # Opendistro is AWS elastic search
+  # we run it with 8Go RAM and disable security (TKEIR tool does not manage yet security for Opendistro)
+  # we expose port 9200 and 9300
+  # opendistro is in the same network than other services : tkeir-net, and the hostname will be tkeir_opendistro
+  # If you have already an opendistro run on you network you can suppress or comment this service but you have
+  # to setup properly the OPENDISTRO_HOST and OPENDISTRO_DNS_HOST in .env file
+  tkeir-opendistro:
+    container_name: tkeir-opendistro
+    hostname: tkeir-opendistro
+    build:
+      context: opendistro/
+      args:
+        OPENDISTRO_VERSION: ${OPENDISTRO_VERSION}
+    volumes:
+      - ${TKEIR_DATA_PATH}/share/index:/usr/share/elasticsearch/data:rw
+    environment:
+      - "ES_JAVA_OPTS=-Xmx${ES_MEMORY:-8g} -Xms${ES_MEMORY:-8g}"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-origin=*"
+      - "discovery.type=single-node"
+      - "opendistro_security.disabled=false"
+      - "indices.query.bool.max_clause_count=250000"
+    networks:
+      - tkeir-net
+
+  
+  # Question and Answering service
+  # depends on : tokenizer
+  tkeir-qa-svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir-qa-svc
+    hostname: tkeir-qa-svc
+    environment:
+      - QA_HOST=${QA_HOST}
+      - QA_PORT=${QA_PORT}    
+      - TKEIR_USE_SSL=${USE_TKEIR_SSL}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, qa]
+
+  # Run search service
+  tkeir-search-svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir-search-svc
+    hostname: tkeir-search-svc
+    environment:
+      - TOKENIZER_HOST=${TOKENIZER_HOST}
+      - TOKENIZER_PORT=${TOKENIZER_PORT}
+      - MSTAGGER_HOST=${MSTAGGER_HOST}
+      - MSTAGGER_PORT=${MSTAGGER_PORT}
+      - NERTAGGER_HOST=${NERTAGGER_HOST}
+      - NERTAGGER_PORT=${NERTAGGER_PORT}
+      - SYNTAXTAGGER_HOST=${SYNTAXTAGGER_HOST}
+      - SYNTAXTAGGER_PORT=${SYNTAXTAGGER_PORT}
+      - SENT_EMBEDDING_HOST=${SENT_EMBEDDING_HOST}
+      - SENT_EMBEDDING_PORT=${SENT_EMBEDDING_PORT}
+      - SENTIMENT_ANALYSIS_HOST=${SENTIMENT_ANALYSIS_HOST}
+      - SENTIMENT_ANALYSIS_PORT=${SENTIMENT_ANALYSIS_PORT}
+      - AUTOMATIC_SUMMARY_HOST=${AUTOMATIC_SUMMARY_HOST}
+      - AUTOMATIC_SUMMARY_PORT=${AUTOMATIC_SUMMARY_PORT}
+      - CLASSIFICATION_HOST=${CLASSIFICATION_HOST}
+      - CLASSIFICATION_PORT=${CLASSIFICATION_PORT}
+      - QA_HOST=tkeir-qa-svc
+      - QA_PORT=${QA_PORT}
+      - PIPELINE_HOST=tkeir-pipeline-svc
+      - PIPELINE_PORT=${PIPELINE_PORT}
+      - KEYWORD_HOST=${KEYWORD_HOST}
+      - KEYWORD_PORT=${KEYWORD_PORT}
+      - SEARCH_HOST=${SEARCH_HOST}
+      - SEARCH_PORT=${SEARCH_PORT}
+      - INDEX_HOST=${INDEX_HOST}
+      - INDEX_PORT=${INDEX_PORT}
+      - TKEIR_USE_SSL=${USE_TKEIR_SSL}
+      - OPENDISTRO_DNS_HOST=${OPENDISTRO_DNS_HOST}
+      - OPENDISTRO_PORT=${OPENDISTRO_PORT}
+      - OPENDISTRO_USE_SSL=${OPENDISTRO_USE_SSL}
+      - OPENDISTRO_VERIFY_CERTS=${OPENDISTRO_VERIFY_CERTS}
+    volumes:
+      - volume_theresis_tkeir_search:/home/tkeir_svc/tkeir/app:z
+    networks:
+      - tkeir-net
+    depends_on:
+      - tkeir-opendistro 
+      - tkeir-qa-svc
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, search]
+  
+
+  # run pipeline service
+  # this service run a complete pipeline from converter to indexing
+  # TKEIR_DATA_PATH is the path "listen" by the pipeline service
+  tkeir-pipeline-svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir-pipeline-svc
+    hostname: tkeir-pipeline-svc
+    volumes:
+      - volume_theresis_tkeir_full:/home/tkeir_svc/tkeir/app:z
+      - /data/tkeir/data/docker-share/:/home/tkeir_svc/share:rw
+    environment:
+      - CONVERTER_HOST=${CONVERTER_HOST}
+      - CONVERTER_PORT=${CONVERTER_PORT}
+      - TOKENIZER_HOST=${TOKENIZER_HOST}
+      - TOKENIZER_PORT=${TOKENIZER_PORT}
+      - MSTAGGER_HOST=${MSTAGGER_HOST}
+      - MSTAGGER_PORT=${MSTAGGER_PORT}
+      - NERTAGGER_HOST=${NERTAGGER_HOST}
+      - NERTAGGER_PORT=${NERTAGGER_PORT}
+      - SYNTAXTAGGER_HOST=${SYNTAXTAGGER_HOST}
+      - SYNTAXTAGGER_PORT=${SYNTAXTAGGER_PORT}
+      - KEYWORD_HOST=${KEYWORD_HOST}
+      - KEYWORD_PORT=${KEYWORD_PORT}
+      - SENT_EMBEDDING_HOST=${SENT_EMBEDDING_HOST}
+      - SENT_EMBEDDING_PORT=${SENT_EMBEDDING_PORT}
+      - CLUSTER_INFERENCE_HOST=${CLUSTER_INFERENCE_HOST}
+      - CLUSTER_INFERENCE_PORT=${CLUSTER_INFERENCE_PORT}
+      - AUTOMATIC_SUMMARY_HOST=${AUTOMATIC_SUMMARY_HOST}
+      - AUTOMATIC_SUMMARY_PORT=${AUTOMATIC_SUMMARY_PORT}
+      - SENTIMENT_ANALYSIS_HOST=${SENTIMENT_ANALYSIS_HOST}
+      - SENTIMENT_ANALYSIS_PORT=${SENTIMENT_ANALYSIS_PORT}
+      - CLASSIFICATION_HOST=${CLASSIFICATION_HOST}
+      - CLASSIFICATION_PORT=${CLASSIFICATION_PORT}
+      - PIPELINE_HOST=${PIPELINE_HOST}
+      - PIPELINE_PORT=${PIPELINE_PORT}
+      - SEARCH_HOST=${SEARCH_HOST}
+      - SEARCH_PORT=${SEARCH_PORT}
+      - INDEX_HOST=${INDEX_HOST}
+      - INDEX_PORT=${INDEX_PORT}
+      - TKEIR_USE_SSL=${USE_TKEIR_SSL}
+      - OPENDISTRO_DNS_HOST=${OPENDISTRO_DNS_HOST}
+      - OPENDISTRO_PORT=${OPENDISTRO_PORT}
+      - OPENDISTRO_USE_SSL=${OPENDISTRO_USE_SSL}
+      - OPENDISTRO_VERIFY_CERTS=${OPENDISTRO_VERIFY_CERTS}
+    networks:
+      - tkeir-net
+    depends_on:
+      - tkeir-opendistro
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, pipeline]
+
+  kong-api-gateway:
+    image: kong:latest
+    container_name: kong-api-gateway
+    hostname: kong-api-gateway
+    volumes:
+      - kong-vol:/usr/local/kong/declarative
+    ports:
+      - 8443:8443
+      - 127.0.0.1:8001:8001
+      - 127.0.0.1:8444:8444
+    environment:
+      - KONG_DATABASE=off
+      - KONG_DECLARATIVE_CONFIG=/usr/local/kong/declarative/kong.yml
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
+      - KONG_SSL=on
+      - KONG_SSL_CERT=/usr/local/kong/declarative/cert/cert.pem
+      - KONG_SSL_CERT_KEY=/usr/local/kong/declarative/cert/privkey.pem
+    networks:
+      - tkeir-net
+
+  apache-tika:
+    image: apache/tika:latest
+    hostname: apache-tika
+    container_name: apache-tika
+    ports:
+      - 9998:9998
+    networks:
+      - tkeir-net
+ 
+networks:
+  tkeir-net:
+    name: tkeir-net
+    driver: bridge

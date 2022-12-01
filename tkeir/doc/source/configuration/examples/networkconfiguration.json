@@ -1,0 +1,16 @@
+{
+    "network": {
+        "host":"0.0.0.0",
+        "port":8080,
+        "associate-environment": {
+            "host":"HOST_ENVNAME",
+            "port":"PORT_ENVNAME"
+        },
+        "ssl":
+        {
+            "certificate":"path/to/certificate",
+            "key":"path/to/key"
+        }
+    }
+}
+ 

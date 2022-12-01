@@ -1,0 +1,102 @@
+version: '3.2'
+
+volumes:
+  volume_theresis_tkeir_full:
+    external: true
+  kong-vol:
+    external: true
+
+services:
+  tkeir-opendistro:
+    container_name: tkeir-opendistro
+    hostname: tkeir-opendistro
+    build:
+      context: opendistro/
+      args:
+        OPENDISTRO_VERSION: ${OPENDISTRO_VERSION}
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ${TKEIR_DATA_PATH}/share/index:/usr/share/elasticsearch/data:rw
+    environment:
+      - "ES_JAVA_OPTS=-Xmx1g -Xms1g"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-origin=*"
+      - "discovery.type=single-node"
+      - "opendistro_security.disabled=false"
+      - "indices.query.bool.max_clause_count=250000"
+    networks:
+      - tkeir-net
+
+  tkeir-shell:
+    image: theresis/tkeir
+    hostname: tkeir-shell
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir-shell
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_full:/home/tkeir_svc/tkeir/app:z
+      - /tmp/tkeir-share/:/home/tkeir_svc/share:rw
+    ports:
+      - ${CONVERTER_PORT}:${CONVERTER_PORT}
+      - ${TOKENIZER_PORT}:${TOKENIZER_PORT}
+      - ${MSTAGGER_PORT}:${MSTAGGER_PORT}
+      - ${NERTAGGER_PORT}:${NERTAGGER_PORT}
+      - ${SYNTAXTAGGER_PORT}:${SYNTAXTAGGER_PORT}
+      - ${SENT_EMBEDDING_PORT}:${SENT_EMBEDDING_PORT}
+      - ${PIPELINE_PORT}:${PIPELINE_PORT}
+      - ${KEYWORD_PORT}:${KEYWORD_PORT}
+      - ${AUTOMATIC_SUMMARY_PORT}:${AUTOMATIC_SUMMARY_PORT}
+      - ${SENTIMENT_ANALYSIS_PORT}:${SENTIMENT_ANALYSIS_PORT}
+      - ${CLASSIFICATION_PORT}:${CLASSIFICATION_PORT}
+      - ${INDEX_PORT}:${INDEX_PORT}
+      - ${QA_PORT}:${QA_PORT}
+      - ${SEARCH_PORT}:${SEARCH_PORT}
+      - ${WEB_PORT}:${WEB_PORT}
+    environment:
+      - CONVERTER_HOST=${CONVERTER_HOST}
+      - CONVERTER_PORT=${CONVERTER_PORT}
+      - TOKENIZER_HOST=${TOKENIZER_HOST}
+      - TOKENIZER_PORT=${TOKENIZER_PORT}
+      - MSTAGGER_HOST=${MSTAGGER_HOST}
+      - MSTAGGER_PORT=${MSTAGGER_PORT}
+      - NERTAGGER_HOST=${NERTAGGER_HOST}
+      - NERTAGGER_PORT=${NERTAGGER_PORT}
+      - SYNTAXTAGGER_HOST=${SYNTAXTAGGER_HOST}
+      - SYNTAXTAGGER_PORT=${SYNTAXTAGGER_PORT}
+      - SENT_EMBEDDING_HOST=${SENT_EMBEDDING_HOST}
+      - SENT_EMBEDDING_PORT=${SENT_EMBEDDING_PORT}
+      - AUTOMATIC_SUMMARY_HOST=${AUTOMATIC_SUMMARY_HOST}
+      - AUTOMATIC_SUMMARY_PORT=${AUTOMATIC_SUMMARY_PORT}
+      - SENTIMENT_ANALYSIS_HOST=${SENTIMENT_ANALYSIS_HOST}
+      - SENTIMENT_ANALYSIS_PORT=${SENTIMENT_ANALYSIS_PORT}
+      - CLASSIFICATION_HOST=${CLASSIFICATION_HOST}
+      - CLASSIFICATION_PORT=${CLASSIFICATION_PORT}
+      - PIPELINE_HOST=${PIPELINE_HOST}
+      - PIPELINE_PORT=${PIPELINE_PORT}
+      - KEYWORD_HOST=${KEYWORD_HOST}
+      - KEYWORD_PORT=${KEYWORD_PORT}
+      - SEARCH_HOST=${SEARCH_HOST}
+      - SEARCH_PORT=${SEARCH_PORT}
+      - CLUSTER_INFERENCE_HOST=${CLUSTER_INFERENCE_HOST}
+      - CLUSTER_INFERENCE_PORT=${CLUSTER_INFERENCE_PORT}
+      - INDEX_HOST=${INDEX_HOST}
+      - INDEX_PORT=${INDEX_PORT}
+      - OPENDISTRO_DNS_HOST=${OPENDISTRO_DNS_HOST}
+      - OPENDISTRO_USE_SSL=${OPENDISTRO_USE_SSL}
+      - OPENDISTRO_VERIFY_CERTS=${OPENDISTRO_VERIFY_CERTS}
+      - SEARX_PORT=${SEARX_PORT}
+      - WEB_TKEIR_APP=${WEB_TKEIR_APP}
+      - SEARCH_SSL=${SEARCH_SSL}
+      - SEARCH_SSL_NO_VERIFY=${SEARCH_SSL_NO_VERIFY}
+    networks:
+      - tkeir-net
+    depends_on:
+      - tkeir-opendistro
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, shell]
+
+networks:
+  tkeir-net:
+    name: tkeir-net
+    driver: bridge

@@ -1,0 +1,218 @@
+{
+  "content": [
+    "The delice is a town in city 5000.\n\n"
+  ],
+  "content_morphosyntax": [
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "delice",
+      "pos": "NOUN",
+      "text": "delice"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "town",
+      "pos": "NOUN",
+      "text": "town"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "city",
+      "pos": "NOUN",
+      "text": "city"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "5000",
+      "pos": "NUM",
+      "text": "5000"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "text": "."
+    }
+  ],
+  "content_ner": [],
+  "content_tokens": [
+    [
+      [
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": true,
+          "token": "The"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "delice"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "is"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "a"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "town"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "in"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "city"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "5000"
+        },
+        {
+          "mwe": {
+            "data": {},
+            "is-compound": false
+          },
+          "start_sentence": false,
+          "token": "."
+        }
+      ]
+    ]
+  ],
+  "data_source": "converter-service",
+  "error": false,
+  "kg": [],
+  "source_doc_id": "file:///home/tkeir_svc/tkeir/thot/tests/data/test-raw/raw-target/ner.txt",
+  "tasks-info": [
+    {
+      "execution-date": "Jul 09 2021 08:49:00",
+      "host": "172.20.0.3",
+      "hostname": "a6c6950c51a2",
+      "os": [
+        "Linux",
+        "a6c6950c51a2",
+        "5.8.0-48-generic",
+        "#54~20.04.1-Ubuntu SMP Sat Mar 20 13:40:25 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/05",
+      "task-name": "converter",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:35:26",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/09",
+      "task-name": "tokenizer",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:37:23",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "morphosyntax",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Sep 29 2021 08:39:37",
+      "host": "172.20.0.3",
+      "hostname": "7022713373ed",
+      "os": [
+        "Linux",
+        "7022713373ed",
+        "5.11.0-34-generic",
+        "#36~20.04.1-Ubuntu SMP Fri Aug 27 08:06:32 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "ner",
+      "task-version": "1.0.0"
+    }
+  ],
+  "title": "",
+  "title_morphosyntax": [],
+  "title_ner": []
+}

@@ -1,0 +1,52 @@
+{
+    "logger": {
+        "logging-level": "{{ project.loglevel }}"
+    },
+    "relations": {
+        "cluster":{
+            "algorithm":"kmeans",
+            "number-of-classes":16,
+            "number-of-iterations":16,
+            "seed":123456,       
+            "batch-size":4096, 
+            "embeddings":
+            {
+                "server":{
+                    "host":"0.0.0.0",
+                    "port":10005,
+                    "associate-environment": {
+                        "host":"SENT_EMBEDDING_HOST",
+                        "port":"SENT_EMBEDDING_PORT"
+                    },
+                    "use-ssl":false,
+                    "no-verify-ssl":true
+                },
+                "aggregate":{
+                    "configuration":"{{ project.path }}/configs/embeddings.json"
+                }
+            }
+        },
+        "clustering-model":{
+            "semantic-quantizer-model":"{{ project.path }}/resources/modeling/relation_names.model.pkl",
+            "train-if-not-exists":true
+        },
+        "network": {
+            "host":"0.0.0.0",
+            "port":10013,
+            "associate-environment": {
+                "host":"CLUSTER_INFERENCE_HOST",
+                "port":"CLUSTER_INFERENCE_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    }
+}

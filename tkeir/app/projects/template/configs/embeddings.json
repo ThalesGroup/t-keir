@@ -1,0 +1,31 @@
+{
+    "logger": {
+        "logging-level": "{{ project.loglevel }}"
+    },
+    "embeddings": {
+        "models":[{
+            "language":"multi",
+            "use-cuda":false,
+            "batch-size":256,
+            "model-path-or-name":"{{ project.path }}/resources/modeling/net"
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10005,
+            "associate-environment": {
+                "host":"SENT_EMBEDDING_HOST",
+                "port":"SENT_EMBEDDING_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":500,
+            "graceful-shutown-timeout":500.0,
+            "request-timeout":600,
+            "response-timeout":600,
+            "workers":1
+        }
+    }
+}

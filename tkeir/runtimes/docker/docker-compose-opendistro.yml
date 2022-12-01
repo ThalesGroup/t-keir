@@ -1,0 +1,29 @@
+version: '3.2'
+
+services:
+  tkeir-opendistro:
+    container_name: tkeir-opendistro
+    hostname: tkeir-opendistro
+    build:
+      context: opendistro/
+      args:
+        OPENDISTRO_VERSION: ${OPENDISTRO_VERSION}
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - /data/index:/usr/share/elasticsearch/data:rw
+    environment:
+      - "ES_JAVA_OPTS=-Xmx1g -Xms1g"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-origin=*"
+      - "discovery.type=single-node"
+      - "opendistro_security.disabled=false"
+      - "indices.query.bool.max_clause_count=250000"
+    networks:
+      - tkeir-net
+  
+networks:
+  tkeir-net:
+    name: tkeir-net
+    driver: bridge

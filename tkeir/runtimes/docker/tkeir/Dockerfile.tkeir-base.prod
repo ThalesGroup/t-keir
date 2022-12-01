@@ -1,0 +1,57 @@
+FROM nvidia/cuda:11.2.0-runtime-ubuntu20.04
+LABEL maintainer Eric Blaudez <Eric Blaudez>
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN rm -f /etc/apt/sources.list.d/cuda.list; \
+    rm -f /etc/apt/sources.list.d/nvidia-ml.list
+
+
+# update distribution
+RUN set -xe; \
+    apt -y update; \
+    apt install -y --no-install-recommends apt-transport-https apt-utils; \
+    apt install -y curl libcurl4 libcurl4-openssl-dev libreadline-dev libssl-dev locales procps python-dev; \
+    apt install -y python3 python3-pip wget zlib1g-dev pkg-config libcairo2-dev httrack; \
+    rm -rf /var/cache/apt/*
+
+
+# add user and associated directory
+RUN useradd -ms /bin/bash tkeir_svc; \
+    mkdir -p /home/tkeir_svc/tkeir                
+
+COPY . /home/tkeir_svc/tkeir
+RUN rm -rf /home/tkeir_svc/.cache; \
+    mkdir -p /home/tkeir_svc/tkeir/app/models; \
+    ln -s /home/tkeir_svc/tkeir/app/models /home/tkeir_svc/.cache
+
+RUN set -xe; \
+    apt -y update; \
+    apt install -y git; \
+    git clone https://github.com/searx/searx /home/tkeir_svc/searx; \
+    apt remove -y git; \
+    rm -rf /var/cache/apt/*
+
+RUN cp -r /home/tkeir_svc/tkeir/app/projects/template/resources/searx/* /home/tkeir_svc/searx/searx/; \
+    pip3 install --no-cache-dir -r  /home/tkeir_svc/searx/requirements.txt
+
+
+# switch to root for system install
+USER root
+ENV SANIC_NO_UVLOOP=true
+ENV SANIC_NO_UJSON=true
+RUN chown -R tkeir_svc.tkeir_svc /home/tkeir_svc; \
+    pip3 install --no-cache-dir /home/tkeir_svc/tkeir/dist/tkeir-1.0.3-py2.py3-none-any.whl
+
+
+USER tkeir_svc
+RUN python3 -m nltk.downloader punkt; \
+    python3 -m nltk.downloader stopwords
+
+# back to user for normal behaviour
+USER tkeir_svc
+WORKDIR /home/tkeir_svc/tkeir
+
+
+
+ENTRYPOINT [ "/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh" ]
+CMD [shell]

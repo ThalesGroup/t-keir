@@ -1,0 +1,2 @@
+opendistro_security.disabled: false
+indices.query.bool.max_clause_count: 250000

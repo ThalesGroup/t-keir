@@ -1,0 +1,9958 @@
+{
+  "content": "The task is to control the ground traffic on an airport (in such a way that the summed up travel time of all airplanes is minimised). Timed travel routes must be assigned to the airplanes so that they reach their targets. There is inbound traffic  (planes that need to go to a parking position) and outbound traffic (planes that need to go to a runway). The former are airplanes that must take off, the latter are airplanes that have just landed and have to park.  The main problem constraint is to ensure the safety of the airplanes. This means to avoid collisions, and also to prevent airplanes from entering the unsafe zones behind large airplanes that have their engines running. Which means that no two planes can share the same airport segment, and that a plane with running engines blocks a set of segments behind it (where the blocked set depends on the size category of the plane). The available activities are to move a plane away backwards from a parking position, to startup the engines, to move between segments, to park by turning off the engines, and to remove the plane from the airport.  The criterion is to minimize the summed up travel time (on the surface of the airport) of all airplanes. There usually are standard routes, i.e., routes that any airplane must take when outbound from a certain parking area, or inbound from a certain runway. The reason for introducing such routes is to reduce complexity for human ground controllers, since significant computer support is not yet available at real airports.",
+  "content_deps": [
+    {
+      "dep": "det",
+      "head": 1,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "The"
+    },
+    {
+      "dep": "nsubj",
+      "head": 2,
+      "lefts": [
+        0
+      ],
+      "lemma": "task",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "task"
+    },
+    {
+      "dep": "ROOT",
+      "head": 2,
+      "lefts": [
+        1
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        4,
+        27,
+        28
+      ],
+      "text": "is"
+    },
+    {
+      "dep": "aux",
+      "head": 4,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 2,
+      "lefts": [
+        3
+      ],
+      "lemma": "control",
+      "pos": "VERB",
+      "rights": [
+        7,
+        8
+      ],
+      "text": "control"
+    },
+    {
+      "dep": "det",
+      "head": 7,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "compound",
+      "head": 7,
+      "lefts": [],
+      "lemma": "ground",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "ground"
+    },
+    {
+      "dep": "dobj",
+      "head": 4,
+      "lefts": [
+        5,
+        6
+      ],
+      "lemma": "traffic",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "traffic"
+    },
+    {
+      "dep": "prep",
+      "head": 4,
+      "lefts": [],
+      "lemma": "on",
+      "pos": "ADP",
+      "rights": [
+        10
+      ],
+      "text": "on"
+    },
+    {
+      "dep": "det",
+      "head": 10,
+      "lefts": [],
+      "lemma": "an",
+      "pos": "DET",
+      "rights": [],
+      "text": "an"
+    },
+    {
+      "dep": "pobj",
+      "head": 8,
+      "lefts": [
+        9
+      ],
+      "lemma": "airport",
+      "pos": "NOUN",
+      "rights": [
+        11,
+        12
+      ],
+      "text": "airport"
+    },
+    {
+      "dep": "punct",
+      "head": 10,
+      "lefts": [],
+      "lemma": "(",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "("
+    },
+    {
+      "dep": "prep",
+      "head": 10,
+      "lefts": [],
+      "lemma": "in",
+      "pos": "ADP",
+      "rights": [
+        15
+      ],
+      "text": "in"
+    },
+    {
+      "dep": "predet",
+      "head": 15,
+      "lefts": [],
+      "lemma": "such",
+      "pos": "DET",
+      "rights": [],
+      "text": "such"
+    },
+    {
+      "dep": "det",
+      "head": 15,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "pobj",
+      "head": 12,
+      "lefts": [
+        13,
+        14
+      ],
+      "lemma": "way",
+      "pos": "NOUN",
+      "rights": [
+        26
+      ],
+      "text": "way"
+    },
+    {
+      "dep": "advmod",
+      "head": 26,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "DET",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "nsubj",
+      "head": 18,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "csubjpass",
+      "head": 26,
+      "lefts": [
+        17
+      ],
+      "lemma": "sum",
+      "pos": "VERB",
+      "rights": [
+        19,
+        21
+      ],
+      "text": "summed"
+    },
+    {
+      "dep": "prt",
+      "head": 18,
+      "lefts": [],
+      "lemma": "up",
+      "pos": "ADP",
+      "rights": [],
+      "text": "up"
+    },
+    {
+      "dep": "compound",
+      "head": 21,
+      "lefts": [],
+      "lemma": "travel",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "travel"
+    },
+    {
+      "dep": "dobj",
+      "head": 18,
+      "lefts": [
+        20
+      ],
+      "lemma": "time",
+      "pos": "NOUN",
+      "rights": [
+        22
+      ],
+      "text": "time"
+    },
+    {
+      "dep": "prep",
+      "head": 21,
+      "lefts": [],
+      "lemma": "of",
+      "pos": "ADP",
+      "rights": [
+        24
+      ],
+      "text": "of"
+    },
+    {
+      "dep": "det",
+      "head": 24,
+      "lefts": [],
+      "lemma": "all",
+      "pos": "DET",
+      "rights": [],
+      "text": "all"
+    },
+    {
+      "dep": "pobj",
+      "head": 22,
+      "lefts": [
+        23
+      ],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airplanes"
+    },
+    {
+      "dep": "auxpass",
+      "head": 26,
+      "lefts": [],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [],
+      "text": "is"
+    },
+    {
+      "dep": "relcl",
+      "head": 15,
+      "lefts": [
+        16,
+        18,
+        25
+      ],
+      "lemma": "minimize",
+      "pos": "VERB",
+      "rights": [],
+      "text": "minimized"
+    },
+    {
+      "dep": "punct",
+      "head": 2,
+      "lefts": [],
+      "lemma": ")",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ")"
+    },
+    {
+      "dep": "punct",
+      "head": 2,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "amod",
+      "head": 31,
+      "lefts": [],
+      "lemma": "timed",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "Timed"
+    },
+    {
+      "dep": "compound",
+      "head": 31,
+      "lefts": [],
+      "lemma": "travel",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "travel"
+    },
+    {
+      "dep": "nsubjpass",
+      "head": 34,
+      "lefts": [
+        29,
+        30
+      ],
+      "lemma": "route",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "routes"
+    },
+    {
+      "dep": "aux",
+      "head": 34,
+      "lefts": [],
+      "lemma": "must",
+      "pos": "AUX",
+      "rights": [],
+      "text": "must"
+    },
+    {
+      "dep": "auxpass",
+      "head": 34,
+      "lefts": [],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [],
+      "text": "be"
+    },
+    {
+      "dep": "ROOT",
+      "head": 34,
+      "lefts": [
+        31,
+        32,
+        33
+      ],
+      "lemma": "assign",
+      "pos": "VERB",
+      "rights": [
+        35,
+        41,
+        44
+      ],
+      "text": "assigned"
+    },
+    {
+      "dep": "prep",
+      "head": 34,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "ADP",
+      "rights": [
+        37
+      ],
+      "text": "to"
+    },
+    {
+      "dep": "det",
+      "head": 37,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "pobj",
+      "head": 35,
+      "lefts": [
+        36
+      ],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airplanes"
+    },
+    {
+      "dep": "mark",
+      "head": 41,
+      "lefts": [],
+      "lemma": "so",
+      "pos": "SCONJ",
+      "rights": [],
+      "text": "so"
+    },
+    {
+      "dep": "mark",
+      "head": 41,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "SCONJ",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "nsubj",
+      "head": 41,
+      "lefts": [],
+      "lemma": "they",
+      "pos": "PRON",
+      "rights": [],
+      "text": "they"
+    },
+    {
+      "dep": "advcl",
+      "head": 34,
+      "lefts": [
+        38,
+        39,
+        40
+      ],
+      "lemma": "reach",
+      "pos": "VERB",
+      "rights": [
+        43
+      ],
+      "text": "reach"
+    },
+    {
+      "dep": "poss",
+      "head": 43,
+      "lefts": [],
+      "lemma": "their",
+      "pos": "PRON",
+      "rights": [],
+      "text": "their"
+    },
+    {
+      "dep": "dobj",
+      "head": 41,
+      "lefts": [
+        42
+      ],
+      "lemma": "target",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "targets"
+    },
+    {
+      "dep": "punct",
+      "head": 34,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "expl",
+      "head": 46,
+      "lefts": [],
+      "lemma": "there",
+      "pos": "PRON",
+      "rights": [],
+      "text": "There"
+    },
+    {
+      "dep": "ROOT",
+      "head": 46,
+      "lefts": [
+        45
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        48,
+        73
+      ],
+      "text": "is"
+    },
+    {
+      "dep": "amod",
+      "head": 48,
+      "lefts": [],
+      "lemma": "inbound",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "inbound"
+    },
+    {
+      "dep": "attr",
+      "head": 46,
+      "lefts": [
+        47
+      ],
+      "lemma": "traffic",
+      "pos": "NOUN",
+      "rights": [
+        49,
+        50,
+        59,
+        60,
+        62
+      ],
+      "text": "traffic"
+    },
+    {
+      "dep": "punct",
+      "head": 48,
+      "lefts": [],
+      "lemma": "(",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "("
+    },
+    {
+      "dep": "appos",
+      "head": 48,
+      "lefts": [],
+      "lemma": "plane",
+      "pos": "NOUN",
+      "rights": [
+        52
+      ],
+      "text": "planes"
+    },
+    {
+      "dep": "nsubj",
+      "head": 52,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "DET",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "relcl",
+      "head": 50,
+      "lefts": [
+        51
+      ],
+      "lemma": "need",
+      "pos": "VERB",
+      "rights": [
+        54
+      ],
+      "text": "need"
+    },
+    {
+      "dep": "aux",
+      "head": 54,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 52,
+      "lefts": [
+        53
+      ],
+      "lemma": "go",
+      "pos": "VERB",
+      "rights": [
+        55
+      ],
+      "text": "go"
+    },
+    {
+      "dep": "prep",
+      "head": 54,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "ADP",
+      "rights": [
+        58
+      ],
+      "text": "to"
+    },
+    {
+      "dep": "det",
+      "head": 58,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "compound",
+      "head": 58,
+      "lefts": [],
+      "lemma": "parking",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "parking"
+    },
+    {
+      "dep": "pobj",
+      "head": 55,
+      "lefts": [
+        56,
+        57
+      ],
+      "lemma": "position",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "position"
+    },
+    {
+      "dep": "punct",
+      "head": 48,
+      "lefts": [],
+      "lemma": ")",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ")"
+    },
+    {
+      "dep": "cc",
+      "head": 48,
+      "lefts": [],
+      "lemma": "and",
+      "pos": "CCONJ",
+      "rights": [],
+      "text": "and"
+    },
+    {
+      "dep": "amod",
+      "head": 62,
+      "lefts": [],
+      "lemma": "outbound",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "outbound"
+    },
+    {
+      "dep": "conj",
+      "head": 48,
+      "lefts": [
+        61
+      ],
+      "lemma": "traffic",
+      "pos": "NOUN",
+      "rights": [
+        63,
+        64,
+        72
+      ],
+      "text": "traffic"
+    },
+    {
+      "dep": "punct",
+      "head": 62,
+      "lefts": [],
+      "lemma": "(",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "("
+    },
+    {
+      "dep": "appos",
+      "head": 62,
+      "lefts": [],
+      "lemma": "plane",
+      "pos": "NOUN",
+      "rights": [
+        66
+      ],
+      "text": "planes"
+    },
+    {
+      "dep": "nsubj",
+      "head": 66,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "DET",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "relcl",
+      "head": 64,
+      "lefts": [
+        65
+      ],
+      "lemma": "need",
+      "pos": "VERB",
+      "rights": [
+        68
+      ],
+      "text": "need"
+    },
+    {
+      "dep": "aux",
+      "head": 68,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 66,
+      "lefts": [
+        67
+      ],
+      "lemma": "go",
+      "pos": "VERB",
+      "rights": [
+        69
+      ],
+      "text": "go"
+    },
+    {
+      "dep": "prep",
+      "head": 68,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "ADP",
+      "rights": [
+        71
+      ],
+      "text": "to"
+    },
+    {
+      "dep": "det",
+      "head": 71,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "pobj",
+      "head": 69,
+      "lefts": [
+        70
+      ],
+      "lemma": "runway",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "runway"
+    },
+    {
+      "dep": "punct",
+      "head": 62,
+      "lefts": [],
+      "lemma": ")",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ")"
+    },
+    {
+      "dep": "punct",
+      "head": 46,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "det",
+      "head": 75,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "The"
+    },
+    {
+      "dep": "nsubj",
+      "head": 76,
+      "lefts": [
+        74
+      ],
+      "lemma": "former",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "former"
+    },
+    {
+      "dep": "ccomp",
+      "head": 85,
+      "lefts": [
+        75
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        77
+      ],
+      "text": "are"
+    },
+    {
+      "dep": "attr",
+      "head": 76,
+      "lefts": [],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [
+        80
+      ],
+      "text": "airplanes"
+    },
+    {
+      "dep": "nsubj",
+      "head": 80,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "DET",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "aux",
+      "head": 80,
+      "lefts": [],
+      "lemma": "must",
+      "pos": "AUX",
+      "rights": [],
+      "text": "must"
+    },
+    {
+      "dep": "relcl",
+      "head": 77,
+      "lefts": [
+        78,
+        79
+      ],
+      "lemma": "take",
+      "pos": "VERB",
+      "rights": [
+        81
+      ],
+      "text": "take"
+    },
+    {
+      "dep": "prt",
+      "head": 80,
+      "lefts": [],
+      "lemma": "off",
+      "pos": "ADP",
+      "rights": [],
+      "text": "off"
+    },
+    {
+      "dep": "punct",
+      "head": 85,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "det",
+      "head": 84,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "nsubj",
+      "head": 85,
+      "lefts": [
+        83
+      ],
+      "lemma": "latter",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "latter"
+    },
+    {
+      "dep": "ROOT",
+      "head": 85,
+      "lefts": [
+        76,
+        82,
+        84
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        86,
+        95
+      ],
+      "text": "are"
+    },
+    {
+      "dep": "attr",
+      "head": 85,
+      "lefts": [],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [
+        90
+      ],
+      "text": "airplanes"
+    },
+    {
+      "dep": "nsubj",
+      "head": 90,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "DET",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "aux",
+      "head": 90,
+      "lefts": [],
+      "lemma": "have",
+      "pos": "VERB",
+      "rights": [],
+      "text": "have"
+    },
+    {
+      "dep": "advmod",
+      "head": 90,
+      "lefts": [],
+      "lemma": "just",
+      "pos": "ADV",
+      "rights": [],
+      "text": "just"
+    },
+    {
+      "dep": "relcl",
+      "head": 86,
+      "lefts": [
+        87,
+        88,
+        89
+      ],
+      "lemma": "land",
+      "pos": "VERB",
+      "rights": [
+        91,
+        92
+      ],
+      "text": "landed"
+    },
+    {
+      "dep": "cc",
+      "head": 90,
+      "lefts": [],
+      "lemma": "and",
+      "pos": "CCONJ",
+      "rights": [],
+      "text": "and"
+    },
+    {
+      "dep": "conj",
+      "head": 90,
+      "lefts": [],
+      "lemma": "have",
+      "pos": "VERB",
+      "rights": [
+        94
+      ],
+      "text": "have"
+    },
+    {
+      "dep": "aux",
+      "head": 94,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 92,
+      "lefts": [
+        93
+      ],
+      "lemma": "park",
+      "pos": "VERB",
+      "rights": [],
+      "text": "park"
+    },
+    {
+      "dep": "punct",
+      "head": 85,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "det",
+      "head": 99,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "The"
+    },
+    {
+      "dep": "amod",
+      "head": 99,
+      "lefts": [],
+      "lemma": "main",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "main"
+    },
+    {
+      "dep": "compound",
+      "head": 99,
+      "lefts": [],
+      "lemma": "problem",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "problem"
+    },
+    {
+      "dep": "nsubj",
+      "head": 100,
+      "lefts": [
+        96,
+        97,
+        98
+      ],
+      "lemma": "constraint",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "constraint"
+    },
+    {
+      "dep": "ROOT",
+      "head": 100,
+      "lefts": [
+        99
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        102,
+        108
+      ],
+      "text": "is"
+    },
+    {
+      "dep": "aux",
+      "head": 102,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 100,
+      "lefts": [
+        101
+      ],
+      "lemma": "ensure",
+      "pos": "VERB",
+      "rights": [
+        104
+      ],
+      "text": "ensure"
+    },
+    {
+      "dep": "det",
+      "head": 104,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "dobj",
+      "head": 102,
+      "lefts": [
+        103
+      ],
+      "lemma": "safety",
+      "pos": "NOUN",
+      "rights": [
+        105
+      ],
+      "text": "safety"
+    },
+    {
+      "dep": "prep",
+      "head": 104,
+      "lefts": [],
+      "lemma": "of",
+      "pos": "ADP",
+      "rights": [
+        107
+      ],
+      "text": "of"
+    },
+    {
+      "dep": "det",
+      "head": 107,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "pobj",
+      "head": 105,
+      "lefts": [
+        106
+      ],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airplanes"
+    },
+    {
+      "dep": "punct",
+      "head": 100,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "nsubj",
+      "head": 110,
+      "lefts": [],
+      "lemma": "this",
+      "pos": "DET",
+      "rights": [],
+      "text": "This"
+    },
+    {
+      "dep": "ROOT",
+      "head": 110,
+      "lefts": [
+        109
+      ],
+      "lemma": "mean",
+      "pos": "VERB",
+      "rights": [
+        112,
+        133
+      ],
+      "text": "means"
+    },
+    {
+      "dep": "aux",
+      "head": 112,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 110,
+      "lefts": [
+        111
+      ],
+      "lemma": "avoid",
+      "pos": "VERB",
+      "rights": [
+        113,
+        114,
+        115,
+        118
+      ],
+      "text": "avoid"
+    },
+    {
+      "dep": "dobj",
+      "head": 112,
+      "lefts": [],
+      "lemma": "collision",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "collisions"
+    },
+    {
+      "dep": "punct",
+      "head": 112,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "cc",
+      "head": 112,
+      "lefts": [],
+      "lemma": "and",
+      "pos": "CCONJ",
+      "rights": [],
+      "text": "and"
+    },
+    {
+      "dep": "advmod",
+      "head": 118,
+      "lefts": [],
+      "lemma": "also",
+      "pos": "ADV",
+      "rights": [],
+      "text": "also"
+    },
+    {
+      "dep": "aux",
+      "head": 118,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "conj",
+      "head": 112,
+      "lefts": [
+        116,
+        117
+      ],
+      "lemma": "prevent",
+      "pos": "VERB",
+      "rights": [
+        119,
+        120
+      ],
+      "text": "prevent"
+    },
+    {
+      "dep": "dobj",
+      "head": 118,
+      "lefts": [],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airplanes"
+    },
+    {
+      "dep": "prep",
+      "head": 118,
+      "lefts": [],
+      "lemma": "from",
+      "pos": "ADP",
+      "rights": [
+        121
+      ],
+      "text": "from"
+    },
+    {
+      "dep": "pcomp",
+      "head": 120,
+      "lefts": [],
+      "lemma": "enter",
+      "pos": "VERB",
+      "rights": [
+        124
+      ],
+      "text": "entering"
+    },
+    {
+      "dep": "det",
+      "head": 124,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "amod",
+      "head": 124,
+      "lefts": [],
+      "lemma": "unsafe",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "unsafe"
+    },
+    {
+      "dep": "dobj",
+      "head": 121,
+      "lefts": [
+        122,
+        123
+      ],
+      "lemma": "zone",
+      "pos": "NOUN",
+      "rights": [
+        125
+      ],
+      "text": "zones"
+    },
+    {
+      "dep": "prep",
+      "head": 124,
+      "lefts": [],
+      "lemma": "behind",
+      "pos": "ADP",
+      "rights": [
+        127
+      ],
+      "text": "behind"
+    },
+    {
+      "dep": "amod",
+      "head": 127,
+      "lefts": [],
+      "lemma": "large",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "large"
+    },
+    {
+      "dep": "pobj",
+      "head": 125,
+      "lefts": [
+        126
+      ],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [
+        129
+      ],
+      "text": "airplanes"
+    },
+    {
+      "dep": "nsubj",
+      "head": 129,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "DET",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "relcl",
+      "head": 127,
+      "lefts": [
+        128
+      ],
+      "lemma": "have",
+      "pos": "VERB",
+      "rights": [
+        132
+      ],
+      "text": "have"
+    },
+    {
+      "dep": "poss",
+      "head": 131,
+      "lefts": [],
+      "lemma": "their",
+      "pos": "PRON",
+      "rights": [],
+      "text": "their"
+    },
+    {
+      "dep": "nsubj",
+      "head": 132,
+      "lefts": [
+        130
+      ],
+      "lemma": "engine",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "engines"
+    },
+    {
+      "dep": "ccomp",
+      "head": 129,
+      "lefts": [
+        131
+      ],
+      "lemma": "run",
+      "pos": "VERB",
+      "rights": [],
+      "text": "running"
+    },
+    {
+      "dep": "punct",
+      "head": 110,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "nsubj",
+      "head": 135,
+      "lefts": [],
+      "lemma": "which",
+      "pos": "DET",
+      "rights": [],
+      "text": "Which"
+    },
+    {
+      "dep": "ROOT",
+      "head": 135,
+      "lefts": [
+        134
+      ],
+      "lemma": "mean",
+      "pos": "VERB",
+      "rights": [
+        141,
+        175
+      ],
+      "text": "means"
+    },
+    {
+      "dep": "mark",
+      "head": 141,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "SCONJ",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "det",
+      "head": 139,
+      "lefts": [],
+      "lemma": "no",
+      "pos": "DET",
+      "rights": [],
+      "text": "no"
+    },
+    {
+      "dep": "nummod",
+      "head": 139,
+      "lefts": [],
+      "lemma": "two",
+      "pos": "NUM",
+      "rights": [],
+      "text": "two"
+    },
+    {
+      "dep": "nsubj",
+      "head": 141,
+      "lefts": [
+        137,
+        138
+      ],
+      "lemma": "plane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "planes"
+    },
+    {
+      "dep": "aux",
+      "head": 141,
+      "lefts": [],
+      "lemma": "can",
+      "pos": "AUX",
+      "rights": [],
+      "text": "can"
+    },
+    {
+      "dep": "ccomp",
+      "head": 135,
+      "lefts": [
+        136,
+        139,
+        140
+      ],
+      "lemma": "share",
+      "pos": "VERB",
+      "rights": [
+        145,
+        146,
+        147,
+        154
+      ],
+      "text": "share"
+    },
+    {
+      "dep": "det",
+      "head": 145,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "amod",
+      "head": 145,
+      "lefts": [],
+      "lemma": "same",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "same"
+    },
+    {
+      "dep": "compound",
+      "head": 145,
+      "lefts": [],
+      "lemma": "airport",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airport"
+    },
+    {
+      "dep": "dobj",
+      "head": 141,
+      "lefts": [
+        142,
+        143,
+        144
+      ],
+      "lemma": "segment",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "segment"
+    },
+    {
+      "dep": "punct",
+      "head": 141,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "cc",
+      "head": 141,
+      "lefts": [],
+      "lemma": "and",
+      "pos": "CCONJ",
+      "rights": [],
+      "text": "and"
+    },
+    {
+      "dep": "mark",
+      "head": 154,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "SCONJ",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "det",
+      "head": 150,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "nsubj",
+      "head": 154,
+      "lefts": [
+        149
+      ],
+      "lemma": "plane",
+      "pos": "NOUN",
+      "rights": [
+        151
+      ],
+      "text": "plane"
+    },
+    {
+      "dep": "prep",
+      "head": 150,
+      "lefts": [],
+      "lemma": "with",
+      "pos": "ADP",
+      "rights": [
+        153
+      ],
+      "text": "with"
+    },
+    {
+      "dep": "compound",
+      "head": 153,
+      "lefts": [],
+      "lemma": "run",
+      "pos": "VERB",
+      "rights": [],
+      "text": "running"
+    },
+    {
+      "dep": "pobj",
+      "head": 151,
+      "lefts": [
+        152
+      ],
+      "lemma": "engine",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "engines"
+    },
+    {
+      "dep": "conj",
+      "head": 141,
+      "lefts": [
+        148,
+        150
+      ],
+      "lemma": "block",
+      "pos": "VERB",
+      "rights": [
+        156,
+        174
+      ],
+      "text": "blocks"
+    },
+    {
+      "dep": "det",
+      "head": 156,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "dobj",
+      "head": 154,
+      "lefts": [
+        155
+      ],
+      "lemma": "set",
+      "pos": "NOUN",
+      "rights": [
+        157,
+        161,
+        166
+      ],
+      "text": "set"
+    },
+    {
+      "dep": "prep",
+      "head": 156,
+      "lefts": [],
+      "lemma": "of",
+      "pos": "ADP",
+      "rights": [
+        158
+      ],
+      "text": "of"
+    },
+    {
+      "dep": "pobj",
+      "head": 157,
+      "lefts": [],
+      "lemma": "segment",
+      "pos": "NOUN",
+      "rights": [
+        159
+      ],
+      "text": "segments"
+    },
+    {
+      "dep": "prep",
+      "head": 158,
+      "lefts": [],
+      "lemma": "behind",
+      "pos": "ADP",
+      "rights": [
+        160
+      ],
+      "text": "behind"
+    },
+    {
+      "dep": "pobj",
+      "head": 159,
+      "lefts": [],
+      "lemma": "it",
+      "pos": "PRON",
+      "rights": [],
+      "text": "it"
+    },
+    {
+      "dep": "punct",
+      "head": 156,
+      "lefts": [],
+      "lemma": "(",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "("
+    },
+    {
+      "dep": "advmod",
+      "head": 166,
+      "lefts": [],
+      "lemma": "where",
+      "pos": "ADV",
+      "rights": [],
+      "text": "where"
+    },
+    {
+      "dep": "det",
+      "head": 165,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "amod",
+      "head": 165,
+      "lefts": [],
+      "lemma": "block",
+      "pos": "VERB",
+      "rights": [],
+      "text": "blocked"
+    },
+    {
+      "dep": "nsubj",
+      "head": 166,
+      "lefts": [
+        163,
+        164
+      ],
+      "lemma": "set",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "set"
+    },
+    {
+      "dep": "relcl",
+      "head": 156,
+      "lefts": [
+        162,
+        165
+      ],
+      "lemma": "depend",
+      "pos": "VERB",
+      "rights": [
+        167
+      ],
+      "text": "depends"
+    },
+    {
+      "dep": "prep",
+      "head": 166,
+      "lefts": [],
+      "lemma": "on",
+      "pos": "ADP",
+      "rights": [
+        170
+      ],
+      "text": "on"
+    },
+    {
+      "dep": "det",
+      "head": 170,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "compound",
+      "head": 170,
+      "lefts": [],
+      "lemma": "size",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "size"
+    },
+    {
+      "dep": "pobj",
+      "head": 167,
+      "lefts": [
+        168,
+        169
+      ],
+      "lemma": "category",
+      "pos": "NOUN",
+      "rights": [
+        171
+      ],
+      "text": "category"
+    },
+    {
+      "dep": "prep",
+      "head": 170,
+      "lefts": [],
+      "lemma": "of",
+      "pos": "ADP",
+      "rights": [
+        173
+      ],
+      "text": "of"
+    },
+    {
+      "dep": "det",
+      "head": 173,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "pobj",
+      "head": 171,
+      "lefts": [
+        172
+      ],
+      "lemma": "plane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "plane"
+    },
+    {
+      "dep": "punct",
+      "head": 154,
+      "lefts": [],
+      "lemma": ")",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ")"
+    },
+    {
+      "dep": "punct",
+      "head": 135,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "det",
+      "head": 178,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "The"
+    },
+    {
+      "dep": "amod",
+      "head": 178,
+      "lefts": [],
+      "lemma": "available",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "available"
+    },
+    {
+      "dep": "nsubj",
+      "head": 179,
+      "lefts": [
+        176,
+        177
+      ],
+      "lemma": "activity",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "activities"
+    },
+    {
+      "dep": "ROOT",
+      "head": 179,
+      "lefts": [
+        178
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        181,
+        217
+      ],
+      "text": "are"
+    },
+    {
+      "dep": "aux",
+      "head": 181,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 179,
+      "lefts": [
+        180
+      ],
+      "lemma": "move",
+      "pos": "VERB",
+      "rights": [
+        183,
+        185,
+        190,
+        192
+      ],
+      "text": "move"
+    },
+    {
+      "dep": "det",
+      "head": 183,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "dobj",
+      "head": 181,
+      "lefts": [
+        182
+      ],
+      "lemma": "plane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "plane"
+    },
+    {
+      "dep": "advmod",
+      "head": 185,
+      "lefts": [],
+      "lemma": "away",
+      "pos": "ADV",
+      "rights": [],
+      "text": "away"
+    },
+    {
+      "dep": "advmod",
+      "head": 181,
+      "lefts": [
+        184
+      ],
+      "lemma": "backwards",
+      "pos": "ADV",
+      "rights": [
+        186
+      ],
+      "text": "backwards"
+    },
+    {
+      "dep": "prep",
+      "head": 185,
+      "lefts": [],
+      "lemma": "from",
+      "pos": "ADP",
+      "rights": [
+        189
+      ],
+      "text": "from"
+    },
+    {
+      "dep": "det",
+      "head": 189,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "compound",
+      "head": 189,
+      "lefts": [],
+      "lemma": "parking",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "parking"
+    },
+    {
+      "dep": "pobj",
+      "head": 186,
+      "lefts": [
+        187,
+        188
+      ],
+      "lemma": "position",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "position"
+    },
+    {
+      "dep": "punct",
+      "head": 181,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "aux",
+      "head": 192,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "advcl",
+      "head": 181,
+      "lefts": [
+        191
+      ],
+      "lemma": "startup",
+      "pos": "VERB",
+      "rights": [
+        194,
+        195,
+        197
+      ],
+      "text": "startup"
+    },
+    {
+      "dep": "det",
+      "head": 194,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "dobj",
+      "head": 192,
+      "lefts": [
+        193
+      ],
+      "lemma": "engine",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "engines"
+    },
+    {
+      "dep": "punct",
+      "head": 192,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "aux",
+      "head": 197,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "advcl",
+      "head": 192,
+      "lefts": [
+        196
+      ],
+      "lemma": "move",
+      "pos": "VERB",
+      "rights": [
+        198,
+        200,
+        202,
+        203,
+        208,
+        209,
+        211
+      ],
+      "text": "move"
+    },
+    {
+      "dep": "prep",
+      "head": 197,
+      "lefts": [],
+      "lemma": "between",
+      "pos": "ADP",
+      "rights": [
+        199
+      ],
+      "text": "between"
+    },
+    {
+      "dep": "pobj",
+      "head": 198,
+      "lefts": [],
+      "lemma": "segment",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "segments"
+    },
+    {
+      "dep": "punct",
+      "head": 197,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "aux",
+      "head": 202,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "advcl",
+      "head": 197,
+      "lefts": [
+        201
+      ],
+      "lemma": "park",
+      "pos": "VERB",
+      "rights": [],
+      "text": "park"
+    },
+    {
+      "dep": "prep",
+      "head": 197,
+      "lefts": [],
+      "lemma": "by",
+      "pos": "ADP",
+      "rights": [
+        204
+      ],
+      "text": "by"
+    },
+    {
+      "dep": "pcomp",
+      "head": 203,
+      "lefts": [],
+      "lemma": "turn",
+      "pos": "VERB",
+      "rights": [
+        205,
+        207
+      ],
+      "text": "turning"
+    },
+    {
+      "dep": "prt",
+      "head": 204,
+      "lefts": [],
+      "lemma": "off",
+      "pos": "ADP",
+      "rights": [],
+      "text": "off"
+    },
+    {
+      "dep": "det",
+      "head": 207,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "dobj",
+      "head": 204,
+      "lefts": [
+        206
+      ],
+      "lemma": "engine",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "engines"
+    },
+    {
+      "dep": "punct",
+      "head": 197,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "cc",
+      "head": 197,
+      "lefts": [],
+      "lemma": "and",
+      "pos": "CCONJ",
+      "rights": [],
+      "text": "and"
+    },
+    {
+      "dep": "aux",
+      "head": 211,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "conj",
+      "head": 197,
+      "lefts": [
+        210
+      ],
+      "lemma": "remove",
+      "pos": "VERB",
+      "rights": [
+        213,
+        214
+      ],
+      "text": "remove"
+    },
+    {
+      "dep": "det",
+      "head": 213,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "dobj",
+      "head": 211,
+      "lefts": [
+        212
+      ],
+      "lemma": "plane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "plane"
+    },
+    {
+      "dep": "prep",
+      "head": 211,
+      "lefts": [],
+      "lemma": "from",
+      "pos": "ADP",
+      "rights": [
+        216
+      ],
+      "text": "from"
+    },
+    {
+      "dep": "det",
+      "head": 216,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "pobj",
+      "head": 214,
+      "lefts": [
+        215
+      ],
+      "lemma": "airport",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airport"
+    },
+    {
+      "dep": "punct",
+      "head": 179,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "det",
+      "head": 219,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "The"
+    },
+    {
+      "dep": "nsubj",
+      "head": 220,
+      "lefts": [
+        218
+      ],
+      "lemma": "criterion",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "criterion"
+    },
+    {
+      "dep": "ROOT",
+      "head": 220,
+      "lefts": [
+        219
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        222,
+        239
+      ],
+      "text": "is"
+    },
+    {
+      "dep": "aux",
+      "head": 222,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 220,
+      "lefts": [
+        221
+      ],
+      "lemma": "minimize",
+      "pos": "VERB",
+      "rights": [
+        227
+      ],
+      "text": "minimize"
+    },
+    {
+      "dep": "det",
+      "head": 227,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "amod",
+      "head": 227,
+      "lefts": [],
+      "lemma": "sum",
+      "pos": "VERB",
+      "rights": [
+        225
+      ],
+      "text": "summed"
+    },
+    {
+      "dep": "prt",
+      "head": 224,
+      "lefts": [],
+      "lemma": "up",
+      "pos": "ADP",
+      "rights": [],
+      "text": "up"
+    },
+    {
+      "dep": "compound",
+      "head": 227,
+      "lefts": [],
+      "lemma": "travel",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "travel"
+    },
+    {
+      "dep": "dobj",
+      "head": 222,
+      "lefts": [
+        223,
+        224,
+        226
+      ],
+      "lemma": "time",
+      "pos": "NOUN",
+      "rights": [
+        228,
+        229,
+        235,
+        236
+      ],
+      "text": "time"
+    },
+    {
+      "dep": "punct",
+      "head": 227,
+      "lefts": [],
+      "lemma": "(",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "("
+    },
+    {
+      "dep": "prep",
+      "head": 227,
+      "lefts": [],
+      "lemma": "on",
+      "pos": "ADP",
+      "rights": [
+        231
+      ],
+      "text": "on"
+    },
+    {
+      "dep": "det",
+      "head": 231,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "pobj",
+      "head": 229,
+      "lefts": [
+        230
+      ],
+      "lemma": "surface",
+      "pos": "NOUN",
+      "rights": [
+        232
+      ],
+      "text": "surface"
+    },
+    {
+      "dep": "prep",
+      "head": 231,
+      "lefts": [],
+      "lemma": "of",
+      "pos": "ADP",
+      "rights": [
+        234
+      ],
+      "text": "of"
+    },
+    {
+      "dep": "det",
+      "head": 234,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "the"
+    },
+    {
+      "dep": "pobj",
+      "head": 232,
+      "lefts": [
+        233
+      ],
+      "lemma": "airport",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airport"
+    },
+    {
+      "dep": "punct",
+      "head": 227,
+      "lefts": [],
+      "lemma": ")",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ")"
+    },
+    {
+      "dep": "prep",
+      "head": 227,
+      "lefts": [],
+      "lemma": "of",
+      "pos": "ADP",
+      "rights": [
+        238
+      ],
+      "text": "of"
+    },
+    {
+      "dep": "det",
+      "head": 238,
+      "lefts": [],
+      "lemma": "all",
+      "pos": "DET",
+      "rights": [],
+      "text": "all"
+    },
+    {
+      "dep": "pobj",
+      "head": 236,
+      "lefts": [
+        237
+      ],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airplanes"
+    },
+    {
+      "dep": "punct",
+      "head": 220,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "expl",
+      "head": 242,
+      "lefts": [],
+      "lemma": "there",
+      "pos": "PRON",
+      "rights": [],
+      "text": "There"
+    },
+    {
+      "dep": "advmod",
+      "head": 242,
+      "lefts": [],
+      "lemma": "usually",
+      "pos": "ADV",
+      "rights": [],
+      "text": "usually"
+    },
+    {
+      "dep": "ROOT",
+      "head": 242,
+      "lefts": [
+        240,
+        241
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        244,
+        248,
+        268
+      ],
+      "text": "are"
+    },
+    {
+      "dep": "amod",
+      "head": 244,
+      "lefts": [],
+      "lemma": "standard",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "standard"
+    },
+    {
+      "dep": "attr",
+      "head": 242,
+      "lefts": [
+        243
+      ],
+      "lemma": "route",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "routes"
+    },
+    {
+      "dep": "punct",
+      "head": 248,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "advmod",
+      "head": 248,
+      "lefts": [],
+      "lemma": "i.e.",
+      "pos": "X",
+      "rights": [],
+      "text": "i.e."
+    },
+    {
+      "dep": "punct",
+      "head": 248,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "attr",
+      "head": 242,
+      "lefts": [
+        245,
+        246,
+        247
+      ],
+      "lemma": "route",
+      "pos": "VERB",
+      "rights": [
+        253
+      ],
+      "text": "routes"
+    },
+    {
+      "dep": "dobj",
+      "head": 253,
+      "lefts": [],
+      "lemma": "that",
+      "pos": "SCONJ",
+      "rights": [],
+      "text": "that"
+    },
+    {
+      "dep": "det",
+      "head": 251,
+      "lefts": [],
+      "lemma": "any",
+      "pos": "DET",
+      "rights": [],
+      "text": "any"
+    },
+    {
+      "dep": "nsubj",
+      "head": 253,
+      "lefts": [
+        250
+      ],
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airplane"
+    },
+    {
+      "dep": "aux",
+      "head": 253,
+      "lefts": [],
+      "lemma": "must",
+      "pos": "AUX",
+      "rights": [],
+      "text": "must"
+    },
+    {
+      "dep": "ccomp",
+      "head": 248,
+      "lefts": [
+        249,
+        251,
+        252
+      ],
+      "lemma": "take",
+      "pos": "VERB",
+      "rights": [
+        255
+      ],
+      "text": "take"
+    },
+    {
+      "dep": "advmod",
+      "head": 255,
+      "lefts": [],
+      "lemma": "when",
+      "pos": "ADV",
+      "rights": [],
+      "text": "when"
+    },
+    {
+      "dep": "advcl",
+      "head": 253,
+      "lefts": [
+        254
+      ],
+      "lemma": "outbound",
+      "pos": "ADJ",
+      "rights": [
+        256,
+        262,
+        263
+      ],
+      "text": "outbound"
+    },
+    {
+      "dep": "prep",
+      "head": 255,
+      "lefts": [],
+      "lemma": "from",
+      "pos": "ADP",
+      "rights": [
+        260,
+        261
+      ],
+      "text": "from"
+    },
+    {
+      "dep": "det",
+      "head": 260,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "amod",
+      "head": 260,
+      "lefts": [],
+      "lemma": "certain",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "certain"
+    },
+    {
+      "dep": "compound",
+      "head": 260,
+      "lefts": [],
+      "lemma": "parking",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "parking"
+    },
+    {
+      "dep": "pobj",
+      "head": 256,
+      "lefts": [
+        257,
+        258,
+        259
+      ],
+      "lemma": "area",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "area"
+    },
+    {
+      "dep": "punct",
+      "head": 256,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "cc",
+      "head": 255,
+      "lefts": [],
+      "lemma": "or",
+      "pos": "CCONJ",
+      "rights": [],
+      "text": "or"
+    },
+    {
+      "dep": "conj",
+      "head": 255,
+      "lefts": [],
+      "lemma": "inbound",
+      "pos": "ADJ",
+      "rights": [
+        264
+      ],
+      "text": "inbound"
+    },
+    {
+      "dep": "prep",
+      "head": 263,
+      "lefts": [],
+      "lemma": "from",
+      "pos": "ADP",
+      "rights": [
+        267
+      ],
+      "text": "from"
+    },
+    {
+      "dep": "det",
+      "head": 267,
+      "lefts": [],
+      "lemma": "a",
+      "pos": "DET",
+      "rights": [],
+      "text": "a"
+    },
+    {
+      "dep": "amod",
+      "head": 267,
+      "lefts": [],
+      "lemma": "certain",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "certain"
+    },
+    {
+      "dep": "pobj",
+      "head": 264,
+      "lefts": [
+        265,
+        266
+      ],
+      "lemma": "runway",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "runway"
+    },
+    {
+      "dep": "punct",
+      "head": 242,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    },
+    {
+      "dep": "det",
+      "head": 270,
+      "lefts": [],
+      "lemma": "the",
+      "pos": "DET",
+      "rights": [],
+      "text": "The"
+    },
+    {
+      "dep": "nsubj",
+      "head": 275,
+      "lefts": [
+        269
+      ],
+      "lemma": "reason",
+      "pos": "NOUN",
+      "rights": [
+        271
+      ],
+      "text": "reason"
+    },
+    {
+      "dep": "prep",
+      "head": 270,
+      "lefts": [],
+      "lemma": "for",
+      "pos": "ADP",
+      "rights": [
+        272
+      ],
+      "text": "for"
+    },
+    {
+      "dep": "pcomp",
+      "head": 271,
+      "lefts": [],
+      "lemma": "introduce",
+      "pos": "VERB",
+      "rights": [
+        274
+      ],
+      "text": "introducing"
+    },
+    {
+      "dep": "amod",
+      "head": 274,
+      "lefts": [],
+      "lemma": "such",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "such"
+    },
+    {
+      "dep": "dobj",
+      "head": 272,
+      "lefts": [
+        273
+      ],
+      "lemma": "route",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "routes"
+    },
+    {
+      "dep": "ROOT",
+      "head": 275,
+      "lefts": [
+        270
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        277,
+        288,
+        295
+      ],
+      "text": "is"
+    },
+    {
+      "dep": "aux",
+      "head": 277,
+      "lefts": [],
+      "lemma": "to",
+      "pos": "PART",
+      "rights": [],
+      "text": "to"
+    },
+    {
+      "dep": "xcomp",
+      "head": 275,
+      "lefts": [
+        276
+      ],
+      "lemma": "reduce",
+      "pos": "VERB",
+      "rights": [
+        278,
+        283
+      ],
+      "text": "reduce"
+    },
+    {
+      "dep": "dobj",
+      "head": 277,
+      "lefts": [],
+      "lemma": "complexity",
+      "pos": "NOUN",
+      "rights": [
+        279
+      ],
+      "text": "complexity"
+    },
+    {
+      "dep": "prep",
+      "head": 278,
+      "lefts": [],
+      "lemma": "for",
+      "pos": "ADP",
+      "rights": [
+        282
+      ],
+      "text": "for"
+    },
+    {
+      "dep": "amod",
+      "head": 282,
+      "lefts": [],
+      "lemma": "human",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "human"
+    },
+    {
+      "dep": "compound",
+      "head": 282,
+      "lefts": [],
+      "lemma": "ground",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "ground"
+    },
+    {
+      "dep": "pobj",
+      "head": 279,
+      "lefts": [
+        280,
+        281
+      ],
+      "lemma": "controller",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "controllers"
+    },
+    {
+      "dep": "punct",
+      "head": 277,
+      "lefts": [],
+      "lemma": ",",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": ","
+    },
+    {
+      "dep": "mark",
+      "head": 288,
+      "lefts": [],
+      "lemma": "since",
+      "pos": "SCONJ",
+      "rights": [],
+      "text": "since"
+    },
+    {
+      "dep": "amod",
+      "head": 287,
+      "lefts": [],
+      "lemma": "significant",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "significant"
+    },
+    {
+      "dep": "compound",
+      "head": 287,
+      "lefts": [],
+      "lemma": "computer",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "computer"
+    },
+    {
+      "dep": "nsubj",
+      "head": 288,
+      "lefts": [
+        285,
+        286
+      ],
+      "lemma": "support",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "support"
+    },
+    {
+      "dep": "advcl",
+      "head": 275,
+      "lefts": [
+        284,
+        287
+      ],
+      "lemma": "be",
+      "pos": "VERB",
+      "rights": [
+        289,
+        291
+      ],
+      "text": "is"
+    },
+    {
+      "dep": "neg",
+      "head": 288,
+      "lefts": [],
+      "lemma": "not",
+      "pos": "PART",
+      "rights": [],
+      "text": "not"
+    },
+    {
+      "dep": "advmod",
+      "head": 291,
+      "lefts": [],
+      "lemma": "yet",
+      "pos": "ADV",
+      "rights": [],
+      "text": "yet"
+    },
+    {
+      "dep": "acomp",
+      "head": 288,
+      "lefts": [
+        290
+      ],
+      "lemma": "available",
+      "pos": "ADJ",
+      "rights": [
+        292
+      ],
+      "text": "available"
+    },
+    {
+      "dep": "prep",
+      "head": 291,
+      "lefts": [],
+      "lemma": "at",
+      "pos": "ADP",
+      "rights": [
+        294
+      ],
+      "text": "at"
+    },
+    {
+      "dep": "amod",
+      "head": 294,
+      "lefts": [],
+      "lemma": "real",
+      "pos": "ADJ",
+      "rights": [],
+      "text": "real"
+    },
+    {
+      "dep": "pobj",
+      "head": 292,
+      "lefts": [
+        293
+      ],
+      "lemma": "airport",
+      "pos": "NOUN",
+      "rights": [],
+      "text": "airports"
+    },
+    {
+      "dep": "punct",
+      "head": 275,
+      "lefts": [],
+      "lemma": ".",
+      "pos": "PUNCT",
+      "rights": [],
+      "text": "."
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 0,
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "task",
+      "pos": "NOUN",
+      "position": 1,
+      "text": "task"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 2,
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 3,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "control",
+      "pos": "VERB",
+      "position": 4,
+      "text": "control"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 5,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "ground",
+      "pos": "NOUN",
+      "position": 6,
+      "text": "ground"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "traffic",
+      "pos": "NOUN",
+      "position": 7,
+      "text": "traffic"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "on",
+      "pos": "ADP",
+      "position": 8,
+      "text": "on"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "an",
+      "pos": "DET",
+      "position": 9,
+      "text": "an"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airport",
+      "pos": "NOUN",
+      "position": 10,
+      "text": "airport"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "(",
+      "pos": "PUNCT",
+      "position": 11,
+      "text": "("
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "in",
+      "pos": "ADP",
+      "position": 12,
+      "text": "in"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "such",
+      "pos": "DET",
+      "position": 13,
+      "text": "such"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 14,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "way",
+      "pos": "NOUN",
+      "position": 15,
+      "text": "way"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "position": 16,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 17,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "sum",
+      "pos": "VERB",
+      "position": 18,
+      "text": "summed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "up",
+      "pos": "ADP",
+      "position": 19,
+      "text": "up"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "travel",
+      "pos": "NOUN",
+      "position": 20,
+      "text": "travel"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "time",
+      "pos": "NOUN",
+      "position": 21,
+      "text": "time"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "position": 22,
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "all",
+      "pos": "DET",
+      "position": 23,
+      "text": "all"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 24,
+      "text": "airplanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 25,
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "minimize",
+      "pos": "VERB",
+      "position": 26,
+      "text": "minimized"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ")",
+      "pos": "PUNCT",
+      "position": 27,
+      "text": ")"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 28,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "timed",
+      "pos": "ADJ",
+      "position": 29,
+      "text": "Timed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "travel",
+      "pos": "NOUN",
+      "position": 30,
+      "text": "travel"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "route",
+      "pos": "NOUN",
+      "position": 31,
+      "text": "routes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "must",
+      "pos": "AUX",
+      "position": 32,
+      "text": "must"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 33,
+      "text": "be"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "assign",
+      "pos": "VERB",
+      "position": 34,
+      "text": "assigned"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "position": 35,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 36,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 37,
+      "text": "airplanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "so",
+      "pos": "SCONJ",
+      "position": 38,
+      "text": "so"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "SCONJ",
+      "position": 39,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "they",
+      "pos": "PRON",
+      "position": 40,
+      "text": "they"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reach",
+      "pos": "VERB",
+      "position": 41,
+      "text": "reach"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "their",
+      "pos": "PRON",
+      "position": 42,
+      "text": "their"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "target",
+      "pos": "NOUN",
+      "position": 43,
+      "text": "targets"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 44,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "there",
+      "pos": "PRON",
+      "position": 45,
+      "text": "There"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 46,
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "inbound",
+      "pos": "ADJ",
+      "position": 47,
+      "text": "inbound"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "traffic",
+      "pos": "NOUN",
+      "position": 48,
+      "text": "traffic"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "(",
+      "pos": "PUNCT",
+      "position": 49,
+      "text": "("
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plane",
+      "pos": "NOUN",
+      "position": 50,
+      "text": "planes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "position": 51,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "need",
+      "pos": "VERB",
+      "position": 52,
+      "text": "need"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 53,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "go",
+      "pos": "VERB",
+      "position": 54,
+      "text": "go"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "position": 55,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 56,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "parking",
+      "pos": "NOUN",
+      "position": 57,
+      "text": "parking"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "position",
+      "pos": "NOUN",
+      "position": 58,
+      "text": "position"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ")",
+      "pos": "PUNCT",
+      "position": 59,
+      "text": ")"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "position": 60,
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "outbound",
+      "pos": "ADJ",
+      "position": 61,
+      "text": "outbound"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "traffic",
+      "pos": "NOUN",
+      "position": 62,
+      "text": "traffic"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "(",
+      "pos": "PUNCT",
+      "position": 63,
+      "text": "("
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plane",
+      "pos": "NOUN",
+      "position": 64,
+      "text": "planes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "position": 65,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "need",
+      "pos": "VERB",
+      "position": 66,
+      "text": "need"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 67,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "go",
+      "pos": "VERB",
+      "position": 68,
+      "text": "go"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "ADP",
+      "position": 69,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 70,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "runway",
+      "pos": "NOUN",
+      "position": 71,
+      "text": "runway"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ")",
+      "pos": "PUNCT",
+      "position": 72,
+      "text": ")"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 73,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 74,
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "former",
+      "pos": "ADJ",
+      "position": 75,
+      "text": "former"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 76,
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 77,
+      "text": "airplanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "position": 78,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "must",
+      "pos": "AUX",
+      "position": 79,
+      "text": "must"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "take",
+      "pos": "VERB",
+      "position": 80,
+      "text": "take"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "off",
+      "pos": "ADP",
+      "position": 81,
+      "text": "off"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 82,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 83,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "latter",
+      "pos": "ADJ",
+      "position": 84,
+      "text": "latter"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 85,
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 86,
+      "text": "airplanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "position": 87,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "have",
+      "pos": "VERB",
+      "position": 88,
+      "text": "have"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "just",
+      "pos": "ADV",
+      "position": 89,
+      "text": "just"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "land",
+      "pos": "VERB",
+      "position": 90,
+      "text": "landed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "position": 91,
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "have",
+      "pos": "VERB",
+      "position": 92,
+      "text": "have"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 93,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "park",
+      "pos": "VERB",
+      "position": 94,
+      "text": "park"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 95,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 96,
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "main",
+      "pos": "ADJ",
+      "position": 97,
+      "text": "main"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "problem",
+      "pos": "NOUN",
+      "position": 98,
+      "text": "problem"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "constraint",
+      "pos": "NOUN",
+      "position": 99,
+      "text": "constraint"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 100,
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 101,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "ensure",
+      "pos": "VERB",
+      "position": 102,
+      "text": "ensure"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 103,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "safety",
+      "pos": "NOUN",
+      "position": 104,
+      "text": "safety"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "position": 105,
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 106,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 107,
+      "text": "airplanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 108,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "this",
+      "pos": "DET",
+      "position": 109,
+      "text": "This"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "mean",
+      "pos": "VERB",
+      "position": 110,
+      "text": "means"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 111,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "avoid",
+      "pos": "VERB",
+      "position": 112,
+      "text": "avoid"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "collision",
+      "pos": "NOUN",
+      "position": 113,
+      "text": "collisions"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 114,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "position": 115,
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "also",
+      "pos": "ADV",
+      "position": 116,
+      "text": "also"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 117,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "prevent",
+      "pos": "VERB",
+      "position": 118,
+      "text": "prevent"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 119,
+      "text": "airplanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "from",
+      "pos": "ADP",
+      "position": 120,
+      "text": "from"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "enter",
+      "pos": "VERB",
+      "position": 121,
+      "text": "entering"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 122,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "unsafe",
+      "pos": "ADJ",
+      "position": 123,
+      "text": "unsafe"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "zone",
+      "pos": "NOUN",
+      "position": 124,
+      "text": "zones"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "behind",
+      "pos": "ADP",
+      "position": 125,
+      "text": "behind"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "large",
+      "pos": "ADJ",
+      "position": 126,
+      "text": "large"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 127,
+      "text": "airplanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "DET",
+      "position": 128,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "have",
+      "pos": "VERB",
+      "position": 129,
+      "text": "have"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "their",
+      "pos": "PRON",
+      "position": 130,
+      "text": "their"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "engine",
+      "pos": "NOUN",
+      "position": 131,
+      "text": "engines"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "run",
+      "pos": "VERB",
+      "position": 132,
+      "text": "running"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 133,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "which",
+      "pos": "DET",
+      "position": 134,
+      "text": "Which"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "mean",
+      "pos": "VERB",
+      "position": 135,
+      "text": "means"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "SCONJ",
+      "position": 136,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "no",
+      "pos": "DET",
+      "position": 137,
+      "text": "no"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "two",
+      "pos": "NUM",
+      "position": 138,
+      "text": "two"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plane",
+      "pos": "NOUN",
+      "position": 139,
+      "text": "planes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "can",
+      "pos": "AUX",
+      "position": 140,
+      "text": "can"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "share",
+      "pos": "VERB",
+      "position": 141,
+      "text": "share"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 142,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "same",
+      "pos": "ADJ",
+      "position": 143,
+      "text": "same"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airport",
+      "pos": "NOUN",
+      "position": 144,
+      "text": "airport"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "segment",
+      "pos": "NOUN",
+      "position": 145,
+      "text": "segment"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 146,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "position": 147,
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "SCONJ",
+      "position": 148,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 149,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plane",
+      "pos": "NOUN",
+      "position": 150,
+      "text": "plane"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "with",
+      "pos": "ADP",
+      "position": 151,
+      "text": "with"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "run",
+      "pos": "VERB",
+      "position": 152,
+      "text": "running"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "engine",
+      "pos": "NOUN",
+      "position": 153,
+      "text": "engines"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "block",
+      "pos": "VERB",
+      "position": 154,
+      "text": "blocks"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 155,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "set",
+      "pos": "NOUN",
+      "position": 156,
+      "text": "set"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "position": 157,
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "segment",
+      "pos": "NOUN",
+      "position": 158,
+      "text": "segments"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "behind",
+      "pos": "ADP",
+      "position": 159,
+      "text": "behind"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "it",
+      "pos": "PRON",
+      "position": 160,
+      "text": "it"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "(",
+      "pos": "PUNCT",
+      "position": 161,
+      "text": "("
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "where",
+      "pos": "ADV",
+      "position": 162,
+      "text": "where"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 163,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "block",
+      "pos": "VERB",
+      "position": 164,
+      "text": "blocked"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "set",
+      "pos": "NOUN",
+      "position": 165,
+      "text": "set"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "depend",
+      "pos": "VERB",
+      "position": 166,
+      "text": "depends"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "on",
+      "pos": "ADP",
+      "position": 167,
+      "text": "on"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 168,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "size",
+      "pos": "NOUN",
+      "position": 169,
+      "text": "size"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "category",
+      "pos": "NOUN",
+      "position": 170,
+      "text": "category"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "position": 171,
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 172,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plane",
+      "pos": "NOUN",
+      "position": 173,
+      "text": "plane"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ")",
+      "pos": "PUNCT",
+      "position": 174,
+      "text": ")"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 175,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 176,
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "available",
+      "pos": "ADJ",
+      "position": 177,
+      "text": "available"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "activity",
+      "pos": "NOUN",
+      "position": 178,
+      "text": "activities"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 179,
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 180,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "move",
+      "pos": "VERB",
+      "position": 181,
+      "text": "move"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 182,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plane",
+      "pos": "NOUN",
+      "position": 183,
+      "text": "plane"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "away",
+      "pos": "ADV",
+      "position": 184,
+      "text": "away"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "backwards",
+      "pos": "ADV",
+      "position": 185,
+      "text": "backwards"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "from",
+      "pos": "ADP",
+      "position": 186,
+      "text": "from"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 187,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "parking",
+      "pos": "NOUN",
+      "position": 188,
+      "text": "parking"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "position",
+      "pos": "NOUN",
+      "position": 189,
+      "text": "position"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 190,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 191,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "startup",
+      "pos": "VERB",
+      "position": 192,
+      "text": "startup"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 193,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "engine",
+      "pos": "NOUN",
+      "position": 194,
+      "text": "engines"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 195,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 196,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "move",
+      "pos": "VERB",
+      "position": 197,
+      "text": "move"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "between",
+      "pos": "ADP",
+      "position": 198,
+      "text": "between"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "segment",
+      "pos": "NOUN",
+      "position": 199,
+      "text": "segments"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 200,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 201,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "park",
+      "pos": "VERB",
+      "position": 202,
+      "text": "park"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "by",
+      "pos": "ADP",
+      "position": 203,
+      "text": "by"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "turn",
+      "pos": "VERB",
+      "position": 204,
+      "text": "turning"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "off",
+      "pos": "ADP",
+      "position": 205,
+      "text": "off"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 206,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "engine",
+      "pos": "NOUN",
+      "position": 207,
+      "text": "engines"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 208,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "and",
+      "pos": "CCONJ",
+      "position": 209,
+      "text": "and"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 210,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "remove",
+      "pos": "VERB",
+      "position": 211,
+      "text": "remove"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 212,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "plane",
+      "pos": "NOUN",
+      "position": 213,
+      "text": "plane"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "from",
+      "pos": "ADP",
+      "position": 214,
+      "text": "from"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 215,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airport",
+      "pos": "NOUN",
+      "position": 216,
+      "text": "airport"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 217,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 218,
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "criterion",
+      "pos": "NOUN",
+      "position": 219,
+      "text": "criterion"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 220,
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 221,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "minimize",
+      "pos": "VERB",
+      "position": 222,
+      "text": "minimize"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 223,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "sum",
+      "pos": "VERB",
+      "position": 224,
+      "text": "summed"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "up",
+      "pos": "ADP",
+      "position": 225,
+      "text": "up"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "travel",
+      "pos": "NOUN",
+      "position": 226,
+      "text": "travel"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "time",
+      "pos": "NOUN",
+      "position": 227,
+      "text": "time"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "(",
+      "pos": "PUNCT",
+      "position": 228,
+      "text": "("
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "on",
+      "pos": "ADP",
+      "position": 229,
+      "text": "on"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 230,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "surface",
+      "pos": "NOUN",
+      "position": 231,
+      "text": "surface"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "position": 232,
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 233,
+      "text": "the"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airport",
+      "pos": "NOUN",
+      "position": 234,
+      "text": "airport"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ")",
+      "pos": "PUNCT",
+      "position": 235,
+      "text": ")"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "of",
+      "pos": "ADP",
+      "position": 236,
+      "text": "of"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "all",
+      "pos": "DET",
+      "position": 237,
+      "text": "all"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 238,
+      "text": "airplanes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 239,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "there",
+      "pos": "PRON",
+      "position": 240,
+      "text": "There"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "usually",
+      "pos": "ADV",
+      "position": 241,
+      "text": "usually"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 242,
+      "text": "are"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "standard",
+      "pos": "ADJ",
+      "position": 243,
+      "text": "standard"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "route",
+      "pos": "NOUN",
+      "position": 244,
+      "text": "routes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 245,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "i.e.",
+      "pos": "X",
+      "position": 246,
+      "text": "i.e."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 247,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "route",
+      "pos": "VERB",
+      "position": 248,
+      "text": "routes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "that",
+      "pos": "SCONJ",
+      "position": 249,
+      "text": "that"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "any",
+      "pos": "DET",
+      "position": 250,
+      "text": "any"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airplane",
+      "pos": "NOUN",
+      "position": 251,
+      "text": "airplane"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "must",
+      "pos": "AUX",
+      "position": 252,
+      "text": "must"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "take",
+      "pos": "VERB",
+      "position": 253,
+      "text": "take"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "when",
+      "pos": "ADV",
+      "position": 254,
+      "text": "when"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "outbound",
+      "pos": "ADJ",
+      "position": 255,
+      "text": "outbound"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "from",
+      "pos": "ADP",
+      "position": 256,
+      "text": "from"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 257,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "certain",
+      "pos": "ADJ",
+      "position": 258,
+      "text": "certain"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "parking",
+      "pos": "NOUN",
+      "position": 259,
+      "text": "parking"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "area",
+      "pos": "NOUN",
+      "position": 260,
+      "text": "area"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 261,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "or",
+      "pos": "CCONJ",
+      "position": 262,
+      "text": "or"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "inbound",
+      "pos": "ADJ",
+      "position": 263,
+      "text": "inbound"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "from",
+      "pos": "ADP",
+      "position": 264,
+      "text": "from"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "a",
+      "pos": "DET",
+      "position": 265,
+      "text": "a"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "certain",
+      "pos": "ADJ",
+      "position": 266,
+      "text": "certain"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "runway",
+      "pos": "NOUN",
+      "position": 267,
+      "text": "runway"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 268,
+      "text": "."
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "the",
+      "pos": "DET",
+      "position": 269,
+      "text": "The"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reason",
+      "pos": "NOUN",
+      "position": 270,
+      "text": "reason"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "for",
+      "pos": "ADP",
+      "position": 271,
+      "text": "for"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "introduce",
+      "pos": "VERB",
+      "position": 272,
+      "text": "introducing"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "such",
+      "pos": "ADJ",
+      "position": 273,
+      "text": "such"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "route",
+      "pos": "NOUN",
+      "position": 274,
+      "text": "routes"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 275,
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "to",
+      "pos": "PART",
+      "position": 276,
+      "text": "to"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "reduce",
+      "pos": "VERB",
+      "position": 277,
+      "text": "reduce"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "complexity",
+      "pos": "NOUN",
+      "position": 278,
+      "text": "complexity"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "for",
+      "pos": "ADP",
+      "position": 279,
+      "text": "for"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "human",
+      "pos": "ADJ",
+      "position": 280,
+      "text": "human"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "ground",
+      "pos": "NOUN",
+      "position": 281,
+      "text": "ground"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "controller",
+      "pos": "NOUN",
+      "position": 282,
+      "text": "controllers"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ",",
+      "pos": "PUNCT",
+      "position": 283,
+      "text": ","
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "since",
+      "pos": "SCONJ",
+      "position": 284,
+      "text": "since"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "significant",
+      "pos": "ADJ",
+      "position": 285,
+      "text": "significant"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "computer",
+      "pos": "NOUN",
+      "position": 286,
+      "text": "computer"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "support",
+      "pos": "NOUN",
+      "position": 287,
+      "text": "support"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "be",
+      "pos": "VERB",
+      "position": 288,
+      "text": "is"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "not",
+      "pos": "PART",
+      "position": 289,
+      "text": "not"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "yet",
+      "pos": "ADV",
+      "position": 290,
+      "text": "yet"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "available",
+      "pos": "ADJ",
+      "position": 291,
+      "text": "available"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "at",
+      "pos": "ADP",
+      "position": 292,
+      "text": "at"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "real",
+      "pos": "ADJ",
+      "position": 293,
+      "text": "real"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "airport",
+      "pos": "NOUN",
+      "position": 294,
+      "text": "airports"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": ".",
+      "pos": "PUNCT",
+      "position": 295,
+      "text": "."
+    }
+  ],
+  "content_ner": [],
+  "content_tokens": [
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "The"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "task"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "is"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "control"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "ground"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "traffic"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "on"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "an"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airport"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "("
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "in"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "such"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "way"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "summed"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "up"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "travel"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "time"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "of"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "all"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplanes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "is"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "minimized"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ")"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "Timed"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "travel"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "routes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "must"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "be"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "assigned"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplanes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "so"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "they"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "reach"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "their"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "targets"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "There"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "is"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "inbound"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "traffic"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "("
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "planes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "need"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "go"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "parking"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "position"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ")"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "and"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "outbound"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "traffic"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "("
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "planes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "need"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "go"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "runway"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ")"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "The"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "former"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "are"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplanes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "must"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "take"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "off"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "latter"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "are"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplanes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "have"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "just"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "landed"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "and"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "have"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "park"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "The"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "main"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "problem"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "constraint"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "is"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "ensure"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "safety"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "of"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplanes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "This"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "means"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "avoid"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "collisions"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "and"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "also"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "prevent"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplanes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "from"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "entering"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "unsafe"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "zones"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "behind"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "large"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplanes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "have"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "their"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "engines"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "running"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "Which"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "means"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "no"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "two"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "planes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "can"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "share"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "same"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airport"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "segment"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "and"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "plane"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "with"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "running"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "engines"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "blocks"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "set"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "of"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "segments"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "behind"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "it"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "("
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "where"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "blocked"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "set"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "depends"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "on"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "size"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "category"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "of"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "plane"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ")"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "The"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "available"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "activities"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "are"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "move"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "plane"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "away"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "backwards"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "from"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "parking"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "position"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "startup"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "engines"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "move"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "between"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "segments"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "park"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "by"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "turning"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "off"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "engines"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "and"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "remove"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "plane"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "from"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airport"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "The"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "criterion"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "is"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "minimize"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "summed"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "up"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "travel"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "time"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "("
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "on"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "surface"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "of"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "the"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airport"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ")"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "of"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "all"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplanes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "There"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "usually"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "are"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "standard"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "routes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "i.e."
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "routes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "that"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "any"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airplane"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "must"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "take"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "when"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "outbound"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "from"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "certain"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "parking"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "area"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "or"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "inbound"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "from"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "a"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "certain"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "runway"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ],
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "The"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "reason"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "for"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "introducing"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "such"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "routes"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "is"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "to"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "reduce"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "complexity"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "for"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "human"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "ground"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "controllers"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": ","
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "since"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "significant"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "computer"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "support"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "is"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "not"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "yet"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "available"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "at"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "real"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "airports"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "."
+      }
+    ]
+  ],
+  "data_source": "converter-service",
+  "error": false,
+  "keywords": [
+    {
+      "score": 16,
+      "span": {
+        "end": 4,
+        "start": 0
+      },
+      "text": "airport ground traffic control"
+    },
+    {
+      "score": 41,
+      "span": {
+        "end": 279,
+        "start": 272
+      },
+      "text": "introduce such route be to reduce complexity"
+    },
+    {
+      "score": 32,
+      "span": {
+        "end": 103,
+        "start": 97
+      },
+      "text": "main problem constraint be to ensure"
+    },
+    {
+      "score": 24,
+      "span": {
+        "end": 290,
+        "start": 285
+      },
+      "text": "significant computer support be not"
+    },
+    {
+      "score": 21,
+      "span": {
+        "end": 182,
+        "start": 177
+      },
+      "text": "available activity be to move"
+    },
+    {
+      "score": 16,
+      "span": {
+        "end": 5,
+        "start": 1
+      },
+      "text": "task be to control"
+    },
+    {
+      "score": 16,
+      "span": {
+        "end": 114,
+        "start": 110
+      },
+      "text": "mean to avoid collision"
+    },
+    {
+      "score": 16,
+      "span": {
+        "end": 223,
+        "start": 219
+      },
+      "text": "criterion be to minimize"
+    },
+    {
+      "score": 11,
+      "span": {
+        "end": 245,
+        "start": 242
+      },
+      "text": "be standard route"
+    },
+    {
+      "score": 10,
+      "span": {
+        "end": 120,
+        "start": 117
+      },
+      "text": "to prevent airplane"
+    },
+    {
+      "score": 10,
+      "span": {
+        "end": 27,
+        "start": 24
+      },
+      "text": "airplane be minimize"
+    },
+    {
+      "score": 9,
+      "span": {
+        "end": 32,
+        "start": 29
+      },
+      "text": "timed travel route"
+    },
+    {
+      "score": 9,
+      "span": {
+        "end": 78,
+        "start": 75
+      },
+      "text": "former be airplane"
+    },
+    {
+      "score": 9,
+      "span": {
+        "end": 87,
+        "start": 84
+      },
+      "text": "latter be airplane"
+    },
+    {
+      "score": 8,
+      "span": {
+        "end": 49,
+        "start": 46
+      },
+      "text": "be inbound traffic"
+    },
+    {
+      "score": 8,
+      "span": {
+        "end": 283,
+        "start": 280
+      },
+      "text": "human ground controller"
+    },
+    {
+      "score": 8,
+      "span": {
+        "end": 167,
+        "start": 164
+      },
+      "text": "block set depend"
+    },
+    {
+      "score": 8,
+      "span": {
+        "end": 261,
+        "start": 258
+      },
+      "text": "certain parking area"
+    },
+    {
+      "score": 7,
+      "span": {
+        "end": 155,
+        "start": 152
+      },
+      "text": "run engine block"
+    },
+    {
+      "score": 7,
+      "span": {
+        "end": 146,
+        "start": 143
+      },
+      "text": "same airport segment"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 8,
+        "start": 6
+      },
+      "text": "ground traffic"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 228,
+        "start": 226
+      },
+      "text": "travel time"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 190,
+        "start": 188
+      },
+      "text": "parking position"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 128,
+        "start": 126
+      },
+      "text": "large airplane"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 133,
+        "start": 131
+      },
+      "text": "engine run"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 125,
+        "start": 123
+      },
+      "text": "unsafe zone"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 171,
+        "start": 169
+      },
+      "text": "size category"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 268,
+        "start": 266
+      },
+      "text": "certain runway"
+    },
+    {
+      "score": 4,
+      "span": {
+        "end": 295,
+        "start": 293
+      },
+      "text": "real airport"
+    },
+    {
+      "score": 3,
+      "span": {
+        "end": 63,
+        "start": 61
+      },
+      "text": "outbound traffic"
+    },
+    {
+      "score": 3,
+      "span": {
+        "end": 292,
+        "start": 291
+      },
+      "text": "available"
+    },
+    {
+      "score": 2,
+      "span": {
+        "end": 252,
+        "start": 251
+      },
+      "text": "airplane"
+    },
+    {
+      "score": 2,
+      "span": {
+        "end": 235,
+        "start": 234
+      },
+      "text": "airport"
+    },
+    {
+      "score": 2,
+      "span": {
+        "end": 157,
+        "start": 156
+      },
+      "text": "set"
+    },
+    {
+      "score": 2,
+      "span": {
+        "end": 200,
+        "start": 199
+      },
+      "text": "segment"
+    },
+    {
+      "score": 2,
+      "span": {
+        "end": 208,
+        "start": 207
+      },
+      "text": "engine"
+    },
+    {
+      "score": 2,
+      "span": {
+        "end": 264,
+        "start": 263
+      },
+      "text": "inbound"
+    },
+    {
+      "score": 1,
+      "span": {
+        "end": 72,
+        "start": 71
+      },
+      "text": "runway"
+    },
+    {
+      "score": 1,
+      "span": {
+        "end": 256,
+        "start": 255
+      },
+      "text": "outbound"
+    },
+    {
+      "score": 1,
+      "span": {
+        "end": 16,
+        "start": 15
+      },
+      "text": "way"
+    },
+    {
+      "score": 1,
+      "span": {
+        "end": 44,
+        "start": 43
+      },
+      "text": "target"
+    },
+    {
+      "score": 1,
+      "span": {
+        "end": 214,
+        "start": 213
+      },
+      "text": "plane"
+    },
+    {
+      "score": 1,
+      "span": {
+        "end": 105,
+        "start": 104
+      },
+      "text": "safety"
+    },
+    {
+      "score": 1,
+      "span": {
+        "end": 232,
+        "start": 231
+      },
+      "text": "surface"
+    },
+    {
+      "score": 1,
+      "span": {
+        "end": 271,
+        "start": 270
+      },
+      "text": "reason"
+    }
+  ],
+  "kg": [
+    {
+      "automatically_fill": true,
+      "confidence": 1.0,
+      "field_type": "document-class",
+      "property": {
+        "content": "topic",
+        "label_content": "",
+        "lemma_content": "topic",
+        "positions": [
+          -1
+        ]
+      },
+      "subject": {
+        "content": "planning",
+        "label_content": "",
+        "lemma_content": "planning",
+        "positions": [
+          -1
+        ]
+      },
+      "value": {
+        "content": "rel:instanceof",
+        "label_content": "",
+        "lemma_content": "rel:instanceof",
+        "positions": [
+          -1
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "is"
+        ],
+        "label": "dep_verb",
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          2
+        ]
+      },
+      "subject": {
+        "content": [
+          "task"
+        ],
+        "label": "dep_subject",
+        "lemma_content": [
+          "task"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          1
+        ]
+      },
+      "value": {
+        "content": [
+          "control",
+          "the",
+          "ground",
+          "traffic",
+          "on",
+          "an",
+          "airport",
+          "(",
+          "in",
+          "such",
+          "a",
+          "way",
+          "that",
+          "the",
+          "summed",
+          "up",
+          "travel",
+          "time",
+          "of",
+          "all",
+          "airplanes",
+          "is",
+          "minimized"
+        ],
+        "label": "dep_object",
+        "lemma_content": [
+          "control",
+          "the",
+          "ground",
+          "traffic",
+          "on",
+          "an",
+          "airport",
+          "(",
+          "in",
+          "such",
+          "a",
+          "way",
+          "that",
+          "the",
+          "sum",
+          "up",
+          "travel",
+          "time",
+          "of",
+          "all",
+          "airplane",
+          "be",
+          "minimize"
+        ],
+        "pos": [
+          "VERB",
+          "DET",
+          "NOUN",
+          "NOUN",
+          "ADP",
+          "DET",
+          "NOUN",
+          "PUNCT",
+          "ADP",
+          "DET",
+          "DET",
+          "NOUN",
+          "DET",
+          "DET",
+          "VERB",
+          "ADP",
+          "NOUN",
+          "NOUN",
+          "ADP",
+          "DET",
+          "NOUN",
+          "VERB",
+          "VERB"
+        ],
+        "positions": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "must",
+          "be",
+          "assigned",
+          "to"
+        ],
+        "label": "pattern_verb_phrase",
+        "lemma_content": [
+          "must",
+          "be",
+          "assign",
+          "to"
+        ],
+        "pos": [
+          "AUX",
+          "VERB",
+          "VERB",
+          "ADP"
+        ],
+        "positions": [
+          32,
+          33,
+          34,
+          35
+        ]
+      },
+      "subject": {
+        "content": [
+          "Timed",
+          "travel",
+          "routes"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "timed",
+          "travel",
+          "route"
+        ],
+        "pos": [
+          "ADJ",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          29,
+          30,
+          31
+        ]
+      },
+      "value": {
+        "content": [
+          "airplanes"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "airplane"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          37
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "are"
+        ],
+        "label": "pattern_verb_phrase",
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          76
+        ]
+      },
+      "subject": {
+        "content": [
+          "former"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "former"
+        ],
+        "pos": [
+          "ADJ"
+        ],
+        "positions": [
+          75
+        ]
+      },
+      "value": {
+        "content": [
+          "airplanes"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "airplane"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          77
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "are"
+        ],
+        "label": "pattern_verb_phrase",
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          85
+        ]
+      },
+      "subject": {
+        "content": [
+          "latter"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "latter"
+        ],
+        "pos": [
+          "ADJ"
+        ],
+        "positions": [
+          84
+        ]
+      },
+      "value": {
+        "content": [
+          "airplanes"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "airplane"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          86
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "is"
+        ],
+        "label": "dep_verb",
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          100
+        ]
+      },
+      "subject": {
+        "content": [
+          "problem",
+          "constraint"
+        ],
+        "label": "dep_subject",
+        "lemma_content": [
+          "problem",
+          "constraint"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          98,
+          99
+        ]
+      },
+      "value": {
+        "content": [
+          "ensure",
+          "the",
+          "safety",
+          "of",
+          "the",
+          "airplanes"
+        ],
+        "label": "dep_object",
+        "lemma_content": [
+          "ensure",
+          "the",
+          "safety",
+          "of",
+          "the",
+          "airplane"
+        ],
+        "pos": [
+          "VERB",
+          "DET",
+          "NOUN",
+          "ADP",
+          "DET",
+          "NOUN"
+        ],
+        "positions": [
+          102,
+          103,
+          104,
+          105,
+          106,
+          107
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "can",
+          "share"
+        ],
+        "label": "pattern_verb_phrase",
+        "lemma_content": [
+          "can",
+          "share"
+        ],
+        "pos": [
+          "AUX",
+          "VERB"
+        ],
+        "positions": [
+          140,
+          141
+        ]
+      },
+      "subject": {
+        "content": [
+          "planes"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "plane"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          139
+        ]
+      },
+      "value": {
+        "content": [
+          "same",
+          "airport",
+          "segment"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "same",
+          "airport",
+          "segment"
+        ],
+        "pos": [
+          "ADJ",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          143,
+          144,
+          145
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "can",
+          "share"
+        ],
+        "label": "dep_verb",
+        "lemma_content": [
+          "can",
+          "share"
+        ],
+        "pos": [
+          "AUX",
+          "VERB"
+        ],
+        "positions": [
+          140,
+          141
+        ]
+      },
+      "subject": {
+        "content": [
+          "planes"
+        ],
+        "label": "dep_subject",
+        "lemma_content": [
+          "plane"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          139
+        ]
+      },
+      "value": {
+        "content": [
+          "airport",
+          "segment"
+        ],
+        "label": "dep_object",
+        "lemma_content": [
+          "airport",
+          "segment"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          144,
+          145
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "blocks"
+        ],
+        "label": "dep_verb",
+        "lemma_content": [
+          "block"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          154
+        ]
+      },
+      "subject": {
+        "content": [
+          "plane"
+        ],
+        "label": "dep_subject",
+        "lemma_content": [
+          "plane"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          150
+        ]
+      },
+      "value": {
+        "content": [
+          "set"
+        ],
+        "label": "dep_object",
+        "lemma_content": [
+          "set"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          156
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "blocks"
+        ],
+        "label": "pattern_verb_phrase",
+        "lemma_content": [
+          "block"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          154
+        ]
+      },
+      "subject": {
+        "content": [
+          "engines"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "engine"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          153
+        ]
+      },
+      "value": {
+        "content": [
+          "set",
+          "of",
+          "segments"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "set",
+          "of",
+          "segment"
+        ],
+        "pos": [
+          "NOUN",
+          "ADP",
+          "NOUN"
+        ],
+        "positions": [
+          156,
+          157,
+          158
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "depends",
+          "on"
+        ],
+        "label": "pattern_verb_phrase",
+        "lemma_content": [
+          "depend",
+          "on"
+        ],
+        "pos": [
+          "VERB",
+          "ADP"
+        ],
+        "positions": [
+          166,
+          167
+        ]
+      },
+      "subject": {
+        "content": [
+          "set"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "set"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          165
+        ]
+      },
+      "value": {
+        "content": [
+          "size",
+          "category",
+          "of",
+          "the",
+          "plane"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "size",
+          "category",
+          "of",
+          "the",
+          "plane"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN",
+          "ADP",
+          "DET",
+          "NOUN"
+        ],
+        "positions": [
+          169,
+          170,
+          171,
+          172,
+          173
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "are"
+        ],
+        "label": "dep_verb",
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          179
+        ]
+      },
+      "subject": {
+        "content": [
+          "activities"
+        ],
+        "label": "dep_subject",
+        "lemma_content": [
+          "activity"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          178
+        ]
+      },
+      "value": {
+        "content": [
+          "move",
+          "a",
+          "plane",
+          "away",
+          "backwards",
+          "from",
+          "a",
+          "parking",
+          "position",
+          ",",
+          "to",
+          "startup",
+          "the",
+          "engines",
+          ",",
+          "to",
+          "move",
+          "between",
+          "segments",
+          ",",
+          "to",
+          "park",
+          "by",
+          "turning",
+          "off",
+          "the",
+          "engines",
+          ",",
+          "and",
+          "to",
+          "remove",
+          "the",
+          "plane",
+          "from",
+          "the",
+          "airport"
+        ],
+        "label": "dep_object",
+        "lemma_content": [
+          "move",
+          "a",
+          "plane",
+          "away",
+          "backwards",
+          "from",
+          "a",
+          "parking",
+          "position",
+          ",",
+          "to",
+          "startup",
+          "the",
+          "engine",
+          ",",
+          "to",
+          "move",
+          "between",
+          "segment",
+          ",",
+          "to",
+          "park",
+          "by",
+          "turn",
+          "off",
+          "the",
+          "engine",
+          ",",
+          "and",
+          "to",
+          "remove",
+          "the",
+          "plane",
+          "from",
+          "the",
+          "airport"
+        ],
+        "pos": [
+          "VERB",
+          "DET",
+          "NOUN",
+          "ADV",
+          "ADV",
+          "ADP",
+          "DET",
+          "NOUN",
+          "NOUN",
+          "PUNCT",
+          "PART",
+          "VERB",
+          "DET",
+          "NOUN",
+          "PUNCT",
+          "PART",
+          "VERB",
+          "ADP",
+          "NOUN",
+          "PUNCT",
+          "PART",
+          "VERB",
+          "ADP",
+          "VERB",
+          "ADP",
+          "DET",
+          "NOUN",
+          "PUNCT",
+          "CCONJ",
+          "PART",
+          "VERB",
+          "DET",
+          "NOUN",
+          "ADP",
+          "DET",
+          "NOUN"
+        ],
+        "positions": [
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191,
+          192,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203,
+          204,
+          205,
+          206,
+          207,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215,
+          216
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "is"
+        ],
+        "label": "dep_verb",
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          220
+        ]
+      },
+      "subject": {
+        "content": [
+          "criterion"
+        ],
+        "label": "dep_subject",
+        "lemma_content": [
+          "criterion"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          219
+        ]
+      },
+      "value": {
+        "content": [
+          "minimize",
+          "the",
+          "summed",
+          "up",
+          "travel",
+          "time",
+          "(",
+          "on",
+          "the",
+          "surface",
+          "of",
+          "the",
+          "airport",
+          ")",
+          "of",
+          "all",
+          "airplanes"
+        ],
+        "label": "dep_object",
+        "lemma_content": [
+          "minimize",
+          "the",
+          "sum",
+          "up",
+          "travel",
+          "time",
+          "(",
+          "on",
+          "the",
+          "surface",
+          "of",
+          "the",
+          "airport",
+          ")",
+          "of",
+          "all",
+          "airplane"
+        ],
+        "pos": [
+          "VERB",
+          "DET",
+          "VERB",
+          "ADP",
+          "NOUN",
+          "NOUN",
+          "PUNCT",
+          "ADP",
+          "DET",
+          "NOUN",
+          "ADP",
+          "DET",
+          "NOUN",
+          "PUNCT",
+          "ADP",
+          "DET",
+          "NOUN"
+        ],
+        "positions": [
+          222,
+          223,
+          224,
+          225,
+          226,
+          227,
+          228,
+          229,
+          230,
+          231,
+          232,
+          233,
+          234,
+          235,
+          236,
+          237,
+          238
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "must",
+          "take",
+          "when"
+        ],
+        "label": "pattern_verb_phrase",
+        "lemma_content": [
+          "must",
+          "take",
+          "when"
+        ],
+        "pos": [
+          "AUX",
+          "VERB",
+          "ADV"
+        ],
+        "positions": [
+          252,
+          253,
+          254
+        ]
+      },
+      "subject": {
+        "content": [
+          "airplane"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "airplane"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          251
+        ]
+      },
+      "value": {
+        "content": [
+          "outbound",
+          "from",
+          "a",
+          "certain",
+          "parking",
+          "area",
+          ",",
+          "or",
+          "inbound"
+        ],
+        "label": "pattern_syntagm_or_prep_group",
+        "lemma_content": [
+          "outbound",
+          "from",
+          "a",
+          "certain",
+          "parking",
+          "area",
+          ",",
+          "or",
+          "inbound"
+        ],
+        "pos": [
+          "ADJ",
+          "ADP",
+          "DET",
+          "ADJ",
+          "NOUN",
+          "NOUN",
+          "PUNCT",
+          "CCONJ",
+          "ADJ"
+        ],
+        "positions": [
+          255,
+          256,
+          257,
+          258,
+          259,
+          260,
+          261,
+          262,
+          263
+        ]
+      },
+      "weight": 0.0
+    },
+    {
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "field_type": "content",
+      "property": {
+        "content": [
+          "is"
+        ],
+        "label": "dep_verb",
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          275
+        ]
+      },
+      "subject": {
+        "content": [
+          "reason"
+        ],
+        "label": "dep_subject",
+        "lemma_content": [
+          "reason"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          270
+        ]
+      },
+      "value": {
+        "content": [
+          "reduce",
+          "complexity",
+          "for",
+          "human",
+          "ground",
+          "controllers"
+        ],
+        "label": "dep_object",
+        "lemma_content": [
+          "reduce",
+          "complexity",
+          "for",
+          "human",
+          "ground",
+          "controller"
+        ],
+        "pos": [
+          "VERB",
+          "NOUN",
+          "ADP",
+          "ADJ",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          277,
+          278,
+          279,
+          280,
+          281,
+          282
+        ]
+      },
+      "weight": 0.0
+    }
+  ],
+  "sentiment": {
+    "doc": {
+      "NEGATIVE": 0.9021484901507696,
+      "POSITIVE": 0.09785150984923045
+    },
+    "sentences": [
+      {
+        "label": "POSITIVE",
+        "score": 0.9158744812011719,
+        "sentence": "Airport Ground Traffic Control"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9983784556388855,
+        "sentence": " The task is to control the ground traffic on an airport in such a way that the summed up travel time of all airplanes is minimized"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9851595163345337,
+        "sentence": " Timed travel routes must be assigned to the airplanes so that they reach their targets"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9659996032714844,
+        "sentence": " There is inbound traffic planes that need to go to a parking position and outbound traffic planes that need to go to a runway"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9980840682983398,
+        "sentence": " The former are airplanes that must take off the latter are airplanes that have just landed and have to park"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9973270893096924,
+        "sentence": " The main problem constraint is to ensure the safety of the airplanes"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9087425470352173,
+        "sentence": " This means to avoid collisions and also to prevent airplanes from entering the unsafe zones behind large airplanes that have their engines running"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9997557997703552,
+        "sentence": " Which means that no two planes can share the same airport segment and that a plane with running engines blocks a set of segments behind it where the blocked set depends on the size category of the plane"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9954243302345276,
+        "sentence": " The available activities are to move a plane away backwards from a parking position to startup the engines to move between segments to park by turning off the engines and to remove the plane from the airport"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.941604495048523,
+        "sentence": " The criterion is to minimize the summed up travel time on the surface of the airport of all airplanes"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9525850415229797,
+        "sentence": " There usually are standard routes i.e. routes that any airplane must take when outbound from a certain parking area or inbound from a certain runway"
+      },
+      {
+        "label": "NEGATIVE",
+        "score": 0.9985954165458679,
+        "sentence": "The reason for introducing such routes is to reduce complexity for human ground controllers since significant computer support is not yet available at real airports"
+      }
+    ]
+  },
+  "source_doc_id": "raw/stories-to-classify.md/airport-ground-traffic-control",
+  "summaries": [
+    {
+      "block": "Airport Ground Traffic Control  The task is to control the ground traffic on an airport in such a way that the summed up travel time of all airplanes is minimized  Timed travel routes must be assigned to the airplanes so that they reach their targets  There is inbound traffic planes that need to go to a parking position and outbound traffic planes that need to go to a runway  The former are airplanes that must take off the latter are airplanes that have just landed and have to park  The main problem constraint is to ensure the safety of the airplanes  This means to avoid collisions and also to prevent airplanes from entering the unsafe zones behind large airplanes that have their engines running  Which means that no two planes can share the same airport segment and that a plane with running engines blocks a set of segments behind it where the blocked set depends on the size category of the plane  The available activities are to move a plane away backwards from a parking position to startup the engines to move between segments to park by turning off the engines and to remove the plane from the airport  The criterion is to minimize the summed up travel time on the surface of the airport of all airplanes  There usually are standard routes i.e. routes that any airplane must take when outbound from a certain parking area or inbound from a certain runway The reason for introducing such routes is to reduce complexity for human ground controllers since significant computer support is not yet available at real airports",
+      "summary": "The task is to control the ground traffic on an airport in such a way that the summed up travel time of all airplanes is minimized . Timed travel routes must be assigned to the airplanes so that they reach their targets . The main problem constraint is to ensure the safety of the airplanes . This means to avoid collisions and also to prevent airplanes entering the unsafe zones behind large airplanes that have their engines running ."
+    }
+  ],
+  "tasks-info": [
+    {
+      "execution-date": "Oct 14 2021 15:18:02",
+      "host": "172.18.0.3",
+      "hostname": "61aa0a28a4c5",
+      "os": [
+        "Linux",
+        "61aa0a28a4c5",
+        "5.8.0-59-generic",
+        "#66~20.04.1-Ubuntu SMP Thu Jun 17 11:14:10 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/05",
+      "task-name": "converter",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Oct 14 2021 15:18:02",
+      "host": "172.18.0.3",
+      "hostname": "61aa0a28a4c5",
+      "os": [
+        "Linux",
+        "61aa0a28a4c5",
+        "5.8.0-59-generic",
+        "#66~20.04.1-Ubuntu SMP Thu Jun 17 11:14:10 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/09",
+      "task-name": "tokenizer",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Oct 14 2021 15:18:02",
+      "host": "172.18.0.3",
+      "hostname": "61aa0a28a4c5",
+      "os": [
+        "Linux",
+        "61aa0a28a4c5",
+        "5.8.0-59-generic",
+        "#66~20.04.1-Ubuntu SMP Thu Jun 17 11:14:10 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "morphosyntax",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Oct 14 2021 15:18:02",
+      "host": "172.18.0.3",
+      "hostname": "61aa0a28a4c5",
+      "os": [
+        "Linux",
+        "61aa0a28a4c5",
+        "5.8.0-59-generic",
+        "#66~20.04.1-Ubuntu SMP Thu Jun 17 11:14:10 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "ner",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Oct 14 2021 15:18:02",
+      "host": "172.18.0.3",
+      "hostname": "61aa0a28a4c5",
+      "os": [
+        "Linux",
+        "61aa0a28a4c5",
+        "5.8.0-59-generic",
+        "#66~20.04.1-Ubuntu SMP Thu Jun 17 11:14:10 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/03",
+      "task-name": "syntax",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Oct 14 2021 15:18:06",
+      "host": "172.18.0.3",
+      "hostname": "61aa0a28a4c5",
+      "os": [
+        "Linux",
+        "61aa0a28a4c5",
+        "5.8.0-59-generic",
+        "#66~20.04.1-Ubuntu SMP Thu Jun 17 11:14:10 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/09",
+      "task-name": "zeroshotclassification",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Oct 14 2021 15:18:06",
+      "host": "172.18.0.3",
+      "hostname": "61aa0a28a4c5",
+      "os": [
+        "Linux",
+        "61aa0a28a4c5",
+        "5.8.0-59-generic",
+        "#66~20.04.1-Ubuntu SMP Thu Jun 17 11:14:10 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/10",
+      "task-name": "sentiment",
+      "task-version": "1.0.0"
+    },
+    {
+      "execution-date": "Oct 14 2021 15:18:08",
+      "host": "172.18.0.3",
+      "hostname": "61aa0a28a4c5",
+      "os": [
+        "Linux",
+        "61aa0a28a4c5",
+        "5.8.0-59-generic",
+        "#66~20.04.1-Ubuntu SMP Thu Jun 17 11:14:10 UTC 2021",
+        "x86_64"
+      ],
+      "task-development-date": "2021/10",
+      "task-name": "summarizer",
+      "task-version": "1.0.0"
+    }
+  ],
+  "title": "Airport Ground Traffic Control",
+  "title_deps": [
+    {
+      "dep": "compound",
+      "head": 1,
+      "lefts": [],
+      "lemma": "Airport",
+      "pos": "PROPN",
+      "rights": [],
+      "text": "Airport"
+    },
+    {
+      "dep": "compound",
+      "head": 3,
+      "lefts": [
+        0
+      ],
+      "lemma": "Ground",
+      "pos": "PROPN",
+      "rights": [],
+      "text": "Ground"
+    },
+    {
+      "dep": "compound",
+      "head": 3,
+      "lefts": [],
+      "lemma": "Traffic",
+      "pos": "PROPN",
+      "rights": [],
+      "text": "Traffic"
+    },
+    {
+      "dep": "ROOT",
+      "head": 3,
+      "lefts": [
+        1,
+        2
+      ],
+      "lemma": "Control",
+      "pos": "PROPN",
+      "rights": [],
+      "text": "Control"
+    }
+  ],
+  "title_morphosyntax": [
+    {
+      "is_oov": false,
+      "is_sent_start": true,
+      "lemma": "Airport",
+      "pos": "PROPN",
+      "position": 0,
+      "text": "Airport"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Ground",
+      "pos": "PROPN",
+      "position": 1,
+      "text": "Ground"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Traffic",
+      "pos": "PROPN",
+      "position": 2,
+      "text": "Traffic"
+    },
+    {
+      "is_oov": false,
+      "is_sent_start": false,
+      "lemma": "Control",
+      "pos": "PROPN",
+      "position": 3,
+      "text": "Control"
+    }
+  ],
+  "title_ner": [
+    {
+      "end": 4,
+      "label": "organization",
+      "start": 0,
+      "text": "Airport Ground Traffic Control"
+    }
+  ],
+  "title_tokens": [
+    [
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": true,
+        "token": "Airport"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "Ground"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "Traffic"
+      },
+      {
+        "mwe": {
+          "data": {},
+          "is-compound": false
+        },
+        "start_sentence": false,
+        "token": "Control"
+      }
+    ]
+  ],
+  "zero-shot-classification": {
+    "content_sentences": [
+      {
+        "classes": [
+          {
+            "label": "planning",
+            "score": 0.5686581283807755
+          },
+          {
+            "label": "scheduling",
+            "score": 0.43134182691574097
+          }
+        ],
+        "sequence": " The task is to control the ground traffic on an airport in such a way that the summed up travel time of all airplanes is minimized"
+      },
+      {
+        "classes": [
+          {
+            "label": "scheduling",
+            "score": 0.5309323149267584
+          },
+          {
+            "label": "planning",
+            "score": 0.4690676527097821
+          }
+        ],
+        "sequence": " Timed travel routes must be assigned to the airplanes so that they reach their targets"
+      },
+      {
+        "classes": [
+          {
+            "label": "scheduling",
+            "score": 0.5638888068497181
+          },
+          {
+            "label": "planning",
+            "score": 0.43611118383705616
+          }
+        ],
+        "sequence": " There is inbound traffic planes that need to go to a parking position and outbound traffic planes that need to go to a runway"
+      },
+      {
+        "classes": [
+          {
+            "label": "scheduling",
+            "score": 0.7274113716557622
+          },
+          {
+            "label": "planning",
+            "score": 0.2725886618718505
+          }
+        ],
+        "sequence": " The former are airplanes that must take off the latter are airplanes that have just landed and have to park"
+      },
+      {
+        "classes": [
+          {
+            "label": "scheduling",
+            "score": 0.5966978594660759
+          },
+          {
+            "label": "planning",
+            "score": 0.4033021181821823
+          }
+        ],
+        "sequence": " The main problem constraint is to ensure the safety of the airplanes"
+      },
+      {
+        "classes": [
+          {
+            "label": "planning",
+            "score": 0.8009056784212589
+          },
+          {
+            "label": "scheduling",
+            "score": 0.1990943243727088
+          }
+        ],
+        "sequence": " This means to avoid collisions and also to prevent airplanes from entering the unsafe zones behind large airplanes that have their engines running"
+      },
+      {
+        "classes": [
+          {
+            "label": "scheduling",
+            "score": 0.6480102054774761
+          },
+          {
+            "label": "planning",
+            "score": 0.35198982432484627
+          }
+        ],
+        "sequence": " Which means that no two planes can share the same airport segment and that a plane with running engines blocks a set of segments behind it where the blocked set depends on the size category of the plane"
+      },
+      {
+        "classes": [
+          {
+            "label": "scheduling",
+            "score": 0.6443411959335208
+          },
+          {
+            "label": "planning",
+            "score": 0.35565873235464096
+          }
+        ],
+        "sequence": " The available activities are to move a plane away backwards from a parking position to startup the engines to move between segments to park by turning off the engines and to remove the plane from the airport"
+      },
+      {
+        "classes": [
+          {
+            "label": "planning",
+            "score": 0.5928959883749485
+          },
+          {
+            "label": "scheduling",
+            "score": 0.40710402093827724
+          }
+        ],
+        "sequence": " The criterion is to minimize the summed up travel time on the surface of the airport of all airplanes"
+      },
+      {
+        "classes": [
+          {
+            "label": "scheduling",
+            "score": 0.5462288931012154
+          },
+          {
+            "label": "planning",
+            "score": 0.4537711311131716
+          }
+        ],
+        "sequence": " There usually are standard routes i.e. routes that any airplane must take when outbound from a certain parking area or inbound from a certain runway"
+      },
+      {
+        "classes": [
+          {
+            "label": "planning",
+            "score": 0.5293911788612604
+          },
+          {
+            "label": "scheduling",
+            "score": 0.47060892172157764
+          }
+        ],
+        "sequence": "The reason for introducing such routes is to reduce complexity for human ground controllers since significant computer support is not yet available at real airports"
+      }
+    ],
+    "document": [
+      {
+        "label": "scheduling",
+        "score": 0.5395913753697338
+      },
+      {
+        "label": "planning",
+        "score": 0.4604086321390544
+      }
+    ],
+    "normalized-document": [
+      {
+        "label": "scheduling",
+        "score": 0.5447457941044939
+      },
+      {
+        "label": "planning",
+        "score": 0.45525421941491256
+      }
+    ],
+    "title_sentences": [
+      {
+        "classes": [
+          {
+            "label": "scheduling",
+            "score": 0.7094367630779743
+          },
+          {
+            "label": "planning",
+            "score": 0.29056330723688006
+          }
+        ],
+        "sequence": "Airport Ground Traffic Control"
+      }
+    ]
+  }
+}

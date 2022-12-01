@@ -28,7 +28,7 @@ include = [
 ]
 
 [tool.poetry.urls]
-Releases = "https://gitlab.thalesdigital.io/eric.blaudez/t-keir-community/releases"
+Releases = "https://github.com/ThalesGroup/t-keir/releases"
 
 [tool.poetry.dependencies]
 beautifulsoup4="4.11.1"

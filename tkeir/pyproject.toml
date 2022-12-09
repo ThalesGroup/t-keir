@@ -2,13 +2,13 @@
 name = "tkeir"
 version = "1.0.3"
 description = "t-keir-community"
-authors = ["Eric Blaudez <Eric Blaudez>"]
-maintainers = ["Eric Blaudez <Eric Blaudez>"]
+authors = ["Eric Blaudez"]
+maintainers = ["Eric Blaudez"]
 license = "MIT"
 keywords = ["Python"]
 readme = "README.rst"
 packages = [
-    { include = "tkeir", from = "." },
+    { include = "tkeir", from = ".." },
 ]
 classifiers = [
     "Environment :: Console",
@@ -21,10 +21,10 @@ repository = "https://github.com/ThalesGroup/t-keir"
 documentation = "https://github.com/ThalesGroup/t-keir"
 include = [
     { path = "LICENSE" },
-    { path = "tkeir/runtimes" },
-    { path = "tkeir/tests"},
-    { path = "tkeir/app"},
-    { path = "tkeir/doc"},
+    { path = "runtimes" },
+    { path = "tests"},
+    { path = "app"},
+    { path = "doc"},
 ]
 
 [tool.poetry.urls]

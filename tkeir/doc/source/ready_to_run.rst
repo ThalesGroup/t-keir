@@ -12,7 +12,7 @@ Run the installation part
 -------------------------
 
 Go in installation section and run it.
-Do not forget to create your project configuration with "**tkeir_init_project.py**" and initialize the models with "**init-models.sh**"
+Do not forget to create your project configuration with "**tkeir_init_project.py**" and initialize the models with "**init-models.sh**". These steps allows to configure T-KEIR.
 
 =======================
 Prepare T-KEIR and demo
@@ -63,11 +63,13 @@ Format tsv to csv:
       dtype='object')
 
 Transform csv to "T-Keir" json files. Go into directory **tkeir/app/bin**
+
 .. code-block:: shell
+
     python3 csv2tkeir.py --input=<your data tmp>/data.csv \
                          --title=urlDrugName \
-                         --content=benefitsReview,sideEffectsReview,commentsReview 
-                         --kg=effectiveness,sideEffects,condition,rating 
+                         --content=benefitsReview,sideEffectsReview,commentsReview \
+                         --kg=effectiveness,sideEffects,condition,rating \
                          --output=<your output directory>
 
 ===============================
@@ -82,11 +84,13 @@ Do not forget to setup TRANSFORMERS_CACHE : path to models
 To analyse and index document prepared in previous step, you have to run **batch_ingester.py** script from **tkeir** directory:
 
 .. code-block:: shell
+
     python3 thot/batch_ingester.py -c <PATH TO YOU CONFIGURATION FOLDER>/pipeline.json -i <PATH TO QUICKSTART FOLDER>/data/tkeir -o <PATH TO QUICKSTART FOLDER>/data/tkeir-out
 
 After this process, all documents will be indexed. You can query Elastic Search with the following command:
 
 .. code-block:: shell
+
     curl -k https://admin:admin@localhost:9200/drug-text-index/_search | json_pp
 
 ==================

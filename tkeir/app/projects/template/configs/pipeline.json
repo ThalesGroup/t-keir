@@ -6,7 +6,7 @@
         "settings":{
             "strategy":"serial",
             "max-time-loop":-1,
-            "max-time-per-task":6,
+            "max-time-per-task":300,
             "zip-results":true
         },  
         "tasks":[{

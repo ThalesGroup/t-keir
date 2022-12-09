@@ -33,13 +33,16 @@ Directory structure
 Installation
 ************
 
+The installation is hightly dockerized. 
+The full documentation is available on https://t-keir.pages.thalesdigital.io/theresisnlp/
+
 
 Prerequists
 ===========
 
 The only prerequists is container envrionments:
 
-* For T-Keir based on container : docker (19.03) and docker compose (1.27)
+* docker (19.03) and docker compose (1.27)
 * python >=3.7
 * poetry
 

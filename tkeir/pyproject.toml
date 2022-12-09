@@ -6,7 +6,7 @@ authors = ["Eric Blaudez"]
 maintainers = ["Eric Blaudez"]
 license = "MIT"
 keywords = ["Python"]
-readme = "README.rst"
+readme = "README.md"
 packages = [
     { include = "tkeir", from = ".." },
 ]
@@ -49,27 +49,28 @@ fr-core-news-sm = {url = "https://github.com/explosion/spacy-models/releases/dow
 fr-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.4.0/fr_core_news_md-3.4.0-py3-none-any.whl"}
 scikit-learn="1.1.2"
 sentencepiece="0.1.97"
-torch="1.12.1"
+torch="1.13.0"
 transformers="4.21.2"
 
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-converter-svc = "tkeir.thot.converter_svc:main"
-converter-client = "tkeir.thot.converter_svc:main"
-tokenizer-svc = "tkeir.thot.tokenizer_svc:main"
-mstagger-svc = "tkeir.thot.mstagger_svc:main" 
-nertagger-svc = "tkeir.thot.nertagger_svc:main"
-syntax-svc = "tkeir.thot.syntactictagger_svc:main"
-keywords-svc = "tkeir.thot.keywordextractor_svc:main"
-sentiment-svc = "tkeir.thot.sentiment_svc:main"
-summarizer-svc = "tkeir.thot.summarizer_svc:main"
-zeroshotclassifier-svc = "tkeir.thot.zeroshotclassifier_svc:main"
-clusterinfer-svc = "tkeir.thot.clusterinfer_svc:main"
-qa-svc = "tkeir.thot.qa_svc:main"
-index-svc = "tkeir.thot.index_svc:main"
-search-svc = "tkeir.thot.search_svc:main"
-batch-ingester = "tkeir.thot.batch_ingester:main"
+tkeir-converter-svc = "tkeir.thot.converter_svc:main"
+tkeir-converter-client = "tkeir.thot.converter_svc:main"
+tkeir-tokenizer-svc = "tkeir.thot.tokenizer_svc:main"
+tkeir-mstagger-svc = "tkeir.thot.mstagger_svc:main" 
+tkeir-nertagger-svc = "tkeir.thot.nertagger_svc:main"
+tkeir-syntax-svc = "tkeir.thot.syntactictagger_svc:main"
+tkeir-keywords-svc = "tkeir.thot.keywordextractor_svc:main"
+tkeir-sentiment-svc = "tkeir.thot.sentiment_svc:main"
+tkeir-summarizer-svc = "tkeir.thot.summarizer_svc:main"
+tkeir-zeroshotclassifier-svc = "tkeir.thot.zeroshotclassifier_svc:main"
+tkeir-clusterinfer-svc = "tkeir.thot.clusterinfer_svc:main"
+tkeir-qa-svc = "tkeir.thot.qa_svc:main"
+tkeir-index-svc = "tkeir.thot.index_svc:main"
+tkeir-search-svc = "tkeir.thot.search_svc:main"
+tkeir-batch-ingester = "tkeir.thot.batch_ingester:main"
+tkeir-init-project = "tkeir.thot.tkeir_init_project:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

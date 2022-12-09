@@ -46,4 +46,4 @@ popd
 popd
 popd
 pushd $service_path
-python3 thot/batch_ingester.py -c $config_path/pipeline.json -i $script_path/data/tkeir -o $script_path/data/tkeir-out
+tkeir-batch-ingester -c $config_path/pipeline.json -i $script_path/data/tkeir -o $script_path/data/tkeir-out 

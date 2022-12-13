@@ -1,0 +1,39 @@
+site_name: T-KEIR
+nav:
+    - Overview: 'overview.md'
+    - Conception: 'conception.md'
+    - Installation: 'installation.md'
+    - Quickstart: 'ready_to_run.md'
+    - Tools: 
+        - Tools overview: 'tools/tools_overview.md'
+        - Converter: 'tools/converter.md'
+        - Tokenizer: 'tools/tokenizer.md'
+        - Morphosyntactic tagger: 'tools/mstagger.md'
+        - Named Entities Tagger: 'tools/nertagger.md'
+        - Syntactic Tagger : 'tools/syntactictagger.md'
+        - Keywords Extraction: 'tools/keywords.md'
+        - Cluster Inference: 'tools/cluster_inference.md'
+        - Embedding processing: 'tools/embeddings.md'
+        - Relation clustering: 'tools/relations_clustering.md'
+        - Question and Answering: 'tools/qa.md'
+        - Sentiment Analysis: 'tools/sentiment.md'
+        - Classification: 'tools/zsl_classifier.md'
+        - Automatic Summarization: 'tools/summarizer.md'
+        - Indexing: 'tools/indexing.md'
+        - Search Engine: 'tools/search_engine.md'
+        - Pipelining tools: 'tools/pipeline.md'      
+    - Security: 'security.md'
+    - Operation and Management: 'oam.md'
+plugins:
+    - render_swagger
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+theme:
+  name: readthedocs
+  features:
+    - content.code.annotate

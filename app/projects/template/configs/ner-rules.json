@@ -1,0 +1,11 @@
+{    
+    "ner-pos-validation":[
+        {"label":"person","possible-pos-in-syntagm":["PROPN","DET","ADJ","NOUN"],"at-least":["PROPN"]},
+        {"label":"organization","possible-pos-in-syntagm":["PROPN","DET","ADJ","NOUN"],"at-least":["PROPN"]},
+        {"label":"location","possible-pos-in-syntagm":["PROPN","DET","ADJ","NOUN"],"at-least":["PROPN"]},
+        {"label":"location.city","possible-pos-in-syntagm":["PROPN","DET","ADJ","NOUN"],"at-least":["PROPN"]},
+        {"label":"location.country","possible-pos-in-syntagm":["PROPN","DET","ADJ","NOUN"],"at-least":["PROPN"]},
+        {"label":"product","possible-pos-in-syntagm":["PROPN","DET","ADJ","NOUN"],"at-least":["PROPN"]},
+        {"label":"facility","possible-pos-in-syntagm":["PROPN","DET","ADJ","NOUN"],"at-least":["NOUN","PROPN"]},
+        {"label":"event","possible-pos-in-syntagm":["PROPN","DET","ADJ","NOUN"],"at-least":["NOUN","PROPN"]}]
+}

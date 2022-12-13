@@ -1,0 +1,1701 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Thales knowledge extraction to information retrieval">
+      
+      
+        <meta name="author" content="Thales">
+      
+      
+        <link rel="canonical" href="https://github.com/ThalesGroup/t-keir/conception/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>Conception - T-KEIR</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#4051b5">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#conception" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="T-KEIR" class="md-header__button md-logo" aria-label="T-KEIR" data-md-component="logo">
+      
+  <img src="../logos/png/T-KEIR_logo_FIN-04.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            T-KEIR
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Conception
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ThalesGroup/t-keir/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ThalesGroup/t-keir
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../overview/" class="md-tabs__link">
+      Overview
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      Conception
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../installation/" class="md-tabs__link">
+      Installation
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../ready_to_run/" class="md-tabs__link">
+      Quickstart
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tools/tools_overview/" class="md-tabs__link">
+        Tools
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../security/" class="md-tabs__link">
+      Security
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../oam/" class="md-tabs__link">
+      Operation and Management
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../about/" class="md-tabs__link">
+      About
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="T-KEIR" class="md-nav__button md-logo" aria-label="T-KEIR" data-md-component="logo">
+      
+  <img src="../logos/png/T-KEIR_logo_FIN-04.png" alt="logo">
+
+    </a>
+    T-KEIR
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ThalesGroup/t-keir/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ThalesGroup/t-keir
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Conception
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Conception
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-preparation" class="md-nav__link">
+    Data preparation
+  </a>
+  
+    <nav class="md-nav" aria-label="Data preparation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#construction-of-terminological-lists" class="md-nav__link">
+    Construction of terminological lists
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preparation-of-the-evaluation-data" class="md-nav__link">
+    Preparation of the evaluation data
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#document-analysis" class="md-nav__link">
+    Document Analysis
+  </a>
+  
+    <nav class="md-nav" aria-label="Document Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tokenization" class="md-nav__link">
+    Tokenization
+  </a>
+  
+    <nav class="md-nav" aria-label="Tokenization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-regular-expressions" class="md-nav__link">
+    Using regular expressions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grouping-of-detached-compound-words" class="md-nav__link">
+    Grouping of detached-compound words
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-usage" class="md-nav__link">
+    Resource usage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#normalization-rule" class="md-nav__link">
+    Normalization rule
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#morphosyntax" class="md-nav__link">
+    Morphosyntax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#named-entities-extraction" class="md-nav__link">
+    Named entities extraction
+  </a>
+  
+    <nav class="md-nav" aria-label="Named entities extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#principles" class="md-nav__link">
+    Principles
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-validation-rules" class="md-nav__link">
+    Use validation rules
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependencies-analysis-triple-subject-verb-object-extraction" class="md-nav__link">
+    Dependencies analysis &amp; triple (Subject, Verb, Object) extraction
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependencies analysis &amp; triple (Subject, Verb, Object) extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#principles_1" class="md-nav__link">
+    Principles
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#syntactic-rules" class="md-nav__link">
+    Syntactic rules
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keywords-extraction" class="md-nav__link">
+    Keywords extraction
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classifier" class="md-nav__link">
+    Classifier
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarizer" class="md-nav__link">
+    Summarizer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relation-clustering" class="md-nav__link">
+    Relation clustering
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#question-and-answering" class="md-nav__link">
+    Question and Answering
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexing" class="md-nav__link">
+    Indexing
+  </a>
+  
+    <nav class="md-nav" aria-label="Indexing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#index-design" class="md-nav__link">
+    Index design
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-documentary-analysis-to-index" class="md-nav__link">
+    From documentary analysis to index
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#searching" class="md-nav__link">
+    Searching
+  </a>
+  
+    <nav class="md-nav" aria-label="Searching">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analysis-of-the-request" class="md-nav__link">
+    Analysis of the request
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-elasticsearch-queries" class="md-nav__link">
+    Building Elasticsearch queries
+  </a>
+  
+    <nav class="md-nav" aria-label="Building Elasticsearch queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#standard-queries" class="md-nav__link">
+    Standard queries
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-expansion" class="md-nav__link">
+    Query Expansion
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combine-re-ranking-of-results" class="md-nav__link">
+    Combine &amp; Re-Ranking of results
+  </a>
+  
+    <nav class="md-nav" aria-label="Combine &amp; Re-Ranking of results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#combination-strategies" class="md-nav__link">
+    Combination strategies
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scoring-of-results" class="md-nav__link">
+    Scoring of results
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ready_to_run/" class="md-nav__link">
+        Quickstart
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Tools
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Tools" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Tools
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/tools_overview/" class="md-nav__link">
+        Tools overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/converter/" class="md-nav__link">
+        Converter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/tokenizer/" class="md-nav__link">
+        Tokenizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/mstagger/" class="md-nav__link">
+        Morphosyntactic tagger
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/nertagger/" class="md-nav__link">
+        Named Entities Tagger
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/syntactictagger/" class="md-nav__link">
+        Syntactic Tagger
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/keywords/" class="md-nav__link">
+        Keywords Extraction
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/cluster_inference/" class="md-nav__link">
+        Cluster Inference
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/embeddings/" class="md-nav__link">
+        Embedding processing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/relations_clustering/" class="md-nav__link">
+        Relation clustering
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/qa/" class="md-nav__link">
+        Question and Answering
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/sentiment/" class="md-nav__link">
+        Sentiment Analysis
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/zsl_classifier/" class="md-nav__link">
+        Classification
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/summarizer/" class="md-nav__link">
+        Automatic Summarization
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/indexing/" class="md-nav__link">
+        Indexing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/search_engine/" class="md-nav__link">
+        Search Engine
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/pipeline/" class="md-nav__link">
+        Pipelining tools
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        Security
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oam/" class="md-nav__link">
+        Operation and Management
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../about/" class="md-nav__link">
+        About
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-preparation" class="md-nav__link">
+    Data preparation
+  </a>
+  
+    <nav class="md-nav" aria-label="Data preparation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#construction-of-terminological-lists" class="md-nav__link">
+    Construction of terminological lists
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preparation-of-the-evaluation-data" class="md-nav__link">
+    Preparation of the evaluation data
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#document-analysis" class="md-nav__link">
+    Document Analysis
+  </a>
+  
+    <nav class="md-nav" aria-label="Document Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tokenization" class="md-nav__link">
+    Tokenization
+  </a>
+  
+    <nav class="md-nav" aria-label="Tokenization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-regular-expressions" class="md-nav__link">
+    Using regular expressions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grouping-of-detached-compound-words" class="md-nav__link">
+    Grouping of detached-compound words
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-usage" class="md-nav__link">
+    Resource usage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#normalization-rule" class="md-nav__link">
+    Normalization rule
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#morphosyntax" class="md-nav__link">
+    Morphosyntax
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#named-entities-extraction" class="md-nav__link">
+    Named entities extraction
+  </a>
+  
+    <nav class="md-nav" aria-label="Named entities extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#principles" class="md-nav__link">
+    Principles
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-validation-rules" class="md-nav__link">
+    Use validation rules
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dependencies-analysis-triple-subject-verb-object-extraction" class="md-nav__link">
+    Dependencies analysis &amp; triple (Subject, Verb, Object) extraction
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependencies analysis &amp; triple (Subject, Verb, Object) extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#principles_1" class="md-nav__link">
+    Principles
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#syntactic-rules" class="md-nav__link">
+    Syntactic rules
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keywords-extraction" class="md-nav__link">
+    Keywords extraction
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classifier" class="md-nav__link">
+    Classifier
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarizer" class="md-nav__link">
+    Summarizer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relation-clustering" class="md-nav__link">
+    Relation clustering
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#question-and-answering" class="md-nav__link">
+    Question and Answering
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexing" class="md-nav__link">
+    Indexing
+  </a>
+  
+    <nav class="md-nav" aria-label="Indexing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#index-design" class="md-nav__link">
+    Index design
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from-documentary-analysis-to-index" class="md-nav__link">
+    From documentary analysis to index
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#searching" class="md-nav__link">
+    Searching
+  </a>
+  
+    <nav class="md-nav" aria-label="Searching">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analysis-of-the-request" class="md-nav__link">
+    Analysis of the request
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-elasticsearch-queries" class="md-nav__link">
+    Building Elasticsearch queries
+  </a>
+  
+    <nav class="md-nav" aria-label="Building Elasticsearch queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#standard-queries" class="md-nav__link">
+    Standard queries
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-expansion" class="md-nav__link">
+    Query Expansion
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combine-re-ranking-of-results" class="md-nav__link">
+    Combine &amp; Re-Ranking of results
+  </a>
+  
+    <nav class="md-nav" aria-label="Combine &amp; Re-Ranking of results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#combination-strategies" class="md-nav__link">
+    Combination strategies
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scoring-of-results" class="md-nav__link">
+    Scoring of results
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/ThalesGroup/t-keir/edit/master/docs/conception.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="conception">Conception</h1>
+<p><img alt="Screenshot" src="../resources/images/conception1.png" /></p>
+<h2 id="data-preparation">Data preparation</h2>
+<p>Data preparation consists in</p>
+<ul>
+<li>transform the documents into a format adapted to the tools,</li>
+<li>build terminological and structured resources (such as ontology concepts for example),</li>
+<li>construct the evaluation data.</li>
+</ul>
+<p><img alt="Screenshot" src="../resources/images/conception2.png" /></p>
+<h3 id="construction-of-terminological-lists">Construction of terminological lists</h3>
+<p>Linguistic resources are used by document analysis tools to extract data typed in the target domain
+as well as generic data such as city names (to improve the detection of named entities).</p>
+<h3 id="preparation-of-the-evaluation-data">Preparation of the evaluation data</h3>
+<p>The evaluation data are constructed to know the relevance of the results returned by the
+search system. We seek to have a set of queries associated with the relevant documents to be returned.
+The goal is ultimately to assess the capacity of the search engine</p>
+<h2 id="document-analysis">Document Analysis</h2>
+<p><img alt="Screenshot" src="../resources/images/TheresisNLP.png" /></p>
+<h3 id="tokenization">Tokenization</h3>
+<p>The tokenization phase allows a text to be segmented into linguistic units: sentences, phrases, words.</p>
+<p><img alt="Screenshot" src="../resources/images/conception3.png" /></p>
+<p>Principles
+Segmentation is a delicate phase that requires the use of regular expressions and strategies to group compound word.</p>
+<h4 id="using-regular-expressions">Using regular expressions</h4>
+<p>Regular expressions allow you to define segmentation rules. These rules cover, among other things:</p>
+<ul>
+<li>
+<p>The fact that the ‘.’ Is not systematically used as the end of a sentence, in the case of a decimal number in English
+  for example where the period is a separator</p>
+</li>
+<li>
+<p>The fact that the ‘-‘ at the beginning at the end of words is separated</p>
+</li>
+<li>
+<p>The fact that the ‘-‘ in the middle of a word is not segmented</p>
+</li>
+<li>
+<p>...</p>
+</li>
+</ul>
+<h4 id="grouping-of-detached-compound-words">Grouping of detached-compound words</h4>
+<p>Detached compound words often represent semantic units, for example the sequence "hot dog"
+should be taken as a phrase and should not be segmented into two words ("hot", "dog").
+This problem is addressed in T-KEIR tools through the use of phrase list and a Trie
+type tree data structure.</p>
+<h4 id="resource-usage">Resource usage</h4>
+<p>Linguistic resources provide a list of phrases that can be typed (for example, the list
+of city names in the geoname database is labeled as a place). They can also define a notion
+of hierarchy in the case of an ontology of concepts. All of these resources are "compiled"
+into a Trie structure. This data structure can be configured to remove diacritics
+(add-ascii-folding option), to add a morphosyntaxic label (pos option) or a named entity
+label (label option)</p>
+<p><strong> Example of resource configuration file </strong></p>
+<p><img alt="Screenshot" src="../resources/images/annotation.png" /></p>
+<p><strong> Example of resource file </strong></p>
+<p><img alt="Screenshot" src="../resources/images/example-resource.png" /></p>
+<h4 id="normalization-rule">Normalization rule</h4>
+<p>T-Keir tools provide the ability to normalize words and perform spell checking of the most
+common mistakes. Here simple transformation rules are set up by means of configuration files.</p>
+<p><strong> Example of typo configuration file  </strong></p>
+<p><img alt="Screenshot" src="../resources/images/example-typo.png" /></p>
+<p><strong> Example of normalization configuration file </strong></p>
+<p><img alt="Screenshot" src="../resources/images/example-normalization.png" /></p>
+<h3 id="morphosyntax">Morphosyntax</h3>
+<p>The morphosyntax module is built on the Spacy library. It provides the possibility of giving
+each segmented term during the tokenization phase a morphosyntactic label (noun, verb, adjective, ...).
+This module takes advantage of the pre-tagged information from the segmentation phase by "forcing"
+the tags of phrases and terminology often unrecognized by the original morphosyntactic tagger.
+It is also this module which provides the lemmatized form (this is the canonical form of a word,
+for example the verb "doing" has the lemma "do") of words.</p>
+<p><img alt="Screenshot" src="../resources/images/example-ms.png" /></p>
+<h3 id="named-entities-extraction">Named entities extraction</h3>
+<p><img alt="Screenshot" src="../resources/images/conception5.png" /></p>
+<p>Named feature extraction involves labeling textual elements. They can be seen as (text, label) pairs : where the label is the type of data, for example "city", "person", "organization", ...</p>
+<h4 id="principles">Principles</h4>
+<p>The tagger implemented in the use case uses the Spacy library and uses the elements
+extracted during the segmentation phase as well as validation rules built with the
+morphosyntactic elements.</p>
+<h4 id="use-validation-rules">Use validation rules</h4>
+<p>Validation rules help to avoid basic errors such as associating a city name with a verb.</p>
+<p><img alt="Screenshot" src="../resources/images/validation-rules.png" /></p>
+<h3 id="dependencies-analysis-triple-subject-verb-object-extraction">Dependencies analysis &amp; triple (Subject, Verb, Object) extraction</h3>
+<p><img alt="Screenshot" src="../resources/images/conception4.png" /></p>
+<p>Dependency analysis allows the discovery of relationships between the different structuring
+elements of a sentence.
+It therefore provides the possibility of creating (Subject, Verb, Object) triples which will
+form the basis of a knowledge graph automatically constructed by T-KEIR.</p>
+<h4 id="principles_1">Principles</h4>
+<p>The Dependency Analyzer relies on the Spacy library to extract syntactic dependencies.
+This analysis is improved by taking advantage of the groupings carried out during the
+previous phases (segmentation, morphosyntax and extraction of named entities). Thus the
+structured elements detected by Spacy are extended with the data from the previous phases.
+Finally, the (Subject, Verb, Object) triples are extracted using syntactic patterns defined
+in a configuration file.</p>
+<h4 id="syntactic-rules">Syntactic rules</h4>
+<p>The syntactic rules allow the definition of patterns corresponding to phrases, verbal groups
+or prepositional groups. The creation of these rules is governed by the syntax defined in the
+Spacy library.</p>
+<h3 id="keywords-extraction">Keywords extraction</h3>
+<p>The keywords are the most relevant words or sequences of words in a document. When they are
+weighted, they allow, for example, the creation of word clouds.
+Extracting them is a good way to naively summarize a document by pointing to the most relevant
+elements.</p>
+<p>To judge the relevance of the different terms we used the Rake algorithm. It is built on the
+observation that keywords are found between empty words and punctuation marks. The algorithm
+extracts and weights these word sequences using a method described in "Rose, Stuart &amp; Engel,
+Dave &amp; Cramer, Nick &amp; Cowley, Wendy. (2010). Automatic Keyword Extraction from Individual Documents.
+10.1002 / 9780470689646.ch1 (Automatic Keyword Extraction from Individual Documents (researchgate.net))".
+T-KEIR uses a modified version of Rake taking into account lemmatized forms and their
+morphosyntaxic tags. Thus empty words will be associated with the labels of determinants and
+other conjunctions while the delimiters will be associated with the punctuation tags.</p>
+<h3 id="classifier">Classifier</h3>
+<p><img alt="Screenshot" src="../resources/images/conception8.png" /></p>
+<p>The unsupervised classifer allow to classify text for a given (by the user) set of class / label.</p>
+<h3 id="summarizer">Summarizer</h3>
+<p><img alt="Screenshot" src="../resources/images/conception9.png" /></p>
+<p>The summarizer propose an automatic and extractive summmary of document.</p>
+<h3 id="relation-clustering">Relation clustering</h3>
+<p><img alt="Screenshot" src="../resources/images/conception6.png" /></p>
+<p>The relations clustering allows to associate a semantic class with the elements of
+(Subject, Verb, Object) triples (and keywords) in an unsupervised manner (without human intervention).</p>
+<p>The construction of the classes is carried out in two stages:</p>
+<ul>
+<li>
+<p>The elements of the (Subject, Verb, Object) triples and the keywords are vectorized using a
+  transformer neural network (here we use the LaBSE transformer from the Huggingface library)
+  pre-trained on a large amount of data covering a number varied fields. Each of these vectors can
+  be seen as an embedding of sequences of words (associated with a Subject, a Verb, an Object or
+  a keyword) in a semantic space created by the Transformer.</p>
+</li>
+<li>
+<p>These four sets of vectors (associated respectively with the Subject, Verb, Object and Keywords)
+  are clustered by a clusterin algorithm. From then on, each vector is assigned a
+  class number and the algorithm creates a model to predict the class of a new vector.</p>
+</li>
+</ul>
+<p>Using a clustering algorithm is a good way to do semantic quantization: we don't store the vectors,
+only their semantic classes predicted by the clustering model.</p>
+<h2 id="question-and-answering">Question and Answering</h2>
+<p><img alt="Screenshot" src="../resources/images/conception7.png" /></p>
+<h2 id="indexing">Indexing</h2>
+<h3 id="index-design">Index design</h3>
+<p>The index built by the T-KEIR library is the subject of a particular design responding to the various
+functionalities which are:</p>
+<ul>
+<li>
+<p>Standard information search (by key words / phrase).</p>
+</li>
+<li>
+<p>Structured research by using a knowledge graph with access to Subject, Verb / Predicate / Property, Object type
+  triples. It is essential to note here, that beyond the standard search, the index has been constructed in
+  such a way that the business concepts extracted from the ontology can be used as search criteria. They are
+  therefore considered as \<Subject, Predicate, Object> triples of a knowledge graph.</p>
+</li>
+</ul>
+<p><img alt="Screenshot" src="../resources/images/index-design-hl.png" /></p>
+<table>
+<thead>
+<tr>
+<th><strong> The index is built of several facets </strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong> title </strong>: document title</td>
+</tr>
+<tr>
+<td><strong> content </strong>: content of the document</td>
+</tr>
+<tr>
+<td><strong> lemma_title </strong>: lemmatized version of the title where the tool words and punctuation have been removed</td>
+</tr>
+<tr>
+<td><strong> lemma_content </strong>: lemmatized version of the content (without tool words)</td>
+</tr>
+<tr>
+<td><strong> data_source / index_document </strong>: pointer to document</td>
+</tr>
+<tr>
+<td><strong> text_suggester </strong> : list of keywords allowing the completion  of a query (in the case of a "keywords" type query).</td>
+</tr>
+<tr>
+<td><strong> kg </strong>: knowledge graph, a focus is made thereafter.</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Screenshot" src="../resources/images/index-design-ll.png" /></p>
+<table>
+<thead>
+<tr>
+<th>The kg field contains the basic structure for building a <br> knowledge graph: the (Subject, Predicate / Property, Object) <br> triples.<br> In the T-KEIR index each element or this triplet includes<br> the following fields:<br></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>class</strong>: the class resulting from the cluster of relations <br> or keywords when it is available. It is a cluster identifier <br> linked to the model calculated during the relationship <br/>clustering phase</td>
+</tr>
+<tr>
+<td><strong> content / lemma_content </strong>: the textual content of the element</td>
+</tr>
+<tr>
+<td><strong> label </strong>: the label associated with the content, in the case of <br> a named entity this will for example be "place" or "person"</td>
+</tr>
+<tr>
+<td><strong> positions </strong>: the positions of the element when they are  <br> available</td>
+</tr>
+</tbody>
+</table>
+<h3 id="from-documentary-analysis-to-index">From documentary analysis to index</h3>
+<p>The index is fill with results of the linguistic analysis. Each document is analyzed: it follows the diagram
+<strong>Documentary analysis</strong>. The indexing tool uses the content of the result of this analysis to generate indexing
+ElasticSearch queries following the scheme defined in the Design section of the index.</p>
+<h2 id="searching">Searching</h2>
+<p>The document searching is the step of querying indexes. The rich structure of the index offers many possibilities
+for "querying". Developing a query involves analyzing the user query, constructing an Elasticsearch query and
+manipulating the results</p>
+<h3 id="analysis-of-the-request">Analysis of the request</h3>
+<p>Query analysis follows the same process as document analysis. In this case study, the query corresponds to all or
+part of a document and not simply to a sentence or a juxtaposition of keywords. Using an identical documentary
+analysis ensures that we have the same documentary enrichment as that carried out for the indexed documents.
+The construction of the query to Elasticsearch will therefore be easier.</p>
+<h3 id="building-elasticsearch-queries">Building Elasticsearch queries</h3>
+<p>Elasticsearch provides a very advanced query language (DSL: Domain Specific Language). This language makes
+it possible to carry out multifaceted interrogation by integrating notions of "boosting" of query elements
+(to give more weight to these elements), advanced combinations of Boolean clauses (OR and AND), notions of
+"slop" to manage the alignments between two sequences ...</p>
+<h4 id="standard-queries">Standard queries</h4>
+<p>Standard querying simply uses a bag of words constructed from the content of the document (the tokenization phase).
+This bag of words is sorted by how often the words appear in the document.</p>
+<table>
+<thead>
+<tr>
+<th><img alt="Screenshot" src="../resources/images/basic-query.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>It is possible to configure the request with 2 criteria: <br> * we use a bag of words sorted by frequency of occurrence without weighting (uniq-word-query) <br> * Either we “boost” each word according to their frequency.<br> In both cases, a maximum number of words must be defined <br> in the query (cut-query option).</td>
+</tr>
+</tbody>
+</table>
+<p>"Advanced" queries allow you to create complex queries based on all fields of the index.</p>
+<table>
+<thead>
+<tr>
+<th><img alt="Screenshot" src="../resources/images/advanced-query.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The created query can take into account <br> * Fields prefixed by "lemma_" (use-lemma option) <br> * Keywords by comparing the keywords from the query with <br> those extracted <br> during the indexing phase <br> (use-keyword options) <br> * The knowledge graph by building disjunctive queries or the <br> sub-queries will be conjunctions of the elements of <br> the triples (Subject, Property / Verb / Predicat, Object / Value)<br> (use-knowledge-graph option) <br> * The semantics of the keywords with the classes of the <br> clusters: in the same way as the relations, the keywords are <br> the object of a clustering and have at this tritre of classes <br> which one can interrogate (option <br> use-semantic-keyword )  <br> * The semantics of (Subject, Verb, Object) triples: each element <br> of the triplet has semantic classes resulting from clustering <br> (use-semantic-knowledge-graph option) <br> * The concepts of ontology <br> * Sentences in documents. <br> Then the types of queries defined above can be refined by configuring <br> them (querying field). Thus it is possible to define the slop <br> (maximum distance between the words of each sequence), the boosting <br> value, etc.</td>
+</tr>
+</tbody>
+</table>
+<p>The use of (Subject, Verb, Subject) triples and sentences leads to the construction
+of potentially very large queries. They are all the greater in that to increase the
+relevance of the results we combine three forms of query: OR, AND and ExactMatch.</p>
+<p>To limit the size of the requests, we apply a clustering algorithm (HDBSCAN) to a TF.IDF
+type vectorization of the sequences (document sentences, elements of triples). The clusters
+thus created, we only use the most relevant sequences (those close to the centers of the clusters).</p>
+<h3 id="query-expansion">Query Expansion</h3>
+<p>In the study case, a query expansion option by document was implemented. Here we are looking to
+extend the query using other patents.
+The strategy implemented is to use the term vectors provided by ElasticsSearch. These vectors contain
+for each document the list of terms of the document. Each term contains statistics related to the index:
+how often the term appears in the document, throughout the index, and the number of documents in which
+the term appears. The idea is to combine all the vectors so as to build a query taking into account all
+the documents: query and document to be extended with their associated statistics.</p>
+<h3 id="combine-re-ranking-of-results">Combine &amp; Re-Ranking of results</h3>
+<p><img alt="Screenshot" src="../resources/images/scoring.png" /></p>
+<h4 id="combination-strategies">Combination strategies</h4>
+<p>When creating queries we saw that it was possible to take into account several options: use-keyword,
+use-concepts, use-knowledge-graph, use-semantic-keywords, use-semanic-knowledgre graph; these different
+options can be combined within the same query in which case ElasticSearch will sum the values of the similarities
+of each option or else be executed in several sub-queries and in this case the merge is done a posteriori.
+In this last strategy the lists of results of each subquery are combined by sum of the scores. To ensure that
+there are as many common documents as possible between the search results of the different sub-queries, it is
+possible to extend the number of documents returned by ElasticSearch (expand-results option).
+The configuration of the choice between merging within a single query or after the execution of several queries
+is given by the run-clause-separately field.</p>
+<h4 id="scoring-of-results">Scoring of results</h4>
+<p>The result scoring is generally presented to the user, unfortunately the score provided by ElasticSearch is not
+bounded and is difficult to interpret as it is. So we have implemented several re-scoring strategies</p>
+<ul>
+<li>
+<p>By score normalization: the score is normalized by the score of the first ordered document  (the highest score returned by ElasticSearch). The interpretation of the score is simple, corresponding  to the degree of relevance to the most relevant document. But This implies that the most relevant document  will always have a score of 1, even if the actual relevance is low.</p>
+</li>
+<li>
+<p>Using metrics on the intersection between the terms of the term vectors of the request and those of the document:</p>
+</li>
+<li>
+<p><strong>by-query-size</strong>: we calculate the size of the intersection between a document and the query which we divide  by the size of the query. The score should reflect the presence of all the words of the query in the document.  This is the default configuration.</p>
+</li>
+<li>
+<p><strong>by-document-size</strong>: we calculate the size of the intersection between a document and the query which we divide by the size of the document. The score should reflect a maximum match between the query and the document.</p>
+</li>
+<li><strong>by-union-size</strong>: we calculate the size of the intersection between a document and the query which we divide : by the size of the union between the query and the document (Jaccard similarity). The score must reflect a maximum correspondence between the document and the query and penalize the elements of the query (or document) that do not intersect.</li>
+<li><strong>no-normalization</strong>: no normalization. The score will be the one provided by Elasticsearch.</li>
+</ul>
+<p>The two types of normalization are multiplied to obtain the final score</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../overview/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Overview" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Overview
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../installation/" class="md-footer__link md-footer__link--next" aria-label="Next: Installation" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Installation
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2022 THALES<br>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/ThalesGroup" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs"], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+    
+    
+  </body>
+</html>

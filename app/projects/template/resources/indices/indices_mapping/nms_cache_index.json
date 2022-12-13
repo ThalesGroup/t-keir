@@ -1,0 +1,35 @@
+{
+    "settings": {
+        "index": {
+          "knn": true,
+          "knn.space_type": "cosinesimil"
+        }
+    },
+    "mappings": {
+        "properties": {
+            "cache_doc_id": {
+                "type": "keyword"
+            },
+            "position": {
+                "type":"nested",
+                "properties":{
+                    "start": {"type":"long"},
+                    "length": {"type":"long"}
+                }
+            },
+            "source_doc_id": {
+                "type": "keyword"
+            },
+            "title": {
+                "type": "text"
+            },
+            "content": {
+                "type": "text"
+            },
+            "embedding":{
+                "type":"knn_vector",
+                "dimension":768
+            }            
+        }
+    }
+}

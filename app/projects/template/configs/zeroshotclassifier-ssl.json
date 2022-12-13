@@ -1,0 +1,46 @@
+{
+    "logger": {
+        "logging-level": "{{ project.loglevel }}"
+    },
+    "zeroshot-classification": {
+        "settings":{
+            "language":"en",
+            "use-cuda":false,
+            "cuda-device":0,
+            "model-path-or-name":"{{ project.path }}/resources/modeling/net"
+        },        
+        "classes":[
+            {"label":"machine learning", "content":["machine learning","machine learning model", "bias metric","feature selection","data science"]},
+            {"label":"deep learning", "content":["deep learning","hidden layer","loss function", "neural network", "convolutional neural network", "perceptron"]},
+            {"label":"reinforcement learning", "content":["reinforcement learning","learning policy", "learning state", "advantage function","agent"]},
+            {"label":"robotic", "content":["robotic","robot","control engineering","cybernetics","haptic"]},
+            {"label":"computer vision", "content":["computer vision","images processing","anchor box","object detection","object segmentation"]},
+            {"label":"natural language processing", "content":["natural language processing","tagger","semantic","named entities","classification"]},
+            {"label":"internet of things", "content":["internet of things","devices","iot","embedded software","firmware","machine to machine"]},
+            {"label":"neuromorphic computing", "content":["neuromorphic computing","bio-inspired","personhood","human brain","biological computation"]}
+        ],
+        "re-labelling-strategy":"max",
+        "network": {
+            "host":"0.0.0.0",
+            "port":10010,
+            "associate-environment": {
+                "host":"CLASSIFICATION_HOST",
+                "port":"CLASSIFICATION_PORT"
+            },
+            "ssl":{
+                "cert":"{{ project.path }}/ssl/certificate.crt",
+                "key":"{{ project.path }}/ssl/privateKey.key"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":500,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":600,
+            "response-timeout":600,
+            "workers":1
+        }
+    }
+}

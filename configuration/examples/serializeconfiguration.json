@@ -1,0 +1,12 @@
+{
+    "serialize":{
+        "input":{
+            "path":"/tmp",
+            "keep-service-info":true
+        },
+        "output":{
+            "path":"/tmp",
+            "keep-service-info":true
+        }
+    }
+}

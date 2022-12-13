@@ -1,0 +1,38 @@
+{
+    "logger": {
+        "logging-file": "test.log", 
+        "logging-path": "/tmp", 
+        "logging-level": {"file": "info", "screen": "debug"}
+    },
+    "converter": {
+        "network": {
+            "host":"0.0.0.0",
+            "port":8080,
+            "associate-environment": {
+                "host":"HOST_ENVNAME",
+                "port":"PORT_ENVNAME"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        },
+        "serialize":{
+            "input":{
+                "path":"/tmp",
+                "keep-service-info":true
+            },
+            "output":{
+                "path":"/tmp",
+                "keep-service-info":true
+            }
+        }
+        
+    }
+}

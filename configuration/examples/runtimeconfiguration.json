@@ -1,0 +1,12 @@
+{
+    "runtime":{
+        "request-max-size":100000000,
+        "request-buffer-queue-size":100,
+        "keep-alive":true,
+        "keep-alive-timeout":5,
+        "graceful-shutown-timeout":15.0,
+        "request-timeout":60,
+        "response-timeout":60,
+        "workers":1
+    }    
+}

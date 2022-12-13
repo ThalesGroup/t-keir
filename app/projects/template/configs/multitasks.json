@@ -1,0 +1,40 @@
+{
+    "logger": {
+        "logging-level": "{{ project.loglevel }}"
+    },
+    "multitasks": {
+        "model-path":"{{ project.model }}",
+        "model-task-prefixes":{
+            "morphosyntax":"pos",
+            "lemma":"lemma",
+            "named-entities":"ner",
+            "summary":"sum",
+            "relation":"relation",
+            "event":"event"
+        },
+        "max-output-length":768,
+        "repetition-penalty":1.2,
+        "length-penalty":0.6,
+        "num-beams":2,
+        "no-repeat-ngram-size":5,
+        "use-cuda":true,
+        "network": {
+            "host":"0.0.0.0",
+            "port":10025,
+            "associate-environment": {
+                "host":"MULTITASKS_HOST",
+                "port":"MULTITASKS_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":500,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":600,
+            "response-timeout":600,
+            "workers":1
+        }
+    }
+}

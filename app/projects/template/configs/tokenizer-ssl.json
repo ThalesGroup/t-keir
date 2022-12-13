@@ -1,0 +1,36 @@
+{
+    "logger": {
+        "logging-level": "{{ project.loglevel }}"
+    },
+    "tokenizers": {
+        "segmenters":[{
+            "language":"en",       
+            "resources-base-path":"{{ project.path }}/resources/modeling/tokenizer/en",
+            "mwe": "tkeir_mwe.pkl",
+            "normalization-rules":"tokenizer-rules.json",
+            "annotation-resources-reference":"annotation-resources.json"
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10001,
+            "associate-environment": {
+                "host":"TOKENIZER_HOST",
+                "port":"TOKENIZER_PORT"
+            },
+            "ssl":{
+                "cert":"{{ project.path }}/ssl/certificate.crt",
+                "key":"{{ project.path }}/ssl/privateKey.key"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":500,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":600,
+            "response-timeout":600,
+            "workers":1
+        }
+    }
+}

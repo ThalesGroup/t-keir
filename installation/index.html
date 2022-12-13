@@ -1,0 +1,1182 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Thales knowledge extraction to information retrieval">
+      
+      
+        <meta name="author" content="Thales">
+      
+      
+        <link rel="canonical" href="https://github.com/ThalesGroup/t-keir/installation/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.0, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>Installation - T-KEIR</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.2505c338.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#4051b5">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#installation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="T-KEIR" class="md-header__button md-logo" aria-label="T-KEIR" data-md-component="logo">
+      
+  <img src="../logos/png/T-KEIR_logo_FIN-04.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            T-KEIR
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Installation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ThalesGroup/t-keir/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ThalesGroup/t-keir
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../overview/" class="md-tabs__link">
+      Overview
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../conception/" class="md-tabs__link">
+      Conception
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      Installation
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../ready_to_run/" class="md-tabs__link">
+      Quickstart
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../tools/tools_overview/" class="md-tabs__link">
+        Tools
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../security/" class="md-tabs__link">
+      Security
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../oam/" class="md-tabs__link">
+      Operation and Management
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../about/" class="md-tabs__link">
+      About
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="T-KEIR" class="md-nav__button md-logo" aria-label="T-KEIR" data-md-component="logo">
+      
+  <img src="../logos/png/T-KEIR_logo_FIN-04.png" alt="logo">
+
+    </a>
+    T-KEIR
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ThalesGroup/t-keir/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    ThalesGroup/t-keir
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conception/" class="md-nav__link">
+        Conception
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Installation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Installation
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pre-requist-prepare-t-keir" class="md-nav__link">
+    Pre-requist : prepare T-KEIR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    Directory structure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-prerequists" class="md-nav__link">
+    Installation Prerequists
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation_1" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-from-wheel" class="md-nav__link">
+    Install from Wheel
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-tkeir-docker-image" class="md-nav__link">
+    Build tkeir docker image
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-the-services" class="md-nav__link">
+    Configure the services
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initializeload-the-models" class="md-nav__link">
+    Initialize/Load the models
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-environment-variables" class="md-nav__link">
+    Configure environment variables
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-or-create-data" class="md-nav__link">
+    Copy or create data
+  </a>
+  
+    <nav class="md-nav" aria-label="Copy or create data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#index-mappings" class="md-nav__link">
+    Index mappings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    Resources
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ready_to_run/" class="md-nav__link">
+        Quickstart
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Tools
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Tools" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Tools
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/tools_overview/" class="md-nav__link">
+        Tools overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/converter/" class="md-nav__link">
+        Converter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/tokenizer/" class="md-nav__link">
+        Tokenizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/mstagger/" class="md-nav__link">
+        Morphosyntactic tagger
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/nertagger/" class="md-nav__link">
+        Named Entities Tagger
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/syntactictagger/" class="md-nav__link">
+        Syntactic Tagger
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/keywords/" class="md-nav__link">
+        Keywords Extraction
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/cluster_inference/" class="md-nav__link">
+        Cluster Inference
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/embeddings/" class="md-nav__link">
+        Embedding processing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/relations_clustering/" class="md-nav__link">
+        Relation clustering
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/qa/" class="md-nav__link">
+        Question and Answering
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/sentiment/" class="md-nav__link">
+        Sentiment Analysis
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/zsl_classifier/" class="md-nav__link">
+        Classification
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/summarizer/" class="md-nav__link">
+        Automatic Summarization
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/indexing/" class="md-nav__link">
+        Indexing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/search_engine/" class="md-nav__link">
+        Search Engine
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/pipeline/" class="md-nav__link">
+        Pipelining tools
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        Security
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oam/" class="md-nav__link">
+        Operation and Management
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../about/" class="md-nav__link">
+        About
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pre-requist-prepare-t-keir" class="md-nav__link">
+    Pre-requist : prepare T-KEIR
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    Directory structure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-prerequists" class="md-nav__link">
+    Installation Prerequists
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation_1" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-from-wheel" class="md-nav__link">
+    Install from Wheel
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-tkeir-docker-image" class="md-nav__link">
+    Build tkeir docker image
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-the-services" class="md-nav__link">
+    Configure the services
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initializeload-the-models" class="md-nav__link">
+    Initialize/Load the models
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-environment-variables" class="md-nav__link">
+    Configure environment variables
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-or-create-data" class="md-nav__link">
+    Copy or create data
+  </a>
+  
+    <nav class="md-nav" aria-label="Copy or create data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#index-mappings" class="md-nav__link">
+    Index mappings
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resources" class="md-nav__link">
+    Resources
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/ThalesGroup/t-keir/edit/master/docs/installation.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="installation">Installation</h1>
+<p>These tools work on *nix, WSL and docker environment.</p>
+<h2 id="pre-requist-prepare-t-keir">Pre-requist : prepare T-KEIR</h2>
+<ul>
+<li>install git</li>
+</ul>
+<div class="highlight"><span class="filename">Example under ubuntu</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">#&gt; sudo apt install git</span>
+</code></pre></div>
+<ul>
+<li>install poetry. Follow the instructions : <a href="https://python-poetry.org/docs">Poetry installation documentation</a></li>
+</ul>
+<h2 id="directory-structure">Directory structure</h2>
+<ul>
+<li><strong>app/bin</strong>           : scripts and tools for server execution</li>
+<li><strong>app/projects</strong>       : projects templates</li>
+<li><strong>doc</strong>               : buildable documentation</li>
+<li><strong>runtimes/docker</strong>   : docker environment</li>
+<li><strong>resources</strong>         : contain testing resources &amp; automatic index creation data</li>
+<li><strong>thot</strong>              : tkeir source code</li>
+</ul>
+<h2 id="installation-prerequists">Installation Prerequists</h2>
+<p>T-KEIR is a python software, <strong>python 3.8</strong> and <strong>poetry</strong> are necessary for an installation from gitlab/github.
+Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker</p>
+<p><img alt="Screenshot" src="../resources/images/doc-tkeir-install-strategies.png" /></p>
+<p>To run the document go in directory <strong>tkeir</strong> and run mkdocs server:</p>
+<div class="highlight"><span class="filename">Run the documentation server with mkdocs</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mkdocs serve
+</code></pre></div>
+<h2 id="installation_1">Installation</h2>
+<p>After git repository cloning.
+<div class="highlight"><span class="filename">Build a python wheel package:</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">#&gt; poetry build</span>
+</code></pre></div></p>
+<p>A wheel file will be created in "dist" directory. Then you can simply run a pip install on the created wheel.
+Note that is highly recommanded to run wheel installation in a python virtual environment.</p>
+<h3 id="install-from-wheel">Install from Wheel</h3>
+<p>You can directly install T-Keir from weel:</p>
+<p>Go in "dist" folder (created by poetry)</p>
+<div class="highlight"><span class="filename">Create a python virtual environement:</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">#&gt;  python3 -m venv &lt;YOUR_ENV&gt;`</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Activate you environement:</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">#&gt; source &lt;YOUR_ENV&gt;/bin/activate</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Install the Wheel:</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">#&gt; pip install &lt;FILE_NAME&gt;.whl</span>
+</code></pre></div>
+<p>If there is a problem with <strong>pycurl</strong> install libcurl4-openssl-dev and libssl</p>
+<div class="highlight"><span class="filename">E.G under debian/ubuntu:</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">#&gt; sudo apt install libcurl4-openssl-dev libssl-dev</span>
+</code></pre></div>
+<h3 id="build-tkeir-docker-image">Build tkeir docker image</h3>
+<p>You could build the docker base image. This image contains os and python dependencies and code of search ai with one entry point
+by service. The wheel package will be created, so you should ensure poetry is installed and in running path.</p>
+<p>Go in <strong>tkeir/runtimes/docker</strong> directory and run the following command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">#&gt; ./builddocker.sh</span>
+</code></pre></div>
+<h3 id="configure-the-services">Configure the services</h3>
+<p>T-Keir provides a script to automatically generate configuration file:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">#&gt; python3 tkeir/thot/tkeir_init_project.py -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;</span>
+</code></pre></div></p>
+<p>When you work with a docker you can use a share directory or a volume (to make configurer persistent).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">#&gt; docker run --rm -it -v &lt;PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME&gt;:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share</span>
+</code></pre></div>
+<h3 id="initializeload-the-models">Initialize/Load the models</h3>
+<p>When you build you docker volumes containing model and default configuration are automatically generated.
+To update the configuration you can go into directory <strong>app/bin</strong> and run the command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">#&gt; ./init-models.sh &lt;PATH TO CONFIGURATION&gt; &lt;MODEL PATH&gt;</span>
+</code></pre></div>
+<p>Or from docker</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">#&gt; docker run --rm -it -v $host_dir:$docker_dir -w /home/tkeir_svc/tkeir --entrypoint bash $tkeir_img /home/tkeir_svc/tkeir/app/bin/init-models.sh $docker_dir/project/configs $docker_dir/project/resources/modeling/net/</span>
+</code></pre></div>
+<p>Where </p>
+<ul>
+<li><strong>host_dir</strong> is the variable containing the path to the shared host directory</li>
+<li><strong>docker_dir</strong> is the variable containing the path to the shared docker directory</li>
+<li><strong>tkei_img</strong> is the name of the image</li>
+</ul>
+<p>Note, that the environment variable TRANSFORMERS_CACHE <strong>HAVE TO BE</strong> always set to model path before run a T-Keir service using models.</p>
+<p>Take care of proxies. Please set correclty $HOME/.docker/config.json like that:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="w">  </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="nt">&quot;proxies&quot;</span><span class="p">:</span><span class="w"></span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"></span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">      </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">        </span><span class="nt">&quot;httpProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_http_proxy&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">        </span><span class="nt">&quot;httpsProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_https_proxy&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">        </span><span class="nt">&quot;noProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_no_proxy&quot;</span><span class="w"></span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">      </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">  </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<p>For a docker compose network environment, don't forget to add <strong>tkeir opendistro</strong> hostname and all services in no_proxy.</p>
+<h3 id="configure-environment-variables">Configure environment variables</h3>
+<p>You need to configure some path in <strong>".env"</strong> file in directory docker</p>
+<ul>
+<li><strong> TRANSFORMERS_CACHE </strong> : path to models</li>
+<li><strong> OPENDISTRO_VERSION </strong> : version of opendistrop (1.12.0)</li>
+<li><strong> OPENDISTRO_HOST </strong> : opendistro host (0.0.0.0)</li>
+<li><strong> OPENDISTRO_DNS_HOST </strong> : dns host name of opendistro (generally used by client)</li>
+<li><strong> OPENDISTRO_PORT </strong> : opendistro port (9200)</li>
+<li><strong> TKEIR_DATA_PATH </strong> : the hosting path to the data that will be analyzed and indexed</li>
+<li><strong> CONVERTER_PORT </strong> : converter service port</li>
+<li><strong> TOKENIZER_PORT </strong> : tokenizer service port</li>
+<li><strong> MSTAGGER_PORT </strong> : morphosyntactic service port</li>
+<li><strong> NERTAGGER_PORT </strong> : named entities service port</li>
+<li><strong> SYNTAXTAGGER_PORT </strong> : syntax and relation service port</li>
+<li><strong> SENT_EMBEDDING_PORT </strong> : sentence embedding service port</li>
+<li><strong> PIPELINE_PORT </strong> : tagging pipeline service port</li>
+<li><strong> KEYWORD_PORT </strong> : keywords extraction service port</li>
+<li><strong> AUTOMATIC_SUMMARY_PORT </strong> : automatic extractive summary port</li>
+<li><strong> SENTIMENT_ANALYSIS_PORT </strong> : sentiment analysis service port</li>
+<li><strong> CLASSIFICATION_PORT </strong> : unsupervised classification service port</li>
+<li><strong> QA_PORT </strong> : question and answering service port</li>
+<li><strong> CLUSTER_INFERENCE_HOST </strong> : semantic cluster inference port</li>
+<li><strong> SEARCH_PORT </strong> : search service port</li>
+<li><strong> TIKA_PORT </strong> : tika converter port</li>
+<li><strong> INDEX_PORT </strong> : index service port</li>
+<li><strong> WEB_PORT </strong> : web access port</li>
+<li><strong> CONVERTER_HOST </strong> : converter service hostname or ip</li>
+<li><strong> TOKENIZER_HOST </strong> : tokenizer service hostname or ip</li>
+<li><strong> MSTAGGER_HOST </strong> : morpho syntactic tagger service hostname or ip</li>
+<li><strong> NERTAGGER_HOST </strong> : named entities tagger service hostname or ip</li>
+<li><strong> SYNTAXTAGGER_HOST </strong> : syntacic tagger and rule based svo extraction sevice hostname or ip</li>
+<li><strong> SENT_EMBEDDING_HOST </strong> : sentience embedding sevice host name</li>
+<li><strong> PIPELINE_HOST </strong> : tagger pipepline service host name</li>
+<li><strong> KEYWORD_HOST </strong> : keyword extractor service hostname or ip</li>
+<li><strong> AUTOMATIC_SUMMARY_HOST </strong> : automatic extractive service summary hostname or ip</li>
+<li><strong> SENTIMENT_ANALYSIS_HOST </strong> : sentiment analysis service hostname or ip</li>
+<li><strong> CLASSIFICATION_HOST </strong> : usupervised classification service hostname or ip</li>
+<li><strong> QA_HOST </strong> : question and answering service hostname or ip</li>
+<li><strong> CLUSTER_INFERENCE_HOST </strong> : semantic cluster inference host</li>
+<li><strong> SEARCH_HOST </strong> : search service hostname or ip</li>
+<li><strong> TIKA_HOST </strong> : tika converter host</li>
+<li><strong> INDEX_HOST </strong> : indexing service hostname or ip</li>
+<li><strong> WEB_HOST </strong> : web access service hostname or ip</li>
+<li><strong> SEARCH_SSL </strong> : Search is in SSL model</li>
+<li><strong> SEARCH_SSL_NO_VERIFY </strong> : no verify certificate</li>
+<li><strong> TKEIR_SSL </strong> : [True | False], enable disable SSL even when SSL is specified in configuration file</li>
+<li><strong> ALLOWED_HOSTS </strong> : django allowed host</li>
+<li><strong> ES_MEMORY </strong> : Elastic search memory</li>
+<li><strong> MODEL_PATH </strong> : path of models (huggingface)</li>
+</ul>
+<h2 id="copy-or-create-data">Copy or create data</h2>
+<p>T-Keir comes with default configuration file.
+Nevertheless you can modify or add file. Most of them are configuration (see configuration section).</p>
+<h3 id="index-mappings">Index mappings</h3>
+<p>Index mapping is store in <strong>RESOURCES_DIRECTORY/indices/indices_mapping</strong>. if you create new mapping it MUST contains the same fields.
+You can freely change the analyzers.</p>
+<h3 id="resources">Resources</h3>
+<p>The resources are stored in <strong>RESOURCES_DIRECTORY/modeling/tokenizer/[en|fr...]</strong>. This directory contains file with list or csv tables.
+The descriptions of these file are in <strong>CONFIGS/annotation-resources.json</strong></p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../conception/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Conception" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Conception
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../ready_to_run/" class="md-footer__link md-footer__link--next" aria-label="Next: Quickstart" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Quickstart
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2022 THALES<br>
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+      
+    
+    <a href="https://github.com/ThalesGroup" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M186.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1zM480 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2zm-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3zm-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs"], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+    
+    
+  </body>
+</html>

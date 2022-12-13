@@ -1,0 +1,72 @@
+{
+    "train-sample-per-task":[10000,20000],
+    "model":"google/mt5-small",
+    "evaluation":{
+        "k-fold":5
+    },    
+    "tasks": {
+        "ner":{
+            "datasets":{
+                "train":"ner-train.tsv",
+                "dev":"ner-dev.tsv",
+                "test":"ner-test.tsv"
+            },
+            "split-languages":["#all"],
+            "eval-measures": ["f1","precision","recall"]
+        },
+        "pos":{
+            "datasets":{
+                "train":"pos-train.tsv",
+                "dev":"pos-dev.tsv",
+                "test":"pos-test.tsv"
+            },
+            "split-languages":["#all"],
+            "eval-measures": ["f1","precision","recall"]
+        },
+        "lemma":{
+            "datasets":{
+                "train":"lemma-train.tsv",
+                "dev":"lemma-dev.tsv",
+                "test":"lemma-test.tsv"
+            },
+            "split-languages":["#all"],
+            "eval-measures": ["f1","precision","recall"]
+        },    
+        "svo":{
+            "datasets":{
+                "train":"svo-train.tsv",
+                "dev":"svo-dev.tsv",
+                "test":"svo-test.tsv"
+            },
+            "split-languages":["#all"],
+            "eval-measures": ["f1","precision","recall"]
+        },
+        "relations":{
+            "datasets":{
+                "train":"rel-train.tsv",
+                "dev":"rel-dev.tsv",
+                "test":"rel-test.tsv"
+            },
+            "split-languages":["#all"],
+            "eval-measures": ["f1","precision","recall"]
+        },
+        "events":{
+            "datasets":{
+                "train":"evt-train.tsv",
+                "dev":"evt-dev.tsv",
+                "test":"evt-test.tsv"
+            },
+            "split-languages":["#all"],
+            "eval-measures": ["f1","precision","recall"]
+        },
+        "trans":{
+            "datasets":{
+                "train":"trans-train.tsv",
+                "dev":"trans-dev.tsv",
+                "test":"trans-test.tsv"
+            },
+            "split-languages":["#all"],
+            "eval-measures": ["bleu","meteor"]
+        }
+    }
+}

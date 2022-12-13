@@ -1,0 +1,38 @@
+{
+    "logger": {
+        "logging-level": "{{ project.loglevel }}"
+    },
+    "morphosyntax": {
+        "taggers":[{
+            "language":"en",
+            "resources-base-path":"{{ project.path }}/resources/modeling/tokenizer/en",
+            "mwe": "tkeir_mwe.pkl",
+            "pre-sentencizer": true,
+            "pre-tagging-with-concept":true,
+            "add-concept-in-knowledge-graph":true
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10002,
+            "associate-environment": {
+                "host":"MSTAGGER_HOST",
+                "port":"MSTAGGER_PORT"
+            },
+            "ssl":{
+                "cert":"{{ project.path }}/ssl/certificate.crt",
+                "key":"{{ project.path }}/ssl/privateKey.key"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":500,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":600,
+            "response-timeout":600,
+            "workers":1
+        }
+
+    }
+}

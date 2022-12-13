@@ -1,0 +1,7 @@
+{    
+    "keywords-pos-validation":{"possible-pos-in-syntagm":["PROPN","ADJ","NOUN","ADV", "PART"],"at-least":["PROPN","NOUN","ADJ"]},    
+    "settings":{            
+        "suppress-bounds-sw": true,
+        "pos-to-suppress": ["ADP", "ADV", "AUX", "CONJ", "CCONJ", "DET", "INTJ", "PART","SCONJ", "SYM", "SPACE", "X", "PRON", "PUNCT","SYM"]
+    }    
+}

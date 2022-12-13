@@ -30,6 +30,8 @@ Otherwise and from Thales environnement only, you can install by using pip comma
 ![Screenshot](resources/images/doc-tkeir-install-strategies.png)
 
 
+To run the document go in directory **tkeir** and run mkdocs server:
+
 ```shell  title="Run the documentation server with mkdocs"
 mkdocs serve
 ```

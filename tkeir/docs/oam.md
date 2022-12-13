@@ -16,8 +16,8 @@ docker-compose -f docker-compose-tkeir.yml up
 docker ps -a
 ```
 
-```{image} resources/images/tkeir-docker-ps.png
-```
+![Screenshot](resources/images/tkeir-docker-ps.png)
+
 
 ### Stop and restart service
 
@@ -39,16 +39,14 @@ docker start <service name>
 docker logs --details <service name>
 ```
 
-```{image} resources/images/tkeir-docker-log.png
-```
+![Screenshot](resources/images/tkeir-docker-log.png)
 
 ## Check the service health
 
 You can check the health of a service by using the endpoint **health** of the service. The rest function will return standard http code 200
 and a json description of the running service.
 
-```{image} resources/images/docker-rest-health.png
-```
+![Screenshot](resources/images/docker-rest-health.png)
 
 ## Tools life cyle and release
 

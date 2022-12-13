@@ -94,9 +94,7 @@ When you work with a docker you can use a share directory or a volume (to make c
 #> docker run --rm -it -v <PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME>:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
 ```
 
-==========================
-Initialize/Load the models
-==========================
+### Initialize/Load the models
 
 When you build you docker volumes containing model and default configuration are automatically generated.
 To update the configuration you can go into directory **app/bin** and run the command:

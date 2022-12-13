@@ -13,7 +13,7 @@ Example of Configuration:
 
 
 ```json title="keywords.json"
---8<-- "../app/projects/template/configs/keywords.json"
+--8<-- "./app/projects/template/configs/keywords.json"
 ```
 
 Keywords extractor is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).
@@ -29,7 +29,7 @@ Keywords rules allows to filter and validate rules according to their POS Tags.
 Example of Configuration:
 
 ```json title="indexing.json"
---8<-- "../app/projects/template/configs/keywords-rules.json"
+--8<-- "./app/projects/template/configs/keywords-rules.json"
 ```
 
 

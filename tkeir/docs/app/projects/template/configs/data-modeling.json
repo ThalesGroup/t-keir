@@ -1,0 +1,103 @@
+{
+    "train-sample-per-task":[10000,50000,100000],
+    "model":"google/mt5-small",
+    "ner":{
+        "datasets":{
+            "train":"ner-train.tsv",
+            "dev":"ner-train.tsv",
+            "test":"ner-train.tsv"
+        },
+        "split-on-languages":[
+                "en","de","es","fr","it","nl","pl","pt","ru",
+                "en-fr",
+                "en-pl",
+                "#all"
+        ],
+        "k-fold":5,
+        "eval-measures": ["f1","precision","recall"]
+    },
+    "pos":{
+        "datasets":{
+            "train":"pos-train.tsv",
+            "dev":"pos-train.tsv",
+            "test":"pos-train.tsv"
+        },
+        "split-on-languages":[
+            "af","ar","be","bg","bxr","ca","cop","cs","cu","cy","da","de","el",
+            "en","es","et","eu","fa","fi","fo","fr","fro","ga","gd","gl","got",
+            "grc","he","hi","hr","hsb","hu","hy","hyw","id","is","it","ja","kk",
+            "kmr","ko","la","lij","lt","lv","lzh","mr","mt","nl","no","olo","orv",
+            "pcm","pl","pt","qhe","qtd","ro","ru","sa","sk","sl","sme","sr","sv",
+            "swl","ta","te","tr","ug","uk","ur","vi","wo","zh",
+            "en-fr",
+            "en-fr-ar-ru-ko",
+            "#all"
+        ],
+        "k-fold":5,
+        "combined-tasks":["ner","trans","ner-trans","ner-trans-lemma-relation-svo"],
+        "eval-measures": ["f1","precision","recall"]
+    },
+    "lemma":{
+        "datasets":{
+            "train":"pos-train.tsv",
+            "dev":"pos-train.tsv",
+            "test":"pos-train.tsv"
+        },
+        "split-on-languages":[
+            "af","ar","be","bg","bxr","ca","cop","cs","cu","cy","da","de","el",
+            "en","es","et","eu","fa","fi","fo","fr","fro","ga","gd","gl","got",
+            "grc","he","hi","hr","hsb","hu","hy","hyw","id","is","it","ja","kk",
+            "kmr","ko","la","lij","lt","lv","lzh","mr","mt","nl","no","olo","orv",
+            "pcm","pl","pt","qhe","qtd","ro","ru","sa","sk","sl","sme","sr","sv",
+            "swl","ta","te","tr","ug","uk","ur","vi","wo","zh",
+            "en-fr",
+            "en-fr-ar-ru-ko",
+            "#all"
+        ],
+        "k-fold":5,
+        "eval-measures": ["f1","precision","recall"]
+    },    
+    "svo":{
+        "datasets":{
+            "train":"pos-train.tsv",
+            "dev":"pos-train.tsv",
+            "test":"pos-train.tsv"
+        },
+        "split-on-languages":[
+            "af","ar","be","bg","bxr","ca","cop","cs","cu","cy","da","de","el",
+            "en","es","et","eu","fa","fi","fo","fr","fro","ga","gd","gl","got",
+            "grc","he","hi","hr","hsb","hu","hy","hyw","id","is","it","ja","kk",
+            "kmr","ko","la","lij","lt","lv","lzh","mr","mt","nl","no","olo","orv",
+            "pcm","pl","pt","qhe","qtd","ro","ru","sa","sk","sl","sme","sr","sv",
+            "swl","ta","te","tr","ug","uk","ur","vi","wo","zh",
+            "en-fr",
+            "en-fr-ar-ru-ko",
+            "#all"
+        ],
+        "k-fold":5,
+        "eval-measures": ["f1","precision","recall"]
+    },
+    "relations":{
+        "datasets":{
+            "train":"rel-train.tsv",
+            "dev":"rel-train.tsv",
+            "test":"rel-train.tsv"
+        },
+        "k-fold":5,
+        "split-on-languages":["en"],
+        "eval-measures": ["f1","precision","recall"]
+    },
+    "trans":{
+        "datasets":{
+            "train":"trans-train.tsv",
+            "dev":"trans-train.tsv",
+            "test":"trans-train.tsv"
+        },
+        "k-fold":5,
+        "split-on-languages":["bg","cs","da","de","el","es","et","fi","fr","ga","hr","hu","is",
+                              "it","lt","lv","mt","nb","nl","pl","pt","ro","sk","sl","sv",
+                              "en-fr","en-pl","#all"],
+        "eval-measures": ["bleu","meteor"]
+    }   
+    
+}

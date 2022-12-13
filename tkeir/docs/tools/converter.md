@@ -14,7 +14,7 @@ This API is also available via the service itself on <http:/>/\<service host>:\<
 Example of Configuration:
 
 ```json title="converter.json"
---8<-- "../app/projects/template/configs/converter.json"
+--8<-- "./app/projects/template/configs/converter.json"
 ```
 
 

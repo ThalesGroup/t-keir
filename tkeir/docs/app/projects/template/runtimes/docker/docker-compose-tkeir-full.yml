@@ -1,0 +1,392 @@
+version: '3.2'
+
+# declare volume names
+# each volume is associated to a service, the configuration
+# and the models are copied in the volumes
+volumes:
+  volume_theresis_tkeir_converter:
+    external: true
+  volume_theresis_tkeir_tokenizer:
+    external: true
+  volume_theresis_tkeir_mstagger:
+    external: true
+  volume_theresis_tkeir_nertagger:
+    external: true
+  volume_theresis_tkeir_syntactictagger:
+    external: true
+  volume_theresis_tkeir_keywordextractor:
+    external: true
+  volume_theresis_tkeir_clusterinfer:
+    external: true        
+  volume_theresis_tkeir_embeddings:
+    external: true
+  volume_theresis_tkeir_zeroshotclassifier:
+    external: true
+  volume_theresis_tkeir_sentiment:
+    external: true
+  volume_theresis_tkeir_qa:
+    external: true
+  volume_theresis_tkeir_summarizer:
+    external: true
+  volume_theresis_tkeir_search:
+    external: true
+  volume_theresis_tkeir_full:
+    external: true
+  volume_theresis_tkeir_tkeir2index:
+    external: true
+  volume_theresis_tkeir_web:
+      external: true
+  
+# declare services
+services:
+  # Opendistro is AWS elastic search
+  # we run it with 8Go RAM and disable security (TKEIR tool does not manage yet security for Opendistro)
+  # we expose port 9200 and 9300
+  # opendistro is in the same network than other services : tkeir-net, and the hostname will be tkeir_opendistro
+  # If you have already an opendistro run on you network you can suppress or comment this service but you have
+  # to setup properly the OPENDISTRO_HOST and OPENDISTRO_DNS_HOST in .env file
+  tkeir_opendistro:
+    container_name: tkeir_opendistro
+    build:
+      context: opendistro/
+      args:
+        OPENDISTRO_VERSION: ${OPENDISTRO_VERSION}
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ${TKEIR_DATA_PATH}/share/index:/usr/share/elasticsearch/data:rw
+    environment:
+      - "ES_JAVA_OPTS=-Xmx8g -Xms8g"
+      - "http.cors.enabled=true"
+      - "http.cors.allow-origin=*"
+      - "discovery.type=single-node"
+      - "opendistro_security.disabled=true"
+      - "indices.query.bool.max_clause_count=250000"
+    networks:
+      - tkeir-net
+
+  # the converter service convert input file to a TKEIR compliant document
+  # it's generally the first service used
+  # the service is no very cpu consuming
+  tkeir_converter_svc:    
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_converter_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_converter:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${CONVERTER_PORT}:${CONVERTER_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, converter]
+  
+  # The tokenizer is the first step of document analysis
+  # It require Multi word Expression model created during the
+  # setup of TKEIR environement
+  # Depends on : converter (take TKEIR compliant document as input)
+  tkeir_tokenizer_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_tokenizer_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_tokenizer:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${TOKENIZER_PORT}:${TOKENIZER_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, tokenizer]
+  
+  # The Morpho syntactic tagger allows to tag tokenized document
+  # It's based on spacy framework
+  # Depends on : Tokenizer
+  tkeir_mstagger_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_mstagger_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_mstagger:/home/tkeir_svc/tkeir/app:z      
+    ports:
+      - ${MSTAGGER_PORT}:${MSTAGGER_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, mstagger]
+
+  # The Named entities tagger extract named entities from a document
+  # It's based on spacy framework 
+  # Depends on : MSTagger   
+  tkeir_nertagger_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_nertagger_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_nertagger:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${NERTAGGER_PORT}:${NERTAGGER_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, nertagger]
+
+  # The syntactic tagger extract syntactic dependencies and Subject,Verb, Object triplet
+  # It's based on spacy framework and rules 
+  # Depends on : NERTagger
+  tkeir_syntax_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_syntax_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_syntactictagger:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${SYNTAXTAGGER_PORT}:${SYNTAXTAGGER_PORT}
+    networks:
+      - tkeir-net
+    depends_on:
+      - tkeir_opendistro
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, syntactictagger]
+  
+  # The keywords extractor extracts keywords by using RAKE algorithm on lemmas
+  # It's based on spacy framework and rules 
+  # Depends on : Syntactic tagger
+  tkeir_keywords_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_keywords_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_keywordextractor:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${KEYWORD_PORT}:${KEYWORD_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, keywordextractor]
+
+  # Infer cluster id on triplet Subject, verb, object and keywords
+  # depends on: Keyword extractor and embedding services
+  tkeir_clusterinfer_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_clusterinfer_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_clusterinfer:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${CLUSTER_INFERENCE_PORT}:${CLUSTER_INFERENCE_PORT}
+    networks:
+      - tkeir-net
+    environment:
+      - SENT_EMBEDDING_HOST=${SENT_EMBEDDING_HOST}
+      - SENT_EMBEDDING_PORT=${SENT_EMBEDDING_PORT}
+          
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, clusterinfer]
+
+  # Compute sentence embeddings
+  # depends on : tokenizer
+  tkeir_embeddings_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_embeddings_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_embeddings:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${SENT_EMBEDDING_PORT}:${SENT_EMBEDDING_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, embeddings]
+
+  # Compute automatic summary
+  # depends on : tokenizer
+  tkeir_summarizer_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_summarizer_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_summarizer:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${AUTOMATIC_SUMMARY_PORT}:${AUTOMATIC_SUMMARY_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, summarizer]
+
+  # Compute sentiment analysis
+  # depends on : tokenizer
+  tkeir_sentiment_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_sentiment_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_sentiment:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${SENTIMENT_ANALYSIS_PORT}:${SENTIMENT_ANALYSIS_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, sentiment]
+
+  # Compute zero shot classification
+  # depends on : tokenizer
+  tkeir_classifier_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_classifier_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_zeroshotclassifier:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${CLASSIFICATION_PORT}:${CLASSIFICATION_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, zeroshotclassifier]
+
+  # Question and Answering service
+  # depends on : tokenizer
+  tkeir_qa_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_qa_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_qa:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${QA_PORT}:${QA_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, qa]
+
+
+    # Run search service
+  tkeir_search_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_search_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_search:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${SEARCH_PORT}:${SEARCH_PORT}
+    environment:
+      - TOKENIZER_HOST=${TOKENIZER_HOST}
+      - TOKENIZER_PORT=${TOKENIZER_PORT}
+      - MSTAGGER_HOST=${MSTAGGER_HOST}
+      - MSTAGGER_PORT=${MSTAGGER_PORT}
+      - NERTAGGER_HOST=${NERTAGGER_HOST}
+      - NERTAGGER_PORT=${NERTAGGER_PORT}
+      - SYNTAXTAGGER_HOST=${SYNTAXTAGGER_HOST}
+      - SYNTAXTAGGER_PORT=${SYNTAXTAGGER_PORT}
+      - SENT_EMBEDDING_HOST=${SENT_EMBEDDING_HOST}
+      - SENT_EMBEDDING_PORT=${SENT_EMBEDDING_PORT}
+      - SENTIMENT_ANALYSIS_HOST=${SENTIMENT_ANALYSIS_HOST}
+      - SENTIMENT_ANALYSIS_PORT=${SENTIMENT_ANALYSIS_PORT}
+      - CLASSIFICATION_HOST=${CLASSIFICATION_HOST}
+      - CLASSIFICATION_PORT=${CLASSIFICATION_PORT}
+      - QA_HOST=${QA_HOST}
+      - QA_PORT=${QA_PORT}
+      - PIPELINE_HOST=${PIPELINE_HOST}
+      - PIPELINE_PORT=${PIPELINE_PORT}
+      - KEYWORD_HOST=${KEYWORD_HOST}
+      - KEYWORD_PORT=${KEYWORD_PORT}
+      - SEARCH_HOST=${SEARCH_HOST}
+      - SEARCH_PORT=${SEARCH_PORT}
+      - INDEX_HOST=${INDEX_HOST}
+      - INDEX_PORT=${INDEX_PORT}
+      - OPENDISTRO_DNS_HOST=${OPENDISTRO_DNS_HOST}
+      - OPENDISTRO_PORT=${OPENDISTRO_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, search]
+
+  # Run index service
+  tkeir_index_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_index_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_tkeir2index:/home/tkeir_svc/tkeir/app:rw
+    environment:
+      - OPENDISTRO_DNS_HOST=${OPENDISTRO_DNS_HOST}
+      - OPENDISTRO_PORT=${OPENDISTRO_PORT}
+    ports:
+      - ${INDEX_PORT}:${INDEX_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, index]
+
+  # run pipeline service
+  # this service run a complete pipeline from converter to indexing
+  # TKEIR_DATA_PATH is the path "listen" by the pipeline service
+  tkeir_pipeline_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_pipeline_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_full:/home/tkeir_svc/tkeir/app:rw
+      - ${TKEIR_DATA_PATH}:/data:z
+    ports:
+      - ${PIPELINE_PORT}:${PIPELINE_PORT}
+    environment:
+      - CONVERTER_HOST=${CONVERTER_HOST}
+      - CONVERTER_PORT=${CONVERTER_PORT}
+      - TOKENIZER_HOST=${TOKENIZER_HOST}
+      - TOKENIZER_PORT=${TOKENIZER_PORT}
+      - MSTAGGER_HOST=${MSTAGGER_HOST}
+      - MSTAGGER_PORT=${MSTAGGER_PORT}
+      - NERTAGGER_HOST=${NERTAGGER_HOST}
+      - NERTAGGER_PORT=${NERTAGGER_PORT}
+      - SYNTAXTAGGER_HOST=${SYNTAXTAGGER_HOST}
+      - SYNTAXTAGGER_PORT=${SYNTAXTAGGER_PORT}
+      - SENT_EMBEDDING_HOST=${SENT_EMBEDDING_HOST}
+      - SENT_EMBEDDING_PORT=${SENT_EMBEDDING_PORT}
+      - AUTOMATIC_SUMMARY_HOST=${AUTOMATIC_SUMMARY_HOST}
+      - AUTOMATIC_SUMMARY_PORT=${AUTOMATIC_SUMMARY_PORT}
+      - SENTIMENT_ANALYSIS_HOST=${SENTIMENT_ANALYSIS_HOST}
+      - SENTIMENT_ANALYSIS_PORT=${SENTIMENT_ANALYSIS_PORT}
+      - CLASSIFICATION_HOST=${CLASSIFICATION_HOST}
+      - CLASSIFICATION_PORT=${CLASSIFICATION_PORT}
+      - PIPELINE_HOST=${PIPELINE_HOST}
+      - PIPELINE_PORT=${PIPELINE_PORT}
+      - KEYWORD_HOST=${KEYWORD_HOST}
+      - KEYWORD_PORT=${KEYWORD_PORT}
+      - SEARCH_HOST=${SEARCH_HOST}
+      - SEARCH_PORT=${SEARCH_PORT}
+      - CLUSTER_INFERENCE_HOST=${CLUSTER_INFERENCE_HOST}
+      - CLUSTER_INFERENCE_PORT=${CLUSTER_INFERENCE_PORT}
+      - INDEX_HOST=${INDEX_HOST}
+      - INDEX_PORT=${INDEX_PORT}
+      - OPENDISTRO_DNS_HOST=${OPENDISTRO_DNS_HOST}
+      - OPENDISTRO_PORT=${OPENDISTRO_PORT}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, pipeline]
+
+  # Run web interface
+  tkeir_web_svc:
+    image: theresis/tkeir
+    user: "tkeir_svc:tkeir_svc"
+    container_name: tkeir_web_svc
+    runtime: nvidia
+    volumes:
+      - volume_theresis_tkeir_web:/home/tkeir_svc/tkeir/app:z
+    ports:
+      - ${WEB_PORT}:${WEB_PORT}
+    environment:
+      - WEB_PORT=${WEB_PORT}
+      - SEARCH_HOST=${SEARCH_HOST}
+      - SEARCH_PORT=${SEARCH_PORT}
+      - SEARCH_SSL=${SEARCH_SSL}
+      - SEARCH_SSL_NO_VERIFY=${SEARCH_SSL_NO_VERIFY}
+    networks:
+      - tkeir-net
+    entrypoint: [/home/tkeir_svc/tkeir/app/bin/docker_entrypoint.sh, web]
+ 
+networks:
+  tkeir-net:
+    name: tkeir-net
+    driver: bridge

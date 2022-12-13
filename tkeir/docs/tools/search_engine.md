@@ -12,7 +12,7 @@ Example of Configuration:
 
 
 ```json title="indexing.json"
---8<-- "../app/projects/template/configs/indexing.json"
+--8<-- "./app/projects/template/configs/indexing.json"
 ```
 
 The indexing configuration is an aggreation of serialize configuration, logger (at top level).
@@ -59,7 +59,7 @@ queries based on query analysis. It also allows to manipulate ranking scores.
 Example of Configuration:
 
 ```json title="search.json"
---8<-- "../app/projects/template/configs/search.json"
+--8<-- "./app/projects/template/configs/search.json"
 ```
 
 The search configuration allows to set up the search behaviour according the query analysis. The other configuration are not specific to the service.

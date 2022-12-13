@@ -7,7 +7,7 @@ Relation clustering allows to create class on SVO extracted during the Syntactic
 Example of Configuration:
 
 ```json title="relations.json"
---8<-- "../app/projects/template/configs/relations.json"
+--8<-- "./app/projects/template/configs/relations.json"
 ```
 
 Relation clustering configuration is an aggreation of serialize configuration, logger (at top level).

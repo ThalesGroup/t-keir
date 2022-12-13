@@ -14,7 +14,7 @@ Morphosyntactic tagger is based on spacy toolbox.
 Example of Configuration:
 
 ```json title="mstagger.json"
---8<-- "../app/projects/template/configs/mstagger.json"
+--8<-- "./app/projects/template/configs/mstagger.json"
 ```
 
 Morphosyntactic tagger is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).

@@ -14,7 +14,7 @@ Example of Configuration:
 
 
 ```json title="indexing.json"
---8<-- "../app/projects/template/configs/indexing.json"
+--8<-- "./app/projects/template/configs/indexing.json"
 ```
 
 Indexer is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).

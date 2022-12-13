@@ -12,7 +12,7 @@ This tools is a rest service where the API is described in **API section** and t
 Example of Configuration:
 
 ```json title="ner.json"
---8<-- "../app/projects/template/configs/nertagger.json"
+--8<-- "./app/projects/template/configs/nertagger.json"
 ```
 
 NER Tagger is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).
@@ -28,7 +28,7 @@ Example of Configuration:
 
 
 ```json title="indexing.json"
---8<-- "../app/projects/template/configs/ner-rules.json"
+--8<-- "./app/projects/template/configs/ner-rules.json"
 ```
 
 The validation rule is a set of triple:

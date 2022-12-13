@@ -15,7 +15,7 @@ Example of Configuration:
 
 
 ```json title="relation.json"
---8<-- "../app/projects/template/configs/relations.json"
+--8<-- "./app/projects/template/configs/relations.json"
 ```
 
 ### Configure cluster inference logger

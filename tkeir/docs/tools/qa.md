@@ -14,7 +14,7 @@ Example of Configuration:
 
 
 ```json title="qa.json"
---8<-- "../app/projects/template/configs/qa.json"
+--8<-- "./app/projects/template/configs/qa.json"
 ```
 
 Question and Answering configuration is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).

@@ -12,7 +12,7 @@ This tools is a rest service where the API is described in **API section** and t
 Example of Configuration:
 
 ```json title="summarizer.json"
---8<-- "../app/projects/template/configs/summarizer.json"
+--8<-- "./app/projects/template/configs/summarizer.json"
 ```
 
 Automatic Summary configuration is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).

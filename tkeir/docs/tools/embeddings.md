@@ -14,7 +14,7 @@ Example of Configuration:
 
 
 ```json title="relation.json"
---8<-- "../app/projects/template/configs/embeddings.json"
+--8<-- "./app/projects/template/configs/embeddings.json"
 ```
 
 Embedding configuration is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).

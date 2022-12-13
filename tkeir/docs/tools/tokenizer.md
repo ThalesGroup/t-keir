@@ -15,7 +15,7 @@ This tools allows to create typed compound word list.
 Example of Configuration:
 
 ```json title="tokenizer.json"
---8<-- "../app/projects/template/configs/tokenizer.json"
+--8<-- "./app/projects/template/configs/tokenizer.json"
 ```
 
 Tokenizer is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).
@@ -35,7 +35,7 @@ The normalization rule is a simple json file with the following fields:
 - **normalization/typos** : typos fixing
 
 ```json title="tokenizer-rules.json"
---8<-- "../app/projects/template/configs/tokenizer-rules.json"
+--8<-- "./app/projects/template/configs/tokenizer-rules.json"
 ```
 
 ### Configure tokenizer logger

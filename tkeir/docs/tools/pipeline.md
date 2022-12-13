@@ -15,7 +15,7 @@ Example of Configuration:
 
 
 ```json title="pipeline.json"
---8<-- "../app/projects/template/configs/pipeline.json"
+--8<-- "./app/projects/template/configs/pipeline.json"
 ```
 
 Pipeline is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).

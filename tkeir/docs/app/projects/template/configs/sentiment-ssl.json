@@ -1,0 +1,35 @@
+{
+    "logger": {
+        "logging-level":  "info"
+    },
+    "sentiment": {
+        "settings":{
+            "use-cuda" : false,
+            "cuda-device":0,
+            "language":"en",
+            "model-path-or-name":"{{ project.path }}/resources/modeling/net"
+        },
+        "network": {
+            "host":"0.0.0.0",
+            "port":10009,
+            "associate-environment": {
+                "host":"SENTIMENT_ANALYSIS_HOST",
+                "port":"SENTIMENT_ANALYSIS_PORT"
+            },
+            "ssl":{
+                "cert":"{{ project.path }}/ssl/certificate.crt",
+                "key":"{{ project.path }}/ssl/privateKey.key"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    }
+}

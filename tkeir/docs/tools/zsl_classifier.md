@@ -15,7 +15,7 @@ This tools allows to create typed compound word list.
 Example of Configuration:
 
 ```json title="zeroshotclassifier.json"
---8<-- "../app/projects/template/configs/zeroshotclassifier.json"
+--8<-- "./app/projects/template/configs/zeroshotclassifier.json"
 ```
 
 Zeroshot Classifier is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).

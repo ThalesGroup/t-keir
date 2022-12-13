@@ -13,7 +13,7 @@ Example of Configuration:
 
 
 ```json title="syntactic-tagger.json"
---8<-- "../app/projects/template/configs/syntactic-tagger.json"
+--8<-- "./app/projects/template/configs/syntactic-tagger.json"
 ```
 
 Syntactic is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).
@@ -24,7 +24,7 @@ Example of Configuration:
 
 
 ```json title="syntactic-tagger.json"
---8<-- "../app/projects/template/configs/syntactic-rules.json"
+--8<-- "./app/projects/template/configs/syntactic-rules.json"
 ```
 
 The rules allows to extract triple based on sequence matcher of spacy

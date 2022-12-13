@@ -1,0 +1,319 @@
+{
+    "logger": {
+        "logging-level": "{{ project.loglevel }}"
+    },
+    "searching": {        
+        "document-index-name":"default-text-index",
+        "disable-document-analysis":false,
+        "aggregator":{
+            "host":"localhost",
+            "port":"18888",
+            "index":true,
+            "engines":["wikipedia","github","qwantp","ai4europe"],
+            "index-pipeline":{
+                "host":"localhost",
+                "port":"10006",
+                "use-ssl":false,
+                "no-ssl-verify":false,
+                "associate-environment": {
+                    "host":"PIPELINE_HOST",
+                    "port":"PIPELINE_PORT"
+                }
+            }
+        },
+        "qa":{
+            "host":"localhost",
+            "port":10011,
+            "associate-environment": {
+                "host":"QA_HOST",
+                "port":"QA_PORT"
+            },
+            "max-question-size":32,
+            "max-ranked-doc":5,
+            "use-ssl":false,
+            "no-ssl-verify":false
+        },
+        "suggester":{
+            "number-of-suggestions":10,
+            "spell-check":true
+        },
+        "search-policy":{            
+            "semantic-cluster":{
+                "semantic-quantizer-model":"{{ project.path }}/resources/modeling/relation_names.model.pkl"
+            },
+            "settings":{                
+                "basic-querying":{
+                    "uniq-word-query":true,
+                    "boosted-uniq-word-query":false,
+                    "cut-query":4096
+                },
+                "advanced-querying":{
+                    "use-lemma":true,
+                    "use-keywords":true,
+                    "use-knowledge-graph":true,
+                    "use-semantic-keywords":true,
+                    "use-semantic-knowledge-graph":true, 
+                    "use-concepts":true,
+                    "use-sentences":false,
+                    "querying":{
+                        "match-phrase-slop":3,
+                        "match-phrase-boosting":0.5,
+                        "match-sentence":{
+                            "number-and-symbol-filtering":true,
+                            "max-number-of-words":30
+                        },
+                        "match-keyword":{
+                            "number-and-symbol-filtering":true,                            
+                            "semantic-skip-highest-ranked-classes":3,
+                            "semantic-max-boosting":5
+                        },
+                        "match-svo":{
+                            "semantic-use-class-triple":false,
+                            "semantic-use-lemma-property-object":false,
+                            "semantic-use-subject-lemma-object":false,
+                            "semantic-use-subject-property-lemma":false,
+                            "semantic-use-lemma-lemma-object":true,
+                            "semantic-use-lemma-property-lemma":true,
+                            "semantic-use-subject-lemma-lemma":true,
+                            "semanic-max-boosting":5
+                        },
+                        "match-concept":{
+                            "concept-boosting":0.2,
+                            "concept-pruning":10
+                        }
+                    }
+                },
+                "query-expansion":{
+                    "term-pruning":128,
+                    "suppress-number":true,
+                    "keep-word-collection-thresold-under":0.4,
+                    "word-boost-thresold-above":0.25
+                },
+                "scoring":{
+                    "normalize-score":true,                    
+                    "document-query-intersection-penalty":"by-query-size",
+                    "run-clause-separately":false,
+                    "expand-results":50
+                },
+                "results":{
+                    "see-also":{
+                        "number-of-cross-links":10                        
+                    },
+                    "named-entity-explain": {
+                        "min-score":0.35
+                    },
+                    "default-from":0,
+                    "default-size":5,
+                    "set-highlight":false,
+                    "excludes":[]
+                }
+            }            
+        },
+        "elasticsearch":{
+            "network": {
+                "host": "tkeir-opendistro",
+                "port": 9200,
+                "use_ssl": true,
+                "verify_certs": false,
+                "auth":{
+                    "user":"admin",
+                    "password":"admin",
+                    "associate-environment": {
+                        "user":"OPENDISTRO_USER",
+                        "password":"OPENDISTRO_PASSWORD"
+                    }
+                },
+                "associate-environment": {
+                    "host":"OPENDISTRO_DNS_HOST",
+                    "port":"OPENDISTRO_PORT",
+                    "use_ssl":"OPENDISTRO_USE_SSL",
+                    "verify_certs":"OPENDISTRO_VERIFY_CERTS"
+                }
+            }
+        },
+        "network": {
+            "host":"0.0.0.0",
+            "port":9000,
+            "associate-environment": {
+                "host":"SEARCH_HOST",
+                "port":"SEARCH_PORT"
+            },
+            "ssl":{
+                "cert":"{{ project.path }}/ssl/certificate.crt",
+                "key":"{{ project.path }}/ssl/privateKey.key"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    },
+    "tokenizers": {
+        "segmenters":[{
+            "language":"en",
+            "resources-base-path":"{{ project.path }}/resources/modeling/tokenizer/en",
+            "normalization-rules":"tokenizer-rules.json",
+            "mwe": "tkeir_mwe.pkl"
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10001,
+            "associate-environment": {
+                "host":"TOKENIZER_HOST",
+                "port":"TOKENIZER_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    },
+    "morphosyntax": {
+        "taggers":[{
+            "language":"en",
+            "resources-base-path":"{{ project.path }}/resources/modeling/tokenizer/en",
+            "mwe": "tkeir_mwe.pkl",
+            "pre-sentencizer": true,
+            "pre-tagging-with-concept":true,
+            "add-concept-in-knowledge-graph":true
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10002,
+            "associate-environment": {
+                "host":"MSTAGGER_HOST",
+                "port":"MSTAGGER_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    },
+    "named-entities": {
+        "label":[{
+            "language":"en",
+            "resources-base-path":"{{ project.path }}/resources/modeling/tokenizer/en",
+            "mwe": "tkeir_mwe.pkl",
+            "ner-rules": "ner-rules.json",
+            "use-pre-label":true
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10003,
+            "associate-environment": {
+                "host":"NERTAGGER_HOST",
+                "port":"NERTAGGER_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    },
+    "embeddings": {
+        "models":[
+        { 
+            "language":"multi",
+            "use-cuda":false,
+            "batch-size":256
+        }
+        ],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10005,
+            "associate-environment": {
+                "host":"SENT_EMBEDDING_HOST",
+                "port":"SENT_EMBEDDING_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    },
+    "syntax": {
+        "taggers":[{
+            "language":"en",
+            "resources-base-path":"{{ project.path }}/configs",
+            "syntactic-rules": "syntactic-rules.json"
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10004,
+            "associate-environment": {
+                "host":"SYNTAXTAGGER_HOST",
+                "port":"SYNTAXTAGGER_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+    },
+    "keywords": {
+        "extractors":[{
+            "language":"en",
+            "resources-base-path":"{{ project.path }}/resources/modeling/tokenizer/en",
+            "stopwords":"en.stopwords.lst",
+            "use-lemma":true,
+            "use-pos":true,
+            "use-form":false            
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":10007,
+            "associate-environment": {
+                "host":"KEYWORD_HOST",
+                "port":"KEYWORD_PORT"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
+
+    }
+}

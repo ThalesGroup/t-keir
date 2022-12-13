@@ -1,4 +1,8 @@
+# Project information
 site_name: T-KEIR
+site_description: 'Thales knowledge extraction to information retrieval'
+site_author: 'Thales'
+site_url: 'https://github.com/ThalesGroup/t-keir/'
 nav:
     - Overview: 'overview.md'
     - Conception: 'conception.md'
@@ -24,6 +28,7 @@ nav:
         - Pipelining tools: 'tools/pipeline.md'      
     - Security: 'security.md'
     - Operation and Management: 'oam.md'
+    - About: 'about.md'
 plugins:
     - render_swagger
 markdown_extensions:
@@ -33,7 +38,31 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
 
+# Repository
+repo_name: 'ThalesGroup/t-keir'
+repo_url: 'https://github.com/ThalesGroup/t-keir/'
+
+# Copyright
+copyright: |
+  Copyright &copy; 2022 THALES<br>
+
+# Configuration
 theme:
-  name: readthedocs
+  logo: 'logos/png/T-KEIR_logo_FIN-04.png'
+  name: 'material'
+  language: 'en'
+  palette:
+    primary: 'indigo'
+    accent: 'indigo'
+  font:
+    text: 'Roboto'
+    code: 'Roboto Mono'
   features:
-    - content.code.annotate
+     - navigation.tabs
+
+# Customization
+extra:
+  manifest: 'manifest.webmanifest'
+  social:
+    - icon: 'fontawesome/brands/github-alt'
+      link: 'https://github.com/ThalesGroup'

@@ -689,6 +689,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#stop-and-restart-service" class="md-nav__link">
+    Stop and restart service
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#get-output-a-a-service-log" class="md-nav__link">
     Get output a a service (log)
   </a>
@@ -697,6 +704,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-the-service-health" class="md-nav__link">
+    Check the service health
+  </a>
   
 </li>
       
@@ -772,6 +786,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#stop-and-restart-service" class="md-nav__link">
+    Stop and restart service
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#get-output-a-a-service-log" class="md-nav__link">
     Get output a a service (log)
   </a>
@@ -780,6 +801,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-the-service-health" class="md-nav__link">
+    Check the service health
+  </a>
   
 </li>
       
@@ -819,28 +847,22 @@
 <h3 id="list-services">List services</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker ps -a
 </code></pre></div>
-<p>```{image} resources/images/tkeir-docker-ps.png
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>### Stop and restart service
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>To stop a service :
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>```shell
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>docker stop &lt;service name&gt;
-</code></pre></div></p>
+<p><img alt="Screenshot" src="../resources/images/tkeir-docker-ps.png" /></p>
+<h3 id="stop-and-restart-service">Stop and restart service</h3>
+<p>To stop a service :</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker stop &lt;service name&gt;
+</code></pre></div>
 <p>To restart a service</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker start &lt;service name&gt;
 </code></pre></div>
 <h3 id="get-output-a-a-service-log">Get output a a service (log)</h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>docker logs --details &lt;service name&gt;
 </code></pre></div>
-<p>```{image} resources/images/tkeir-docker-log.png
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>## Check the service health
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>You can check the health of a service by using the endpoint **health** of the service. The rest function will return standard http code 200
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>and a json description of the running service.
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>```{image} resources/images/docker-rest-health.png
-</code></pre></div></p>
+<p><img alt="Screenshot" src="../resources/images/tkeir-docker-log.png" /></p>
+<h2 id="check-the-service-health">Check the service health</h2>
+<p>You can check the health of a service by using the endpoint <strong>health</strong> of the service. The rest function will return standard http code 200
+and a json description of the running service.</p>
+<p><img alt="Screenshot" src="../resources/images/docker-rest-health.png" /></p>
 <h2 id="tools-life-cyle-and-release">Tools life cyle and release</h2>
 <p>This first release is available on Thales Inner Sources repository.
 We make a tag for each project and create release when important features and bugs fixes has been done.</p>

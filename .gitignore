@@ -1,0 +1,14 @@
+*.swp
+*.pyc
+*~
+config.yaml
+.DS_Store
+.idea/
+*.iml
+**/__pycache__
+**/*.log
+build
+public
+tkeir/dist
+tkeir/site
+.venv

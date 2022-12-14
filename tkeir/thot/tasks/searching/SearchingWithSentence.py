@@ -225,6 +225,10 @@ class SearchingWithSentence:
 
         # Run third party as quick as possible
 
+        if "from" not in doc:
+            doc["from"] = 0
+        if "size" not in doc:
+            doc["size"] = 10
         q_from = int(doc["from"])
         q_size = int(doc["size"])
         qe_size = q_size

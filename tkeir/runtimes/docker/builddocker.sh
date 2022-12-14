@@ -14,7 +14,7 @@ echo $script_path
 cd $script_path
 cd ../../../
 
-poetry build
-cp -r dist tkeir
+#poetry build
+#cp -r dist tkeir
 cd tkeir
 docker build -f runtimes/docker/tkeir/Dockerfile.tkeir-base.prod . -t theresis/tkeir

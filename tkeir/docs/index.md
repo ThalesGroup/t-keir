@@ -13,7 +13,9 @@ The tkeir tools allows to apply numerous NLP tools, search, index and classify. 
 - question and answering
 - advanced query formulation and expansion based on clustering and text analysis
 
+## Github
 
+You can get the source code from the [T-Keir github repository](https://github.com/ThalesGroup/t-keir/) 
 
 ## ChangeLog
 

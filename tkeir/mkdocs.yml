@@ -4,6 +4,7 @@ site_description: 'Thales knowledge extraction to information retrieval'
 site_author: 'Thales'
 site_url: 'https://github.com/ThalesGroup/t-keir/'
 nav:
+    - Home: 'index.md'
     - Overview: 'overview.md'
     - Conception: 'conception.md'
     - Installation: 'installation.md'

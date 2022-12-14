@@ -24,8 +24,15 @@ from thot.tasks.evaluation.IREval import IREval
 from thot import __author__, __copyright__, __credits__, __maintainer__, __email__, __status__
 
 
-def main(args):
-
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-q", "--queries", default=None, type=str, help="queries to run")
+    parser.add_argument("-o", "--output", default=None, type=str, help="output directory")
+    parser.add_argument("-n", "--name", default="tkeireval", type=str, help="eval name")
+    parser.add_argument("-p", "--prune", default=-1, type=int, help="mx number of requests")
+    parser.add_argument("-b", "--bypass", default=-1, type=int, help="skip start query")
+    parser.add_argument("-s", "--stats", default=None, type=str, help="comma sperated file list")
+    args = parser.parse_args()
     ireval = IREval()
 
     if args.stats:
@@ -45,11 +52,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-q", "--queries", default=None, type=str, help="queries to run")
-    parser.add_argument("-o", "--output", default=None, type=str, help="output directory")
-    parser.add_argument("-n", "--name", default="tkeireval", type=str, help="eval name")
-    parser.add_argument("-p", "--prune", default=-1, type=int, help="mx number of requests")
-    parser.add_argument("-b", "--bypass", default=-1, type=int, help="skip start query")
-    parser.add_argument("-s", "--stats", default=None, type=str, help="comma sperated file list")
-    main(parser.parse_args())
+    main()

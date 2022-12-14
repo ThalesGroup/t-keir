@@ -120,10 +120,23 @@ To run the command type simply from tkeir directory:
 python3 thot/summarizer_svc.py --config=<path to summarizer configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-summarizer-svc.py --config=<path to summarizer configuration file>
+```
+
+
 A light client can be run through the command
 
 ```shell
 python3 thot/summarizer_client.py --config=<path to summarizer configuration file> --input=<input directory> --output=<output directory> -m <minimal output summary length by block> -M <maximal output summary length by block> [-mp <minimal percentage of block length> -Mp <maximal percentage of text block>]
+```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-summarizer-client.py --config=<path to summarizer configuration file> --input=<input directory> --output=<output directory> -m <minimal output summary length by block> -M <maximal output summary length by block> [-mp <minimal percentage of block length> -Mp <maximal percentage of text block>]
 ```
 
 ## Automatic Summary Tests

@@ -38,11 +38,24 @@ Another way is to use index service (here each document are indexed separately, 
 python3 thot/index_svc --config=<path to indexing configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-index-svc --config=<path to indexing configuration file>
+```
+
+
 It is possible to use a quick client:
 
 ```shell
 python3 thot/index_client --config=<path to indexing configuration file> -i <path to tkeir document>
 ```
+or if you install tkeir wheel:
+
+```shell
+tkeir-index-client --config=<path to indexing configuration file> -i <path to tkeir document>
+```
+
 
 ## Search
 
@@ -187,4 +200,10 @@ To run the command type simply from tkeir directory:
 
 ```shell
 python3 thot/search_svc.py --config=<path to relation configuration file>
+```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-search-svc --config=<path to relation configuration file>
 ```

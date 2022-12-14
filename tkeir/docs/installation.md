@@ -84,14 +84,21 @@ Go in **tkeir/runtimes/docker** directory and run the following command:
 ### Configure the services
 
 T-Keir provides a script to automatically generate configuration file:
+
 ```shell
-#> python3 tkeir/thot/tkeir_init_project.py -t <PATH TO TKEIR>/tkeir/app/projects/template/ -o <PATH TO YOUR OUTPUT CONFIG DIR>
+python3 tkeir/thot/tkeir_init_project.py -t <PATH TO TKEIR>/tkeir/app/projects/template/ -o <PATH TO YOUR OUTPUT CONFIG DIR>
+```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-init-project -t <PATH TO TKEIR>/tkeir/app/projects/template/ -o <PATH TO YOUR OUTPUT CONFIG DIR>
 ```
 
 When you work with a docker you can use a share directory or a volume (to make configurer persistent).
 
 ```shell
-#> docker run --rm -it -v <PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME>:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
+docker run --rm -it -v <PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME>:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
 ```
 
 ### Initialize/Load the models
@@ -100,13 +107,13 @@ When you build you docker volumes containing model and default configuration are
 To update the configuration you can go into directory **app/bin** and run the command:
   
 ```shell
-#> ./init-models.sh <PATH TO CONFIGURATION> <MODEL PATH>
+./init-models.sh <PATH TO CONFIGURATION> <MODEL PATH>
 ```
 
 Or from docker
 
 ```shell
-#> docker run --rm -it -v $host_dir:$docker_dir -w /home/tkeir_svc/tkeir --entrypoint bash $tkeir_img /home/tkeir_svc/tkeir/app/bin/init-models.sh $docker_dir/project/configs $docker_dir/project/resources/modeling/net/
+docker run --rm -it -v $host_dir:$docker_dir -w /home/tkeir_svc/tkeir --entrypoint bash $tkeir_img /home/tkeir_svc/tkeir/app/bin/init-models.sh $docker_dir/project/configs $docker_dir/project/resources/modeling/net/
 ```
 
 Where 

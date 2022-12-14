@@ -18,7 +18,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "../")))
 sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "./")))
 
 
-def main(args):
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input", default=None, type=str, help="syntax directory")
+    parser.add_argument("-o", "--output", default=None, type=str, help="output stats")
+    args = parser.parse_args()
     try:
         file_list = []
         for (dirpath, dirnames, filenames) in os.walk(args.input):
@@ -164,7 +168,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", default=None, type=str, help="syntax directory")
-    parser.add_argument("-o", "--output", default=None, type=str, help="output stats")
-    main(parser.parse_args())
+    main()

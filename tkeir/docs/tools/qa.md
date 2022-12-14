@@ -116,19 +116,26 @@ To run the command type simply from tkeir directory:
 python3 thot/qa_svc.py --config=<path to qa configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-qa-svc --config=<path to qa configuration file>
+```
+
+
 A light client can be run through the command
 
 ```shell
 python3 thot/qa_client.py --config=<path to qa configuration file> --input=<input directory> --output=<output directory> --queries=<queries file>
 ```
 
-Example of Queries:
+or if you install tkeir wheel:
 
-```{eval-rst}
-.. literalinclude:: ../../../thot/tests/data/qa_queries.json
-    :language: json
 
+```shell
+tkeir-qa-client --config=<path to qa configuration file> --input=<input directory> --output=<output directory> --queries=<queries file>
 ```
+
 
 ## Question and Answering Tests
 

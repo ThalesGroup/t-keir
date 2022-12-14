@@ -113,11 +113,24 @@ To run the command type simply from tkeir directory:
 python3 thot/index_svc.py --config=<path to indexer configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-index-svc --config=<path to indexer configuration file>
+```
+
 A light client can be run through the command
 
 ```shell
 python3 thot/index_client.py --config=<path to indexer configuration file> --input=<input directory> --output=<output directory>
 ```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-index-client --config=<path to indexer configuration file> --input=<input directory> --output=<output directory>
+```
+
 
 ## Indexer Tests
 

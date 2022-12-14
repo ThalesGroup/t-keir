@@ -336,14 +336,15 @@ def cluster_train(config,input,output,exclude):
         ThotLogger.error("An error occured." + exception_error_and_trace(str(e), str(traceback.format_exc())))
         sys.exit(-1)
 
-def main(args):
-    cluster_train(args.config,args.input,args.output,args.exclude)
-
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default=None, type=str, help="configuration file")
     parser.add_argument("-i", "--input", default=None, type=str, help="directory with syntactic analysis")
     parser.add_argument("-e", "--exclude", default=None, type=str, help="exclude file list")
     parser.add_argument("-o", "--output", default=None, type=str, help="output model directory")
     parser.add_argument("-w", "--worker", default=1, type=int, help="number of workers")
-    main(parser.parse_args())
+    args = parser.parse_args()
+    cluster_train(args.config,args.input,args.output,args.exclude)
+    
+if __name__ == "__main__":
+    main()

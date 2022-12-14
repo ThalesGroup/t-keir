@@ -123,10 +123,23 @@ To run the command type simply from tkeir directory:
 python3 thot/embeddings_svc.py --config=<path to embeddings configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-embeddings-svc --config=<path to embeddings configuration file>
+```
+
+
 A light client can be run through the command
 
 ```shell
 python3 thot/embeddings_client.py --config=<path to embeddings configuration file> --input=<input directory> --output=<output directory>
+```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-embeddings-client --config=<path to embeddings configuration file> --input=<input directory> --output=<output directory>
 ```
 
 ## Embeddings Tests

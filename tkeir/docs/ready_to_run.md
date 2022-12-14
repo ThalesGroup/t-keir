@@ -75,6 +75,13 @@ To analyse and index document prepared in previous step, you have to run **batch
 python3 thot/batch_ingester.py -c <PATH TO YOU CONFIGURATION FOLDER>/pipeline.json -i <PATH TO QUICKSTART FOLDER>/data/tkeir -o <PATH TO QUICKSTART FOLDER>/data/tkeir-out
 ```
 
+or if you install wheel:
+
+```shell
+tkeir-batch-ingester -c <PATH TO YOU CONFIGURATION FOLDER>/pipeline.json -i <PATH TO QUICKSTART FOLDER>/data/tkeir -o <PATH TO QUICKSTART FOLDER>/data/tkeir-out
+```
+
+
 After this process, all documents will be indexed. You can query Elastic Search with the following command:
 
 ```shell
@@ -89,6 +96,13 @@ Firstly run Q/A system:
 python3 thot/qa_svc.py -c <PATH TO CONFIG>/qa.json
 ```
 
+or if you install wheel:
+
+```shell
+tkeir-qa-svc -c <PATH TO CONFIG>/qa.json
+```
+
+
 Check health:
 
 ```shell
@@ -99,6 +113,12 @@ Secondly run search service:
 
 ```shell
 python3 thot/search_svc.py -c <PATH TO CONFIG>/search.json
+```
+
+or if you install wheel:
+
+```shell
+tkeir-search-svc.py -c <PATH TO CONFIG>/search.json
 ```
 
 Check health:

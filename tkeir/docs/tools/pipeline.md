@@ -127,10 +127,22 @@ To run the command type simply from tkeir directory:
 python3 thot/pipeline_svc.py --config=<path to pipeline configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-pipeline-svc --config=<path to pipeline configuration file>
+```
+
 A light client can be run through the command
 
 ```shell
 python3 thot/pipeline_client.py --config=<path to pipeline configuration file> --input=<input directory> --output=<output directory> --loop-time=<time between two get loop> --scheme [http|https] --nsv (not verify ssl)
+```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-pipeline-client --config=<path to pipeline configuration file> --input=<input directory> --output=<output directory> --loop-time=<time between two get loop> --scheme [http|https] --nsv (not verify ssl)
 ```
 
 ## Pipeline as batch processing
@@ -139,4 +151,10 @@ You can also run the pipeline with a batch function:
 
 ```shell
 python3 thot/batch_ingester.py -c <PATH TO YOU CONFIGURATION FOLDER>/pipeline.json -i <PATH TO DATA FOLDER>/data/tkeir -o <PATH TO DATA FOLDER>/data/tkeir-out
+```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-batch-ingester -c <PATH TO YOU CONFIGURATION FOLDER>/pipeline.json -i <PATH TO DATA FOLDER>/data/tkeir -o <PATH TO DATA FOLDER>/data/tkeir-out
 ```

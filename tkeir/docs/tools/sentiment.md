@@ -118,10 +118,22 @@ To run the command type simply from tkeir directory:
 python3 thot/sentiment_svc.py --config=<path to configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-sentiment-svc --config=<path to configuration file>
+```
+
 A light client can be run through the command
 
 ```shell
 python3 thot/sentiment_client.py --config=<path to configuration file> --input=<input directory> --output=<output directory>
+```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-sentiment-client --config=<path to configuration file> --input=<input directory> --output=<output directory>
 ```
 
 ## Sentiment Analyzer Tests

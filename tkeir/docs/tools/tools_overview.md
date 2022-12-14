@@ -13,6 +13,25 @@ The services can be run a a same way:
 python3 thot/<service_name>_svc.py -c service_config.json
 ```
 
+if you install wheel
+
+```shell
+tkeir-<service_name>-svc -c service_config.json
+```
+
+The services clients can be run a a same way:
+
+```shell
+python3 thot/<service_name>_client.py CLIENT_OPTIONS
+```
+
+if you install wheel
+
+```shell
+tkeir-<service_name>-client CLIENT_OPTIONS
+```
+
+
 ## How use the services
 
 There is two way to consume the service:

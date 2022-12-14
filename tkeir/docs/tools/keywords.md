@@ -130,11 +130,24 @@ To run the command type simply from tkeir directory:
 python3 thot/keywordextractor_svc.py --config=<path to keywords configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-keywordextractor-svc --config=<path to keywords configuration file>
+```
+
 A light client can be run through the command
 
 ```shell
 python3 thot/keywordextractor_client.py --config=<path to keywords configuration file> --input=<input directory> --output=<output directory>
 ```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-keywordextractor-client --config=<path to keywords configuration file> --input=<input directory> --output=<output directory>
+```
+
 
 ## Keywords extractor Tests
 

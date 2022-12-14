@@ -137,11 +137,25 @@ To run the command type simply from tkeir directory:
 python3 thot/tokenizer_svc.py --config=<path to tokenizer configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-tokenizer-svc --config=<path to tokenizer configuration file>
+```
+
+
 A light client can be run through the command
 
 ```shell
 python3 thot/tokenizer_client.py --config=<path to tokenizer configuration file> --input=<input directory> --output=<output directory>
 ```
+
+or if you install tkeir wheel:
+
+```shell
+python3 tkeir-tokenizer-client.py --config=<path to tokenizer configuration file> --input=<input directory> --output=<output directory>
+```
+
 
 ## Tokenizer Tests
 

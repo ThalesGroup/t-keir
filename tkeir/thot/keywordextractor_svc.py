@@ -95,7 +95,7 @@ def service_not_loaded(call_context):
     call_context["status"] = 500
     ThotLogger.error("Service is not loaded", context=call_context)
     return sanic.response.json(
-        {"error": Constant.SERVICE_NOT_LOADED, "version": __version_keywords__, "date": __date_keywords__},
+        {"error": Constants.SERVICE_NOT_LOADED, "version": __version_keywords__, "date": __date_keywords__},
         headers={"X-Served-By": x_served_by},
         status=500,
     )

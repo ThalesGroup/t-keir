@@ -130,11 +130,24 @@ To run the command type simply from tkeir directory:
 python3 thot/nertagger_svc.py --config=<path to ner configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-nertagger-svc --config=<path to ner configuration file>
+```
+
 A light client can be run through the command
 
 ```shell
 python3 thot/nertagger_client.py --config=<path to ner tagger configuration file> --input=<input directory> --output=<output directory>
 ```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-nertagger-client --config=<path to ner tagger configuration file> --input=<input directory> --output=<output directory>
+```
+
 
 ## NER Tagger Tests
 

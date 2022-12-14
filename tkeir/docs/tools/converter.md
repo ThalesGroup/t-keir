@@ -117,10 +117,23 @@ To run the command type simply from tkeir directory:
 python3 thot/converter_svc.py --config=/home/tkeir_svc/tkeir/configs/default/configs/converter.json
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-converter-svc --config=/home/tkeir_svc/tkeir/configs/default/configs/converter.json
+```
+
+
 A light client can be run through the command
 
 ```shell
 python3 thot/converter_client.py -c /home/tkeir_svc/tkeir/configs/default/configs/converter.json -t email -i /home/tkeir_svc/tkeir/thot/tests/data/test-raw/mail -o /home/tkeir_svc/tkeir/thot/tests/data/test-inputs/
+```
+
+or if you install tkeir wheel:
+
+```shell
+tkeir-converter-client  -c /home/tkeir_svc/tkeir/configs/default/configs/converter.json -t email -i /home/tkeir_svc/tkeir/thot/tests/data/test-raw/mail -o /home/tkeir_svc/tkeir/thot/tests/data/test-inputs/
 ```
 
 ## Converter Tests

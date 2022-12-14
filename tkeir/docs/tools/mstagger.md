@@ -118,11 +118,26 @@ To run the command type simply from tkeir directory:
 python3 thot/mstagger_svc.py --config=<path to Morphosyntactic Tagger configuration file>
 ```
 
+or if you install tkeir wheel:
+
+```shell
+tkeir-mstagger-svc --config=<path to Morphosyntactic Tagger configuration file>
+```
+
+
 A light client can be run through the command
 
 ```shell
 python3 thot/mstagger_client.py --config=<path to Morphosyntactic Tagger configuration file> --input=<input directory> --output=<output directory>
 ```
+or if you install tkeir wheel:
+
+```shell
+tkeir-mstagger-client --config=<path to Morphosyntactic Tagger configuration file> --input=<input directory> --output=<output directory>
+```
+
+
+or if you install tkeir wheel:
 
 ## Morphosyntactic Tagger Tests
 

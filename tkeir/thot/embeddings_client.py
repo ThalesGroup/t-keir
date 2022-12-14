@@ -25,7 +25,14 @@ from thot.tasks.embeddings import __version_embeddings__, __date_embeddings__
 from thot.tasks.embeddings.EmbeddingsConfiguration import EmbeddingsConfiguration
 
 
-def main(args):
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--config", default=None, type=str, help="configuration file")
+    parser.add_argument("-i", "--input", default=None, type=str, help="input directory")
+    parser.add_argument("-o", "--output", default=None, type=str, help="output directory")
+    parser.add_argument("-s", "--scheme", default="http", type=str, help="connection scheme : http or https")
+    parser.add_argument("-nsv", "--no-ssl-verify", action="store_false", help="Verify ssl certificate, default is true")
+    args = parser.parse_args()    
     if not args.config:
         ThotLogger.loads()
         ThotLogger.error("Configuration file is mandatory")
@@ -66,11 +73,5 @@ def main(args):
         sys.exit(-1)
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", default=None, type=str, help="configuration file")
-    parser.add_argument("-i", "--input", default=None, type=str, help="input directory")
-    parser.add_argument("-o", "--output", default=None, type=str, help="output directory")
-    parser.add_argument("-s", "--scheme", default="http", type=str, help="connection scheme : http or https")
-    parser.add_argument("-nsv", "--no-ssl-verify", action="store_false", help="Verify ssl certificate, default is true")
-    main(parser.parse_args())
+if __name__ == "__main__":    
+    main()

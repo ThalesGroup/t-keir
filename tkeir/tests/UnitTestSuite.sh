@@ -153,26 +153,26 @@ log "TestMSTaggerClient"
 #python3 -m unittest unittests/TestTextQueryFormulator.py
 #log "TestTextQueryFormulator"
 
-#python3 -m unittest unittests/TestZeroShotClassification.py
-#log "TestZeroShotClassification"
+python3 -m unittest unittests/TestZeroShotClassification.py
+log "TestZeroShotClassification"
 
-#python3 -m unittest unittests/TestQA.py
-#log "TestQA"
+python3 -m unittest unittests/TestQA.py
+log "TestQA"
 
-#python3 -m unittest unittests/TestSentiment.py
-#log "TestSentiment"
+python3 -m unittest unittests/TestSentiment.py
+log "TestSentiment"
 
-#python3 -m unittest unittests/TestSummarizer.py
-#log "TestSummarizer"
+python3 -m unittest unittests/TestSummarizer.py
+log "TestSummarizer"
 
-#python3 -m unittest unittests/TestEmbeddings.py
-#log "TestEmbeddings"
+python3 -m unittest unittests/TestEmbeddings.py
+log "TestEmbeddings"
 
-#python3 -m unittest unittests/TestNERTagger.py
-#log "TestNERTagger"
+python3 -m unittest unittests/TestNERTagger.py
+log "TestNERTagger"
 
-#python3 -m unittest unittests/TestTokenizer.py
-#log "TestTokenizer"
+python3 -m unittest unittests/TestTokenizer.py
+log "TestTokenizer"
 
 
 

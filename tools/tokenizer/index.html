@@ -146,6 +146,18 @@
 
 
   <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
     <a href="../../overview/" class="md-tabs__link">
       Overview
     </a>
@@ -293,6 +305,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../overview/" class="md-nav__link">
         Overview
       </a>
@@ -358,18 +385,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_5">
+        <label class="md-nav__link" for="__nav_6">
           Tools
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Tools" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
+        <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
           Tools
         </label>
@@ -2961,22 +2988,28 @@ The normalization rule is a simple json file with the following fields:</p>
 <p>To run the command type simply from tkeir directory:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3 thot/tokenizer_svc.py --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt;
 </code></pre></div>
+<p>or if you install tkeir wheel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>tkeir-tokenizer-svc --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt;
+</code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3 thot/tokenizer_client.py --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3 thot/tokenizer_client.py --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+</code></pre></div>
+<p>or if you install tkeir wheel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3 tkeir-tokenizer-client.py --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h2 id="tokenizer-tests">Tokenizer Tests</h2>
 <p>The converter service come with unit and functional testing.</p>
 <h3 id="tokenizer-unit-tests">Tokenizer Unit tests</h3>
 <p>Unittest allows to test Tokenizer classes only.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3 -m unittest thot/tests/unittests/TestTokenizerConfiguration.py
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>python3 -m unittest thot/tests/unittests/TestTokenizer.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3 -m unittest thot/tests/unittests/TestTokenizerConfiguration.py
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>python3 -m unittest thot/tests/unittests/TestTokenizer.py
 </code></pre></div>
 <p>Notes:
 : - if there is error due to the file <strong>tkeir_mwe.mkl</strong> it is normal. You can avoid this error by creating the</p>
 <p>the resources model
 : - the model data directory is mapped into docker-compose file, please check if all the configuration files are inside this directory</p>
 <h3 id="tokenizer-functional-tests">Tokenizer Functional tests</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3 -m unittest thot/tests/functional_tests/TestTokenizerSvc.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3 -m unittest thot/tests/functional_tests/TestTokenizerSvc.py
 </code></pre></div>
 
 

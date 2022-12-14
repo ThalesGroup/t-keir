@@ -146,6 +146,18 @@
 
 
   <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
     <a href="../../overview/" class="md-tabs__link">
       Overview
     </a>
@@ -293,6 +305,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../overview/" class="md-nav__link">
         Overview
       </a>
@@ -358,18 +385,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_5">
+        <label class="md-nav__link" for="__nav_6">
           Tools
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Tools" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
+        <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
           Tools
         </label>
@@ -1164,18 +1191,24 @@ This tools is a rest service where the API is described in <strong>API section</
 <p>To run the command type simply from tkeir directory:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3 thot/syntactictagger_svc.py --config<span class="o">=</span>&lt;path to ner configuration file&gt;
 </code></pre></div>
+<p>or if you install tkeir wheel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>tkeir-syntactictagger-svc --config<span class="o">=</span>&lt;path to ner configuration file&gt;
+</code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3 thot/syntactictagger_client.py --config<span class="o">=</span>&lt;path to ner tagger configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3 thot/syntactictagger_client.py --config<span class="o">=</span>&lt;path to ner tagger configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+</code></pre></div>
+<p>or if you install tkeir wheel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>tkeir-syntactictagger-client --config<span class="o">=</span>&lt;path to ner tagger configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h2 id="syntactic-tagger-tests">Syntactic tagger Tests</h2>
 <p>The Syntactic tagger service come with unit and functional testing.</p>
 <h3 id="syntactic-tagger-unit-tests">Syntactic Tagger Unit tests</h3>
 <p>Unittest allows to test Tokenizer classes only.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3 -m unittest thot/tests/unittests/TestSyntacticTaggerConfiguration.py
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>python3 -m unittest thot/tests/unittests/TestSyntacticTagger.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3 -m unittest thot/tests/unittests/TestSyntacticTaggerConfiguration.py
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>python3 -m unittest thot/tests/unittests/TestSyntacticTagger.py
 </code></pre></div>
 <h3 id="syntactic-tagger-functional-tests">Syntactic tagger Functional tests</h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3 -m unittest thot/tests/functional_tests/TestSyntacticTaggerSvc.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3 -m unittest thot/tests/functional_tests/TestSyntacticTaggerSvc.py
 </code></pre></div>
 
 

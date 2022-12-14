@@ -146,6 +146,18 @@
 
 
   <li class="md-tabs__item">
+    <a href=".." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
     <a href="../overview/" class="md-tabs__link">
       Overview
     </a>
@@ -284,6 +296,21 @@
     </div>
   
   <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
     
       
       
@@ -486,18 +513,18 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
       
       
       
       
-        <label class="md-nav__link" for="__nav_5">
+        <label class="md-nav__link" for="__nav_6">
           Tools
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Tools" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
+        <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
           Tools
         </label>
@@ -986,19 +1013,22 @@ by service. The wheel package will be created, so you should ensure poetry is in
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">#&gt; ./builddocker.sh</span>
 </code></pre></div>
 <h3 id="configure-the-services">Configure the services</h3>
-<p>T-Keir provides a script to automatically generate configuration file:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">#&gt; python3 tkeir/thot/tkeir_init_project.py -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;</span>
-</code></pre></div></p>
+<p>T-Keir provides a script to automatically generate configuration file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3 tkeir/thot/tkeir_init_project.py -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;
+</code></pre></div>
+<p>or if you install tkeir wheel:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>tkeir-init-project -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;
+</code></pre></div>
 <p>When you work with a docker you can use a share directory or a volume (to make configurer persistent).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">#&gt; docker run --rm -it -v &lt;PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME&gt;:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>docker run --rm -it -v &lt;PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME&gt;:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
 </code></pre></div>
 <h3 id="initializeload-the-models">Initialize/Load the models</h3>
 <p>When you build you docker volumes containing model and default configuration are automatically generated.
 To update the configuration you can go into directory <strong>app/bin</strong> and run the command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">#&gt; ./init-models.sh &lt;PATH TO CONFIGURATION&gt; &lt;MODEL PATH&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>./init-models.sh &lt;PATH TO CONFIGURATION&gt; &lt;MODEL PATH&gt;
 </code></pre></div>
 <p>Or from docker</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">#&gt; docker run --rm -it -v $host_dir:$docker_dir -w /home/tkeir_svc/tkeir --entrypoint bash $tkeir_img /home/tkeir_svc/tkeir/app/bin/init-models.sh $docker_dir/project/configs $docker_dir/project/resources/modeling/net/</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>docker run --rm -it -v <span class="nv">$host_dir</span>:<span class="nv">$docker_dir</span> -w /home/tkeir_svc/tkeir --entrypoint bash <span class="nv">$tkeir_img</span> /home/tkeir_svc/tkeir/app/bin/init-models.sh <span class="nv">$docker_dir</span>/project/configs <span class="nv">$docker_dir</span>/project/resources/modeling/net/
 </code></pre></div>
 <p>Where </p>
 <ul>
@@ -1008,17 +1038,17 @@ To update the configuration you can go into directory <strong>app/bin</strong> a
 </ul>
 <p>Note, that the environment variable TRANSFORMERS_CACHE <strong>HAVE TO BE</strong> always set to model path before run a T-Keir service using models.</p>
 <p>Take care of proxies. Please set correclty $HOME/.docker/config.json like that:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="w">  </span><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="nt">&quot;proxies&quot;</span><span class="p">:</span><span class="w"></span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"></span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">      </span><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">        </span><span class="nt">&quot;httpProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_http_proxy&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">        </span><span class="nt">&quot;httpsProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_https_proxy&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">        </span><span class="nt">&quot;noProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_no_proxy&quot;</span><span class="w"></span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">      </span><span class="p">}</span><span class="w"></span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="w">  </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="nt">&quot;proxies&quot;</span><span class="p">:</span><span class="w"></span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"></span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">      </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">        </span><span class="nt">&quot;httpProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_http_proxy&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">        </span><span class="nt">&quot;httpsProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_https_proxy&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">        </span><span class="nt">&quot;noProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_no_proxy&quot;</span><span class="w"></span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">      </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">  </span><span class="p">}</span><span class="w"></span>
 </code></pre></div>
 <p>For a docker compose network environment, don't forget to add <strong>tkeir opendistro</strong> hostname and all services in no_proxy.</p>
 <h3 id="configure-environment-variables">Configure environment variables</h3>

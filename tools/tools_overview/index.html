@@ -146,6 +146,18 @@
 
 
   <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
     <a href="../../overview/" class="md-tabs__link">
       Overview
     </a>
@@ -293,6 +305,21 @@
   
   
     <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../overview/" class="md-nav__link">
         Overview
       </a>
@@ -358,18 +385,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_5">
+        <label class="md-nav__link" for="__nav_6">
           Tools
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Tools" data-md-level="1">
-        <label class="md-nav__title" for="__nav_5">
+        <label class="md-nav__title" for="__nav_6">
           <span class="md-nav__icon md-icon"></span>
           Tools
         </label>
@@ -1002,13 +1029,22 @@ which store the extracted information (i.e. tokens, morphosyntax, named entities
 <p>The services can be run a a same way:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python3 thot/&lt;service_name&gt;_svc.py -c service_config.json
 </code></pre></div>
+<p>if you install wheel</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>tkeir-&lt;service_name&gt;-svc -c service_config.json
+</code></pre></div>
+<p>The services clients can be run a a same way:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python3 thot/&lt;service_name&gt;_client.py CLIENT_OPTIONS
+</code></pre></div>
+<p>if you install wheel</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>tkeir-&lt;service_name&gt;-client CLIENT_OPTIONS
+</code></pre></div>
 <h2 id="how-use-the-services">How use the services</h2>
 <p>There is two way to consume the service:</p>
 <ol>
 <li>by developing your own access to the REST api</li>
 <li>by using the python client</li>
 </ol>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3 thot/&lt;service_name&gt;_client.py -c service_config.json <span class="o">[</span>client specific option<span class="o">]</span> -s <span class="o">[</span>http<span class="p">|</span>https<span class="o">]</span> -nsv
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3 thot/&lt;service_name&gt;_client.py -c service_config.json <span class="o">[</span>client specific option<span class="o">]</span> -s <span class="o">[</span>http<span class="p">|</span>https<span class="o">]</span> -nsv
 </code></pre></div>
 <ul>
 <li>-s option allows to select http scheme it should be http or https</li>
@@ -1016,7 +1052,7 @@ which store the extracted information (i.e. tokens, morphosyntax, named entities
 </ul>
 <h2 id="quick-start-docker-compose">Quick start / Docker compose</h2>
 <p>T-KEIR comes with ready to use docker compose. to run all services go in directory <strong>runtime/docker</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker-compose -f docker-compose-tkeir.yml up
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>docker-compose -f docker-compose-tkeir.yml up
 </code></pre></div>
 <h2 id="quick-start-example-service-by-service">Quick start / Example service by service</h2>
 <p>Here we use all pre-configured service: the configuration environement is in  directory <strong>app/projects/default/configs/*</strong>.</p>
@@ -1029,10 +1065,10 @@ This tools is a rest service where the API is described in <strong>Tools  sectio
 <li><strong>email</strong> : a mail format</li>
 </ul>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python3 thot/converter_svc.py --config<span class="o">=</span>/home/tkeir_svc/tkeir/configs/default/configs/converter.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3 thot/converter_svc.py --config<span class="o">=</span>/home/tkeir_svc/tkeir/configs/default/configs/converter.json
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3 thot/converter_client.py -c /home/tkeir_svc/tkeir/configs/default/configs/converter.json -t email -i /home/tkeir_svc/tkeir/thot/tests/data/test-raw/mail -o /home/tkeir_svc/tkeir/thot/tests/data/test-inputs/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3 thot/converter_client.py -c /home/tkeir_svc/tkeir/configs/default/configs/converter.json -t email -i /home/tkeir_svc/tkeir/thot/tests/data/test-raw/mail -o /home/tkeir_svc/tkeir/thot/tests/data/test-inputs/
 </code></pre></div>
 <h3 id="tokenizer">Tokenizer</h3>
 <p>The tokenizer is a tool allowing to tokenize "title" and "content" field of tkeir document.
@@ -1043,103 +1079,103 @@ This tools is a rest service where the API is described in <strong>Tools  sectio
 <li><strong>email</strong> : a mail format</li>
 </ul>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python3 thot/tokenizer_svc.py --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3 thot/tokenizer_svc.py --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python3 thot/tokenizer_client.py --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3 thot/tokenizer_client.py --config<span class="o">=</span>&lt;path to tokenizer configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="morphosyntactic-tagger">Morphosyntactic tagger</h3>
 <p>The Morphosyntactic tagger is a tool allowing to extract Part Of Speech and lemma from "title_tokens" and "content_tokens" field of tkeir document.
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3 thot/mstagger_svc.py --config<span class="o">=</span>&lt;path to mstagger configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3 thot/mstagger_svc.py --config<span class="o">=</span>&lt;path to mstagger configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3 thot/mstagger_client.py --config<span class="o">=</span>&lt;path to ms tagger configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3 thot/mstagger_client.py --config<span class="o">=</span>&lt;path to ms tagger configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="named-entity-tagger">Named entity tagger</h3>
 <p>The Named entity tagger is a tool allowing to extract Named Entities from "title_tokens" and "content_tokens" field of tkeir document.
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python3 thot/nertagger_svc.py --config<span class="o">=</span>&lt;path to ner configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>python3 thot/nertagger_svc.py --config<span class="o">=</span>&lt;path to ner configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3 thot/nertagger_client.py --config<span class="o">=</span>&lt;path to ner tagger configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>python3 thot/nertagger_client.py --config<span class="o">=</span>&lt;path to ner tagger configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="syntactic-tagger-and-svo-extraction">Syntactic tagger and SVO Extraction</h3>
 <p>The syntactic tagger is a tool allowing to extract syntactic depencies and extract SVO.
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3 thot/syntactictagger_svc.py --config<span class="o">=</span>&lt;path to syntactic configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>python3 thot/syntactictagger_svc.py --config<span class="o">=</span>&lt;path to syntactic configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>python3 thot/syntactictagger_client.py --config<span class="o">=</span>&lt;path to syntactic configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>python3 thot/syntactictagger_client.py --config<span class="o">=</span>&lt;path to syntactic configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="keyword-extraction">Keyword Extraction</h3>
 <p>The keywords extractor is a tool allowing to extract keywords by using RAKE algoritms
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>python3 thot/keywordextractor_svc.py --config<span class="o">=</span>&lt;path to keywords configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>python3 thot/keywordextractor_svc.py --config<span class="o">=</span>&lt;path to keywords configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>python3 thot/keywordextractor_client.py --config<span class="o">=</span>&lt;path to keyword configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>python3 thot/keywordextractor_client.py --config<span class="o">=</span>&lt;path to keyword configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="embbeding-processing">Embbeding processing</h3>
 <p>The embeddings extraction is a tool allowing to extract embedding from "title_tokens" and "content_tokens", "ner", "svo" field of tkeir document.
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>python3 thot/embeddings_svc.py --config<span class="o">=</span>&lt;path to embeddings configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>python3 thot/embeddings_svc.py --config<span class="o">=</span>&lt;path to embeddings configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>python3 thot/embeddings_client.py --config<span class="o">=</span>&lt;path to embeddings configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>python3 thot/embeddings_client.py --config<span class="o">=</span>&lt;path to embeddings configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="relation-clustering">Relation clustering</h3>
 <p>Relation clustering allows to create class on SVO extracted during the Syntactic tagging phase.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>python3 thot/relation_clustering.py --config<span class="o">=</span>&lt;path to relation configuration file&gt; -i &lt;path to file with syntactic data extracted&gt; -o &lt;path to output folder&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>python3 thot/relation_clustering.py --config<span class="o">=</span>&lt;path to relation configuration file&gt; -i &lt;path to file with syntactic data extracted&gt; -o &lt;path to output folder&gt;
 </code></pre></div>
 <p>There is also a service allowing inferencer according to a model computed with the previous command</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>python3 thot/clusterinfer_svc.py --config<span class="o">=</span>&lt;path to relation configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>python3 thot/clusterinfer_svc.py --config<span class="o">=</span>&lt;path to relation configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>python3 thot/clusterinfer_client.py --config<span class="o">=</span>&lt;path to relation configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>python3 thot/clusterinfer_client.py --config<span class="o">=</span>&lt;path to relation configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="document-classification">Document classification</h3>
 <p>The document classification allows to classify document into user defined classes
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>python3 thot/zeroshotclassifier_svc.py --config<span class="o">=</span>&lt;path to configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>python3 thot/zeroshotclassifier_svc.py --config<span class="o">=</span>&lt;path to configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>python3 thot/zeroshotclassifier_client.py --config<span class="o">=</span>&lt;path to configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>python3 thot/zeroshotclassifier_client.py --config<span class="o">=</span>&lt;path to configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="sentiment-analysis">Sentiment Analysis</h3>
 <p>The sentiment analsysis allows to classify document into 2 classes : POSITIVE and NEGATIVE
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>python3 thot/sentiment_svc.py --config<span class="o">=</span>&lt;path to configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>python3 thot/sentiment_svc.py --config<span class="o">=</span>&lt;path to configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>python3 thot/sentiment_client.py --config<span class="o">=</span>&lt;path to configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>python3 thot/sentiment_client.py --config<span class="o">=</span>&lt;path to configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt;
 </code></pre></div>
 <h3 id="document-summary">Document summary</h3>
 <p>The document summarizer allows to create a summary of document (by block of 500 words)
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>python3 thot/summarizer_svc.py --config<span class="o">=</span>&lt;path to configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>python3 thot/summarizer_svc.py --config<span class="o">=</span>&lt;path to configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>python3 thot/summarizer_client.py --config<span class="o">=</span>&lt;path to configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt; -m &lt;min length&gt; -M &lt;max length&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>python3 thot/summarizer_client.py --config<span class="o">=</span>&lt;path to configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt; --output<span class="o">=</span>&lt;output directory&gt; -m &lt;min length&gt; -M &lt;max length&gt;
 </code></pre></div>
 <h3 id="document-indexing">Document indexing</h3>
 <p>The document indexer allows to index a document
 This tools is a rest service where the API is described in <strong>Tools  section</strong>.</p>
 <p>To run the command type simply from tkeir directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>python3 thot/index_svc.py --config<span class="o">=</span>&lt;path to configuration file&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>python3 thot/index_svc.py --config<span class="o">=</span>&lt;path to configuration file&gt;
 </code></pre></div>
 <p>A light client can be run through the command</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>python3 thot/index_client.py --config<span class="o">=</span>&lt;path to configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>python3 thot/index_client.py --config<span class="o">=</span>&lt;path to configuration file&gt; --input<span class="o">=</span>&lt;input directory&gt;
 </code></pre></div>
 <p>Another way to index a directory is to use the tool tkeir2index</p>
 

@@ -2,9 +2,7 @@ FROM nvidia/cuda:11.2.0-runtime-ubuntu20.04
 LABEL maintainer Eric Blaudez <Eric Blaudez>
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN rm -f /etc/apt/sources.list.d/cuda.list; \
-    rm -f /etc/apt/sources.list.d/nvidia-ml.list
-
+RUN rm -f /etc/apt/sources.list.d/cuda.list;
 
 # update distribution
 RUN set -xe; \
@@ -12,8 +10,7 @@ RUN set -xe; \
     apt install -y --no-install-recommends apt-transport-https apt-utils; \
     apt install -y curl libcurl4 libcurl4-openssl-dev libreadline-dev libssl-dev locales procps python-dev; \
     apt install -y python3 python3-pip wget zlib1g-dev pkg-config libcairo2-dev httrack; \
-    rm -rf /var/cache/apt/*
-
+    rm -rf /var/lib/apt/lists/*
 
 # add user and associated directory
 RUN useradd -ms /bin/bash tkeir_svc; \
@@ -29,17 +26,29 @@ RUN set -xe; \
     apt install -y git; \
     git clone https://github.com/searx/searx /home/tkeir_svc/searx; \
     apt remove -y git; \
-    rm -rf /var/cache/apt/*
+    rm -rf /home/tkeir_svc/searx/.git; \
+    rm -rf /var/lib/apt/lists/*
 
 RUN cp -r /home/tkeir_svc/tkeir/app/projects/template/resources/searx/* /home/tkeir_svc/searx/searx/; \
     pip3 install --no-cache-dir -r  /home/tkeir_svc/searx/requirements.txt
 
+#TIPS: Install manually torch for CPU only to skip its fully installation with cuda on next step
+#RUN pip3 install --no-cache-dir torch==1.12.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
+RUN cp -r /home/tkeir_svc/tkeir/app/projects/template/resources/searx/* /home/tkeir_svc/searx/searx/; \
+    pip3 install --no-cache-dir -r  /home/tkeir_svc/searx/requirements.txt
 
 # switch to root for system install
 USER root
 ENV SANIC_NO_UVLOOP=true
 ENV SANIC_NO_UJSON=true
+ENV PATH="/root/.local/bin:$PATH"
+WORKDIR /home/tkeir_svc/tkeir
 RUN chown -R tkeir_svc.tkeir_svc /home/tkeir_svc; \
+    pip install -U --index-url https://pypi.org/simple --no-cache-dir pip setuptools; \
+    pip install -U --index-url https://pypi.org/simple --no-cache-dir poetry; \
+    touch README.rst; \
+    poetry build; \
     pip3 install --no-cache-dir /home/tkeir_svc/tkeir/dist/tkeir-1.0.3-py2.py3-none-any.whl
 
 
@@ -49,7 +58,7 @@ RUN python3 -m nltk.downloader punkt; \
 
 # back to user for normal behaviour
 USER tkeir_svc
-WORKDIR /home/tkeir_svc/tkeir
+
 
 
 

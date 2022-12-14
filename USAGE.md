@@ -27,7 +27,7 @@ These tools work on \*nix, WSL and docker environment.
 T-KEIR is a python software, **python 3.8** and **poetry** are necessary for an installation from gitlab/github.
 Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker
 
-![Screenshot](resources/images/doc-tkeir-install-strategies.png)
+![Screenshot](tkeir/docs/resources/images/doc-tkeir-install-strategies.png)
 
 
 To run the document go in directory **tkeir** and run mkdocs server:
@@ -206,7 +206,7 @@ The descriptions of these file are in **CONFIGS/annotation-resources.json**
 
 # Quick start
 
-![Screenshot](resources/images/doc-tkeir-quickstart-flow.png)
+![Screenshot](tkeir/docs/resources/images/doc-tkeir-quickstart-flow.png)
 
 
 This section describes the step to create a full information retrieval engine.

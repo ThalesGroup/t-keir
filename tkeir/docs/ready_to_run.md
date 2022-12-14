@@ -120,4 +120,4 @@ python3 thot/web/manager.py runservice 0.0.0.0:8080 --insecure
 ```
 
 To visualize a search request you can open firefox on http://<host of web server\>:8080/search
-If you run web server manualy with command:
+

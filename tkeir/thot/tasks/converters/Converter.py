@@ -36,7 +36,7 @@ class Converter:
         """
         return list(self._managed_type)
 
-    def convert(self, data_type: str = "raw", data: str = None, source: str = "empty", call_context=None):
+    def convert(self, data_type: str = "raw", data: str = None, source: str = "empty", call_context=None, tags=[]):
         """Convert document
 
         Args:
@@ -91,6 +91,37 @@ class Converter:
             raise ValueError("Title and/or Content is mandatory")
         if (not tkeir_doc["content"]) and (not tkeir_doc["title"]):
             raise ValueError("Document is empty")
+        
+        for tag in tags:
+            tkeir_doc["kg"].append(
+                                {
+                                    "automatically_fill": True,
+                                    "confidence": 1.0,
+                                    "field_type": "keywords",
+                                    "property": {
+                                        "content": "rel:is_a",
+                                        "label_content": "",
+                                        "lemma_content": "rel:is_a",
+                                        "class": -1,
+                                        "positions": [-1],
+                                    },
+                                    "subject": {
+                                        "content": tag,
+                                        "label_content": "",
+                                        "lemma_content": tag.lower(),
+                                        "class": -1,
+                                        "positions": [-1],
+                                    },
+                                    "value": {
+                                        "content": "tag",
+                                        "label_content": "",
+                                        "lemma_content": "tag",
+                                        "class": -1,
+                                        "positions": [-1],
+                                    },
+                                    "weight": 0.0,
+                                }
+                            )
         taskInfo = TaskInfo(task_name="converter", task_version=__version_converter__, task_date=__date_converter__)
         tkeir_doc = taskInfo.addInfo(tkeir_doc)
         return tkeir_doc

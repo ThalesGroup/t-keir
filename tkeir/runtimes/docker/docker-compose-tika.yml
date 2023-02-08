@@ -1,0 +1,18 @@
+version: '3.2'
+
+# declare services
+services:
+  apache-tika:
+    image: apache/tika:latest
+    hostname: apache-tika
+    container_name: apache-tika
+    ports:
+      - 9998:9998
+    networks:
+      - tkeir-net
+
+ 
+networks:
+  tkeir-net:
+    name: tkeir-net
+    driver: bridge

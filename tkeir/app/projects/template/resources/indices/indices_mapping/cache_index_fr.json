@@ -73,16 +73,13 @@
     },
     "mappings": {
         "properties": {
-	    "date":{
-		"type":"date"
-	    },
-	    "position":{
-		"type":"geo_point"
-	    },
-            "data_source" : {
-                "type": "keyword"
+            "date":{
+                "type":"date"
             },
-            "data_source" : {
+            "position":{
+                "type":"geo_point"
+            },
+            "data_source": {
                 "type": "keyword"
             },
             "source_doc_id": {
@@ -156,6 +153,17 @@
             "kg": {
                 "type": "nested",
                 "properties": {
+                    "dynamic": {
+                        "type":"nested",
+                        "properties":{
+                            "date":{
+                                "type":"date"
+                            },
+                            "position":{
+                                "type":"geo_point"
+                            }
+                        }
+                    },
                     "subject": {
                         "type":"nested",
                         "properties":{

@@ -73,12 +73,12 @@
     },
     "mappings": {
         "properties": {
-	    "date":{
-		"type":"date"
-	    },
-	    "position":{
-		"type":"geo_point"
-	    },
+            "date":{
+                "type":"date"
+            },
+            "position":{
+                "type":"geo_point"
+            },
             "data_source" : {
                 "type": "keyword"
             },
@@ -153,6 +153,17 @@
             "kg": {
                 "type": "nested",
                 "properties": {
+                    "dynamic": {
+                        "type":"nested",
+                        "properties":{
+                            "date":{
+                                "type":"date"
+                            },
+                            "position":{
+                                "type":"geo_point"
+                            }
+                        }
+                    },
                     "subject": {
                         "type":"nested",
                         "properties":{

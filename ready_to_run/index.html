@@ -399,26 +399,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#run-the-installation-part" class="md-nav__link">
-    Run the installation part
+  <a href="#pre-requisite-run-the-installation-part" class="md-nav__link">
+    Pre-requisite : run the installation part
   </a>
   
-    <nav class="md-nav" aria-label="Run the installation part">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#prepare-t-keir-and-demo" class="md-nav__link">
     Prepare T-KEIR and demo
   </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prepare-you-data" class="md-nav__link">
-    Prepare you data
-  </a>
-  
-</li>
+    <nav class="md-nav" aria-label="Prepare T-KEIR and demo">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#analyse-and-index-your-document" class="md-nav__link">
@@ -791,26 +784,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#run-the-installation-part" class="md-nav__link">
-    Run the installation part
+  <a href="#pre-requisite-run-the-installation-part" class="md-nav__link">
+    Pre-requisite : run the installation part
   </a>
   
-    <nav class="md-nav" aria-label="Run the installation part">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#prepare-t-keir-and-demo" class="md-nav__link">
     Prepare T-KEIR and demo
   </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prepare-you-data" class="md-nav__link">
-    Prepare you data
-  </a>
-  
-</li>
+    <nav class="md-nav" aria-label="Prepare T-KEIR and demo">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#analyse-and-index-your-document" class="md-nav__link">
@@ -854,10 +840,10 @@
 <h1 id="from-zero-to-hero-create-quickly-a-ready-to-run-application">From Zero to Hero: Create Quickly a ready to run application</h1>
 <p><img alt="Screenshot" src="../resources/images/doc-tkeir-quickstart-flow.png" /></p>
 <p>This section describes the step to create a full information retrieval engine.</p>
-<h2 id="run-the-installation-part">Run the installation part</h2>
+<h2 id="pre-requisite-run-the-installation-part">Pre-requisite : run the installation part</h2>
 <p>Go in installation section and run it.
 Do not forget to create your project configuration with "<strong>tkeir_init_project.py</strong>" and initialize the models with "<strong>init-models.sh</strong>". These steps allows to configure T-KEIR.</p>
-<h3 id="prepare-t-keir-and-demo">Prepare T-KEIR and demo</h3>
+<h2 id="prepare-t-keir-and-demo">Prepare T-KEIR and demo</h2>
 <p>You have to run the <strong>installation</strong>. It will set up configurations and models.</p>
 <p>You have to edit the configuration files:</p>
 <ul>
@@ -870,72 +856,44 @@ Then run</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">#&gt; docker-compose -f docker-compose-opendistro.yml</span>
 </code></pre></div>
 <p>Take care to the error display by opendistro, sometimes there is user rights issues.</p>
-<p>For the demo, all is scripted, just go into <strong>demos/quickstart/</strong> and run or edit quickstart.sh</p>
-<h3 id="prepare-you-data">Prepare you data</h3>
-<p>We propose to get an example dataset.
-Create a temporary directory to store the data</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>wget https://archive.ics.uci.edu/ml/machine-learning-databases/00461/drugLib_raw.zip
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>unzip drugLib_raw.zip
-</code></pre></div>
-<p>Format tsv to csv:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-2-1">1</a></span>
-<span class="normal"><a href="#__codelineno-2-2">2</a></span>
-<span class="normal"><a href="#__codelineno-2-3">3</a></span>
-<span class="normal"><a href="#__codelineno-2-4">4</a></span>
-<span class="normal"><a href="#__codelineno-2-5">5</a></span>
-<span class="normal"><a href="#__codelineno-2-6">6</a></span>
-<span class="normal"><a href="#__codelineno-2-7">7</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;drugLibTrain_raw.tsv&quot;</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3"></a><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;data.csv&quot;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5"></a><span class="n">Index</span><span class="p">([</span><span class="s1">&#39;Unnamed: 0&#39;</span><span class="p">,</span> <span class="s1">&#39;urlDrugName&#39;</span><span class="p">,</span> <span class="s1">&#39;rating&#39;</span><span class="p">,</span> <span class="s1">&#39;effectiveness&#39;</span><span class="p">,</span> <span class="s1">&#39;sideEffects&#39;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6"></a>   <span class="s1">&#39;condition&#39;</span><span class="p">,</span> <span class="s1">&#39;benefitsReview&#39;</span><span class="p">,</span> <span class="s1">&#39;sideEffectsReview&#39;</span><span class="p">,</span> <span class="s1">&#39;commentsReview&#39;</span><span class="p">],</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7"></a>  <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-<p>Transform csv to "T-Keir" json files. Go into directory <strong>tkeir/app/bin</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python3 csv2tkeir.py --input<span class="o">=</span>&lt;your data tmp&gt;/data.csv <span class="se">\</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>                     --title<span class="o">=</span>urlDrugName <span class="se">\</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>                     --content<span class="o">=</span>benefitsReview,sideEffectsReview,commentsReview <span class="se">\</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>                     --kg<span class="o">=</span>effectiveness,sideEffects,condition,rating <span class="se">\</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>                     --output<span class="o">=</span>&lt;your output directory&gt;
-</code></pre></div>
+<p>For the demo, all is scripted, just go into <strong>demos/quickstart/</strong> and run or edit <strong>quickstart.sh</strong></p>
 <h3 id="analyse-and-index-your-document">Analyse and index your document</h3>
 <p>T-Keir depends on Opendistro. We propose a docker compose file to pull and use Opendistro. For this demo, this part of software will be automatically run
 in docker compose environement.
 Do not forget to setup TRANSFORMERS_CACHE : path to models</p>
 <p>To analyse and index document prepared in previous step, you have to run <strong>batch_ingester.py</strong> script from <strong>tkeir</strong> directory:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3 thot/batch_ingester.py -c &lt;PATH TO YOU CONFIGURATION FOLDER&gt;/pipeline.json -i &lt;PATH TO QUICKSTART FOLDER&gt;/data/tkeir -o &lt;PATH TO QUICKSTART FOLDER&gt;/data/tkeir-out
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3 thot/batch_ingester.py -c &lt;PATH TO YOUR OUTPUR CONFIGURATION&gt;/project/configs/pipeline.json -i &lt;PATH TO QUICKSTART FOLDER&gt;/data/tkeir -o &lt;PATH TO QUICKSTART FOLDER&gt;/data/tkeir-out
 </code></pre></div>
 <p>or if you install wheel:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>tkeir-batch-ingester -c &lt;PATH TO YOU CONFIGURATION FOLDER&gt;/pipeline.json -i &lt;PATH TO QUICKSTART FOLDER&gt;/data/tkeir -o &lt;PATH TO QUICKSTART FOLDER&gt;/data/tkeir-out
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>tkeir-batch-ingester -c &lt;PATH TO YOU CONFIGURATION FOLDER&gt;/pipeline.json -i &lt;PATH TO QUICKSTART FOLDER&gt;/data/tkeir -o &lt;PATH TO QUICKSTART FOLDER&gt;/data/tkeir-out
 </code></pre></div>
 <p>After this process, all documents will be indexed. You can query Elastic Search with the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl -k https://admin:admin@localhost:9200/drug-text-index/_search <span class="p">|</span> json_pp
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl -k https://admin:admin@localhost:9200/drug-text-index/_search <span class="p">|</span> json_pp
 </code></pre></div>
 <h3 id="run-search-service">Run Search Service</h3>
 <p>Firstly run Q/A system:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3 thot/qa_svc.py -c &lt;PATH TO CONFIG&gt;/qa.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3 thot/qa_svc.py -c &lt;PATH TO CONFIG&gt;/qa.json
 </code></pre></div>
 <p>or if you install wheel:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>tkeir-qa-svc -c &lt;PATH TO CONFIG&gt;/qa.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>tkeir-qa-svc -c &lt;PATH TO CONFIG&gt;/qa.json
 </code></pre></div>
 <p>Check health:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl http://localhost:10011/api/qa/health
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>curl http://localhost:10011/api/qa/health
 </code></pre></div>
 <p>Secondly run search service:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python3 thot/search_svc.py -c &lt;PATH TO CONFIG&gt;/search.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>python3 thot/search_svc.py -c &lt;PATH TO CONFIG&gt;/search.json
 </code></pre></div>
 <p>or if you install wheel:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>tkeir-search-svc.py -c &lt;PATH TO CONFIG&gt;/search.json
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>tkeir-search-svc.py -c &lt;PATH TO CONFIG&gt;/search.json
 </code></pre></div>
 <p>Check health:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl http://localhost:9000/api/searching/health
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl http://localhost:9000/api/searching/health
 </code></pre></div>
 <p>Finaly, on full version only (not available for OSS version) run web interface (in tkeir/thot/web/directory):</p>
 <p>set path to web interface :</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">export</span> <span class="nv">WEB_TKEIR_APP</span><span class="o">=</span>&lt;PATH TO WEB DEMO&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">export</span> <span class="nv">WEB_TKEIR_APP</span><span class="o">=</span>&lt;PATH TO WEB DEMO&gt;
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>python3 thot/web/manager.py runservice <span class="m">0</span>.0.0.0:8080 --insecure
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3 thot/web/manager.py runservice <span class="m">0</span>.0.0.0:8080 --insecure
 </code></pre></div>
 <p>To visualize a search request you can open firefox on http://&lt;host of web server>:8080/search</p>
 

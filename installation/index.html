@@ -413,6 +413,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#quick-installation-with-script" class="md-nav__link">
+    Quick installation with script
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-by-step" class="md-nav__link">
+    Step by Step
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#install-from-wheel" class="md-nav__link">
     Install from Wheel
   </a>
@@ -420,8 +434,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#build-tkeir-docker-image" class="md-nav__link">
-    Build tkeir docker image
+  <a href="#install-t-keir-with-a-docker-image" class="md-nav__link">
+    Install T-Keir with a docker image
   </a>
   
 </li>
@@ -431,18 +445,31 @@
     Configure the services
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Configure the services">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#initializeload-the-models" class="md-nav__link">
-    Initialize/Load the models
+  <a href="#nomenclature" class="md-nav__link">
+    Nomenclature
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#configure-environment-variables" class="md-nav__link">
-    Configure environment variables
+  <a href="#command-lines" class="md-nav__link">
+    Command lines
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initializeload-the-models" class="md-nav__link">
+    Initialize/Load the models
   </a>
   
 </li>
@@ -875,6 +902,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#quick-installation-with-script" class="md-nav__link">
+    Quick installation with script
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-by-step" class="md-nav__link">
+    Step by Step
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#install-from-wheel" class="md-nav__link">
     Install from Wheel
   </a>
@@ -882,8 +923,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#build-tkeir-docker-image" class="md-nav__link">
-    Build tkeir docker image
+  <a href="#install-t-keir-with-a-docker-image" class="md-nav__link">
+    Install T-Keir with a docker image
   </a>
   
 </li>
@@ -893,18 +934,31 @@
     Configure the services
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Configure the services">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#initializeload-the-models" class="md-nav__link">
-    Initialize/Load the models
+  <a href="#nomenclature" class="md-nav__link">
+    Nomenclature
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#configure-environment-variables" class="md-nav__link">
-    Configure environment variables
+  <a href="#command-lines" class="md-nav__link">
+    Command lines
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initializeload-the-models" class="md-nav__link">
+    Initialize/Load the models
   </a>
   
 </li>
@@ -962,7 +1016,10 @@
 
 
 <h1 id="installation">Installation</h1>
-<p>These tools work on *nix, WSL and docker environment.</p>
+<p>Tested environments:</p>
+<ul>
+<li>ubuntu 20.04</li>
+</ul>
 <h2 id="pre-requist-prepare-t-keir">Pre-requist : prepare T-KEIR</h2>
 <ul>
 <li>install git</li>
@@ -970,12 +1027,19 @@
 <div class="highlight"><span class="filename">Example under ubuntu</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">#&gt; sudo apt install git</span>
 </code></pre></div>
 <ul>
-<li>install poetry. Follow the instructions : <a href="https://python-poetry.org/docs">Poetry installation documentation</a></li>
+<li>
+<p>install pyhton (3.8) and poetry. Follow the instructions : <a href="https://python-poetry.org/docs">Poetry installation documentation</a></p>
+</li>
+<li>
+<p>clone repository</p>
+</li>
 </ul>
+<div class="highlight"><span class="filename">Example of repository clonning into 't-keir-oss' directory</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">#&gt; git clone https://github.com/ThalesGroup/t-keir.git t-keir-oss</span>
+</code></pre></div>
 <h2 id="directory-structure">Directory structure</h2>
 <ul>
 <li><strong>app/bin</strong>           : scripts and tools for server execution</li>
-<li><strong>app/projects</strong>       : projects templates</li>
+<li><strong>app/projects</strong>      : projects templates (use by T-Keir to create user configuration file - do not edit or modify)</li>
 <li><strong>doc</strong>               : buildable documentation</li>
 <li><strong>runtimes/docker</strong>   : docker environment</li>
 <li><strong>resources</strong>         : contain testing resources &amp; automatic index creation data</li>
@@ -985,50 +1049,69 @@
 <p>T-KEIR is a python software, <strong>python 3.8</strong> and <strong>poetry</strong> are necessary for an installation from gitlab/github.
 Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker</p>
 <p><img alt="Screenshot" src="../resources/images/doc-tkeir-install-strategies.png" /></p>
-<p>To run the document go in directory <strong>tkeir</strong> and run mkdocs server:</p>
-<div class="highlight"><span class="filename">Run the documentation server with mkdocs</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>mkdocs serve
+<p>Optionnaly, to run the document go in directory <strong>tkeir</strong> and run mkdocs server :</p>
+<div class="highlight"><span class="filename">Example of mkdocs installation under ubuntu</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">#&gt; sudo apt install mkdocs</span>
+</code></pre></div>
+<div class="highlight"><span class="filename">Run the documentation server with mkdocs</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>mkdocs serve
 </code></pre></div>
 <h2 id="installation_1">Installation</h2>
+<p>T-Keir provides a script to install all in one time (section <a href="#Quick-installation-with-script">Quick installation with script</a>).
+You can also follow step by the installation.</p>
+<h3 id="quick-installation-with-script">Quick installation with script</h3>
+<p>The 'quick installation script' is in the root of T-Keir directory. </p>
 <p>After git repository cloning.
-<div class="highlight"><span class="filename">Build a python wheel package:</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">#&gt; poetry build</span>
+<div class="highlight"><span class="filename">Install T-Keir</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">#&gt; ./install.sh $HOME/mytkeir</span>
 </code></pre></div></p>
-<p>A wheel file will be created in "dist" directory. Then you can simply run a pip install on the created wheel.
+<p>The script will install T-Keir in repository '$HOME/mytkeir' in a dedicated python environment ('$HOME/mytkeir/tkeirenv').
+Notice that this installation will also install Opensearch 2.9.0 as a third party tool.</p>
+<h3 id="step-by-step">Step by Step</h3>
+<p>After git repository cloning.
+<div class="highlight"><span class="filename">Build a python wheel package:</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">#&gt; poetry build</span>
+</code></pre></div></p>
+<p>A wheel file will be created in "<strong>dist</strong>" directory. Then you can simply run a pip install on the created wheel.
 Note that is highly recommanded to run wheel installation in a python virtual environment.</p>
 <h3 id="install-from-wheel">Install from Wheel</h3>
 <p>You can directly install T-Keir from weel:</p>
-<p>Go in "dist" folder (created by poetry)</p>
-<div class="highlight"><span class="filename">Create a python virtual environement:</span><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">#&gt;  python3 -m venv &lt;YOUR_ENV&gt;`</span>
+<p>Go in "dist" folder (created by poetry - under <strong>t-keir-oss</strong> directory created by github cloning)</p>
+<div class="highlight"><span class="filename">Create a python virtual environement:</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">#&gt;  python3 -m venv $HOME/tkeirenv`</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">Activate you environement:</span><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">#&gt; source &lt;YOUR_ENV&gt;/bin/activate</span>
+<div class="highlight"><span class="filename">Activate you environement:</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">#&gt; source $HOME/tkeirenv/bin/activate</span>
 </code></pre></div>
-<div class="highlight"><span class="filename">Install the Wheel:</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">#&gt; pip install &lt;FILE_NAME&gt;.whl</span>
+<div class="highlight"><span class="filename">Install the Wheel:</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">#&gt; pip install &lt;FILE_NAME&gt;.whl</span>
 </code></pre></div>
 <p>If there is a problem with <strong>pycurl</strong> install libcurl4-openssl-dev and libssl</p>
-<div class="highlight"><span class="filename">E.G under debian/ubuntu:</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">#&gt; sudo apt install libcurl4-openssl-dev libssl-dev</span>
+<div class="highlight"><span class="filename">E.G under debian/ubuntu:</span><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">#&gt; sudo apt install libcurl4-openssl-dev libssl-dev</span>
 </code></pre></div>
-<h3 id="build-tkeir-docker-image">Build tkeir docker image</h3>
+<h3 id="install-t-keir-with-a-docker-image">Install T-Keir with a docker image</h3>
 <p>You could build the docker base image. This image contains os and python dependencies and code of search ai with one entry point
 by service. The wheel package will be created, so you should ensure poetry is installed and in running path.</p>
 <p>Go in <strong>tkeir/runtimes/docker</strong> directory and run the following command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">#&gt; ./builddocker.sh</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">#&gt; ./builddocker.sh</span>
 </code></pre></div>
 <h3 id="configure-the-services">Configure the services</h3>
 <p>T-Keir provides a script to automatically generate configuration file:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python3 tkeir/thot/tkeir_init_project.py -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;
+<h4 id="nomenclature">Nomenclature</h4>
+<ul>
+<li>PATH_TO_TKEIR : to the the name of directory containing t-keir (the clone of github, in this installation guide it is <strong>t-keir-oss</strong>)</li>
+<li>PATH_TO_YOUR_OUTPUR_CONFIG_DIR : this is your workspace space (where you configuration files are created and stores, where there are your model)</li>
+<li>PATH_TO_YOUR_SHARE_DIRECTORY_OR_VOLUME_NAME : share directory need by docker to communication with host</li>
+</ul>
+<h4 id="command-lines">Command lines</h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python3 tkeir/thot/tkeir_init_project.py -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;
 </code></pre></div>
 <p>or if you install tkeir wheel:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>tkeir-init-project -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>tkeir-init-project -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;
 </code></pre></div>
 <p>When you work with a docker you can use a share directory or a volume (to make configurer persistent).</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>docker run --rm -it -v &lt;PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME&gt;:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>docker run --rm -it -v &lt;PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME&gt;:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
 </code></pre></div>
 <h3 id="initializeload-the-models">Initialize/Load the models</h3>
 <p>When you build you docker volumes containing model and default configuration are automatically generated.
 To update the configuration you can go into directory <strong>app/bin</strong> and run the command:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>./init-models.sh &lt;PATH TO CONFIGURATION&gt; &lt;MODEL PATH&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>./init-models.sh &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;/project/configs  &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;/project/models
 </code></pre></div>
 <p>Or from docker</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>docker run --rm -it -v <span class="nv">$host_dir</span>:<span class="nv">$docker_dir</span> -w /home/tkeir_svc/tkeir --entrypoint bash <span class="nv">$tkeir_img</span> /home/tkeir_svc/tkeir/app/bin/init-models.sh <span class="nv">$docker_dir</span>/project/configs <span class="nv">$docker_dir</span>/project/resources/modeling/net/
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>docker run --rm -it -v <span class="nv">$host_dir</span>:<span class="nv">$docker_dir</span> -w /home/tkeir_svc/tkeir --entrypoint bash <span class="nv">$tkeir_img</span> /home/tkeir_svc/tkeir/app/bin/init-models.sh <span class="nv">$docker_dir</span>/project/configs <span class="nv">$docker_dir</span>/project/resources/modeling/net/
 </code></pre></div>
 <p>Where </p>
 <ul>
@@ -1038,69 +1121,19 @@ To update the configuration you can go into directory <strong>app/bin</strong> a
 </ul>
 <p>Note, that the environment variable TRANSFORMERS_CACHE <strong>HAVE TO BE</strong> always set to model path before run a T-Keir service using models.</p>
 <p>Take care of proxies. Please set correclty $HOME/.docker/config.json like that:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="w">  </span><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="nt">&quot;proxies&quot;</span><span class="p">:</span><span class="w"></span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"></span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">      </span><span class="p">{</span><span class="w"></span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">        </span><span class="nt">&quot;httpProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_http_proxy&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">        </span><span class="nt">&quot;httpsProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_https_proxy&quot;</span><span class="p">,</span><span class="w"></span>
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">        </span><span class="nt">&quot;noProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_no_proxy&quot;</span><span class="w"></span>
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">      </span><span class="p">}</span><span class="w"></span>
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">  </span><span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="w">  </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="nt">&quot;proxies&quot;</span><span class="p">:</span><span class="w"></span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">      </span><span class="nt">&quot;default&quot;</span><span class="p">:</span><span class="w"></span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">      </span><span class="p">{</span><span class="w"></span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">        </span><span class="nt">&quot;httpProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_http_proxy&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">        </span><span class="nt">&quot;httpsProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_https_proxy&quot;</span><span class="p">,</span><span class="w"></span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">        </span><span class="nt">&quot;noProxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your_no_proxy&quot;</span><span class="w"></span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">      </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="p">}</span><span class="w"></span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">  </span><span class="p">}</span><span class="w"></span>
 </code></pre></div>
 <p>For a docker compose network environment, don't forget to add <strong>tkeir opendistro</strong> hostname and all services in no_proxy.</p>
-<h3 id="configure-environment-variables">Configure environment variables</h3>
-<p>You need to configure some path in <strong>".env"</strong> file in directory docker</p>
-<ul>
-<li><strong> TRANSFORMERS_CACHE </strong> : path to models</li>
-<li><strong> OPENDISTRO_VERSION </strong> : version of opendistrop (1.12.0)</li>
-<li><strong> OPENDISTRO_HOST </strong> : opendistro host (0.0.0.0)</li>
-<li><strong> OPENDISTRO_DNS_HOST </strong> : dns host name of opendistro (generally used by client)</li>
-<li><strong> OPENDISTRO_PORT </strong> : opendistro port (9200)</li>
-<li><strong> TKEIR_DATA_PATH </strong> : the hosting path to the data that will be analyzed and indexed</li>
-<li><strong> CONVERTER_PORT </strong> : converter service port</li>
-<li><strong> TOKENIZER_PORT </strong> : tokenizer service port</li>
-<li><strong> MSTAGGER_PORT </strong> : morphosyntactic service port</li>
-<li><strong> NERTAGGER_PORT </strong> : named entities service port</li>
-<li><strong> SYNTAXTAGGER_PORT </strong> : syntax and relation service port</li>
-<li><strong> SENT_EMBEDDING_PORT </strong> : sentence embedding service port</li>
-<li><strong> PIPELINE_PORT </strong> : tagging pipeline service port</li>
-<li><strong> KEYWORD_PORT </strong> : keywords extraction service port</li>
-<li><strong> AUTOMATIC_SUMMARY_PORT </strong> : automatic extractive summary port</li>
-<li><strong> SENTIMENT_ANALYSIS_PORT </strong> : sentiment analysis service port</li>
-<li><strong> CLASSIFICATION_PORT </strong> : unsupervised classification service port</li>
-<li><strong> QA_PORT </strong> : question and answering service port</li>
-<li><strong> CLUSTER_INFERENCE_HOST </strong> : semantic cluster inference port</li>
-<li><strong> SEARCH_PORT </strong> : search service port</li>
-<li><strong> TIKA_PORT </strong> : tika converter port</li>
-<li><strong> INDEX_PORT </strong> : index service port</li>
-<li><strong> WEB_PORT </strong> : web access port</li>
-<li><strong> CONVERTER_HOST </strong> : converter service hostname or ip</li>
-<li><strong> TOKENIZER_HOST </strong> : tokenizer service hostname or ip</li>
-<li><strong> MSTAGGER_HOST </strong> : morpho syntactic tagger service hostname or ip</li>
-<li><strong> NERTAGGER_HOST </strong> : named entities tagger service hostname or ip</li>
-<li><strong> SYNTAXTAGGER_HOST </strong> : syntacic tagger and rule based svo extraction sevice hostname or ip</li>
-<li><strong> SENT_EMBEDDING_HOST </strong> : sentience embedding sevice host name</li>
-<li><strong> PIPELINE_HOST </strong> : tagger pipepline service host name</li>
-<li><strong> KEYWORD_HOST </strong> : keyword extractor service hostname or ip</li>
-<li><strong> AUTOMATIC_SUMMARY_HOST </strong> : automatic extractive service summary hostname or ip</li>
-<li><strong> SENTIMENT_ANALYSIS_HOST </strong> : sentiment analysis service hostname or ip</li>
-<li><strong> CLASSIFICATION_HOST </strong> : usupervised classification service hostname or ip</li>
-<li><strong> QA_HOST </strong> : question and answering service hostname or ip</li>
-<li><strong> CLUSTER_INFERENCE_HOST </strong> : semantic cluster inference host</li>
-<li><strong> SEARCH_HOST </strong> : search service hostname or ip</li>
-<li><strong> TIKA_HOST </strong> : tika converter host</li>
-<li><strong> INDEX_HOST </strong> : indexing service hostname or ip</li>
-<li><strong> WEB_HOST </strong> : web access service hostname or ip</li>
-<li><strong> SEARCH_SSL </strong> : Search is in SSL model</li>
-<li><strong> SEARCH_SSL_NO_VERIFY </strong> : no verify certificate</li>
-<li><strong> TKEIR_SSL </strong> : [True | False], enable disable SSL even when SSL is specified in configuration file</li>
-<li><strong> ALLOWED_HOSTS </strong> : django allowed host</li>
-<li><strong> ES_MEMORY </strong> : Elastic search memory</li>
-<li><strong> MODEL_PATH </strong> : path of models (huggingface)</li>
-</ul>
 <h2 id="copy-or-create-data">Copy or create data</h2>
 <p>T-Keir comes with default configuration file.
 Nevertheless you can modify or add file. Most of them are configuration (see configuration section).</p>

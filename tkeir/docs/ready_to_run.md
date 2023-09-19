@@ -5,12 +5,12 @@
 
 This section describes the step to create a full information retrieval engine.
 
-## Run the installation part
+## Pre-requisite : run the installation part
 
 Go in installation section and run it.
 Do not forget to create your project configuration with "**tkeir_init_project.py**" and initialize the models with "**init-models.sh**". These steps allows to configure T-KEIR.
 
-### Prepare T-KEIR and demo
+## Prepare T-KEIR and demo
 
 You have to run the **installation**. It will set up configurations and models.
 
@@ -29,39 +29,7 @@ Then run
 
 Take care to the error display by opendistro, sometimes there is user rights issues.
 
-For the demo, all is scripted, just go into **demos/quickstart/** and run or edit quickstart.sh
-
-### Prepare you data
-
-We propose to get an example dataset.
-Create a temporary directory to store the data
-
-```shell
-wget https://archive.ics.uci.edu/ml/machine-learning-databases/00461/drugLib_raw.zip
-unzip drugLib_raw.zip
-```
-
-Format tsv to csv:
-
-```py linenums="1"
-import pandas as pd
-df = pd.read_csv("drugLibTrain_raw.tsv",sep="\t")
-df.to_csv("data.csv",index=False)
-df.columns
-Index(['Unnamed: 0', 'urlDrugName', 'rating', 'effectiveness', 'sideEffects',
-   'condition', 'benefitsReview', 'sideEffectsReview', 'commentsReview'],
-  dtype='object')
-```
-
-Transform csv to "T-Keir" json files. Go into directory **tkeir/app/bin**
-
-```shell
-python3 csv2tkeir.py --input=<your data tmp>/data.csv \
-                     --title=urlDrugName \
-                     --content=benefitsReview,sideEffectsReview,commentsReview \
-                     --kg=effectiveness,sideEffects,condition,rating \
-                     --output=<your output directory>
-```
+For the demo, all is scripted, just go into **demos/quickstart/** and run or edit **quickstart.sh**
 
 ### Analyse and index your document
 
@@ -72,7 +40,7 @@ Do not forget to setup TRANSFORMERS_CACHE : path to models
 To analyse and index document prepared in previous step, you have to run **batch_ingester.py** script from **tkeir** directory:
 
 ```shell
-python3 thot/batch_ingester.py -c <PATH TO YOU CONFIGURATION FOLDER>/pipeline.json -i <PATH TO QUICKSTART FOLDER>/data/tkeir -o <PATH TO QUICKSTART FOLDER>/data/tkeir-out
+python3 thot/batch_ingester.py -c <PATH TO YOUR OUTPUR CONFIGURATION>/project/configs/pipeline.json -i <PATH TO QUICKSTART FOLDER>/data/tkeir -o <PATH TO QUICKSTART FOLDER>/data/tkeir-out
 ```
 
 or if you install wheel:

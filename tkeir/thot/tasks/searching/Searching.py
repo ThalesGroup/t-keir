@@ -105,9 +105,12 @@ class Searching:
             self._syntactictagger = SyntacticTagger(config=config.syntaxConfig)
             self._kwExtractor = KeywordsExtractor(config=config.kwConfig)
             self._quantizerModel = None
-            with open(config.configuration["search-policy"]["semantic-cluster"]["semantic-quantizer-model"], "rb") as q_model_f:
-                self._quantizerModel = RelationsClusterizer(model_file_handler=q_model_f)
-                q_model_f.close()
+            try:
+                with open(config.configuration["search-policy"]["semantic-cluster"]["semantic-quantizer-model"], "rb") as q_model_f:
+                    self._quantizerModel = RelationsClusterizer(model_file_handler=q_model_f)
+                    q_model_f.close()
+            except Exception as e:
+              ThotLogger.info("Quantizer disable", context=call_context)  
             self._embeddings = Embeddings(config=config.embeddingsConfig)
 
         self._last_query = dict()
@@ -134,9 +137,7 @@ class Searching:
             ThotLogger.info("* [Search Models] Semantic clusters loaded", context=call_context)
         if self._embeddings:
             ThotLogger.info("* [Search Models] Embeddings loaded", context=call_context)
-        if self._quantizerModel:
-            ThotLogger.info("* [Search Models] Semantic quantizer loaded", context=call_context)
-
+        
         (self.es_url, self.es_verify_certs) = get_elastic_url(config.configuration["elasticsearch"])
         ThotLogger.info("Use url:" + self.es_url + " verify certificates:" + str(self.es_verify_certs), context=call_context)
 

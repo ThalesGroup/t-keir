@@ -1,6 +1,9 @@
 # Installation
 
-These tools work on \*nix, WSL and docker environment.
+Tested environments:
+
+* ubuntu 20.04
+
 
 ## Pre-requist : prepare T-KEIR
 
@@ -10,12 +13,19 @@ These tools work on \*nix, WSL and docker environment.
 #> sudo apt install git
 ```
 
-* install poetry. Follow the instructions : [Poetry installation documentation](https://python-poetry.org/docs)
+* install pyhton (3.8) and poetry. Follow the instructions : [Poetry installation documentation](https://python-poetry.org/docs)
+
+
+* clone repository
+
+```shell  title="Example of repository clonning into 't-keir-oss' directory"
+#> git clone https://github.com/ThalesGroup/t-keir.git t-keir-oss
+```
 
 ## Directory structure
 
 * **app/bin**           : scripts and tools for server execution
-* **app/projects**       : projects templates
+* **app/projects**      : projects templates (use by T-Keir to create user configuration file - do not edit or modify)
 * **doc**               : buildable documentation
 * **runtimes/docker**   : docker environment
 * **resources**         : contain testing resources & automatic index creation data
@@ -30,7 +40,12 @@ Otherwise and from Thales environnement only, you can install by using pip comma
 ![Screenshot](resources/images/doc-tkeir-install-strategies.png)
 
 
-To run the document go in directory **tkeir** and run mkdocs server:
+Optionnaly, to run the document go in directory **tkeir** and run mkdocs server :
+
+```shell  title="Example of mkdocs installation under ubuntu"
+#> sudo apt install mkdocs
+```
+
 
 ```shell  title="Run the documentation server with mkdocs"
 mkdocs serve
@@ -38,26 +53,43 @@ mkdocs serve
 
 ## Installation
 
+T-Keir provides a script to install all in one time (section [Quick installation with script](#Quick-installation-with-script)).
+You can also follow step by the installation.
+
+### Quick installation with script
+
+The 'quick installation script' is in the root of T-Keir directory. 
+
+After git repository cloning.
+```shell  title="Install T-Keir"
+#> ./install.sh $HOME/mytkeir
+```
+
+The script will install T-Keir in repository '$HOME/mytkeir' in a dedicated python environment ('$HOME/mytkeir/tkeirenv').
+Notice that this installation will also install Opensearch 2.9.0 as a third party tool.
+
+### Step by Step
+
 After git repository cloning.
 ```shell  title="Build a python wheel package:"
 #> poetry build
 ```
 
-A wheel file will be created in "dist" directory. Then you can simply run a pip install on the created wheel.
+A wheel file will be created in "**dist**" directory. Then you can simply run a pip install on the created wheel.
 Note that is highly recommanded to run wheel installation in a python virtual environment.
 
 ### Install from Wheel
 
 You can directly install T-Keir from weel:
 
-Go in "dist" folder (created by poetry)
+Go in "dist" folder (created by poetry - under **t-keir-oss** directory created by github cloning)
 
 ```shell  title="Create a python virtual environement:"
-#>  python3 -m venv <YOUR_ENV>`
+#>  python3 -m venv $HOME/tkeirenv`
 ```
 
 ```shell  title="Activate you environement:"
-#> source <YOUR_ENV>/bin/activate
+#> source $HOME/tkeirenv/bin/activate
 ```
 
 ```shell  title="Install the Wheel:"
@@ -70,7 +102,7 @@ If there is a problem with **pycurl** install libcurl4-openssl-dev and libssl
 #> sudo apt install libcurl4-openssl-dev libssl-dev
 ```
 
-### Build tkeir docker image
+### Install T-Keir with a docker image
 
 You could build the docker base image. This image contains os and python dependencies and code of search ai with one entry point
 by service. The wheel package will be created, so you should ensure poetry is installed and in running path.
@@ -84,6 +116,15 @@ Go in **tkeir/runtimes/docker** directory and run the following command:
 ### Configure the services
 
 T-Keir provides a script to automatically generate configuration file:
+
+#### Nomenclature
+
+* PATH_TO_TKEIR : to the the name of directory containing t-keir (the clone of github, in this installation guide it is **t-keir-oss**)
+* PATH_TO_YOUR_OUTPUR_CONFIG_DIR : this is your workspace space (where you configuration files are created and stores, where there are your model)
+* PATH_TO_YOUR_SHARE_DIRECTORY_OR_VOLUME_NAME : share directory need by docker to communication with host
+
+
+#### Command lines
 
 ```shell
 python3 tkeir/thot/tkeir_init_project.py -t <PATH TO TKEIR>/tkeir/app/projects/template/ -o <PATH TO YOUR OUTPUT CONFIG DIR>
@@ -107,7 +148,7 @@ When you build you docker volumes containing model and default configuration are
 To update the configuration you can go into directory **app/bin** and run the command:
   
 ```shell
-./init-models.sh <PATH TO CONFIGURATION> <MODEL PATH>
+./init-models.sh <PATH TO YOUR OUTPUT CONFIG DIR>/project/configs  <PATH TO YOUR OUTPUT CONFIG DIR>/project/models
 ```
 
 Or from docker
@@ -141,58 +182,6 @@ Take care of proxies. Please set correclty $HOME/.docker/config.json like that:
 ```
 
 For a docker compose network environment, don't forget to add **tkeir opendistro** hostname and all services in no_proxy.
-
-
-### Configure environment variables
-
-You need to configure some path in **".env"** file in directory docker
-
-* ** TRANSFORMERS_CACHE ** : path to models
-* ** OPENDISTRO_VERSION ** : version of opendistrop (1.12.0)
-* ** OPENDISTRO_HOST ** : opendistro host (0.0.0.0)
-* ** OPENDISTRO_DNS_HOST ** : dns host name of opendistro (generally used by client)
-* ** OPENDISTRO_PORT ** : opendistro port (9200)
-* ** TKEIR_DATA_PATH ** : the hosting path to the data that will be analyzed and indexed
-* ** CONVERTER_PORT ** : converter service port
-* ** TOKENIZER_PORT ** : tokenizer service port
-* ** MSTAGGER_PORT ** : morphosyntactic service port
-* ** NERTAGGER_PORT ** : named entities service port
-* ** SYNTAXTAGGER_PORT ** : syntax and relation service port
-* ** SENT_EMBEDDING_PORT ** : sentence embedding service port
-* ** PIPELINE_PORT ** : tagging pipeline service port
-* ** KEYWORD_PORT ** : keywords extraction service port
-* ** AUTOMATIC_SUMMARY_PORT ** : automatic extractive summary port
-* ** SENTIMENT_ANALYSIS_PORT ** : sentiment analysis service port
-* ** CLASSIFICATION_PORT ** : unsupervised classification service port
-* ** QA_PORT ** : question and answering service port
-* ** CLUSTER_INFERENCE_HOST ** : semantic cluster inference port
-* ** SEARCH_PORT ** : search service port
-* ** TIKA_PORT ** : tika converter port
-* ** INDEX_PORT ** : index service port
-* ** WEB_PORT ** : web access port
-* ** CONVERTER_HOST ** : converter service hostname or ip
-* ** TOKENIZER_HOST ** : tokenizer service hostname or ip
-* ** MSTAGGER_HOST ** : morpho syntactic tagger service hostname or ip
-* ** NERTAGGER_HOST ** : named entities tagger service hostname or ip
-* ** SYNTAXTAGGER_HOST ** : syntacic tagger and rule based svo extraction sevice hostname or ip
-* ** SENT_EMBEDDING_HOST ** : sentience embedding sevice host name
-* ** PIPELINE_HOST ** : tagger pipepline service host name
-* ** KEYWORD_HOST ** : keyword extractor service hostname or ip
-* ** AUTOMATIC_SUMMARY_HOST ** : automatic extractive service summary hostname or ip
-* ** SENTIMENT_ANALYSIS_HOST ** : sentiment analysis service hostname or ip
-* ** CLASSIFICATION_HOST ** : usupervised classification service hostname or ip
-* ** QA_HOST ** : question and answering service hostname or ip
-* ** CLUSTER_INFERENCE_HOST ** : semantic cluster inference host
-* ** SEARCH_HOST ** : search service hostname or ip
-* ** TIKA_HOST ** : tika converter host
-* ** INDEX_HOST ** : indexing service hostname or ip
-* ** WEB_HOST ** : web access service hostname or ip
-* ** SEARCH_SSL ** : Search is in SSL model
-* ** SEARCH_SSL_NO_VERIFY ** : no verify certificate
-* ** TKEIR_SSL ** : \[True | False\], enable disable SSL even when SSL is specified in configuration file
-* ** ALLOWED_HOSTS ** : django allowed host
-* ** ES_MEMORY ** : Elastic search memory
-* ** MODEL_PATH ** : path of models (huggingface)
 
 
 ## Copy or create data

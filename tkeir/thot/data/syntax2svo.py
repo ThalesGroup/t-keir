@@ -33,13 +33,13 @@ def get_verbs(child_tree, list_verb, up_tree):
     if (child_tree.token["upos"] == "VERB") or (child_tree.token["upos"] == "AUX"):
         list_verb.append({"verb": child_tree, "subject": None})
         if "xcomp" in child_tree.token["deprel"]:
-            list_verb[-1]["subject"] = up_tree
+             list_verb[-1]["subject"] = up_tree
         if "acl" in child_tree.token["deprel"]:
-            for c in child_tree.children:
-                if "subj" in c.token["deprel"]:
-                    list_verb[-1]["subject"] = c
-            if up_tree and (not list_verb[-1]["subject"]) and ("subj" in up_tree.token["deprel"]):  # search subj in up tree
-                list_verb[-1]["subject"] = up_tree
+             for c in child_tree.children:
+                 if "subj" in c.token["deprel"]:
+                     list_verb[-1]["subject"] = c
+             if up_tree and (not list_verb[-1]["subject"]) and ("subj" in up_tree.token["deprel"]):  # search subj in up tree
+                 list_verb[-1]["subject"] = up_tree
     for c in child_tree.children:
         get_verbs(c, list_verb, child_tree)
 
@@ -92,11 +92,11 @@ def get_relation(root_tree):
             s.sort(key=lambda x: x["id"])
             subjects.append(s)
         for child in v["verb"].children:
-            if "subj" in child.token["deprel"]:
-                s = []
-                untree(child, s)
-                s.sort(key=lambda x: x["id"])
-                subjects.append(s)
+            # if "subj" in child.token["deprel"]:
+            #     s = []
+            #     untree(child, s)
+            #     s.sort(key=lambda x: x["id"])
+            #     subjects.append(s)
             if ("obj" in child.token["deprel"]) or ("obl" in child.token["deprel"]) or ("comp" in child.token["deprel"]):
                 o = []
                 untree(child, o)
@@ -116,6 +116,7 @@ def get_language(filename):
 
 def write_in_file(conllu_f, output_df, lang):
     for s in parse_tree_incr(conllu_f):
+        s.print_tree()
         root_tree = s
         # s.print_tree()
         relations = get_relation(root_tree)
@@ -125,23 +126,22 @@ def write_in_file(conllu_f, output_df, lang):
         if "+" in text:
             text = text.replace("+", " ")
         rels = []
+        
         for r in relations:
-            subjects = []
-            objects = []
             for s in r["h"]:
-                subjects.append(" ".join(s.replace(",", " ").replace("|", " ").replace("+", " ").replace(";", " ").split()))
-            for o in r["t"]:
-                objects.append(" ".join(o.replace(",", " ").replace("|", " ").replace("+", " ").replace(";", " ").split()))
-            rel = " | ".join(subjects) + " + " + r["relation"] + " + " + "|".join(objects)
-            rels.append(rel)
-        target = ";".join(rels)
-        if "_" in target:
-            target = target.replace("_", "-").replace("\t", " ")
-        if not target:
-            target = "_"
-        if set(text.split()) != set(["_"]):
-            ndf = pd.DataFrame([["svo", lang, text, target]], columns=["prefix", "language", "input_text", "target_text"])
-            output_df = pd.concat([output_df, ndf])
+                subi = " ".join(s.replace(",", " ").replace("|", " ").replace("+", " ").replace(";", " ").replace("$$"," ").split())
+                for o in r["t"]:
+                    obji = " ".join(o.replace(",", " ").replace("|", " ").replace("+", " ").replace(";", " ").replace("$$"," ").split())
+                    rels.append(subi+" , "+r["relation"]+" , " + obji)
+        if len(rels):
+            target = " $$ ".join(list(set(rels)))
+            if "_" in target:
+                target = target.replace("_", "-").replace("\t", " ")
+            if not target:
+                target = "_"
+            if (set(text.split()) != set(["_"])) and (set(target.split()) != set(["_"])):
+                ndf = pd.DataFrame([["svo", lang, text, target]], columns=["prefix", "language", "input_text", "target_text"])
+                output_df = pd.concat([output_df, ndf])
     return output_df
 
 
@@ -151,11 +151,11 @@ def main(args):
     dev = []
     for (dirpath, dirnames, filenames) in os.walk(args.input):
         for filename in filenames:
-            if filename.endswith(".conllu") and ("train" in filename.lower()):
-                train.append(os.path.join(dirpath, filename))
-            elif filename.endswith(".conllu") and ("test" in filename.lower()):
-                test.append(os.path.join(dirpath, filename))
-            elif filename.endswith(".conllu") and ("dev" in filename.lower()):
+            #if filename.endswith(".conllu") and ("train" in filename.lower()):
+            #    train.append(os.path.join(dirpath, filename))
+            #elif filename.endswith(".conllu") and ("test" in filename.lower()):
+            #    test.append(os.path.join(dirpath, filename))
+            if filename.endswith(".conllu") and ("dev" in filename.lower()):
                 dev.append(os.path.join(dirpath, filename))
     train_files = tqdm(train)
     test_files = tqdm(test)

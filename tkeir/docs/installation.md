@@ -13,8 +13,17 @@ Tested environments:
 #> sudo apt install git
 ```
 
+```shell  title="Example under almalinux"
+#> sudo dnf install git
+```
+
 * install pyhton (3.8) and poetry. Follow the instructions : [Poetry installation documentation](https://python-poetry.org/docs)
 
+When **python** and **pip** package manager is install you can simply run: 
+
+```shell  title="Example install poetry"
+#> pip3 install poetry
+```
 
 * clone repository
 
@@ -34,13 +43,13 @@ Tested environments:
 
 ## Installation Prerequists
 
-T-KEIR is a python software, **python 3.8** and **poetry** are necessary for an installation from gitlab/github.
+T-KEIR is a python software, **python >=3.8** and **poetry** are necessary for an installation from gitlab/github.
 Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker
 
 ![Screenshot](resources/images/doc-tkeir-install-strategies.png)
 
 
-Optionnaly, to run the document go in directory **tkeir** and run mkdocs server :
+Optionnaly, to run the documentation server go in directory **tkeir** and run mkdocs server :
 
 ```shell  title="Example of mkdocs installation under ubuntu"
 #> sudo apt install mkdocs
@@ -50,6 +59,7 @@ Optionnaly, to run the document go in directory **tkeir** and run mkdocs server 
 ```shell  title="Run the documentation server with mkdocs"
 mkdocs serve
 ```
+
 
 ## Installation
 

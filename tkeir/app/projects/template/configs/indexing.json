@@ -10,7 +10,7 @@
             "network": {
                 "host": "localhost",
                 "port": 9200,
-                "use_ssl": true,
+                "use_ssl": false,
                 "verify_certs": false,
                 "auth":{
                     "user":"admin",

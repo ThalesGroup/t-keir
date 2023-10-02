@@ -49,11 +49,10 @@ tkeir-init-project -t $source_path/app/projects/template/ -o $workspace/
 cd $source_path/app/bin
 ./init-models.sh $workspace/project/configs $workspace/project/model
 
-echo "Download and install opensearch ..."
+echo "Download and install elasticsearch ..."
 mkdir -p $workspace/thirdparty
 cd $workspace/thirdparty
-wget https://artifacts.opensearch.org/releases/bundle/opensearch/2.9.0/opensearch-2.9.0-linux-x64.tar.gz
-tar xfz opensearch-2.9.0-linux-x64.tar.gz
-cp $source_path/app/projects/template/resources/indices/opensearch.yml opensearch-2.9.0/config
-cp $source_path/app/projects/template/resources/indices/jvm.options opensearch-2.9.0/config
-cp $source_path/app/projects/template/resources/indices/run-opensearch.sh opensearch-2.9.0
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.17.13-linux-x86_64.tar.gz
+tar xfz elasticsearch-7.17.13-linux-x86_64.tar.gz
+cp $source_path/app/projects/template/resources/indices/elasticsearch.yml elasticsearch-7.17.13/config
+

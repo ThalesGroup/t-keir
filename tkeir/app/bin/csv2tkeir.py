@@ -42,7 +42,8 @@ def add_kg_item(subject, prop, value):
     return kg_item
 
 def main(args):                
-    df = pd.read_csv(args.input)
+    df = pd.read_csv(args.input,sep=";",encoding="utf-8")
+    df.fillna("",inplace=True)
     mkdir_p(args.output)
     kg_columns=[]
     object_pos=[]
@@ -50,7 +51,6 @@ def main(args):
         kg_columns = args.kg.split(",")
     if args.object_position:
         object_pos=args.object_position.split(",")
-    print("KG columns:"+str(kg_columns))
     count_row=0
     for index, row in df.iterrows():        
         if args.prune:
@@ -75,12 +75,19 @@ def main(args):
             titles=args.title.split(",")
             for kt in titles:
                 document["title"] = document["title"]+ " " + str(row[kt])
+                
             document["title"] = document["title"].strip()
         for kg_item_col in kg_columns:            
             document["kg"].append(add_kg_item(row[kg_item_col],"rel:is_a",kg_item_col))
         if args.object_position:
+            if "," in row[object_pos[0]]:
+                row[object_pos[0]] = row[object_pos[0]].replace(",",".")
+            if "," in row[object_pos[1]]:
+                row[object_pos[1]] = row[object_pos[1]].replace(",",".")
             document["position"]=[float(row[object_pos[0]]),float(row[object_pos[1]])]
         if args.object_date:
+            if "T00:00:00" not in row[args.object_date]:
+                row[args.object_date]=str(row[args.object_date])+"T00:00:00"
             document["date"]=row[args.object_date]
         
         

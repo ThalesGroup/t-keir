@@ -69,9 +69,9 @@ mkdocs serve
 T-Keir provides a script to install all in one time (section [Quick installation with script](#Quick-installation-with-script)).
 Alternatively, you can follow step by the installation (section [Step by step](#Step-by-step)).
 
-### Quick installation with script
+### Quick installation with the installation script
 
-The 'quick installation script' is in the root of T-Keir directory. As pre-requisite you have to make sur **wget** is installed. 
+The 'quick installation script' is in the root of T-Keir directory. As pre-requisite you have to make sure **wget** is installed. 
 
 After git repository cloning.
 ```shell  title="Install T-Keir"

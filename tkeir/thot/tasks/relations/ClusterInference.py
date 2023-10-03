@@ -101,9 +101,9 @@ class ClusteringInference:
                 if kg_item[triple_item]["positions"] == [-1]:
                     no_position = True
                 if kg_item[triple_item]["lemma_content"]:
-                    triple_items[triple_item] = " ".join(kg_item[triple_item]["lemma_content"])
+                    triple_items[triple_item] = " ".join(str(kg_item[triple_item]["lemma_content"]))
                 else:
-                    triple_items[triple_item] = " ".join(kg_item[triple_item]["content"])
+                    triple_items[triple_item] = " ".join(str(kg_item[triple_item]["content"]))
             if not no_position:
                 for triple_item in ["subject", "property", "value"]:
                     semantic_need[nameClusterMapping[triple_item]].add(triple_items[triple_item])

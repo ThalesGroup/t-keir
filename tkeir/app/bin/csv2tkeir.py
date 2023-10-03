@@ -70,7 +70,7 @@ def main(args):
             for kc in contents:
                 if str(row[kc]) != "nan":
                     document["content"] = document["content"]+" "+str(row[kc])
-            document["content"] = document["content"].strip()
+            document["content"] = str(document["content"]).strip()
         if args.title:
             titles=args.title.split(",")
             for kt in titles:

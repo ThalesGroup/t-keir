@@ -115,7 +115,7 @@
                     "resources-base-path":"{{ project.path }}/configs/",
                     "input-dir":"{{ project.data }}/raw-inputs",
                     "output-dir":"{{ project.data }}/test-outputs-index",
-                    "configuration": "indexing.json",
+                    "configuration": "small_indexing.json",
                     "network":{
                         "use-ssl":false,
                         "no-ssl-verify":true

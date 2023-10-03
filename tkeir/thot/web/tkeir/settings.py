@@ -28,7 +28,7 @@ if "ALLOWED_HOSTS" in os.environ:
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "bzf2tux4#ath8&8e75ac5i(j@jy&7msyxbmwug&)te@ohqua8f"
+SECRET_KEY = "MY_SECRET_TO_CHANGE"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False

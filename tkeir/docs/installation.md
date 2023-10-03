@@ -20,6 +20,16 @@ Tested environments:
 #> sudo dnf install git
 ```
 
+* install wget
+
+```shell  title="Example under ubuntu"
+#> sudo apt install wget
+```
+
+```shell  title="Example under almalinux"
+#> sudo dnf install wget
+```
+
 * install pyhton (3.8) and poetry. Follow the instructions : [Poetry installation documentation](https://python-poetry.org/docs)
 
 When **python** and **pip** package manager are installed you can simply run: 
@@ -76,9 +86,9 @@ mkdocs serve
 ## Installation running
 
 T-Keir provides a script to install all in one time (section [Quick installation with script](#Quick-installation-with-script)).
-Alternatively, you can follow step by the installation (section [Step by step](#Step-by-step)).
+Alternatively and for expert, you can follow the step by step installation (section [Step by step](#Step-by-step)).
 
-### Quick installation with the installation script
+### **<span style="color:green">\[RECOMMANDED\]</span>** Quick installation with the installation script
 
 The 'quick installation script' is in the root of T-Keir directory. As pre-requisite you have to make sure **wget** is installed. 
 
@@ -91,7 +101,7 @@ The script will install T-Keir in repository '$HOME/mytkeir' in a dedicated pyth
 Notice that this installation will also install ElasticSearch as a third party tool.
 
 
-### Step by Step
+### **<span style="color:red">\[EXPERT\] </span>** Step by Step
 
 After git repository cloning.
 ```shell  title="Build a python wheel package:"
@@ -136,18 +146,18 @@ Go in **tkeir/runtimes/docker** directory and run the following command:
 #> ./builddocker.sh
 ```
 
-## Configure the services
+#### Configure the services
 
 T-Keir provides a script to automatically generate configuration file:
 
-### Nomenclature
+##### Nomenclature
 
 * PATH_TO_TKEIR : to the the name of directory containing t-keir (the clone of github, in this installation guide it is **t-keir-oss**)
 * PATH_TO_YOUR_OUTPUR_CONFIG_DIR : this is your workspace space (where you configuration files are created and stores, where there are your model)
 * PATH_TO_YOUR_SHARE_DIRECTORY_OR_VOLUME_NAME : share directory need by docker to communication with host
 
 
-### Command lines
+##### Command lines
 
 
 ```shell
@@ -166,7 +176,7 @@ When you work with a docker you can use a share directory or a volume (to make c
 docker run --rm -it -v <PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME>:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
 ```
 
-### Initialize/Load the models
+##### Initialize/Load the models
 
 When you build you docker volumes containing model and default configuration are automatically generated.
 To update the configuration you can go into directory **app/bin** and run the command:

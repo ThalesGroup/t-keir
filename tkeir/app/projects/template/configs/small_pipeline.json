@@ -82,7 +82,7 @@
                    {
                     "task":"keywords",
                     "previous-task":"syntax",
-                    "save-output":false,
+                    "save-output":true,
                     "clean-input-folder-after-analysis":true,
                     "resources-base-path":"{{ project.path }}/configs/",
                     "input-dir":"{{ project.data }}/raw-inputs",

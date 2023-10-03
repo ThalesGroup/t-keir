@@ -84,10 +84,10 @@ def main(args):
                 row[object_pos[0]] = row[object_pos[0]].replace(",",".")
             if "," in row[object_pos[1]]:
                 row[object_pos[1]] = row[object_pos[1]].replace(",",".")
-            document["position"]=[float(row[object_pos[0]]),float(row[object_pos[1]])]
-        if args.object_date:
-            if "T00:00:00" not in row[args.object_date]:
-                row[args.object_date]=str(row[args.object_date])+"T00:00:00"
+            document["position"]={"lon":float(row[object_pos[0]]),"lat":float(row[object_pos[1]])}
+        if args.object_date:        
+            #if "T00:00:00Z" not in row[args.object_date]:
+            #    row[args.object_date]=str(row[args.object_date])+"T00:00:00Z"
             document["date"]=row[args.object_date]
         
         

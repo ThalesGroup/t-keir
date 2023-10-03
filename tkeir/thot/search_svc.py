@@ -7,6 +7,7 @@ All Rights Reserved.
 """
 from requests.models import parse_url
 from sanic import Sanic
+from sanic_cors import CORS
 from sanic.exceptions import ServerError
 import sanic.response
 from sanic.exceptions import NotFound
@@ -435,6 +436,18 @@ def main():
         sys.exit(-1)
 
     try:
+        
+        CORS(
+            app,
+            resources={
+                r"/api/searching/health": {"origins": "*"},
+                r"/api/searching/querying": {"origins": "*"},
+                r"/api/searching/suggest": {"origins": "*"},
+                r"/metrics": {"origins": "*"},
+                r"/api/searching/query_with_doc": {"origins": "*"},
+                r"/api/searching/custom_structured_query": {"origins": "*"},
+            },
+        )
 
         # initialize logger
         ThotLogger.loads(SearchingEngine.get_config().logger_config.configuration, logger_name="Search")

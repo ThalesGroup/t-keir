@@ -3,9 +3,12 @@
 Tested environments:
 
 * ubuntu 20.04
+* Almalinux 8
 
 
-## Pre-requist : prepare T-KEIR
+## Installation Pre-requist : prepare T-KEIR
+
+### Prepare environment
 
 * install git
 
@@ -13,8 +16,17 @@ Tested environments:
 #> sudo apt install git
 ```
 
+```shell  title="Example under almalinux"
+#> sudo dnf install git
+```
+
 * install pyhton (3.8) and poetry. Follow the instructions : [Poetry installation documentation](https://python-poetry.org/docs)
 
+When **python** and **pip** package manager are installed you can simply run: 
+
+```shell  title="Example install poetry"
+#> pip3 install poetry
+```
 
 * clone repository
 
@@ -22,25 +34,25 @@ Tested environments:
 #> git clone https://github.com/ThalesGroup/t-keir.git t-keir-oss
 ```
 
-## Directory structure
+### T-Keir Directory structure
 
 * **app/bin**           : scripts and tools for server execution
 * **app/projects**      : projects templates (use by T-Keir to create user configuration file - do not edit or modify)
-* **doc**               : buildable documentation
+* **docs**              : buildable documentation
 * **runtimes/docker**   : docker environment
-* **resources**         : contain testing resources & automatic index creation data
+* **tests**             : internal unit tests
 * **thot**              : tkeir source code
 
 
-## Installation Prerequists
+### Python environnment
 
-T-KEIR is a python software, **python 3.8** and **poetry** are necessary for an installation from gitlab/github.
+T-KEIR is a python software, **python >=3.8** and **poetry** are necessary for an installation from gitlab/github.
 Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker
 
 ![Screenshot](resources/images/doc-tkeir-install-strategies.png)
 
 
-Optionnaly, to run the document go in directory **tkeir** and run mkdocs server :
+Optionnaly, to run the documentation server go in directory **tkeir** and run mkdocs server :
 
 ```shell  title="Example of mkdocs installation under ubuntu"
 #> sudo apt install mkdocs
@@ -51,14 +63,15 @@ Optionnaly, to run the document go in directory **tkeir** and run mkdocs server 
 mkdocs serve
 ```
 
-## Installation
+
+## Installation running
 
 T-Keir provides a script to install all in one time (section [Quick installation with script](#Quick-installation-with-script)).
-You can also follow step by the installation.
+Alternatively, you can follow step by the installation (section [Step by step](#Step-by-step)).
 
-### Quick installation with script
+### Quick installation with the installation script
 
-The 'quick installation script' is in the root of T-Keir directory. 
+The 'quick installation script' is in the root of T-Keir directory. As pre-requisite you have to make sure **wget** is installed. 
 
 After git repository cloning.
 ```shell  title="Install T-Keir"
@@ -78,7 +91,7 @@ After git repository cloning.
 A wheel file will be created in "**dist**" directory. Then you can simply run a pip install on the created wheel.
 Note that is highly recommanded to run wheel installation in a python virtual environment.
 
-### Install from Wheel
+#### Install from Wheel
 
 You can directly install T-Keir from weel:
 
@@ -96,13 +109,13 @@ Go in "dist" folder (created by poetry - under **t-keir-oss** directory created 
 #> pip install <FILE_NAME>.whl
 ```
 
-If there is a problem with **pycurl** install libcurl4-openssl-dev and libssl
+**Troubleshooting** : if there is a problem with **pycurl** install libcurl4-openssl-dev and libssl
 
 ```shell  title="E.G under debian/ubuntu:"
 #> sudo apt install libcurl4-openssl-dev libssl-dev
 ```
 
-### Install T-Keir with a docker image
+#### Install T-Keir with a docker image
 
 You could build the docker base image. This image contains os and python dependencies and code of search ai with one entry point
 by service. The wheel package will be created, so you should ensure poetry is installed and in running path.
@@ -113,24 +126,25 @@ Go in **tkeir/runtimes/docker** directory and run the following command:
 #> ./builddocker.sh
 ```
 
-### Configure the services
+## Configure the services
 
 T-Keir provides a script to automatically generate configuration file:
 
-#### Nomenclature
+### Nomenclature
 
 * PATH_TO_TKEIR : to the the name of directory containing t-keir (the clone of github, in this installation guide it is **t-keir-oss**)
 * PATH_TO_YOUR_OUTPUR_CONFIG_DIR : this is your workspace space (where you configuration files are created and stores, where there are your model)
 * PATH_TO_YOUR_SHARE_DIRECTORY_OR_VOLUME_NAME : share directory need by docker to communication with host
 
 
-#### Command lines
+### Command lines
+
 
 ```shell
 python3 tkeir/thot/tkeir_init_project.py -t <PATH TO TKEIR>/tkeir/app/projects/template/ -o <PATH TO YOUR OUTPUT CONFIG DIR>
 ```
 
-or if you install tkeir wheel:
+or if you install T-Keir wheel:
 
 ```shell
 tkeir-init-project -t <PATH TO TKEIR>/tkeir/app/projects/template/ -o <PATH TO YOUR OUTPUT CONFIG DIR>
@@ -198,5 +212,3 @@ You can freely change the analyzers.
 
 The resources are stored in **RESOURCES_DIRECTORY/modeling/tokenizer/\[en|fr...\]**. This directory contains file with list or csv tables.
 The descriptions of these file are in **CONFIGS/annotation-resources.json**
-
-

@@ -12,14 +12,6 @@
                 "port": 9200,
                 "use_ssl": false,
                 "verify_certs": false,
-                "auth":{
-                    "user":"admin",
-                    "password":"admin",
-                    "associate-environment": {
-                        "user":"OPENDISTRO_USER",
-                        "password":"OPENDISTRO_PASSWORD"
-                    }
-                },
                 "associate-environment": {
                     "host":"OPENDISTRO_DNS_HOST",
                     "port":"OPENDISTRO_PORT",

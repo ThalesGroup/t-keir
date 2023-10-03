@@ -1,0 +1,60 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Standalone T-Keir</title>
+
+  <link rel="shortcut icon" href="{% static 'imgs/favicon.png' %}" />
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+
+  <!-- Custom styles for this template -->
+  <link rel="stylesheet" href="{% static 'css/portal.css' %}" >
+  <link rel="stylesheet" href="{% static 'css/colors.css' %}">
+  <link rel="stylesheet" href="{% static 'css/modal.css' %}">
+  <link rel="stylesheet" href="{% static 'css/serp.css' %}">
+
+
+
+<body>
+
+
+      {% block container %}
+
+      {% endblock %}
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="{% static 'js/jquery-3.4.0.min.js' %}" ></script>
+  <script src="{% static 'js/jquery-ui-1.12.1/jquery-ui.min.js' %}" ></script>
+  <script src="{% static 'js/jQWCloudv3.4.1.js' %}" ></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  
+
+  {% block demoscripts %}
+  {% endblock %}
+
+
+  <!-- Footer -->
+  <footer style="padding-top:30px">
+    <div class="container-fluid">
+        <span style="text-align:center;"><p>Copyright &copy; THALES SIX GTS FRANCE  </p></span>
+    </div>
+    <!-- /.container -->
+  </footer>
+
+</body>
+
+</html>

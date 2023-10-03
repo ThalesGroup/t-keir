@@ -1,0 +1,42 @@
+{% extends 'templates/base.html' %}
+{% load static %}
+
+
+{% block container %}
+
+<div class="row" style="margin-top:30px">
+  <div class="col-sm-3"></div>
+  <div class="col-sm-6"><img src="{% static 'imgs/logo.png' %}" alt="logo"></div>
+</div>
+<div class="row" style="margin-top:30px">
+<div class="col-sm-3"></div>
+<div class="col-sm-6">
+ <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <table>
+      <caption>&nbsp;</caption>
+      <tr>
+        <th scope="col">&nbsp;</th>
+        <th scope="col">&nbsp;</th>
+      </tr>
+      <tr>
+        <td>{{ form.username.label_tag }}</td>
+        <td>{{ form.username }}</td>
+      </tr>
+      <tr>
+        <td>{{ form.password.label_tag }}</td>
+        <td>{{ form.password }}</td>
+      </tr>
+    </table>
+    <input type="submit" value="login" />
+    <input type="hidden" name="next" value="{{ next }}" />
+  </form>
+</div>
+<div class="col-sm-3"></div>
+</div>
+{% endblock %}
+
+{% block demoscripts %}
+
+
+{% endblock %}

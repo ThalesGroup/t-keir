@@ -24,6 +24,15 @@ Tested environments:
 
 When **python** and **pip** package manager are installed you can simply run: 
 
+```shell  title="Example under ubuntu"
+#> sudo apt install python3 python3-pip
+```
+
+```shell  title="Example under almalinux"
+#> sudo dnf install python3
+#> sudo dnf install python3-pip
+```
+
 ```shell  title="Example install poetry"
 #> pip3 install poetry
 ```
@@ -44,7 +53,7 @@ When **python** and **pip** package manager are installed you can simply run:
 * **thot**              : tkeir source code
 
 
-### Python environnment
+### Python environment
 
 T-KEIR is a python software, **python >=3.8** and **poetry** are necessary for an installation from gitlab/github.
 Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker
@@ -79,7 +88,8 @@ After git repository cloning.
 ```
 
 The script will install T-Keir in repository '$HOME/mytkeir' in a dedicated python environment ('$HOME/mytkeir/tkeirenv').
-Notice that this installation will also install Opensearch 2.9.0 as a third party tool.
+Notice that this installation will also install ElasticSearch as a third party tool.
+
 
 ### Step by Step
 

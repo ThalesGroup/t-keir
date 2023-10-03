@@ -454,17 +454,7 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#configure-the-services" class="md-nav__link">
     Configure the services
   </a>
@@ -490,6 +480,16 @@
   <a href="#initializeload-the-models" class="md-nav__link">
     Initialize/Load the models
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -962,17 +962,7 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#configure-the-services" class="md-nav__link">
     Configure the services
   </a>
@@ -998,6 +988,16 @@
   <a href="#initializeload-the-models" class="md-nav__link">
     Initialize/Load the models
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1143,15 +1143,15 @@ by service. The wheel package will be created, so you should ensure poetry is in
 <p>Go in <strong>tkeir/runtimes/docker</strong> directory and run the following command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">#&gt; ./builddocker.sh</span>
 </code></pre></div>
-<h2 id="configure-the-services">Configure the services</h2>
+<h4 id="configure-the-services">Configure the services</h4>
 <p>T-Keir provides a script to automatically generate configuration file:</p>
-<h3 id="nomenclature">Nomenclature</h3>
+<h5 id="nomenclature">Nomenclature</h5>
 <ul>
 <li>PATH_TO_TKEIR : to the the name of directory containing t-keir (the clone of github, in this installation guide it is <strong>t-keir-oss</strong>)</li>
 <li>PATH_TO_YOUR_OUTPUR_CONFIG_DIR : this is your workspace space (where you configuration files are created and stores, where there are your model)</li>
 <li>PATH_TO_YOUR_SHARE_DIRECTORY_OR_VOLUME_NAME : share directory need by docker to communication with host</li>
 </ul>
-<h3 id="command-lines">Command lines</h3>
+<h5 id="command-lines">Command lines</h5>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>python3 tkeir/thot/tkeir_init_project.py -t &lt;PATH TO TKEIR&gt;/tkeir/app/projects/template/ -o &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;
 </code></pre></div>
 <p>or if you install T-Keir wheel:</p>
@@ -1160,7 +1160,7 @@ by service. The wheel package will be created, so you should ensure poetry is in
 <p>When you work with a docker you can use a share directory or a volume (to make configurer persistent).</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>docker run --rm -it -v &lt;PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME&gt;:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
 </code></pre></div>
-<h3 id="initializeload-the-models">Initialize/Load the models</h3>
+<h5 id="initializeload-the-models">Initialize/Load the models</h5>
 <p>When you build you docker volumes containing model and default configuration are automatically generated.
 To update the configuration you can go into directory <strong>app/bin</strong> and run the command:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>./init-models.sh &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;/project/configs  &lt;PATH TO YOUR OUTPUT CONFIG DIR&gt;/project/models

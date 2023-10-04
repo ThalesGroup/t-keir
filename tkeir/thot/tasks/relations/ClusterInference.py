@@ -148,19 +148,19 @@ class ClusteringInference:
 
         for kg_item in tkeir_doc["kg"]:
             if " ".join(str(kg_item["subject"]["lemma_content"])) in embpred["subject"]:
-                kg_item["subject"]["class"] = embpred["subject"][" ".join(kg_item["subject"]["lemma_content"])]
+                kg_item["subject"]["class"] = embpred["subject"][" ".join(str(kg_item["subject"]["lemma_content"]))]
             elif " ".join(str(kg_item["subject"]["content"])) in embpred["subject"]:
-                kg_item["subject"]["class"] = embpred["subject"][" ".join(kg_item["subject"]["content"])]
+                kg_item["subject"]["class"] = embpred["subject"][" ".join(str(kg_item["subject"]["content"]))]
 
-            if " ".join(kg_item["property"]["lemma_content"]) in embpred["relation"]:
-                kg_item["property"]["class"] = embpred["relation"][" ".join(kg_item["property"]["lemma_content"])]
-            elif " ".join(kg_item["property"]["content"]) in embpred["relation"]:
-                kg_item["property"]["class"] = embpred["relation"][" ".join(kg_item["property"]["content"])]
+            if " ".join(str(kg_item["property"]["lemma_content"])) in embpred["relation"]:
+                kg_item["property"]["class"] = embpred["relation"][" ".join(str(kg_item["property"]["lemma_content"]))]
+            elif " ".join(str(kg_item["property"]["content"])) in embpred["relation"]:
+                kg_item["property"]["class"] = embpred["relation"][" ".join(str(kg_item["property"]["content"]))]
 
             if " ".join(str(kg_item["value"]["lemma_content"])) in embpred["object"]:
-                kg_item["value"]["class"] = embpred["object"][" ".join(kg_item["value"]["lemma_content"])]
+                kg_item["value"]["class"] = embpred["object"][" ".join(str(kg_item["value"]["lemma_content"]))]
             elif " ".join(str(kg_item["value"]["content"])) in embpred["object"]:
-                kg_item["value"]["class"] = embpred["object"][" ".join(kg_item["value"]["content"])]
+                kg_item["value"]["class"] = embpred["object"][" ".join(str(kg_item["value"]["content"]))]
 
             for triple in ["subject", "property", "value"]:
                 for t_i in ["lemma_content", "content"]:

@@ -188,7 +188,7 @@ class Indexing:
             if "date" in tkeir_doc:
                 doc2index["date"] = tkeir_doc["date"]
             m = hashlib.md5()
-            m.update((str(tkeir_doc["title"]) + str(tkeir_doc["content"])).encode())
+            m.update((str(tkeir_doc["title"]) + str(tkeir_doc["content"]) + str(tkeir_doc["source_doc_id"])).encode())
             hash_id = "tkeir-id-" + m.hexdigest()
             return (hash_id, doc2index)
 

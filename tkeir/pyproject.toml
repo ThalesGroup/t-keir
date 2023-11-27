@@ -36,7 +36,7 @@ elasticsearch="7.14.0"
 mistune="2.0.4"
 emoji="2.0.0"
 fold-to-ascii="1.0.2.post1"
-Django="4.1.10"
+Django="4.1.13"
 Jinja2="3.1.2"
 nltk="3.7"
 pandas="1.4.3"
@@ -52,7 +52,7 @@ fr-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/dow
 scikit-learn="1.1.2"
 torch="2.0.1"
 sentencepiece="0.1.97"
-transformers="4.21.2"
+transformers="4.30.0"
 websockets="10.0.0"
 
 [tool.poetry.dev-dependencies]

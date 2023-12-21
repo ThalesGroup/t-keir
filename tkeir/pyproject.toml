@@ -52,7 +52,7 @@ fr-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/dow
 scikit-learn="1.1.2"
 torch="2.0.1"
 sentencepiece="0.1.97"
-transformers="4.30.0"
+transformers="4.36.0"
 websockets="10.0.0"
 
 [tool.poetry.dev-dependencies]

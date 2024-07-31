@@ -37,8 +37,8 @@ mistune="2.0.4"
 emoji="2.0.0"
 fold-to-ascii="1.0.2.post1"
 Django="4.1.13"
-Jinja2="3.1.3"
-nltk="3.7"
+Jinja2="^3.1.4"
+nltk="^3.7"
 pandas="1.4.3"
 prometheus-client="0.14.1"
 protobuf="4.21.6"
@@ -49,8 +49,8 @@ en-core-web-sm = {url = "https://github.com/explosion/spacy-models/releases/down
 en-core-web-md = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl"}
 fr-core-news-sm = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.6.0/fr_core_news_sm-3.6.0-py3-none-any.whl"}
 fr-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl"}
-scikit-learn="1.1.2"
-torch="2.0.1"
+scikit-learn="^1.5.0"
+torch="^2.2.0"
 sentencepiece="0.1.97"
 transformers="4.36.0"
 websockets="10.0.0"

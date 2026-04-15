@@ -31,17 +31,18 @@ include = [
 Releases = "https://github.com/ThalesGroup/t-keir/releases"
 
 [tool.poetry.dependencies]
+python = ">=3.8,<4.0"
 beautifulsoup4="4.11.1"
 elasticsearch="7.14.0"
 mistune="2.0.4"
 emoji="2.0.0"
 fold-to-ascii="1.0.2.post1"
-Django="4.1.13"
+Django=">=4.2.26,<5.0"
 Jinja2="^3.1.4"
 nltk="^3.7"
 pandas="1.4.3"
 prometheus-client="0.14.1"
-protobuf="4.21.6"
+protobuf=">=4.25.8,<5.0"
 sanic="22.6.2"
 Sanic-Cors="2.1.0"
 spacy="3.6.1"
@@ -51,11 +52,11 @@ fr-core-news-sm = {url = "https://github.com/explosion/spacy-models/releases/dow
 fr-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl"}
 scikit-learn="^1.5.0"
 torch="^2.2.0"
-sentencepiece="0.1.97"
-transformers="^4.38.0"
+sentencepiece=">=0.2.1"
+transformers=">=5.0.0rc3,<6.0"
 websockets="10.0.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 
 [tool.poetry.scripts]
 tkeir-converter-svc = "tkeir.thot.converter_svc:main"

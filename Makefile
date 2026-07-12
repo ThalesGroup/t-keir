@@ -214,12 +214,12 @@ owasp-dependency-check: check-docker ci-deps
 
 docs: ci-deps
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
-		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger \
+		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger-plugin \
 		mkdocs serve -a 127.0.0.1:$(DOCS_PORT)
 
 docs-build: ci-deps
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
-		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger \
+		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger-plugin \
 		mkdocs build
 	@echo "Built static site: $(TKEIR_DIR)/site/index.html"
 

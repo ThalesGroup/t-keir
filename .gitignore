@@ -9,6 +9,17 @@ config.yaml
 **/*.log
 build
 public
+!tkeir-hmi/public/
+!tkeir-hmi/public/**
+tkeir-hmi/node_modules/
+tkeir-hmi/.next/
 tkeir/dist
 tkeir/site
 .venv
+.cache/
+.pytest_cache/
+reports/
+coverage-reports/
+output/
+!tkeir/tests/indexing/output/
+!tkeir/tests/indexing/output/**

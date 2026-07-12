@@ -1,0 +1,16 @@
+{
+    "logger": {
+        "logging-level": "info"
+    },
+    "named-entities": {
+        "label": [
+            {
+                "language": "en",
+                "resources-base-path": "resources/modeling/tokenizer/en",
+                "use-mwe": false,
+                "ner-rules": "ner-rules.json",
+                "use-pre-label": true
+            }
+        ]
+    }
+}

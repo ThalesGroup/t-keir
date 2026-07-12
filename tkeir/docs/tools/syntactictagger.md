@@ -1,11 +1,8 @@
 # Syntactic tagger
 
-The Named entity tagger is a tool allowing to extract Named Entities from "title_tokens" and "content_tokens" field of tkeir document.
-This tools is a rest service where the API is described in **API section** and the configuration file is described in **Configuration section**.
-
-## Syntactic tagger API
-
-!!swagger syntactictagger.json!!
+The syntactic tagger builds dependency parses and knowledge-graph triples from
+`title_morphosyntax` and `content_morphosyntax`. It runs inside the unified pipeline
+(`tkeir-pipeline`).
 
 ## Syntactic tagger configuration
 
@@ -13,10 +10,10 @@ Example of Configuration:
 
 
 ```json title="syntactic-tagger.json"
---8<-- "./app/projects/template/configs/syntactic-tagger.json"
+--8<-- "./configs/syntactic-tagger.json"
 ```
 
-Syntactic is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).
+Syntactic tagger configuration contains a top-level `logger` section and syntax-specific `taggers` settings.
 
 Syntactic Rules allows to define rule for triple Subject, Predicate, Object extraction
 
@@ -24,7 +21,7 @@ Example of Configuration:
 
 
 ```json title="syntactic-tagger.json"
---8<-- "./app/projects/template/configs/syntactic-rules.json"
+--8<-- "./resources/modeling/tokenizer/en/syntactic-rules.json"
 ```
 
 The rules allows to extract triple based on sequence matcher of spacy
@@ -58,104 +55,25 @@ The logger fields is:
   - **error** to display only error
   - **critical** to display only error
 
-### Configure Syntactic tagger Network
-
-Example of Configuration:
-
-
-```json title="network configuration"
---8<-- "./docs/configuration/examples/networkconfiguration.json"
-```
-
-The network fields:
-
-- **host** : hostname
-
-- **port** : port of the service
-
-- **associated-environement** : is the "host" and "port" associated environment variables that allows to replace the
-  default one. This field is not mandatory.
-
-  - "host" : associated "host" environment variable
-  - "port" : associated "port" environment variable
-
-- **ssl** : ssl configuration **IN PRODUCTION IT IS MANDATORY TO USE CERTIFICATE AND KEY THAT ARE \*NOT\* SELF SIGNED**
-
-  - **cert** : certificate file
-  - **key** : key file
-
-
-### Configure Syntactic tagger runtime
-
-Example of Configuration:
-
-```json title="network configuration"
---8<-- "./docs/configuration/examples/runtimeconfiguration.json"
-```
-
-The Runtime fields:
-
-- **request-max-size** : how big a request may be (bytes)
-- **request-buffer-queue-size**: request streaming buffer queue size
-- **request-timeout** : how long a request can take to arrive (sec)
-- **response-timeout** : how long a response can take to process (sec)
-- **keep-alive**: keep-alive
-- **keep-alive-timeout**: how long to hold a TCP connection open (sec)
-- **graceful-shutdown_timeout** : how long to wait to force close non-idle connection (sec)
-- **workers** : number of workers for the service on a node
-- **associated-environement** : if one of previous field is on the associated environment variables that allows to replace the  default one. This field is not mandatory.
-- **request-max-size** : overwrite with environement variable
-- **request-buffer-queue-size**: overwrite with environement variable
-- **request-timeout** : overwrite with environement variable
-- **response-timeout** : overwrite with environement variable
-- **keep-alive**: overwrite with environement variable
-- **keep-alive-timeout**: overwrite with environement variable
-- **graceful-shutdown_timeout** : overwrite with environement variable
-- **workers** : overwrite with environement variable
-
-## Syntactic tagger service
-
-To run the command type simply from tkeir directory:
+## Syntactic tagger usage
 
 ```shell
-python3 thot/syntactictagger_svc.py --config=<path to ner configuration file>
+tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks syntax
 ```
-
-or if you install tkeir wheel:
-
-```shell
-tkeir-syntactictagger-svc --config=<path to ner configuration file>
-```
-
-
-A light client can be run through the command
-
-```shell
-python3 thot/syntactictagger_client.py --config=<path to ner tagger configuration file> --input=<input directory> --output=<output directory>
-```
-
-or if you install tkeir wheel:
-
-```shell
-tkeir-syntactictagger-client --config=<path to ner tagger configuration file> --input=<input directory> --output=<output directory>
-```
-
 
 ## Syntactic tagger Tests
 
-The Syntactic tagger service come with unit and functional testing.
+The syntactic tagger comes with unit and functional testing.
 
 ### Syntactic Tagger Unit tests
 
-Unittest allows to test Tokenizer classes only.
-
 ```shell
-python3 -m unittest thot/tests/unittests/TestSyntacticTaggerConfiguration.py
-python3 -m unittest thot/tests/unittests/TestSyntacticTagger.py
+python3 -m pytest tkeir/tests/unittests/TestSyntacticTaggerConfiguration.py
+python3 -m pytest tkeir/tests/unittests/TestSyntacticTagger.py
 ```
 
 ### Syntactic tagger Functional tests
 
 ```shell
-python3 -m unittest thot/tests/functional_tests/TestSyntacticTaggerSvc.py
+python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
 ```

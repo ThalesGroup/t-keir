@@ -1,0 +1,21 @@
+schema tkeir_document {
+    document tkeir_document {
+        field source_doc_id type string {
+            indexing: summary | attribute
+        }
+        field title type string {
+            indexing: summary | index | attribute
+            index: enable-bm25
+        }
+        field content type array<string> {
+            indexing: summary | index | attribute
+            index: enable-bm25
+        }
+        field rdf_graph_serialized type string {
+            indexing: summary
+        }
+        field shacl_status type string {
+            indexing: summary | attribute
+        }
+    }
+}

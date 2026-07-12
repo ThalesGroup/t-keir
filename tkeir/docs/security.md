@@ -1,33 +1,21 @@
 # Security
 
-## REST API Secure Layer
+T-KEIR runs as an in-process document analysis pipeline (`tkeir-pipeline`). Task configuration files no longer expose HTTP `network` or `runtime` sections.
 
-By default the tools does not use SSL.
-All the services provide a way to run on SSL layer. A self signed certificate is provided to test HTTPS but it is mandatory to have signed certicates in production mode.
+## Input and output paths
 
-When you run a service
+- Restrict read access on input directories and write access on output directories to trusted users.
+- Pipeline output JSON may contain extracted document text; treat output directories with the same confidentiality level as source documents.
 
-```shell
-python3 thot/<service>_svc.py --config=<path to service configuration file>
-```
+## External services
 
-The confguration file describre network access.
+Some optional features contact external systems when enabled in configuration:
 
-Example of Configuration:
+- **PDF OCR (`llm` mode)** — sends rendered page images to an OpenAI-compatible API when `ocr.llm-api-key` or `OPENAI_API_KEY` is set.
+- **Annotation resource downloads** — tokenizer resource preparation may fetch remote lists when `download.url` is present in annotation configuration.
 
-```json title="network configuration"
---8<-- "./docs/configuration/examples/networkconfiguration.json"
-```
+Review those settings before running in production environments.
 
-The ssl networks fields:
+## API gateway
 
-- **ssl** : ssl configuration **IN PRODUCTION IT IS MANDATORY TO USE CERTIFICATE AND KEY THAT ARE \*NOT\* SELF SIGNED**
-
-  - **cert** : certificate file
-  - **key** : key file
-
-are not mandatory. The provide a way do define the certicate associated to https scheme
-
-## Use your favorite API Gateway
-
-To create token and fine use of the API (billing, number of requests ... ) you can use a third party API gateway like WSO2/am.
+If you expose pipeline results or wrap T-KEIR behind HTTP, use your organization's API gateway for authentication, rate limiting, and TLS termination.

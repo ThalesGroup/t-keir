@@ -1,0 +1,16 @@
+{
+    "logger": {
+        "logging-level": "error"
+    },
+    "tokenizers": {
+        "segmenters": [
+            {
+                "language": "en",
+                "resources-base-path": "/Users/blaudez/resources/modeling/tokenizer/en",
+                "mwe": "tkeir_mwe.pkl",
+                "normalization-rules": "tokenizer-rules.json",
+                "annotation-resources-reference": "annotation-resources.json"
+            }
+        ]
+    }
+}

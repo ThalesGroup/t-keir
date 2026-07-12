@@ -1,0 +1,108 @@
+{    
+    "pattern_syntagm_or_prep_group":{
+        "rule":[[
+            {"POS":{"IN":["PREP","DET","ADP","NOUN","PROPN","ADJ","PRON"]},"OP":"*"},
+            {"POS":{"IN":["SPACE"]},"OP":"*"},
+            {"POS":{"IN":["NOUN","PROPN","ADJ"]},"OP":"+"}
+        ],
+        [
+            {"POS":{"IN":["PREP","DET","ADP","NOUN","PROPN","ADJ","PRON"]},"OP":"*"},
+            {"POS":{"IN":["SPACE"]},"OP":"*"},
+            {"POS":{"IN":["NOUN","PROPN","ADJ"]},"OP":"+"},
+            {"POS":{"IN":["SPACE"]},"OP":"*"},
+            {"POS":{"IN":["CONJ","CCONJ"]}},
+            {"POS":{"IN":["SPACE"]},"OP":"*"},
+            {"POS":{"IN":["NOUN","PROPN","ADJ","DET"]},"OP":"+"}
+        ],
+        [
+            {"POS":{"IN":["ADP", "DET","NOUN","PROPN","ADJ"]},"OP":"+"},
+            {"POS":{"IN":["SPACE"]},"OP":"*"},
+            {"POS":{"IN":["DET","NOUN","PROPN","ADJ","PUNCT"]},"OP":"+"},
+            {"POS":{"IN":["SPACE"]},"OP":"*"},
+            {"POS":{"IN":["CONJ","CCONJ"]}},
+            {"POS":{"IN":["SPACE"]},"OP":"*"},
+            {"POS":{"IN":["DET","NOUN","PROPN","ADJ"]},"OP":"+"}
+        ]],
+        "type":["subject","object"]
+    },
+    "pattern_infinitive_verb":{
+        "rule":[
+            [
+            {"LOWER":"to"},
+            {"POS":{"IN":["SPACE"]},"OP":"*"},
+            {"POS":{"IN":["VERB","AUX"]}}
+            ]
+        ],
+        "type":["predicate"]        
+    },
+    "pattern_pro":{
+        "rule":[
+            [            
+            {"POS":{"IN":["PRON"]}}
+            ]
+        ],
+        "type":["subject"]
+    },
+    "pattern_verb_phrase":{
+        "rule":[
+                    [
+                    {"POS":{"IN":["VERB","AUX"]},"OP":"+"},
+                    {"POS":{"IN":["SPACE"]},"OP":"*"},
+                    {"POS":{"IN":["ADV","ADP"]},"OP":"?"},
+                    {"POS":{"IN":["SPACE"]},"OP":"*"},
+                    {"POS":{"IN":["VERB","AUX"]},"OP":"*"}
+                    ],
+                    [
+                    {"POS":{"IN":["VERB","AUX"]},"OP":"+"},
+                    {"POS":{"IN":["SPACE"]},"OP":"*"},
+                    {"POS":{"IN":["ADV","ADP"]},"OP":"?"},
+                    {"POS":{"IN":["SPACE"]},"OP":"*"},
+                    {"POS":{"IN":["VERB","AUX"]},"OP":"*"},
+                    {"POS":{"IN":["SPACE"]},"OP":"*"},
+                    {"POS":{"IN":["CONJ","CCONJ"]}},
+                    {"POS":{"IN":["SPACE"]},"OP":"*"},
+                    {"POS":{"IN":["VERB","AUX"]},"OP":"+"},
+                    {"POS":{"IN":["SPACE"]},"OP":"*"},
+                    {"POS":{"IN":["ADV","ADP"]},"OP":"?"},
+                    {"POS":{"IN":["SPACE"]},"OP":"*"},
+                    {"POS":{"IN":["VERB","AUX"]},"OP":"*"}
+                    ]
+       ],
+       "type":["predicate"]
+    },
+    "conj_rule":{
+        "rule":
+            [[{"POS":{"IN":["CONJ", "CCONJ"]},"OP":"+"}]],
+        "type":["empty"]
+    },
+    "link_rule":{
+        "type":["link"],
+        "rule":[
+            {"match-rule":"pattern_verb_phrase", "end-with":"ADP"},
+            {"match-rule":"pattern_syntagm_or_prep_group", "start-with":"ADP"}            
+        ],
+        "action": {
+            "on":"span-right",
+            "shift":"right"
+        }
+    },
+    "available-name-entities": {
+        "list": ["person","organization",
+                 "location","location.city","location.country",
+                 "product","facility","event",
+                 "money","quantity","date","time","energyterm","financeterm",
+                 "url","email"],
+        "type": ["named-entity-list"]
+    },
+    "triple_ner":{
+        "type":["triple"],
+        "rule":[
+                   [{"subject":"pattern_syntagm_or_prep_group"}, {"predicate":"pattern_verb_phrase"}, {"object":"pattern_syntagm_or_prep_group"}],
+                   [{"subject":"available-name-entities"}, {"predicate":"pattern_verb_phrase"}, {"object":"available-name-entities"}],
+                   [{"subject":"pattern_pro"}, {"predicate":"pattern_verb_phrase"}, {"object":"pattern_syntagm_or_prep_group"}],
+                   [{"subject":"pattern_pro"}, {"predicate":"pattern_verb_phrase"}, {"object":"available-name-entities"}],
+                   [{"subject":"available-name-entities"}, {"predicate":"pattern_verb_phrase"}, {"object":"pattern_syntagm_or_prep_group"}],
+                   [{"subject":"pattern_syntagm_or_prep_group"}, {"predicate":"pattern_verb_phrase"}, {"object":"available-name-entities"}]
+        ]
+    }
+}

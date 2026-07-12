@@ -2,15 +2,13 @@
 """CMorphosyntactic tagger configuration
 Author: Eric Blaudez (Eric Blaudez)
 
-Copyright (c) 2022 THALES 
+Copyright (c) 2022 THALES
 All Rights Reserved.
 """
 
 import json
 
 from thot.core.LoggerConfiguration import LoggerConfiguration
-from thot.core.NetworkConfiguration import NetworkConfiguration
-from thot.core.RuntimeConfiguration import RuntimeConfiguration
 
 
 class MorphoSyntacticTaggerConfiguration:
@@ -53,9 +51,14 @@ class MorphoSyntacticTaggerConfiguration:
     """
 
     def __init__(self):
+        """Initialize the instance.
+
+        Example:
+            >>> cfg = MorphoSyntacticTaggerConfiguration()
+            >>> cfg.configuration
+            {}
+        """
         self.logger_config = LoggerConfiguration()
-        self.net_config = NetworkConfiguration()
-        self.runtime_config = RuntimeConfiguration()
         # Fill on tokenizer empty
         self.configuration = dict()
 
@@ -65,27 +68,47 @@ class MorphoSyntacticTaggerConfiguration:
         Args:
             config_f (str, optional): load configruation with file handler. Defaults to None.
             path (list,option): access to a part of the configuration
+
+                Example:
+                    >>> callable(MorphoSyntacticTaggerConfiguration().load)
+                    True
         """
         json_config = json.load(config_f)
         self.loads(json_config)
 
-    def loads(self, configuration: dict = None):
+    def loads(self, configuration: dict | None = None):
         """Load logger configuration from dict (json)
 
         Args:
             configuration (dict, optional): load logger configruation with dict. Defaults to None.
+
+                Example:
+                    >>> cfg = MorphoSyntacticTaggerConfiguration()
+                    >>> cfg.loads({'logger': {}, 'morphosyntax': {'taggers': [{'language': 'en'}]}})
+                    >>> 'taggers' in cfg.configuration
+                    True
         """
+        if configuration is None:
+            raise ValueError("configuration is required")
         self.logger_config.loads(configuration, logger_name="morphosyntax")
-        self.net_config.loads(configuration["morphosyntax"])
-        self.runtime_config.loads(configuration["morphosyntax"])
         if "taggers" in configuration["morphosyntax"]:
-            self.configuration["taggers"] = configuration["morphosyntax"]["taggers"]
+            self.configuration["taggers"] = configuration["morphosyntax"][
+                "taggers"
+            ]
         else:
-            raise ValueError("taggers are mandatory in morphosyntactic tagger configuration")
+            raise ValueError(
+                "taggers are mandatory in morphosyntactic tagger configuration"
+            )
 
     def clear(self):
-        """clear logger configuration"""
+        """clear logger configuration
+
+        Example:
+            >>> cfg = MorphoSyntacticTaggerConfiguration()
+            >>> cfg.loads({'logger': {}, 'morphosyntax': {'taggers': [{'language': 'en'}]}})
+            >>> cfg.clear()
+            >>> cfg.configuration
+            {}
+        """
         self.logger_config.clear()
-        self.net_config.clear()
-        self.runtime_config.clear()
         self.configuration = dict()

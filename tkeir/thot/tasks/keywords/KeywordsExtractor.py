@@ -3,18 +3,22 @@
 
 Author: Eric Blaudez (Eric Blaudez)
 
-Copyright (c) 2022 THALES 
+Copyright (c) 2022 THALES
 All Rights Reserved.
 """
-from thot.tasks.keywords.KeywordsConfiguration import KeywordsConfiguration
-from thot.core.ThotLogger import ThotLogger
 
-
-import os
 import json
+import os
 from collections import Counter, defaultdict
-from itertools import chain, groupby, product
 from enum import Enum
+from itertools import chain, groupby, product
+
+from thot.core.KeywordRules import (
+    DEFAULT_MIN_KEYWORD_LENGTH,
+    is_valid_keyword_label,
+)
+from thot.core.ThotLogger import ThotLogger
+from thot.tasks.keywords.KeywordsConfiguration import KeywordsConfiguration
 
 
 class Metric(Enum):
@@ -29,7 +33,12 @@ class NLTKRake(object):
     """Rapid Automatic Keyword Extraction Algorithm."""
 
     def __init__(
-        self, ranking_metric=Metric.DEGREE_TO_FREQUENCY_RATIO, max_length=5, min_length=1, validation=dict(), settings=dict()
+        self,
+        ranking_metric=Metric.DEGREE_TO_FREQUENCY_RATIO,
+        max_length=5,
+        min_length=1,
+        validation=dict(),
+        settings=dict(),
     ):
         """Constructor.
 
@@ -40,6 +49,10 @@ class NLTKRake(object):
                            (Inclusive. Defaults to 100000)
         :param min_length: Minimum limit on the number of words in a phrase
                            (Inclusive. Defaults to 1)
+
+                Example:
+                    >>> callable(NLTKRake)
+                    True
         """
         # By default use degree to frequency ratio as the metric.
         if isinstance(ranking_metric, Metric):
@@ -51,7 +64,21 @@ class NLTKRake(object):
         self._settings = settings
 
         # sw POS equivalent
-        self._to_ignore = set(["ADP", "ADV", "AUX", "CONJ", "CCONJ", "DET", "INTJ", "SCONJ", "PRON", "PUNCT", "SYM"])
+        self._to_ignore = set(
+            [
+                "ADP",
+                "ADV",
+                "AUX",
+                "CONJ",
+                "CCONJ",
+                "DET",
+                "INTJ",
+                "SCONJ",
+                "PRON",
+                "PUNCT",
+                "SYM",
+            ]
+        )
 
         # Assign min or max length to the attributes
         self.min_length = min_length
@@ -64,6 +91,12 @@ class NLTKRake(object):
         self.ranked_phrases = None
 
     def flattern_token_list(self, doc_token):
+        """flattern_token_list API.
+
+        Example:
+            >>> callable(NLTKRake.flattern_token_list)
+            True
+        """
         flat_tokens = []
         for l in doc_token:
             if isinstance(l, list):
@@ -76,6 +109,10 @@ class NLTKRake(object):
         """Method to extract keywords from the text provided.
 
         :param text: Text to extract keywords from, provided as a string.
+
+                Example:
+                    >>> callable(NLTKRake.extract_keywords_from_tkeir)
+                    True
         """
         field_name_ms = section_name + "_morphosyntax"
         doc_ms = tkeir_doc[field_name_ms]
@@ -104,6 +141,10 @@ class NLTKRake(object):
 
         :param sentences: Text to extraxt keywords from, provided as a list
                           of strings, where each string is a sentence.
+
+                Example:
+                    >>> callable(NLTKRake.extract_keywords_from_sentences)
+                    True
         """
         phrase_list = self._generate_phrases(sentences)
         self._build_frequency_dist(phrase_list)
@@ -116,6 +157,10 @@ class NLTKRake(object):
 
         :return: List of strings where each string represents an extracted
                  keyword string.
+
+                Example:
+                    >>> callable(NLTKRake.get_ranked_phrases)
+                    True
         """
         return self.ranked_phrases
 
@@ -124,6 +169,10 @@ class NLTKRake(object):
 
         :return: List of tuples where each tuple is formed of an extracted
                  keyword string and its score. Ex: (5.68, 'Four Scoures')
+
+                Example:
+                    >>> callable(NLTKRake.get_ranked_phrases_with_scores)
+                    True
         """
         return self.rank_list
 
@@ -131,15 +180,24 @@ class NLTKRake(object):
         """Method to fetch the word frequency distribution in the given text.
 
         :return: Dictionary (defaultdict) of the format `word -> frequency`.
+
+                Example:
+                    >>> callable(NLTKRake.get_word_frequency_distribution)
+                    True
         """
         return self.frequency_dist
 
     def get_word_degrees(self):
         """Method to fetch the degree of words in the given text. Degree can be
+
         defined as sum of co-occurances of the word with other words in the
         given text.
 
         :return: Dictionary (defaultdict) of the format `word -> degree`.
+
+                Example:
+                    >>> callable(NLTKRake.get_word_degrees)
+                    True
         """
         return self.degree
 
@@ -148,15 +206,24 @@ class NLTKRake(object):
 
         :param phrase_list: List of List of strings where each sublist is a
                             collection of words which form a contender phrase.
+
+                Example:
+                    >>> callable(NLTKRake._build_frequency_dist)
+                    True
         """
         self.frequency_dist = Counter(chain.from_iterable(phrase_list))
 
     def _build_word_co_occurance_graph(self, phrase_list):
         """Builds the co-occurance graph of words in the given body of text to
+
         compute degree of each word.
 
         :param phrase_list: List of List of strings where each sublist is a
                             collection of words which form a contender phrase.
+
+                Example:
+                    >>> callable(NLTKRake._build_word_co_occurance_graph)
+                    True
         """
         co_occurance_graph = defaultdict(lambda: defaultdict(lambda: 0))
         for phrase in phrase_list:
@@ -165,7 +232,7 @@ class NLTKRake(object):
             #
             # Note: Keep the co-occurances graph as is, to help facilitate its
             # use in other creative ways if required later.
-            for (word, coword) in product(phrase, phrase):
+            for word, coword in product(phrase, phrase):
                 co_occurance_graph[word][coword] += 1
         self.degree = defaultdict(lambda: 0)
         for key in co_occurance_graph:
@@ -174,11 +241,15 @@ class NLTKRake(object):
     def _build_ranklist(self, phrase_list):
         """Method to rank each contender phrase using the formula
 
-              phrase_score = sum of scores of words in the phrase.
+        phrase_score = sum of scores of words in the phrase.
               word_score = d(w)/f(w) where d is degree and f is frequency.
 
         :param phrase_list: List of List of strings where each sublist is a
                             collection of words which form a contender phrase.
+
+                Example:
+                    >>> callable(NLTKRake._build_ranklist)
+                    True
         """
         self.rank_list = []
         for phrase in phrase_list:
@@ -190,18 +261,25 @@ class NLTKRake(object):
                     rank += 1.0 * self.degree[word]
                 else:
                     rank += 1.0 * self.frequency_dist[word]
-            self.rank_list.append((rank, " ".join(phrase), phrase_list[phrase]))
+            self.rank_list.append(
+                (rank, " ".join(phrase), phrase_list[phrase])
+            )
         self.rank_list.sort(reverse=True, key=lambda x: x[0])
         self.ranked_phrases = [ph[1] for ph in self.rank_list]
 
     def _generate_phrases(self, sentences):
         """Method to generate contender phrases given the sentences of the text
+
         document.
 
         :param sentences: List of strings where each string represents a
                           sentence which forms the text.
         :return: Set of string tuples where each tuple is a collection
                  of words forming a contender phrase.
+
+                Example:
+                    >>> callable(NLTKRake._generate_phrases)
+                    True
         """
         phrase_list = dict()
         # Create contender phrases from sentences.
@@ -229,6 +307,7 @@ class NLTKRake(object):
 
     def _get_phrase_list_from_words(self, word_list):
         """Method to create contender phrases from the list of words that form
+
         a sentence by dropping stopwords and punctuations and grouping the left
         words into phrases. Only phrases in the given length range (both limits
         inclusive) would be considered to build co-occurrence matrix. Ex:
@@ -248,14 +327,24 @@ class NLTKRake(object):
                           the same order.
         :return: List of contender phrases that are formed after dropping
                  stopwords and punctuations.
+
+                Example:
+                    >>> callable(NLTKRake._get_phrase_list_from_words)
+                    True
         """
         groups = groupby(word_list, lambda x: x["pos"] not in self._to_ignore)
         phrases = [tuple(group[1]) for group in groups if group[0]]
-        return list(filter(lambda x: self.min_length <= len(x) <= self.max_length, phrases))
+        return list(
+            filter(
+                lambda x: self.min_length <= len(x) <= self.max_length, phrases
+            )
+        )
 
 
 class KeywordsExtractor:
-    def __init__(self, config: KeywordsConfiguration = None, call_context=None):
+    def __init__(
+        self, config: KeywordsConfiguration = None, call_context=None
+    ):
         """Initialize tagger
 
         Args:
@@ -264,62 +353,149 @@ class KeywordsExtractor:
         Raises:
             ValueError: If configuration is not set
             ValueError: If language is not managed
+
+                Example:
+                    >>> callable(KeywordsExtractor)
+                    True
         """
         self.kw_prunning = 5
         if "prunning" in config.configuration["extractors"][0]:
-            self.kw_prunning = config.configuration["extractors"][0]["prunning"]
+            self.kw_prunning = config.configuration["extractors"][0][
+                "prunning"
+            ]
+        extractor_cfg = config.configuration["extractors"][0]
+        self.min_keyword_length = int(
+            extractor_cfg.get(
+                "min-keyword-length",
+                DEFAULT_MIN_KEYWORD_LENGTH,
+            )
+        )
+        self.min_keyword_length = max(1, self.min_keyword_length)
         self._config = config
         self._kw_validation = dict()
         self._kw_settings = {
             "suppress-bounds-sw": False,
             "pos-to-suppress": set(
-                ["ADP", "ADV", "AUX", "CONJ", "CCONJ", "DET", "INTJ", "PART", "SCONJ", "SYM", "SPACE", "X", "PRON", "PUNCT"]
+                [
+                    "ADP",
+                    "ADV",
+                    "AUX",
+                    "CONJ",
+                    "CCONJ",
+                    "DET",
+                    "INTJ",
+                    "PART",
+                    "SCONJ",
+                    "SYM",
+                    "SPACE",
+                    "X",
+                    "PRON",
+                    "PUNCT",
+                ]
             ),
         }
         if not config:
             raise ValueError("configuration is mandatory")
         if "keywords-rules" in self._config.configuration["extractors"][0]:
             ner_rules = os.path.join(
-                self._config.configuration["extractors"][0]["resources-base-path"],
+                self._config.configuration["extractors"][0][
+                    "resources-base-path"
+                ],
                 self._config.configuration["extractors"][0]["keywords-rules"],
             )
             ThotLogger.info("Load rules:" + ner_rules, context=call_context)
             with open(ner_rules) as json_f:
                 kw_rules_data = json.load(json_f)
                 if "keywords-pos-validation" in kw_rules_data:
-                    if ("possible-pos-in-syntagm" in kw_rules_data["keywords-pos-validation"]) and (
+                    if (
+                        "possible-pos-in-syntagm"
+                        in kw_rules_data["keywords-pos-validation"]
+                    ) and (
                         "at-least" in kw_rules_data["keywords-pos-validation"]
                     ):
                         self._kw_validation = {
-                            "possible": set(kw_rules_data["keywords-pos-validation"]["possible-pos-in-syntagm"]),
-                            "at-least": set(kw_rules_data["keywords-pos-validation"]["at-least"]),
+                            "possible": set(
+                                kw_rules_data["keywords-pos-validation"][
+                                    "possible-pos-in-syntagm"
+                                ]
+                            ),
+                            "at-least": set(
+                                kw_rules_data["keywords-pos-validation"][
+                                    "at-least"
+                                ]
+                            ),
                         }
-                    ThotLogger.info("[" + str(len(self._kw_validation)) + "] Validation rules Loaded.", context=call_context)
+                    ThotLogger.info(
+                        "["
+                        + str(len(self._kw_validation))
+                        + "] Validation rules Loaded.",
+                        context=call_context,
+                    )
                 if "settings" in kw_rules_data:
                     if "suppress-bounds-sw" in kw_rules_data["settings"]:
-                        self._kw_settings["suppress-bounds-sw"] = kw_rules_data["settings"]["suppress-bounds-sw"]
+                        self._kw_settings["suppress-bounds-sw"] = (
+                            kw_rules_data["settings"]["suppress-bounds-sw"]
+                        )
                     if "pos-to-suppress" in kw_rules_data["settings"]:
-                        self._kw_settings["pos-to-suppress"] = set(kw_rules_data["settings"]["pos-to-suppress"])
+                        self._kw_settings["pos-to-suppress"] = set(
+                            kw_rules_data["settings"]["pos-to-suppress"]
+                        )
 
     def getKeywords(self, tkeir_doc: dict):
+        """Run the getKeywords task step on a T-KEIR document.
 
-        if ("title_morphosyntax" not in tkeir_doc) and ("content_morphosyntax" not in tkeir_doc):
+        Example:
+            >>> callable(KeywordsExtractor.getKeywords)
+            True
+        """
+        if ("title_morphosyntax" not in tkeir_doc) and (
+            "content_morphosyntax" not in tkeir_doc
+        ):
             raise ValueError("Morphosyntax analysis should be performed")
 
         keywords = []
         if "title_morphosyntax" in tkeir_doc:
-            rake = NLTKRake(validation=self._kw_validation, settings=self._kw_settings, max_length=self.kw_prunning)
+            rake = NLTKRake(
+                validation=self._kw_validation,
+                settings=self._kw_settings,
+                max_length=self.kw_prunning,
+            )
             keywords = rake.extract_keywords_from_tkeir(tkeir_doc, "title")
         if "content_morphosyntax" in tkeir_doc:
-            rake = NLTKRake(validation=self._kw_validation, settings=self._kw_settings, max_length=self.kw_prunning)
-            keywords = keywords + rake.extract_keywords_from_tkeir(tkeir_doc, "content")
+            rake = NLTKRake(
+                validation=self._kw_validation,
+                settings=self._kw_settings,
+                max_length=self.kw_prunning,
+            )
+            keywords = keywords + rake.extract_keywords_from_tkeir(
+                tkeir_doc, "content"
+            )
         kw_list = []
         for kw in keywords:
+            text = str(kw[1]).strip()
+            if not is_valid_keyword_label(
+                text,
+                min_length=self.min_keyword_length,
+            ):
+                continue
             kw_list.append(
-                {"score": int(kw[0]), "text": kw[1], "span": {"start": kw[2][0]["position"], "end": kw[2][-1]["position"] + 1}}
+                {
+                    "score": int(kw[0]),
+                    "text": text,
+                    "span": {
+                        "start": kw[2][0]["position"],
+                        "end": kw[2][-1]["position"] + 1,
+                    },
+                }
             )
         tkeir_doc["keywords"] = kw_list
         return tkeir_doc
 
     def run(self, tkeir_doc):
+        """Run the run task step on a T-KEIR document.
+
+        Example:
+            >>> callable(KeywordsExtractor.run)
+            True
+        """
         return self.getKeywords(tkeir_doc)

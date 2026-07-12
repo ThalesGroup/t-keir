@@ -1,0 +1,16 @@
+{
+    "logger": {
+        "logging-level": "info"
+    },
+    "golden-chunking": {
+        "chunkers": [
+            {
+                "language": "en",
+                "target-min-tokens": 300,
+                "target-max-tokens": 500,
+                "high-ner-density-max-tokens": 250,
+                "ner-density-threshold": 3
+            }
+        ]
+    }
+}

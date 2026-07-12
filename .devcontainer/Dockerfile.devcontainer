@@ -1,0 +1,19 @@
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl wget git jq unzip bash-completion \
+    tesseract-ocr tesseract-ocr-eng tesseract-ocr-fra \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=docker:27-cli /usr/local/bin/docker /usr/local/bin/docker
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh \
+    && chmod 755 /usr/local/bin/uv \
+    && uv --version
+
+RUN echo 'source /usr/share/bash-completion/bash_completion' >> /home/vscode/.bashrc \
+    && echo 'alias tkeir-pipeline="cd /workspace/tkeir && uv run tkeir-pipeline"' >> /home/vscode/.bashrc
+
+USER vscode
+WORKDIR /workspace

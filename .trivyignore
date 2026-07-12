@@ -1,0 +1,15 @@
+# Tracked dependency CVEs (aligned with make pip-audit PIP_AUDIT_IGNORE).
+# Remove entries after upgrading mistune / urllib3 pins in tkeir/pyproject.toml.
+CVE-2026-49851
+CVE-2026-44708
+CVE-2026-44897
+CVE-2025-66418
+CVE-2025-66471
+CVE-2026-21441
+CVE-2026-44431
+PYSEC-2026-168
+PYSEC-2026-141
+PYSEC-2026-1999
+PYSEC-2026-1998
+PYSEC-2026-1994
+PYSEC-2026-1996

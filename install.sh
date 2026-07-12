@@ -37,7 +37,7 @@ echo -ne "Create python environment ...\n"
 python3 -m venv $workspace/tkeirenv
 
 echo -ne "Build wheel ...\n"
-poetry build
+uv build
 cd dist
 whl=`ls *.whl` 
 
@@ -45,14 +45,7 @@ echo -ne "Install wheel ...\n"
 source $workspace/tkeirenv/bin/activate
 pip3 install $whl
 
-tkeir-init-project -t $source_path/app/projects/template/ -o $workspace/
+mkdir -p $workspace/model
 cd $source_path/app/bin
-./init-models.sh $workspace/project/configs $workspace/project/model
-
-echo "Download and install elasticsearch ..."
-mkdir -p $workspace/thirdparty
-cd $workspace/thirdparty
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.17.13-linux-x86_64.tar.gz
-tar xfz elasticsearch-7.17.13-linux-x86_64.tar.gz
-cp $source_path/app/projects/template/resources/indices/elasticsearch.yml elasticsearch-7.17.13/config
+./init-models.sh $source_path/configs $workspace/model
 

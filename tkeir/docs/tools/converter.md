@@ -1,24 +1,18 @@
 # Converter
 
-Converter is a tool allowing to convert different kind of document format to one compliant with **tkeir** tools.
-This tools is a rest service.
-
-## Converter API
-
-!!swagger converter.json!!
-
-This API is also available via the service itself on <http:/>/\<service host>:\<service port>/swagger
+The converter turns raw text or office/PDF/HTML inputs into T-KEIR JSON documents.
+It is the first step of the unified pipeline (`tkeir-pipeline`).
 
 ## Converter configuration
 
 Example of Configuration:
 
 ```json title="converter.json"
---8<-- "./app/projects/template/configs/converter.json"
+--8<-- "./configs/converter.json"
 ```
 
 
-Converter is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).
+Converter is a pipeline task that converts document formats into T-KEIR JSON. Configuration contains a top-level `logger` section and converter-specific `settings` (output and OCR options).
 
 ### Configure converter logger
 
@@ -42,98 +36,45 @@ The logger fields is:
   - **error** to display only error
   - **critical** to display only error
 
-### Configure converter Network
+## Converter usage
 
-Example of Configuration:
+Documents are converted with [Microsoft MarkItDown](https://github.com/microsoft/markitdown). Supported types include `email`, `pdf`, `docx`, `html`, `pptx`, `xlsx`, `csv`, and other formats handled by MarkItDown. Plain text uses the dedicated `raw` datatype. Existing T-KEIR JSON documents can be passed through with the `tkeir` datatype.
 
-```json title="network configuration"
---8<-- "./docs/configuration/examples/networkconfiguration.json"
+### Input datatype (`-t` / `--type`)
+
+| Value | When to use |
+|---|---|
+| `auto` | **Default.** Detect from file extension and magic bytes (PDF, Office, email, …). |
+| `raw` | Plain UTF-8 text only (`.txt`, `.md`, …). Do **not** use for PDFs — binary bytes would be decoded as garbage text. |
+| `pdf`, `docx`, … | Force a specific MarkItDown converter type. |
+
+The pipeline CLI and `make pipeline` default to `PIPELINE_TYPE=auto`.
+
+MarkItDown extracts only the PDF **text layer** by default. Text inside embedded images (diagrams, scans) is recovered when OCR is enabled in `converter.json`:
+
+```json
+"ocr": {
+  "enabled": true,
+  "mode": "tesseract",
+  "min-image-pixels": 10000,
+  "min-page-text-chars": 40,
+  "render-dpi": 200
+}
 ```
 
-The network fields:
+- **tesseract** mode (default): requires the [Tesseract](https://github.com/tesseract-ocr/tesseract) binary on `PATH`.
+- **llm** mode: set `"mode": "llm"` and provide `OPENAI_API_KEY` (or `ocr.llm-api-key`) for vision-based extraction from images and scanned pages.
 
-- **host** : hostname
-
-- **port** : port of the service
-
-- **associated-environement** : is the "host" and "port" associated environment variables that allows to replace the default one. This field is not mandatory.
-
-  - "host" : associated "host" environment variable
-  - "port" : associated "port" environment variable
-
-- **ssl** : ssl configuration **IN PRODUCTION IT IS MANDATORY TO USE CERTIFICATE AND KEY THAT ARE \*NOT\* SELF SIGNED**
-
-  - **cert** : certificate file
-  - **key** : key file
-
-
-### Configure converter runtime
-
-Example of Configuration:
-
-```json title="network configuration"
---8<-- "./docs/configuration/examples/runtimeconfiguration.json"
-```
-
-The Runtime fields:
-
-- **request-max-size** : how big a request may be (bytes)
-
-- **request-buffer-queue-size**: request streaming buffer queue size
-
-- **request-timeout** : how long a request can take to arrive (sec)
-
-- **response-timeout** : how long a response can take to process (sec)
-
-- **keep-alive**: keep-alive
-
-- **keep-alive-timeout**: how long to hold a TCP connection open (sec)
-
-- **graceful-shutdown_timeout** : how long to wait to force close non-idle connection (sec)
-
-- **workers** : number of workers for the service on a node
-
-- **associated-environement** : if one of previous field is on the associated environment variables that allows to replace the  default one. This field is not mandatory.
-
-  - **request-max-size** : overwrite with environement variable
-  - **request-buffer-queue-size**: overwrite with environement variable
-  - **request-timeout** : overwrite with environement variable
-  - **response-timeout** : overwrite with environement variable
-  - **keep-alive**: overwrite with environement variable
-  - **keep-alive-timeout**: overwrite with environement variable
-  - **graceful-shutdown_timeout** : overwrite with environement variable
-  - **workers** : overwrite with environement variable
-
-## Converter service
-
-The available input format are:
-
-- **raw** : a raw text format
-- **email** : a mail format
-
-To run the command type simply from tkeir directory:
+Run conversion through the unified pipeline:
 
 ```shell
-python3 thot/converter_svc.py --config=/home/tkeir_svc/tkeir/configs/default/configs/converter.json
+tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks converter
 ```
 
-or if you install tkeir wheel:
+Or run the full pipeline (converter is the first step by default):
 
 ```shell
-tkeir-converter-svc --config=/home/tkeir_svc/tkeir/configs/default/configs/converter.json
-```
-
-
-A light client can be run through the command
-
-```shell
-python3 thot/converter_client.py -c /home/tkeir_svc/tkeir/configs/default/configs/converter.json -t email -i /home/tkeir_svc/tkeir/thot/tests/data/test-raw/mail -o /home/tkeir_svc/tkeir/thot/tests/data/test-inputs/
-```
-
-or if you install tkeir wheel:
-
-```shell
-tkeir-converter-client  -c /home/tkeir_svc/tkeir/configs/default/configs/converter.json -t email -i /home/tkeir_svc/tkeir/thot/tests/data/test-raw/mail -o /home/tkeir_svc/tkeir/thot/tests/data/test-inputs/
+tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
 ```
 
 ## Converter Tests
@@ -145,15 +86,14 @@ The converter service come with unit and functional testing.
 Unittest allows to test Converters classes only.
 
 ```shell
-python3 -m unittest thot/tests/unittests/TestConverterConfiguration.py
-python3 -m unittest thot/tests/unittests/TestConverter.py
-python3 -m unittest thot/tests/unittests/TestEmailConverter.py
-python3 -m unittest thot/tests/unittests/TestRawConverter.py
-python3 -m unittest thot/tests/unittests/TestURIConverter.py
+python3 -m pytest tkeir/tests/unittests/TestConverterConfiguration.py
+python3 -m pytest tkeir/tests/unittests/TestConverter.py
+python3 -m pytest tkeir/tests/unittests/TestMarkItDownConverter.py
+python3 -m pytest tkeir/tests/unittests/TestRawConverter.py
 ```
 
 ### Converter Functional tests
 
 ```shell
-python3 -m unittest thot/tests/functional_tests/TestConverterSvc.py
+python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
 ```

@@ -1,0 +1,51 @@
+{
+  "name": "T-Keir Dev Environment",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "vscode",
+
+  "initializeCommand": "bash .devcontainer/preflight-host.sh",
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "upgradePackages": false
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11",
+      "installTools": true
+    }
+  },
+
+  "forwardPorts": [8000, 8080, 8090, 19071],
+  "portsAttributes": {
+    "8000": { "label": "MkDocs", "onAutoForward": "silent" },
+    "8080": { "label": "Vespa search", "onAutoForward": "silent" },
+    "8090": { "label": "RAG API", "onAutoForward": "silent" },
+    "19071": { "label": "Vespa config", "onAutoForward": "silent" }
+  },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postAttachCommand": "echo 'Inside T-KEIR dev container (/workspace). Run: make setup'",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "eamodio.gitlens",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/workspace/tkeir/.venv/bin/python"
+      }
+    }
+  }
+}

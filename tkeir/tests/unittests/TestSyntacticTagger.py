@@ -5,15 +5,23 @@ Author: Eric Blaudez (Eric Blaudez)
 Copyright (c) 2020 by THALES
 """
 
-from thot.core.ThotLogger import ThotLogger, LogUserContext
-from thot.tasks.syntax.SyntacticTaggerConfiguration import SyntacticTaggerConfiguration
-from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
-import os
 import json
+import os
 import unittest
 
+from thot.core.ThotLogger import LogUserContext, ThotLogger
+from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+from thot.tasks.syntax.SyntacticTaggerConfiguration import (
+    SyntacticTaggerConfiguration,
+)
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
-test_file_path = os.path.abspath(os.path.join(dir_path, "../data/test-outputs-ner"))
+test_file_path = os.path.abspath(
+    os.path.join(dir_path, "../fixtures/test-outputs-ner")
+)
+resources_path = os.path.abspath(
+    os.path.join(dir_path, "../../resources/modeling/tokenizer/en")
+)
 
 
 class TestSyntacticTagger(unittest.TestCase):
@@ -24,87 +32,69 @@ class TestSyntacticTagger(unittest.TestCase):
             "taggers": [
                 {
                     "language": "en",
-                    "resources-base-path": "/home/tkeir_svc/tkeir/app/projects/default/configs",
+                    "resources-base-path": (
+                        "/home/tkeir_svc/tkeir/app/projects/default/configs"
+                    ),
                     "syntactic-rules": "syntactic-rules.json",
                 }
             ],
-            "network": {
-                "host": "0.0.0.0",
-                "port": 8080,
-                "associate-environment": {"host": "HOST_ENVNAME", "port": "PORT_ENVNAME"},
-            },
-            "runtime": {
-                "request-max-size": 100000000,
-                "request-buffer-queue-size": 100,
-                "keep-alive": True,
-                "keep-alive-timeout": 5,
-                "graceful-shutown-timeout": 15.0,
-                "request-timeout": 60,
-                "response-timeout": 60,
-                "workers": 1,
-            },
-            "serialize": {
-                "input": {"path": "/tmp", "keep-service-info": True},
-                "output": {"path": "/tmp", "keep-service-info": True},
-            },
         },
     }
 
     def test_tagger_mail(self):
         config = SyntacticTaggerConfiguration()
-        res_path = os.path.abspath(os.path.join(dir_path, "../../app/projects/template/configs/"))
-        TestSyntacticTagger.tagger_config["syntax"]["taggers"][0]["resources-base-path"] = res_path
+        TestSyntacticTagger.tagger_config["syntax"]["taggers"][0][
+            "resources-base-path"
+        ] = resources_path
         config.loads(TestSyntacticTagger.tagger_config)
         ThotLogger.loads(config.logger_config.configuration)
 
-        with open(os.path.join(test_file_path, "mail3.txt.converted.tokenized.ms.ner.json")) as f:
+        with open(
+            os.path.join(
+                test_file_path, "mail3.txt.converted.tokenized.ms.ner.json"
+            )
+        ) as f:
             tkeir_doc = json.load(f)
             f.close()
             test = dict()
             test["title_deps"] = [
-                    {
+                {
                     "text": "Lackawanna",
                     "lemma": "Lackawanna",
                     "pos": "PROPN",
                     "head": 1,
                     "dep": "compound",
                     "lefts": [],
-                    "rights": []
-                    },
-                    {
+                    "rights": [],
+                },
+                {
                     "text": "Letter",
                     "lemma": "Letter",
                     "pos": "PROPN",
                     "head": 1,
                     "dep": "ROOT",
-                    "lefts": [
-                        0
-                    ],
-                    "rights": [
-                        2
-                    ]
-                    },
-                    {
+                    "lefts": [0],
+                    "rights": [2],
+                },
+                {
                     "text": "of",
                     "lemma": "of",
                     "pos": "ADP",
                     "head": 1,
                     "dep": "prep",
                     "lefts": [],
-                    "rights": [
-                        3
-                    ]
-                    },
-                    {
+                    "rights": [3],
+                },
+                {
                     "text": "Credit",
                     "lemma": "Credit",
                     "pos": "PROPN",
                     "head": 2,
                     "dep": "pobj",
                     "lefts": [],
-                    "rights": []
-                    }
-                    ]
+                    "rights": [],
+                },
+            ]
 
             test["kg"] = [
                 {
@@ -123,7 +113,12 @@ class TestSyntacticTagger(unittest.TestCase):
                         "lemma_content": "john.enerson@enron.com",
                         "positions": [-1],
                     },
-                    "value": {"content": "email", "label_content": "", "lemma_content": "email", "positions": [-1]},
+                    "value": {
+                        "content": "email",
+                        "label_content": "",
+                        "lemma_content": "email",
+                        "positions": [-1],
+                    },
                     "weight": 0.0,
                 },
                 {
@@ -142,7 +137,12 @@ class TestSyntacticTagger(unittest.TestCase):
                         "lemma_content": "John Enerso",
                         "positions": [-1],
                     },
-                    "value": {"content": "person", "label_content": "", "lemma_content": "person", "positions": [-1]},
+                    "value": {
+                        "content": "person",
+                        "label_content": "",
+                        "lemma_content": "person",
+                        "positions": [-1],
+                    },
                     "weight": 0.0,
                 },
                 {
@@ -209,7 +209,12 @@ class TestSyntacticTagger(unittest.TestCase):
                         "lemma_content": "Richard B Sander",
                         "positions": [-1],
                     },
-                    "value": {"content": "person", "label_content": "", "lemma_content": "person", "positions": [-1]},
+                    "value": {
+                        "content": "person",
+                        "label_content": "",
+                        "lemma_content": "person",
+                        "positions": [-1],
+                    },
                     "weight": 0.0,
                 },
                 {
@@ -348,7 +353,12 @@ class TestSyntacticTagger(unittest.TestCase):
                         "lemma_content": "John Enerso",
                         "positions": [-1],
                     },
-                    "value": {"content": "Dan Lyon", "label_content": "", "lemma_content": "Dan Lyon", "positions": [-1]},
+                    "value": {
+                        "content": "Dan Lyon",
+                        "label_content": "",
+                        "lemma_content": "Dan Lyon",
+                        "positions": [-1],
+                    },
                     "weight": 0.0,
                 },
                 {
@@ -367,7 +377,12 @@ class TestSyntacticTagger(unittest.TestCase):
                         "lemma_content": "Richard Lydecker",
                         "positions": [-1],
                     },
-                    "value": {"content": "person", "label_content": "", "lemma_content": "person", "positions": [-1]},
+                    "value": {
+                        "content": "person",
+                        "label_content": "",
+                        "lemma_content": "person",
+                        "positions": [-1],
+                    },
                     "weight": 0.0,
                 },
                 {
@@ -386,7 +401,12 @@ class TestSyntacticTagger(unittest.TestCase):
                         "lemma_content": "Randy Petersen",
                         "positions": [-1],
                     },
-                    "value": {"content": "person", "label_content": "", "lemma_content": "person", "positions": [-1]},
+                    "value": {
+                        "content": "person",
+                        "label_content": "",
+                        "lemma_content": "person",
+                        "positions": [-1],
+                    },
                     "weight": 0.0,
                 },
                 {
@@ -399,8 +419,18 @@ class TestSyntacticTagger(unittest.TestCase):
                         "lemma_content": "rel:instanceof",
                         "positions": [-1],
                     },
-                    "subject": {"content": "Dan Lyon", "label_content": "", "lemma_content": "Dan Lyon", "positions": [-1]},
-                    "value": {"content": "person", "label_content": "", "lemma_content": "person", "positions": [-1]},
+                    "subject": {
+                        "content": "Dan Lyon",
+                        "label_content": "",
+                        "lemma_content": "Dan Lyon",
+                        "positions": [-1],
+                    },
+                    "value": {
+                        "content": "person",
+                        "label_content": "",
+                        "lemma_content": "person",
+                        "positions": [-1],
+                    },
                     "weight": 0.0,
                 },
                 {
@@ -491,7 +521,12 @@ class TestSyntacticTagger(unittest.TestCase):
                         "lemma_content": "Tue, 30 Jan 2001 02:35:00 -0800",
                         "positions": [-1],
                     },
-                    "value": {"content": "date", "label_content": "", "lemma_content": "date", "positions": [-1]},
+                    "value": {
+                        "content": "date",
+                        "label_content": "",
+                        "lemma_content": "date",
+                        "positions": [-1],
+                    },
                     "weight": 0.0,
                 },
                 {
@@ -577,8 +612,18 @@ class TestSyntacticTagger(unittest.TestCase):
                 },
                 {
                     "subject": {
-                        "content": ["Approval", "of", "these", "specifications"],
-                        "lemma_content": ["approval", "of", "these", "specification"],
+                        "content": [
+                            "Approval",
+                            "of",
+                            "these",
+                            "specifications",
+                        ],
+                        "lemma_content": [
+                            "approval",
+                            "of",
+                            "these",
+                            "specification",
+                        ],
                         "pos": ["NOUN", "ADP", "DET", "NOUN"],
                         "positions": [113, 114, 115, 116],
                         "label": "pattern_syntagm_or_prep_group",
@@ -716,5 +761,3 @@ class TestSyntacticTagger(unittest.TestCase):
             tagger = SyntacticTagger(config=config, call_context=log_context)
             tkeir_doc = tagger.tag(tkeir_doc)
             self.assertEqual(test["title_deps"], tkeir_doc["title_deps"])
-
-

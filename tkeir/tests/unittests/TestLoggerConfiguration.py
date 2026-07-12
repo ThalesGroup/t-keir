@@ -5,10 +5,11 @@ Author: Eric Blaudez (Eric Blaudez)
 Copyright (c) 2020 by THALES
 """
 
-from thot.core.LoggerConfiguration import LoggerConfiguration
 import json
 import os
 import unittest
+
+from thot.core.LoggerConfiguration import LoggerConfiguration
 
 
 class TestLoggerConfiguration(unittest.TestCase):
@@ -31,13 +32,17 @@ class TestLoggerConfiguration(unittest.TestCase):
     def test_loads(self):
         """Test load with dict function"""
         logger_config = LoggerConfiguration()
-        logger_config.loads({"logger": {"logging-level": "info"}}, logger_name="test")
+        logger_config.loads(
+            {"logger": {"logging-level": "info"}}, logger_name="test"
+        )
 
         test_dict = {"logger": {"logging-level": "info"}}
         self.assertEqual(logger_config.configuration, test_dict)
 
         logger_config.clear()
-        logger_config.loads({"logger": {"logging-level": "debug"}}, logger_name="test")
+        logger_config.loads(
+            {"logger": {"logging-level": "debug"}}, logger_name="test"
+        )
         test_dict = {"logger": {"logging-level": "debug"}}
         self.assertEqual(logger_config.configuration, test_dict)
 

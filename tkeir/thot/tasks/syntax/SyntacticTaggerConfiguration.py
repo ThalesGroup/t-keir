@@ -2,15 +2,13 @@
 """Synatctic tagger configuration
 Author : Eric Blaudez (Eric Blaudez)
 
-Copyright (c) 2022 THALES 
+Copyright (c) 2022 THALES
 All Rights Reserved.
 """
 
 import json
 
 from thot.core.LoggerConfiguration import LoggerConfiguration
-from thot.core.NetworkConfiguration import NetworkConfiguration
-from thot.core.RuntimeConfiguration import RuntimeConfiguration
 
 
 class SyntacticTaggerConfiguration:
@@ -52,9 +50,14 @@ class SyntacticTaggerConfiguration:
     """
 
     def __init__(self):
+        """Initialize the instance.
+
+        Example:
+            >>> cfg = SyntacticTaggerConfiguration()
+            >>> cfg.configuration
+            {}
+        """
         self.logger_config = LoggerConfiguration()
-        self.net_config = NetworkConfiguration()
-        self.runtime_config = RuntimeConfiguration()
         # Fill on tokenizer empty
         self.configuration = dict()
 
@@ -64,27 +67,45 @@ class SyntacticTaggerConfiguration:
         Args:
             config_f (str, optional): load configruation with file handler. Defaults to None.
             path (list,option): access to a part of the configuration
+
+                Example:
+                    >>> callable(SyntacticTaggerConfiguration().load)
+                    True
         """
         json_config = json.load(config_f)
         self.loads(json_config)
 
-    def loads(self, configuration: dict = None):
+    def loads(self, configuration: dict | None = None):
         """Load logger configuration from dict (json)
 
         Args:
             configuration (dict, optional): load logger configruation with dict. Defaults to None.
+
+                Example:
+                    >>> cfg = SyntacticTaggerConfiguration()
+                    >>> cfg.loads({'logger': {}, 'syntax': {'taggers': [{'language': 'en'}]}})
+                    >>> 'taggers' in cfg.configuration
+                    True
         """
+        if configuration is None:
+            raise ValueError("configuration is required")
         self.logger_config.loads(configuration, logger_name="syntax")
-        self.net_config.loads(configuration["syntax"])
-        self.runtime_config.loads(configuration["syntax"])
         if "taggers" in configuration["syntax"]:
             self.configuration["taggers"] = configuration["syntax"]["taggers"]
         else:
-            raise ValueError("taggers are mandatory in morphosyntactic tagger configuration")
+            raise ValueError(
+                "taggers are mandatory in morphosyntactic tagger configuration"
+            )
 
     def clear(self):
-        """clear logger configuration"""
+        """clear logger configuration
+
+        Example:
+            >>> cfg = SyntacticTaggerConfiguration()
+            >>> cfg.loads({'logger': {}, 'syntax': {'taggers': [{'language': 'en'}]}})
+            >>> cfg.clear()
+            >>> cfg.configuration
+            {}
+        """
         self.logger_config.clear()
-        self.net_config.clear()
-        self.runtime_config.clear()
         self.configuration = dict()

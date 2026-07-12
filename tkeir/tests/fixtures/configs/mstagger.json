@@ -1,0 +1,16 @@
+{
+    "logger": {
+        "logging-level": "error"
+    },
+    "morphosyntax": {
+        "taggers": [
+            {
+                "language": "en",
+                "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+                "pre-sentencizer": true,
+                "pre-tagging-with-concept": true,
+                "add-concept-in-knowledge-graph": true
+            }
+        ]
+    }
+}

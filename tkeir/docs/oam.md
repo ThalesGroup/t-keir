@@ -1,54 +1,58 @@
-# Operation and Management With Docker
+# Operation and Management
 
-This section describes the operations and the management of T-KEIR services.
+This section describes how to run and check the T-KEIR pipeline locally.
 
-## Start and stop the services
+## Run the pipeline
 
-All the services are embedded in a docker-compose file to run the services go in directory **runtime/docker** and run:
-
-```shell
-docker-compose -f docker-compose-tkeir.yml up
-```
-
-### List services
+From the repository root:
 
 ```shell
-docker ps -a
+tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
 ```
 
-![Screenshot](resources/images/tkeir-docker-ps.png)
+Use `-t raw` for plain text only. `make pipeline` defaults to `PIPELINE_TYPE=auto`.
 
-
-### Stop and restart service
-
-To stop a service :
+Run a subset of tasks:
 
 ```shell
-docker stop <service name>
+tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT> -o <OUTPUT> -t raw --tasks tokenizer,morphosyntax
 ```
 
-To restart a service
+## Validate configuration
+
+Task configuration files under `tkeir/configs/` contain only `logger` settings and task-specific options. They no longer require `network` or `runtime` sections.
+
+Load and test configuration parsing:
 
 ```shell
-docker start <service name>
+python3 -m pytest tkeir/tests/unittests/TestPipelineConfiguration.py
 ```
 
-### Get output a a service (log)
+## Observability
 
-```shell
-docker logs --details <service name>
+T-KEIR records counters through **OpenTelemetry** (`thot.core.ThotMetrics`). Metrics are exposed in Prometheus exposition format for scraping by Prometheus, Grafana, or any OTLP-compatible collector.
+
+Logger error events increment the `logger_errors` counter automatically. Custom counters can be created with `ThotMetrics.create_counter()` and `ThotMetrics.increment_counter()`.
+
+```python
+from thot.core.ThotMetrics import ThotMetrics
+
+ThotMetrics.create_counter(
+    short_name="pipeline-run",
+    function_name="pipeline_run_total",
+    counter_description="Pipeline run count",
+)
+ThotMetrics.increment_counter(
+    short_name="pipeline-run",
+    method="POST",
+    path="/api/pipeline/run",
+    status=200,
+)
+payload = ThotMetrics.generateMetricsResponse()
 ```
 
-![Screenshot](resources/images/tkeir-docker-log.png)
+Set `OTEL_EXPORTER_OTLP_ENDPOINT` when exporting metrics to an OTLP collector in addition to the in-process Prometheus reader.
 
-## Check the service health
+## Tools lifecycle and release
 
-You can check the health of a service by using the endpoint **health** of the service. The rest function will return standard http code 200
-and a json description of the running service.
-
-![Screenshot](resources/images/docker-rest-health.png)
-
-## Tools life cyle and release
-
-This first release is available on Thales Inner Sources repository.
-We make a tag for each project and create release when important features and bugs fixes has been done.
+Releases are tagged on the GitHub repository when important features and bug fixes are completed.

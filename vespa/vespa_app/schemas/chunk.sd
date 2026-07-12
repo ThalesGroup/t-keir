@@ -1,0 +1,49 @@
+schema chunk {
+    document chunk {
+        field chunk_id type string {
+            indexing: summary | attribute
+        }
+        field doc_ref type reference<tkeir_document> {
+            indexing: summary | attribute
+        }
+        field parent_title type string {
+            indexing: summary | index | attribute
+            index: enable-bm25
+        }
+        field parent_content type array<string> {
+            indexing: summary | index | attribute
+            index: enable-bm25
+        }
+        field text_raw type string {
+            indexing: summary | index
+        }
+        field chunk_embedding type tensor<float>(x[384]) {
+            indexing: attribute | index
+            attribute { distance-metric: angular }
+            index { hnsw }
+        }
+        field questions_embeddings type tensor<float>(q{}, x[384]) {
+            indexing: attribute | index
+            attribute { distance-metric: angular }
+            index { hnsw }
+        }
+    }
+
+    rank-profile hybrid_2_level {
+        inputs {
+            query(q_chunk_emb) tensor<float>(x[384])
+            query(q_question_emb) tensor<float>(x[384])
+        }
+        first-phase {
+            expression {
+                closeness(field, chunk_embedding) * 0.40 +
+                closeness(field, questions_embeddings) * 0.40 +
+                bm25(parent_content) * 0.20
+            }
+        }
+        second-phase {
+            expression: firstPhase + 0.15 * bm25(parent_title)
+            rerank-count: 30
+        }
+    }
+}

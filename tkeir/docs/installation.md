@@ -30,7 +30,7 @@ Tested environments:
 #> sudo dnf install wget
 ```
 
-* install pyhton (3.8) and poetry. Follow the instructions : [Poetry installation documentation](https://python-poetry.org/docs)
+* install Python (**>= 3.10**, 3.11 recommended) and [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 When **python** and **pip** package manager are installed you can simply run: 
 
@@ -43,8 +43,8 @@ When **python** and **pip** package manager are installed you can simply run:
 #> sudo dnf install python3-pip
 ```
 
-```shell  title="Example install poetry"
-#> pip3 install poetry
+```shell  title="Example install uv"
+#> curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 * clone repository
@@ -55,32 +55,24 @@ When **python** and **pip** package manager are installed you can simply run:
 
 ### T-Keir Directory structure
 
-* **app/bin**           : scripts and tools for server execution
-* **app/projects**      : projects templates (use by T-Keir to create user configuration file - do not edit or modify)
-* **docs**              : buildable documentation
-* **runtimes/docker**   : docker environment
-* **tests**             : internal unit tests
-* **thot**              : tkeir source code
+* **configs**           : bundled pipeline and task configuration files
+* **docs**              : MkDocs documentation (`make docs` from repository root)
+* **tests**             : unit and functional tests
+* **thot**              : T-KEIR source code and CLI tools (`thot/tools/`)
 
 
 ### Python environment
 
-T-KEIR is a python software, **python >=3.8** and **poetry** are necessary for an installation from gitlab/github.
-Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker
+T-KEIR requires **Python >= 3.10** and **uv** for installation from GitHub.
+From the repository root, run `make setup` (see [Quickstart](ready_to_run.md)).
 
-![Screenshot](resources/images/doc-tkeir-install-strategies.png)
+### Dev container (recommended)
 
-
-Optionnaly, to run the documentation server go in directory **tkeir** and run mkdocs server :
-
-```shell  title="Example of mkdocs installation under ubuntu"
-#> sudo apt install mkdocs
-```
-
-
-```shell  title="Run the documentation server with mkdocs"
-mkdocs serve
-```
+Instead of installing Python and system packages on the host, use the bundled dev
+container: `make devcontainer` or `bash .devcontainer/enter-devcontainer.sh` from the
+host; or open the repository root in Cursor/VS Code → Command Palette →
+**Dev Containers: Reopen in Container**. Step-by-step instructions:
+[Dev Container](devcontainer.md).
 
 
 ## Installation running
@@ -97,15 +89,15 @@ After git repository cloning.
 #> ./install.sh $HOME/mytkeir
 ```
 
-The script will install T-Keir in repository '$HOME/mytkeir' in a dedicated python environment ('$HOME/mytkeir/tkeirenv').
-Notice that this installation will also install ElasticSearch as a third party tool.
+The script installs dependencies into `tkeir/.venv`. For the current OSS workflow,
+prefer `make setup` from the repository root instead of the legacy `install.sh` path.
 
 
 ### **<span style="color:red">\[EXPERT\] </span>** Step by Step
 
 After git repository cloning.
 ```shell  title="Build a python wheel package:"
-#> poetry build
+#> uv build
 ```
 
 A wheel file will be created in "**dist**" directory. Then you can simply run a pip install on the created wheel.
@@ -115,7 +107,7 @@ Note that is highly recommanded to run wheel installation in a python virtual en
 
 You can directly install T-Keir from weel:
 
-Go in "dist" folder (created by poetry - under **t-keir-oss** directory created by github cloning)
+Go in "dist" folder (created by uv - under **t-keir-oss** directory created by github cloning)
 
 ```shell  title="Create a python virtual environement:"
 #>  python3 -m venv $HOME/tkeirenv`
@@ -135,88 +127,27 @@ Go in "dist" folder (created by poetry - under **t-keir-oss** directory created 
 #> sudo apt install libcurl4-openssl-dev libssl-dev
 ```
 
-#### Install T-Keir with a docker image
-
-You could build the docker base image. This image contains os and python dependencies and code of search ai with one entry point
-by service. The wheel package will be created, so you should ensure poetry is installed and in running path.
-
-Go in **tkeir/runtimes/docker** directory and run the following command:
-
-```shell 
-#> ./builddocker.sh
-```
-
 #### Configure the services
 
-T-Keir provides a script to automatically generate configuration file:
+Service configuration files are bundled in **tkeir/configs/**. You can copy or edit them directly; paths to lexical resources are resolved relative to the tkeir package root.
 
-##### Nomenclature
+##### Initialize tokenizer resources
 
-* PATH_TO_TKEIR : to the the name of directory containing t-keir (the clone of github, in this installation guide it is **t-keir-oss**)
-* PATH_TO_YOUR_OUTPUR_CONFIG_DIR : this is your workspace space (where you configuration files are created and stores, where there are your model)
-* PATH_TO_YOUR_SHARE_DIRECTORY_OR_VOLUME_NAME : share directory need by docker to communication with host
-
-
-##### Command lines
-
+Build the multi-word expression pickle before the first pipeline run:
 
 ```shell
-python3 tkeir/thot/tkeir_init_project.py -t <PATH TO TKEIR>/tkeir/app/projects/template/ -o <PATH TO YOUR OUTPUT CONFIG DIR>
+make init-models
 ```
 
-or if you install T-Keir wheel:
+Or explicitly:
 
 ```shell
-tkeir-init-project -t <PATH TO TKEIR>/tkeir/app/projects/template/ -o <PATH TO YOUR OUTPUT CONFIG DIR>
+tkeir-create-annotation-resource \
+  --entries-file resources/modeling/tokenizer/en/annotation-resources.json \
+  --output resources/modeling/tokenizer/en/tkeir_mwe.pkl
 ```
 
-When you work with a docker you can use a share directory or a volume (to make configurer persistent).
-
-```shell
-docker run --rm -it -v <PATH TO YOUR SHARE DIRECTORY OR VOLUME NAME>:/home/tkeir_svc/share -w /home/tkeir_svc/tkeir --entrypoint python3 theresis/tkeir /home/tkeir_svc/tkeir/thot/tkeir_init_project.py -t /home/tkeir_svc/tkeir/app/projects/template -o /home/tkeir_svc/share
-```
-
-##### Initialize/Load the models
-
-When you build you docker volumes containing model and default configuration are automatically generated.
-To update the configuration you can go into directory **app/bin** and run the command:
-  
-```shell
-./init-models.sh <PATH TO YOUR OUTPUT CONFIG DIR>/project/configs  <PATH TO YOUR OUTPUT CONFIG DIR>/project/models
-```
-
-Or from docker
-
-```shell
-docker run --rm -it -v $host_dir:$docker_dir -w /home/tkeir_svc/tkeir --entrypoint bash $tkeir_img /home/tkeir_svc/tkeir/app/bin/init-models.sh $docker_dir/project/configs $docker_dir/project/resources/modeling/net/
-```
-
-Where 
-
-* **host_dir** is the variable containing the path to the shared host directory
-* **docker_dir** is the variable containing the path to the shared docker directory
-* **tkei_img** is the name of the image
-
-Note, that the environment variable TRANSFORMERS_CACHE **HAVE TO BE** always set to model path before run a T-Keir service using models.
-
-Take care of proxies. Please set correclty $HOME/.docker/config.json like that:
-
-```json
-  {
-    "proxies":
-    {
-      "default":
-      {
-        "httpProxy": "your_http_proxy",
-        "httpsProxy": "your_https_proxy",
-        "noProxy": "your_no_proxy"
-      }
-    }
-  }
-```
-
-For a docker compose network environment, don't forget to add **tkeir opendistro** hostname and all services in no_proxy.
-
+Set `TRANSFORMERS_CACHE` when downloading Hugging Face models used by optional tasks.
 
 ## Copy or create data
 
@@ -225,10 +156,8 @@ Nevertheless you can modify or add file. Most of them are configuration (see con
 
 ### Index mappings
 
-Index mapping is store in **RESOURCES_DIRECTORY/indices/indices_mapping**. if you create new mapping it MUST contains the same fields.
-You can freely change the analyzers.
+Index mapping support has been removed from this distribution.
 
 ### Resources
 
-The resources are stored in **RESOURCES_DIRECTORY/modeling/tokenizer/\[en|fr...\]**. This directory contains file with list or csv tables.
-The descriptions of these file are in **CONFIGS/annotation-resources.json**
+Lexical resources and rule files are stored in **resources/modeling/tokenizer/\[en|fr...\]**. Their usage is described in **resources/modeling/tokenizer/en/annotation-resources.json**.

@@ -1,0 +1,8 @@
+# RAG API runtime configuration (retrieval UI and ontology export).
+# Keep ontology.min_keyword_length aligned with keywords.json → min-keyword-length.
+
+ontology:
+  # Minimum number of characters for a keyword label exposed in the HMI/RAG API.
+  min_keyword_length: 3
+  max_entities: 120
+  max_keywords: 60

@@ -1,11 +1,7 @@
 # Keywords extractor
 
-The Keywords extractor is a tool allowing to extract keywords from "title_morphosyntax" and "content_morphosyntax" field of tkeir document.
-This tools is a rest service where the API is described in **API section** and the configuration file is described in **Configuration section**.
-
-## Keywords extractor API
-
-!!swagger keywords.json!!
+The keywords extractor runs RAKE over morphosyntax fields and is invoked by the unified
+pipeline (`tkeir-pipeline`).
 
 ## Keywords extractor configuration
 
@@ -13,23 +9,24 @@ Example of Configuration:
 
 
 ```json title="keywords.json"
---8<-- "./app/projects/template/configs/keywords.json"
+--8<-- "./configs/keywords.json"
 ```
 
-Keywords extractor is an aggreation of network configuration, serialize configuration, runtime configuration (in field converter), logger (at top level).
+Keywords extractor configuration contains a top-level `logger` section and keywords-specific `extractors` settings.
 The extractor allows to define validation rules for keywords:
 
 - **language** :the language of tokenizer
-- **resources-base-path**: the path to the resources (containing file created by tools *createAnnotationResources.py*
+- **resources-base-path**: path to resources (see `tkeir-create-annotation-resource`)
 - **keywords-rules** : validation rules
 - **prunning** : max number of words in keyword sequence
+- **min-keyword-length** : minimum number of characters for an extracted keyword label (default: 3)
 
 Keywords rules allows to filter and validate rules according to their POS Tags.
 
 Example of Configuration:
 
-```json title="indexing.json"
---8<-- "./app/projects/template/configs/keywords-rules.json"
+```json title="keywords-rules.json"
+--8<-- "./resources/modeling/tokenizer/en/keywords-rules.json"
 ```
 
 
@@ -60,110 +57,25 @@ The logger fields is:
   - **error** to display only error
   - **critical** to display only error
 
-### Configure Keywords extractor Network
-
-Example of Configuration:
-
-```json title="network configuration"
---8<-- "./docs/configuration/examples/networkconfiguration.json"
-```
-
-The network fields:
-
-- **host** : hostname
-
-- **port** : port of the service
-
-- **associated-environement** : is the "host" and "port" associated environment variables that allows to replace the default one. This field is not mandatory.
-
-  - "host" : associated "host" environment variable
-  - "port" : associated "port" environment variable
-
-- **ssl** : ssl configuration **IN PRODUCTION IT IS MANDATORY TO USE CERTIFICATE AND KEY THAT ARE \*NOT\* SELF SIGNED**
-
-  - **cert** : certificate file
-  - **key** : key file
-
-
-### Configure Keywords extractor runtime
-
-Example of Configuration:
-
-```json title="network configuration"
---8<-- "./docs/configuration/examples/runtimeconfiguration.json"
-```
-
-The Runtime fields:
-
-- **request-max-size** : how big a request may be (bytes)
-
-- **request-buffer-queue-size**: request streaming buffer queue size
-
-- **request-timeout** : how long a request can take to arrive (sec)
-
-- **response-timeout** : how long a response can take to process (sec)
-
-- **keep-alive**: keep-alive
-
-- **keep-alive-timeout**: how long to hold a TCP connection open (sec)
-
-- **graceful-shutdown_timeout** : how long to wait to force close non-idle connection (sec)
-
-- **workers** : number of workers for the service on a node
-
-- **associated-environement** : if one of previous field is on the associated environment variables that allows to replace the  default one. This field is not mandatory.
-
-  - **request-max-size** : overwrite with environement variable
-  - **request-buffer-queue-size**: overwrite with environement variable
-  - **request-timeout** : overwrite with environement variable
-  - **response-timeout** : overwrite with environement variable
-  - **keep-alive**: overwrite with environement variable
-  - **keep-alive-timeout**: overwrite with environement variable
-  - **graceful-shutdown_timeout** : overwrite with environement variable
-  - **workers** : overwrite with environement variable
-
-## Keywords extractor service
-
-To run the command type simply from tkeir directory:
+## Keywords extractor usage
 
 ```shell
-python3 thot/keywordextractor_svc.py --config=<path to keywords configuration file>
+tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks keywords
 ```
-
-or if you install tkeir wheel:
-
-```shell
-tkeir-keywordextractor-svc --config=<path to keywords configuration file>
-```
-
-A light client can be run through the command
-
-```shell
-python3 thot/keywordextractor_client.py --config=<path to keywords configuration file> --input=<input directory> --output=<output directory>
-```
-
-or if you install tkeir wheel:
-
-```shell
-tkeir-keywordextractor-client --config=<path to keywords configuration file> --input=<input directory> --output=<output directory>
-```
-
 
 ## Keywords extractor Tests
 
-The Keywords extractor service come with unit and functional testing.
+The keywords extractor comes with unit and functional testing.
 
 ### Keywords Unit tests
 
-Unittest allows to test Tokenizer classes only.
-
 ```shell
-python3 -m unittest thot/tests/unittests/TestKeywordsConfiguration.py
-python3 -m unittest thot/tests/unittests/TestKeywordsExtractor.py
+python3 -m pytest tkeir/tests/unittests/TestKeywordsConfiguration.py
+python3 -m pytest tkeir/tests/unittests/TestKeywordsExtractor.py
 ```
 
 ### Keywords extractor Functional tests
 
 ```shell
-python3 -m unittest thot/tests/functional_tests/TestKeywordsExtractorSvc.py
+python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
 ```

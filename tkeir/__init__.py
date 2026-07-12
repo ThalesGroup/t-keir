@@ -3,4 +3,4 @@ Author: Eric Blaudez (Eric Blaudez)
 All rights Reserved.
 Copyright (c) 2022 by THALES
 """
-__version__="1.0.3"
+__version__="2.0.0"

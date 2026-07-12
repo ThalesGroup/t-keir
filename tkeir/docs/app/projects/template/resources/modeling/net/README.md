@@ -1,1 +1,0 @@
-This directory contains models that can be load by default

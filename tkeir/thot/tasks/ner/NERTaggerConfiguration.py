@@ -2,15 +2,13 @@
 """NER Tagger configuration
 Author : Eric Blaudez (Eric Blaudez)
 
-Copyright (c) 2022 THALES 
+Copyright (c) 2022 THALES
 All Rights Reserved.
 """
 
 import json
 
 from thot.core.LoggerConfiguration import LoggerConfiguration
-from thot.core.NetworkConfiguration import NetworkConfiguration
-from thot.core.RuntimeConfiguration import RuntimeConfiguration
 
 
 class NERTaggerConfiguration:
@@ -62,9 +60,14 @@ class NERTaggerConfiguration:
     """
 
     def __init__(self):
+        """Initialize the instance.
+
+        Example:
+            >>> cfg = NERTaggerConfiguration()
+            >>> cfg.configuration
+            {}
+        """
         self.logger_config = LoggerConfiguration()
-        self.net_config = NetworkConfiguration()
-        self.runtime_config = RuntimeConfiguration()
         # Fill on named entity empty
         self.configuration = dict()
 
@@ -74,27 +77,47 @@ class NERTaggerConfiguration:
         Args:
             config_f (str, optional): load configruation with file handler. Defaults to None.
             path (list,option): access to a part of the configuration
+
+                Example:
+                    >>> callable(NERTaggerConfiguration().load)
+                    True
         """
         json_config = json.load(config_f)
         self.loads(json_config)
 
-    def loads(self, configuration: dict = None):
+    def loads(self, configuration: dict | None = None):
         """Load logger configuration from dict (json)
 
         Args:
             configuration (dict, optional): load logger configruation with dict. Defaults to None.
+
+                Example:
+                    >>> cfg = NERTaggerConfiguration()
+                    >>> cfg.loads({'logger': {}, 'named-entities': {'label': [{'language': 'en'}]}})
+                    >>> 'label' in cfg.configuration
+                    True
         """
+        if configuration is None:
+            raise ValueError("configuration is required")
         self.logger_config.loads(configuration, logger_name="named-entities")
-        self.net_config.loads(configuration["named-entities"])
-        self.runtime_config.loads(configuration["named-entities"])
         if "label" in configuration["named-entities"]:
-            self.configuration["label"] = configuration["named-entities"]["label"]
+            self.configuration["label"] = configuration["named-entities"][
+                "label"
+            ]
         else:
-            raise ValueError("label are mandatory in named entity configuration")
+            raise ValueError(
+                "label are mandatory in named entity configuration"
+            )
 
     def clear(self):
-        """clear logger configuration"""
+        """clear logger configuration
+
+        Example:
+            >>> cfg = NERTaggerConfiguration()
+            >>> cfg.loads({'logger': {}, 'named-entities': {'label': [{'language': 'en'}]}})
+            >>> cfg.clear()
+            >>> cfg.configuration
+            {}
+        """
         self.logger_config.clear()
-        self.net_config.clear()
-        self.runtime_config.clear()
         self.configuration = dict()

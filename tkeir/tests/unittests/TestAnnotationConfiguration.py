@@ -5,10 +5,13 @@ Author: Eric Blaudez (Eric Blaudez)
 Copyright (c) 2020 by THALES
 """
 
-from thot.tasks.tokenizer.AnnotationConfiguration import AnnotationConfiguration
 import json
 import os
 import unittest
+
+from thot.tools.annotation.AnnotationConfiguration import (
+    AnnotationConfiguration,
+)
 
 
 class TestAnnotationConfiguration(unittest.TestCase):
@@ -20,7 +23,12 @@ class TestAnnotationConfiguration(unittest.TestCase):
             {
                 "lists": [
                     {
-                        "format": {"type": "csv", "header": False, "sep": "\t", "columns": [{"id": 4}]},
+                        "format": {
+                            "type": "csv",
+                            "header": False,
+                            "sep": "\t",
+                            "columns": [{"id": 4}],
+                        },
                         "name": "geoname-country",
                         "path": "countryInfo.txt",
                         "exceptions": ["stopwords.txt"],
@@ -36,7 +44,12 @@ class TestAnnotationConfiguration(unittest.TestCase):
                             "sep": "\t",
                             "columns": [{"id": 1}, {"id": 3, "split-on": ","}],
                         },
-                        "download": {"url": "http://download.geonames.org/export/dump/cities5000.zip", "format": "zip"},
+                        "download": {
+                            "url": (
+                                "http://download.geonames.org/export/dump/cities5000.zip"
+                            ),
+                            "format": "zip",
+                        },
                         "name": "geoname-city",
                         "path": "cities5000.txt",
                         "exceptions": ["stopwords.txt"],
@@ -46,7 +59,12 @@ class TestAnnotationConfiguration(unittest.TestCase):
                         "weight": 10,
                     },
                     {
-                        "format": {"type": "csv", "header": True, "sep": ",", "columns": [{"id": 2}]},
+                        "format": {
+                            "type": "csv",
+                            "header": True,
+                            "sep": ",",
+                            "columns": [{"id": 2}],
+                        },
                         "name": "fortune500-company",
                         "path": "fortune500.csv",
                         "exceptions": ["stopwords.txt"],
@@ -56,7 +74,12 @@ class TestAnnotationConfiguration(unittest.TestCase):
                         "weight": 10,
                     },
                     {
-                        "format": {"type": "csv", "header": True, "sep": ",", "columns": [{"id": 4}]},
+                        "format": {
+                            "type": "csv",
+                            "header": True,
+                            "sep": ",",
+                            "columns": [{"id": 4}],
+                        },
                         "name": "fortune500-industry",
                         "path": "fortune500.csv",
                         "exceptions": ["stopwords.txt"],
@@ -94,13 +117,19 @@ class TestAnnotationConfiguration(unittest.TestCase):
         annotation_config = AnnotationConfiguration()
         annotation_config.load(fh)
         fh.close()
-        self.assertEqual(annotation_config.configuration, TestAnnotationConfiguration.test_dict)
+        self.assertEqual(
+            annotation_config.configuration,
+            TestAnnotationConfiguration.test_dict,
+        )
 
     def test_loads(self):
         """Test load with dict function"""
         annotation_config = AnnotationConfiguration()
         annotation_config.loads(TestAnnotationConfiguration.test_dict)
-        self.assertEqual(annotation_config.configuration, TestAnnotationConfiguration.test_dict)
+        self.assertEqual(
+            annotation_config.configuration,
+            TestAnnotationConfiguration.test_dict,
+        )
 
     def test_clear(self):
         annotation_config = AnnotationConfiguration()

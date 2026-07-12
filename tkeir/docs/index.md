@@ -1,21 +1,30 @@
 # Introduction
 
-The tkeir tools allows to apply numerous NLP tools, search, index and classify. The tools cover
+T-KEIR **2.0.0** is a document analysis toolkit that enriches JSON documents through a unified
+in-process pipeline and optional Vespa-backed RAG.
 
-- advanced tokenizer configuration
-- named entities with validations rules
-- keywords extraction
-- SVO based on syntactic dependencies and rules
-- automatic summarization
-- sentiment analysis
-- unsupervised classification
-- relation clustering
-- question and answering
-- advanced query formulation and expansion based on clustering and text analysis
+## Features
 
-## Github
+- **Document conversion** — raw text, PDF, Office, HTML via MarkItDown
+- **Tokenizer** — configurable multi-word expressions per language
+- **Morphosyntax, NER, syntax** — spaCy-based tagging and knowledge-graph triples
+- **Keywords** — RAKE extraction
+- **Ontology export** — RDF graphs and HMI-friendly entity/keyword views
+- **Vespa RAG** — 2-level document/chunk indexing and FastAPI query API
 
-You can get the source code from the [T-Keir github repository](https://github.com/ThalesGroup/t-keir/) 
+## Documentation
+
+| Topic | Page |
+|---|---|
+| Quick start | [ready_to_run.md](ready_to_run.md) |
+| Dev container | [devcontainer.md](devcontainer.md) |
+| Pipeline tools | [tools/tools_overview.md](tools/tools_overview.md) |
+| Vespa RAG | [tools/vespa_rag.md](tools/vespa_rag.md) |
+| Python API examples | [tools/api_reference.md](tools/api_reference.md) |
+
+## Source
+
+[T-KEIR on GitHub](https://github.com/ThalesGroup/t-keir/)
 
 ## ChangeLog
 
@@ -25,4 +34,4 @@ You can get the source code from the [T-Keir github repository](https://github.c
 | 2021/12 | 1.0.1       | Eric Blaudez |
 | 2022/02 | 1.0.2       | Eric Blaudez |
 | 2022/09 | 1.0.3       | Eric Blaudez |
-
+| 2026/07 | 2.0.0       | Eric Blaudez |

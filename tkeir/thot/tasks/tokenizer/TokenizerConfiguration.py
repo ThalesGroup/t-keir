@@ -2,15 +2,13 @@
 """Tokenizer configuration
 Author : Eric Blaudez (Eric Blaudez)
 
-Copyright (c) 2022 THALES 
+Copyright (c) 2022 THALES
 All Rights Reserved.
 """
 
 import json
 
 from thot.core.LoggerConfiguration import LoggerConfiguration
-from thot.core.NetworkConfiguration import NetworkConfiguration
-from thot.core.RuntimeConfiguration import RuntimeConfiguration
 
 
 class TokenizerConfiguration:
@@ -52,9 +50,14 @@ class TokenizerConfiguration:
     """
 
     def __init__(self):
+        """Initialize the instance.
+
+        Example:
+            >>> cfg = TokenizerConfiguration()
+            >>> cfg.configuration
+            {}
+        """
         self.logger_config = LoggerConfiguration()
-        self.net_config = NetworkConfiguration()
-        self.runtime_config = RuntimeConfiguration()
         # Fill on tokenizer empty
         self.configuration = dict()
 
@@ -64,27 +67,47 @@ class TokenizerConfiguration:
         Args:
             config_f (str, optional): load configruation with file handler. Defaults to None.
             path (list,option): access to a part of the configuration
+
+                Example:
+                    >>> callable(TokenizerConfiguration().load)
+                    True
         """
         json_config = json.load(config_f)
         self.loads(json_config)
 
-    def loads(self, configuration: dict = None):
+    def loads(self, configuration: dict | None = None):
         """Load logger configuration from dict (json)
 
         Args:
             configuration (dict, optional): load logger configruation with dict. Defaults to None.
+
+                Example:
+                    >>> cfg = TokenizerConfiguration()
+                    >>> cfg.loads({'logger': {}, 'tokenizers': {'segmenters': [{'language': 'en'}]}})
+                    >>> 'segmenters' in cfg.configuration
+                    True
         """
+        if configuration is None:
+            raise ValueError("configuration is required")
         self.logger_config.loads(configuration, logger_name="tokenizers")
-        self.net_config.loads(configuration["tokenizers"])
-        self.runtime_config.loads(configuration["tokenizers"])
         if "segmenters" in configuration["tokenizers"]:
-            self.configuration["segmenters"] = configuration["tokenizers"]["segmenters"]
+            self.configuration["segmenters"] = configuration["tokenizers"][
+                "segmenters"
+            ]
         else:
-            raise ValueError("segmenters are mandatory in tokenizer configuration")
+            raise ValueError(
+                "segmenters are mandatory in tokenizer configuration"
+            )
 
     def clear(self):
-        """clear logger configuration"""
+        """clear logger configuration
+
+        Example:
+            >>> cfg = TokenizerConfiguration()
+            >>> cfg.loads({'logger': {}, 'tokenizers': {'segmenters': [{'language': 'en'}]}})
+            >>> cfg.clear()
+            >>> cfg.configuration
+            {}
+        """
         self.logger_config.clear()
-        self.net_config.clear()
-        self.runtime_config.clear()
         self.configuration = dict()

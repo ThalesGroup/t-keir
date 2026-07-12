@@ -93,10 +93,10 @@ check-docker:
 	}
 
 install: check-uv
-	$(UV) sync --directory $(TKEIR_DIR) --group dev
+	$(UV) sync --directory $(TKEIR_DIR) --group dev --python $(PYTHON)
 
 ci-deps: check-uv
-	$(UV) sync --directory $(TKEIR_DIR) --group dev --group models
+	$(UV) sync --directory $(TKEIR_DIR) --group dev --group models --python $(PYTHON)
 
 install-spacy-models: check-uv
 	@chmod +x "$(SCRIPTS_DIR)/install_spacy_models.sh"

@@ -13,7 +13,7 @@ RAG_HITS ?= 20
 
 # Sync T-KEIR Python dependencies (tools live under thot/tools/)
 sync:
-	cd $(TKEIR_DIR) && $(UV) sync --group dev
+	cd $(TKEIR_DIR) && $(UV) sync --group dev --python 3.11
 
 # Start Vespa container
 start:

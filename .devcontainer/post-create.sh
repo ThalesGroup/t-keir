@@ -15,6 +15,9 @@ fi
 
 bash .devcontainer/ensure-venv.sh
 
+# Pin Python 3.11 (spaCy/thinc have no wheels for 3.12+).
+uv python install 3.11 >/dev/null 2>&1 || true
+
 make install
 echo ""
 echo "Devcontainer ready — you are in /workspace"

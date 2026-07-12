@@ -4,7 +4,9 @@
 from thot.tools.search.vespa_client import (
     build_chunk_tensor,
     build_questions_tensor,
+    build_text_raw_contains_or_clause,
     chunk_embedding_text,
+    escape_yql_literal,
     sanitize_vespa_string,
     strip_search_vector_payload,
 )
@@ -50,3 +52,34 @@ def test_chunk_embedding_text_prefers_search_vector_payload():
     assert chunk_embedding_text(chunk) == (
         "before summary Core chunk text after summary"
     )
+
+
+def test_build_text_raw_contains_or_clause_single_term():
+    assert build_text_raw_contains_or_clause("Yang") == 'text_raw contains "Yang"'
+
+
+def test_build_text_raw_contains_or_clause_multiple_terms():
+    assert build_text_raw_contains_or_clause("Michael Chang") == (
+        '(text_raw contains "Michael" OR text_raw contains "Chang")'
+    )
+
+
+def test_build_text_raw_contains_or_clause_escapes_quotes():
+    assert build_text_raw_contains_or_clause('say "hi"') == (
+        '(text_raw contains "say" OR text_raw contains "\\"hi\\"")'
+    )
+
+
+def test_build_text_raw_contains_or_clause_empty():
+    assert build_text_raw_contains_or_clause("") is None
+    assert build_text_raw_contains_or_clause("   ") is None
+
+
+def test_build_text_raw_contains_or_clause_deduplicates_terms():
+    assert build_text_raw_contains_or_clause("the the song") == (
+        '(text_raw contains "the" OR text_raw contains "song")'
+    )
+
+
+def test_escape_yql_literal():
+    assert escape_yql_literal('say "hello"') == 'say \\"hello\\"'

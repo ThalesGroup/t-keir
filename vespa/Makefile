@@ -66,8 +66,9 @@ index: sync init
 	@echo "Indexing from $(INDEX_INPUT)"
 	cd $(TKEIR_DIR) && $(UV) run python -m thot.tools.search.index_documents -i "$(INDEX_INPUT)"
 
-# Run FastAPI RAG service
+# Run FastAPI RAG service (spaCy models required for morphosyntax query refinement)
 rag: sync
+	cd $(REPO_ROOT) && $(MAKE) install-spacy-models
 	cd $(TKEIR_DIR) && $(UV) run python -m thot.tools.search.app
 
 # Send a sample RAG query (override: make rag-query RAG_QUERY="your question")

@@ -20,7 +20,7 @@ import type {
 
 export function RagDashboard() {
   const [query, setQuery] = useState("");
-  const [language, setLanguage] = useState<Language>("fr");
+  const [language, setLanguage] = useState<Language>("en");
   const [hits, setHits] = useState(20);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

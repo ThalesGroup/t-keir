@@ -12,6 +12,8 @@ from urllib.parse import quote
 
 import httpx
 
+from thot.core.ThotLogger import ThotLogger
+
 _ILLEGAL_STRING_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _CONTEXT_BEFORE_TAG_RE = re.compile(r"\[CONTEXT_BEFORE\]\s*", re.IGNORECASE)
 _CONTEXT_AFTER_TAG_RE = re.compile(r"\s*\[CONTEXT_AFTER\]\s*", re.IGNORECASE)
@@ -214,6 +216,43 @@ def escape_yql_literal(value: str) -> str:
         True
     """
     return value.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def build_text_raw_contains_or_clause(query_text: str) -> str | None:
+    """Build a YQL ``text_raw contains`` clause with OR between query terms.
+
+    Vespa ``contains`` on a multi-word string matches all terms (AND). Splitting
+    into separate ``contains`` clauses joined by OR matches any term.
+
+    Args:
+        query_text: Raw user query.
+
+    Returns:
+        YQL fragment, or ``None`` when there are no searchable terms.
+
+    Example:
+        >>> from thot.tools.search.vespa_client import build_text_raw_contains_or_clause
+        >>> build_text_raw_contains_or_clause("Michael Chang")
+        '(text_raw contains "Michael" OR text_raw contains "Chang")'
+    """
+    terms: list[str] = []
+    seen: set[str] = set()
+    for term in _WHITESPACE_RE.split((query_text or "").strip()):
+        if not term:
+            continue
+        key = term.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        terms.append(term)
+    if not terms:
+        return None
+    if len(terms) == 1:
+        return f'text_raw contains "{escape_yql_literal(terms[0])}"'
+    clauses = [
+        f'text_raw contains "{escape_yql_literal(term)}"' for term in terms
+    ]
+    return "(" + " OR ".join(clauses) + ")"
 
 
 @dataclass(frozen=True)
@@ -527,13 +566,14 @@ class VespaClient:
             >>> from thot.tools.search.vespa_client import VespaClient
             >>> asyncio.run(VespaClient().hybrid_search("hello", [0.0]*384, [0.0]*384))  # doctest: +SKIP
         """
-        escaped_query = escape_yql_literal(query_text)
-        yql = (
-            "select * from chunk where "
-            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(chunk_embedding, q_chunk_emb)) or '
-            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(questions_embeddings, q_question_emb)) or '
-            f'text_raw contains "{escaped_query}"'
-        )
+        text_clause = build_text_raw_contains_or_clause(query_text)
+        yql_parts = [
+            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(chunk_embedding, q_chunk_emb))',
+            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(questions_embeddings, q_question_emb))',
+        ]
+        if text_clause:
+            yql_parts.append(text_clause)
+        yql = "select * from chunk where " + " or ".join(yql_parts)
         payload = {
             "yql": yql,
             "hits": hits,
@@ -546,6 +586,9 @@ class VespaClient:
                 : self._config.embedding_dim
             ],
         }
+        ThotLogger.info(
+            f"Vespa hybrid search query={query_text!r} yql={yql}"
+        )
         response = await self._client.post(
             self._config.search_api_url,
             json=payload,

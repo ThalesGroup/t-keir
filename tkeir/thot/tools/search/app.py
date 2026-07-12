@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -14,7 +15,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from thot import __version__ as TKEIR_VERSION
-from thot.core.TkeirPaths import rag_prompts_path
+from thot.core.TkeirPaths import configs_dir, rag_prompts_path
+from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
+from thot.tasks.pipeline.PipelineRunner import PipelineRunner
 from thot.tools.search.llm_wrapper import UnifiedLLMWrapper
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
@@ -23,6 +26,7 @@ from thot.tools.search.ontology_utils import (
     summarize_graph_for_prompt,
     truncate_for_prompt,
 )
+from thot.tools.search.query_refiner import refine_search_query_text
 from thot.tools.search.rag_config import RagConfig, load_rag_config
 from thot.tools.search.rag_report import (
     assemble_report_markdown,
@@ -91,6 +95,7 @@ class AppState:
         """
         self.llm: UnifiedLLMWrapper | None = None
         self.vespa: VespaClient | None = None
+        self.pipeline_runner: PipelineRunner | None = None
         self.prompts: dict[str, Any] = {}
         self.rag_config: RagConfig = load_rag_config()
 
@@ -330,6 +335,23 @@ def _parse_hits(
     return parsed
 
 
+def _load_pipeline_runner() -> PipelineRunner:
+    """Load the bundled pipeline configuration for query refinement.
+
+    Example:
+        >>> from thot.tools.search.app import _load_pipeline_runner
+        >>> isinstance(_load_pipeline_runner(), PipelineRunner)
+        True
+    """
+    config = PipelineConfiguration()
+    with open(
+        os.path.join(configs_dir(), "pipeline.json"),
+        encoding="utf-8",
+    ) as handle:
+        config.load(handle)
+    return PipelineRunner(config)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """FastAPI lifespan hook that wires LLM and Vespa clients.
@@ -343,6 +365,7 @@ async def lifespan(app: FastAPI):
     state.prompts = _load_prompts()
     state.llm = UnifiedLLMWrapper()
     state.vespa = VespaClient()
+    state.pipeline_runner = _load_pipeline_runner()
     app.state.rag = state
     try:
         yield
@@ -404,8 +427,17 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
     query_text = request.query.strip()
     try:
         query_embedding = await state.llm.embed(query_text)
+        if state.pipeline_runner is None:
+            search_query_text = query_text
+        else:
+            search_query_text = await asyncio.to_thread(
+                refine_search_query_text,
+                state.pipeline_runner,
+                query_text,
+                language=request.language,
+            )
         search_response = await state.vespa.hybrid_search(
-            query_text,
+            search_query_text,
             query_embedding,
             query_embedding,
             hits=request.hits,

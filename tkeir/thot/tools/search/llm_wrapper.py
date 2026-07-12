@@ -206,6 +206,32 @@ class UnifiedLLMWrapper:
         """
         await self.aclose()
 
+    async def verify_provider(self) -> None:
+        """Fail fast when the configured embedding/LLM backend is unreachable.
+
+        Raises:
+            SystemExit: When the provider health check fails.
+
+        Example:
+            >>> import asyncio
+            >>> from thot.tools.search.llm_wrapper import UnifiedLLMWrapper
+            >>> asyncio.run(UnifiedLLMWrapper().verify_provider())  # doctest: +SKIP
+        """
+        if self._config.provider is not Provider.OLLAMA:
+            return
+        url = self._config.ollama_base_url
+        try:
+            response = await self._client.get(f"{url}/api/tags")
+            response.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise SystemExit(
+                f"Cannot reach Ollama at {url} ({exc}). "
+                "On the host: run `ollama serve` and `ollama pull bge-m3`. "
+                "Inside the devcontainer use "
+                "OLLAMA_BASE_URL=http://host.docker.internal:11434 "
+                "(default in .devcontainer/docker-compose.yml)."
+            ) from exc
+
     async def embed(self, text: str) -> list[float]:
         """Embed a single text string.
 

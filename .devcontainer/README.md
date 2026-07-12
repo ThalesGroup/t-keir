@@ -26,7 +26,9 @@ bash .devcontainer/enter-devcontainer.sh -- make setup
 1. Install [Docker Desktop](https://docs.docker.com/get-docker/) and start it.
 2. Install the **Dev Containers** extension.
 3. Open the repository root (`t-keir/`).
-4. Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`) → **`Dev Containers: Reopen in Container`**.
+4. Command Palette → **`Dev Containers: Reopen in Container`** (or **Rebuild** after Dockerfile/feature changes).
+
+Includes Python 3.11, Node.js 22 (npm), Tesseract, and Docker socket access.
 
 ## Other host scripts
 

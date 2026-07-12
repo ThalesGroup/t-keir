@@ -12,8 +12,13 @@ services:
       DOCKER_BUILDKIT: "1"
       TRANSFORMERS_CACHE: /workspace/.cache/models
       UV_LINK_MODE: copy
+      # Host services (Ollama, Vespa published ports) — localhost is the container, not the Mac/VM host.
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      VESPA_URL: http://host.docker.internal:8080
+      VESPA_CONFIG_URL: http://host.docker.internal:19071
     command: sleep infinity
-    network_mode: host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     cap_add:
       - SYS_PTRACE
     security_opt:

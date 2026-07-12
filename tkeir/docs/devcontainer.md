@@ -106,6 +106,7 @@ Rebuild from the editor: **Command Palette** → **`Dev Containers: Rebuild Cont
 | Component | Location / notes |
 |---|---|
 | Python | 3.11 via devcontainer feature |
+| Node.js / npm | 22 via devcontainer feature (for `tkeir-hmi/`) |
 | `uv` | Package manager for `tkeir/` |
 | Tesseract | `eng` + `fra` (PDF OCR in pipeline) |
 | Docker CLI | Host socket mounted for Vespa containers |
@@ -126,7 +127,7 @@ tkeir-pipeline   # runs uv run tkeir-pipeline from tkeir/
 | 8080 | Vespa search API |
 | 8090 | FastAPI RAG API |
 | 19071 | Vespa config server |
-| 3000 | tkeir-hmi (`cd tkeir-hmi && npm run dev` on host or in container) |
+| 3000 | tkeir-hmi (`cd tkeir-hmi && npm install && npm run dev`) |
 
 ## Typical workflow inside the container
 
@@ -156,21 +157,38 @@ PDFs and `tests/indexing/output` pipeline JSON).
 
 ## Environment variables
 
-| Variable | Default in container | Purpose |
+| Variable | Default in devcontainer | Purpose |
 |---|---|---|
 | `TRANSFORMERS_CACHE` | `/workspace/.cache/models` | Hugging Face / model cache |
-| `PROVIDER` | `ollama` (host) | LLM provider for RAG indexing |
-| `VESPA_URL` | `http://localhost:8080` | Vespa search endpoint |
+| `PROVIDER` | `ollama` | LLM/embeddings provider for indexing and RAG |
+| `OLLAMA_BASE_URL` | `http://host.docker.internal:11434` | Ollama on the **host** (not container `localhost`) |
+| `VESPA_URL` | `http://host.docker.internal:8080` | Vespa document/search API (ports published by Docker on host) |
+| `VESPA_CONFIG_URL` | `http://host.docker.internal:19071` | Vespa config server |
 
-Ollama must run on the **host** (or another reachable endpoint) when using the default
-`PROVIDER=ollama` for indexing and RAG.
+Ollama must run on the **host** when using `PROVIDER=ollama`:
+
+```bash
+ollama serve
+ollama pull bge-m3
+ollama pull mistral-nemo
+```
+
+Inside the devcontainer, `localhost:11434` points at the container itself — use
+`host.docker.internal` (set automatically in `.devcontainer/docker-compose.yml`).
+After changing compose env, **rebuild the devcontainer** or export the variables manually.
 
 ## Troubleshooting
 
 **Vespa bootstrap timeout** — ensure Docker is running on the host and port 8080 is free.
 
-**Ollama connection errors** — start Ollama on the host (`ollama serve`) and pull models
-(`bge-m3`, `mistral-nemo`).
+**Ollama connection errors (`httpx.ConnectError` on `make index`)** — Ollama runs on the
+host, not inside the devcontainer. Start it on the host (`ollama serve`) and pull
+`bge-m3`. Ensure `OLLAMA_BASE_URL=http://host.docker.internal:11434` (default after
+devcontainer rebuild). Test from inside the container:
+
+```bash
+curl -s "$OLLAMA_BASE_URL/api/tags" | head
+```
 
 **Permission errors on Docker socket** — add your host user to the `docker` group or run
 Docker Desktop.

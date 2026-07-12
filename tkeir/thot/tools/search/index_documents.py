@@ -238,10 +238,12 @@ async def _async_main(args: argparse.Namespace) -> int:
 
     async with UnifiedLLMWrapper() as llm, VespaClient() as vespa:
         LOGGER.info(
-            "Using provider=%s embedding_model=%s",
+            "Using provider=%s embedding_model=%s ollama_base_url=%s",
             llm._config.provider.value,
             llm._config.embedding_model,
+            llm._config.ollama_base_url,
         )
+        await llm.verify_provider()
         if not await vespa.health():
             raise SystemExit(
                 "Vespa is not ready (config server, deployed application, "
@@ -262,7 +264,8 @@ async def _async_main(args: argparse.Namespace) -> int:
         raise SystemExit(
             f"Indexing failed: 0/{len(pipeline_paths)} documents indexed. "
             "Check Vespa logs (`cd vespa && make logs`) and the embedding "
-            "provider (default: Ollama with bge-m3)."
+            "provider (default: Ollama with bge-m3 at "
+            "OLLAMA_BASE_URL, e.g. http://host.docker.internal:11434 in devcontainer)."
         )
     return 0
 

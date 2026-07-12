@@ -19,11 +19,16 @@
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.11",
       "installTools": true
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22",
+      "nodeGypDependencies": true
     }
   },
 
-  "forwardPorts": [8000, 8080, 8090, 19071],
+  "forwardPorts": [3000, 8000, 8080, 8090, 19071],
   "portsAttributes": {
+    "3000": { "label": "tkeir-hmi", "onAutoForward": "silent" },
     "8000": { "label": "MkDocs", "onAutoForward": "silent" },
     "8080": { "label": "Vespa search", "onAutoForward": "silent" },
     "8090": { "label": "RAG API", "onAutoForward": "silent" },

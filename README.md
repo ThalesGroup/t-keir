@@ -1,34 +1,281 @@
-# Theresis NLP Tools
+# T-KEIR
 
-Set of tool for NLP purposes, developped by Theresis.
-The T-KEIR tools allows to apply numerous NLP tools, search, index and classify. The tools cover
+**T-KEIR 2.0.0** is a document analysis and retrieval toolkit by Theresis / Thales.
+It runs a unified NLP pipeline on documents, indexes them in [Vespa](https://vespa.ai/),
+and exposes hybrid search plus RAG through a FastAPI backend and a Next.js HMI.
 
+Full documentation: [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io/t-keir)
 
-  * advanced tokenizer configuration
-  * named entities with validations rules
-  * keywords extraction
-  * SVO based on syntactic dependencies and rules
-  * automatic summarization
-  * sentiment analysis
-  * unsupervised classification
-  * relation clustering
-  * question and answering
-  * advanced query formulation and expansion based on clustering and text analysis
+## What it does
 
-Documentation is available directly on [Thalesgroup.github.io](https://thalesgroup.github.io/t-keir)
+- **Document conversion** — plain text, PDF, Office, HTML, email (MarkItDown + optional OCR)
+- **NLP pipeline** — language detection, tokenizer, morphosyntax, NER, syntax, keywords
+- **Ontology export** — entity/keyword graphs for RAG and the HMI
+- **Vespa RAG** — two-level document/chunk indexing, hybrid retrieval, LLM answers
+- **Web UI** — search, results, ontology explorer (`tkeir-hmi/`)
 
 ## Repository layout
 
 | Path | Role |
 |---|---|
-| `tkeir/thot/` | Core NLP pipeline tasks and runtime |
-| `tkeir/thot/tools/` | CLI tools: pipeline, Vespa search/RAG, annotation resources |
-| `tkeir/configs/` | Bundled configuration (pipeline, taggers, `rag-prompts.yaml`) |
-| `vespa/` | Vespa Docker deployment (schemas, shell scripts); Makefile calls `thot.tools.search` |
-| `tkeir-hmi/` | Next.js Human-Machine Interface for Search & RAG |
+| `tkeir/thot/` | Core pipeline tasks and runtime |
+| `tkeir/thot/tools/` | CLI: `tkeir-pipeline`, Vespa indexer, RAG API |
+| `tkeir/configs/` | Pipeline, taggers, converter OCR, RAG prompts |
+| `vespa/` | Vespa Docker deployment, Makefile for bootstrap / index / RAG |
+| `tkeir-hmi/` | Next.js Human-Machine Interface |
+| `.devcontainer/` | Reproducible dev environment (Python 3.11, uv, Tesseract, Docker socket) |
 
-Quick start: `make setup` then `make quickstart`. Vespa RAG: `cd vespa && make bootstrap && make index && make rag`. Web UI: `cd tkeir-hmi && npm install && npm run dev` (see [tkeir/docs/hmi.md](tkeir/docs/hmi.md)).
+## Quick start
 
-**Dev container (recommended for development):** `make devcontainer` or
-`bash .devcontainer/enter-devcontainer.sh` from the host; or open the repo in Cursor/VS Code →
-**Dev Containers: Reopen in Container**. See [tkeir/docs/devcontainer.md](tkeir/docs/devcontainer.md).
+### 1. Dev container (recommended)
+
+Requires [Docker Desktop](https://docs.docker.com/get-docker/) running on the host.
+
+**Terminal (no IDE):**
+
+```bash
+make devcontainer
+# or: bash .devcontainer/enter-devcontainer.sh
+```
+
+**Cursor / VS Code:** open the repo root → Command Palette → **Dev Containers: Reopen in Container**.
+
+Inside the container (`/workspace`):
+
+```bash
+make setup          # Python deps, spaCy models, Tesseract check
+```
+
+If `uv sync` fails because of a host-built `tkeir/.venv`, run
+`bash .devcontainer/ensure-venv.sh && make install` inside the container, or
+`rm -rf tkeir/.venv` on the host and retry.
+
+Details: [tkeir/docs/devcontainer.md](tkeir/docs/devcontainer.md)
+
+### 2. Pipeline demo (local, no Vespa)
+
+```bash
+make setup
+make quickstart
+```
+
+Runs `tkeir-pipeline` on bundled fixtures under `tkeir/tests/fixtures/` and writes
+results to `output/quickstart/`.
+
+### 3. Vespa stack — bootstrap, index, RAG
+
+Ollama must be running on the **host** when using the default `PROVIDER=ollama`
+(`ollama serve`, models `bge-m3` and `mistral-nemo`).
+
+```bash
+cd vespa
+
+make sync              # uv sync in tkeir/
+make bootstrap         # start Vespa + deploy schemas
+
+# Build pipeline JSON from example PDFs (if output/ is empty)
+make index-fixtures    # tkeir/tests/indexing/input → output/
+
+# Index into Vespa (embeddings + chunking)
+export PROVIDER=ollama
+export EMBEDDING_MODEL=bge-m3
+export LLM_MODEL=mistral-nemo
+make index
+
+# Start FastAPI RAG API on :8090
+make rag
+
+# Sample query
+make rag-query RAG_QUERY="Who is Rob Brown?"
+```
+
+Indexing reads `tkeir/tests/indexing/output/*.pipeline.json` by default.
+Override with `INDEX_INPUT=/path/to/json/dir make index`.
+
+Details: [vespa/README.md](vespa/README.md), [tkeir/docs/tools/vespa_rag.md](tkeir/docs/tools/vespa_rag.md)
+
+### 4. Web UI (HMI)
+
+With Vespa indexed and `make rag` running:
+
+```bash
+cd tkeir-hmi
+npm install
+cp .env.local.example .env.local   # optional
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). The UI proxies `/api/*` to the
+RAG API on port 8090.
+
+Details: [tkeir/docs/hmi.md](tkeir/docs/hmi.md)
+
+## Document converter
+
+The **converter** is the first pipeline step. It turns files into T-KEIR JSON
+(`title`, `content`, metadata) for downstream tagging and indexing.
+
+### Supported input types
+
+Conversion uses [Microsoft MarkItDown](https://github.com/microsoft/markitdown).
+Typical formats:
+
+| Type | Examples |
+|---|---|
+| Plain text | `.txt`, `.md`, `.csv` (as text) |
+| PDF | `.pdf` |
+| Office | `.docx`, `.pptx`, `.xlsx` |
+| Web / markup | `.html`, `.htm` |
+| Email | `.eml`, mail folders |
+| Existing JSON | T-KEIR documents (`tkeir` datatype — pass-through) |
+
+Use **`-t auto`** (default) so the pipeline detects format from extension and magic
+bytes. Use **`-t raw`** only for plain UTF-8 text — never on PDFs or binary files
+(that would decode bytes as garbage text).
+
+```bash
+tkeir-pipeline -c tkeir/configs/pipeline.json \
+  -i path/to/docs -o output/ -t auto
+```
+
+Or via Makefile:
+
+```bash
+make pipeline PIPELINE_INPUT=path/to/docs PIPELINE_OUTPUT=output/
+```
+
+### PDF text layer and OCR
+
+MarkItDown extracts the PDF **text layer** by default. Text trapped in images
+(scans, diagrams, screenshots) is recovered when OCR is enabled in
+`tkeir/configs/converter.json`:
+
+```json
+"ocr": {
+  "enabled": true,
+  "mode": "tesseract",
+  "min-image-pixels": 10000,
+  "min-page-text-chars": 40,
+  "render-dpi": 200
+}
+```
+
+| Mode | Requirement |
+|---|---|
+| `tesseract` | [Tesseract](https://github.com/tesseract-ocr/tesseract) on `PATH` (`eng` + `fra` in devcontainer) |
+| `llm` | `"mode": "llm"` + `OPENAI_API_KEY` (or `ocr.llm-api-key`) for vision-based extraction |
+
+The devcontainer and `make setup` install Tesseract for PDF OCR in the pipeline.
+
+Details: [tkeir/docs/tools/converter.md](tkeir/docs/tools/converter.md)
+
+## Makefile reference
+
+Run `make help` at the repository root for a short list. Two Makefiles drive most workflows:
+the **root** `Makefile` (Python pipeline, tests, docs, devcontainer) and **`vespa/Makefile`**
+(Vespa Docker, indexing, RAG API).
+
+### Root `Makefile` — setup & pipeline
+
+| Target | Description |
+|---|---|
+| `make help` | List common targets and variables |
+| `make setup` | Full local setup: `install` + spaCy models + Tesseract + `init-models` |
+| `make install` | `uv sync` in `tkeir/` (dev dependency group) |
+| `make install-spacy-models` | Download spaCy language models used by the pipeline |
+| `make install-tesseract` | Install Tesseract OCR (PDF image text) |
+| `make init-models` | Build `tkeir_mwe.pkl` from annotation resources (optional MWE) |
+| `make pipeline` | Run `tkeir-pipeline` on `PIPELINE_INPUT` → `PIPELINE_OUTPUT` |
+| `make quickstart` | Pipeline demo on bundled fixtures → `output/quickstart/` |
+| `make devcontainer` | Start devcontainer and open a shell (`/workspace`) |
+| `make build` | Build Python wheel → `dist/` |
+| `make install-workspace` | Install wheel into `WORKSPACE` via `install.sh` |
+| `make clean` | Remove build artifacts, caches, coverage reports |
+
+**Pipeline variables** (override on the command line):
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PIPELINE_INPUT` | `tkeir/tests/fixtures/test-raw/raw` | Input file or directory |
+| `PIPELINE_OUTPUT` | `/tmp/tkeir-pipeline-out` | Output directory for JSON |
+| `PIPELINE_TYPE` | `auto` | Input type: `auto`, `raw`, `pdf`, … |
+| `PIPELINE_CONFIG` | `tkeir/configs/pipeline.json` | Pipeline configuration |
+| `TRANSFORMERS_CACHE` | `.cache/models` | Hugging Face / model cache |
+
+Example:
+
+```bash
+make pipeline \
+  PIPELINE_INPUT=docs/ \
+  PIPELINE_OUTPUT=output/my-run/ \
+  PIPELINE_TYPE=auto
+```
+
+### Root `Makefile` — quality & docs
+
+| Target | Description |
+|---|---|
+| `make test` | Unit + functional test suites |
+| `make test-unit` | Unit tests only (`tkeir/tests/unittests/`) |
+| `make test-functional` | Functional tests only |
+| `make coverage` | Coverage run (90% fail-under) |
+| `make lint` | `black` + `isort` checks |
+| `make format` | Apply `black` + `isort` |
+| `make typecheck` | `mypy` on `thot/` and `tests/` |
+| `make liccheck` | Verify dependency licenses |
+| `make complexity` | `radon` + `xenon` complexity gates |
+| `make pip-audit` | Scan dependencies for known CVEs |
+| `make bom` | CycloneDX SBOM + AIBOM → `reports/bom/` |
+| `make trivy` | Filesystem/config security scan (Docker) |
+| `make owasp-dependency-check` | OWASP Dependency-Check (Docker) |
+| `make ci` | All quality gates (lint, types, tests, coverage, security, BOM) |
+| `make docs` | MkDocs dev server → http://127.0.0.1:8000 |
+| `make docs-build` | Static site → `tkeir/site/` |
+
+### `vespa/Makefile` — search & RAG
+
+Run from `cd vespa`:
+
+| Target | Description |
+|---|---|
+| `make sync` | `uv sync` in `tkeir/` |
+| `make start` | Start Vespa Docker container |
+| `make init` | Deploy schemas (Vespa must already be running) |
+| `make bootstrap` | `start` + deploy schemas |
+| `make check` | Vespa health check |
+| `make test` | Vespa query smoke test |
+| `make test-py` | Python unit tests for search tools |
+| `make index-fixtures` | Pipeline on `tkeir/tests/indexing/input/` → `output/` |
+| `make index` | Embed and index `*.pipeline.json` into Vespa |
+| `make rag` | Start FastAPI RAG API on port **8090** |
+| `make rag-query` | `curl` sample RAG request |
+| `make clean-db` | Wipe Vespa data volume (then re-run `bootstrap`) |
+
+**Vespa variables:**
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `INDEX_INPUT` | `tkeir/tests/indexing/output` | Directory of `*.pipeline.json` to index |
+| `PROVIDER` | `ollama` | LLM/embeddings provider (`openai`, `ollama`, `vllm`) |
+| `EMBEDDING_MODEL` | provider-specific | Embedding model (e.g. `bge-m3`) |
+| `LLM_MODEL` | provider-specific | Generation model (e.g. `mistral-nemo`) |
+| `RAG_QUERY` | `Who is Rob Brown?` | Query for `make rag-query` |
+| `RAG_URL` | `http://localhost:8090` | RAG API base URL |
+
+### Typical command chains
+
+```bash
+# Local pipeline only
+make setup && make quickstart
+
+# Full RAG stack (from repo root)
+make setup
+cd vespa && make bootstrap && make index-fixtures && make index && make rag
+
+# CI before pushing
+make ci
+```
+
+## License
+
+See repository license files.

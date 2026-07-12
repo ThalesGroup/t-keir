@@ -55,7 +55,9 @@ def test_chunk_embedding_text_prefers_search_vector_payload():
 
 
 def test_build_text_raw_contains_or_clause_single_term():
-    assert build_text_raw_contains_or_clause("Yang") == 'text_raw contains "Yang"'
+    assert (
+        build_text_raw_contains_or_clause("Yang") == 'text_raw contains "Yang"'
+    )
 
 
 def test_build_text_raw_contains_or_clause_multiple_terms():

@@ -113,7 +113,5 @@ def refine_search_query_text(
         return query_text
 
     refined = " ".join(tokens)
-    ThotLogger.info(
-        f"RAG search query refined: {query_text!r} -> {refined!r}"
-    )
+    ThotLogger.info(f"RAG search query refined: {query_text!r} -> {refined!r}")
     return refined

@@ -586,9 +586,7 @@ class VespaClient:
                 : self._config.embedding_dim
             ],
         }
-        ThotLogger.info(
-            f"Vespa hybrid search query={query_text!r} yql={yql}"
-        )
+        ThotLogger.info(f"Vespa hybrid search query={query_text!r} yql={yql}")
         response = await self._client.post(
             self._config.search_api_url,
             json=payload,

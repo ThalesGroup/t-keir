@@ -169,6 +169,7 @@ export function enrichQueryResponse(
   report_markdown: string;
   highlight_entities: string[];
   highlight_keywords: string[];
+  highlight_query_terms: string[];
 } {
   const highlightEntities =
     raw.highlight_entities && raw.highlight_entities.length > 0
@@ -178,6 +179,7 @@ export function enrichQueryResponse(
     raw.highlight_keywords && raw.highlight_keywords.length > 0
       ? raw.highlight_keywords
       : extractHighlightKeywords(raw.ontology);
+  const highlightQueryTerms = raw.highlight_query_terms ?? [];
   const reportMarkdown =
     raw.report_markdown?.trim() ||
     buildClientReportMarkdown(raw, query, language);
@@ -186,6 +188,7 @@ export function enrichQueryResponse(
     ...raw,
     highlight_entities: highlightEntities,
     highlight_keywords: highlightKeywords,
+    highlight_query_terms: highlightQueryTerms,
     report_markdown: reportMarkdown,
   };
 }

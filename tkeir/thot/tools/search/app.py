@@ -20,21 +20,25 @@ from thot.core.ThotLogger import ThotLogger
 from thot.core.TkeirPaths import configs_dir, rag_prompts_path
 from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
-from thot.tools.search.llm_wrapper import UnifiedLLMWrapper
+from thot.core.LlmWrapper import UnifiedLLMWrapper
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
     extract_focus_passages,
-    merge_turtle_graphs,
+    merge_rdf_graphs,
+    prioritize_chunks_by_query_match,
     summarize_graph_for_prompt,
     truncate_for_prompt,
 )
 from thot.tools.search.query_refiner import refine_search_query_text
 from thot.tools.search.rag_config import RagConfig, load_rag_config
 from thot.tools.search.rag_report import (
+    apply_chunk_evidence_fallback,
     assemble_report_markdown,
     build_fallback_detailed_report,
     extract_highlight_labels,
+    is_unavailable_short_answer,
     parse_structured_generation,
+    query_highlight_terms,
 )
 from thot.tools.search.vespa_client import VespaClient
 
@@ -74,6 +78,7 @@ class SemanticKeyword(BaseModel):
 class FusedOntology(BaseModel):
     entities: list[SemanticEntity]
     keywords: list[SemanticKeyword]
+    json_ld: str = ""
 
 
 class QueryResponse(BaseModel):
@@ -81,6 +86,9 @@ class QueryResponse(BaseModel):
     report_markdown: str
     highlight_entities: list[str] = Field(default_factory=list)
     highlight_keywords: list[str] = Field(default_factory=list)
+    highlight_query_terms: list[str] = Field(default_factory=list)
+    used_chunk_evidence: bool = False
+    answer_unavailable: bool = False
     chunks: list[RetrievedChunk]
     ontology: FusedOntology
     vespa_hits: int
@@ -267,14 +275,17 @@ def _format_chunk_excerpts(
 
 
 def _extract_parent_rdf(parent_fields: dict[str, Any]) -> str:
-    """Extract serialized RDF graph text from parent Vespa fields.
+    """Extract JSON-LD graph text from parent Vespa fields.
 
     Example:
-        >>> _extract_parent_rdf({"rdf_graph_serialized": "@prefix ex: <> ."})
-        '@prefix ex: <> .'
+        >>> _extract_parent_rdf({"json_ld": '[{"@id": "http://example.org/a"}]'})
+        '[{"@id": "http://example.org/a"}]'
     """
-    value = parent_fields.get("rdf_graph_serialized")
-    return value if isinstance(value, str) else ""
+    for key in ("json_ld", "rdf_graph_serialized"):
+        value = parent_fields.get(key)
+        if isinstance(value, str) and value.strip():
+            return value
+    return ""
 
 
 async def _enrich_hits(
@@ -568,8 +579,13 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         chunks=len(retrieved_chunks),
     )
 
+    retrieved_chunks = prioritize_chunks_by_query_match(
+        retrieved_chunks,
+        query_text,
+    )
+
     step_started = time.perf_counter()
-    fused_graph = merge_turtle_graphs(rdf_payloads)
+    fused_graph = merge_rdf_graphs(rdf_payloads)
     fused_summary = summarize_graph_for_prompt(
         fused_graph,
         query_text,
@@ -603,6 +619,7 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
 
     if not retrieved_chunks:
         entity_labels, keyword_labels = extract_highlight_labels(ontology)
+        query_term_labels = query_highlight_terms(query_text, retrieved_chunks)
         report_markdown = assemble_report_markdown(
             query=query_text,
             language=request.language,
@@ -629,6 +646,9 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
             report_markdown=report_markdown,
             highlight_entities=entity_labels,
             highlight_keywords=keyword_labels,
+            highlight_query_terms=query_term_labels,
+            used_chunk_evidence=False,
+            answer_unavailable=True,
             chunks=retrieved_chunks,
             ontology=ontology,
             vespa_hits=len(parsed_hits),
@@ -658,6 +678,14 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         raw_generation,
         unavailable_answer=unavailable_answer,
     )
+    used_chunk_evidence = False
+    short_answer, detailed_report, used_chunk_evidence = apply_chunk_evidence_fallback(
+        query_text=query_text,
+        short_answer=short_answer,
+        detailed_report=detailed_report,
+        chunks=retrieved_chunks,
+        unavailable_answer=unavailable_answer,
+    )
     if not detailed_report.strip():
         detailed_report = build_fallback_detailed_report(
             focus_passages=focus_passages,
@@ -665,6 +693,7 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         )
 
     entity_labels, keyword_labels = extract_highlight_labels(ontology)
+    query_term_labels = query_highlight_terms(query_text, retrieved_chunks)
     report_markdown = assemble_report_markdown(
         query=query_text,
         language=request.language,
@@ -688,6 +717,13 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         report_markdown=report_markdown,
         highlight_entities=entity_labels,
         highlight_keywords=keyword_labels,
+        highlight_query_terms=query_term_labels,
+        used_chunk_evidence=used_chunk_evidence,
+        answer_unavailable=is_unavailable_short_answer(
+            short_answer,
+            unavailable_answer,
+        )
+        and not used_chunk_evidence,
         chunks=retrieved_chunks,
         ontology=ontology,
         vespa_hits=len(parsed_hits),

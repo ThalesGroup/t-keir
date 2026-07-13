@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import { FileText, Hash, Layers } from "lucide-react";
 
 import {
@@ -26,21 +27,40 @@ interface DocumentResultsProps {
   activeChunkIds: Set<string> | null;
   highlightEntities?: string[];
   highlightKeywords?: string[];
+  highlightQueryTerms?: string[];
 }
 
-function ChunkBlock({
+const ChunkBlock = memo(function ChunkBlock({
   chunk,
   highlighted,
   dimmed,
   highlightEntities,
   highlightKeywords,
+  highlightQueryTerms,
 }: {
   chunk: RetrievedChunk;
   highlighted: boolean;
   dimmed: boolean;
   highlightEntities: string[];
   highlightKeywords: string[];
+  highlightQueryTerms: string[];
 }) {
+  const renderedText = useMemo(
+    () =>
+      highlightText(
+        chunk.text_raw,
+        highlightEntities,
+        highlightKeywords,
+        highlightQueryTerms,
+      ),
+    [
+      chunk.text_raw,
+      highlightEntities,
+      highlightKeywords,
+      highlightQueryTerms,
+    ],
+  );
+
   return (
     <div
       id={`chunk-${chunk.chunk_id}`}
@@ -63,27 +83,33 @@ function ChunkBlock({
         )}
       </div>
       <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-        {highlightText(chunk.text_raw, highlightEntities, highlightKeywords)}
+        {renderedText}
       </p>
     </div>
   );
-}
+});
 
-function DocumentCard({
+const DocumentCard = memo(function DocumentCard({
   group,
   activeChunkIds,
-  defaultOpen,
+  defaultOpenChunkId,
   highlightEntities,
   highlightKeywords,
+  highlightQueryTerms,
 }: {
   group: DocumentGroup;
   activeChunkIds: Set<string> | null;
-  defaultOpen: boolean;
+  defaultOpenChunkId: string | null;
   highlightEntities: string[];
   highlightKeywords: string[];
+  highlightQueryTerms: string[];
 }) {
-  const visibleChunks = group.chunks.filter((chunk) =>
-    chunkMatchesFilter(chunk.chunk_id, activeChunkIds),
+  const visibleChunks = useMemo(
+    () =>
+      group.chunks.filter((chunk) =>
+        chunkMatchesFilter(chunk.chunk_id, activeChunkIds),
+      ),
+    [group.chunks, activeChunkIds],
   );
 
   if (activeChunkIds !== null && visibleChunks.length === 0) {
@@ -115,7 +141,9 @@ function DocumentCard({
       <CardContent>
         <Accordion
           type="multiple"
-          defaultValue={defaultOpen ? group.chunks.map((c) => c.chunk_id) : []}
+          defaultValue={
+            defaultOpenChunkId ? [defaultOpenChunkId] : []
+          }
           className="w-full"
         >
           {group.chunks.map((chunk) => {
@@ -145,6 +173,7 @@ function DocumentCard({
                     dimmed={dimmed}
                     highlightEntities={highlightEntities}
                     highlightKeywords={highlightKeywords}
+                    highlightQueryTerms={highlightQueryTerms}
                   />
                 </AccordionContent>
               </AccordionItem>
@@ -154,7 +183,7 @@ function DocumentCard({
       </CardContent>
     </Card>
   );
-}
+});
 
 function LoadingSkeleton() {
   return (
@@ -175,13 +204,21 @@ function LoadingSkeleton() {
   );
 }
 
-export function DocumentResults({
+export const DocumentResults = memo(function DocumentResults({
   chunks,
   loading,
   activeChunkIds,
   highlightEntities = [],
   highlightKeywords = [],
+  highlightQueryTerms = [],
 }: DocumentResultsProps) {
+  const groups = useMemo(
+    () => groupChunksByDocument(chunks),
+    [chunks],
+  );
+  const hasFilter = activeChunkIds !== null && activeChunkIds.size > 0;
+  const topOpenChunkId = groups[0]?.chunks[0]?.chunk_id ?? null;
+
   if (loading) {
     return <LoadingSkeleton />;
   }
@@ -196,9 +233,6 @@ export function DocumentResults({
       </Card>
     );
   }
-
-  const groups = groupChunksByDocument(chunks);
-  const hasFilter = activeChunkIds !== null && activeChunkIds.size > 0;
 
   return (
     <div className="space-y-4">
@@ -216,11 +250,12 @@ export function DocumentResults({
           key={group.parentDocId}
           group={group}
           activeChunkIds={activeChunkIds}
-          defaultOpen={index === 0}
+          defaultOpenChunkId={index === 0 ? topOpenChunkId : null}
           highlightEntities={highlightEntities}
           highlightKeywords={highlightKeywords}
+          highlightQueryTerms={highlightQueryTerms}
         />
       ))}
     </div>
   );
-}
+});

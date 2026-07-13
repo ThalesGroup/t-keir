@@ -1,19 +1,25 @@
 "use client";
 
+import { memo } from "react";
 import { AlertCircle, Bot, Sparkles } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { isUnavailableAnswer } from "@/lib/types";
 
 interface AiSynthesisProps {
   answer: string | null;
   loading: boolean;
   vespaHits?: number;
+  answerUnavailable?: boolean;
 }
 
-export function AiSynthesis({ answer, loading, vespaHits }: AiSynthesisProps) {
+export const AiSynthesis = memo(function AiSynthesis({
+  answer,
+  loading,
+  vespaHits,
+  answerUnavailable = false,
+}: AiSynthesisProps) {
   if (loading) {
     return (
       <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
@@ -51,7 +57,7 @@ export function AiSynthesis({ answer, loading, vespaHits }: AiSynthesisProps) {
     );
   }
 
-  const unavailable = isUnavailableAnswer(answer);
+  const unavailable = answerUnavailable;
 
   if (unavailable) {
     return (
@@ -89,4 +95,4 @@ export function AiSynthesis({ answer, loading, vespaHits }: AiSynthesisProps) {
       </CardContent>
     </Card>
   );
-}
+});

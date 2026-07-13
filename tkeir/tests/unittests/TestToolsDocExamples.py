@@ -23,7 +23,7 @@ from thot.tools.search.app import (
     _parse_hits,
     _unavailable_answer,
 )
-from thot.tools.search.llm_wrapper import Provider, WrapperConfig
+from thot.core.LlmWrapper import Provider, WrapperConfig
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
     extract_relevant_triples,
@@ -148,7 +148,11 @@ class TestOntologyUtilsDocExamples:
         assert len(graph) == 1
 
     def test_build_hmi_ontology_empty_example(self):
-        assert build_hmi_ontology([], []) == {"entities": [], "keywords": []}
+        assert build_hmi_ontology([], []) == {
+            "entities": [],
+            "keywords": [],
+            "json_ld": "[]",
+        }
 
     def test_summarize_graph_for_prompt_empty_example(self):
         from rdflib import Graph

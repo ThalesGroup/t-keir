@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass
 
 _DEMONSTRATIVE_POS = frozenset({"DET", "PRON"})
@@ -153,6 +154,72 @@ def build_sentence_chunk_ranges(
     return ranges
 
 
+_NUMERIC_ENTITY_RE = re.compile(r"^-?\d+(?:[.,]\d+)?(?:\s+\d+)*%?$")
+_ENTITY_LABEL_PRIORITY = (
+    "person",
+    "organization",
+    "org",
+    "company",
+    "event",
+    "facility",
+    "product",
+    "location",
+    "gpe",
+)
+
+
+def _label_priority(label: str) -> int:
+    normalized = str(label).lower()
+    for index, preferred in enumerate(_ENTITY_LABEL_PRIORITY):
+        if preferred in normalized:
+            return index
+    return len(_ENTITY_LABEL_PRIORITY)
+
+
+def _is_noisy_entity_text(text: str) -> bool:
+    compact = str(text).strip().replace(" ", "")
+    if not compact:
+        return True
+    if _NUMERIC_ENTITY_RE.match(compact):
+        return True
+    return compact.isdigit()
+
+
+def _flatten_primary_entities(
+    primary_entities: dict[str, list[str]],
+    *,
+    limit: int = 8,
+) -> list[str]:
+    """Rank entity texts for summaries, prioritizing people and organizations."""
+    ranked: list[tuple[int, str, str]] = []
+    for label, values in primary_entities.items():
+        priority = _label_priority(label)
+        for value in values:
+            text = str(value).strip()
+            if not text or _is_noisy_entity_text(text):
+                continue
+            ranked.append((priority, text.lower(), text))
+
+    ranked.sort(key=lambda item: (item[0], item[1]))
+    selected: list[str] = []
+    seen: set[str] = set()
+    for _priority, key, value in ranked:
+        if key in seen:
+            continue
+        seen.add(key)
+        selected.append(value)
+        if len(selected) >= limit:
+            break
+    return selected
+
+
+def _triple_token_positions(triple: dict) -> list[int]:
+    positions: list[int] = []
+    for part in ("subject", "property", "value"):
+        positions.extend((triple.get(part) or {}).get("positions", []))
+    return positions
+
+
 def _triples_for_token_range(
     kg: list[dict], start: int, end: int
 ) -> list[dict]:
@@ -167,8 +234,10 @@ def _triples_for_token_range(
     for triple in kg:
         if triple.get("field_type") not in (None, "content"):
             continue
-        positions = triple.get("subject", {}).get("positions", [])
-        if any(start <= position < end for position in positions):
+        if any(
+            start <= position < end
+            for position in _triple_token_positions(triple)
+        ):
             selected.append(triple)
     return selected
 
@@ -306,14 +375,10 @@ def _summarize_chunk(
         True
     """
     parts: list[str] = []
-    flat_entities = [
-        value
-        for label in sorted(primary_entities)
-        for value in primary_entities[label][:2]
-    ]
+    flat_entities = _flatten_primary_entities(primary_entities)
     if flat_entities:
         label = "Upcoming entities" if mode == "after" else "Active entities"
-        parts.append(label + ": " + ", ".join(flat_entities[:4]))
+        parts.append(label + ": " + ", ".join(flat_entities))
 
     if svo_triplets:
         subject, verb, obj = svo_triplets[0]

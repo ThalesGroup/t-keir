@@ -152,7 +152,7 @@ class TestOntologyBuilder:
 class TestSelfHealingLoop:
     def test_rule_repair_can_pass_after_attempt(self):
         graph = build_document_graph(_document_with_kg())
-        graph, status, attempts, incoherences = run_self_healing_validation(
+        graph, status, attempts, incoherence_summary = run_self_healing_validation(
             graph,
             settings=SelfHealingSettings(max_repair_attempts=2),
         )
@@ -162,9 +162,9 @@ class TestSelfHealingLoop:
             "FAILED_WITH_INCOHERENCES",
         }
         assert attempts in {0, 1, 2}
-        assert isinstance(incoherences, list)
-        for item in incoherences:
-            assert item["status"] in {"UNRESOLVED", "AUTO_FIXED"}
+        assert isinstance(incoherence_summary, dict)
+        assert "total" in incoherence_summary
+        assert "unresolved" in incoherence_summary
 
 
 class TestDocumentOntologyBuilder:
@@ -186,14 +186,17 @@ class TestDocumentOntologyBuilder:
         document = _document_with_kg()
         result = builder.run(document)
         ontology = result["document_ontology"]
-        assert ontology["rdf_graph_serialized"]
+        assert ontology["json_ld"]
+        assert ontology["json_ld"].lstrip().startswith("[")
         assert ontology["shacl_status"] in {
             "PASSED",
             "PASSED_AFTER_REPAIR",
             "FAILED_WITH_INCOHERENCES",
         }
         assert ontology["correction_attempts"] in {0, 1, 2}
-        assert isinstance(ontology["incoherences"], list)
+        assert isinstance(ontology["incoherences"], dict)
+        assert "total" in ontology["incoherences"]
+        assert "alignment" not in ontology
         assert "text_coverage_percent" in ontology
         assert ontology["text_coverage_percent"] >= 0
         assert ontology["covered_tokens"] <= ontology["total_tokens"]

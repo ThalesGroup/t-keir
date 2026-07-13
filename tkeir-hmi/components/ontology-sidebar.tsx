@@ -1,6 +1,7 @@
 "use client";
 
-import { Filter, Network, Tag, X } from "lucide-react";
+import { Filter, FileJson, Network, Tag, X } from "lucide-react";
+import { memo, useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 
 interface OntologySidebarProps {
   ontology: FusedOntology | null;
+  loading?: boolean;
   activeChunkIds: Set<string> | null;
   activeLabel: string | null;
   onSelectEntity: (entity: SemanticEntity) => void;
@@ -78,22 +80,41 @@ function KeywordButton({
   );
 }
 
-export function OntologySidebar({
+export const OntologySidebar = memo(function OntologySidebar({
   ontology,
+  loading = false,
   activeChunkIds,
   activeLabel,
   onSelectEntity,
   onSelectKeyword,
   onClearFilter,
 }: OntologySidebarProps) {
-  const entityGroups = ontology
-    ? groupEntitiesByType(ontology.entities)
-    : new Map<string, SemanticEntity[]>();
-  const visibleKeywords = ontology
-    ? ontology.keywords.filter(
-        (keyword) => keyword.label.trim().length >= MIN_KEYWORD_LENGTH,
-      )
-    : [];
+  const entityGroups = useMemo(
+    () =>
+      ontology
+        ? groupEntitiesByType(ontology.entities)
+        : new Map<string, SemanticEntity[]>(),
+    [ontology],
+  );
+  const visibleKeywords = useMemo(
+    () =>
+      ontology
+        ? ontology.keywords.filter(
+            (keyword) => keyword.label.trim().length >= MIN_KEYWORD_LENGTH,
+          )
+        : [],
+    [ontology],
+  );
+  const formattedJsonLd = useMemo(() => {
+    if (!ontology?.json_ld?.trim()) {
+      return "";
+    }
+    try {
+      return JSON.stringify(JSON.parse(ontology.json_ld), null, 2);
+    } catch {
+      return ontology.json_ld;
+    }
+  }, [ontology?.json_ld]);
 
   const hasFilter = activeChunkIds !== null && activeChunkIds.size > 0;
 
@@ -123,20 +144,25 @@ export function OntologySidebar({
         )}
       </CardHeader>
       <CardContent className="overflow-y-auto pb-6">
-        {!ontology ? (
+        {loading ? (
+          <p className="text-sm text-muted-foreground">
+            Loading ontology for the current search…
+          </p>
+        ) : !ontology ? (
           <p className="text-sm text-muted-foreground">
             Run a query to load the fused RDF ontology (entities and keywords
             mapped to chunk IDs).
           </p>
         ) : (
           <Tabs defaultValue="entities" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="entities">
                 Entities ({ontology.entities.length})
               </TabsTrigger>
               <TabsTrigger value="keywords">
                 Keywords ({visibleKeywords.length})
               </TabsTrigger>
+              <TabsTrigger value="jsonld">JSON-LD</TabsTrigger>
             </TabsList>
 
             <TabsContent value="entities" className="mt-4 space-y-4">
@@ -192,9 +218,27 @@ export function OntologySidebar({
                 </>
               )}
             </TabsContent>
+
+            <TabsContent value="jsonld" className="mt-4 space-y-3">
+              {!formattedJsonLd ? (
+                <p className="text-sm text-muted-foreground">
+                  No fused JSON-LD graph for this response.
+                </p>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <FileJson className="h-3 w-3" />
+                    Fused RDF graph (JSON-LD) from retrieved documents
+                  </div>
+                  <pre className="max-h-[50vh] overflow-auto rounded-md border bg-muted/40 p-3 text-[11px] leading-relaxed">
+                    <code>{formattedJsonLd}</code>
+                  </pre>
+                </>
+              )}
+            </TabsContent>
           </Tabs>
         )}
       </CardContent>
     </Card>
   );
-}
+});

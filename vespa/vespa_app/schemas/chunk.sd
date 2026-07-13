@@ -15,7 +15,8 @@ schema chunk {
             index: enable-bm25
         }
         field text_raw type string {
-            indexing: summary | index
+            indexing: summary | index | attribute
+            index: enable-bm25
         }
         field chunk_embedding type tensor<float>(x[384]) {
             indexing: attribute | index
@@ -36,9 +37,10 @@ schema chunk {
         }
         first-phase {
             expression {
-                closeness(field, chunk_embedding) * 0.40 +
+                closeness(field, chunk_embedding) * 0.30 +
                 closeness(field, questions_embeddings) * 0.10 +
-                bm25(parent_content) * 0.50
+                bm25(text_raw) * 0.40 +
+                bm25(parent_content) * 0.20
             }
         }
         second-phase {

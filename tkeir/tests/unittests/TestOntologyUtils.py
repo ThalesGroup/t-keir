@@ -3,9 +3,12 @@
 
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
+    detect_rdf_format,
     extract_focus_passages,
     extract_relevant_triples,
+    merge_rdf_graphs,
     merge_turtle_graphs,
+    serialize_graph_json_ld,
     truncate_for_prompt,
 )
 
@@ -39,6 +42,21 @@ tkeirdoc:doc_a a tkeir:Document ;
 """
 
 
+def test_detect_rdf_format():
+    assert detect_rdf_format('[{"@id": "http://example.org/a"}]') == "json-ld"
+    assert detect_rdf_format("@prefix ex: <http://example.org/> .") == "turtle"
+
+
+def test_merge_rdf_graphs_accepts_json_ld():
+    graph = merge_rdf_graphs(
+        [
+            '[{"@id": "http://example.org/Alice", '
+            '"@type": "http://example.org/Person"}]'
+        ]
+    )
+    assert len(graph) > 0
+
+
 def test_merge_and_query_turtle_graphs():
     graph = merge_turtle_graphs(
         [
@@ -66,7 +84,7 @@ def test_build_hmi_ontology_exports_entities_and_keywords():
     )
     assert acme["type"] == "Company"
     assert chunk_id in acme["chunk_ids"]
-    assert not any(
+    assert any(
         node["label"] == "January 2001" for node in ontology["entities"]
     )
     assert not any(node["label"] == "Widget" for node in ontology["entities"])
@@ -76,6 +94,14 @@ def test_build_hmi_ontology_exports_entities_and_keywords():
     assert chunk_id in keyword["chunk_ids"]
     assert "edges" not in ontology
     assert "nodes" not in ontology
+    assert ontology["json_ld"].startswith("[")
+
+
+def test_build_hmi_ontology_serializes_json_ld_from_turtle():
+    ontology = build_hmi_ontology([_SAMPLE_TURTLE], [])
+    assert '"@id"' in ontology["json_ld"] or '"@type"' in ontology["json_ld"]
+    roundtrip = merge_rdf_graphs([ontology["json_ld"]])
+    assert len(roundtrip) > 0
 
 
 def test_extract_focus_passages_ranks_yang_trump_sentences():

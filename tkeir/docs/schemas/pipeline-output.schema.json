@@ -687,34 +687,29 @@
       "required": ["chunk_id", "parent_doc_id", "text_raw"],
       "additionalProperties": true
     },
-    "OntologyIncoherence": {
+    "OntologyIncoherenceSummary": {
       "type": "object",
-      "description": "One SHACL validation issue or auto-repair outcome.",
+      "description": "Compact SHACL incoherence statistics for the document graph.",
       "properties": {
-        "focus_node": {
-          "type": "string",
-          "description": "RDF focus node URI associated with the violation."
-        },
-        "message": {
-          "type": "string",
-          "description": "Human-readable SHACL validation message."
-        },
-        "status": {
-          "type": "string",
-          "enum": ["UNRESOLVED", "AUTO_FIXED"],
-          "description": "Whether the issue remains or was repaired by the self-healing loop."
-        }
+        "total": { "type": "integer", "minimum": 0 },
+        "unresolved": { "type": "integer", "minimum": 0 },
+        "auto_fixed": { "type": "integer", "minimum": 0 },
+        "affected_node_count": { "type": "integer", "minimum": 0 },
+        "graph_node_count": { "type": "integer", "minimum": 0 },
+        "graph_triple_count": { "type": "integer", "minimum": 0 },
+        "by_result_path": { "type": "object", "additionalProperties": { "type": "integer" } },
+        "by_severity": { "type": "object", "additionalProperties": { "type": "integer" } }
       },
-      "required": ["message", "status"],
+      "required": ["total", "unresolved", "auto_fixed"],
       "additionalProperties": true
     },
     "DocumentOntology": {
       "type": "object",
       "description": "SHACL-validated RDF ontology built from SVO triples, NER, keywords, dependencies, and golden chunks.",
       "properties": {
-        "rdf_graph_serialized": {
+        "json_ld": {
           "type": "string",
-          "description": "Document RDF graph serialized in Turtle format."
+          "description": "Document RDF graph serialized as JSON-LD."
         },
         "shacl_status": {
           "type": "string",
@@ -727,11 +722,9 @@
           "description": "Number of ontology repair attempts performed."
         },
         "incoherences": {
-          "type": "array",
-          "description": "Remaining or auto-fixed SHACL violations.",
-          "items": {
-            "$ref": "#/$defs/OntologyIncoherence"
-          }
+          "type": "object",
+          "description": "Compact SHACL incoherence statistics.",
+          "$ref": "#/$defs/OntologyIncoherenceSummary"
         },
         "text_coverage_percent": {
           "type": "number",
@@ -761,7 +754,7 @@
         }
       },
       "required": [
-        "rdf_graph_serialized",
+        "json_ld",
         "shacl_status",
         "correction_attempts",
         "incoherences",

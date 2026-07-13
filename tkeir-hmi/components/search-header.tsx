@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useState } from "react";
 import { Loader2, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,30 +14,32 @@ import {
 } from "@/components/ui/select";
 import type { Language } from "@/lib/types";
 
-interface SearchHeaderProps {
+export interface SearchParams {
   query: string;
   language: Language;
   hits: number;
-  loading: boolean;
-  onQueryChange: (value: string) => void;
-  onLanguageChange: (value: Language) => void;
-  onHitsChange: (value: number) => void;
-  onSubmit: () => void;
 }
 
-export function SearchHeader({
-  query,
-  language,
-  hits,
+interface SearchHeaderProps {
+  loading: boolean;
+  onSearch: (params: SearchParams) => void;
+}
+
+export const SearchHeader = memo(function SearchHeader({
   loading,
-  onQueryChange,
-  onLanguageChange,
-  onHitsChange,
-  onSubmit,
+  onSearch,
 }: SearchHeaderProps) {
+  const [query, setQuery] = useState("");
+  const [language, setLanguage] = useState<Language>("en");
+  const [hits, setHits] = useState(20);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onSubmit();
+    const trimmed = query.trim();
+    if (!trimmed || loading) {
+      return;
+    }
+    onSearch({ query: trimmed, language, hits });
   };
 
   return (
@@ -57,7 +60,7 @@ export function SearchHeader({
             <Input
               id="rag-query"
               value={query}
-              onChange={(event) => onQueryChange(event.target.value)}
+              onChange={(event) => setQuery(event.target.value)}
               placeholder='e.g. "What did Acme launch?"'
               className="pl-10"
               disabled={loading}
@@ -75,7 +78,7 @@ export function SearchHeader({
             </label>
             <Select
               value={language}
-              onValueChange={(value) => onLanguageChange(value as Language)}
+              onValueChange={(value) => setLanguage(value as Language)}
               disabled={loading}
             >
               <SelectTrigger id="rag-language" className="w-full min-w-[7rem]">
@@ -104,7 +107,7 @@ export function SearchHeader({
               onChange={(event) => {
                 const parsed = Number.parseInt(event.target.value, 10);
                 if (!Number.isNaN(parsed)) {
-                  onHitsChange(Math.min(100, Math.max(1, parsed)));
+                  setHits(Math.min(100, Math.max(1, parsed)));
                 }
               }}
               disabled={loading}
@@ -134,4 +137,4 @@ export function SearchHeader({
       </div>
     </form>
   );
-}
+});

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from rdflib import Graph
 
 from thot.core.ThotLogger import ThotLogger
+from thot.tasks.document_ontology.incoherence_stats import summarize_incoherences
 from thot.tasks.document_ontology.OntologyRepairer import repair_graph
 from thot.tasks.document_ontology.ShaclValidator import validate_document_graph
 
@@ -31,26 +32,16 @@ def _violation_key(violation: dict) -> tuple[str, str, str]:
     )
 
 
-def _public_violation(violation: dict, status: str) -> dict:
-    """Public violation helper.
-
-    Example:
-        >>> _public_violation({'focus_node': 'n', 'message': 'm'}, 'AUTO_FIXED')
-        {'focus_node': 'n', 'message': 'm', 'status': 'AUTO_FIXED'}
-    """
-    return {
-        "focus_node": violation.get("focus_node", ""),
-        "message": violation.get("message", ""),
-        "status": status,
-    }
-
-
 def run_self_healing_validation(
     graph: Graph,
     settings: SelfHealingSettings | None = None,
+    shapes_ttl: str | None = None,
     call_context=None,
-) -> tuple[Graph, str, int, list[dict]]:
+) -> tuple[Graph, str, int, dict[str, object]]:
     """Validate and optionally repair the graph up to max_repair_attempts.
+
+    Returns:
+        Tuple of ``(graph, status, correction_attempts, incoherence_summary)``.
 
     Example:
         >>> from thot.tasks.document_ontology.SelfHealingLoop import run_self_healing_validation
@@ -59,14 +50,16 @@ def run_self_healing_validation(
     """
     settings = settings or SelfHealingSettings()
     conforms, violations = validate_document_graph(
-        graph, call_context=call_context
+        graph,
+        call_context=call_context,
+        shapes_ttl=shapes_ttl,
     )
 
     if conforms:
-        return graph, "PASSED", 0, []
+        return graph, "PASSED", 0, summarize_incoherences([], graph)
 
     correction_attempts = 0
-    auto_fixed: list[dict] = []
+    auto_fixed_keys: set[tuple[str, str, str]] = set()
     remaining = violations
 
     for attempt in range(1, settings.max_repair_attempts + 1):
@@ -85,7 +78,6 @@ def run_self_healing_validation(
         )
 
         before_keys = {_violation_key(violation) for violation in remaining}
-        before_violations = list(remaining)
         graph = repair_graph(
             graph,
             remaining,
@@ -93,35 +85,46 @@ def run_self_healing_validation(
         )
         correction_attempts = attempt
         conforms, remaining = validate_document_graph(
-            graph, call_context=call_context
+            graph,
+            call_context=call_context,
+            shapes_ttl=shapes_ttl,
         )
         after_keys = {_violation_key(violation) for violation in remaining}
-
-        for violation in before_violations:
-            key = _violation_key(violation)
-            if key in before_keys and key not in after_keys:
-                fixed = _public_violation(violation, "AUTO_FIXED")
-                if fixed not in auto_fixed:
-                    auto_fixed.append(fixed)
+        auto_fixed_keys |= before_keys - after_keys
 
         if conforms:
-            unresolved = [
-                _public_violation(violation, "UNRESOLVED")
-                for violation in remaining
+            summary_violations = [
+                {
+                    "focus_node": focus_node,
+                    "result_path": result_path,
+                    "message": message,
+                    "status": "AUTO_FIXED",
+                }
+                for focus_node, result_path, message in auto_fixed_keys
             ]
             return (
                 graph,
                 "PASSED_AFTER_REPAIR",
                 correction_attempts,
-                unresolved + auto_fixed,
+                summarize_incoherences(summary_violations, graph),
             )
 
-    unresolved = [
-        _public_violation(violation, "UNRESOLVED") for violation in remaining
+    summary_violations = [
+        {**violation, "status": "UNRESOLVED"} for violation in remaining
     ]
+    for key in auto_fixed_keys:
+        focus_node, result_path, message = key
+        summary_violations.append(
+            {
+                "focus_node": focus_node,
+                "result_path": result_path,
+                "message": message,
+                "status": "AUTO_FIXED",
+            }
+        )
     return (
         graph,
         "FAILED_WITH_INCOHERENCES",
         correction_attempts,
-        unresolved + auto_fixed,
+        summarize_incoherences(summary_violations, graph),
     )

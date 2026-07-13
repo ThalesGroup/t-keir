@@ -9,12 +9,16 @@ from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
 
 from thot.tasks.document_ontology.OntologyBuilder import NUMERIC_RE, TKEIR
+from thot.tasks.document_ontology.OntologyVocabulary import METRIC_CLASS
 
-_OWNERSHIP_PREDICATES = (
-    TKEIR.ownedBy,
-    TKEIR.createdBy,
-    TKEIR.publishedBy,
-)
+
+def _local_name_from_uri(value: str) -> str:
+    text = str(value).strip()
+    if not text:
+        return ""
+    if "#" in text:
+        return text.rsplit("#", 1)[-1]
+    return text.rsplit("/", 1)[-1]
 
 
 def merge_repair_ttl(graph: Graph, repair_ttl: str) -> Graph:
@@ -61,32 +65,6 @@ def _label_for_node(graph: Graph, node: URIRef) -> str:
     return str(label) if label is not None else ""
 
 
-def _has_company_relation(graph: Graph, product: URIRef) -> bool:
-    """Has company relation helper.
-
-    Example:
-        >>> from thot.tasks.document_ontology.OntologyRepairer import _has_company_relation
-        >>> callable(_has_company_relation)
-        True
-    """
-    for predicate in _OWNERSHIP_PREDICATES:
-        for company in graph.objects(product, predicate):
-            if (company, RDF.type, TKEIR.Company) in graph:
-                return True
-    return False
-
-
-def _company_nodes(graph: Graph) -> list[URIRef]:
-    """Company nodes helper.
-
-    Example:
-        >>> from thot.tasks.document_ontology.OntologyRepairer import _company_nodes
-        >>> callable(_company_nodes)
-        True
-    """
-    return _nodes_of_type(graph, TKEIR.Company)
-
-
 def _metric_nodes(graph: Graph) -> list[URIRef]:
     """Metric nodes helper.
 
@@ -95,7 +73,7 @@ def _metric_nodes(graph: Graph) -> list[URIRef]:
         >>> callable(_metric_nodes)
         True
     """
-    return _nodes_of_type(graph, TKEIR.Metric)
+    return _nodes_of_type(graph, TKEIR[METRIC_CLASS])
 
 
 def _parse_numeric_literal(text: str) -> str | None:
@@ -138,6 +116,58 @@ def _infer_numeric_value(graph: Graph, node: URIRef) -> str | None:
     return None
 
 
+def _repair_missing_typed_link(
+    graph: Graph,
+    violations: Iterable[dict],
+) -> None:
+    """Add a missing typed object link for minCount shape violations."""
+    for violation in violations:
+        focus_text = str(violation.get("focus_node", "")).strip()
+        result_path = _local_name_from_uri(str(violation.get("result_path", "")))
+        if not focus_text or not result_path:
+            continue
+        if result_path in {"hasNumericValue"}:
+            continue
+        focus_node = URIRef(focus_text)
+        if graph.value(focus_node, RDF.type) is None:
+            continue
+        predicate = TKEIR[result_path]
+        if any(graph.objects(focus_node, predicate)):
+            continue
+        for _subject, path, obj in graph:
+            if path != predicate or not isinstance(obj, URIRef):
+                continue
+            if graph.value(obj, RDF.type) is None:
+                continue
+            graph.add((focus_node, predicate, obj))
+            break
+
+
+def _repair_numeric_values(
+    graph: Graph,
+    violations: Iterable[dict],
+) -> None:
+    for violation in violations:
+        result_path = _local_name_from_uri(str(violation.get("result_path", "")))
+        if result_path != "hasNumericValue":
+            continue
+        focus_text = str(violation.get("focus_node", "")).strip()
+        if not focus_text:
+            continue
+        focus_node = URIRef(focus_text)
+        if graph.value(focus_node, TKEIR.hasNumericValue) is not None:
+            continue
+        numeric = _infer_numeric_value(graph, focus_node)
+        if numeric:
+            graph.add(
+                (
+                    focus_node,
+                    TKEIR.hasNumericValue,
+                    Literal(numeric, datatype=XSD.decimal),
+                )
+            )
+
+
 def apply_rule_based_repairs(
     graph: Graph, violations: Iterable[dict]
 ) -> Graph:
@@ -148,31 +178,9 @@ def apply_rule_based_repairs(
         >>> callable(apply_rule_based_repairs)
         True
     """
-    messages = " ".join(
-        violation.get("message", "") for violation in violations
-    )
-
-    if "Product must be owned or created by a Company" in messages:
-        companies = _company_nodes(graph)
-        if companies:
-            company = companies[0]
-            for product in _nodes_of_type(graph, TKEIR.Product):
-                if not _has_company_relation(graph, product):
-                    graph.add((product, TKEIR.createdBy, company))
-
-    if "numeric object target" in messages.lower():
-        for metric in _metric_nodes(graph):
-            if graph.value(metric, TKEIR.hasNumericValue) is None:
-                numeric = _infer_numeric_value(graph, metric)
-                if numeric:
-                    graph.add(
-                        (
-                            metric,
-                            TKEIR.hasNumericValue,
-                            Literal(numeric, datatype=XSD.decimal),
-                        )
-                    )
-
+    violation_list = list(violations)
+    _repair_numeric_values(graph, violation_list)
+    _repair_missing_typed_link(graph, violation_list)
     return graph
 
 

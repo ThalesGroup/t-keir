@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from thot.tools.search.llm_wrapper import UnifiedLLMWrapper
+from thot.core.LlmWrapper import UnifiedLLMWrapper
 from thot.tools.search.vespa_client import (
     VespaClient,
     build_chunk_tensor,
@@ -81,13 +81,12 @@ def _document_fields(document: dict[str, Any]) -> dict[str, Any]:
         'Doc'
     """
     ontology = document.get("document_ontology") or {}
+    json_ld = ontology.get("json_ld") or ontology.get("rdf_graph_serialized", "")
     return {
         "source_doc_id": sanitize_vespa_string(document["source_doc_id"]),
         "title": sanitize_vespa_string(document.get("title") or ""),
         "content": sanitize_vespa_strings(document.get("content") or []),
-        "rdf_graph_serialized": sanitize_vespa_string(
-            ontology.get("rdf_graph_serialized", "")
-        ),
+        "json_ld": sanitize_vespa_string(json_ld),
         "shacl_status": sanitize_vespa_string(
             ontology.get("shacl_status", "")
         ),

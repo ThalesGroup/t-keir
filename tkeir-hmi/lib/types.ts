@@ -29,6 +29,7 @@ export interface SemanticKeyword {
 export interface FusedOntology {
   entities: SemanticEntity[];
   keywords: SemanticKeyword[];
+  json_ld: string;
 }
 
 export interface QueryResponse {
@@ -36,6 +37,9 @@ export interface QueryResponse {
   report_markdown?: string;
   highlight_entities?: string[];
   highlight_keywords?: string[];
+  highlight_query_terms?: string[];
+  used_chunk_evidence?: boolean;
+  answer_unavailable?: boolean;
   chunks: RetrievedChunk[];
   ontology: FusedOntology;
   vespa_hits: number;
@@ -45,15 +49,6 @@ export interface DocumentGroup {
   parentDocId: string;
   displayName: string;
   chunks: RetrievedChunk[];
-}
-
-export const UNAVAILABLE_ANSWERS = new Set([
-  "L'information n'est pas disponible.",
-  "The information is not available.",
-]);
-
-export function isUnavailableAnswer(answer: string): boolean {
-  return UNAVAILABLE_ANSWERS.has(answer.trim());
 }
 
 export function formatDocumentName(parentDocId: string): string {

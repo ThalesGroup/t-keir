@@ -3,10 +3,14 @@
 
 from thot.tools.search.app import RetrievedChunk
 from thot.tools.search.rag_report import (
+    apply_chunk_evidence_fallback,
     assemble_report_markdown,
     build_fallback_detailed_report,
+    build_chunk_evidence_answer,
     extract_highlight_labels,
+    is_unavailable_short_answer,
     parse_structured_generation,
+    query_highlight_terms,
 )
 
 
@@ -87,3 +91,128 @@ def test_build_fallback_detailed_report_uses_passages():
     )
     assert "Focus Passages" in report
     assert "Relevant sentence." in report
+
+
+def test_build_chunk_evidence_answer_lists_matching_documents():
+    chunk = RetrievedChunk(
+        chunk_id="file://tests/doc.pdf#chunk-4",
+        text_raw="Awards · Charles Sutton Medal · AFL",
+        parent_doc_id="file://tests/input/00948237f4a650deb4c4f101aef11882.pdf",
+        relevance=3.19,
+    )
+    short, detailed = build_chunk_evidence_answer("Charles Sutton", [chunk])
+    assert short is not None
+    assert detailed is not None
+    assert "00948237f4a650deb4c4f101aef11882.pdf" in short
+    assert "Charles Sutton" in detailed or "Charles Sutton Medal" in detailed
+
+
+def test_apply_chunk_evidence_fallback_replaces_negative_llm_answer():
+    chunk = RetrievedChunk(
+        chunk_id="doc.pdf#chunk-1",
+        text_raw="Charles Sutton Medal",
+        parent_doc_id="file://tests/doc.pdf",
+    )
+    short, detailed, used = apply_chunk_evidence_fallback(
+        query_text="In which document appears Charles Sutton",
+        short_answer=(
+            "None of the provided document chunks mention Charles Sutton."
+        ),
+        detailed_report="Impossible to determine.",
+        chunks=[chunk],
+        unavailable_answer="The information is not available.",
+    )
+    assert used is True
+    assert "doc.pdf" in short
+    assert "Charles Sutton Medal" in detailed
+
+
+def test_query_highlight_terms_from_user_query():
+    chunk = RetrievedChunk(
+        chunk_id="c1",
+        text_raw="Active entities: Charles Sutton, AFLW.",
+        parent_doc_id="doc",
+    )
+    terms = query_highlight_terms("In which document appears Charles Sutton", [chunk])
+    assert "Charles Sutton" in terms
+    assert "Charles" in terms
+
+
+def test_passage_based_short_answer_prefers_predicate_sentence():
+    from thot.tools.search.rag_report import _passage_based_short_answer
+
+    chunk = RetrievedChunk(
+        chunk_id="doc.pdf#chunk-2",
+        text_raw=(
+            "Active entities: David R. Adler, James Taylor. "
+            "Topic: critic Jon Landau regards song. "
+            'George Harrison liked " Something in the Way She Moves " so much '
+            "that he used the beginning."
+        ),
+        parent_doc_id="file://tests/008363af8cc8b4678c3d72f70d76f21c.pdf",
+    )
+    answer = _passage_based_short_answer(
+        'Who liked "Something in the Way She Moves"',
+        [chunk],
+    )
+    assert answer == "George Harrison"
+
+
+def test_build_chunk_evidence_answer_uses_passage_for_who_questions():
+    chunk = RetrievedChunk(
+        chunk_id="doc.pdf#chunk-2",
+        text_raw=(
+            'George Harrison liked " Something in the Way She Moves " so much '
+            "that he used the beginning."
+        ),
+        parent_doc_id="file://tests/008363af8cc8b4678c3d72f70d76f21c.pdf",
+        relevance=0.9,
+    )
+    short, detailed = build_chunk_evidence_answer(
+        'Who liked "Something in the Way She Moves"',
+        [chunk],
+    )
+    assert short is not None
+    assert detailed is not None
+    assert "George Harrison" in short
+    assert "George Harrison" in detailed
+
+
+def test_answer_supported_by_matching_chunks_keeps_llm_name_answer():
+    from thot.tools.search.rag_report import answer_supported_by_matching_chunks
+
+    chunk = RetrievedChunk(
+        chunk_id="c1",
+        text_raw='George Harrison liked "Something in the Way She Moves".',
+        parent_doc_id="file://doc.pdf",
+    )
+    assert answer_supported_by_matching_chunks(
+        "George Harrison",
+        [chunk],
+        'Who liked "Something in the Way She Moves"',
+    )
+
+
+def test_apply_chunk_evidence_fallback_skips_supported_llm_answer():
+    chunk = RetrievedChunk(
+        chunk_id="c1",
+        text_raw='George Harrison liked "Something in the Way She Moves".',
+        parent_doc_id="file://doc.pdf",
+    )
+    short, detailed, used = apply_chunk_evidence_fallback(
+        query_text='Who liked "Something in the Way She Moves"',
+        short_answer="George Harrison",
+        detailed_report="He liked the song.",
+        chunks=[chunk],
+        unavailable_answer="The information is not available.",
+    )
+    assert used is False
+    assert short == "George Harrison"
+    assert is_unavailable_short_answer(
+        "The information is not available.",
+        "The information is not available.",
+    )
+    assert not is_unavailable_short_answer(
+        "Found in doc.pdf",
+        "The information is not available.",
+    )

@@ -3,25 +3,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, Moon, Sun } from "lucide-react";
 
-import { AiSynthesis } from "@/components/ai-synthesis";
-import { DocumentResults } from "@/components/document-results";
-import { OntologySidebar } from "@/components/ontology-sidebar";
-import { RagReportPanel } from "@/components/rag-report";
-import { SearchHeader } from "@/components/search-header";
+import { RagResults } from "@/components/rag-results";
+import {
+  SearchHeader,
+  type SearchParams,
+} from "@/components/search-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { checkHealth, queryRag, RagApiError } from "@/lib/api";
-import type {
-  Language,
-  QueryResponse,
-  SemanticEntity,
-  SemanticKeyword,
-} from "@/lib/types";
+import type { QueryResponse, SemanticEntity, SemanticKeyword } from "@/lib/types";
 
 export function RagDashboard() {
-  const [query, setQuery] = useState("");
-  const [language, setLanguage] = useState<Language>("en");
-  const [hits, setHits] = useState(20);
+  const [submittedQuery, setSubmittedQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<QueryResponse | null>(null);
@@ -50,23 +43,16 @@ export function RagDashboard() {
     element?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
-  const runSearch = useCallback(async () => {
-    const trimmed = query.trim();
-    if (!trimmed) {
-      return;
-    }
-
+  const handleSearch = useCallback(async ({ query, language, hits }: SearchParams) => {
     setLoading(true);
     setError(null);
+    setResponse(null);
+    setSubmittedQuery(query);
     setActiveChunkIds(null);
     setActiveLabel(null);
 
     try {
-      const result = await queryRag({
-        query: trimmed,
-        language,
-        hits,
-      });
+      const result = await queryRag({ query, language, hits });
       setResponse(result);
     } catch (caught) {
       const message =
@@ -80,7 +66,7 @@ export function RagDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [query, language, hits]);
+  }, []);
 
   const handleSelectEntity = useCallback(
     (entity: SemanticEntity) => {
@@ -111,6 +97,11 @@ export function RagDashboard() {
     },
     [activeLabel, scrollToFirstMatch],
   );
+
+  const handleClearFilter = useCallback(() => {
+    setActiveChunkIds(null);
+    setActiveLabel(null);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -153,16 +144,7 @@ export function RagDashboard() {
           </Alert>
         )}
 
-        <SearchHeader
-          query={query}
-          language={language}
-          hits={hits}
-          loading={loading}
-          onQueryChange={setQuery}
-          onLanguageChange={setLanguage}
-          onHitsChange={setHits}
-          onSubmit={() => void runSearch()}
-        />
+        <SearchHeader loading={loading} onSearch={handleSearch} />
 
         {error && (
           <Alert variant="destructive">
@@ -172,41 +154,16 @@ export function RagDashboard() {
           </Alert>
         )}
 
-        <AiSynthesis
-          answer={response?.answer ?? null}
+        <RagResults
+          submittedQuery={submittedQuery}
+          response={response}
           loading={loading}
-          vespaHits={response?.vespa_hits}
+          activeChunkIds={activeChunkIds}
+          activeLabel={activeLabel}
+          onSelectEntity={handleSelectEntity}
+          onSelectKeyword={handleSelectKeyword}
+          onClearFilter={handleClearFilter}
         />
-
-        <RagReportPanel
-          query={query}
-          reportMarkdown={response?.report_markdown ?? null}
-          highlightEntities={response?.highlight_entities ?? []}
-          highlightKeywords={response?.highlight_keywords ?? []}
-          loading={loading}
-        />
-
-        <div className="grid gap-6 lg:grid-cols-[1fr_20rem] xl:grid-cols-[1fr_22rem]">
-          <DocumentResults
-            chunks={response?.chunks ?? []}
-            loading={loading}
-            activeChunkIds={activeChunkIds}
-            highlightEntities={response?.highlight_entities ?? []}
-            highlightKeywords={response?.highlight_keywords ?? []}
-          />
-
-          <OntologySidebar
-            ontology={response?.ontology ?? null}
-            activeChunkIds={activeChunkIds}
-            activeLabel={activeLabel}
-            onSelectEntity={handleSelectEntity}
-            onSelectKeyword={handleSelectKeyword}
-            onClearFilter={() => {
-              setActiveChunkIds(null);
-              setActiveLabel(null);
-            }}
-          />
-        </div>
       </main>
     </div>
   );

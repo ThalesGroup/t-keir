@@ -10,14 +10,24 @@ from thot.tasks.document_ontology import (
 from thot.tasks.document_ontology.DocumentOntologyConfiguration import (
     DocumentOntologyConfiguration,
 )
+from thot.tasks.document_ontology.OntologyAlignment import (
+    AlignmentSettings,
+    align_document_graph,
+    build_document_vocabulary,
+    merge_alignment_reports,
+)
 from thot.tasks.document_ontology.OntologyBuilder import (
     OntologyBuildSettings,
     build_document_graph,
     compute_ontology_text_coverage,
 )
+from thot.tools.search.ontology_utils import serialize_graph_json_ld
 from thot.tasks.document_ontology.SelfHealingLoop import (
     SelfHealingSettings,
     run_self_healing_validation,
+)
+from thot.tasks.document_ontology.ShaclInductor import (
+    induce_document_shacl_shapes,
 )
 from thot.tasks.TaskInfo import TaskInfo
 
@@ -73,6 +83,33 @@ class DocumentOntologyBuilder:
         self._healing_settings = SelfHealingSettings(
             max_repair_attempts=int(builder_cfg.get("max-repair-attempts", 2)),
         )
+        alignment_cfg = builder_cfg.get("alignment") or {}
+        if not isinstance(alignment_cfg, dict):
+            alignment_cfg = {}
+        self._alignment_settings = AlignmentSettings(
+            enabled=bool(alignment_cfg.get("enabled", True)),
+            similarity_threshold=float(
+                alignment_cfg.get(
+                    "similarity-threshold",
+                    alignment_cfg.get("similarity_threshold", 0.85),
+                )
+            ),
+            min_cluster_size=max(
+                2,
+                int(
+                    alignment_cfg.get(
+                        "min-cluster-size",
+                        alignment_cfg.get("min_cluster_size", 2),
+                    )
+                ),
+            ),
+        )
+        self._save_alignment = bool(
+            builder_cfg.get(
+                "save-alignment",
+                builder_cfg.get("save_alignment", False),
+            )
+        )
 
     def build(self, tkeir_doc: dict, call_context=None) -> dict:
         """Build, validate, and serialize the document ontology.
@@ -113,31 +150,46 @@ class DocumentOntologyBuilder:
                 + ", ".join(missing)
             )
 
-        graph = build_document_graph(tkeir_doc, settings=self._settings)
+        vocabulary, vocabulary_report = build_document_vocabulary(
+            tkeir_doc,
+            settings=self._alignment_settings,
+            call_context=call_context,
+        )
+        graph = build_document_graph(
+            tkeir_doc,
+            settings=self._settings,
+            vocabulary=vocabulary,
+        )
+        graph, graph_alignment_report = align_document_graph(
+            graph,
+            settings=self._alignment_settings,
+            call_context=call_context,
+        )
+        alignment_report = merge_alignment_reports(
+            vocabulary_report,
+            graph_alignment_report,
+        )
+        shapes_ttl = induce_document_shacl_shapes(graph, alignment_report)
         text_coverage = compute_ontology_text_coverage(
             tkeir_doc,
             settings=self._settings,
         )
-        graph, shacl_status, correction_attempts, incoherences = (
+        graph, shacl_status, correction_attempts, incoherence_summary = (
             run_self_healing_validation(
                 graph,
                 settings=self._healing_settings,
+                shapes_ttl=shapes_ttl,
                 call_context=call_context,
             )
         )
 
         if shacl_status == "FAILED_WITH_INCOHERENCES":
-            unresolved = [
-                item
-                for item in incoherences
-                if item.get("status") == "UNRESOLVED"
-            ]
             ThotLogger.info(
                 "Document ontology SHACL validation still failing after "
                 + str(correction_attempts)
                 + " repair attempt(s); "
-                + str(len(unresolved))
-                + " unresolved incoherence(s) saved.",
+                + str(incoherence_summary.get("unresolved", 0))
+                + " unresolved incoherence(s).",
                 context=call_context,
             )
         elif shacl_status == "PASSED_AFTER_REPAIR":
@@ -148,13 +200,16 @@ class DocumentOntologyBuilder:
                 context=call_context,
             )
 
-        tkeir_doc["document_ontology"] = {
-            "rdf_graph_serialized": graph.serialize(format="turtle"),
+        document_ontology: dict[str, object] = {
+            "json_ld": serialize_graph_json_ld(graph),
             "shacl_status": shacl_status,
             "correction_attempts": correction_attempts,
-            "incoherences": incoherences,
+            "incoherences": incoherence_summary,
             **text_coverage,
         }
+        if self._save_alignment:
+            document_ontology["alignment"] = alignment_report
+        tkeir_doc["document_ontology"] = document_ontology
         task_info = TaskInfo(
             task_name="document-ontology",
             task_version=__version_document_ontology__,

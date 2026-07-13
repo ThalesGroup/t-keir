@@ -71,7 +71,7 @@ uv run pytest tests/unittests/TestDocExampleCoverage.py tests/unittests/TestAllD
 | `_format_chunk_excerpts(chunks, empty_message)` | Chunk block for LLM |
 | `_parse_hits(response)` | Parse Vespa search JSON |
 
-## LLM wrapper (`thot.tools.search.llm_wrapper`)
+## LLM wrapper (`thot.core.LlmWrapper`)
 
 | Function / class | Purpose |
 |---|---|

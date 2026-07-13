@@ -62,13 +62,19 @@ def test_build_text_raw_contains_or_clause_single_term():
 
 def test_build_text_raw_contains_or_clause_multiple_terms():
     assert build_text_raw_contains_or_clause("Michael Chang") == (
-        '(text_raw contains "Michael" OR text_raw contains "Chang")'
+        '(text_raw contains "Michael Chang" OR text_raw contains "Michael" OR text_raw contains "Chang")'
+    )
+
+
+def test_build_text_raw_contains_or_clause_phrase_entity_name():
+    assert build_text_raw_contains_or_clause("Charles Sutton") == (
+        '(text_raw contains "Charles Sutton" OR text_raw contains "Charles" OR text_raw contains "Sutton")'
     )
 
 
 def test_build_text_raw_contains_or_clause_escapes_quotes():
     assert build_text_raw_contains_or_clause('say "hi"') == (
-        '(text_raw contains "say" OR text_raw contains "\\"hi\\"")'
+        '(text_raw contains "say \\"hi\\"" OR text_raw contains "say" OR text_raw contains "\\"hi\\"")'
     )
 
 
@@ -79,7 +85,7 @@ def test_build_text_raw_contains_or_clause_empty():
 
 def test_build_text_raw_contains_or_clause_deduplicates_terms():
     assert build_text_raw_contains_or_clause("the the song") == (
-        '(text_raw contains "the" OR text_raw contains "song")'
+        '(text_raw contains "the song" OR text_raw contains "the" OR text_raw contains "song")'
     )
 
 

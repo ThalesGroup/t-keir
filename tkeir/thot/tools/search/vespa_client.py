@@ -219,10 +219,11 @@ def escape_yql_literal(value: str) -> str:
 
 
 def build_text_raw_contains_or_clause(query_text: str) -> str | None:
-    """Build a YQL ``text_raw contains`` clause with OR between query terms.
+    """Build a YQL ``text_raw contains`` clause for hybrid keyword retrieval.
 
-    Vespa ``contains`` on a multi-word string matches all terms (AND). Splitting
-    into separate ``contains`` clauses joined by OR matches any term.
+    Vespa ``contains`` on a multi-word string requires every term (AND). This
+    helper adds a phrase clause for the full query plus per-term OR clauses so
+    entity names like ``Charles Sutton`` match indexed chunk text.
 
     Args:
         query_text: Raw user query.
@@ -233,7 +234,7 @@ def build_text_raw_contains_or_clause(query_text: str) -> str | None:
     Example:
         >>> from thot.tools.search.vespa_client import build_text_raw_contains_or_clause
         >>> build_text_raw_contains_or_clause("Michael Chang")
-        '(text_raw contains "Michael" OR text_raw contains "Chang")'
+        '(text_raw contains "Michael Chang" OR text_raw contains "Michael" OR text_raw contains "Chang")'
     """
     terms: list[str] = []
     seen: set[str] = set()
@@ -249,8 +250,12 @@ def build_text_raw_contains_or_clause(query_text: str) -> str | None:
         return None
     if len(terms) == 1:
         return f'text_raw contains "{escape_yql_literal(terms[0])}"'
+    phrase = " ".join(terms)
     clauses = [
-        f'text_raw contains "{escape_yql_literal(term)}"' for term in terms
+        f'text_raw contains "{escape_yql_literal(phrase)}"',
+        *(
+            f'text_raw contains "{escape_yql_literal(term)}"' for term in terms
+        ),
     ]
     return "(" + " OR ".join(clauses) + ")"
 

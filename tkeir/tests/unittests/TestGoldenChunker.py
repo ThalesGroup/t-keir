@@ -187,6 +187,69 @@ class TestChunkBuilder:
         resolved = company_chunk["metadata"]["implicit_subjects"]
         assert any("The company" in item for item in resolved)
 
+    def test_context_summary_prioritizes_people_over_dates(self):
+        document = {
+            "source_doc_id": "doc-afl",
+            "content_morphosyntax": [
+                _token(str(index), is_sent_start=index == 0, pos="NUM")
+                for index in range(40)
+            ]
+            + [
+                _token("Charles", True, pos="PROPN"),
+                _token("Sutton"),
+                _token("Medal"),
+                _token("."),
+            ],
+            "content_ner": [
+                {
+                    "start": 10,
+                    "end": 12,
+                    "label": "date",
+                    "text": "86.4 34",
+                },
+                {
+                    "start": 12,
+                    "end": 14,
+                    "label": "date",
+                    "text": "8 13 1 1974",
+                },
+                {
+                    "start": 20,
+                    "end": 22,
+                    "label": "location",
+                    "text": "Melbourne",
+                },
+                {
+                    "start": 30,
+                    "end": 32,
+                    "label": "organization",
+                    "text": "Brisbane Lions",
+                },
+                {
+                    "start": 40,
+                    "end": 43,
+                    "label": "person",
+                    "text": "Charles Sutton",
+                },
+            ],
+            "content_deps": [],
+            "kg": [],
+        }
+        chunks = build_golden_chunks(
+            document,
+            settings=ChunkSettings(target_min_tokens=1, target_max_tokens=50),
+        )
+        assert len(chunks) >= 2
+        person_chunk = chunks[-1]
+        previous_chunk = chunks[-2]
+        assert "Charles Sutton" in person_chunk["metadata"]["primary_entities"][
+            "person"
+        ]
+        context_after = previous_chunk["metadata"]["context_summary_after"]
+        assert "Charles Sutton" in context_after
+        assert "[CONTEXT_AFTER]" in previous_chunk["search_vector_payload"]
+        assert "Charles Sutton" in previous_chunk["search_vector_payload"]
+
     def test_implicit_subjects_language_agnostic_french(self):
         document = {
             "source_doc_id": "doc-fr",

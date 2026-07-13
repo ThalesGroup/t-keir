@@ -14,16 +14,55 @@ from thot.core.KeywordRules import is_valid_keyword_label
 
 TKEIR = Namespace("http://tkeir.local/ontology/")
 
-_HIGH_VALUE_ENTITY_TYPES = frozenset(
+_STRUCTURAL_ENTITY_TYPES = frozenset(
     {
-        "Person",
-        "Company",
-        "Location",
-        "Product",
-        "Event",
-        "Facility",
+        "Document",
+        "DocumentChunk",
+        "Keyword",
+        "Tag",
+        "Entity",
+        "Metric",
     }
 )
+
+
+def detect_rdf_format(payload: str) -> str:
+    """Detect whether an RDF payload is JSON-LD or Turtle.
+
+    Example:
+        >>> detect_rdf_format('[{"@id": "http://example.org/a"}]')
+        'json-ld'
+        >>> detect_rdf_format('@prefix ex: <http://example.org/> .')
+        'turtle'
+    """
+    stripped = (payload or "").lstrip()
+    if stripped.startswith("{") or stripped.startswith("["):
+        return "json-ld"
+    return "turtle"
+
+
+def merge_rdf_graphs(rdf_documents: list[str]) -> Graph:
+    """Merge multiple RDF payloads (JSON-LD or Turtle) into one graph.
+
+    Args:
+        rdf_documents: Serialized RDF graphs from pipeline documents or Vespa.
+
+    Returns:
+        Combined :class:`rdflib.Graph`.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import merge_rdf_graphs
+        >>> graph = merge_rdf_graphs([
+        ...     '[{"@id": "http://example.org/Alice", "@type": "http://example.org/Person"}]'
+        ... ])
+        >>> len(graph)
+        1
+    """
+    graph = Graph()
+    graph.bind("tkeir", TKEIR)
+    for document in _unique_rdf_documents(rdf_documents):
+        graph.parse(data=document, format=detect_rdf_format(document))
+    return graph
 
 
 def merge_turtle_graphs(turtle_documents: list[str]) -> Graph:
@@ -43,14 +82,26 @@ def merge_turtle_graphs(turtle_documents: list[str]) -> Graph:
         >>> len(graph)
         1
     """
-    graph = Graph()
-    graph.bind("tkeir", TKEIR)
-    for turtle in turtle_documents:
-        payload = (turtle or "").strip()
-        if not payload:
-            continue
-        graph.parse(data=payload, format="turtle")
-    return graph
+    return merge_rdf_graphs(turtle_documents)
+
+
+def serialize_graph_json_ld(graph: Graph) -> str:
+    """Serialize an RDF graph as JSON-LD for storage or HMI display.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tools.search.ontology_utils import serialize_graph_json_ld
+        >>> graph = Graph()
+        >>> node = URIRef("http://example.org/Alice")
+        >>> graph.add((node, RDF.type, URIRef("http://example.org/Person")))
+        >>> payload = serialize_graph_json_ld(graph)
+        >>> payload.startswith('[')
+        True
+    """
+    if len(graph) == 0:
+        return "[]"
+    return graph.serialize(format="json-ld")
 
 
 _FOCUS_STOPWORDS = frozenset(
@@ -205,6 +256,121 @@ def _query_terms(query_text: str) -> set[str]:
     }
 
 
+def extract_query_highlight_terms(query_text: str) -> list[str]:
+    """Return query tokens and phrases for UI highlighting (longest first).
+
+    Labels are taken from the user query surface form — no stopword list.
+
+    Example:
+        >>> "Charles Sutton" in extract_query_highlight_terms(
+        ...     "In which document appears Charles Sutton"
+        ... )
+        True
+    """
+    query = (query_text or "").strip()
+    if not query:
+        return []
+
+    tokens = re.findall(r"[A-Za-z0-9][A-Za-z0-9'._-]{2,}", query)
+    if not tokens:
+        return []
+
+    seen: set[str] = set()
+    labels: list[str] = []
+
+    def add(label: str) -> None:
+        key = label.lower()
+        if key not in seen:
+            seen.add(key)
+            labels.append(label)
+
+    if len(tokens) >= 2:
+        for start in range(len(tokens)):
+            for end in range(len(tokens), start, -1):
+                add(" ".join(tokens[start:end]))
+
+    for token in tokens:
+        add(token)
+
+    labels.sort(key=len, reverse=True)
+    return labels
+
+
+def highlight_query_terms_in_chunks(
+    query_text: str,
+    chunk_texts: list[str],
+) -> list[str]:
+    """Keep query highlight labels that appear in at least one chunk body.
+
+    Example:
+        >>> highlight_query_terms_in_chunks(
+        ...     "Charles Sutton",
+        ...     ["Active entities: Charles Sutton, AFLW."],
+        ... )
+        ['Charles Sutton', 'Charles', 'Sutton']
+    """
+    candidates = extract_query_highlight_terms(query_text)
+    if not candidates or not chunk_texts:
+        return candidates
+
+    corpus = "\n".join(chunk_texts).lower()
+    return [label for label in candidates if label.lower() in corpus]
+
+
+def chunk_text_matches_query(query_text: str, chunk_text: str) -> bool:
+    """Return whether any query term appears in a chunk body.
+
+    Example:
+        >>> chunk_text_matches_query("Charles Sutton", "Charles Sutton Medal")
+        True
+    """
+    terms = _query_terms(query_text)
+    if not terms:
+        return False
+    haystack = chunk_text.lower()
+    return any(term in haystack for term in terms)
+
+
+def prioritize_chunks_by_query_match(
+    chunks: list[Any],
+    query_text: str,
+) -> list[Any]:
+    """Sort chunks so query-matching bodies rank above pure vector matches.
+
+    Example:
+        >>> chunks = [
+        ...     {"text_raw": "unrelated", "relevance": 0.9},
+        ...     {"text_raw": "Charles Sutton Medal", "relevance": 0.5},
+        ... ]
+        >>> prioritize_chunks_by_query_match(chunks, "Charles Sutton")[0]["text_raw"]
+        'Charles Sutton Medal'
+    """
+    terms = _query_terms(query_text)
+
+    def match_score(chunk: Any) -> int:
+        text = (
+            chunk.text_raw
+            if hasattr(chunk, "text_raw")
+            else str(chunk.get("text_raw") or "")
+        )
+        haystack = text.lower()
+        return sum(1 for term in terms if term in haystack)
+
+    def relevance_score(chunk: Any) -> float:
+        relevance = (
+            chunk.relevance
+            if hasattr(chunk, "relevance")
+            else chunk.get("relevance")
+        )
+        return float(relevance or 0.0)
+
+    return sorted(
+        chunks,
+        key=lambda chunk: (match_score(chunk), relevance_score(chunk)),
+        reverse=True,
+    )
+
+
 def _node_label(graph: Graph, node: URIRef | Literal) -> str:
     """Return a human-readable label for an RDF node.
 
@@ -267,6 +433,24 @@ def _chunk_uri_map(graph: Graph) -> dict[str, str]:
     return mapping
 
 
+def _unique_rdf_documents(rdf_documents: list[str]) -> list[str]:
+    """Deduplicate non-empty RDF payloads.
+
+    Example:
+        >>> _unique_rdf_documents(['@prefix ex: <> .', '@prefix ex: <> .'])
+        ['@prefix ex: <> .']
+    """
+    unique: list[str] = []
+    seen: set[str] = set()
+    for document in rdf_documents:
+        payload = (document or "").strip()
+        if not payload or payload in seen:
+            continue
+        seen.add(payload)
+        unique.append(payload)
+    return unique
+
+
 def _unique_turtle_documents(turtle_documents: list[str]) -> list[str]:
     """Deduplicate non-empty Turtle payloads.
 
@@ -274,15 +458,7 @@ def _unique_turtle_documents(turtle_documents: list[str]) -> list[str]:
         >>> _unique_turtle_documents(["@prefix ex: <> .", "@prefix ex: <> ."])
         ['@prefix ex: <> .']
     """
-    unique: list[str] = []
-    seen: set[str] = set()
-    for turtle in turtle_documents:
-        payload = (turtle or "").strip()
-        if not payload or payload in seen:
-            continue
-        seen.add(payload)
-        unique.append(payload)
-    return unique
+    return _unique_rdf_documents(turtle_documents)
 
 
 def _document_uri_for_chunk(graph: Graph, chunk_uri: URIRef) -> URIRef | None:
@@ -317,7 +493,7 @@ def _keyword_in_chunk_text(keyword: str, chunk_text: str) -> bool:
 
 
 def build_hmi_ontology(
-    turtle_documents: list[str],
+    rdf_documents: list[str],
     retrieved_chunk_ids: list[str],
     *,
     chunk_texts: dict[str, str] | None = None,
@@ -325,10 +501,10 @@ def build_hmi_ontology(
     max_keywords: int = 60,
     min_keyword_length: int = 3,
 ) -> dict[str, Any]:
-    """Export chunk-linked NER entities and keywords for HMI display.
+    """Export chunk-linked NER entities, keywords, and JSON-LD for HMI display.
 
     Args:
-        turtle_documents: Parent document RDF payloads from Vespa.
+        rdf_documents: Parent document RDF payloads from Vespa (JSON-LD or Turtle).
         retrieved_chunk_ids: Chunk ids returned by hybrid search.
         chunk_texts: Optional map of ``chunk_id`` to indexed text for keyword linking.
         max_entities: Maximum number of entity records to return.
@@ -336,17 +512,17 @@ def build_hmi_ontology(
         min_keyword_length: Minimum character length for exported keyword labels.
 
     Returns:
-        Dict with ``entities`` and ``keywords`` lists; each item contains
-        ``label``, ``chunk_ids``, and ``type`` (entities only).
+        Dict with ``entities``, ``keywords``, and ``json_ld``; entity items contain
+        ``label``, ``chunk_ids``, and ``type``.
 
     Example:
         >>> from thot.tools.search.ontology_utils import build_hmi_ontology
         >>> build_hmi_ontology([], [])
-        {'entities': [], 'keywords': []}
+        {'entities': [], 'keywords': [], 'json_ld': '[]'}
     """
-    graph = merge_turtle_graphs(_unique_turtle_documents(turtle_documents))
+    graph = merge_rdf_graphs(_unique_rdf_documents(rdf_documents))
     if len(graph) == 0:
-        return {"entities": [], "keywords": []}
+        return {"entities": [], "keywords": [], "json_ld": "[]"}
 
     chunk_texts = chunk_texts or {}
     chunk_uri_by_id = {
@@ -374,7 +550,7 @@ def build_hmi_ontology(
             if not isinstance(entity, URIRef):
                 continue
             entity_type = _node_type(graph, entity)
-            if entity_type not in _HIGH_VALUE_ENTITY_TYPES:
+            if entity_type in _STRUCTURAL_ENTITY_TYPES:
                 continue
             label = _node_label(graph, entity).strip()
             if not label:
@@ -424,7 +600,11 @@ def build_hmi_ontology(
         )[:max_keywords]
         if chunk_ids
     ]
-    return {"entities": entities, "keywords": keywords}
+    return {
+        "entities": entities,
+        "keywords": keywords,
+        "json_ld": serialize_graph_json_ld(graph),
+    }
 
 
 def extract_relevant_triples(

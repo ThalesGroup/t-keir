@@ -13,65 +13,14 @@ from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, RDFS, XSD
 
 from thot.core.KeywordRules import is_valid_keyword_label
+from thot.tasks.document_ontology.OntologyVocabulary import (
+    FALLBACK_ENTITY_CLASS,
+    METRIC_CLASS,
+    OntologyVocabulary,
+)
 
 TKEIR = Namespace("http://tkeir.local/ontology/")
 TKEIRDOC = Namespace("http://tkeir.local/doc/")
-
-NER_CLASS_MAP = {
-    "organization": "Company",
-    "org": "Company",
-    "company": "Company",
-    "person": "Person",
-    "per": "Person",
-    "product": "Product",
-    "event": "Event",
-    "facility": "Facility",
-    "location": "Location",
-    "loc": "Location",
-    "gpe": "Location",
-    "date": "Date",
-    "time": "Time",
-    "money": "Metric",
-    "percent": "Metric",
-    "quantity": "Metric",
-    "cardinal": "Metric",
-    "ordinal": "Metric",
-}
-
-NODE_CLASSES = {
-    "Entity",
-    "Company",
-    "Person",
-    "Product",
-    "Event",
-    "Location",
-    "Facility",
-    "Date",
-    "Time",
-}
-
-OWNERSHIP_VERBS = frozenset(
-    {
-        "own",
-        "owns",
-        "owned",
-        "create",
-        "creates",
-        "created",
-        "launch",
-        "launches",
-        "launched",
-        "publish",
-        "publishes",
-        "published",
-        "produce",
-        "produces",
-        "produced",
-        "develop",
-        "develops",
-        "developed",
-    }
-)
 
 NUMERIC_RE = re.compile(r"^-?\d+(?:[.,]\d+)?%?$")
 
@@ -104,44 +53,64 @@ def _entity_text(parts: Iterable[object]) -> str:
     return " ".join(str(part).strip() for part in parts if str(part).strip())
 
 
-def _class_for_label(label: str | None) -> str:
+def _class_for_label(
+    label: str | None,
+    vocabulary: OntologyVocabulary | None = None,
+) -> str:
     """Class for label helper.
 
     Example:
         >>> _class_for_label('organization')
-        'Company'
+        'Organization'
     """
-    if not label:
-        return "Entity"
-    return NER_CLASS_MAP.get(str(label).lower(), "Entity")
+    vocab = vocabulary or OntologyVocabulary.empty()
+    return vocab.class_for_ner_label(label)
 
 
-def _build_entity_index(ner_spans: list[dict]) -> dict[str, str]:
+def _build_entity_index(
+    ner_spans: list[dict],
+    vocabulary: OntologyVocabulary | None = None,
+) -> dict[str, str]:
     """Build entity index helper.
 
     Example:
         >>> spans = [{'text': 'ACME', 'label': 'organization'}]
         >>> _build_entity_index(spans)['acme']
-        'Company'
+        'Organization'
     """
     index: dict[str, str] = {}
     for span in ner_spans or []:
         text = str(span.get("text", "")).strip()
         if text:
-            index[text.lower()] = _class_for_label(span.get("label"))
+            index[text.lower()] = _class_for_label(
+                span.get("label"),
+                vocabulary,
+            )
     return index
 
 
-def _lookup_class(text: str, entity_index: dict[str, str]) -> str:
+def _lookup_class(
+    text: str,
+    entity_index: dict[str, str],
+    vocabulary: OntologyVocabulary | None = None,
+    *,
+    role: str = "subject",
+) -> str:
     """Lookup class helper.
 
     Example:
-        >>> _lookup_class('ACME', {'acme': 'Company'})
-        'Company'
+        >>> _lookup_class('ACME', {'acme': 'Organization'})
+        'Organization'
     """
     normalized = str(text).strip().lower()
     if not normalized:
-        return "Entity"
+        return FALLBACK_ENTITY_CLASS
+
+    vocab = vocabulary or OntologyVocabulary.empty()
+    context_class = vocab.class_for_entity(text, role=role)
+    if context_class:
+        return context_class
+
     if normalized in entity_index:
         return entity_index[normalized]
 
@@ -151,8 +120,8 @@ def _lookup_class(text: str, entity_index: dict[str, str]) -> str:
 
     compact = normalized.replace(" ", "").replace(",", "")
     if NUMERIC_RE.match(compact):
-        return "Metric"
-    return "Entity"
+        return METRIC_CLASS
+    return FALLBACK_ENTITY_CLASS
 
 
 def _node_uri(doc_key: str, text: str, class_name: str) -> URIRef:
@@ -167,28 +136,18 @@ def _node_uri(doc_key: str, text: str, class_name: str) -> URIRef:
     return TKEIRDOC[f"{doc_key}/{class_name}/{_slug(text)}-{digest}"]
 
 
-def _predicate_uri(verb: str) -> URIRef:
+def _predicate_uri(
+    verb: str,
+    vocabulary: OntologyVocabulary | None = None,
+) -> URIRef:
     """Predicate uri helper.
 
     Example:
-        >>> str(_predicate_uri('owns')).endswith('ownedBy')
+        >>> str(_predicate_uri('launched')).endswith('launched')
         True
     """
-    normalized = _slug(verb)
-    if normalized in {"own", "owned", "owns"}:
-        return TKEIR.ownedBy
-    if normalized in {
-        "create",
-        "created",
-        "creates",
-        "launch",
-        "launched",
-        "launches",
-    }:
-        return TKEIR.createdBy
-    if normalized in {"publish", "published", "publishes"}:
-        return TKEIR.publishedBy
-    return TKEIR[normalized]
+    vocab = vocabulary or OntologyVocabulary.empty()
+    return TKEIR[vocab.predicate_for_verb(verb)]
 
 
 def _doc_key(document: dict) -> str:
@@ -541,6 +500,7 @@ def _add_svo_to_graph(
     subject_text: str,
     verb_text: str,
     object_text: str,
+    vocabulary: OntologyVocabulary | None = None,
 ) -> None:
     """Add svo to graph helper.
 
@@ -555,18 +515,24 @@ def _add_svo_to_graph(
     if not subject_text or not verb_text:
         return
 
-    subject_uri = entity_node(subject_text)
-    predicate_uri = _predicate_uri(verb_text)
+    vocab = vocabulary or OntologyVocabulary.empty()
+    subject_uri = entity_node(subject_text, role="subject")
+    predicate_uri = _predicate_uri(verb_text, vocab)
     graph.add((doc_uri, TKEIR.hasStatement, subject_uri))
 
     if object_text:
-        object_class = _lookup_class(object_text, entity_index)
-        if object_class in NODE_CLASSES:
-            object_uri = entity_node(object_text)
+        object_class = _lookup_class(
+            object_text,
+            entity_index,
+            vocabulary,
+            role="object",
+        )
+        if vocab.is_node_class(object_class):
+            object_uri = entity_node(object_text, role="object")
             graph.add((subject_uri, predicate_uri, object_uri))
         else:
             graph.add((subject_uri, predicate_uri, Literal(object_text)))
-            if object_class == "Metric":
+            if object_class == METRIC_CLASS:
                 numeric = object_text.replace(",", "").replace("%", "").strip()
                 if NUMERIC_RE.match(numeric):
                     graph.add(
@@ -579,20 +545,6 @@ def _add_svo_to_graph(
     else:
         graph.add((subject_uri, predicate_uri, Literal("")))
 
-    if (
-        _lookup_class(subject_text, entity_index) == "Product"
-        and verb_text.lower() in OWNERSHIP_VERBS
-        and object_text
-        and _lookup_class(object_text, entity_index) == "Company"
-    ):
-        graph.add(
-            (
-                entity_node(subject_text),
-                TKEIR.createdBy,
-                entity_node(object_text),
-            )
-        )
-
 
 def _enrich_graph_from_analysis(
     graph: Graph,
@@ -602,6 +554,7 @@ def _enrich_graph_from_analysis(
     entity_node: Callable[[str], URIRef],
     entity_index: dict[str, str],
     settings: OntologyBuildSettings,
+    vocabulary: OntologyVocabulary | None = None,
 ) -> None:
     """Enrich graph from analysis helper.
 
@@ -635,6 +588,7 @@ def _enrich_graph_from_analysis(
                 subject_text=subject_text,
                 verb_text=verb_text,
                 object_text=object_text,
+                vocabulary=vocabulary,
             )
 
         for keyword in keywords:
@@ -716,6 +670,7 @@ def _enrich_graph_from_analysis(
                     subject_text=str(triplet[0]).strip(),
                     verb_text=str(triplet[1]).strip(),
                     object_text=str(triplet[2]).strip(),
+                    vocabulary=vocabulary,
                 )
 
 
@@ -793,6 +748,7 @@ def compute_ontology_text_coverage(
 def build_document_graph(
     document: dict,
     settings: OntologyBuildSettings | None = None,
+    vocabulary: OntologyVocabulary | None = None,
 ) -> Graph:
     """Build an RDF graph for the document from kg triples and NER spans.
 
@@ -802,12 +758,14 @@ def build_document_graph(
         True
     """
     settings = settings or OntologyBuildSettings()
+    vocabulary = vocabulary or OntologyVocabulary.empty()
     graph = Graph()
     graph.bind("tkeir", TKEIR)
     graph.bind("tkeirdoc", TKEIRDOC)
 
     entity_index = _build_entity_index(
-        (document.get("title_ner") or []) + (document.get("content_ner") or [])
+        (document.get("title_ner") or []) + (document.get("content_ner") or []),
+        vocabulary,
     )
     doc_key = _doc_key(document)
     doc_uri = TKEIRDOC[doc_key]
@@ -816,7 +774,7 @@ def build_document_graph(
 
     seen_nodes: dict[tuple[str, str], URIRef] = {}
 
-    def entity_node(text: str) -> URIRef:
+    def entity_node(text: str, role: str = "subject") -> URIRef:
         """entity_node API.
 
         Example:
@@ -825,7 +783,12 @@ def build_document_graph(
             True
         """
         clean_text = str(text).strip()
-        class_name = _lookup_class(clean_text, entity_index)
+        class_name = _lookup_class(
+            clean_text,
+            entity_index,
+            vocabulary,
+            role=role,
+        )
         cache_key = (class_name, clean_text.lower())
         if cache_key not in seen_nodes:
             node = _node_uri(doc_key, clean_text, class_name)
@@ -844,6 +807,7 @@ def build_document_graph(
             subject_text=subject_text,
             verb_text=verb_text,
             object_text=object_text,
+            vocabulary=vocabulary,
         )
 
     _enrich_graph_from_analysis(
@@ -854,6 +818,7 @@ def build_document_graph(
         entity_node=entity_node,
         entity_index=entity_index,
         settings=settings,
+        vocabulary=vocabulary,
     )
 
     return graph

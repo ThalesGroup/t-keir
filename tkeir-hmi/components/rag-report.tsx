@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Download, FileText } from "lucide-react";
@@ -19,16 +20,20 @@ interface RagReportPanelProps {
   reportMarkdown: string | null;
   highlightEntities: string[];
   highlightKeywords: string[];
+  highlightQueryTerms: string[];
   loading: boolean;
 }
+
+const REMARK_PLUGINS = [remarkGfm];
 
 function highlightedComponents(
   entities: string[],
   keywords: string[],
+  queryTerms: string[],
 ): Components {
-  const renderChildren = (children: React.ReactNode): React.ReactNode => {
+  const renderChildren = (children: ReactNode): ReactNode => {
     if (typeof children === "string") {
-      return highlightText(children, entities, keywords);
+      return highlightText(children, entities, keywords, queryTerms);
     }
     if (Array.isArray(children)) {
       return children.map((child, index) => (
@@ -71,13 +76,24 @@ function highlightedComponents(
   };
 }
 
-export function RagReportPanel({
+export const RagReportPanel = memo(function RagReportPanel({
   query,
   reportMarkdown,
   highlightEntities,
   highlightKeywords,
+  highlightQueryTerms,
   loading,
 }: RagReportPanelProps) {
+  const markdownComponents = useMemo(
+    () =>
+      highlightedComponents(
+        highlightEntities,
+        highlightKeywords,
+        highlightQueryTerms,
+      ),
+    [highlightEntities, highlightKeywords, highlightQueryTerms],
+  );
+
   if (loading) {
     return (
       <Card>
@@ -145,11 +161,8 @@ export function RagReportPanel({
 
         <article className="prose prose-sm max-w-none dark:prose-invert">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={highlightedComponents(
-              highlightEntities,
-              highlightKeywords,
-            )}
+            remarkPlugins={REMARK_PLUGINS}
+            components={markdownComponents}
           >
             {reportMarkdown}
           </ReactMarkdown>
@@ -157,4 +170,4 @@ export function RagReportPanel({
       </CardContent>
     </Card>
   );
-}
+});

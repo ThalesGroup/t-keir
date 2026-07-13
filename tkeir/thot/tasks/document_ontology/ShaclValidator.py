@@ -44,6 +44,7 @@ def parse_validation_report(report_graph: Graph | None) -> list[dict]:
 def validate_document_graph(
     data_graph: Graph,
     call_context=None,
+    shapes_ttl: str | None = None,
 ) -> tuple[bool, list[dict]]:
     """Validate a document graph; returns (conforms, violations).
 
@@ -53,7 +54,10 @@ def validate_document_graph(
         True
     """
     shapes_graph = Graph()
-    shapes_graph.parse(data=DOCUMENT_SHACL_SHAPES_TTL, format="turtle")
+    shapes_graph.parse(
+        data=shapes_ttl or DOCUMENT_SHACL_SHAPES_TTL,
+        format="turtle",
+    )
 
     try:
         import pyshacl

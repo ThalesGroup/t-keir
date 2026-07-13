@@ -8,6 +8,15 @@ from collections import defaultdict
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
+from thot.tools.search.ontology_utils import (
+    _focus_query_terms,
+    _split_sentences,
+    chunk_text_matches_query,
+    extract_focus_passages,
+    highlight_query_terms_in_chunks,
+    prioritize_chunks_by_query_match,
+)
+
 if TYPE_CHECKING:
     from thot.tools.search.app import FusedOntology, RetrievedChunk
 
@@ -24,6 +33,452 @@ def _format_document_name(parent_doc_id: str) -> str:
     """
     without_scheme = parent_doc_id.replace("file://", "")
     return without_scheme.split("/")[-1] or parent_doc_id
+
+
+def is_unavailable_short_answer(short_answer: str, unavailable_answer: str) -> bool:
+    """Return whether the short answer is the configured unavailable fallback.
+
+    Example:
+        >>> is_unavailable_short_answer(
+        ...     "The information is not available.",
+        ...     "The information is not available.",
+        ... )
+        True
+    """
+    short = short_answer.strip().lower()
+    if not short:
+        return True
+    unavailable = unavailable_answer.strip().lower()
+    if not unavailable:
+        return False
+    return short == unavailable or unavailable in short
+
+
+def chunks_matching_query(
+    chunks: list[RetrievedChunk],
+    query_text: str,
+) -> list[RetrievedChunk]:
+    """Return retrieved chunks whose body contains at least one query term.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunk = RetrievedChunk(
+        ...     chunk_id="c1",
+        ...     text_raw="Charles Sutton Medal",
+        ...     parent_doc_id="file://doc.pdf",
+        ... )
+        >>> chunks_matching_query([chunk], "Charles Sutton")[0].chunk_id
+        'c1'
+    """
+    return [
+        chunk
+        for chunk in chunks
+        if chunk_text_matches_query(query_text, chunk.text_raw)
+    ]
+
+
+def _answer_terms(short_answer: str) -> set[str]:
+    """Extract salient tokens from a short answer for chunk cross-checking."""
+    terms: set[str] = set()
+    for token in re.findall(
+        r"[A-Za-z0-9][A-Za-z0-9'._-]{2,}", short_answer.lower()
+    ):
+        terms.add(token)
+    for word in re.findall(r"[A-Za-z][A-Za-z'._-]+", short_answer):
+        if word[0].isupper():
+            terms.add(word.lower())
+    return terms
+
+
+def answer_supported_by_matching_chunks(
+    short_answer: str,
+    chunks: list[RetrievedChunk],
+    query_text: str,
+    *,
+    unavailable_answer: str = "",
+) -> bool:
+    """Return whether the answer names content present in query-matching chunks.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunk = RetrievedChunk(
+        ...     chunk_id="c1",
+        ...     text_raw='George Harrison liked "Something in the Way She Moves".',
+        ...     parent_doc_id="file://doc.pdf",
+        ... )
+        >>> answer_supported_by_matching_chunks(
+        ...     "George Harrison",
+        ...     [chunk],
+        ...     'Who liked "Something in the Way She Moves"',
+        ... )
+        True
+    """
+    if is_unavailable_short_answer(short_answer, unavailable_answer):
+        return False
+
+    matching = chunks_matching_query(chunks, query_text)
+    if not matching or not short_answer.strip():
+        return False
+
+    passage_answer = _passage_based_short_answer(query_text, matching)
+    short_clean = short_answer.strip().lower()
+    if passage_answer:
+        passage_clean = passage_answer.strip().lower()
+        if short_clean == passage_clean:
+            return True
+        if passage_clean in short_clean or short_clean in passage_clean:
+            return True
+
+    answer_terms = _answer_terms(short_answer)
+    if len(answer_terms) > 6:
+        return False
+    corpus = "\n".join(chunk.text_raw.lower() for chunk in matching)
+    return any(term in corpus for term in answer_terms)
+
+
+def _best_focus_sentence(
+    matching: list[RetrievedChunk],
+    query_text: str,
+) -> tuple[str, str] | None:
+    """Return the best ``(chunk_id, sentence)`` pair for the query."""
+    if re.match(r"^\s*who\b", query_text, re.I):
+        predicate = _who_predicate_token(query_text)
+        terms = _focus_query_terms(query_text)
+        if predicate:
+            best: tuple[str, str] | None = None
+            best_score = 0
+            for chunk in matching:
+                for sentence in _split_sentences(chunk.text_raw):
+                    sentence_lower = sentence.lower()
+                    if predicate not in sentence_lower:
+                        continue
+                    score = sum(1 for term in terms if term in sentence_lower)
+                    if score > best_score:
+                        best_score = score
+                        best = (chunk.chunk_id, sentence.strip())
+            if best is not None:
+                return best
+
+    focus = extract_focus_passages(
+        [(chunk.chunk_id, chunk.text_raw) for chunk in matching],
+        query_text,
+        max_passages=1,
+    )
+    if not focus or focus == "No focused passages identified.":
+        return None
+    line = focus.split("\n")[0].strip()
+    match = re.match(r"- \[(.+?)\] (.+)", line)
+    if match:
+        return match.group(1), match.group(2).strip()
+    return None, line.lstrip("- ").strip()
+
+
+def _top_focus_sentence(
+    matching: list[RetrievedChunk],
+    query_text: str,
+) -> tuple[str, str] | None:
+    """Return the best ``(chunk_id, sentence)`` pair for the query."""
+    return _best_focus_sentence(matching, query_text)
+
+
+def _who_predicate_token(query_text: str) -> str | None:
+    """Return the main verb/token immediately following a ``who`` question."""
+    match = re.match(
+        r"^\s*who\s+([A-Za-z][A-Za-z'._-]*)",
+        query_text,
+        re.I,
+    )
+    if not match:
+        return None
+    return match.group(1).lower()
+
+
+def _subject_before_query_token(query_text: str, sentence: str) -> str | None:
+    """Extract the subject that precedes a query verb/token in a focus sentence."""
+    if re.match(r"^\s*who\b", query_text, re.I):
+        predicate = _who_predicate_token(query_text)
+        if predicate:
+            name_match = re.search(
+                rf"([A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+)*)\s+{re.escape(predicate)}\b",
+                sentence,
+            )
+            if name_match:
+                return name_match.group(1).strip()
+        return None
+
+    for token in sorted(_focus_query_terms(query_text), key=len, reverse=True):
+        match = re.search(rf"^(.+?)\s+{re.escape(token)}\b", sentence, re.I)
+        if not match:
+            continue
+        subject = match.group(1).strip().strip("\"'")
+        if subject and len(subject) > 1:
+            return subject
+    return None
+
+
+def _passage_based_short_answer(
+    query_text: str,
+    matching: list[RetrievedChunk],
+) -> str | None:
+    """Build a concise answer from the top focus passage when possible.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunk = RetrievedChunk(
+        ...     chunk_id="c1",
+        ...     text_raw='George Harrison liked "Something in the Way She Moves".',
+        ...     parent_doc_id="file://doc.pdf",
+        ... )
+        >>> _passage_based_short_answer(
+        ...     'Who liked "Something in the Way She Moves"',
+        ...     [chunk],
+        ... )
+        'George Harrison'
+    """
+    top = _top_focus_sentence(matching, query_text)
+    if top is None:
+        return None
+    _chunk_id, sentence = top
+    if re.match(r"^\s*who\b", query_text, re.I):
+        subject = _subject_before_query_token(query_text, sentence)
+        if subject:
+            return subject
+    clause = re.split(r"\s+so\s+|\.", sentence, maxsplit=1)[0].strip()
+    return clause[:400] if clause else None
+
+
+def build_chunk_evidence_answer(
+    query_text: str,
+    chunks: list[RetrievedChunk],
+) -> tuple[str, str] | None:
+    """Build a chunk-grounded answer when the LLM returned unavailable.
+
+    Args:
+        query_text: Original user question.
+        chunks: Retrieved chunks from Vespa.
+
+    Returns:
+        ``(short_answer, detailed_report)`` when query terms appear in chunks,
+        otherwise ``None``.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunk = RetrievedChunk(
+        ...     chunk_id="doc.pdf#chunk-1",
+        ...     text_raw="Awards · Charles Sutton Medal · AFL",
+        ...     parent_doc_id="file://tests/doc.pdf",
+        ... )
+        >>> short, _ = build_chunk_evidence_answer("Charles Sutton", [chunk])
+        >>> "doc.pdf" in short
+        True
+    """
+    matching = chunks_matching_query(chunks, query_text)
+    if not matching:
+        return None
+
+    passage_answer = _passage_based_short_answer(query_text, matching)
+
+    by_document: dict[str, list[RetrievedChunk]] = defaultdict(list)
+    for chunk in matching:
+        by_document[chunk.parent_doc_id].append(chunk)
+
+    doc_lines: list[str] = []
+    for parent_doc_id, doc_chunks in sorted(
+        by_document.items(),
+        key=lambda item: (
+            -_document_top_relevance(item[1]),
+            _format_document_name(item[0]).lower(),
+        ),
+    ):
+        display_name = _format_document_name(parent_doc_id)
+        chunk_ids = [
+            chunk.chunk_id.split("#")[-1]
+            if "#" in chunk.chunk_id
+            else chunk.chunk_id
+            for chunk in sorted(
+                doc_chunks,
+                key=lambda item: item.relevance or 0.0,
+                reverse=True,
+            )
+        ]
+        suffix = "s" if len(chunk_ids) != 1 else ""
+        doc_lines.append(
+            f"- **{display_name}** "
+            f"({len(chunk_ids)} matching chunk{suffix}: "
+            f"{', '.join(chunk_ids)})"
+        )
+
+    short_answer = passage_answer or (
+        "The excerpts do not fully answer the question, but query terms appear "
+        "in the following retrieved document(s):\n" + "\n".join(doc_lines)
+    )
+    if passage_answer and len(by_document) > 1:
+        short_answer = (
+            f"{passage_answer}\n\n"
+            "Also mentioned in: "
+            + ", ".join(
+                _format_document_name(parent_doc_id)
+                for parent_doc_id in by_document
+            )
+        )
+    elif passage_answer and doc_lines:
+        short_answer = (
+            f"{passage_answer}\n\n"
+            "Source: "
+            + ", ".join(
+                _format_document_name(parent_doc_id)
+                for parent_doc_id in by_document
+            )
+        )
+
+    detailed_lines = [
+        "## Detailed Analysis",
+        "",
+        "Retrieved chunks contain terms from your query. Relevant excerpts:",
+        "",
+    ]
+    for chunk in prioritize_chunks_by_query_match(matching, query_text)[:8]:
+        display_name = _format_document_name(chunk.parent_doc_id)
+        excerpt = re.sub(r"\s+", " ", chunk.text_raw).strip()
+        if len(excerpt) > 500:
+            excerpt = f"{excerpt[:500].rstrip()}…"
+        detailed_lines.append(
+            f"- **{display_name}** — chunk `{chunk.chunk_id}` "
+            f"(relevance: {_format_relevance(chunk.relevance)})"
+        )
+        detailed_lines.append(f"  {excerpt}")
+        detailed_lines.append("")
+
+    return short_answer, "\n".join(detailed_lines).strip()
+
+
+def should_apply_chunk_evidence(
+    short_answer: str,
+    chunks: list[RetrievedChunk],
+    query_text: str,
+    unavailable_answer: str,
+) -> bool:
+    """Return whether to replace the LLM answer with chunk-grounded evidence.
+
+    Uses query tokens extracted from the user question — no hardcoded word list.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunk = RetrievedChunk(
+        ...     chunk_id="doc.pdf#c1",
+        ...     text_raw="Charles Sutton Medal",
+        ...     parent_doc_id="file://doc.pdf",
+        ... )
+        >>> should_apply_chunk_evidence(
+        ...     "The information is not available.",
+        ...     [chunk],
+        ...     "Charles Sutton",
+        ...     "The information is not available.",
+        ... )
+        True
+    """
+    matching = chunks_matching_query(chunks, query_text)
+    if not matching:
+        return False
+    if is_unavailable_short_answer(short_answer, unavailable_answer):
+        return True
+    if answer_supported_by_matching_chunks(
+        short_answer,
+        chunks,
+        query_text,
+        unavailable_answer=unavailable_answer,
+    ):
+        return False
+
+    short_lower = short_answer.strip().lower()
+    if not short_lower:
+        return True
+
+    highlight_terms = highlight_query_terms_in_chunks(
+        query_text,
+        [chunk.text_raw for chunk in chunks],
+    )
+    mentions_terms = any(term.lower() in short_lower for term in highlight_terms)
+    if not mentions_terms:
+        return True
+
+    matching_doc_names = {
+        _format_document_name(chunk.parent_doc_id).lower() for chunk in matching
+    }
+    cites_document = any(
+        name in short_lower
+        for name in matching_doc_names
+        if name
+    ) or any(chunk.parent_doc_id.lower() in short_lower for chunk in matching)
+
+    return not cites_document
+
+
+def apply_chunk_evidence_fallback(
+    *,
+    query_text: str,
+    short_answer: str,
+    detailed_report: str,
+    chunks: list[RetrievedChunk],
+    unavailable_answer: str,
+) -> tuple[str, str, bool]:
+    """Replace weak LLM answers when retrieved chunks contain query terms.
+
+    Returns:
+        ``(short_answer, detailed_report, used_chunk_evidence)``.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunk = RetrievedChunk(
+        ...     chunk_id="doc.pdf#c1",
+        ...     text_raw="Charles Sutton Medal",
+        ...     parent_doc_id="file://doc.pdf",
+        ... )
+        >>> short, _, used = apply_chunk_evidence_fallback(
+        ...     query_text="Charles Sutton",
+        ...     short_answer="The information is not available.",
+        ...     detailed_report="",
+        ...     chunks=[chunk],
+        ...     unavailable_answer="The information is not available.",
+        ... )
+        >>> used
+        True
+    """
+    if not should_apply_chunk_evidence(
+        short_answer,
+        chunks,
+        query_text,
+        unavailable_answer,
+    ):
+        return short_answer, detailed_report, False
+
+    evidence = build_chunk_evidence_answer(query_text, chunks)
+    if evidence is None:
+        return short_answer, detailed_report, False
+    short, detailed = evidence
+    return short, detailed, True
+
+
+def query_highlight_terms(
+    query_text: str,
+    chunks: list[RetrievedChunk],
+) -> list[str]:
+    """Return query labels present in retrieved chunks for UI highlighting.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunk = RetrievedChunk(
+        ...     chunk_id="c1",
+        ...     text_raw="Charles Sutton Medal",
+        ...     parent_doc_id="doc",
+        ... )
+        >>> "Charles Sutton" in query_highlight_terms("Charles Sutton", [chunk])
+        True
+    """
+    return highlight_query_terms_in_chunks(
+        query_text,
+        [chunk.text_raw for chunk in chunks],
+    )
 
 
 def parse_structured_generation(
@@ -236,6 +691,11 @@ def _ontology_section_markdown(
     return "\n".join(lines)
 
 
+def _document_top_relevance(doc_chunks: list[RetrievedChunk]) -> float:
+    """Return the highest relevance score within a document group."""
+    return max((chunk.relevance or 0.0) for chunk in doc_chunks)
+
+
 def _sources_section_markdown(chunks: list[RetrievedChunk]) -> str:
     """Build the retrieved-sources section of a downloadable RAG report.
 
@@ -254,7 +714,10 @@ def _sources_section_markdown(chunks: list[RetrievedChunk]) -> str:
 
     for parent_doc_id, doc_chunks in sorted(
         by_document.items(),
-        key=lambda item: _format_document_name(item[0]).lower(),
+        key=lambda item: (
+            -_document_top_relevance(item[1]),
+            _format_document_name(item[0]).lower(),
+        ),
     ):
         display_name = _format_document_name(parent_doc_id)
         lines.append(f"### Document: `{display_name}`")

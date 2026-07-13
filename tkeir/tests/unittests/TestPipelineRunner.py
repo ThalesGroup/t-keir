@@ -87,11 +87,11 @@ class TestPipelineRunner:
             **enriched,
             "golden_chunks": [],
             "document_ontology": {
-                "rdf_graph_serialized": (
-                    "@prefix tkeir: <http://tkeir.local/ontology/> ."
+                "json_ld": (
+                    '[{"@id": "http://tkeir.local/ontology/Document"}]'
                 ),
                 "shacl_status": "PASSED",
-                "incoherences": [],
+                "incoherences": {"total": 0, "unresolved": 0, "auto_fixed": 0},
             },
         }
         mock_chunk_questions.return_value.run.return_value = {
@@ -99,11 +99,11 @@ class TestPipelineRunner:
             "keywords": [],
             "golden_chunks": [],
             "document_ontology": {
-                "rdf_graph_serialized": (
-                    "@prefix tkeir: <http://tkeir.local/ontology/> ."
+                "json_ld": (
+                    '[{"@id": "http://tkeir.local/ontology/Document"}]'
                 ),
                 "shacl_status": "PASSED",
-                "incoherences": [],
+                "incoherences": {"total": 0, "unresolved": 0, "auto_fixed": 0},
             },
             "chunk_questions_ready": True,
         }
@@ -231,7 +231,7 @@ class TestPipelineRunner:
             "golden_chunks": [],
             "document_ontology": {
                 "shacl_status": "PASSED",
-                "incoherences": [],
+                "incoherences": {"total": 0, "unresolved": 0, "auto_fixed": 0},
             },
         }
         mock_chunk_questions.return_value.run.return_value = {
@@ -240,7 +240,7 @@ class TestPipelineRunner:
             "golden_chunks": [],
             "document_ontology": {
                 "shacl_status": "PASSED",
-                "incoherences": [],
+                "incoherences": {"total": 0, "unresolved": 0, "auto_fixed": 0},
             },
             "chunk_questions_ready": True,
         }

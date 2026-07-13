@@ -190,16 +190,18 @@ class TestChunkBuilder:
     def test_context_summary_prioritizes_people_over_dates(self):
         document = {
             "source_doc_id": "doc-afl",
-            "content_morphosyntax": [
-                _token(str(index), is_sent_start=index == 0, pos="NUM")
-                for index in range(40)
-            ]
-            + [
-                _token("Charles", True, pos="PROPN"),
-                _token("Sutton"),
-                _token("Medal"),
-                _token("."),
-            ],
+            "content_morphosyntax": (
+                [
+                    _token(str(index), is_sent_start=index == 0, pos="NUM")
+                    for index in range(40)
+                ]
+                + [
+                    _token("Charles", True, pos="PROPN"),
+                    _token("Sutton"),
+                    _token("Medal"),
+                    _token("."),
+                ]
+            ),
             "content_ner": [
                 {
                     "start": 10,
@@ -242,9 +244,10 @@ class TestChunkBuilder:
         assert len(chunks) >= 2
         person_chunk = chunks[-1]
         previous_chunk = chunks[-2]
-        assert "Charles Sutton" in person_chunk["metadata"]["primary_entities"][
-            "person"
-        ]
+        assert (
+            "Charles Sutton"
+            in person_chunk["metadata"]["primary_entities"]["person"]
+        )
         context_after = previous_chunk["metadata"]["context_summary_after"]
         assert "Charles Sutton" in context_after
         assert "[CONTEXT_AFTER]" in previous_chunk["search_vector_payload"]

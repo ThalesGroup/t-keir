@@ -152,9 +152,11 @@ class TestOntologyBuilder:
 class TestSelfHealingLoop:
     def test_rule_repair_can_pass_after_attempt(self):
         graph = build_document_graph(_document_with_kg())
-        graph, status, attempts, incoherence_summary = run_self_healing_validation(
-            graph,
-            settings=SelfHealingSettings(max_repair_attempts=2),
+        graph, status, attempts, incoherence_summary = (
+            run_self_healing_validation(
+                graph,
+                settings=SelfHealingSettings(max_repair_attempts=2),
+            )
         )
         assert status in {
             "PASSED",

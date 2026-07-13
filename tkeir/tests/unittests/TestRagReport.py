@@ -5,8 +5,8 @@ from thot.tools.search.app import RetrievedChunk
 from thot.tools.search.rag_report import (
     apply_chunk_evidence_fallback,
     assemble_report_markdown,
-    build_fallback_detailed_report,
     build_chunk_evidence_answer,
+    build_fallback_detailed_report,
     extract_highlight_labels,
     is_unavailable_short_answer,
     parse_structured_generation,
@@ -133,7 +133,9 @@ def test_query_highlight_terms_from_user_query():
         text_raw="Active entities: Charles Sutton, AFLW.",
         parent_doc_id="doc",
     )
-    terms = query_highlight_terms("In which document appears Charles Sutton", [chunk])
+    terms = query_highlight_terms(
+        "In which document appears Charles Sutton", [chunk]
+    )
     assert "Charles Sutton" in terms
     assert "Charles" in terms
 
@@ -179,7 +181,9 @@ def test_build_chunk_evidence_answer_uses_passage_for_who_questions():
 
 
 def test_answer_supported_by_matching_chunks_keeps_llm_name_answer():
-    from thot.tools.search.rag_report import answer_supported_by_matching_chunks
+    from thot.tools.search.rag_report import (
+        answer_supported_by_matching_chunks,
+    )
 
     chunk = RetrievedChunk(
         chunk_id="c1",

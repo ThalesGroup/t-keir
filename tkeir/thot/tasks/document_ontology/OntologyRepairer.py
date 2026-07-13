@@ -13,6 +13,12 @@ from thot.tasks.document_ontology.OntologyVocabulary import METRIC_CLASS
 
 
 def _local_name_from_uri(value: str) -> str:
+    """Local name from uri helper.
+
+    Example:
+        >>> _local_name_from_uri('http://example.org#Person')
+        'Person'
+    """
     text = str(value).strip()
     if not text:
         return ""
@@ -120,10 +126,28 @@ def _repair_missing_typed_link(
     graph: Graph,
     violations: Iterable[dict],
 ) -> None:
-    """Add a missing typed object link for minCount shape violations."""
+    """Add a missing typed object link for minCount shape violations.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> focus = URIRef('http://example.org/entity')
+        >>> related = URIRef('http://example.org/related')
+        >>> _ = graph.add((focus, RDF.type, TKEIR.Person))
+        >>> _ = graph.add((related, RDF.type, TKEIR.Organization))
+        >>> _ = graph.add((URIRef('http://example.org/other'), TKEIR.worksFor, related))
+        >>> violations = [{'focus_node': str(focus), 'result_path': str(TKEIR.worksFor)}]
+        >>> _repair_missing_typed_link(graph, violations)
+        >>> (focus, TKEIR.worksFor, related) in graph
+        True
+    """
     for violation in violations:
         focus_text = str(violation.get("focus_node", "")).strip()
-        result_path = _local_name_from_uri(str(violation.get("result_path", "")))
+        result_path = _local_name_from_uri(
+            str(violation.get("result_path", ""))
+        )
         if not focus_text or not result_path:
             continue
         if result_path in {"hasNumericValue"}:
@@ -147,8 +171,25 @@ def _repair_numeric_values(
     graph: Graph,
     violations: Iterable[dict],
 ) -> None:
+    """Repair numeric values helper.
+
+    Example:
+        >>> from rdflib import Graph, Literal, URIRef
+        >>> from rdflib.namespace import RDF, RDFS
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> metric = URIRef('http://example.org/metric')
+        >>> _ = graph.add((metric, RDF.type, TKEIR.Metric))
+        >>> _ = graph.add((metric, RDFS.label, Literal('12.5%')))
+        >>> violations = [{'focus_node': str(metric), 'result_path': str(TKEIR.hasNumericValue)}]
+        >>> _repair_numeric_values(graph, violations)
+        >>> str(graph.value(metric, TKEIR.hasNumericValue))
+        '12.5'
+    """
     for violation in violations:
-        result_path = _local_name_from_uri(str(violation.get("result_path", "")))
+        result_path = _local_name_from_uri(
+            str(violation.get("result_path", ""))
+        )
         if result_path != "hasNumericValue":
             continue
         focus_text = str(violation.get("focus_node", "")).strip()

@@ -21,7 +21,6 @@ from thot.tasks.document_ontology.OntologyBuilder import (
     build_document_graph,
     compute_ontology_text_coverage,
 )
-from thot.tools.search.ontology_utils import serialize_graph_json_ld
 from thot.tasks.document_ontology.SelfHealingLoop import (
     SelfHealingSettings,
     run_self_healing_validation,
@@ -30,6 +29,7 @@ from thot.tasks.document_ontology.ShaclInductor import (
     induce_document_shacl_shapes,
 )
 from thot.tasks.TaskInfo import TaskInfo
+from thot.tools.search.ontology_utils import serialize_graph_json_ld
 
 
 class DocumentOntologyBuilder:

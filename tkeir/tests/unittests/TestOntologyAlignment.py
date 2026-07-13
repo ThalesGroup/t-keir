@@ -99,12 +99,12 @@ def test_build_document_vocabulary_clusters_with_tfidf_lemmas():
         ),
     )
     assert report["status"] == "APPLIED"
-    assert vocabulary.class_for_ner_label("writer") == vocabulary.class_for_ner_label(
-        "writers"
-    )
-    assert vocabulary.predicate_for_verb("written by") == vocabulary.predicate_for_verb(
-        "written_by"
-    )
+    assert vocabulary.class_for_ner_label(
+        "writer"
+    ) == vocabulary.class_for_ner_label("writers")
+    assert vocabulary.predicate_for_verb(
+        "written by"
+    ) == vocabulary.predicate_for_verb("written_by")
 
 
 def test_extract_class_and_predicate_labels():

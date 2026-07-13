@@ -9,7 +9,9 @@ from thot.tasks.document_ontology.OntologyVocabulary import (
     sanitize_rdf_local_name,
     title_case_label,
 )
-from thot.tasks.document_ontology.ShaclInductor import induce_document_shacl_shapes
+from thot.tasks.document_ontology.ShaclInductor import (
+    induce_document_shacl_shapes,
+)
 from thot.tasks.document_ontology.ShaclValidator import validate_document_graph
 
 
@@ -37,6 +39,8 @@ def test_induced_shacl_shapes_parse_with_sanitized_class_names():
     )
     shapes_graph = Graph()
     shapes_graph.parse(data=shapes_ttl, format="turtle")
-    conforms, _violations = validate_document_graph(graph, shapes_ttl=shapes_ttl)
+    conforms, _violations = validate_document_graph(
+        graph, shapes_ttl=shapes_ttl
+    )
     assert "Mandarin.[7" not in shapes_ttl
     assert "Mandarin7" in shapes_ttl

@@ -87,9 +87,7 @@ class TestPipelineRunner:
             **enriched,
             "golden_chunks": [],
             "document_ontology": {
-                "json_ld": (
-                    '[{"@id": "http://tkeir.local/ontology/Document"}]'
-                ),
+                "json_ld": '[{"@id": "http://tkeir.local/ontology/Document"}]',
                 "shacl_status": "PASSED",
                 "incoherences": {"total": 0, "unresolved": 0, "auto_fixed": 0},
             },
@@ -99,9 +97,7 @@ class TestPipelineRunner:
             "keywords": [],
             "golden_chunks": [],
             "document_ontology": {
-                "json_ld": (
-                    '[{"@id": "http://tkeir.local/ontology/Document"}]'
-                ),
+                "json_ld": '[{"@id": "http://tkeir.local/ontology/Document"}]',
                 "shacl_status": "PASSED",
                 "incoherences": {"total": 0, "unresolved": 0, "auto_fixed": 0},
             },

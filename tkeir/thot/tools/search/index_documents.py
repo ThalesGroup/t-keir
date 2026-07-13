@@ -81,7 +81,9 @@ def _document_fields(document: dict[str, Any]) -> dict[str, Any]:
         'Doc'
     """
     ontology = document.get("document_ontology") or {}
-    json_ld = ontology.get("json_ld") or ontology.get("rdf_graph_serialized", "")
+    json_ld = ontology.get("json_ld") or ontology.get(
+        "rdf_graph_serialized", ""
+    )
     return {
         "source_doc_id": sanitize_vespa_string(document["source_doc_id"]),
         "title": sanitize_vespa_string(document.get("title") or ""),

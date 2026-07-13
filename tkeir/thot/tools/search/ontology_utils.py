@@ -94,7 +94,7 @@ def serialize_graph_json_ld(graph: Graph) -> str:
         >>> from thot.tools.search.ontology_utils import serialize_graph_json_ld
         >>> graph = Graph()
         >>> node = URIRef("http://example.org/Alice")
-        >>> graph.add((node, RDF.type, URIRef("http://example.org/Person")))
+        >>> _ = graph.add((node, RDF.type, URIRef("http://example.org/Person")))
         >>> payload = serialize_graph_json_ld(graph)
         >>> payload.startswith('[')
         True

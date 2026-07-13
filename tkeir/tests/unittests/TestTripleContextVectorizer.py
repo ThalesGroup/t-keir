@@ -37,7 +37,10 @@ def test_build_context_bags_for_subject_predicate_object_roles():
     predicate_bags = build_context_bags(triples, "predicate")
 
     assert "acme" in subject_bags
-    assert "launched" in predicate_bags["launched"][0] or "widget" in subject_bags["acme"][0]
+    assert (
+        "launched" in predicate_bags["launched"][0]
+        or "widget" in subject_bags["acme"][0]
+    )
     assert "globex" in subject_bags
     assert "widget" in object_bags
 
@@ -111,5 +114,8 @@ def test_build_document_vocabulary_uses_subject_context_map():
         ),
     )
     assert report["status"] == "APPLIED"
-    assert vocabulary.subject_class_map["acme"] == vocabulary.subject_class_map["globex"]
+    assert (
+        vocabulary.subject_class_map["acme"]
+        == vocabulary.subject_class_map["globex"]
+    )
     assert report["context_clustering"]["triple_count"] == 2

@@ -169,6 +169,12 @@ _ENTITY_LABEL_PRIORITY = (
 
 
 def _label_priority(label: str) -> int:
+    """Label priority helper.
+
+    Example:
+        >>> _label_priority('person')
+        0
+    """
     normalized = str(label).lower()
     for index, preferred in enumerate(_ENTITY_LABEL_PRIORITY):
         if preferred in normalized:
@@ -177,6 +183,14 @@ def _label_priority(label: str) -> int:
 
 
 def _is_noisy_entity_text(text: str) -> bool:
+    """Noisy entity text helper.
+
+    Example:
+        >>> _is_noisy_entity_text('42')
+        True
+        >>> _is_noisy_entity_text('Alice')
+        False
+    """
     compact = str(text).strip().replace(" ", "")
     if not compact:
         return True
@@ -190,7 +204,12 @@ def _flatten_primary_entities(
     *,
     limit: int = 8,
 ) -> list[str]:
-    """Rank entity texts for summaries, prioritizing people and organizations."""
+    """Rank entity texts for summaries, prioritizing people and organizations.
+
+    Example:
+        >>> _flatten_primary_entities({'person': ['Alice', 'Bob']})
+        ['Alice', 'Bob']
+    """
     ranked: list[tuple[int, str, str]] = []
     for label, values in primary_entities.items():
         priority = _label_priority(label)
@@ -214,6 +233,16 @@ def _flatten_primary_entities(
 
 
 def _triple_token_positions(triple: dict) -> list[int]:
+    """Triple token positions helper.
+
+    Example:
+        >>> _triple_token_positions({
+        ...     'subject': {'positions': [0, 1]},
+        ...     'property': {'positions': [2]},
+        ...     'value': {'positions': [3]},
+        ... })
+        [0, 1, 2, 3]
+    """
     positions: list[int] = []
     for part in ("subject", "property", "value"):
         positions.extend((triple.get(part) or {}).get("positions", []))

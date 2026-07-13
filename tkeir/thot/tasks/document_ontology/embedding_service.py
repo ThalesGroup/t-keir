@@ -15,5 +15,10 @@ EmbedBatchFn = LabelVectorFn
 
 
 def embed_labels_sync(labels: list[str]) -> list[list[float]]:
-    """Deprecated: use :func:`vectorize_labels_tfidf` instead."""
+    """Deprecated: use :func:`vectorize_labels_tfidf` instead.
+
+    Example:
+        >>> len(embed_labels_sync(['Writer']))
+        1
+    """
     return vectorize_labels_tfidf(labels)

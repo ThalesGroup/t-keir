@@ -40,6 +40,7 @@ ACTIVE_TESTS=(
     unittests/TestRawConverter.py
     unittests/TestThotLogger.py
     unittests/TestUtils.py
+    unittests/TestLlmWrapper.py
     functional_tests/TestPipeline.py
 )
 

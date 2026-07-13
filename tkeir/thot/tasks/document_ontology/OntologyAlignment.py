@@ -5,11 +5,12 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, cast
 
 import numpy as np
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, RDFS
+from rdflib.term import Node
 from sklearn.cluster import AgglomerativeClustering
 
 from thot.core.ThotLogger import ThotLogger
@@ -18,12 +19,8 @@ from thot.tasks.document_ontology.label_vectorizer import (
     vectorize_labels_tfidf,
 )
 from thot.tasks.document_ontology.OntologyBuilder import (
-    OntologyBuildSettings,
     TKEIR,
-)
-from thot.tasks.document_ontology.triple_context_vectorizer import (
-    cluster_entities_by_triple_context,
-    collect_document_svo_triples,
+    OntologyBuildSettings,
 )
 from thot.tasks.document_ontology.OntologyVocabulary import (
     FALLBACK_ENTITY_CLASS,
@@ -32,6 +29,10 @@ from thot.tasks.document_ontology.OntologyVocabulary import (
     slug_to_predicate_name,
     slugify_verb,
     title_case_label,
+)
+from thot.tasks.document_ontology.triple_context_vectorizer import (
+    cluster_entities_by_triple_context,
+    collect_document_svo_triples,
 )
 
 DEFAULT_SIMILARITY_THRESHOLD = 0.85
@@ -69,6 +70,17 @@ class AlignmentSettings:
 
 
 def _local_name(uri: URIRef) -> str:
+    """Return the local name segment of a URI.
+
+    Example:
+        >>> from rdflib import URIRef
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _local_name
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> _local_name(TKEIR.Person)
+        'Person'
+        >>> _local_name(URIRef("http://example.org/foo/Bar"))
+        'Bar'
+    """
     text = str(uri)
     if "#" in text:
         return text.rsplit("#", 1)[-1]
@@ -76,6 +88,17 @@ def _local_name(uri: URIRef) -> str:
 
 
 def _is_tkeir_uri(uri: URIRef) -> bool:
+    """Return whether ``uri`` belongs to the TKEIR ontology namespace.
+
+    Example:
+        >>> from rdflib import URIRef
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _is_tkeir_uri
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> _is_tkeir_uri(TKEIR.Person)
+        True
+        >>> _is_tkeir_uri(URIRef("http://example.org/foo"))
+        False
+    """
     return str(uri).startswith(str(TKEIR))
 
 
@@ -89,8 +112,8 @@ def extract_class_labels(graph: Graph) -> list[str]:
         >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
         >>> graph = Graph()
         >>> node = URIRef("http://example.org/person/1")
-        >>> graph.add((node, RDF.type, TKEIR.Person))
-        >>> graph.add((node, RDFS.label, Literal("Alice")))
+        >>> _ = graph.add((node, RDF.type, TKEIR.Person))
+        >>> _ = graph.add((node, RDFS.label, Literal("Alice")))
         >>> extract_class_labels(graph)
         ['Person']
     """
@@ -114,7 +137,7 @@ def extract_predicate_labels(graph: Graph) -> list[str]:
         >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
         >>> graph = Graph()
         >>> s, o = URIRef("http://example.org/s"), URIRef("http://example.org/o")
-        >>> graph.add((s, TKEIR.createdBy, o))
+        >>> _ = graph.add((s, TKEIR.createdBy, o))
         >>> "createdBy" in extract_predicate_labels(graph)
         True
     """
@@ -130,6 +153,15 @@ def extract_predicate_labels(graph: Graph) -> list[str]:
 
 
 def _normalize_rows(vectors: np.ndarray) -> np.ndarray:
+    """L2-normalize each row of a vector matrix.
+
+    Example:
+        >>> import numpy as np
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _normalize_rows
+        >>> normalized = _normalize_rows(np.array([[3.0, 4.0]]))
+        >>> round(float(normalized[0, 0]), 1)
+        0.6
+    """
     norms = np.linalg.norm(vectors, axis=1, keepdims=True)
     norms[norms == 0] = 1.0
     return vectors / norms
@@ -143,7 +175,23 @@ def _cluster_labels(
     min_cluster_size: int,
     canonical_picker: Callable[[list[str], np.ndarray], str],
 ) -> dict[str, str]:
-    """Cluster labels and map each member to a canonical label."""
+    """Cluster labels and map each member to a canonical label.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import (
+        ...     _canonical_class_label,
+        ...     _cluster_labels,
+        ... )
+        >>> mapping = _cluster_labels(
+        ...     ["Alpha", "Beta"],
+        ...     [[1.0, 0.0], [1.0, 0.0]],
+        ...     similarity_threshold=0.9,
+        ...     min_cluster_size=2,
+        ...     canonical_picker=_canonical_class_label,
+        ... )
+        >>> mapping["Alpha"] == mapping["Beta"]
+        True
+    """
     if not labels:
         return {}
     if len(labels) == 1:
@@ -178,7 +226,15 @@ def _cluster_labels(
 
 
 def _canonical_class_label(labels: list[str], vectors: np.ndarray) -> str:
-    """Pick the class label closest to the cluster centroid."""
+    """Pick the class label closest to the cluster centroid.
+
+    Example:
+        >>> import numpy as np
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _canonical_class_label
+        >>> vectors = np.array([[1.0, 0.0], [0.9, 0.1]])
+        >>> _canonical_class_label(["Alice", "Alicia"], vectors) in ["Alice", "Alicia"]
+        True
+    """
     centroid = vectors.mean(axis=0)
     centroid_norm = np.linalg.norm(centroid)
     if centroid_norm == 0:
@@ -192,7 +248,15 @@ def _canonical_property_label(
     labels: list[str],
     frequencies: Counter[str],
 ) -> str:
-    """Pick the most frequent property label, then the shortest."""
+    """Pick the most frequent property label, then the shortest.
+
+    Example:
+        >>> from collections import Counter
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _canonical_property_label
+        >>> frequencies = Counter({"writtenBy": 3, "createdBy": 1})
+        >>> _canonical_property_label(["writtenBy", "createdBy"], frequencies)
+        'writtenBy'
+    """
     return sorted(
         labels,
         key=lambda label: (-frequencies[label], len(label), label.lower()),
@@ -204,6 +268,13 @@ def _build_class_map(
     settings: AlignmentSettings,
     vector_fn: LabelVectorFn,
 ) -> dict[str, str]:
+    """Build a class synonym map from graph labels and URI segments.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _build_class_map
+        >>> callable(_build_class_map)
+        True
+    """
     class_names = extract_class_labels(graph)
     if len(class_names) < settings.min_cluster_size:
         return {label: label for label in class_names}
@@ -220,7 +291,9 @@ def _build_class_map(
         min_cluster_size=settings.min_cluster_size,
         canonical_picker=_canonical_class_label,
     )
-    return _class_map_from_alias_clusters(class_names, alias_to_class, alias_map)
+    return _class_map_from_alias_clusters(
+        class_names, alias_to_class, alias_map
+    )
 
 
 def _build_property_map(
@@ -228,6 +301,13 @@ def _build_property_map(
     settings: AlignmentSettings,
     vector_fn: LabelVectorFn,
 ) -> dict[str, str]:
+    """Build a property synonym map from graph predicate labels.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _build_property_map
+        >>> callable(_build_property_map)
+        True
+    """
     labels = extract_predicate_labels(graph)
     if len(labels) < settings.min_cluster_size:
         return {label: label for label in labels}
@@ -256,6 +336,21 @@ def _build_property_map(
 
 
 def _rewrite_classes(graph: Graph, class_map: dict[str, str]) -> int:
+    """Rewrite ``rdf:type`` edges using a class synonym map.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _rewrite_classes
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> node = URIRef("http://example.org/person/1")
+        >>> _ = graph.add((node, RDF.type, TKEIR.Writers))
+        >>> _rewrite_classes(graph, {"Writers": "Writer"})
+        1
+        >>> list(graph.objects(node, RDF.type)) == [TKEIR.Writer]
+        True
+    """
     replacements = 0
     for old_label, new_label in class_map.items():
         if old_label == new_label:
@@ -270,6 +365,20 @@ def _rewrite_classes(graph: Graph, class_map: dict[str, str]) -> int:
 
 
 def _rewrite_properties(graph: Graph, property_map: dict[str, str]) -> int:
+    """Rewrite graph predicates using a property synonym map.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _rewrite_properties
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> s, o = URIRef("http://example.org/s"), URIRef("http://example.org/o")
+        >>> _ = graph.add((s, TKEIR.createdBy, o))
+        >>> _rewrite_properties(graph, {"createdBy": "writtenBy"})
+        1
+        >>> list(graph.predicates(s, o)) == [TKEIR.writtenBy]
+        True
+    """
     replacements = 0
     for old_label, new_label in property_map.items():
         if old_label == new_label:
@@ -286,10 +395,22 @@ def _rewrite_properties(graph: Graph, property_map: dict[str, str]) -> int:
 
 
 def _alignment_clusters(mapping: dict[str, str]) -> list[dict[str, object]]:
+    """Group synonym mappings into canonical cluster reports.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _alignment_clusters
+        >>> clusters = _alignment_clusters(
+        ...     {"Writer": "Writer", "Writers": "Writer"}
+        ... )
+        >>> clusters[0]["canonical"]
+        'Writer'
+        >>> sorted(clusters[0]["members"])
+        ['Writer', 'Writers']
+    """
     grouped: dict[str, list[str]] = {}
     for label, canonical in mapping.items():
         grouped.setdefault(canonical, []).append(label)
-    clusters = []
+    clusters: list[dict[str, object]] = []
     for canonical, members in sorted(grouped.items()):
         synonyms = sorted(
             {member for member in members if member != canonical}
@@ -309,7 +430,13 @@ def _compose_label_maps(
     base_map: dict[str, str],
     overlay_map: dict[str, str],
 ) -> dict[str, str]:
-    """Chain two label maps so overlay refinements apply to base mappings."""
+    """Chain two label maps so overlay refinements apply to base mappings.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _compose_label_maps
+        >>> _compose_label_maps({"A": "B", "C": "C"}, {"B": "D"})["A"]
+        'D'
+    """
     keys = set(base_map) | set(overlay_map)
     composed: dict[str, str] = {}
     for label in keys:
@@ -322,17 +449,43 @@ def merge_alignment_reports(
     vocabulary_report: dict[str, object],
     graph_report: dict[str, object],
 ) -> dict[str, object]:
-    """Merge pre-build vocabulary alignment with post-build graph alignment."""
+    """Merge pre-build vocabulary alignment with post-build graph alignment.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import merge_alignment_reports
+        >>> vocab = {
+        ...     "enabled": True,
+        ...     "status": "APPLIED",
+        ...     "class_map": {"Writer": "Writer"},
+        ...     "property_map": {},
+        ... }
+        >>> graph = {
+        ...     "enabled": True,
+        ...     "status": "APPLIED",
+        ...     "class_map": {"Writers": "Writer"},
+        ...     "property_map": {},
+        ...     "class_rewrites": 1,
+        ... }
+        >>> merged = merge_alignment_reports(vocab, graph)
+        >>> merged["class_map"]["Writers"]
+        'Writer'
+    """
     if not graph_report.get("enabled"):
         return {
             **vocabulary_report,
             "graph_alignment": graph_report,
         }
 
-    vocab_class_map = dict(vocabulary_report.get("class_map") or {})
-    vocab_property_map = dict(vocabulary_report.get("property_map") or {})
-    graph_class_map = dict(graph_report.get("class_map") or {})
-    graph_property_map = dict(graph_report.get("property_map") or {})
+    vocab_class_map = cast(
+        dict[str, str], vocabulary_report.get("class_map") or {}
+    )
+    vocab_property_map = cast(
+        dict[str, str], vocabulary_report.get("property_map") or {}
+    )
+    graph_class_map = cast(dict[str, str], graph_report.get("class_map") or {})
+    graph_property_map = cast(
+        dict[str, str], graph_report.get("property_map") or {}
+    )
 
     merged: dict[str, object] = {
         "enabled": True,
@@ -342,15 +495,30 @@ def merge_alignment_reports(
         "property_map": _compose_label_maps(
             vocab_property_map, graph_property_map
         ),
-        "node_classes": vocabulary_report.get("vocabulary", {}).get(
-            "node_classes"
+        "node_classes": _nested_report_value(
+            vocabulary_report, "vocabulary", "node_classes"
         ),
-        "class_clusters": list(vocabulary_report.get("class_clusters") or [])
-        + list(graph_report.get("class_clusters") or []),
-        "property_clusters": list(
-            vocabulary_report.get("property_clusters") or []
-        )
-        + list(graph_report.get("property_clusters") or []),
+        "class_clusters": (
+            list(
+                cast(
+                    list[object], vocabulary_report.get("class_clusters") or []
+                )
+            )
+            + list(
+                cast(list[object], graph_report.get("class_clusters") or [])
+            )
+        ),
+        "property_clusters": (
+            list(
+                cast(
+                    list[object],
+                    vocabulary_report.get("property_clusters") or [],
+                )
+            )
+            + list(
+                cast(list[object], graph_report.get("property_clusters") or [])
+            )
+        ),
     }
 
     if graph_report.get("status") == "SKIPPED":
@@ -375,6 +543,15 @@ def merge_alignment_reports(
 
 
 def _collect_document_ner_labels(document: dict) -> list[str]:
+    """Collect normalized NER labels from title and content spans.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _collect_document_ner_labels
+        >>> _collect_document_ner_labels(
+        ...     {"content_ner": [{"label": "Person", "text": "Alice"}]}
+        ... )
+        ['person']
+    """
     labels: set[str] = set()
     for key in ("title_ner", "content_ner"):
         for span in document.get(key) or []:
@@ -385,7 +562,16 @@ def _collect_document_ner_labels(document: dict) -> list[str]:
 
 
 def _collect_dynamic_class_labels(document: dict) -> list[str]:
-    """Collect class label candidates from NER, chunks, KG, and entity text."""
+    """Collect class label candidates from NER, chunks, KG, and entity text.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _collect_dynamic_class_labels
+        >>> labels = _collect_dynamic_class_labels(
+        ...     {"content_ner": [{"label": "organization", "text": "Acme Corp"}]}
+        ... )
+        >>> "Organization" in labels
+        True
+    """
     candidates: set[str] = set()
 
     for label in _collect_document_ner_labels(document):
@@ -402,7 +588,7 @@ def _collect_dynamic_class_labels(document: dict) -> list[str]:
 
     for chunk in document.get("golden_chunks") or []:
         metadata = chunk.get("metadata") or {}
-        for entity_key in (metadata.get("primary_entities") or {}):
+        for entity_key in metadata.get("primary_entities") or {}:
             key_text = str(entity_key).strip()
             if key_text:
                 candidates.add(key_text.lower())
@@ -429,8 +615,37 @@ def _collect_dynamic_class_labels(document: dict) -> list[str]:
     )
 
 
-def _uri_class_segment(node: URIRef) -> str | None:
-    """Return the URI path segment immediately before the instance id."""
+def _nested_report_value(
+    report: dict[str, object],
+    section_key: str,
+    value_key: str,
+) -> object:
+    """Read a nested value from an alignment report section.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _nested_report_value
+        >>> _nested_report_value(
+        ...     {"vocabulary": {"node_classes": ["Person"]}},
+        ...     "vocabulary",
+        ...     "node_classes",
+        ... )
+        ['Person']
+    """
+    section = report.get(section_key)
+    if isinstance(section, dict):
+        return section.get(value_key)
+    return None
+
+
+def _uri_class_segment(node: Node) -> str | None:
+    """Return the URI path segment immediately before the instance id.
+
+    Example:
+        >>> from rdflib import URIRef
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _uri_class_segment
+        >>> _uri_class_segment(URIRef("http://tkeir.local/doc/demo/Writer/alice-1"))
+        'Writer'
+    """
     parts = str(node).rstrip("/").split("/")
     if len(parts) < 2:
         return None
@@ -443,7 +658,22 @@ def _uri_class_segment(node: URIRef) -> str | None:
 def _class_cluster_candidates(
     graph: Graph,
 ) -> tuple[list[str], dict[str, str]]:
-    """Build clustering aliases for RDF class names and URI class segments."""
+    """Build clustering aliases for RDF class names and URI class segments.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _class_cluster_candidates
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> node = URIRef("http://tkeir.local/doc/demo/Writer/alice-1")
+        >>> _ = graph.add((node, RDF.type, TKEIR.Writer))
+        >>> labels, aliases = _class_cluster_candidates(graph)
+        >>> "writer" in labels
+        True
+        >>> aliases["writer"]
+        'Writer'
+    """
     cluster_labels: list[str] = []
     alias_to_class: dict[str, str] = {}
 
@@ -477,11 +707,35 @@ def _class_map_from_alias_clusters(
     alias_to_class: dict[str, str],
     alias_map: dict[str, str],
 ) -> dict[str, str]:
+    """Collapse alias clusters back to canonical RDF class names.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _class_map_from_alias_clusters
+        >>> class_map = _class_map_from_alias_clusters(
+        ...     ["Writer", "Writers"],
+        ...     {
+        ...         "Writer": "Writer",
+        ...         "writer": "Writer",
+        ...         "Writers": "Writers",
+        ...         "writers": "Writers",
+        ...     },
+        ...     {
+        ...         "Writer": "Writer",
+        ...         "writer": "Writer",
+        ...         "Writers": "Writer",
+        ...         "writers": "Writer",
+        ...     },
+        ... )
+        >>> class_map["Writers"]
+        'Writer'
+    """
     class_map: dict[str, str] = {}
     class_name_set = set(class_names)
     for class_name in class_names:
         aliases = [
-            alias for alias, mapped in alias_to_class.items() if mapped == class_name
+            alias
+            for alias, mapped in alias_to_class.items()
+            if mapped == class_name
         ]
         canonical_aliases = {alias_map.get(alias, alias) for alias in aliases}
         canonical_aliases.add(class_name)
@@ -506,10 +760,21 @@ def _class_map_from_alias_clusters(
 
 
 def _collect_document_verb_slugs(document: dict) -> list[str]:
+    """Collect slugified verb phrases from document KG triples.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _collect_document_verb_slugs
+        >>> _collect_document_verb_slugs(
+        ...     {"kg": [{"property": {"content": ["written by"]}}]}
+        ... )
+        ['written_by']
+    """
     slugs: set[str] = set()
     for triple in document.get("kg") or []:
         content = (triple.get("property") or {}).get("content", [])
-        verb = " ".join(str(part).strip() for part in content if str(part).strip())
+        verb = " ".join(
+            str(part).strip() for part in content if str(part).strip()
+        )
         if verb:
             slugs.add(slugify_verb(verb))
     return sorted(slugs)
@@ -520,6 +785,21 @@ def _build_vocabulary_class_map(
     settings: AlignmentSettings,
     vector_fn: LabelVectorFn,
 ) -> dict[str, str]:
+    """Build a class synonym map from vocabulary label candidates.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import (
+        ...     AlignmentSettings,
+        ...     _build_vocabulary_class_map,
+        ... )
+        >>> from thot.tasks.document_ontology.label_vectorizer import vectorize_labels_tfidf
+        >>> _build_vocabulary_class_map(
+        ...     ["Person"],
+        ...     AlignmentSettings(min_cluster_size=2),
+        ...     vectorize_labels_tfidf,
+        ... )
+        {'Person': 'Person'}
+    """
     if len(class_labels) < settings.min_cluster_size:
         return {label: label for label in class_labels}
 
@@ -550,11 +830,21 @@ def _build_vocabulary_class_map(
         min_cluster_size=settings.min_cluster_size,
         canonical_picker=_canonical_class_label,
     )
-    return _class_map_from_alias_clusters(class_labels, alias_to_class, alias_map)
+    return _class_map_from_alias_clusters(
+        class_labels, alias_to_class, alias_map
+    )
 
 
 def _collect_ner_entity_classes(document: dict) -> dict[str, str]:
-    """Map normalized entity surface forms to NER-derived class names."""
+    """Map normalized entity surface forms to NER-derived class names.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _collect_ner_entity_classes
+        >>> _collect_ner_entity_classes(
+        ...     {"content_ner": [{"label": "person", "text": "Alice"}]}
+        ... )
+        {'alice': 'Person'}
+    """
     entity_classes: dict[str, str] = {}
     for key in ("title_ner", "content_ner"):
         for span in document.get(key) or []:
@@ -569,6 +859,16 @@ def _apply_canonical_class_map(
     mapping: dict[str, str],
     class_map: dict[str, str],
 ) -> dict[str, str]:
+    """Apply a canonical class map to entity-to-class mappings.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _apply_canonical_class_map
+        >>> _apply_canonical_class_map(
+        ...     {"alice": "Writers"},
+        ...     {"Writers": "Writer"},
+        ... )
+        {'alice': 'Writer'}
+    """
     return {
         key: class_map.get(class_name, class_name)
         for key, class_name in mapping.items()
@@ -580,7 +880,22 @@ def _build_triple_context_maps(
     settings: AlignmentSettings,
     ner_entity_classes: dict[str, str],
 ) -> tuple[dict[str, str], dict[str, str], dict[str, str], int]:
-    """Cluster subjects, objects, and predicates from complementary SVO context."""
+    """Cluster subjects, objects, and predicates from complementary SVO context.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import (
+        ...     AlignmentSettings,
+        ...     _build_triple_context_maps,
+        ... )
+        >>> callable(
+        ...     _build_triple_context_maps(
+        ...         {"kg": []},
+        ...         AlignmentSettings(),
+        ...         {},
+        ...     )
+        ... )
+        False
+    """
     triples = collect_document_svo_triples(document, OntologyBuildSettings())
     subject_map = cluster_entities_by_triple_context(
         triples,
@@ -609,20 +924,25 @@ def _build_triple_context_maps(
 
 
 def _build_heuristic_vocabulary(document: dict) -> OntologyVocabulary:
-    """Label NER spans and verbs from document text without clustering."""
+    """Label NER spans and verbs from document text without clustering.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _build_heuristic_vocabulary
+        >>> vocabulary = _build_heuristic_vocabulary(
+        ...     {"content_ner": [{"label": "person", "text": "Alice"}]}
+        ... )
+        >>> vocabulary.class_for_ner_label("person")
+        'Person'
+    """
     ner_labels = _collect_document_ner_labels(document)
     verb_slugs = _collect_document_verb_slugs(document)
     class_candidates = _collect_dynamic_class_labels(document)
 
-    ner_class_map = {
-        label: title_case_label(label) for label in ner_labels
-    }
+    ner_class_map = {label: title_case_label(label) for label in ner_labels}
     class_map = {class_name: class_name for class_name in class_candidates}
     for label, class_name in ner_class_map.items():
         class_map[class_name] = class_name
-    property_map = {
-        slug: slug_to_predicate_name(slug) for slug in verb_slugs
-    }
+    property_map = {slug: slug_to_predicate_name(slug) for slug in verb_slugs}
     node_classes = frozenset(
         class_name
         for class_name in class_map.values()
@@ -648,13 +968,26 @@ def _build_vocabulary_property_map(
     settings: AlignmentSettings,
     vector_fn: LabelVectorFn,
 ) -> dict[str, str]:
+    """Build a property synonym map from verb slug candidates.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import (
+        ...     AlignmentSettings,
+        ...     _build_vocabulary_property_map,
+        ... )
+        >>> from thot.tasks.document_ontology.label_vectorizer import vectorize_labels_tfidf
+        >>> _build_vocabulary_property_map(
+        ...     ["launched"],
+        ...     AlignmentSettings(min_cluster_size=2),
+        ...     vectorize_labels_tfidf,
+        ... )
+        {'launched': 'launched'}
+    """
     labels = sorted(set(verb_slugs))
     if not labels:
         return {}
     if len(labels) < settings.min_cluster_size:
-        return {
-            label: slug_to_predicate_name(label) for label in labels
-        }
+        return {label: slug_to_predicate_name(label) for label in labels}
 
     frequencies: Counter[str] = Counter(verb_slugs)
     vectors = vector_fn(labels)
@@ -707,9 +1040,7 @@ def build_document_vocabulary(
     ner_labels = _collect_document_ner_labels(document)
     verb_slugs = _collect_document_verb_slugs(document)
 
-    initial_classes = {
-        label: title_case_label(label) for label in ner_labels
-    }
+    initial_classes = {label: title_case_label(label) for label in ner_labels}
     class_candidates = sorted(
         set(_collect_dynamic_class_labels(document))
         | set(initial_classes.values())
@@ -718,9 +1049,12 @@ def build_document_vocabulary(
     ner_entity_classes = _collect_ner_entity_classes(document)
 
     try:
-        subject_class_map, object_class_map, predicate_context_map, triple_count = (
-            _build_triple_context_maps(document, settings, ner_entity_classes)
-        )
+        (
+            subject_class_map,
+            object_class_map,
+            predicate_context_map,
+            triple_count,
+        ) = _build_triple_context_maps(document, settings, ner_entity_classes)
         class_map = _build_vocabulary_class_map(
             class_candidates,
             settings,
@@ -731,8 +1065,12 @@ def build_document_vocabulary(
             settings,
             vectorize,
         )
-        subject_class_map = _apply_canonical_class_map(subject_class_map, class_map)
-        object_class_map = _apply_canonical_class_map(object_class_map, class_map)
+        subject_class_map = _apply_canonical_class_map(
+            subject_class_map, class_map
+        )
+        object_class_map = _apply_canonical_class_map(
+            object_class_map, class_map
+        )
         property_map = dict(property_label_map)
         property_map.update(predicate_context_map)
     except Exception as error:
@@ -783,6 +1121,9 @@ def build_document_vocabulary(
         object_class_map=object_class_map,
     )
 
+    class_clusters = _alignment_clusters(class_map)
+    property_clusters = _alignment_clusters(property_map)
+
     report: dict[str, object] = {
         "enabled": True,
         "status": "APPLIED",
@@ -798,15 +1139,15 @@ def build_document_vocabulary(
             "object_entities": len(object_class_map),
             "predicate_aliases": len(predicate_context_map),
         },
-        "class_clusters": _alignment_clusters(class_map),
-        "property_clusters": _alignment_clusters(property_map),
+        "class_clusters": class_clusters,
+        "property_clusters": property_clusters,
         "vocabulary": vocabulary.to_report(),
     }
     ThotLogger.info(
         "Document vocabulary alignment applied: "
-        + str(len(report["class_clusters"]))
+        + str(len(class_clusters))
         + " class cluster(s), "
-        + str(len(report["property_clusters"]))
+        + str(len(property_clusters))
         + " property cluster(s)",
         context=call_context,
     )
@@ -862,6 +1203,9 @@ def align_document_graph(
     class_rewrites = _rewrite_classes(graph, class_map)
     property_rewrites = _rewrite_properties(graph, property_map)
 
+    class_clusters = _alignment_clusters(class_map)
+    property_clusters = _alignment_clusters(property_map)
+
     report: dict[str, object] = {
         "enabled": True,
         "status": "APPLIED",
@@ -869,16 +1213,16 @@ def align_document_graph(
         "similarity_threshold": settings.similarity_threshold,
         "class_map": class_map,
         "property_map": property_map,
-        "class_clusters": _alignment_clusters(class_map),
-        "property_clusters": _alignment_clusters(property_map),
+        "class_clusters": class_clusters,
+        "property_clusters": property_clusters,
         "class_rewrites": class_rewrites,
         "property_rewrites": property_rewrites,
     }
     ThotLogger.info(
         "Ontology alignment applied: "
-        + str(len(report["class_clusters"]))
+        + str(len(class_clusters))
         + " class cluster(s), "
-        + str(len(report["property_clusters"]))
+        + str(len(property_clusters))
         + " property cluster(s)",
         context=call_context,
     )

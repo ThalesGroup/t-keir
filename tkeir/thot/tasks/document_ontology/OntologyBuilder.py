@@ -495,7 +495,7 @@ def _coverage_stats(document: dict, settings: OntologyBuildSettings) -> dict:
 def _add_svo_to_graph(
     graph: Graph,
     doc_uri: URIRef,
-    entity_node: Callable[[str], URIRef],
+    entity_node: Callable[..., URIRef],
     entity_index: dict[str, str],
     subject_text: str,
     verb_text: str,
@@ -551,7 +551,7 @@ def _enrich_graph_from_analysis(
     document: dict,
     doc_uri: URIRef,
     doc_key: str,
-    entity_node: Callable[[str], URIRef],
+    entity_node: Callable[..., URIRef],
     entity_index: dict[str, str],
     settings: OntologyBuildSettings,
     vocabulary: OntologyVocabulary | None = None,
@@ -764,7 +764,8 @@ def build_document_graph(
     graph.bind("tkeirdoc", TKEIRDOC)
 
     entity_index = _build_entity_index(
-        (document.get("title_ner") or []) + (document.get("content_ner") or []),
+        (document.get("title_ner") or [])
+        + (document.get("content_ner") or []),
         vocabulary,
     )
     doc_key = _doc_key(document)

@@ -12,12 +12,19 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 LabelVectorFn = Callable[[list[str]], list[list[float]]]
 
-_CAMEL_BOUNDARY = re.compile(r"(?<!^)(?=[A-Z])|(?<=[a-z])(?=[0-9])|(?<=[0-9])(?=[A-Za-z])")
+_CAMEL_BOUNDARY = re.compile(
+    r"(?<!^)(?=[A-Z])|(?<=[a-z])(?=[0-9])|(?<=[0-9])(?=[A-Za-z])"
+)
 _TOKEN_SPLIT = re.compile(r"[^a-zA-Z0-9]+")
 
 
 def _lemma_token(token: str) -> str:
-    """Normalize a token to a coarse lemma for clustering."""
+    """Normalize a token to a coarse lemma for clustering.
+
+    Example:
+        >>> _lemma_token('writers')
+        'writer'
+    """
     normalized = token.lower().strip()
     if not normalized:
         return ""
@@ -33,16 +40,17 @@ def _lemma_token(token: str) -> str:
 
 
 def label_tokens(label: str) -> list[str]:
-    """Split a class or property label into raw tokens."""
+    """Split a class or property label into raw tokens.
+
+    Example:
+        >>> label_tokens('writtenBy')
+        ['written', 'By']
+    """
     text = str(label).strip()
     if not text:
         return []
     spaced = _CAMEL_BOUNDARY.sub(" ", text)
-    return [
-        token
-        for token in _TOKEN_SPLIT.split(spaced)
-        if token
-    ]
+    return [token for token in _TOKEN_SPLIT.split(spaced) if token]
 
 
 def label_lemmas(label: str) -> list[str]:

@@ -47,6 +47,6 @@ def test_pipeline_runner_for_language_falls_back_to_english():
 
     state = AppState()
     sentinel = object()
-    state.pipeline_runners = {"en": sentinel}  # type: ignore[assignment]
+    state.pipeline_runners = {"en": sentinel}
     assert _pipeline_runner_for_language(state, "fr") is sentinel
     assert _pipeline_runner_for_language(state, "en") is sentinel

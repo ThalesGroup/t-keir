@@ -253,9 +253,7 @@ def build_text_raw_contains_or_clause(query_text: str) -> str | None:
     phrase = " ".join(terms)
     clauses = [
         f'text_raw contains "{escape_yql_literal(phrase)}"',
-        *(
-            f'text_raw contains "{escape_yql_literal(term)}"' for term in terms
-        ),
+        *(f'text_raw contains "{escape_yql_literal(term)}"' for term in terms),
     ]
     return "(" + " OR ".join(clauses) + ")"
 

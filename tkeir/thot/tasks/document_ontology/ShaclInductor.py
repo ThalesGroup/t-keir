@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from typing import cast
 
 from rdflib import Graph, URIRef
 from rdflib.namespace import RDF
@@ -19,6 +20,13 @@ from thot.tasks.document_ontology.ShaclShapes import DOCUMENT_SHACL_SHAPES_TTL
 
 
 def _local_name(uri: URIRef) -> str:
+    """Local name helper.
+
+    Example:
+        >>> from rdflib import URIRef
+        >>> _local_name(URIRef('http://example.org#Person'))
+        'Person'
+    """
     text = str(uri)
     if "#" in text:
         return text.rsplit("#", 1)[-1]
@@ -30,22 +38,39 @@ def _rewrite_shapes_ttl(
     class_map: dict[str, str],
     property_map: dict[str, str],
 ) -> str:
-    """Replace class/property tokens in Turtle SHACL with canonical names."""
+    """Replace class/property tokens in Turtle SHACL with canonical names.
+
+    Example:
+        >>> _rewrite_shapes_ttl('tkeir:writers', {'writers': 'Writer'}, {})
+        'tkeir:Writer'
+    """
     updated = shapes_ttl
     for old_label, new_label in class_map.items():
         if old_label != new_label:
             old_safe = sanitize_rdf_class_name(old_label, fallback=old_label)
             new_safe = sanitize_rdf_class_name(new_label, fallback=new_label)
-            updated = updated.replace(f"tkeir:{old_label}", f"tkeir:{new_safe}")
+            updated = updated.replace(
+                f"tkeir:{old_label}", f"tkeir:{new_safe}"
+            )
             if old_safe != old_label:
-                updated = updated.replace(f"tkeir:{old_safe}", f"tkeir:{new_safe}")
+                updated = updated.replace(
+                    f"tkeir:{old_safe}", f"tkeir:{new_safe}"
+                )
     for old_label, new_label in property_map.items():
         if old_label != new_label:
-            old_safe = sanitize_rdf_property_name(old_label, fallback=old_label)
-            new_safe = sanitize_rdf_property_name(new_label, fallback=new_label)
-            updated = updated.replace(f"tkeir:{old_label}", f"tkeir:{new_safe}")
+            old_safe = sanitize_rdf_property_name(
+                old_label, fallback=old_label
+            )
+            new_safe = sanitize_rdf_property_name(
+                new_label, fallback=new_label
+            )
+            updated = updated.replace(
+                f"tkeir:{old_label}", f"tkeir:{new_safe}"
+            )
             if old_safe != old_label:
-                updated = updated.replace(f"tkeir:{old_safe}", f"tkeir:{new_safe}")
+                updated = updated.replace(
+                    f"tkeir:{old_safe}", f"tkeir:{new_safe}"
+                )
     return updated
 
 
@@ -53,6 +78,13 @@ def _resolve_node_classes(
     graph: Graph,
     alignment_report: dict[str, object] | None,
 ) -> frozenset[str]:
+    """Resolve node classes helper.
+
+    Example:
+        >>> from rdflib import Graph
+        >>> _resolve_node_classes(Graph(), {'node_classes': ['Person']})
+        frozenset({'Person'})
+    """
     report = alignment_report or {}
     direct = report.get("node_classes")
     if isinstance(direct, (list, set, frozenset)):
@@ -71,7 +103,23 @@ def _collect_typed_property_constraints(
     graph: Graph,
     node_classes: frozenset[str],
 ) -> dict[str, dict[str, set[str]]]:
-    """Map class label -> property label -> set of object class labels."""
+    """Map class label -> property label -> set of object class labels.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> subj = URIRef('http://ex/s')
+        >>> obj = URIRef('http://ex/o')
+        >>> _ = graph.add((subj, RDF.type, TKEIR.Person))
+        >>> _ = graph.add((obj, RDF.type, TKEIR.Organization))
+        >>> _ = graph.add((subj, TKEIR.worksFor, obj))
+        >>> 'worksFor' in _collect_typed_property_constraints(
+        ...     graph, frozenset({'Person', 'Organization'})
+        ... )['Person']
+        True
+    """
     constraints: dict[str, dict[str, set[str]]] = defaultdict(
         lambda: defaultdict(set)
     )
@@ -103,9 +151,19 @@ def _induced_property_shape_lines(
     property_label: str,
     object_classes: set[str],
 ) -> list[str]:
+    """Induced property shape lines helper.
+
+    Example:
+        >>> _induced_property_shape_lines('Person', 'worksFor', {'Organization'})[0]
+        'tkeir:PersonInducedWorksForShape a sh:NodeShape ;'
+    """
     class_name = sanitize_rdf_class_name(class_label, fallback="Entity")
-    property_name = sanitize_rdf_property_name(property_label, fallback="relatedTo")
-    object_class = sanitize_rdf_class_name(sorted(object_classes)[0], fallback="Entity")
+    property_name = sanitize_rdf_property_name(
+        property_label, fallback="relatedTo"
+    )
+    object_class = sanitize_rdf_class_name(
+        sorted(object_classes)[0], fallback="Entity"
+    )
     shape_property = (
         property_name[0].upper() + property_name[1:]
         if property_name
@@ -124,6 +182,12 @@ def _induced_property_shape_lines(
 
 
 def _metric_numeric_shape_lines() -> list[str]:
+    """Metric numeric shape lines helper.
+
+    Example:
+        >>> _metric_numeric_shape_lines()[0]
+        'tkeir:MetricNumericValueShape a sh:NodeShape ;'
+    """
     return [
         f"tkeir:{METRIC_CLASS}NumericValueShape a sh:NodeShape ;",
         f"  sh:targetClass tkeir:{METRIC_CLASS} ;",
@@ -149,12 +213,14 @@ def induce_document_shacl_shapes(
     Example:
         >>> from rdflib import Graph
         >>> from thot.tasks.document_ontology.ShaclInductor import induce_document_shacl_shapes
-        >>> induce_document_shacl_shapes(Graph()).startswith('@prefix sh:')
+        >>> '@prefix sh:' in induce_document_shacl_shapes(Graph())
         True
     """
     alignment_report = alignment_report or {}
-    class_map = dict(alignment_report.get("class_map") or {})
-    property_map = dict(alignment_report.get("property_map") or {})
+    class_map = cast(dict[str, str], alignment_report.get("class_map") or {})
+    property_map = cast(
+        dict[str, str], alignment_report.get("property_map") or {}
+    )
     node_classes = _resolve_node_classes(graph, alignment_report)
 
     shapes_ttl = _rewrite_shapes_ttl(

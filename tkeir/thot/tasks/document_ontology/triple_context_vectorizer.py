@@ -31,7 +31,12 @@ def collect_document_svo_triples(
     document: dict,
     settings: OntologyBuildSettings | None = None,
 ) -> list[tuple[str, str, str]]:
-    """Collect subject/predicate/object text tuples from KG, deps, and chunks."""
+    """Collect subject/predicate/object text tuples from KG, deps, and chunks.
+
+    Example:
+        >>> collect_document_svo_triples({'kg': []})
+        []
+    """
     settings = settings or OntologyBuildSettings()
     triples: list[tuple[str, str, str]] = []
     seen: set[tuple[str, str, str]] = set()
@@ -73,6 +78,12 @@ def collect_document_svo_triples(
 
 
 def _predicate_object_context(predicate: str, obj: str) -> str:
+    """Predicate object context helper.
+
+    Example:
+        >>> _predicate_object_context('works for', 'ACME')
+        'work for a c m e'
+    """
     parts = [label_lemma_text(predicate)]
     if obj:
         parts.append(label_lemma_text(obj))
@@ -80,6 +91,12 @@ def _predicate_object_context(predicate: str, obj: str) -> str:
 
 
 def _subject_predicate_context(subject: str, predicate: str) -> str:
+    """Subject predicate context helper.
+
+    Example:
+        >>> _subject_predicate_context('Alice', 'works for')
+        'alice work for'
+    """
     return " ".join(
         part
         for part in (label_lemma_text(subject), label_lemma_text(predicate))
@@ -88,6 +105,12 @@ def _subject_predicate_context(subject: str, predicate: str) -> str:
 
 
 def _subject_object_context(subject: str, obj: str) -> str:
+    """Subject object context helper.
+
+    Example:
+        >>> _subject_object_context('Alice', 'ACME')
+        'alice a c m e'
+    """
     parts = [label_lemma_text(subject)]
     if obj:
         parts.append(label_lemma_text(obj))
@@ -98,7 +121,12 @@ def build_context_bags(
     triples: list[tuple[str, str, str]],
     role: EntityRole,
 ) -> dict[str, list[str]]:
-    """Build per-entity context bags for the requested SVO role."""
+    """Build per-entity context bags for the requested SVO role.
+
+    Example:
+        >>> build_context_bags([('Alice', 'works for', 'ACME')], 'subject')
+        {'alice': ['work for a c m e']}
+    """
     bags: dict[str, list[str]] = defaultdict(list)
 
     for subject, predicate, obj in triples:
@@ -120,12 +148,25 @@ def build_context_bags(
 
 
 def _normalize_rows(vectors: np.ndarray) -> np.ndarray:
+    """Normalize rows helper.
+
+    Example:
+        >>> import numpy as np
+        >>> _normalize_rows(np.array([[3.0, 4.0]])).tolist()
+        [[0.6, 0.8]]
+    """
     norms = np.linalg.norm(vectors, axis=1, keepdims=True)
     norms[norms == 0] = 1.0
     return vectors / norms
 
 
 def _vectorize_context_documents(documents: list[str]) -> list[list[float]]:
+    """Vectorize context documents helper.
+
+    Example:
+        >>> _vectorize_context_documents(['alice works acme'])
+        [[1.0]]
+    """
     if not documents:
         return []
     if len(documents) == 1:
@@ -159,12 +200,21 @@ def _cluster_context_keys(
     min_cluster_size: int,
     canonical_picker: Callable[[list[str], np.ndarray], str],
 ) -> dict[str, str]:
+    """Cluster context keys helper.
+
+    Example:
+        >>> from thot.tasks.document_ontology.triple_context_vectorizer import _cluster_context_keys
+        >>> callable(_cluster_context_keys)
+        True
+    """
     if not keys:
         return {}
     if len(keys) == 1:
         return {keys[0]: keys[0]}
 
-    matrix = _normalize_rows(np.asarray(_vectorize_context_documents(documents), dtype=float))
+    matrix = _normalize_rows(
+        np.asarray(_vectorize_context_documents(documents), dtype=float)
+    )
     distance_threshold = max(0.0, 1.0 - similarity_threshold)
     clustering = AgglomerativeClustering(
         n_clusters=None,
@@ -193,6 +243,12 @@ def _cluster_context_keys(
 
 
 def _top_context_lemma(context_documents: list[str]) -> str:
+    """Top context lemma helper.
+
+    Example:
+        >>> _top_context_lemma(['alice works', 'alice acme'])
+        'alice'
+    """
     counts: Counter[str] = Counter()
     for document in context_documents:
         counts.update(token for token in document.split() if token)
@@ -207,15 +263,22 @@ def _canonical_subject_or_object_class(
     context_bags: dict[str, list[str]],
     ner_entity_classes: dict[str, str],
 ) -> str:
+    """Canonical subject or object class helper.
+
+    Example:
+        >>> import numpy as np
+        >>> _canonical_subject_or_object_class(
+        ...     ['alice'], np.array([[1.0, 0.0]]), {'alice': ['alice works']}, {}
+        ... )
+        'Alice'
+    """
     for key in sorted(member_keys, key=len):
         ner_class = ner_entity_classes.get(key)
         if ner_class:
             return title_case_label(ner_class)
 
     merged_context = " ".join(
-        context
-        for key in member_keys
-        for context in context_bags.get(key, [])
+        context for key in member_keys for context in context_bags.get(key, [])
     )
     top_lemma = _top_context_lemma([merged_context])
     if top_lemma:
@@ -235,6 +298,14 @@ def _canonical_predicate_class(
     matrix: np.ndarray,
     predicate_frequencies: Counter[str],
 ) -> str:
+    """Canonical predicate class helper.
+
+    Example:
+        >>> from collections import Counter
+        >>> import numpy as np
+        >>> _canonical_predicate_class(['work'], np.array([[1.0]]), Counter({'work': 2}))
+        'work'
+    """
     canonical_slug = sorted(
         member_keys,
         key=lambda key: (-predicate_frequencies[key], len(key), key),
@@ -250,14 +321,22 @@ def cluster_entities_by_triple_context(
     min_cluster_size: int,
     ner_entity_classes: dict[str, str] | None = None,
 ) -> dict[str, str]:
-    """Cluster entities using TF-IDF vectors built from complementary SVO context."""
+    """Cluster entities using TF-IDF vectors built from complementary SVO context.
+
+    Example:
+        >>> from thot.tasks.document_ontology.triple_context_vectorizer import cluster_entities_by_triple_context
+        >>> callable(cluster_entities_by_triple_context)
+        True
+    """
     context_bags = build_context_bags(triples, role)
     keys = sorted(context_bags)
     if not keys:
         return {}
 
     documents = [" ".join(context_bags[key]) for key in keys]
-    predicate_frequencies = Counter(slugify_verb(predicate) for _, predicate, _ in triples)
+    predicate_frequencies = Counter(
+        slugify_verb(predicate) for _, predicate, _ in triples
+    )
 
     if role == "predicate":
         slug_map = _cluster_context_keys(

@@ -8,7 +8,9 @@ from dataclasses import dataclass
 from rdflib import Graph
 
 from thot.core.ThotLogger import ThotLogger
-from thot.tasks.document_ontology.incoherence_stats import summarize_incoherences
+from thot.tasks.document_ontology.incoherence_stats import (
+    summarize_incoherences,
+)
 from thot.tasks.document_ontology.OntologyRepairer import repair_graph
 from thot.tasks.document_ontology.ShaclValidator import validate_document_graph
 

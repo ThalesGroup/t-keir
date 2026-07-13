@@ -10,6 +10,12 @@ from rdflib.namespace import RDF
 
 
 def _local_name_from_uri(value: str) -> str:
+    """Local name from uri helper.
+
+    Example:
+        >>> _local_name_from_uri('http://example.org/ns/hasNumericValue')
+        'hasNumericValue'
+    """
     text = str(value).strip()
     if not text:
         return ""
@@ -19,6 +25,18 @@ def _local_name_from_uri(value: str) -> str:
 
 
 def _graph_entity_nodes(graph: Graph | None) -> set[str]:
+    """Graph entity nodes helper.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> node = URIRef('http://ex/a')
+        >>> _ = graph.add((node, RDF.type, TKEIR.Person))
+        >>> 'http://ex/a' in _graph_entity_nodes(graph)
+        True
+    """
     if graph is None:
         return set()
     nodes: set[str] = set()
@@ -34,12 +52,23 @@ def summarize_incoherences(
     violations: list[dict],
     graph: Graph | None = None,
 ) -> dict[str, object]:
-    """Return compact incoherence statistics instead of full violation payloads."""
+    """Return compact incoherence statistics instead of full violation payloads.
+
+    Example:
+        >>> summarize_incoherences(
+        ...     [{'focus_node': 'http://ex/a', 'result_path': 'http://tkeir#hasNumericValue', 'status': 'UNRESOLVED'}]
+        ... )['total']
+        1
+    """
     unresolved = sum(
-        1 for violation in violations if violation.get("status") == "UNRESOLVED"
+        1
+        for violation in violations
+        if violation.get("status") == "UNRESOLVED"
     )
     auto_fixed = sum(
-        1 for violation in violations if violation.get("status") == "AUTO_FIXED"
+        1
+        for violation in violations
+        if violation.get("status") == "AUTO_FIXED"
     )
     affected_nodes = {
         str(violation.get("focus_node", "")).strip()
@@ -52,7 +81,9 @@ def summarize_incoherences(
         path = _local_name_from_uri(str(violation.get("result_path", "")))
         if path:
             by_result_path[path] += 1
-        severity = _local_name_from_uri(str(violation.get("result_severity", "")))
+        severity = _local_name_from_uri(
+            str(violation.get("result_severity", ""))
+        )
         if severity:
             by_severity[severity] += 1
 

@@ -16,11 +16,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from thot import __version__ as TKEIR_VERSION
+from thot.core.LlmWrapper import UnifiedLLMWrapper
 from thot.core.ThotLogger import ThotLogger
 from thot.core.TkeirPaths import configs_dir, rag_prompts_path
 from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
-from thot.core.LlmWrapper import UnifiedLLMWrapper
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
     extract_focus_passages,
@@ -679,12 +679,14 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         unavailable_answer=unavailable_answer,
     )
     used_chunk_evidence = False
-    short_answer, detailed_report, used_chunk_evidence = apply_chunk_evidence_fallback(
-        query_text=query_text,
-        short_answer=short_answer,
-        detailed_report=detailed_report,
-        chunks=retrieved_chunks,
-        unavailable_answer=unavailable_answer,
+    short_answer, detailed_report, used_chunk_evidence = (
+        apply_chunk_evidence_fallback(
+            query_text=query_text,
+            short_answer=short_answer,
+            detailed_report=detailed_report,
+            chunks=retrieved_chunks,
+            unavailable_answer=unavailable_answer,
+        )
     )
     if not detailed_report.strip():
         detailed_report = build_fallback_detailed_report(

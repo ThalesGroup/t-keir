@@ -5,6 +5,7 @@ import json
 import os
 import tempfile
 
+from thot.core.LlmWrapper import Provider, WrapperConfig
 from thot.core.TkeirPaths import (
     configs_dir,
     effective_resources_path,
@@ -23,7 +24,6 @@ from thot.tools.search.app import (
     _parse_hits,
     _unavailable_answer,
 )
-from thot.core.LlmWrapper import Provider, WrapperConfig
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
     extract_relevant_triples,

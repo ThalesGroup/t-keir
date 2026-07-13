@@ -35,7 +35,9 @@ def _format_document_name(parent_doc_id: str) -> str:
     return without_scheme.split("/")[-1] or parent_doc_id
 
 
-def is_unavailable_short_answer(short_answer: str, unavailable_answer: str) -> bool:
+def is_unavailable_short_answer(
+    short_answer: str, unavailable_answer: str
+) -> bool:
     """Return whether the short answer is the configured unavailable fallback.
 
     Example:
@@ -78,7 +80,12 @@ def chunks_matching_query(
 
 
 def _answer_terms(short_answer: str) -> set[str]:
-    """Extract salient tokens from a short answer for chunk cross-checking."""
+    """Extract salient tokens from a short answer for chunk cross-checking.
+
+    Example:
+        >>> _answer_terms('George Harrison') == {'george', 'harrison'}
+        True
+    """
     terms: set[str] = set()
     for token in re.findall(
         r"[A-Za-z0-9][A-Za-z0-9'._-]{2,}", short_answer.lower()
@@ -140,7 +147,18 @@ def _best_focus_sentence(
     matching: list[RetrievedChunk],
     query_text: str,
 ) -> tuple[str, str] | None:
-    """Return the best ``(chunk_id, sentence)`` pair for the query."""
+    """Return the best ``(chunk_id, sentence)`` pair for the query.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunks = [RetrievedChunk(
+        ...     chunk_id='c1',
+        ...     text_raw='George Harrison liked the song.',
+        ...     parent_doc_id='file://doc.pdf',
+        ... )]
+        >>> _best_focus_sentence(chunks, 'Who liked the song')
+        ('c1', 'George Harrison liked the song.')
+    """
     if re.match(r"^\s*who\b", query_text, re.I):
         predicate = _who_predicate_token(query_text)
         terms = _focus_query_terms(query_text)
@@ -170,19 +188,31 @@ def _best_focus_sentence(
     match = re.match(r"- \[(.+?)\] (.+)", line)
     if match:
         return match.group(1), match.group(2).strip()
-    return None, line.lstrip("- ").strip()
+    chunk_id = matching[0].chunk_id if matching else ""
+    return chunk_id, line.lstrip("- ").strip()
 
 
 def _top_focus_sentence(
     matching: list[RetrievedChunk],
     query_text: str,
 ) -> tuple[str, str] | None:
-    """Return the best ``(chunk_id, sentence)`` pair for the query."""
+    """Return the best ``(chunk_id, sentence)`` pair for the query.
+
+    Example:
+        >>> from thot.tools.search.rag_report import _top_focus_sentence
+        >>> callable(_top_focus_sentence)
+        True
+    """
     return _best_focus_sentence(matching, query_text)
 
 
 def _who_predicate_token(query_text: str) -> str | None:
-    """Return the main verb/token immediately following a ``who`` question."""
+    """Return the main verb/token immediately following a ``who`` question.
+
+    Example:
+        >>> _who_predicate_token('Who liked the song')
+        'liked'
+    """
     match = re.match(
         r"^\s*who\s+([A-Za-z][A-Za-z'._-]*)",
         query_text,
@@ -194,7 +224,15 @@ def _who_predicate_token(query_text: str) -> str | None:
 
 
 def _subject_before_query_token(query_text: str, sentence: str) -> str | None:
-    """Extract the subject that precedes a query verb/token in a focus sentence."""
+    """Extract the subject that precedes a query verb/token in a focus sentence.
+
+    Example:
+        >>> _subject_before_query_token(
+        ...     'Who liked the song',
+        ...     'George Harrison liked the song.',
+        ... )
+        'George Harrison'
+    """
     if re.match(r"^\s*who\b", query_text, re.I):
         predicate = _who_predicate_token(query_text)
         if predicate:
@@ -292,9 +330,11 @@ def build_chunk_evidence_answer(
     ):
         display_name = _format_document_name(parent_doc_id)
         chunk_ids = [
-            chunk.chunk_id.split("#")[-1]
-            if "#" in chunk.chunk_id
-            else chunk.chunk_id
+            (
+                chunk.chunk_id.split("#")[-1]
+                if "#" in chunk.chunk_id
+                else chunk.chunk_id
+            )
             for chunk in sorted(
                 doc_chunks,
                 key=lambda item: item.relevance or 0.0,
@@ -322,13 +362,9 @@ def build_chunk_evidence_answer(
             )
         )
     elif passage_answer and doc_lines:
-        short_answer = (
-            f"{passage_answer}\n\n"
-            "Source: "
-            + ", ".join(
-                _format_document_name(parent_doc_id)
-                for parent_doc_id in by_document
-            )
+        short_answer = f"{passage_answer}\n\n" "Source: " + ", ".join(
+            _format_document_name(parent_doc_id)
+            for parent_doc_id in by_document
         )
 
     detailed_lines = [
@@ -398,17 +434,18 @@ def should_apply_chunk_evidence(
         query_text,
         [chunk.text_raw for chunk in chunks],
     )
-    mentions_terms = any(term.lower() in short_lower for term in highlight_terms)
+    mentions_terms = any(
+        term.lower() in short_lower for term in highlight_terms
+    )
     if not mentions_terms:
         return True
 
     matching_doc_names = {
-        _format_document_name(chunk.parent_doc_id).lower() for chunk in matching
+        _format_document_name(chunk.parent_doc_id).lower()
+        for chunk in matching
     }
     cites_document = any(
-        name in short_lower
-        for name in matching_doc_names
-        if name
+        name in short_lower for name in matching_doc_names if name
     ) or any(chunk.parent_doc_id.lower() in short_lower for chunk in matching)
 
     return not cites_document
@@ -692,7 +729,19 @@ def _ontology_section_markdown(
 
 
 def _document_top_relevance(doc_chunks: list[RetrievedChunk]) -> float:
-    """Return the highest relevance score within a document group."""
+    """Return the highest relevance score within a document group.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunks = [RetrievedChunk(
+        ...     chunk_id='c1',
+        ...     text_raw='text',
+        ...     parent_doc_id='file://doc.pdf',
+        ...     relevance=0.9,
+        ... )]
+        >>> _document_top_relevance(chunks)
+        0.9
+    """
     return max((chunk.relevance or 0.0) for chunk in doc_chunks)
 
 

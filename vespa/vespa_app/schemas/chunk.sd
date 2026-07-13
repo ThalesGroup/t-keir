@@ -37,8 +37,8 @@ schema chunk {
         first-phase {
             expression {
                 closeness(field, chunk_embedding) * 0.40 +
-                closeness(field, questions_embeddings) * 0.40 +
-                bm25(parent_content) * 0.20
+                closeness(field, questions_embeddings) * 0.10 +
+                bm25(parent_content) * 0.50
             }
         }
         second-phase {

@@ -2,6 +2,7 @@ import {
   formatDocumentName,
   groupChunksByDocument,
   groupEntitiesByType,
+  sortChunksByRelevance,
   type FusedOntology,
   type QueryResponse,
 } from "@/lib/types";
@@ -110,9 +111,7 @@ function detailedAnalysisSection(chunks: QueryResponse["chunks"]): string {
     "",
   ];
 
-  const topChunks = [...chunks]
-    .sort((a, b) => (b.relevance ?? 0) - (a.relevance ?? 0))
-    .slice(0, 5);
+  const topChunks = sortChunksByRelevance(chunks).slice(0, 5);
 
   for (const chunk of topChunks) {
     const relevance =

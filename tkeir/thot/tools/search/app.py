@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import time
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -15,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from thot import __version__ as TKEIR_VERSION
+from thot.core.ThotLogger import ThotLogger
 from thot.core.TkeirPaths import configs_dir, rag_prompts_path
 from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
@@ -95,7 +97,7 @@ class AppState:
         """
         self.llm: UnifiedLLMWrapper | None = None
         self.vespa: VespaClient | None = None
-        self.pipeline_runner: PipelineRunner | None = None
+        self.pipeline_runners: dict[str, PipelineRunner] = {}
         self.prompts: dict[str, Any] = {}
         self.rag_config: RagConfig = load_rag_config()
 
@@ -172,6 +174,24 @@ _DEFAULT_MAX_TRIPLES_FOR_PROMPT = 25
 _DEFAULT_MAX_CHARS_PER_CHUNK = 800
 _DEFAULT_MAX_CHUNKS_FOR_PROMPT = 5
 _DEFAULT_MAX_FOCUS_PASSAGES = 4
+_PIPELINE_PRELOAD_LANGUAGES = ("en", "fr")
+
+
+def _log_rag_step(step: str, start: float, **details: Any) -> None:
+    """Log elapsed time for one RAG pipeline step.
+
+    Example:
+        >>> import time
+        >>> from thot.tools.search.app import _log_rag_step
+        >>> started = time.perf_counter()
+        >>> _log_rag_step("query-generation", started, query="hello")  # doctest: +SKIP
+    """
+    elapsed = time.perf_counter() - start
+    suffix = " ".join(f"{key}={value}" for key, value in details.items())
+    message = f"RAG step {step} elapsed={elapsed:.3f}s"
+    if suffix:
+        message = f"{message} {suffix}"
+    ThotLogger.info(message)
 
 
 def _build_generation_prompts(
@@ -335,12 +355,12 @@ def _parse_hits(
     return parsed
 
 
-def _load_pipeline_runner() -> PipelineRunner:
-    """Load the bundled pipeline configuration for query refinement.
+def _load_pipeline_configuration() -> PipelineConfiguration:
+    """Load the bundled pipeline configuration.
 
     Example:
-        >>> from thot.tools.search.app import _load_pipeline_runner
-        >>> isinstance(_load_pipeline_runner(), PipelineRunner)
+        >>> from thot.tools.search.app import _load_pipeline_configuration
+        >>> isinstance(_load_pipeline_configuration(), PipelineConfiguration)
         True
     """
     config = PipelineConfiguration()
@@ -349,7 +369,78 @@ def _load_pipeline_runner() -> PipelineRunner:
         encoding="utf-8",
     ) as handle:
         config.load(handle)
-    return PipelineRunner(config)
+    return config
+
+
+def _load_pipeline_runner() -> PipelineRunner:
+    """Load a pipeline runner with the bundled configuration.
+
+    Example:
+        >>> from thot.tools.search.app import _load_pipeline_runner
+        >>> isinstance(_load_pipeline_runner(), PipelineRunner)
+        True
+    """
+    return PipelineRunner(_load_pipeline_configuration())
+
+
+def _preload_pipeline_runner(runner: PipelineRunner, language: str) -> None:
+    """Warm tokenizer and morphosyntax models for a processing language.
+
+    Example:
+        >>> from thot.tools.search.app import _load_pipeline_runner, _preload_pipeline_runner
+        >>> _preload_pipeline_runner(_load_pipeline_runner(), "en")  # doctest: +SKIP
+    """
+    ThotLogger.info(
+        f"Preloading pipeline runner for language {language} at startup"
+    )
+    document = {
+        "content": ["warmup"],
+        "language-detection": {"language": language},
+    }
+    try:
+        runner.run(
+            document,
+            skip_converter=True,
+            tasks=["morphosyntax"],
+        )
+    except Exception as error:
+        ThotLogger.warning(
+            f"Pipeline preload failed for language {language}",
+            trace=str(error),
+        )
+
+
+def _load_pipeline_runners() -> dict[str, PipelineRunner]:
+    """Load and preload dedicated pipeline runners for each RAG language.
+
+    Example:
+        >>> from thot.tools.search.app import _load_pipeline_runners
+        >>> runners = _load_pipeline_runners()  # doctest: +SKIP
+    """
+    runners: dict[str, PipelineRunner] = {}
+    for language in _PIPELINE_PRELOAD_LANGUAGES:
+        runner = PipelineRunner(_load_pipeline_configuration())
+        _preload_pipeline_runner(runner, language)
+        runners[language] = runner
+    return runners
+
+
+def _pipeline_runner_for_language(
+    state: AppState,
+    language: str,
+) -> PipelineRunner | None:
+    """Return the preloaded pipeline runner for a request language.
+
+    Example:
+        >>> from thot.tools.search.app import AppState, _pipeline_runner_for_language
+        >>> _pipeline_runner_for_language(AppState(), "en") is None
+        True
+    """
+    if not state.pipeline_runners:
+        return None
+    return state.pipeline_runners.get(language) or state.pipeline_runners.get(
+        "en"
+    )
 
 
 @asynccontextmanager
@@ -365,7 +456,7 @@ async def lifespan(app: FastAPI):
     state.prompts = _load_prompts()
     state.llm = UnifiedLLMWrapper()
     state.vespa = VespaClient()
-    state.pipeline_runner = _load_pipeline_runner()
+    state.pipeline_runners = await asyncio.to_thread(_load_pipeline_runners)
     app.state.rag = state
     try:
         yield
@@ -425,39 +516,59 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         )
 
     query_text = request.query.strip()
+    request_started = time.perf_counter()
+
+    step_started = time.perf_counter()
     try:
         query_embedding = await state.llm.embed(query_text)
-        if state.pipeline_runner is None:
+        pipeline_runner = _pipeline_runner_for_language(
+            state,
+            request.language,
+        )
+        if pipeline_runner is None:
             search_query_text = query_text
         else:
             search_query_text = await asyncio.to_thread(
                 refine_search_query_text,
-                state.pipeline_runner,
+                pipeline_runner,
                 query_text,
                 language=request.language,
             )
+    except Exception as error:
+        LOGGER.exception("Query generation failed")
+        raise HTTPException(
+            status_code=502, detail=f"Query generation failed: {error}"
+        ) from error
+    _log_rag_step(
+        "query-generation",
+        step_started,
+        query=repr(query_text),
+        search_query=repr(search_query_text),
+    )
+
+    step_started = time.perf_counter()
+    try:
         search_response = await state.vespa.hybrid_search(
             search_query_text,
             query_embedding,
             query_embedding,
             hits=request.hits,
         )
+        parsed_hits = _parse_hits(search_response)
+        retrieved_chunks, rdf_payloads = await _enrich_hits(state, parsed_hits)
     except Exception as error:
         LOGGER.exception("Retrieval failed")
         raise HTTPException(
             status_code=502, detail=f"Retrieval failed: {error}"
         ) from error
+    _log_rag_step(
+        "vespa-querying",
+        step_started,
+        vespa_hits=len(parsed_hits),
+        chunks=len(retrieved_chunks),
+    )
 
-    parsed_hits = _parse_hits(search_response)
-    try:
-        retrieved_chunks, rdf_payloads = await _enrich_hits(state, parsed_hits)
-    except Exception as error:
-        LOGGER.exception("Parent enrichment failed")
-        raise HTTPException(
-            status_code=502,
-            detail=f"Parent enrichment failed: {error}",
-        ) from error
-
+    step_started = time.perf_counter()
     fused_graph = merge_turtle_graphs(rdf_payloads)
     fused_summary = summarize_graph_for_prompt(
         fused_graph,
@@ -503,6 +614,15 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
             chunks=retrieved_chunks,
             ontology=ontology,
             vespa_hits=len(parsed_hits),
+        )
+        _log_rag_step(
+            "answer-building",
+            step_started,
+            generated=False,
+            chunks=len(retrieved_chunks),
+        )
+        _log_rag_step(
+            "rag-query-total", request_started, query=repr(query_text)
         )
         return QueryResponse(
             answer=unavailable_answer,
@@ -554,6 +674,14 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         ontology=ontology,
         vespa_hits=len(parsed_hits),
     )
+
+    _log_rag_step(
+        "answer-building",
+        step_started,
+        generated=True,
+        chunks=len(retrieved_chunks),
+    )
+    _log_rag_step("rag-query-total", request_started, query=repr(query_text))
 
     return QueryResponse(
         answer=short_answer,

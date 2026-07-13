@@ -62,6 +62,25 @@ export function formatDocumentName(parentDocId: string): string {
   return segments[segments.length - 1] || parentDocId;
 }
 
+export function chunkRelevanceScore(chunk: RetrievedChunk): number {
+  return chunk.relevance ?? 0;
+}
+
+export function sortChunksByRelevance(
+  chunks: RetrievedChunk[],
+): RetrievedChunk[] {
+  return [...chunks].sort(
+    (a, b) => chunkRelevanceScore(b) - chunkRelevanceScore(a),
+  );
+}
+
+function groupTopRelevance(chunks: RetrievedChunk[]): number {
+  return chunks.reduce(
+    (max, chunk) => Math.max(max, chunkRelevanceScore(chunk)),
+    0,
+  );
+}
+
 export function groupChunksByDocument(
   chunks: RetrievedChunk[],
 ): DocumentGroup[] {
@@ -73,13 +92,13 @@ export function groupChunksByDocument(
     groups.set(chunk.parent_doc_id, existing);
   }
 
-  return Array.from(groups.entries()).map(([parentDocId, docChunks]) => ({
-    parentDocId,
-    displayName: formatDocumentName(parentDocId),
-    chunks: docChunks.sort(
-      (a, b) => (b.relevance ?? 0) - (a.relevance ?? 0),
-    ),
-  }));
+  return Array.from(groups.entries())
+    .map(([parentDocId, docChunks]) => ({
+      parentDocId,
+      displayName: formatDocumentName(parentDocId),
+      chunks: sortChunksByRelevance(docChunks),
+    }))
+    .sort((a, b) => groupTopRelevance(b.chunks) - groupTopRelevance(a.chunks));
 }
 
 export function groupEntitiesByType(

@@ -40,3 +40,13 @@ def test_generation_prompts_inject_unavailable_answer():
     assert unavailable in user_prompt
     assert "Passages" in user_prompt
     assert _no_chunks_message(fr_cfg).startswith("Aucun")
+
+
+def test_pipeline_runner_for_language_falls_back_to_english():
+    from thot.tools.search.app import AppState, _pipeline_runner_for_language
+
+    state = AppState()
+    sentinel = object()
+    state.pipeline_runners = {"en": sentinel}  # type: ignore[assignment]
+    assert _pipeline_runner_for_language(state, "fr") is sentinel
+    assert _pipeline_runner_for_language(state, "en") is sentinel

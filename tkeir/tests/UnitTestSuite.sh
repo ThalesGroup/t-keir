@@ -41,6 +41,7 @@ ACTIVE_TESTS=(
     unittests/TestThotLogger.py
     unittests/TestUtils.py
     unittests/TestLlmWrapper.py
+    unittests/TestQueryAnalyzer.py
     functional_tests/TestPipeline.py
 )
 

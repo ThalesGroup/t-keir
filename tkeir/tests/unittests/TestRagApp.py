@@ -6,8 +6,11 @@ from thot.tools.search.app import (
     _language_prompt_cfg,
     _load_prompts,
     _no_chunks_message,
+    _resolve_system_prompt_template,
+    _resolve_user_prompt_template,
     _unavailable_answer,
 )
+from thot.tools.search.rag_config import RagPromptConfig
 
 
 def test_unavailable_answer_is_language_specific():
@@ -34,12 +37,45 @@ def test_generation_prompts_inject_unavailable_answer():
         focus_passages="Passages",
         chunk_excerpts="Extraits",
         query_text="Qui est Rob Brown ?",
+        query_analysis="- Lexical search query: Rob Brown",
         unavailable_answer=unavailable,
     )
     assert unavailable in system_prompt
     assert unavailable in user_prompt
     assert "Passages" in user_prompt
     assert _no_chunks_message(fr_cfg).startswith("Aucun")
+
+
+def test_resolve_user_prompt_template_uses_compact_svo_variant():
+    prompts = _load_prompts()
+    en_cfg = _language_prompt_cfg(prompts, "en")
+    svo_template = _resolve_user_prompt_template(
+        en_cfg,
+        RagPromptConfig("svo_ontology", 80),
+    )
+    default_template = _resolve_user_prompt_template(
+        en_cfg,
+        RagPromptConfig("chunk_excerpts", 80),
+    )
+    assert "SVO FACTS (from retrieved documents):" in svo_template
+    assert "KEY PASSAGES" in svo_template
+    assert (
+        "SEARCH QUERY ANALYSIS" not in default_template
+        or "GLOBAL CONTEXT" in default_template
+    )
+    assert (
+        "KEY PASSAGES" not in default_template
+        or "KEY PASSAGES (highest relevance" in default_template
+    )
+    assert "GLOBAL CONTEXT" not in svo_template
+    assert "SEARCH QUERY ANALYSIS" in default_template
+    assert "RELEVANT TEXT EXCERPTS" in default_template
+    system_svo = _resolve_system_prompt_template(
+        en_cfg,
+        RagPromptConfig("svo_ontology", 80),
+    )
+    assert system_svo is not None
+    assert "KEY PASSAGES" in system_svo
 
 
 def test_pipeline_runner_for_language_falls_back_to_english():

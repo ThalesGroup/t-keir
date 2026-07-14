@@ -12,6 +12,13 @@ def test_load_rag_config_reads_min_keyword_length():
     assert config.ontology.min_keyword_length >= 1
     assert config.ontology.max_entities >= 1
     assert config.ontology.max_keywords >= 1
+    assert config.prompt.chunk_context_mode in {
+        "chunk_excerpts",
+        "svo_ontology",
+    }
+    assert config.prompt.max_svo_triples >= 1
+    assert isinstance(config.search.enabled, bool)
+    assert config.search.ranking_profile == "hybrid_2_level"
 
 
 def test_ontology_settings_from_mapping_overrides_defaults():

@@ -4,11 +4,14 @@ en:
   system: |
     You are a document analysis expert. Answer the user question using ONLY the
     structured facts and text excerpts provided below. Do not invent facts.
+    When SEARCH QUERY ANALYSIS includes SVO triples, treat them as the primary
+    semantic frame: match subject-verb-object relations from the context to the
+    question structure before relying on surface wording alone.
     Interpret informal or imperfect question wording generously when the excerpts
     clearly support an answer (match entities and events even if grammar differs).
     For "who" questions, identify the person or organization that reported,
     stated, or wrote the relevant claim in the excerpts.
-    Prefer the KEY PASSAGES section when it contains a direct answer.
+    Prefer KEY PASSAGES and SVO facts that align with the query SVO structure.
     Use the unavailable answer only when the excerpts and structured facts cannot
     support any factual response. When required, reply with exactly:
     "{unavailable_answer}"
@@ -27,22 +30,63 @@ en:
     relevant chunks. Use bullet lists where helpful. Cite facts only from the
     provided context. Mention key entities and events explicitly.>
 
-    ### 1. GLOBAL CONTEXT (Facts from merged Knowledge Graph)
+    ### 1. SEARCH QUERY ANALYSIS (SVO-first interpretation of the request)
+    {query_analysis}
+
+    ### 2. GLOBAL CONTEXT (Facts from merged Knowledge Graph)
     {fused_graph_triples_or_summary}
 
-    ### 2. KEY PASSAGES (highest relevance to the question)
+    ### 3. KEY PASSAGES (highest relevance to the SVO-aligned query)
     {focus_passages}
 
-    ### 3. RELEVANT TEXT EXCERPTS (Chunks)
+    ### 4. RELEVANT TEXT EXCERPTS (Chunks)
     {chunk_excerpts}
 
-    ### 4. USER QUESTION
+    ### 5. USER QUESTION
     "{query_text}"
 
-    ### 5. CONSTRAINTS
-    Do not hallucinate. If the context does not contain the answer, set
-    SHORT_ANSWER to exactly: "{unavailable_answer}" and explain the gap briefly
-    in DETAILED_REPORT.
+    ### 6. CONSTRAINTS
+    Do not hallucinate. Prioritize facts that match the SVO structure above.
+    If the context does not contain the answer, set SHORT_ANSWER to exactly:
+    "{unavailable_answer}" and explain the gap briefly in DETAILED_REPORT.
+
+  user_svo: |
+    Return EXACTLY this format (keep the markers):
+
+    SHORT_ANSWER:
+    <One to three concise sentences answering from the passages and SVO facts below.>
+
+    DETAILED_REPORT:
+    ## Detailed Analysis
+    <Brief synthesis using KEY PASSAGES and SVO facts aligned with the query SVO below.>
+
+    SEARCH QUERY ANALYSIS (match document facts to this structure):
+    {query_analysis}
+
+    KEY PASSAGES (highest relevance — prefer these for the answer):
+    {focus_passages}
+
+    SVO FACTS (from retrieved documents):
+    {chunk_excerpts}
+
+    QUESTION:
+    "{query_text}"
+
+    If KEY PASSAGES and SVO facts cannot answer, set SHORT_ANSWER to exactly:
+    "{unavailable_answer}"
+
+  system_svo: |
+    Answer using the KEY PASSAGES and SVO facts provided below. Do not invent facts.
+    Prefer KEY PASSAGES when they contain a direct answer; use SVO facts to confirm
+    subject-verb-object relations. Align your answer with the SVO structure in
+    SEARCH QUERY ANALYSIS.
+    When the question verb (e.g. interpret, perform) does not appear verbatim in a
+    passage, answer from related facts in that passage (wrote, recorded, liked,
+    used, inspired, released) without inventing songs, albums, or roles.
+    For "who" questions, name the person or group the passage associates with the
+    topic; quote or paraphrase only what the passage states.
+    When the context is insufficient, reply with exactly:
+    "{unavailable_answer}"
 
 fr:
   unavailable_answer: "L'information n'est pas disponible."
@@ -51,11 +95,14 @@ fr:
     Vous êtes un expert en analyse documentaire. Répondez à la Question en vous
     basant STRICTEMENT sur les Faits Structurés (Ontologie) et les Extraits
     Textuels (Chunks) fournis ci-dessous. N'inventez aucun fait.
+    Lorsque l'ANALYSE DE LA REQUÊTE contient des triplets SVO, utilisez-les
+    comme cadre sémantique principal : faites correspondre les relations
+    sujet-verbe-objet du contexte à la structure de la question.
     Interprétez les formulations informelles ou imparfaites de la question
     lorsque les extraits contiennent clairement la réponse.
     Pour les questions « qui », identifiez la personne ou l'organisation qui
     a rapporté, déclaré ou écrit l'information pertinente dans les extraits.
-    Privilégiez la section PASSAGES CLÉS lorsqu'elle contient une réponse directe.
+    Privilégiez les PASSAGES CLÉS et les faits SVO alignés sur la structure SVO.
     N'utilisez la réponse d'indisponibilité que si le contexte ne permet aucune
     réponse factuelle. Le cas échéant, répondez exactement :
     "{unavailable_answer}"
@@ -75,19 +122,56 @@ fr:
     chunks pertinents. Utilisez des listes à puces si utile. Citez uniquement le
     contexte fourni. Mentionnez explicitement les entités et événements clés.>
 
-    ### 1. CONTEXTE GLOBAL (Faits extraits du Graphe de Connaissances fusionné)
+    ### 1. ANALYSE DE LA REQUÊTE (interprétation SVO de la demande)
+    {query_analysis}
+
+    ### 2. CONTEXTE GLOBAL (Faits extraits du Graphe de Connaissances fusionné)
     {fused_graph_triples_or_summary}
 
-    ### 2. PASSAGES CLÉS (les plus pertinents pour la question)
+    ### 3. PASSAGES CLÉS (les plus pertinents pour la requête alignée SVO)
     {focus_passages}
 
-    ### 3. EXTRAITS TEXTUELS PERTINENTS (Chunks)
+    ### 4. EXTRAITS TEXTUELS PERTINENTS (Chunks)
     {chunk_excerpts}
 
-    ### 4. QUESTION DE L'UTILISATEUR
+    ### 5. QUESTION DE L'UTILISATEUR
     "{query_text}"
 
-    ### 5. CONTRAINTES
-    Pas d'hallucination. Si le contexte ne contient pas la réponse, mettez
-    SHORT_ANSWER à exactement : "{unavailable_answer}" et expliquez brièvement
-    l'absence dans DETAILED_REPORT.
+    ### 6. CONTRAINTES
+    Pas d'hallucination. Privilégiez les faits qui correspondent à la structure SVO.
+    Si le contexte ne contient pas la réponse, mettez SHORT_ANSWER à exactement :
+    "{unavailable_answer}" et expliquez brièvement l'absence dans DETAILED_REPORT.
+
+  user_svo: |
+    Retournez EXACTEMENT ce format (conservez les marqueurs) :
+
+    SHORT_ANSWER:
+    <Une à trois phrases concises à partir des passages et faits SVO ci-dessous.>
+
+    DETAILED_REPORT:
+    ## Analyse détaillée
+    <Synthèse brève en utilisant les PASSAGES CLÉS et les faits SVO alignés sur la requête.>
+
+    ANALYSE DE LA REQUÊTE (faire correspondre les faits documentaires) :
+    {query_analysis}
+
+    PASSAGES CLÉS (prioritaires pour la réponse) :
+    {focus_passages}
+
+    FAITS SVO (documents récupérés) :
+    {chunk_excerpts}
+
+    QUESTION :
+    "{query_text}"
+
+    Si les PASSAGES CLÉS et les faits SVO ne permettent pas de répondre, mettez
+    SHORT_ANSWER à exactement : "{unavailable_answer}"
+
+  system_svo: |
+    Répondez en utilisant les PASSAGES CLÉS et les faits SVO fournis ci-dessous.
+    N'inventez aucun fait. Privilégiez les PASSAGES CLÉS lorsqu'ils contiennent
+    une réponse directe ; utilisez les faits SVO pour confirmer les relations
+    sujet-verbe-objet. Alignez votre réponse sur la structure SVO de
+    l'ANALYSE DE LA REQUÊTE.
+    Si le contexte est insuffisant, répondez exactement :
+    "{unavailable_answer}"

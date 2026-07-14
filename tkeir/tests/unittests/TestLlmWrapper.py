@@ -97,6 +97,32 @@ def test_openai_generate_with_system_message():
     assert payload["temperature"] == 0.2
 
 
+def test_generate_logs_llm_statistics(monkeypatch):
+    client = AsyncMock()
+    client.post = AsyncMock(
+        return_value=_json_response(
+            {"choices": [{"message": {"content": "generated text"}}]}
+        )
+    )
+    wrapper = UnifiedLLMWrapper(_config(Provider.OPENAI), client=client)
+    logged: list[str] = []
+    monkeypatch.setattr(
+        "thot.core.LlmWrapper.ThotLogger.info",
+        lambda message, **_: logged.append(message),
+    )
+
+    async def _run() -> str:
+        return await wrapper.generate("user prompt", system="system prompt")
+
+    assert asyncio.run(_run()) == "generated text"
+    assert len(logged) == 1
+    message = logged[0]
+    assert "prompt_size=24" in message
+    assert "output_size=14" in message
+    assert "elapsed=" in message
+    assert "provider=openai" in message
+
+
 def test_ollama_embed_and_generate():
     client = AsyncMock()
     client.post = AsyncMock(

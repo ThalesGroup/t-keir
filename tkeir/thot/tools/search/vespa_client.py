@@ -78,6 +78,34 @@ def strip_search_vector_payload(payload: str) -> str:
     return sanitize_vespa_string(_WHITESPACE_RE.sub(" ", text))
 
 
+def clean_chunk_text_for_prompt(text: str) -> str:
+    """Remove indexing metadata wrappers from chunk text for LLM prompts.
+
+    Example:
+        >>> from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
+        >>> sample = (
+        ...     'Active entities: Taylor. Topic: critic regards song '
+        ...     'Inspiration for Something George Harrison liked Abbey Road.'
+        ... )
+        >>> cleaned = clean_chunk_text_for_prompt(sample)
+        >>> 'Active entities' not in cleaned
+        True
+        >>> 'George Harrison' in cleaned
+        True
+    """
+    cleaned = strip_search_vector_payload(text)
+    cleaned = re.sub(r"Active entities:[^.]*\.\s*", "", cleaned, flags=re.I)
+    cleaned = re.sub(r"Previous context:[^.]*\.\s*", "", cleaned, flags=re.I)
+    cleaned = re.sub(r"Next focus:[^.]*\.\s*", "", cleaned, flags=re.I)
+    cleaned = re.sub(r"Upcoming entities:[^.]*\.\s*", "", cleaned, flags=re.I)
+    cleaned = re.sub(r"Topic:\s*", "", cleaned, count=1, flags=re.I)
+    cleaned = re.sub(r"\[\s*edit\s*\]", ". ", cleaned, flags=re.I)
+    cleaned = re.sub(
+        r"(?<=[a-z])\s+Inspiration for\b", ". Inspiration for", cleaned
+    )
+    return sanitize_vespa_string(_WHITESPACE_RE.sub(" ", cleaned)).strip()
+
+
 def chunk_embedding_text(chunk: dict[str, Any]) -> str:
     """Select the text used for chunk vector indexing.
 
@@ -218,6 +246,35 @@ def escape_yql_literal(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"', '\\"')
 
 
+def build_field_contains_or_clause(field: str, query_text: str) -> str | None:
+    """Build a YQL ``<field> contains`` clause with phrase and per-term OR.
+
+    Example:
+        >>> build_field_contains_or_clause("parent_title", "Michael Chang")
+        '(parent_title contains "Michael Chang" OR parent_title contains "Michael" OR parent_title contains "Chang")'
+    """
+    terms: list[str] = []
+    seen: set[str] = set()
+    for term in _WHITESPACE_RE.split((query_text or "").strip()):
+        if not term:
+            continue
+        key = term.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        terms.append(term)
+    if not terms:
+        return None
+    if len(terms) == 1:
+        return f'{field} contains "{escape_yql_literal(terms[0])}"'
+    phrase = " ".join(terms)
+    clauses = [
+        f'{field} contains "{escape_yql_literal(phrase)}"',
+        *(f'{field} contains "{escape_yql_literal(term)}"' for term in terms),
+    ]
+    return "(" + " OR ".join(clauses) + ")"
+
+
 def build_text_raw_contains_or_clause(query_text: str) -> str | None:
     """Build a YQL ``text_raw contains`` clause for hybrid keyword retrieval.
 
@@ -236,26 +293,47 @@ def build_text_raw_contains_or_clause(query_text: str) -> str | None:
         >>> build_text_raw_contains_or_clause("Michael Chang")
         '(text_raw contains "Michael Chang" OR text_raw contains "Michael" OR text_raw contains "Chang")'
     """
-    terms: list[str] = []
+    return build_field_contains_or_clause("text_raw", query_text)
+
+
+def build_multi_field_contains_or_clause(
+    terms: list[str],
+    *,
+    fields: tuple[str, ...],
+) -> str | None:
+    """Build OR clauses across multiple BM25 fields for each search term.
+
+    Example:
+        >>> build_multi_field_contains_or_clause(
+        ...     ["Microsoft"],
+        ...     fields=("text_raw", "parent_title"),
+        ... )
+        '(text_raw contains "Microsoft" OR parent_title contains "Microsoft")'
+    """
+    if not terms or not fields:
+        return None
+    per_term: list[str] = []
     seen: set[str] = set()
-    for term in _WHITESPACE_RE.split((query_text or "").strip()):
-        if not term:
+    for term in terms:
+        cleaned = (term or "").strip()
+        if not cleaned:
             continue
-        key = term.lower()
+        key = cleaned.lower()
         if key in seen:
             continue
         seen.add(key)
-        terms.append(term)
-    if not terms:
+        field_clauses = [
+            clause
+            for field in fields
+            if (clause := build_field_contains_or_clause(field, cleaned))
+        ]
+        if field_clauses:
+            per_term.append("(" + " OR ".join(field_clauses) + ")")
+    if not per_term:
         return None
-    if len(terms) == 1:
-        return f'text_raw contains "{escape_yql_literal(terms[0])}"'
-    phrase = " ".join(terms)
-    clauses = [
-        f'text_raw contains "{escape_yql_literal(phrase)}"',
-        *(f'text_raw contains "{escape_yql_literal(term)}"' for term in terms),
-    ]
-    return "(" + " OR ".join(clauses) + ")"
+    if len(per_term) == 1:
+        return per_term[0]
+    return "(" + " OR ".join(per_term) + ")"
 
 
 @dataclass(frozen=True)
@@ -545,6 +623,45 @@ class VespaClient:
         """
         return self._config
 
+    def build_hybrid_search_payload(
+        self,
+        query_text: str,
+        q_chunk_emb: list[float],
+        q_question_emb: list[float],
+        *,
+        hits: int = 20,
+    ) -> dict[str, Any]:
+        """Build the Vespa hybrid search HTTP payload without executing it.
+
+        Example:
+            >>> from thot.tools.search.vespa_client import VespaClient
+            >>> payload = VespaClient().build_hybrid_search_payload(
+            ...     "hello", [0.0] * 384, [0.0] * 384
+            ... )
+            >>> payload["ranking.profile"]
+            'hybrid_2_level'
+        """
+        text_clause = build_text_raw_contains_or_clause(query_text)
+        yql_parts = [
+            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(chunk_embedding, q_chunk_emb))',
+            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(questions_embeddings, q_question_emb))',
+        ]
+        if text_clause:
+            yql_parts.append(text_clause)
+        yql = "select * from chunk where " + " or ".join(yql_parts)
+        return {
+            "yql": yql,
+            "hits": hits,
+            "timeout": f"{int(self._config.timeout_seconds)}s",
+            "ranking.profile": "hybrid_2_level",
+            "input.query(q_chunk_emb)": q_chunk_emb[
+                : self._config.embedding_dim
+            ],
+            "input.query(q_question_emb)": q_question_emb[
+                : self._config.embedding_dim
+            ],
+        }
+
     async def hybrid_search(
         self,
         query_text: str,
@@ -569,31 +686,40 @@ class VespaClient:
             >>> from thot.tools.search.vespa_client import VespaClient
             >>> asyncio.run(VespaClient().hybrid_search("hello", [0.0]*384, [0.0]*384))  # doctest: +SKIP
         """
-        text_clause = build_text_raw_contains_or_clause(query_text)
-        yql_parts = [
-            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(chunk_embedding, q_chunk_emb))',
-            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(questions_embeddings, q_question_emb))',
-        ]
-        if text_clause:
-            yql_parts.append(text_clause)
-        yql = "select * from chunk where " + " or ".join(yql_parts)
-        payload = {
-            "yql": yql,
-            "hits": hits,
-            "timeout": f"{int(self._config.timeout_seconds)}s",
-            "ranking.profile": "hybrid_2_level",
-            "input.query(q_chunk_emb)": q_chunk_emb[
-                : self._config.embedding_dim
-            ],
-            "input.query(q_question_emb)": q_question_emb[
-                : self._config.embedding_dim
-            ],
-        }
-        ThotLogger.info(f"Vespa hybrid search query={query_text!r} yql={yql}")
+        payload = self.build_hybrid_search_payload(
+            query_text,
+            q_chunk_emb,
+            q_question_emb,
+            hits=hits,
+        )
+        ThotLogger.info(
+            f"Vespa hybrid search query={query_text!r} yql={payload['yql']}"
+        )
         response = await self._client.post(
             self._config.search_api_url,
             json=payload,
         )
+        response.raise_for_status()
+        return response.json()
+
+    async def search(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Execute a pre-built Vespa search payload.
+
+        Example:
+            >>> import asyncio
+            >>> from thot.tools.search.vespa_client import VespaClient
+            >>> asyncio.run(VespaClient().search({"yql": "select * from chunk where true"}))  # doctest: +SKIP
+        """
+        response = await self._client.post(
+            self._config.search_api_url,
+            json=payload,
+        )
+        if response.is_error:
+            ThotLogger.error(
+                "Vespa search failed "
+                + f"status={response.status_code} "
+                + f"body={response.text[:500]}"
+            )
         response.raise_for_status()
         return response.json()
 

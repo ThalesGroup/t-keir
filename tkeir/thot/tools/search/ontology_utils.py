@@ -11,6 +11,7 @@ from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, Namespace
 
 from thot.core.KeywordRules import is_valid_keyword_label
+from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
 
 TKEIR = Namespace("http://tkeir.local/ontology/")
 
@@ -22,6 +23,20 @@ _STRUCTURAL_ENTITY_TYPES = frozenset(
         "Tag",
         "Entity",
         "Metric",
+    }
+)
+
+_STRUCTURAL_PREDICATES = frozenset(
+    {
+        TKEIR.hasStatement,
+        TKEIR.hasChunk,
+        TKEIR.hasMention,
+        TKEIR.hasKeyword,
+        TKEIR.hasTag,
+        TKEIR.isTagOf,
+        TKEIR.hasNumericValue,
+        RDF.type,
+        RDFS.label,
     }
 )
 
@@ -135,6 +150,11 @@ _FOCUS_STOPWORDS = frozenset(
         "do",
         "replace",
         "replaced",
+        "interpret",
+        "interprets",
+        "interpreted",
+        "who",
+        "album",
     }
 )
 
@@ -151,6 +171,24 @@ def _focus_query_terms(query_text: str) -> set[str]:
     return terms or _query_terms(query_text)
 
 
+def _is_metadata_sentence(sentence: str) -> bool:
+    """Return whether a sentence is indexing metadata rather than body text.
+
+    Example:
+        >>> _is_metadata_sentence("Topic: critic Jon Landau regards song")
+        True
+    """
+    stripped = sentence.strip()
+    if re.match(
+        r"^(Active entities|Topic:|Previous context|Next focus|Upcoming entities)\b",
+        stripped,
+        re.I,
+    ):
+        return True
+    first = stripped.split()[0].lower().rstrip(":") if stripped else ""
+    return first in {"topic", "active", "previous", "next", "upcoming", "hide"}
+
+
 def _split_sentences(text: str) -> list[str]:
     """Split text into sentence-like spans for passage ranking.
 
@@ -158,19 +196,38 @@ def _split_sentences(text: str) -> list[str]:
         >>> _split_sentences("Alice went home. Bob stayed.")
         ['Alice went home.', 'Bob stayed.']
     """
-    parts = re.split(r"(?<=[.!?])\s+", text.strip())
-    return [part.strip() for part in parts if part.strip()]
+    cleaned = clean_chunk_text_for_prompt(text)
+    parts = re.split(r"(?<=[.!?])\s+", cleaned.strip())
+    return [
+        part.strip()
+        for part in parts
+        if part.strip()
+        and (len(part.strip()) > 15 or part.endswith((".", "!", "?")))
+    ]
 
 
-def _sentence_relevance(sentence: str, terms: set[str]) -> int:
-    """Score a sentence by how many query terms it contains.
+def _sentence_relevance(
+    sentence: str, terms: set[str], query_text: str = ""
+) -> int:
+    """Score a sentence by query term and phrase overlap.
 
     Example:
-        >>> _sentence_relevance("Andrew Yang replaced Trump", {"yang", "trump"})
-        2
+        >>> _sentence_relevance(
+        ...     "George Harrison liked Abbey Road",
+        ...     {"abbey", "road", "album"},
+        ...     "Abbey Road album",
+        ... )
+        5
     """
+    if _is_metadata_sentence(sentence):
+        return -10
     haystack = sentence.lower()
-    return sum(1 for term in terms if term in haystack)
+    score = sum(1 for term in terms if term in haystack)
+    if query_text:
+        for label in extract_query_highlight_terms(query_text):
+            if len(label.split()) >= 2 and label.lower() in haystack:
+                score += 3
+    return score
 
 
 def extract_focus_passages(
@@ -203,7 +260,7 @@ def extract_focus_passages(
     min_score = 2 if len(terms) >= 2 else 1
     for rank, (chunk_id, text_raw) in enumerate(chunk_texts):
         for sentence in _split_sentences(text_raw):
-            score = _sentence_relevance(sentence, terms)
+            score = _sentence_relevance(sentence, terms, query_text)
             if score >= min_score:
                 scored.append((score, -rank, chunk_id, sentence))
 
@@ -369,6 +426,84 @@ def prioritize_chunks_by_query_match(
         key=lambda chunk: (match_score(chunk), relevance_score(chunk)),
         reverse=True,
     )
+
+
+def _distinctive_query_phrases(query_text: str) -> list[str]:
+    """Return high-precision phrases for scoping prompt chunks to the query.
+
+    Example:
+        >>> _distinctive_query_phrases("Who interpret the album Abbey Road")
+        ['abbey road']
+    """
+    tokens = re.findall(r"[A-Za-z0-9][A-Za-z0-9'._-]{2,}", query_text or "")
+    phrases: list[str] = []
+    for index in range(len(tokens) - 1):
+        left, right = tokens[index], tokens[index + 1]
+        if left[:1].isupper() and right[:1].isupper():
+            phrases.append(f"{left} {right}".lower())
+    if phrases:
+        return list(dict.fromkeys(phrases))
+
+    multi_word = [
+        label
+        for label in extract_query_highlight_terms(query_text)
+        if len(label.split()) >= 2
+    ]
+    multi_word.sort(key=len, reverse=True)
+    return [label.lower() for label in multi_word[:2]]
+
+
+def filter_query_relevant_chunks(
+    chunks: list[Any],
+    query_text: str,
+    *,
+    max_chunks: int = 8,
+) -> list[Any]:
+    """Keep chunks whose cleaned body matches the query for prompt assembly.
+
+    Example:
+        >>> chunks = [
+        ...     {"text_raw": "George Harrison liked Abbey Road.", "relevance": 0.9},
+        ...     {"text_raw": "Unrelated vaporwave essay.", "relevance": 0.95},
+        ... ]
+        >>> kept = filter_query_relevant_chunks(chunks, "Abbey Road")
+        >>> kept[0]["text_raw"].startswith("George")
+        True
+    """
+    ranked = prioritize_chunks_by_query_match(chunks, query_text)
+    key_phrases = _distinctive_query_phrases(query_text)
+    if key_phrases:
+        phrase_matching = [
+            chunk
+            for chunk in ranked
+            if any(
+                phrase
+                in clean_chunk_text_for_prompt(
+                    chunk.text_raw
+                    if hasattr(chunk, "text_raw")
+                    else str(chunk.get("text_raw") or "")
+                ).lower()
+                for phrase in key_phrases
+            )
+        ]
+        if phrase_matching:
+            return phrase_matching[:max_chunks]
+
+    matching = [
+        chunk
+        for chunk in ranked
+        if chunk_text_matches_query(
+            query_text,
+            clean_chunk_text_for_prompt(
+                chunk.text_raw
+                if hasattr(chunk, "text_raw")
+                else str(chunk.get("text_raw") or "")
+            ),
+        )
+    ]
+    if matching:
+        return matching[:max_chunks]
+    return ranked[:max_chunks]
 
 
 def _node_label(graph: Graph, node: URIRef | Literal) -> str:
@@ -685,3 +820,203 @@ def summarize_graph_for_prompt(
             f"- {_node_label(graph, subject)} | {_predicate_label(predicate)} | {_node_label(graph, obj)}"
         )
     return "\n".join(fallback)
+
+
+def _is_structural_subject(graph: Graph, subject: URIRef | Literal) -> bool:
+    """Return whether a subject node is a structural entity type.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _is_structural_subject
+        >>> from rdflib import Graph, Literal
+        >>> _is_structural_subject(Graph(), Literal("chunk-1"))
+        True
+    """
+    if not isinstance(subject, URIRef):
+        return True
+    return _node_type(graph, subject) in _STRUCTURAL_ENTITY_TYPES
+
+
+def _chunk_entity_uris(graph: Graph, chunk_ids: list[str]) -> set[str]:
+    """Return entity URIs mentioned in the requested chunk ids.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _chunk_entity_uris
+        >>> from rdflib import Graph
+        >>> _chunk_entity_uris(Graph(), [])
+        set()
+    """
+    id_to_uri = {
+        chunk_id: uri for uri, chunk_id in _chunk_uri_map(graph).items()
+    }
+    entities: set[str] = set()
+    for chunk_id in chunk_ids:
+        chunk_uri = id_to_uri.get(chunk_id)
+        if not chunk_uri:
+            continue
+        for _subject, _predicate, entity in graph.triples(
+            (URIRef(chunk_uri), TKEIR.hasMention, None)
+        ):
+            if isinstance(entity, URIRef):
+                entities.add(str(entity))
+    return entities
+
+
+def extract_deduplicated_svo_triples(
+    graph: Graph,
+    query_text: str = "",
+    *,
+    chunk_ids: list[str] | None = None,
+    max_triples: int = 80,
+) -> list[str]:
+    """Extract deduplicated subject-verb-object lines from an ontology graph.
+
+    Keeps semantic predicates between typed entities or literals, scoped to
+    entities linked to ``chunk_ids`` when provided.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import (
+        ...     extract_deduplicated_svo_triples,
+        ...     merge_turtle_graphs,
+        ... )
+        >>> turtle = '''
+        ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        ... @prefix tkeir: <http://tkeir.local/ontology/> .
+        ... @prefix tkeirdoc: <http://tkeir.local/doc/> .
+        ... tkeirdoc:doc_a a tkeir:Document ;
+        ...     tkeir:hasChunk <http://tkeir.local/doc/doc_a/Chunk/chunk_1> .
+        ... <http://tkeir.local/doc/doc_a/Chunk/chunk_1> a tkeir:DocumentChunk ;
+        ...     rdfs:label "doc.pdf#chunk-1" ;
+        ...     tkeir:hasMention <http://tkeir.local/doc/doc_a/Company/acme> .
+        ... <http://tkeir.local/doc/doc_a/Company/acme> a tkeir:Company ;
+        ...     rdfs:label "Acme" ;
+        ...     tkeir:createdBy <http://tkeir.local/doc/doc_a/Product/widget> .
+        ... <http://tkeir.local/doc/doc_a/Product/widget> a tkeir:Product ;
+        ...     rdfs:label "Widget" .
+        ... '''
+        >>> graph = merge_turtle_graphs([turtle])
+        >>> lines = extract_deduplicated_svo_triples(
+        ...     graph,
+        ...     "Acme",
+        ...     chunk_ids=["doc.pdf#chunk-1"],
+        ... )
+        >>> lines
+        ['Acme | createdBy | Widget']
+    """
+    if len(graph) == 0:
+        return []
+
+    chunk_entities: set[str] | None
+    if chunk_ids is None:
+        chunk_entities = None
+    else:
+        chunk_entities = _chunk_entity_uris(graph, chunk_ids)
+        if not chunk_entities:
+            return []
+
+    terms = _query_terms(query_text)
+    matched: list[str] = []
+    fallback: list[str] = []
+    seen: set[tuple[str, str, str]] = set()
+
+    for subject, predicate, obj in graph:
+        if predicate in _STRUCTURAL_PREDICATES:
+            continue
+        if _is_structural_subject(graph, subject):
+            continue
+
+        subject_uri = str(subject) if isinstance(subject, URIRef) else ""
+        object_uri = str(obj) if isinstance(obj, URIRef) else ""
+        if chunk_entities is not None:
+            if (
+                subject_uri not in chunk_entities
+                and object_uri not in chunk_entities
+            ):
+                continue
+
+        subject_label = _node_label(graph, subject).strip()
+        predicate_label = _predicate_label(predicate).strip()
+        object_label = _node_label(graph, obj).strip()
+        if not subject_label or not predicate_label:
+            continue
+
+        key = (
+            subject_label.lower(),
+            predicate_label.lower(),
+            object_label.lower(),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+
+        line = f"{subject_label} | {predicate_label} | {object_label}"
+        haystack = line.lower()
+        if terms and any(term in haystack for term in terms):
+            matched.append(line)
+        else:
+            fallback.append(line)
+
+    selected = matched + fallback
+    return selected[:max_triples]
+
+
+def format_svo_ontology_context(
+    graph: Graph,
+    query_text: str,
+    chunks: list[Any],
+    *,
+    empty_message: str,
+    max_triples: int = 80,
+) -> str:
+    """Format deduplicated ontology SVO lines for LLM prompt injection.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> from thot.tools.search.ontology_utils import (
+        ...     format_svo_ontology_context,
+        ...     merge_turtle_graphs,
+        ... )
+        >>> turtle = '''
+        ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        ... @prefix tkeir: <http://tkeir.local/ontology/> .
+        ... @prefix tkeirdoc: <http://tkeir.local/doc/> .
+        ... tkeirdoc:doc_a a tkeir:Document ;
+        ...     tkeir:hasChunk <http://tkeir.local/doc/doc_a/Chunk/chunk_1> .
+        ... <http://tkeir.local/doc/doc_a/Chunk/chunk_1> a tkeir:DocumentChunk ;
+        ...     rdfs:label "c1" ;
+        ...     tkeir:hasMention <http://tkeir.local/doc/doc_a/Company/acme> .
+        ... <http://tkeir.local/doc/doc_a/Company/acme> a tkeir:Company ;
+        ...     rdfs:label "Acme" ;
+        ...     tkeir:createdBy <http://tkeir.local/doc/doc_a/Product/widget> .
+        ... <http://tkeir.local/doc/doc_a/Product/widget> a tkeir:Product ;
+        ...     rdfs:label "Widget" .
+        ... '''
+        >>> graph = merge_turtle_graphs([turtle])
+        >>> chunk = RetrievedChunk(
+        ...     chunk_id="c1",
+        ...     text_raw="Acme launched Widget.",
+        ...     parent_doc_id="file://doc.pdf",
+        ... )
+        >>> text = format_svo_ontology_context(
+        ...     graph,
+        ...     "Acme",
+        ...     [chunk],
+        ...     empty_message="none",
+        ... )
+        >>> "Acme | createdBy | Widget" in text
+        True
+    """
+    chunk_ids = [
+        str(
+            chunk.chunk_id if hasattr(chunk, "chunk_id") else chunk["chunk_id"]
+        )
+        for chunk in chunks
+    ]
+    triples = extract_deduplicated_svo_triples(
+        graph,
+        query_text,
+        chunk_ids=chunk_ids,
+        max_triples=max_triples,
+    )
+    if not triples:
+        return empty_message
+    return "\n".join(f"- {line}" for line in triples)

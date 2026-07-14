@@ -14,6 +14,7 @@ import yaml
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from rdflib import Graph
 
 from thot import __version__ as TKEIR_VERSION
 from thot.core.LlmWrapper import UnifiedLLMWrapper
@@ -24,23 +25,40 @@ from thot.tasks.pipeline.PipelineRunner import PipelineRunner
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
     extract_focus_passages,
+    filter_query_relevant_chunks,
+    format_svo_ontology_context,
     merge_rdf_graphs,
     prioritize_chunks_by_query_match,
     summarize_graph_for_prompt,
     truncate_for_prompt,
 )
+from thot.tools.search.query_analyzer import (
+    QueryAnalyzerTask,
+    build_focus_query_text,
+    build_svo_match_query,
+    format_query_analysis_for_prompt,
+    format_vespa_query_json,
+)
 from thot.tools.search.query_refiner import refine_search_query_text
-from thot.tools.search.rag_config import RagConfig, load_rag_config
+from thot.tools.search.rag_config import (
+    RagConfig,
+    RagPromptConfig,
+    load_rag_config,
+)
 from thot.tools.search.rag_report import (
     apply_chunk_evidence_fallback,
     assemble_report_markdown,
     build_fallback_detailed_report,
     extract_highlight_labels,
+    format_input_prompt,
     is_unavailable_short_answer,
     parse_structured_generation,
     query_highlight_terms,
 )
-from thot.tools.search.vespa_client import VespaClient
+from thot.tools.search.vespa_client import (
+    VespaClient,
+    clean_chunk_text_for_prompt,
+)
 
 LOGGER = logging.getLogger(__name__)
 PROMPTS_PATH = rag_prompts_path()
@@ -84,6 +102,8 @@ class FusedOntology(BaseModel):
 class QueryResponse(BaseModel):
     answer: str
     report_markdown: str
+    input_prompt: str = ""
+    vespa_query: str = ""
     highlight_entities: list[str] = Field(default_factory=list)
     highlight_keywords: list[str] = Field(default_factory=list)
     highlight_query_terms: list[str] = Field(default_factory=list)
@@ -209,25 +229,124 @@ def _build_generation_prompts(
     focus_passages: str,
     chunk_excerpts: str,
     query_text: str,
+    query_analysis: str,
     unavailable_answer: str,
+    user_prompt_template: str | None = None,
+    system_prompt_template: str | None = None,
 ) -> tuple[str, str]:
     """Build system and user prompts for answer generation.
 
     Example:
-        >>> cfg = {"user": "Q:{query_text} F:{focus_passages}", "system": "S:{unavailable_answer}"}
-        >>> _build_generation_prompts(cfg, fused_summary="", focus_passages="p", chunk_excerpts="", query_text="Hi", unavailable_answer="N/A")
-        ('S:N/A', 'Q:Hi F:p')
+        >>> cfg = {"user": "Q:{query_text} A:{query_analysis}", "system": "S:{unavailable_answer}"}
+        >>> _build_generation_prompts(cfg, fused_summary="", focus_passages="p", chunk_excerpts="", query_text="Hi", query_analysis="- terms: hi", unavailable_answer="N/A")
+        ('S:N/A', 'Q:Hi A:- terms: hi')
     """
     format_kwargs = {
         "fused_graph_triples_or_summary": fused_summary,
         "focus_passages": focus_passages,
         "chunk_excerpts": chunk_excerpts,
         "query_text": query_text,
+        "query_analysis": query_analysis,
         "unavailable_answer": unavailable_answer,
     }
-    user_prompt = prompt_cfg["user"].format(**format_kwargs)
-    system_prompt = prompt_cfg.get("system", "").format(**format_kwargs)
+    user_template = user_prompt_template or prompt_cfg["user"]
+    user_prompt = user_template.format(**format_kwargs)
+    system_template = system_prompt_template or prompt_cfg.get("system", "")
+    system_prompt = system_template.format(**format_kwargs)
     return system_prompt.strip(), user_prompt.strip()
+
+
+def _resolve_user_prompt_template(
+    prompt_cfg: dict[str, Any],
+    prompt_settings: RagPromptConfig,
+) -> str:
+    """Pick the user prompt template for the configured chunk context mode.
+
+    Example:
+        >>> cfg = {"user": "default", "user_svo": "svo"}
+        >>> _resolve_user_prompt_template(cfg, RagPromptConfig("svo_ontology", 80))
+        'svo'
+    """
+    if prompt_settings.chunk_context_mode == "svo_ontology":
+        return str(prompt_cfg.get("user_svo") or prompt_cfg["user"])
+    return str(prompt_cfg["user"])
+
+
+def _resolve_system_prompt_template(
+    prompt_cfg: dict[str, Any],
+    prompt_settings: RagPromptConfig,
+) -> str | None:
+    """Pick the system prompt template for the configured chunk context mode.
+
+    Example:
+        >>> cfg = {"system": "default", "system_svo": "svo"}
+        >>> _resolve_system_prompt_template(cfg, RagPromptConfig("svo_ontology", 80))
+        'svo'
+    """
+    if prompt_settings.chunk_context_mode == "svo_ontology":
+        configured = prompt_cfg.get("system_svo")
+        return str(configured) if configured else None
+    return None
+
+
+def _uses_svo_only_prompt(prompt_settings: RagPromptConfig) -> bool:
+    """Return whether generation should use the compact SVO-only prompt.
+
+    Example:
+        >>> from thot.tools.search.app import _uses_svo_only_prompt
+        >>> from thot.tools.search.rag_config import RagPromptConfig
+        >>> _uses_svo_only_prompt(
+        ...     RagPromptConfig(chunk_context_mode="svo_ontology", max_svo_triples=12)
+        ... )
+        True
+    """
+    return prompt_settings.chunk_context_mode == "svo_ontology"
+
+
+def _format_chunk_context(
+    *,
+    prompt_settings: RagPromptConfig,
+    graph: Graph,
+    query_text: str,
+    chunks: list[RetrievedChunk],
+    empty_message: str,
+    max_chars_per_chunk: int,
+    max_chunks: int,
+) -> str:
+    """Build chunk-context text for the LLM user prompt.
+
+    Example:
+        >>> from thot.tools.search.app import _format_chunk_context
+        >>> from thot.tools.search.rag_config import RagPromptConfig
+        >>> from rdflib import Graph
+        >>> _format_chunk_context(
+        ...     prompt_settings=RagPromptConfig(
+        ...         chunk_context_mode="svo_ontology",
+        ...         max_svo_triples=12,
+        ...     ),
+        ...     graph=Graph(),
+        ...     query_text="test",
+        ...     chunks=[],
+        ...     empty_message="No context.",
+        ...     max_chars_per_chunk=100,
+        ...     max_chunks=3,
+        ... )
+        'No context.'
+    """
+    if prompt_settings.chunk_context_mode == "svo_ontology":
+        return format_svo_ontology_context(
+            graph,
+            query_text,
+            chunks,
+            empty_message=empty_message,
+            max_triples=prompt_settings.max_svo_triples,
+        )
+    return _format_chunk_excerpts(
+        chunks,
+        empty_message=empty_message,
+        max_chars_per_chunk=max_chars_per_chunk,
+        max_chunks=max_chunks,
+    )
 
 
 def _format_chunk_excerpts(
@@ -260,7 +379,7 @@ def _format_chunk_excerpts(
             f"{chunk.relevance:.4f}" if chunk.relevance is not None else "n/a"
         )
         body = truncate_for_prompt(
-            chunk.text_raw,
+            clean_chunk_text_for_prompt(chunk.text_raw),
             max_chars=max_chars_per_chunk,
         )
         blocks.append(
@@ -530,21 +649,60 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
     request_started = time.perf_counter()
 
     step_started = time.perf_counter()
+    pipeline_runner = _pipeline_runner_for_language(
+        state,
+        request.language,
+    )
+    search_query_text = query_text
+    query_analysis: dict[str, Any] | None = None
+    vespa_payload: dict[str, Any] | None = None
     try:
-        query_embedding = await state.llm.embed(query_text)
-        pipeline_runner = _pipeline_runner_for_language(
-            state,
-            request.language,
-        )
-        if pipeline_runner is None:
-            search_query_text = query_text
-        else:
-            search_query_text = await asyncio.to_thread(
-                refine_search_query_text,
+        if (
+            state.rag_config.search.enabled
+            and pipeline_runner is not None
+            and state.llm is not None
+        ):
+            analyzer = QueryAnalyzerTask(
                 pipeline_runner,
+                state.llm,
+                state.rag_config.search,
+                embedding_dim=state.vespa.config.embedding_dim,
+                timeout_seconds=state.vespa.config.timeout_seconds,
+            )
+            analyzed = await analyzer.process(
                 query_text,
                 language=request.language,
+                hits=request.hits,
             )
+            vespa_payload = analyzed["payload"]
+            search_response = await state.vespa.search(vespa_payload)
+            query_analysis = analyzed["analysis"]
+            search_query_text = (
+                query_analysis.get("lexical_query") or query_text
+            )
+        else:
+            query_embedding = await state.llm.embed(query_text)
+            if pipeline_runner is None:
+                search_query_text = query_text
+            else:
+                search_query_text = await asyncio.to_thread(
+                    refine_search_query_text,
+                    pipeline_runner,
+                    query_text,
+                    language=request.language,
+                )
+            vespa_payload = state.vespa.build_hybrid_search_payload(
+                search_query_text,
+                query_embedding,
+                query_embedding,
+                hits=request.hits,
+            )
+            search_response = await state.vespa.search(vespa_payload)
+            query_analysis = {
+                "raw_query": query_text,
+                "lexical_query": search_query_text,
+                "search_terms": search_query_text.split(),
+            }
     except Exception as error:
         LOGGER.exception("Query generation failed")
         raise HTTPException(
@@ -555,16 +713,29 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         step_started,
         query=repr(query_text),
         search_query=repr(search_query_text),
+        analyzer=bool(query_analysis),
+    )
+
+    vespa_query_json = (
+        format_vespa_query_json(vespa_payload) if vespa_payload else ""
+    )
+    svo_match_query = build_svo_match_query(
+        raw_query=query_text,
+        lexical_query=search_query_text,
+        analysis=query_analysis,
+    )
+    focus_query_text = build_focus_query_text(
+        raw_query=query_text,
+        analysis=query_analysis,
+    )
+    query_analysis_context = format_query_analysis_for_prompt(
+        raw_query=query_text,
+        lexical_query=search_query_text,
+        analysis=query_analysis,
     )
 
     step_started = time.perf_counter()
     try:
-        search_response = await state.vespa.hybrid_search(
-            search_query_text,
-            query_embedding,
-            query_embedding,
-            hits=request.hits,
-        )
         parsed_hits = _parse_hits(search_response)
         retrieved_chunks, rdf_payloads = await _enrich_hits(state, parsed_hits)
     except Exception as error:
@@ -581,16 +752,32 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
 
     retrieved_chunks = prioritize_chunks_by_query_match(
         retrieved_chunks,
-        query_text,
+        focus_query_text,
     )
+    prompt_chunks = filter_query_relevant_chunks(
+        retrieved_chunks,
+        focus_query_text,
+        max_chunks=_DEFAULT_MAX_CHUNKS_FOR_PROMPT,
+    )
+    prompt_chunk_ids = {chunk.chunk_id for chunk in prompt_chunks}
+    prompt_rdf_payloads = [
+        payload
+        for payload, chunk in zip(rdf_payloads, retrieved_chunks, strict=False)
+        if getattr(chunk, "chunk_id", None) in prompt_chunk_ids
+    ]
+    if not prompt_rdf_payloads:
+        prompt_rdf_payloads = rdf_payloads[: len(prompt_chunks)]
 
     step_started = time.perf_counter()
-    fused_graph = merge_rdf_graphs(rdf_payloads)
-    fused_summary = summarize_graph_for_prompt(
-        fused_graph,
-        query_text,
-        max_triples=_DEFAULT_MAX_TRIPLES_FOR_PROMPT,
-    )
+    fused_graph = merge_rdf_graphs(prompt_rdf_payloads)
+    svo_only_prompt = _uses_svo_only_prompt(state.rag_config.prompt)
+    fused_summary = ""
+    if not svo_only_prompt:
+        fused_summary = summarize_graph_for_prompt(
+            fused_graph,
+            svo_match_query,
+            max_triples=_DEFAULT_MAX_TRIPLES_FOR_PROMPT,
+        )
     hmi_ontology = build_hmi_ontology(
         rdf_payloads,
         [chunk.chunk_id for chunk in retrieved_chunks],
@@ -605,17 +792,43 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
 
     prompt_cfg = _language_prompt_cfg(state.prompts, request.language)
     unavailable_answer = _unavailable_answer(prompt_cfg, request.language)
-    chunk_excerpts = _format_chunk_excerpts(
-        retrieved_chunks,
+    user_prompt_template = _resolve_user_prompt_template(
+        prompt_cfg,
+        state.rag_config.prompt,
+    )
+    system_prompt_template = _resolve_system_prompt_template(
+        prompt_cfg,
+        state.rag_config.prompt,
+    )
+    chunk_excerpts = _format_chunk_context(
+        prompt_settings=state.rag_config.prompt,
+        graph=fused_graph,
+        query_text=svo_match_query,
+        chunks=prompt_chunks,
         empty_message=_no_chunks_message(prompt_cfg),
         max_chars_per_chunk=_DEFAULT_MAX_CHARS_PER_CHUNK,
         max_chunks=_DEFAULT_MAX_CHUNKS_FOR_PROMPT,
     )
     focus_passages = extract_focus_passages(
-        [(chunk.chunk_id, chunk.text_raw) for chunk in retrieved_chunks],
-        query_text,
+        [
+            (chunk.chunk_id, clean_chunk_text_for_prompt(chunk.text_raw))
+            for chunk in prompt_chunks
+        ],
+        focus_query_text,
         max_passages=_DEFAULT_MAX_FOCUS_PASSAGES,
     )
+    system_prompt, user_prompt = _build_generation_prompts(
+        prompt_cfg,
+        fused_summary=fused_summary,
+        focus_passages=focus_passages,
+        chunk_excerpts=chunk_excerpts,
+        query_text=query_text,
+        query_analysis=query_analysis_context,
+        unavailable_answer=unavailable_answer,
+        user_prompt_template=user_prompt_template,
+        system_prompt_template=system_prompt_template,
+    )
+    input_prompt = format_input_prompt(system_prompt, user_prompt)
 
     if not retrieved_chunks:
         entity_labels, keyword_labels = extract_highlight_labels(ontology)
@@ -631,6 +844,8 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
             chunks=retrieved_chunks,
             ontology=ontology,
             vespa_hits=len(parsed_hits),
+            input_prompt=input_prompt,
+            vespa_query=vespa_query_json,
         )
         _log_rag_step(
             "answer-building",
@@ -644,6 +859,8 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         return QueryResponse(
             answer=unavailable_answer,
             report_markdown=report_markdown,
+            input_prompt=input_prompt,
+            vespa_query=vespa_query_json,
             highlight_entities=entity_labels,
             highlight_keywords=keyword_labels,
             highlight_query_terms=query_term_labels,
@@ -653,15 +870,6 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
             ontology=ontology,
             vespa_hits=len(parsed_hits),
         )
-
-    system_prompt, user_prompt = _build_generation_prompts(
-        prompt_cfg,
-        fused_summary=fused_summary,
-        focus_passages=focus_passages,
-        chunk_excerpts=chunk_excerpts,
-        query_text=query_text,
-        unavailable_answer=unavailable_answer,
-    )
 
     try:
         raw_generation = await state.llm.generate(
@@ -681,10 +889,10 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
     used_chunk_evidence = False
     short_answer, detailed_report, used_chunk_evidence = (
         apply_chunk_evidence_fallback(
-            query_text=query_text,
+            query_text=focus_query_text,
             short_answer=short_answer,
             detailed_report=detailed_report,
-            chunks=retrieved_chunks,
+            chunks=prompt_chunks,
             unavailable_answer=unavailable_answer,
         )
     )
@@ -704,6 +912,8 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         chunks=retrieved_chunks,
         ontology=ontology,
         vespa_hits=len(parsed_hits),
+        input_prompt=input_prompt,
+        vespa_query=vespa_query_json,
     )
 
     _log_rag_step(
@@ -717,6 +927,8 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
     return QueryResponse(
         answer=short_answer,
         report_markdown=report_markdown,
+        input_prompt=input_prompt,
+        vespa_query=vespa_query_json,
         highlight_entities=entity_labels,
         highlight_keywords=keyword_labels,
         highlight_query_terms=query_term_labels,

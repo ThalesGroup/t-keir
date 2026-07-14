@@ -4,11 +4,14 @@
 from __future__ import annotations
 
 import os
+import time
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Protocol
 
 import httpx
+
+from thot.core.ThotLogger import ThotLogger
 
 
 class Provider(str, Enum):
@@ -144,6 +147,36 @@ def _normalize_embedding(
     if len(vector) > expected_dim:
         return vector[:expected_dim]
     return vector + [0.0] * (expected_dim - len(vector))
+
+
+def _log_llm_generate_stats(
+    *,
+    elapsed_seconds: float,
+    prompt_size: int,
+    output_size: int,
+    provider: Provider,
+    model: str,
+) -> None:
+    """Log prompt size, elapsed time, and output size for one LLM call.
+
+    Example:
+        >>> from thot.core.LlmWrapper import _log_llm_generate_stats, Provider
+        >>> _log_llm_generate_stats(
+        ...     elapsed_seconds=0.5,
+        ...     prompt_size=120,
+        ...     output_size=40,
+        ...     provider=Provider.OLLAMA,
+        ...     model="llama3",
+        ... )
+    """
+    ThotLogger.info(
+        "LLM generate "
+        + f"elapsed={elapsed_seconds:.3f}s "
+        + f"prompt_size={prompt_size} "
+        + f"output_size={output_size} "
+        + f"provider={provider.value} "
+        + f"model={model}"
+    )
 
 
 class UnifiedLLMWrapper:
@@ -294,23 +327,37 @@ class UnifiedLLMWrapper:
             >>> from thot.core.LlmWrapper import UnifiedLLMWrapper
             >>> asyncio.run(UnifiedLLMWrapper().generate("Hello"))  # doctest: +SKIP
         """
-        if self._config.provider is Provider.OPENAI:
-            return await self._openai_generate(
-                prompt,
-                system=system,
-                temperature=temperature,
+        prompt_size = len(prompt) + len(system or "")
+        started = time.perf_counter()
+        result = ""
+        try:
+            if self._config.provider is Provider.OPENAI:
+                result = await self._openai_generate(
+                    prompt,
+                    system=system,
+                    temperature=temperature,
+                )
+            elif self._config.provider is Provider.OLLAMA:
+                result = await self._ollama_generate(
+                    prompt,
+                    system=system,
+                    temperature=temperature,
+                )
+            else:
+                result = await self._vllm_generate(
+                    prompt,
+                    system=system,
+                    temperature=temperature,
+                )
+            return result
+        finally:
+            _log_llm_generate_stats(
+                elapsed_seconds=time.perf_counter() - started,
+                prompt_size=prompt_size,
+                output_size=len(result),
+                provider=self._config.provider,
+                model=self._config.llm_model,
             )
-        if self._config.provider is Provider.OLLAMA:
-            return await self._ollama_generate(
-                prompt,
-                system=system,
-                temperature=temperature,
-            )
-        return await self._vllm_generate(
-            prompt,
-            system=system,
-            temperature=temperature,
-        )
 
     async def _openai_embed_batch(self, texts: list[str]) -> list[list[float]]:
         """Request embeddings from the OpenAI-compatible embeddings API.

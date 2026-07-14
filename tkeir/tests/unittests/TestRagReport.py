@@ -8,6 +8,7 @@ from thot.tools.search.rag_report import (
     build_chunk_evidence_answer,
     build_fallback_detailed_report,
     extract_highlight_labels,
+    format_input_prompt,
     is_unavailable_short_answer,
     parse_structured_generation,
     query_highlight_terms,
@@ -46,6 +47,46 @@ def test_extract_highlight_labels_ranks_by_chunk_links():
     )
     assert entities[0] == "Acme"
     assert keywords[0] == "launch"
+
+
+def test_format_input_prompt_combines_system_and_user():
+    prompt = format_input_prompt("Be concise.", "Who is Alice?")
+    assert "[SYSTEM]" in prompt
+    assert "Be concise." in prompt
+    assert "[USER]" in prompt
+    assert "Who is Alice?" in prompt
+
+
+def test_assemble_report_markdown_includes_input_prompt():
+    report = assemble_report_markdown(
+        query="Who is Alice?",
+        language="en",
+        short_answer="Alice works at Acme.",
+        detailed_report="## Detailed Analysis\nAlice is mentioned.",
+        chunks=[],
+        ontology={"entities": [], "keywords": []},
+        vespa_hits=0,
+        input_prompt="[SYSTEM]\nBe concise.\n\n[USER]\nWho is Alice?",
+    )
+    assert "## LLM Input Prompt" in report
+    assert "[SYSTEM]" in report
+    assert "Who is Alice?" in report
+
+
+def test_assemble_report_markdown_includes_vespa_query():
+    report = assemble_report_markdown(
+        query="Abbey Road",
+        language="en",
+        short_answer="A Beatles album.",
+        detailed_report="## Detailed Analysis\nAlbum details.",
+        chunks=[],
+        ontology={"entities": [], "keywords": []},
+        vespa_hits=3,
+        vespa_query='{"yql": "select * from chunk where true", "hits": 3}',
+    )
+    assert "## Vespa Search Query" in report
+    assert "```json" in report
+    assert "select * from chunk where true" in report
 
 
 def test_assemble_report_markdown_includes_sources_and_entities():
@@ -160,6 +201,62 @@ def test_passage_based_short_answer_prefers_predicate_sentence():
     assert answer == "George Harrison"
 
 
+def test_passage_based_short_answer_extracts_name_when_predicate_missing():
+    from thot.tools.search.rag_report import _passage_based_short_answer
+
+    chunk = RetrievedChunk(
+        chunk_id="doc.pdf#chunk-2",
+        text_raw=(
+            'George Harrison liked "Something in the Way She Moves" so much that '
+            "he used the beginning as the first line of his 1969 song Something "
+            "from the Beatles album Abbey Road."
+        ),
+        parent_doc_id="file://tests/008363af8cc8b4678c3d72f70d76f21c.pdf",
+    )
+    answer = _passage_based_short_answer(
+        "Who interpret the album Abbey Road",
+        [chunk],
+    )
+    assert answer == "George Harrison"
+
+    metadata_chunk = (
+        "Active entities: David R. Adler, James Taylor. "
+        "Topic: critic Jon Landau regards song A live version was included. "
+        "Inspiration for Something George Harrison liked "
+        '"Something in the Way She Moves" so much that he used the beginning '
+        "as the first line of his 1969 song Something from the Beatles "
+        "album Abbey Road."
+    )
+    metadata = RetrievedChunk(
+        chunk_id="doc.pdf#chunk-3",
+        text_raw=metadata_chunk,
+        parent_doc_id="file://tests/008363af8cc8b4678c3d72f70d76f21c.pdf",
+    )
+    assert (
+        _passage_based_short_answer(
+            "Who interpret the album Abbey Road", [metadata]
+        )
+        == "George Harrison"
+    )
+
+
+def test_extract_focus_passages_prefers_abbey_road_sentence():
+    from thot.tools.search.ontology_utils import extract_focus_passages
+    from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
+
+    text = (
+        "Active entities: Taylor. Topic: critic regards song live version. "
+        "Inspiration for Something George Harrison liked Abbey Road album."
+    )
+    focus = extract_focus_passages(
+        [("c1", clean_chunk_text_for_prompt(text))],
+        "Who interpret the album Abbey Road",
+        max_passages=2,
+    )
+    assert "George Harrison" in focus
+    assert "Topic:" not in focus
+
+
 def test_build_chunk_evidence_answer_uses_passage_for_who_questions():
     chunk = RetrievedChunk(
         chunk_id="doc.pdf#chunk-2",
@@ -195,6 +292,57 @@ def test_answer_supported_by_matching_chunks_keeps_llm_name_answer():
         [chunk],
         'Who liked "Something in the Way She Moves"',
     )
+
+
+def test_answer_supported_rejects_who_name_with_hallucinated_details():
+    from thot.tools.search.rag_report import (
+        answer_supported_by_matching_chunks,
+    )
+
+    chunk = RetrievedChunk(
+        chunk_id="doc.pdf#chunk-2",
+        text_raw=(
+            'George Harrison liked "Something in the Way She Moves" so much that '
+            "he used the beginning as the first line of his 1969 song Something "
+            "from the Beatles album Abbey Road."
+        ),
+        parent_doc_id="file://tests/008363af8cc8b4678c3d72f70d76f21c.pdf",
+    )
+    hallucinated = (
+        'George Harrison interpreted "Something in the Way She Moves" '
+        "from his solo album."
+    )
+    assert not answer_supported_by_matching_chunks(
+        hallucinated,
+        [chunk],
+        "Who interpret the album Abbey Road",
+    )
+
+
+def test_apply_chunk_evidence_corrects_abbey_road_who_hallucination():
+    chunk = RetrievedChunk(
+        chunk_id="doc.pdf#chunk-2",
+        text_raw=(
+            'George Harrison liked "Something in the Way She Moves" so much that '
+            "he used the beginning as the first line of his 1969 song Something "
+            "from the Beatles album Abbey Road."
+        ),
+        parent_doc_id="file://tests/008363af8cc8b4678c3d72f70d76f21c.pdf",
+        relevance=0.9,
+    )
+    hallucinated = (
+        'George Harrison interpreted "Something in the Way She Moves" '
+        "from his solo album."
+    )
+    short, _, used = apply_chunk_evidence_fallback(
+        query_text="Who interpret the album Abbey Road",
+        short_answer=hallucinated,
+        detailed_report="Wrong analysis.",
+        chunks=[chunk],
+        unavailable_answer="The information is not available.",
+    )
+    assert used is True
+    assert short.startswith("George Harrison")
 
 
 def test_apply_chunk_evidence_fallback_skips_supported_llm_answer():

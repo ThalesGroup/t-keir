@@ -13,9 +13,11 @@ from thot.tools.search.ontology_utils import (
     _split_sentences,
     chunk_text_matches_query,
     extract_focus_passages,
+    extract_query_highlight_terms,
     highlight_query_terms_in_chunks,
     prioritize_chunks_by_query_match,
 )
+from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
 
 if TYPE_CHECKING:
     from thot.tools.search.app import FusedOntology, RetrievedChunk
@@ -133,6 +135,15 @@ def answer_supported_by_matching_chunks(
         passage_clean = passage_answer.strip().lower()
         if short_clean == passage_clean:
             return True
+        # Compact passage answers (e.g. an extracted person name) must match
+        # exactly. A longer LLM answer that merely mentions the name can still
+        # invent unsupported facts (wrong song, wrong album, etc.).
+        is_compact_passage = (
+            len(passage_clean.split()) <= 4
+            and len(passage_answer.strip()) <= 48
+        )
+        if is_compact_passage:
+            return False
         if passage_clean in short_clean or short_clean in passage_clean:
             return True
 
@@ -141,6 +152,47 @@ def answer_supported_by_matching_chunks(
         return False
     corpus = "\n".join(chunk.text_raw.lower() for chunk in matching)
     return any(term in corpus for term in answer_terms)
+
+
+_WHO_ANSWER_SKIP_LEADERS = frozenset(
+    {
+        "topic",
+        "active",
+        "previous",
+        "next",
+        "upcoming",
+        "hide",
+        "inspiration",
+        "critic",
+    }
+)
+
+
+def _extract_person_from_sentence(sentence: str) -> str | None:
+    """Extract a person name from a focus sentence when possible.
+
+    Example:
+        >>> _extract_person_from_sentence(
+        ...     'George Harrison liked "Something" from the Beatles album Abbey Road.'
+        ... )
+        'George Harrison'
+    """
+    verb_match = re.search(
+        r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+"
+        r"(?:liked|wrote|said|recorded|released|reported|acquired|used|composed|inspired)\b",
+        sentence,
+    )
+    if verb_match:
+        return verb_match.group(1).strip()
+    leading = re.match(
+        r"^([A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+)*)",
+        sentence.strip(),
+    )
+    if leading:
+        candidate = leading.group(1).strip()
+        if candidate.split()[0].lower() not in _WHO_ANSWER_SKIP_LEADERS:
+            return candidate
+    return None
 
 
 def _best_focus_sentence(
@@ -162,23 +214,40 @@ def _best_focus_sentence(
     if re.match(r"^\s*who\b", query_text, re.I):
         predicate = _who_predicate_token(query_text)
         terms = _focus_query_terms(query_text)
-        if predicate:
-            best: tuple[str, str] | None = None
-            best_score = 0
-            for chunk in matching:
-                for sentence in _split_sentences(chunk.text_raw):
-                    sentence_lower = sentence.lower()
-                    if predicate not in sentence_lower:
-                        continue
+        key_phrases = [
+            label.lower()
+            for label in extract_query_highlight_terms(query_text)
+            if len(label.split()) >= 2
+        ]
+        best: tuple[str, str] | None = None
+        best_score = -999
+        for chunk in matching:
+            for sentence in _split_sentences(chunk.text_raw):
+                sentence_lower = sentence.lower()
+                if predicate and predicate in sentence_lower:
                     score = sum(1 for term in terms if term in sentence_lower)
-                    if score > best_score:
-                        best_score = score
-                        best = (chunk.chunk_id, sentence.strip())
-            if best is not None:
-                return best
+                elif key_phrases and any(
+                    phrase in sentence_lower for phrase in key_phrases
+                ):
+                    score = 5 + sum(
+                        1 for term in terms if term in sentence_lower
+                    )
+                else:
+                    continue
+                if score > best_score:
+                    best_score = score
+                    best = (chunk.chunk_id, sentence.strip())
+        if best is not None:
+            return best
 
     focus = extract_focus_passages(
-        [(chunk.chunk_id, chunk.text_raw) for chunk in matching],
+        [
+            (
+                chunk.chunk_id,
+                clean_chunk_text_for_prompt(chunk.text_raw),
+            )
+            for chunk in matching
+        ],
         query_text,
         max_passages=1,
     )
@@ -278,6 +347,9 @@ def _passage_based_short_answer(
         return None
     _chunk_id, sentence = top
     if re.match(r"^\s*who\b", query_text, re.I):
+        person = _extract_person_from_sentence(sentence)
+        if person:
+            return person
         subject = _subject_before_query_token(query_text, sentence)
         if subject:
             return subject
@@ -418,6 +490,16 @@ def should_apply_chunk_evidence(
         return False
     if is_unavailable_short_answer(short_answer, unavailable_answer):
         return True
+
+    short_clean = short_answer.strip().lower()
+    if (
+        short_clean in _WHO_ANSWER_SKIP_LEADERS
+        or len(short_clean.split()) <= 1
+    ):
+        matching = chunks_matching_query(chunks, query_text)
+        if matching:
+            return True
+
     if answer_supported_by_matching_chunks(
         short_answer,
         chunks,
@@ -833,6 +915,65 @@ def build_fallback_detailed_report(
     return "\n".join(lines).strip()
 
 
+def format_input_prompt(system_prompt: str, user_prompt: str) -> str:
+    """Combine system and user prompts for RAG result display.
+
+    Example:
+        >>> format_input_prompt("Be concise.", "Who is Alice?")
+        '[SYSTEM]\\nBe concise.\\n\\n[USER]\\nWho is Alice?'
+    """
+    parts: list[str] = []
+    if system_prompt.strip():
+        parts.append("[SYSTEM]\n" + system_prompt.strip())
+    if user_prompt.strip():
+        parts.append("[USER]\n" + user_prompt.strip())
+    return "\n\n".join(parts)
+
+
+def _input_prompt_section_markdown(input_prompt: str) -> str:
+    """Render the LLM input prompt as a markdown section.
+
+    Example:
+        >>> from thot.tools.search.rag_report import _input_prompt_section_markdown
+        >>> "## LLM Input Prompt" in _input_prompt_section_markdown("[USER]\\nhello")
+        True
+    """
+    if not input_prompt.strip():
+        return ""
+    return "\n".join(
+        [
+            "## LLM Input Prompt",
+            "",
+            "```text",
+            input_prompt.strip(),
+            "```",
+            "",
+        ]
+    )
+
+
+def _vespa_query_section_markdown(vespa_query: str) -> str:
+    """Render the Vespa search payload as a markdown JSON section.
+
+    Example:
+        >>> from thot.tools.search.rag_report import _vespa_query_section_markdown
+        >>> "## Vespa Search Query" in _vespa_query_section_markdown('{"yql": "select * from chunk where true"}')
+        True
+    """
+    if not vespa_query.strip():
+        return ""
+    return "\n".join(
+        [
+            "## Vespa Search Query",
+            "",
+            "```json",
+            vespa_query.strip(),
+            "```",
+            "",
+        ]
+    )
+
+
 def assemble_report_markdown(
     *,
     query: str,
@@ -842,6 +983,8 @@ def assemble_report_markdown(
     chunks: list[RetrievedChunk],
     ontology: dict[str, Any] | FusedOntology,
     vespa_hits: int,
+    input_prompt: str = "",
+    vespa_query: str = "",
 ) -> str:
     """Assemble the downloadable markdown report for a RAG query.
 
@@ -855,6 +998,7 @@ def assemble_report_markdown(
         ...     chunks=[RetrievedChunk(chunk_id="c1", text_raw="Alice works at Acme.", parent_doc_id="doc")],
         ...     ontology={"entities": [], "keywords": []},
         ...     vespa_hits=1,
+        ...     vespa_query='{"yql": "select * from chunk where true"}',
         ... )
         >>> "# T-KEIR RAG Report" in report
         True
@@ -882,10 +1026,20 @@ def assemble_report_markdown(
         "",
         short_answer.strip(),
         "",
-        detailed,
-        "",
-        _ontology_section_markdown(ontology),
-        "",
-        _sources_section_markdown(chunks),
     ]
+    prompt_section = _input_prompt_section_markdown(input_prompt)
+    if prompt_section:
+        sections.extend([prompt_section.rstrip(), ""])
+    vespa_section = _vespa_query_section_markdown(vespa_query)
+    if vespa_section:
+        sections.extend([vespa_section.rstrip(), ""])
+    sections.extend(
+        [
+            detailed,
+            "",
+            _ontology_section_markdown(ontology),
+            "",
+            _sources_section_markdown(chunks),
+        ]
+    )
     return "\n".join(sections).strip() + "\n"

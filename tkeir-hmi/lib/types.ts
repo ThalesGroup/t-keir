@@ -35,6 +35,8 @@ export interface FusedOntology {
 export interface QueryResponse {
   answer: string;
   report_markdown?: string;
+  input_prompt?: string;
+  vespa_query?: string;
   highlight_entities?: string[];
   highlight_keywords?: string[];
   highlight_query_terms?: string[];

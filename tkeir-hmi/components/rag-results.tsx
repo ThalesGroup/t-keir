@@ -4,6 +4,8 @@ import { memo, useMemo } from "react";
 
 import { AiSynthesis } from "@/components/ai-synthesis";
 import { DocumentResults } from "@/components/document-results";
+import { InputPromptPanel } from "@/components/input-prompt-panel";
+import { VespaQueryPanel } from "@/components/vespa-query-panel";
 import { OntologySidebar } from "@/components/ontology-sidebar";
 import { RagReportPanel } from "@/components/rag-report";
 import type {
@@ -54,6 +56,16 @@ export const RagResults = memo(function RagResults({
         loading={loading}
         vespaHits={response?.vespa_hits}
         answerUnavailable={response?.answer_unavailable}
+      />
+
+      <InputPromptPanel
+        inputPrompt={response?.input_prompt ?? null}
+        loading={loading}
+      />
+
+      <VespaQueryPanel
+        vespaQuery={response?.vespa_query ?? null}
+        loading={loading}
       />
 
       <RagReportPanel

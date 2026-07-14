@@ -6,3 +6,32 @@ ontology:
   min_keyword_length: 3
   max_entities: 120
   max_keywords: 60
+
+prompt:
+  # chunk_excerpts: copy retrieved chunk text into the LLM prompt (default).
+  # svo_ontology: KEY PASSAGES + deduplicated SVO facts (no raw chunk excerpts).
+  chunk_context_mode: svo_ontology
+  max_svo_triples: 80
+
+search:
+  # When enabled, raw queries are analyzed with the full NLP pipeline and the
+  # Vespa request is built by QueryAnalyzerTask instead of query_refiner only.
+  enabled: true
+  use_chunk_embedding: true
+  use_question_embedding: true
+  use_text_raw: true
+  use_parent_content: true
+  use_parent_title: true
+  use_ner: true
+  use_svo: true
+  use_keywords: true
+  use_lemmas: true
+  ranking_profile: hybrid_2_level
+  hits: 20
+  max_yql_terms: 32
+  # Informational weights aligned with chunk.sd hybrid_2_level rank profile.
+  weight_chunk_embedding: 0.30
+  weight_question_embedding: 0.10
+  weight_text_raw_bm25: 0.40
+  weight_parent_content_bm25: 0.20
+  weight_parent_title_bm25: 0.15

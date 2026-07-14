@@ -4,8 +4,10 @@
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
     detect_rdf_format,
+    extract_deduplicated_svo_triples,
     extract_focus_passages,
     extract_relevant_triples,
+    format_svo_ontology_context,
     merge_rdf_graphs,
     merge_turtle_graphs,
     serialize_graph_json_ld,
@@ -68,6 +70,41 @@ def test_merge_and_query_turtle_graphs():
     lines = extract_relevant_triples(graph, "Alice works")
     assert lines
     assert any("worksFor" in line or "Person" in line for line in lines)
+
+
+def test_extract_deduplicated_svo_triples_scopes_to_chunk_entities():
+    graph = merge_turtle_graphs([_SAMPLE_TURTLE])
+    chunk_id = "doc.pdf#chunk-1-abc"
+    lines = extract_deduplicated_svo_triples(
+        graph,
+        "Acme",
+        chunk_ids=[chunk_id],
+    )
+    assert lines == ["Acme | createdBy | Widget"]
+    assert not extract_deduplicated_svo_triples(
+        graph,
+        "Acme",
+        chunk_ids=["missing-chunk"],
+    )
+
+
+def test_format_svo_ontology_context_replaces_chunk_excerpts():
+    from thot.tools.search.app import RetrievedChunk
+
+    graph = merge_turtle_graphs([_SAMPLE_TURTLE])
+    chunk = RetrievedChunk(
+        chunk_id="doc.pdf#chunk-1-abc",
+        text_raw="Acme launched Widget.",
+        parent_doc_id="file://doc.pdf",
+    )
+    text = format_svo_ontology_context(
+        graph,
+        "Acme",
+        [chunk],
+        empty_message="none",
+    )
+    assert "Acme | createdBy | Widget" in text
+    assert "Deduped SVO facts" not in text
 
 
 def test_build_hmi_ontology_exports_entities_and_keywords():

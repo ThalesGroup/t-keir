@@ -1,0 +1,859 @@
+# -*- coding: utf-8 -*-
+"""Analyze user queries and build structured Vespa hybrid search payloads."""
+
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import dataclass, field
+from typing import Any, Protocol
+
+from thot.core.LlmWrapper import UnifiedLLMWrapper
+from thot.core.ThotLogger import ThotLogger
+from thot.tasks.pipeline.PipelineRunner import PipelineRunner
+from thot.tools.search.query_refiner import meaningful_tokens_from_morphosyntax
+from thot.tools.search.rag_config import RagSearchConfig
+from thot.tools.search.vespa_client import (
+    build_chunk_tensor,
+    build_multi_field_contains_or_clause,
+    build_text_raw_contains_or_clause,
+)
+
+_WHITESPACE_RE = re.compile(r"\s+")
+_RELATION_PREFIX = "rel:"
+
+
+class EmbeddingClient(Protocol):
+    """Minimal async embedding client interface."""
+
+    async def embed(self, text: str) -> list[float]:
+        """Embed text into a dense vector.
+
+        Example:
+            >>> import inspect
+            >>> from thot.tools.search.query_analyzer import EmbeddingClient
+            >>> inspect.isabstract(EmbeddingClient.embed)
+            False
+        """
+        ...
+
+
+@dataclass(frozen=True)
+class NerEntity:
+    text: str
+    label: str
+
+
+@dataclass(frozen=True)
+class SvoTriple:
+    subject: str
+    verb: str
+    object: str
+
+
+@dataclass
+class QueryAnalysis:
+    """Structured output of the linguistic query pipeline."""
+
+    raw_query: str
+    language: str | None
+    ner_entities: list[NerEntity] = field(default_factory=list)
+    svo_triples: list[SvoTriple] = field(default_factory=list)
+    keywords: list[str] = field(default_factory=list)
+    lemmas: list[str] = field(default_factory=list)
+    search_terms: list[str] = field(default_factory=list)
+    lexical_query: str = ""
+    chunk_embedding_text: str = ""
+    question_embedding_text: str = ""
+    pipeline_failed: bool = False
+
+
+def _node_text(node: dict[str, Any] | None) -> str:
+    """Extract display text from a pipeline graph node.
+
+    Example:
+        >>> from thot.tools.search.query_analyzer import _node_text
+        >>> _node_text({"content": "Microsoft"})
+        'Microsoft'
+    """
+    if not node:
+        return ""
+    content = node.get("content")
+    if isinstance(content, list):
+        return " ".join(
+            str(part).strip() for part in content if str(part).strip()
+        )
+    if isinstance(content, str):
+        return content.strip()
+    lemma = node.get("lemma_content")
+    if isinstance(lemma, list):
+        return " ".join(
+            str(part).strip() for part in lemma if str(part).strip()
+        )
+    if isinstance(lemma, str):
+        return lemma.strip()
+    return ""
+
+
+def extract_ner_entities(ner_spans: list[dict[str, Any]]) -> list[NerEntity]:
+    """Extract named entities from pipeline NER spans.
+
+    Example:
+        >>> extract_ner_entities([{"text": "Microsoft", "label": "organization"}])
+        [NerEntity(text='Microsoft', label='organization')]
+    """
+    entities: list[NerEntity] = []
+    seen: set[tuple[str, str]] = set()
+    for span in ner_spans or []:
+        text = str(span.get("text", "")).strip()
+        label = str(span.get("label", "entity")).strip() or "entity"
+        if not text:
+            continue
+        key = (text.lower(), label.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        entities.append(NerEntity(text=text, label=label))
+    return entities
+
+
+def extract_svo_triples(kg_triples: list[dict[str, Any]]) -> list[SvoTriple]:
+    """Extract subject-verb-object triples from pipeline ``kg`` output.
+
+    Example:
+        >>> triples = [{
+        ...     "subject": {"content": "Microsoft"},
+        ...     "property": {"content": "acquire"},
+        ...     "value": {"content": "GitHub"},
+        ... }]
+        >>> extract_svo_triples(triples)[0].subject
+        'Microsoft'
+    """
+    triples: list[SvoTriple] = []
+    seen: set[tuple[str, str, str]] = set()
+    for triple in kg_triples or []:
+        subject = _node_text(triple.get("subject"))
+        verb = _node_text(triple.get("property"))
+        obj = _node_text(triple.get("value"))
+        if verb.startswith(_RELATION_PREFIX):
+            continue
+        if not subject and not verb and not obj:
+            continue
+        key = (subject.lower(), verb.lower(), obj.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        triples.append(SvoTriple(subject=subject, verb=verb, object=obj))
+    return triples
+
+
+def extract_keyword_terms(keywords: list[dict[str, Any]]) -> list[str]:
+    """Extract keyword texts ordered by salience score.
+
+    Example:
+        >>> extract_keyword_terms([{"text": "cloud platform", "score": 10}])
+        ['cloud platform']
+    """
+    ranked = sorted(
+        keywords or [],
+        key=lambda item: int(item.get("score") or 0),
+        reverse=True,
+    )
+    terms: list[str] = []
+    seen: set[str] = set()
+    for item in ranked:
+        text = str(item.get("text", "")).strip()
+        if not text:
+            continue
+        key = text.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        terms.append(text)
+    return terms
+
+
+def extract_lemma_terms(morphosyntax: list[dict[str, Any]]) -> list[str]:
+    """Extract lemma tokens from morphosyntax output.
+
+    Example:
+        >>> morph = [{"text": "acquired", "lemma": "acquire", "pos": "VERB"}]
+        >>> extract_lemma_terms(morph)
+        ['acquire']
+    """
+    lemmas: list[str] = []
+    seen: set[str] = set()
+    for token in morphosyntax or []:
+        lemma = str(token.get("lemma") or token.get("text") or "").strip()
+        if not lemma:
+            continue
+        key = lemma.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        lemmas.append(lemma)
+    return lemmas
+
+
+def build_search_terms(
+    analysis: QueryAnalysis, config: RagSearchConfig
+) -> list[str]:
+    """Merge NER, SVO, keywords, and lemmas into a deduplicated term list.
+
+    Example:
+        >>> analysis = QueryAnalysis(
+        ...     raw_query="test",
+        ...     language="en",
+        ...     ner_entities=[NerEntity("Microsoft", "organization")],
+        ...     lemmas=["acquire"],
+        ... )
+        >>> build_search_terms(analysis, RagSearchConfig())[0]
+        'Microsoft'
+    """
+    ordered: list[str] = []
+    seen: set[str] = set()
+
+    def add_term(value: str) -> None:
+        cleaned = (value or "").strip()
+        if not cleaned:
+            return
+        key = cleaned.lower()
+        if key in seen:
+            return
+        seen.add(key)
+        ordered.append(cleaned)
+
+    if config.use_ner:
+        for entity in analysis.ner_entities:
+            add_term(entity.text)
+
+    if config.use_svo:
+        for triple in analysis.svo_triples:
+            add_term(triple.subject)
+            add_term(triple.verb)
+            add_term(triple.object)
+
+    if config.use_keywords:
+        for keyword in analysis.keywords:
+            add_term(keyword)
+
+    if config.use_lemmas:
+        for lemma in analysis.lemmas:
+            add_term(lemma)
+
+    if not ordered:
+        for token in meaningful_tokens_from_morphosyntax(
+            [
+                {"text": part, "pos": "X"}
+                for part in _WHITESPACE_RE.split(analysis.raw_query)
+                if part
+            ]
+        ):
+            add_term(token)
+        if not ordered:
+            for part in _WHITESPACE_RE.split(analysis.raw_query):
+                add_term(part)
+
+    return ordered[: config.max_yql_terms]
+
+
+def build_question_embedding_text(analysis: QueryAnalysis) -> str:
+    """Build the implicit question string for ``q_question_emb``.
+
+    Example:
+        >>> analysis = QueryAnalysis(
+        ...     raw_query="What did Microsoft acquire?",
+        ...     language="en",
+        ...     svo_triples=[SvoTriple("Microsoft", "acquire", "")],
+        ... )
+        >>> "Microsoft" in build_question_embedding_text(analysis)
+        True
+    """
+    if analysis.svo_triples:
+        parts: list[str] = []
+        for triple in analysis.svo_triples:
+            parts.extend(
+                piece
+                for piece in (triple.subject, triple.verb, triple.object)
+                if piece
+            )
+        if parts:
+            return " ".join(dict.fromkeys(parts))
+    if analysis.ner_entities:
+        return " ".join(entity.text for entity in analysis.ner_entities)
+    return analysis.lexical_query or analysis.raw_query
+
+
+def build_chunk_embedding_text(analysis: QueryAnalysis) -> str:
+    """Build the cleaned query string for ``q_chunk_emb``.
+
+    Example:
+        >>> analysis = QueryAnalysis(
+        ...     raw_query="What did Microsoft acquire?",
+        ...     language="en",
+        ...     lexical_query="Microsoft acquire",
+        ... )
+        >>> build_chunk_embedding_text(analysis)
+        'Microsoft acquire'
+    """
+    return analysis.lexical_query or analysis.raw_query
+
+
+def build_hybrid_yql(
+    analysis: QueryAnalysis,
+    config: RagSearchConfig,
+    *,
+    hits: int,
+) -> str:
+    """Assemble the YQL query for hybrid chunk retrieval.
+
+    Example:
+        >>> analysis = QueryAnalysis(
+        ...     raw_query="Microsoft acquire",
+        ...     language="en",
+        ...     search_terms=["Microsoft", "acquire"],
+        ... )
+        >>> yql = build_hybrid_yql(analysis, RagSearchConfig(use_chunk_embedding=False, use_question_embedding=False), hits=5)
+        >>> "Microsoft" in yql
+        True
+    """
+    yql_parts: list[str] = []
+    if config.use_chunk_embedding:
+        yql_parts.append(
+            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(chunk_embedding, q_chunk_emb))'
+        )
+    if config.use_question_embedding:
+        yql_parts.append(
+            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(questions_embeddings, q_question_emb))'
+        )
+
+    bm25_fields: list[str] = []
+    if config.use_text_raw:
+        bm25_fields.append("text_raw")
+    if config.use_parent_content:
+        bm25_fields.append("parent_content")
+    if config.use_parent_title:
+        bm25_fields.append("parent_title")
+
+    if bm25_fields and analysis.search_terms:
+        text_clause = build_multi_field_contains_or_clause(
+            analysis.search_terms,
+            fields=tuple(bm25_fields),
+        )
+        if text_clause:
+            yql_parts.append(text_clause)
+
+    if not yql_parts:
+        fallback = build_text_raw_contains_or_clause(analysis.raw_query)
+        if fallback:
+            yql_parts.append(fallback)
+        else:
+            yql_parts.append("true")
+
+    return "select * from chunk where " + " or ".join(yql_parts)
+
+
+def build_vespa_search_payload(
+    analysis: QueryAnalysis,
+    config: RagSearchConfig,
+    *,
+    q_chunk_emb: list[float],
+    q_question_emb: list[float],
+    hits: int,
+    timeout_seconds: float,
+    embedding_dim: int,
+) -> dict[str, Any]:
+    """Build a Vespa HTTP search payload from analysis and embeddings.
+
+    Example:
+        >>> analysis = QueryAnalysis(raw_query="Microsoft", language="en", search_terms=["Microsoft"])
+        >>> payload = build_vespa_search_payload(
+        ...     analysis,
+        ...     RagSearchConfig(use_question_embedding=False),
+        ...     q_chunk_emb=[0.0] * 384,
+        ...     q_question_emb=[0.0] * 384,
+        ...     hits=10,
+        ...     timeout_seconds=30.0,
+        ...     embedding_dim=384,
+        ... )
+        >>> payload["ranking.profile"]
+        'hybrid_2_level'
+    """
+    payload: dict[str, Any] = {
+        "yql": build_hybrid_yql(analysis, config, hits=hits),
+        "hits": hits,
+        "timeout": f"{int(timeout_seconds)}s",
+        "ranking.profile": config.ranking_profile,
+    }
+    if config.use_chunk_embedding:
+        payload["input.query(q_chunk_emb)"] = build_chunk_tensor(
+            q_chunk_emb,
+            embedding_dim=embedding_dim,
+        )
+    if config.use_question_embedding:
+        payload["input.query(q_question_emb)"] = build_chunk_tensor(
+            q_question_emb,
+            embedding_dim=embedding_dim,
+        )
+    return payload
+
+
+def build_svo_match_query(
+    *,
+    raw_query: str,
+    lexical_query: str,
+    analysis: dict[str, Any] | None = None,
+) -> str:
+    """Build a query string optimized for SVO proximity matching.
+
+    Example:
+        >>> build_svo_match_query(
+        ...     raw_query="What did Microsoft acquire?",
+        ...     lexical_query="Microsoft acquire",
+        ...     analysis={
+        ...         "svo_triples": [{"subject": "Microsoft", "verb": "acquire", "object": ""}],
+        ...         "search_terms": ["Microsoft", "acquire"],
+        ...     },
+        ... )
+        'Microsoft acquire'
+    """
+    parts: list[str] = []
+    if analysis:
+        for triple in analysis.get("svo_triples") or []:
+            for key in ("subject", "verb", "object"):
+                value = str(triple.get(key, "")).strip()
+                if value:
+                    parts.append(value)
+        for term in analysis.get("search_terms") or []:
+            text = str(term).strip()
+            if text:
+                parts.append(text)
+    if parts:
+        return " ".join(dict.fromkeys(parts))
+    return (lexical_query or raw_query).strip()
+
+
+def build_focus_query_text(
+    *,
+    raw_query: str,
+    analysis: dict[str, Any] | None = None,
+) -> str:
+    """Build a query string for focus-passage ranking near the user request.
+
+    Example:
+        >>> build_focus_query_text(
+        ...     raw_query="Who interpret the album Abbey Road",
+        ...     analysis={"ner_entities": [{"text": "Abbey Road", "label": "work"}]},
+        ... )
+        'Who interpret the album Abbey Road'
+    """
+    parts: list[str] = []
+    normalized = (raw_query or "").strip()
+    if normalized:
+        parts.append(normalized)
+    if analysis:
+        existing = normalized.lower()
+        for entity in analysis.get("ner_entities") or []:
+            text = str(entity.get("text", "")).strip()
+            if text and text.lower() not in existing:
+                parts.append(text)
+        for term in analysis.get("search_terms") or []:
+            text = str(term).strip()
+            if text and text.lower() not in existing:
+                parts.append(text)
+    if parts:
+        return " ".join(dict.fromkeys(parts))
+    return normalized
+
+
+def build_svo_question_restatement(
+    svo_triples: list[dict[str, Any]],
+) -> str:
+    """Restate the user question from extracted SVO triples.
+
+    Example:
+        >>> build_svo_question_restatement(
+        ...     [{"subject": "Microsoft", "verb": "acquire", "object": "GitHub"}]
+        ... )
+        'Microsoft acquire GitHub'
+    """
+    readings: list[str] = []
+    for triple in svo_triples:
+        subject = str(triple.get("subject", "")).strip()
+        verb = str(triple.get("verb", "")).strip()
+        obj = str(triple.get("object", "")).strip()
+        if subject and verb and obj:
+            readings.append(f"{subject} {verb} {obj}")
+        elif subject and verb:
+            readings.append(f"{subject} {verb} …")
+        elif subject:
+            readings.append(subject)
+    return "; ".join(readings)
+
+
+def format_query_analysis_for_prompt(
+    *,
+    raw_query: str,
+    lexical_query: str,
+    analysis: dict[str, Any] | None = None,
+) -> str:
+    """Format analyzed query metadata for inclusion in the RAG user prompt.
+
+    SVO triples are placed first so generation stays aligned with the
+    subject-verb-object structure of the request.
+
+    Example:
+        >>> text = format_query_analysis_for_prompt(
+        ...     raw_query="What did Microsoft acquire?",
+        ...     lexical_query="Microsoft acquire",
+        ...     analysis={
+        ...         "svo_triples": [{"subject": "Microsoft", "verb": "acquire", "object": ""}],
+        ...         "search_terms": ["Microsoft", "acquire"],
+        ...     },
+        ... )
+        >>> text.startswith("PRIMARY")
+        True
+    """
+    lines: list[str] = []
+    svo_triples = (analysis or {}).get("svo_triples") or []
+
+    if svo_triples:
+        lines.append("PRIMARY — question structure (SVO):")
+        for triple in svo_triples:
+            subject = str(triple.get("subject", "")).strip()
+            verb = str(triple.get("verb", "")).strip()
+            obj = str(triple.get("object", "")).strip()
+            if subject or verb or obj:
+                lines.append(f"  - {subject} | {verb} | {obj}")
+        restatement = build_svo_question_restatement(svo_triples)
+        if restatement:
+            lines.append(f"- SVO-aligned reading: {restatement}")
+        lines.append(
+            "Interpret the user question through this SVO structure first; "
+            "prefer facts and passages that match these subject-verb-object relations."
+        )
+        lines.append("")
+
+    lines.extend(
+        [
+            f"- Raw question: {raw_query.strip()}",
+            f"- Lexical search query: {(lexical_query or raw_query).strip()}",
+        ]
+    )
+    if not analysis:
+        return "\n".join(lines)
+
+    search_terms = analysis.get("search_terms") or []
+    if search_terms:
+        lines.append(
+            f"- Search terms: {', '.join(str(term) for term in search_terms)}"
+        )
+
+    ner_entities = analysis.get("ner_entities") or []
+    if ner_entities:
+        lines.append("- Named entities:")
+        for entity in ner_entities:
+            text = str(entity.get("text", "")).strip()
+            label = str(entity.get("label", "entity")).strip()
+            if text:
+                lines.append(f"  - {text} ({label})")
+
+    keywords = analysis.get("keywords") or []
+    if keywords:
+        lines.append(
+            f"- Keywords: {', '.join(str(keyword) for keyword in keywords)}"
+        )
+
+    return "\n".join(lines)
+
+
+_VESPA_EMBEDDING_KEYS = (
+    "input.query(q_chunk_emb)",
+    "input.query(q_question_emb)",
+)
+
+
+def format_vespa_query_json(payload: dict[str, Any]) -> str:
+    """Serialize a Vespa search payload as pretty-printed JSON.
+
+    Embedding vectors are omitted from the API/report payload to keep
+    responses compact.
+
+    Example:
+        >>> rendered = format_vespa_query_json({
+        ...     "yql": "select * from chunk where true",
+        ...     "input.query(q_chunk_emb)": [0.1, 0.2],
+        ... })
+        >>> '"omitted": true' in rendered
+        True
+    """
+    display = dict(payload)
+    for key in _VESPA_EMBEDDING_KEYS:
+        if key not in display:
+            continue
+        vector = display[key]
+        if isinstance(vector, list):
+            display[key] = {"omitted": True, "dimensions": len(vector)}
+    return json.dumps(display, indent=2, ensure_ascii=False)
+
+
+def run_linguistic_pipeline(
+    runner: PipelineRunner,
+    raw_query: str,
+    *,
+    language: str | None = None,
+) -> dict[str, Any]:
+    """Run tokenizer, morphosyntax, NER, syntax, and keywords on a query.
+
+    Example:
+        >>> callable(run_linguistic_pipeline)
+        True
+    """
+    document: dict[str, Any] = {"content": [raw_query.strip()]}
+    if language:
+        document["language-detection"] = {"language": language}
+    return runner.run(
+        document,
+        skip_converter=True,
+        tasks=["ner", "syntax", "keywords"],
+    )
+
+
+def analyze_query_document(
+    processed: dict[str, Any],
+    raw_query: str,
+    *,
+    language: str | None,
+    config: RagSearchConfig,
+) -> QueryAnalysis:
+    """Convert pipeline output into a :class:`QueryAnalysis`.
+
+    Example:
+        >>> analysis = analyze_query_document({}, "Microsoft acquire", language="en", config=RagSearchConfig())
+        >>> analysis.raw_query
+        'Microsoft acquire'
+    """
+    morphosyntax = processed.get("content_morphosyntax") or []
+    analysis = QueryAnalysis(
+        raw_query=raw_query,
+        language=language,
+        ner_entities=extract_ner_entities(processed.get("content_ner") or []),
+        svo_triples=extract_svo_triples(processed.get("kg") or []),
+        keywords=extract_keyword_terms(processed.get("keywords") or []),
+        lemmas=extract_lemma_terms(morphosyntax),
+    )
+    if not analysis.lemmas:
+        analysis.lemmas = meaningful_tokens_from_morphosyntax(morphosyntax)
+    analysis.search_terms = build_search_terms(analysis, config)
+    analysis.lexical_query = " ".join(analysis.search_terms)
+    analysis.chunk_embedding_text = build_chunk_embedding_text(analysis)
+    analysis.question_embedding_text = build_question_embedding_text(analysis)
+    return analysis
+
+
+class QueryAnalyzerTask:
+    """Analyze a raw query and produce a Vespa hybrid search payload."""
+
+    def __init__(
+        self,
+        runner: PipelineRunner,
+        llm: EmbeddingClient,
+        config: RagSearchConfig,
+        *,
+        embedding_dim: int = 384,
+        timeout_seconds: float = 60.0,
+    ):
+        """Initialize the analyzer with pipeline, embedder, and search config.
+
+        Example:
+            >>> callable(QueryAnalyzerTask)
+            True
+        """
+        self._runner = runner
+        self._llm = llm
+        self._config = config
+        self._embedding_dim = embedding_dim
+        self._timeout_seconds = timeout_seconds
+
+    @property
+    def config(self) -> RagSearchConfig:
+        """Return the active search configuration.
+
+        Example:
+            >>> class _LLM:
+            ...     async def embed(self, text):
+            ...         return [0.0] * 384
+            >>> task = QueryAnalyzerTask(None, _LLM(), RagSearchConfig())  # doctest: +SKIP
+            >>> task.config.ranking_profile  # doctest: +SKIP
+            'hybrid_2_level'
+        """
+        return self._config
+
+    def analyze_sync(
+        self,
+        raw_query: str,
+        *,
+        language: str | None = None,
+    ) -> QueryAnalysis:
+        """Run the linguistic pipeline synchronously.
+
+        Example:
+            >>> callable(QueryAnalyzerTask.analyze_sync)
+            True
+        """
+        normalized = (raw_query or "").strip()
+        if not normalized:
+            return QueryAnalysis(raw_query=raw_query, language=language)
+
+        try:
+            processed = run_linguistic_pipeline(
+                self._runner,
+                normalized,
+                language=language,
+            )
+        except Exception as error:
+            ThotLogger.warning(
+                "QueryAnalyzerTask pipeline failed; using lexical fallback",
+                trace=str(error),
+            )
+            analysis = QueryAnalysis(
+                raw_query=normalized,
+                language=language,
+                pipeline_failed=True,
+            )
+            analysis.search_terms = build_search_terms(analysis, self._config)
+            analysis.lexical_query = (
+                " ".join(analysis.search_terms) or normalized
+            )
+            analysis.chunk_embedding_text = analysis.lexical_query
+            analysis.question_embedding_text = normalized
+            return analysis
+
+        return analyze_query_document(
+            processed,
+            normalized,
+            language=language,
+            config=self._config,
+        )
+
+    async def embed_analysis(
+        self,
+        analysis: QueryAnalysis,
+    ) -> tuple[list[float], list[float]]:
+        """Generate chunk and question embeddings for an analysis.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(QueryAnalyzerTask.embed_analysis)
+            True
+        """
+        zero = [0.0] * self._embedding_dim
+        chunk_text = analysis.chunk_embedding_text or analysis.raw_query
+        question_text = analysis.question_embedding_text or analysis.raw_query
+
+        q_chunk_emb = zero
+        q_question_emb = zero
+
+        if self._config.use_chunk_embedding and chunk_text.strip():
+            q_chunk_emb = await self._llm.embed(chunk_text)
+        if self._config.use_question_embedding and question_text.strip():
+            q_question_emb = await self._llm.embed(question_text)
+        elif (
+            self._config.use_question_embedding
+            and self._config.use_chunk_embedding
+        ):
+            q_question_emb = q_chunk_emb
+
+        return q_chunk_emb, q_question_emb
+
+    def build_payload(
+        self,
+        analysis: QueryAnalysis,
+        *,
+        q_chunk_emb: list[float],
+        q_question_emb: list[float],
+        hits: int | None = None,
+    ) -> dict[str, Any]:
+        """Build the Vespa HTTP payload from analysis and embeddings.
+
+        Example:
+            >>> class _LLM:
+            ...     async def embed(self, text):
+            ...         return [0.0] * 384
+            >>> task = QueryAnalyzerTask(None, _LLM(), RagSearchConfig(use_question_embedding=False))  # doctest: +SKIP
+        """
+        return build_vespa_search_payload(
+            analysis,
+            self._config,
+            q_chunk_emb=q_chunk_emb,
+            q_question_emb=q_question_emb,
+            hits=hits or self._config.hits,
+            timeout_seconds=self._timeout_seconds,
+            embedding_dim=self._embedding_dim,
+        )
+
+    async def process(
+        self,
+        raw_query: str,
+        *,
+        language: str | None = None,
+        hits: int | None = None,
+    ) -> dict[str, Any]:
+        """Analyze a query and return a ready-to-send Vespa search payload.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(QueryAnalyzerTask.process)
+            True
+        """
+        analysis = self.analyze_sync(raw_query, language=language)
+        q_chunk_emb, q_question_emb = await self.embed_analysis(analysis)
+        payload = self.build_payload(
+            analysis,
+            q_chunk_emb=q_chunk_emb,
+            q_question_emb=q_question_emb,
+            hits=hits,
+        )
+        ThotLogger.info(
+            "QueryAnalyzerTask "
+            + f"terms={len(analysis.search_terms)} "
+            + f"ner={len(analysis.ner_entities)} "
+            + f"svo={len(analysis.svo_triples)} "
+            + f"yql={payload.get('yql', '')[:240]}"
+        )
+        return {
+            "payload": payload,
+            "analysis": {
+                "raw_query": analysis.raw_query,
+                "language": analysis.language,
+                "search_terms": analysis.search_terms,
+                "lexical_query": analysis.lexical_query,
+                "chunk_embedding_text": analysis.chunk_embedding_text,
+                "question_embedding_text": analysis.question_embedding_text,
+                "ner_entities": [
+                    {"text": entity.text, "label": entity.label}
+                    for entity in analysis.ner_entities
+                ],
+                "svo_triples": [
+                    {
+                        "subject": triple.subject,
+                        "verb": triple.verb,
+                        "object": triple.object,
+                    }
+                    for triple in analysis.svo_triples
+                ],
+                "keywords": analysis.keywords,
+                "pipeline_failed": analysis.pipeline_failed,
+                "ranking_weights": {
+                    "chunk_embedding": self._config.weight_chunk_embedding,
+                    "question_embedding": (
+                        self._config.weight_question_embedding
+                    ),
+                    "text_raw_bm25": self._config.weight_text_raw_bm25,
+                    "parent_content_bm25": (
+                        self._config.weight_parent_content_bm25
+                    ),
+                    "parent_title_bm25": self._config.weight_parent_title_bm25,
+                },
+            },
+        }

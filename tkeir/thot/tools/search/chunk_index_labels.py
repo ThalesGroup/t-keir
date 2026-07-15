@@ -22,6 +22,7 @@ CHUNK_CONTEXT_PREFIXES: tuple[str, ...] = (
     LABEL_CONTINUES_WITH,
 )
 
+
 def is_chunk_protocol_sentence(sentence: str) -> bool:
     """Return whether a sentence starts with a chunk-indexing protocol label.
 
@@ -70,6 +71,8 @@ def strip_chunk_index_protocol(text: str) -> str:
             cleaned,
             flags=re.I,
         )
-    cleaned = re.sub(rf"{re.escape(LABEL_TOPIC)}:\s*", "", cleaned, count=1, flags=re.I)
+    cleaned = re.sub(
+        rf"{re.escape(LABEL_TOPIC)}:\s*", "", cleaned, count=1, flags=re.I
+    )
     cleaned = re.sub(r"\[\s*edit\s*\]", ". ", cleaned, flags=re.I)
     return cleaned.strip()

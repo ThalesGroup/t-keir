@@ -25,35 +25,7 @@ class NERTaggerConfiguration:
             "resources-base-path":"/home/tkeir_svc/tkeir/thot/tests/data",
             "mwe": "tkeir_mwe.pkl",
             "use-pre-label":true
-        }],
-        "network": {
-            "host":"0.0.0.0",
-            "port":8080,
-            "associate-environment": {
-                "host":"HOST_ENVNAME",
-                "port":"PORT_ENVNAME"
-            }
-        },
-        "runtime":{
-            "request-max-size":100000000,
-            "request-buffer-queue-size":100,
-            "keep-alive":True,
-            "keep-alive-timeout":5,
-            "graceful-shutown-timeout":15.0,
-            "request-timeout":60,
-            "response-timeout":60,
-            "workers":1
-        },
-        "serialize":{
-            "input":{
-                "path":"/tmp",
-                "keep-service-info":True
-            },
-            "output":{
-                "path":"/tmp",
-                "keep-service-info":True
-            }
-        }
+        }]
     }
 
 

@@ -414,7 +414,11 @@ def _summarize_chunk(
     parts: list[str] = []
     flat_entities = _flatten_primary_entities(primary_entities)
     if flat_entities:
-        label = LABEL_UPCOMING_ENTITIES if mode == "after" else LABEL_ACTIVE_ENTITIES
+        label = (
+            LABEL_UPCOMING_ENTITIES
+            if mode == "after"
+            else LABEL_ACTIVE_ENTITIES
+        )
         parts.append(label + ": " + ", ".join(flat_entities))
 
     if svo_triplets:

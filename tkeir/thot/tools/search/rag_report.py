@@ -156,7 +156,12 @@ def answer_supported_by_matching_chunks(
 
 
 def _predicate_stem_variants(predicate: str) -> set[str]:
-    """Return lowercase verb forms derived from a who-question predicate."""
+    """Return lowercase verb forms derived from a who-question predicate.
+
+    Example:
+        >>> "liked" in _predicate_stem_variants("like")
+        True
+    """
     stem = predicate.rstrip("e")
     return {
         form.lower()
@@ -188,7 +193,9 @@ def _extract_person_from_sentence(
         'George Harrison'
     """
     if predicate:
-        for variant in sorted(_predicate_stem_variants(predicate), key=len, reverse=True):
+        for variant in sorted(
+            _predicate_stem_variants(predicate), key=len, reverse=True
+        ):
             name_match = re.search(
                 rf"([A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+)*)\s+{re.escape(variant)}\b",
                 sentence,
@@ -641,7 +648,12 @@ def query_highlight_terms(
 
 
 def _normalize_structured_markers(text: str) -> str:
-    """Map markdown-style section headings to canonical parse markers."""
+    """Map markdown-style section headings to canonical parse markers.
+
+    Example:
+        >>> _normalize_structured_markers("**SHORT ANSWER:**\\nYes.")
+        'SHORT_ANSWER:\\nYes.'
+    """
     lines: list[str] = []
     for line in text.splitlines():
         stripped = line.strip()

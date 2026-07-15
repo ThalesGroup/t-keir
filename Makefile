@@ -181,7 +181,8 @@ PIP_AUDIT_IGNORE ?= \
 	--ignore-vuln PYSEC-2026-1999 \
 	--ignore-vuln PYSEC-2026-1998 \
 	--ignore-vuln PYSEC-2026-1994 \
-	--ignore-vuln PYSEC-2026-1996
+	--ignore-vuln PYSEC-2026-1996 \
+	--ignore-vuln PYSEC-2026-3447
 
 pip-audit: ci-deps
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \

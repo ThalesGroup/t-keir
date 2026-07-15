@@ -479,7 +479,17 @@ def build_focus_query_text(
 
 
 def _entity_after_adp(morphosyntax: list[dict[str, Any]]) -> str | None:
-    """Return the span after a preposition token (report-about-X patterns)."""
+    """Return the span after a preposition token (report-about-X patterns).
+
+    Example:
+        >>> morph = [
+        ...     {"text": "about", "pos": "ADP"},
+        ...     {"text": "Claudio", "pos": "PROPN"},
+        ...     {"text": "Miranda", "pos": "PROPN"},
+        ... ]
+        >>> _entity_after_adp(morph)
+        'Claudio Miranda'
+    """
     for index, token in enumerate(morphosyntax):
         if str(token.get("pos", "")).upper() != "ADP":
             continue
@@ -497,7 +507,14 @@ def _entity_after_adp(morphosyntax: list[dict[str, Any]]) -> str | None:
 
 
 def _query_starts_with_interrogative(analysis: dict[str, Any] | None) -> bool:
-    """Return whether morphosyntax marks the query as a direct question."""
+    """Return whether morphosyntax marks the query as a direct question.
+
+    Example:
+        >>> _query_starts_with_interrogative(
+        ...     {"morphosyntax": [{"text": "Who", "pos": "PRON"}]}
+        ... )
+        True
+    """
     morph = (analysis or {}).get("morphosyntax") or []
     if not morph:
         return False
@@ -568,7 +585,9 @@ def detect_generation_intent(
         if morph:
             if _entity_after_adp(morph):
                 return "entity_report"
-            lemmas = analysis.get("lemmas") or analysis.get("search_terms") or []
+            lemmas = (
+                analysis.get("lemmas") or analysis.get("search_terms") or []
+            )
             if analysis.get("ner_entities") and len(lemmas) >= 2:
                 return "entity_report"
         elif analysis.get("ner_entities"):

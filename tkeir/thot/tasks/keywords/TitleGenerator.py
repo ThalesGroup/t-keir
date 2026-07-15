@@ -43,7 +43,13 @@ def _morphosyntax_slice(
     start: int,
     end: int,
 ) -> list[dict]:
-    """Return morphosyntax tokens covered by a token index range."""
+    """Return morphosyntax tokens covered by a token index range.
+
+    Example:
+        >>> morph = [{"text": "Rob", "pos": "PROPN"}, {"text": "Brown", "pos": "PROPN"}]
+        >>> [token["text"] for token in _morphosyntax_slice(morph, 0, 2)]
+        ['Rob', 'Brown']
+    """
     if not morphosyntax:
         return []
     start = max(0, start)
@@ -52,7 +58,14 @@ def _morphosyntax_slice(
 
 
 def _named_content_score(morph_slice: list[dict]) -> tuple[int, int]:
-    """Return ``(propn_count, noun_count)`` for a morphosyntax slice."""
+    """Return ``(propn_count, noun_count)`` for a morphosyntax slice.
+
+    Example:
+        >>> _named_content_score(
+        ...     [{"text": "Rob", "pos": "PROPN"}, {"text": "Brown", "pos": "PROPN"}]
+        ... )
+        (2, 0)
+    """
     propn = sum(1 for token in morph_slice if token.get("pos") == "PROPN")
     nouns = sum(1 for token in morph_slice if token.get("pos") == "NOUN")
     return propn, nouns
@@ -139,7 +152,15 @@ def _is_low_value_ner_span(
     text: str,
     morph_slice: list[dict],
 ) -> bool:
-    """Return whether an NER span is unlikely to be a document title."""
+    """Return whether an NER span is unlikely to be a document title.
+
+    Example:
+        >>> _is_low_value_ner_span(
+        ...     "Rob Brown",
+        ...     [{"text": "Rob", "pos": "PROPN"}, {"text": "Brown", "pos": "PROPN"}],
+        ... )
+        False
+    """
     cleaned = (text or "").strip()
     if not cleaned or cleaned.isdigit():
         return True
@@ -191,7 +212,17 @@ def _title_from_early_ner(
 
 
 def _sentence_spans(morphosyntax: list[dict]) -> list[tuple[int, int]]:
-    """Return ``(start, end)`` token spans for each sentence."""
+    """Return ``(start, end)`` token spans for each sentence.
+
+    Example:
+        >>> morph = [
+        ...     {"text": "Hello", "is_sent_start": True},
+        ...     {"text": "world", "is_sent_start": False},
+        ...     {"text": "Again", "is_sent_start": True},
+        ... ]
+        >>> _sentence_spans(morph)
+        [(0, 2), (2, 3)]
+    """
     if not morphosyntax:
         return []
     starts = [0]
@@ -200,8 +231,7 @@ def _sentence_spans(morphosyntax: list[dict]) -> list[tuple[int, int]]:
             starts.append(index)
     starts.append(len(morphosyntax))
     return [
-        (starts[index], starts[index + 1])
-        for index in range(len(starts) - 1)
+        (starts[index], starts[index + 1]) for index in range(len(starts) - 1)
     ]
 
 
@@ -209,7 +239,18 @@ def _phrase_in_boilerplate_sentence(
     phrase: str,
     morphosyntax: list[dict],
 ) -> bool:
-    """Return whether a keyword phrase only appears inside navigation-like text."""
+    """Return whether a keyword phrase only appears inside navigation-like text.
+
+    Example:
+        >>> morph = [
+        ...     {"text": "Read", "pos": "VERB", "is_sent_start": True},
+        ...     {"text": "edit", "pos": "VERB"},
+        ...     {"text": "view", "pos": "VERB"},
+        ...     {"text": "history", "pos": "NOUN"},
+        ... ]
+        >>> _phrase_in_boilerplate_sentence("edit view", morph)
+        True
+    """
     normalized = _WHITESPACE_RE.sub(" ", phrase.strip().lower())
     if not normalized:
         return True
@@ -323,9 +364,13 @@ def _title_from_content_lines(tkeir_doc: dict, max_length: int) -> str:
         if word_count < 2 or word_count > 16:
             continue
         morph_slice: list[dict] | None = None
-        if morphosyntax and candidate.lower() in " ".join(
-            token.get("text", "") for token in morphosyntax
-        ).lower():
+        if (
+            morphosyntax
+            and candidate.lower()
+            in " ".join(
+                token.get("text", "") for token in morphosyntax
+            ).lower()
+        ):
             for start, end in _sentence_spans(morphosyntax):
                 sentence = _sentence_text(morphosyntax, start, end)
                 if candidate.lower() in sentence.lower():

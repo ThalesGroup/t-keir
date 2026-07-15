@@ -38,6 +38,7 @@ def test_generation_prompts_inject_unavailable_answer():
         chunk_excerpts="Extraits",
         query_text="Qui est Rob Brown ?",
         query_analysis="- Lexical search query: Rob Brown",
+        generation_guidance="MODE DE GÉNÉRATION : réponse directe",
         unavailable_answer=unavailable,
     )
     assert unavailable in system_prompt
@@ -57,19 +58,23 @@ def test_resolve_user_prompt_template_uses_compact_svo_variant():
         en_cfg,
         RagPromptConfig("chunk_excerpts", 80),
     )
-    assert "SVO FACTS (from retrieved documents):" in svo_template
+    assert "STRUCTURED FACTS" in svo_template
     assert "KEY PASSAGES" in svo_template
     assert (
         "SEARCH QUERY ANALYSIS" not in default_template
         or "GLOBAL CONTEXT" in default_template
+        or "### GLOBAL CONTEXT" in default_template
     )
     assert (
         "KEY PASSAGES" not in default_template
-        or "KEY PASSAGES (highest relevance" in default_template
+        or "### KEY PASSAGES" in default_template
     )
     assert "GLOBAL CONTEXT" not in svo_template
     assert "SEARCH QUERY ANALYSIS" in default_template
-    assert "RELEVANT TEXT EXCERPTS" in default_template
+    assert (
+        "RELEVANT TEXT EXCERPTS" in default_template
+        or "### RELEVANT TEXT EXCERPTS" in default_template
+    )
     system_svo = _resolve_system_prompt_template(
         en_cfg,
         RagPromptConfig("svo_ontology", 80),

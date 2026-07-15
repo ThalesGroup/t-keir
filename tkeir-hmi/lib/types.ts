@@ -6,6 +6,12 @@ export interface QueryRequest {
   query: string;
   language: Language;
   hits: number;
+  /** Override rag.yaml prompt.passages.count */
+  max_passages?: number;
+  /** Override rag.yaml prompt.passages.max_chars */
+  max_chars_per_passage?: number;
+  /** Override rag.yaml prompt.passages.context_sentences */
+  focus_context_sentences?: number;
 }
 
 export interface RetrievedChunk {

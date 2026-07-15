@@ -248,6 +248,18 @@ def test_format_query_analysis_for_prompt_includes_entities():
     assert "Microsoft (organization)" in text
 
 
+def test_build_focus_query_text_uses_focal_entity_for_reports():
+    from thot.tools.search.query_analyzer import build_focus_query_text
+
+    focus = build_focus_query_text(
+        raw_query="Generate a report about Claudio Miranda",
+        analysis={
+            "ner_entities": [{"text": "Claudio Miranda", "label": "person"}]
+        },
+    )
+    assert focus == "Claudio Miranda"
+
+
 def test_build_focus_query_text_includes_entities():
     from thot.tools.search.query_analyzer import build_focus_query_text
 
@@ -256,10 +268,42 @@ def test_build_focus_query_text_includes_entities():
         analysis={
             "ner_entities": [{"text": "Abbey Road", "label": "work"}],
             "search_terms": ["Abbey Road", "interpret"],
+            "morphosyntax": [{"text": "Who", "pos": "PRON"}],
         },
     )
     assert "Abbey Road" in focus
     assert "interpret" in focus
+
+
+def test_detect_generation_intent_entity_report():
+    from thot.tools.search.query_analyzer import (
+        detect_generation_intent,
+        format_generation_guidance,
+        is_entity_report_query,
+    )
+
+    query = "Generate a report about Claudio Miranda"
+    analysis = {
+        "ner_entities": [{"text": "Claudio Miranda", "label": "person"}],
+        "lemmas": ["Generate", "report", "Claudio", "Miranda"],
+        "morphosyntax": [
+            {"text": "Generate", "pos": "VERB"},
+            {"text": "a", "pos": "DET"},
+            {"text": "report", "pos": "NOUN"},
+            {"text": "about", "pos": "ADP"},
+            {"text": "Claudio", "pos": "PROPN"},
+            {"text": "Miranda", "pos": "PROPN"},
+        ],
+    }
+    assert detect_generation_intent(query, analysis) == "entity_report"
+    assert is_entity_report_query(query, analysis)
+    guidance = format_generation_guidance(
+        query,
+        analysis,
+    )
+    assert "Claudio Miranda" in guidance
+    assert "Overview" in guidance
+    assert "Career" in guidance
 
 
 def test_build_svo_match_query_prioritizes_triples():

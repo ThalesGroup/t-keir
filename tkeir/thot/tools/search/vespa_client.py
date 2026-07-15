@@ -13,6 +13,7 @@ from urllib.parse import quote
 import httpx
 
 from thot.core.ThotLogger import ThotLogger
+from thot.tools.search.chunk_index_labels import strip_chunk_index_protocol
 
 _ILLEGAL_STRING_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _CONTEXT_BEFORE_TAG_RE = re.compile(r"\[CONTEXT_BEFORE\]\s*", re.IGNORECASE)
@@ -85,7 +86,7 @@ def clean_chunk_text_for_prompt(text: str) -> str:
         >>> from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
         >>> sample = (
         ...     'Active entities: Taylor. Topic: critic regards song '
-        ...     'Inspiration for Something George Harrison liked Abbey Road.'
+        ...     'George Harrison liked Abbey Road.'
         ... )
         >>> cleaned = clean_chunk_text_for_prompt(sample)
         >>> 'Active entities' not in cleaned
@@ -94,16 +95,32 @@ def clean_chunk_text_for_prompt(text: str) -> str:
         True
     """
     cleaned = strip_search_vector_payload(text)
-    cleaned = re.sub(r"Active entities:[^.]*\.\s*", "", cleaned, flags=re.I)
-    cleaned = re.sub(r"Previous context:[^.]*\.\s*", "", cleaned, flags=re.I)
-    cleaned = re.sub(r"Next focus:[^.]*\.\s*", "", cleaned, flags=re.I)
-    cleaned = re.sub(r"Upcoming entities:[^.]*\.\s*", "", cleaned, flags=re.I)
-    cleaned = re.sub(r"Topic:\s*", "", cleaned, count=1, flags=re.I)
-    cleaned = re.sub(r"\[\s*edit\s*\]", ". ", cleaned, flags=re.I)
-    cleaned = re.sub(
-        r"(?<=[a-z])\s+Inspiration for\b", ". Inspiration for", cleaned
-    )
+    cleaned = strip_chunk_index_protocol(cleaned)
     return sanitize_vespa_string(_WHITESPACE_RE.sub(" ", cleaned)).strip()
+
+
+def trim_passage_leading_noise(text: str, focal_entity: str = "") -> str:
+    """Drop leading noise before the focal entity when possible.
+
+    Example:
+        >>> sample = (
+        ...     'Donate Create account Log in Claudio Miranda '
+        ...     'Claudio Miranda , ASC is a cinematographer.'
+        ... )
+        >>> trimmed = trim_passage_leading_noise(sample, "Claudio Miranda")
+        >>> trimmed.startswith("Claudio Miranda")
+        True
+    """
+    cleaned = clean_chunk_text_for_prompt(text).strip()
+    if not cleaned:
+        return cleaned
+
+    focal = (focal_entity or "").strip()
+    if focal:
+        match = re.search(re.escape(focal), cleaned, re.I)
+        if match and match.start() > 20:
+            cleaned = cleaned[match.start() :].lstrip(" ,.;:")
+    return cleaned
 
 
 def chunk_embedding_text(chunk: dict[str, Any]) -> str:

@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any
 
 from thot.tools.search.ontology_utils import (
     _focus_query_terms,
+    _is_metadata_sentence,
     _split_sentences,
     chunk_text_matches_query,
     extract_focus_passages,
@@ -154,43 +155,82 @@ def answer_supported_by_matching_chunks(
     return any(term in corpus for term in answer_terms)
 
 
-_WHO_ANSWER_SKIP_LEADERS = frozenset(
-    {
-        "topic",
-        "active",
-        "previous",
-        "next",
-        "upcoming",
-        "hide",
-        "inspiration",
-        "critic",
+def _predicate_stem_variants(predicate: str) -> set[str]:
+    """Return lowercase verb forms derived from a who-question predicate."""
+    stem = predicate.rstrip("e")
+    return {
+        form.lower()
+        for form in {
+            predicate,
+            f"{predicate}s",
+            f"{predicate}d",
+            f"{predicate}ed",
+            f"{predicate}ing",
+            f"{stem}ed",
+            f"{stem}ing",
+        }
     }
-)
 
 
-def _extract_person_from_sentence(sentence: str) -> str | None:
+def _extract_person_from_sentence(
+    sentence: str,
+    predicate: str | None = None,
+) -> str | None:
     """Extract a person name from a focus sentence when possible.
+
+    Uses capitalization structure and the query predicate — no fixed verb lists.
 
     Example:
         >>> _extract_person_from_sentence(
-        ...     'George Harrison liked "Something" from the Beatles album Abbey Road.'
+        ...     'George Harrison liked "Something" from the Beatles album Abbey Road.',
+        ...     'like',
         ... )
         'George Harrison'
     """
-    verb_match = re.search(
-        r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+"
-        r"(?:liked|wrote|said|recorded|released|reported|acquired|used|composed|inspired)\b",
-        sentence,
+    if predicate:
+        for variant in sorted(_predicate_stem_variants(predicate), key=len, reverse=True):
+            name_match = re.search(
+                rf"([A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+)*)\s+{re.escape(variant)}\b",
+                sentence,
+                re.I,
+            )
+            if name_match:
+                candidate = name_match.group(1).strip()
+                if not _is_metadata_sentence(f"{candidate} is mentioned."):
+                    return candidate
+
+    patterns = (
+        r"\b([A-Z][a-z]+\s+[A-Z][a-z]+)\s+([a-z][a-z'-]+)\b",
+        r"\b([A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+)+)\s+([a-z][a-z'-]+)\b",
     )
-    if verb_match:
-        return verb_match.group(1).strip()
+    best_name: str | None = None
+    best_score = -999
+    for pattern in patterns:
+        for match in re.finditer(pattern, sentence):
+            candidate = match.group(1).strip()
+            if _is_metadata_sentence(f"{candidate} is mentioned."):
+                continue
+            verb = match.group(2).lower()
+            score = 0
+            if predicate and verb in _predicate_stem_variants(predicate):
+                score += 10
+            word_count = len(candidate.split())
+            if word_count == 2:
+                score += 5
+            score -= word_count
+            if score > best_score:
+                best_score = score
+                best_name = candidate
+    if best_name:
+        return best_name
+
     leading = re.match(
-        r"^([A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+)*)",
+        r"^([A-Z][A-Za-z'.-]+(?:\s+[A-Z][A-Za-z'.-]+)+)",
         sentence.strip(),
     )
     if leading:
         candidate = leading.group(1).strip()
-        if candidate.split()[0].lower() not in _WHO_ANSWER_SKIP_LEADERS:
+        if not _is_metadata_sentence(f"{candidate} is mentioned."):
             return candidate
     return None
 
@@ -223,6 +263,8 @@ def _best_focus_sentence(
         best_score = -999
         for chunk in matching:
             for sentence in _split_sentences(chunk.text_raw):
+                if _is_metadata_sentence(sentence):
+                    continue
                 sentence_lower = sentence.lower()
                 if predicate and predicate in sentence_lower:
                     score = sum(1 for term in terms if term in sentence_lower)
@@ -347,7 +389,8 @@ def _passage_based_short_answer(
         return None
     _chunk_id, sentence = top
     if re.match(r"^\s*who\b", query_text, re.I):
-        person = _extract_person_from_sentence(sentence)
+        predicate = _who_predicate_token(query_text)
+        person = _extract_person_from_sentence(sentence, predicate)
         if person:
             return person
         subject = _subject_before_query_token(query_text, sentence)
@@ -465,6 +508,8 @@ def should_apply_chunk_evidence(
     chunks: list[RetrievedChunk],
     query_text: str,
     unavailable_answer: str,
+    *,
+    detailed_report: str = "",
 ) -> bool:
     """Return whether to replace the LLM answer with chunk-grounded evidence.
 
@@ -491,14 +536,8 @@ def should_apply_chunk_evidence(
     if is_unavailable_short_answer(short_answer, unavailable_answer):
         return True
 
-    short_clean = short_answer.strip().lower()
-    if (
-        short_clean in _WHO_ANSWER_SKIP_LEADERS
-        or len(short_clean.split()) <= 1
-    ):
-        matching = chunks_matching_query(chunks, query_text)
-        if matching:
-            return True
+    if detailed_report.strip() and len(detailed_report.strip()) >= 80:
+        return False
 
     if answer_supported_by_matching_chunks(
         short_answer,
@@ -568,6 +607,7 @@ def apply_chunk_evidence_fallback(
         chunks,
         query_text,
         unavailable_answer,
+        detailed_report=detailed_report,
     ):
         return short_answer, detailed_report, False
 
@@ -600,6 +640,21 @@ def query_highlight_terms(
     )
 
 
+def _normalize_structured_markers(text: str) -> str:
+    """Map markdown-style section headings to canonical parse markers."""
+    lines: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if re.match(r"(?i)\*{0,2}\s*SHORT\s+ANSWER", stripped):
+            lines.append(_SHORT_ANSWER_MARKER)
+            continue
+        if re.match(r"(?i)\*{0,2}\s*DETAILED\s+REPORT", stripped):
+            lines.append(_DETAILED_REPORT_MARKER)
+            continue
+        lines.append(line)
+    return "\n".join(lines)
+
+
 def parse_structured_generation(
     raw_text: str,
     *,
@@ -622,8 +677,14 @@ def parse_structured_generation(
         'Yes.'
         >>> "## Detailed Analysis" in detail
         True
+        >>> md = "**SHORT ANSWER:**\\nClaudio Miranda made the film.\\n\\n**DETAILED REPORT:**\\n## Filmography\\nDetails."
+        >>> short, detail = parse_structured_generation(md, unavailable_answer="N/A")
+        >>> short
+        'Claudio Miranda made the film.'
+        >>> "## Filmography" in detail
+        True
     """
-    cleaned = raw_text.strip()
+    cleaned = _normalize_structured_markers(raw_text.strip())
     if not cleaned:
         return unavailable_answer, ""
 

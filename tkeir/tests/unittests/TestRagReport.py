@@ -257,6 +257,25 @@ def test_extract_focus_passages_prefers_abbey_road_sentence():
     assert "Topic:" not in focus
 
 
+def test_parse_structured_generation_accepts_markdown_markers():
+    raw = (
+        "**SHORT ANSWER:**\n"
+        'Claudio Miranda made "The Curious Case of Benjamin Button."\n\n'
+        "**DETAILED REPORT:**\n"
+        "## Filmography\n"
+        "- **The Curious Case of Benjamin Button (2008)**"
+    )
+    short, detailed = parse_structured_generation(
+        raw,
+        unavailable_answer="The information is not available.",
+    )
+    assert (
+        short == 'Claudio Miranda made "The Curious Case of Benjamin Button."'
+    )
+    assert "## Filmography" in detailed
+    assert "**SHORT ANSWER:**" not in short
+
+
 def test_build_chunk_evidence_answer_uses_passage_for_who_questions():
     chunk = RetrievedChunk(
         chunk_id="doc.pdf#chunk-2",
@@ -317,6 +336,60 @@ def test_answer_supported_rejects_who_name_with_hallucinated_details():
         [chunk],
         "Who interpret the album Abbey Road",
     )
+
+
+def test_curious_case_llm_answer_is_not_replaced_by_fallback():
+    import json
+    from pathlib import Path
+
+    from thot.tools.search.app import RetrievedChunk
+
+    obj = json.loads(
+        Path(
+            "tests/indexing/output/00708688ff6b5e723c0268ef52344c7f.pdf.pipeline.json"
+        ).read_text()
+    )
+    raws: list[str] = []
+
+    def collect(o: object) -> None:
+        if isinstance(o, dict):
+            text = o.get("text_raw")
+            if isinstance(text, str) and len(text) > 100:
+                raws.append(text)
+            for value in o.values():
+                collect(value)
+        elif isinstance(o, list):
+            for value in o:
+                collect(value)
+
+    collect(obj)
+    chunks = [
+        RetrievedChunk(
+            chunk_id=f"c{i}",
+            text_raw=text,
+            parent_doc_id="file://claudio.pdf",
+            relevance=10 - i,
+        )
+        for i, text in enumerate(raws[:6])
+    ]
+    query = 'Who make "The Curious Cas" ?'
+    llm_short = 'Claudio Miranda made "The Curious Case of Benjamin Button."'
+    llm_detailed = (
+        "## Filmography\n"
+        "- **The Curious Case of Benjamin Button (2008)**\n"
+        "  - Directed by David Fincher\n"
+        "  - Cinematographer: Claudio Miranda, ASC\n"
+    )
+    short, detailed, used = apply_chunk_evidence_fallback(
+        query_text=query,
+        short_answer=llm_short,
+        detailed_report=llm_detailed,
+        chunks=chunks,
+        unavailable_answer="The information is not available.",
+    )
+    assert used is False
+    assert short == llm_short
+    assert "Filmography" in detailed
 
 
 def test_apply_chunk_evidence_corrects_abbey_road_who_hallucination():

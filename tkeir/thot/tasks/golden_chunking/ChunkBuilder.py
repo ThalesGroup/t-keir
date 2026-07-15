@@ -7,6 +7,15 @@ import hashlib
 import re
 from dataclasses import dataclass
 
+from thot.tools.search.chunk_index_labels import (
+    LABEL_ACTIVE_ENTITIES,
+    LABEL_CONTINUES_WITH,
+    LABEL_NEXT_FOCUS,
+    LABEL_PREVIOUS_CONTEXT,
+    LABEL_TOPIC,
+    LABEL_UPCOMING_ENTITIES,
+)
+
 _DEMONSTRATIVE_POS = frozenset({"DET", "PRON"})
 _NOUN_LIKE_POS = frozenset({"NOUN", "PROPN"})
 
@@ -399,28 +408,29 @@ def _summarize_chunk(
     """Summarize chunk helper.
 
     Example:
-        >>> from thot.tasks.golden_chunking.ChunkBuilder import _summarize_chunk
         >>> callable(_summarize_chunk)
         True
     """
     parts: list[str] = []
     flat_entities = _flatten_primary_entities(primary_entities)
     if flat_entities:
-        label = "Upcoming entities" if mode == "after" else "Active entities"
+        label = LABEL_UPCOMING_ENTITIES if mode == "after" else LABEL_ACTIVE_ENTITIES
         parts.append(label + ": " + ", ".join(flat_entities))
 
     if svo_triplets:
         subject, verb, obj = svo_triplets[0]
         if mode == "after":
             parts.append(
-                "Next focus: "
+                LABEL_NEXT_FOCUS
+                + ": "
                 + " ".join(
                     part for part in (subject, verb, obj) if part
                 ).strip()
             )
         else:
             parts.append(
-                "Topic: "
+                LABEL_TOPIC
+                + ": "
                 + " ".join(
                     part for part in (subject, verb, obj) if part
                 ).strip()
@@ -428,9 +438,9 @@ def _summarize_chunk(
     elif text_raw:
         snippet = " ".join(text_raw.split()[:18])
         if mode == "after":
-            parts.append("Continues with: " + snippet)
+            parts.append(LABEL_CONTINUES_WITH + ": " + snippet)
         else:
-            parts.append("Previous context: " + snippet)
+            parts.append(LABEL_PREVIOUS_CONTEXT + ": " + snippet)
 
     summary = ". ".join(part for part in parts if part).strip()
     if len(summary) > 320:

@@ -141,6 +141,42 @@ def test_build_hmi_ontology_serializes_json_ld_from_turtle():
     assert len(roundtrip) > 0
 
 
+def test_extract_focus_passages_prefers_tight_query_cluster():
+    text = (
+        "Unrelated vaporwave essay about albums and music scenes. "
+        "George Harrison liked Abbey Road from the Beatles. "
+        "More vaporwave artists continued releasing albums."
+    )
+    passages = extract_focus_passages(
+        [("c1", text)],
+        "Abbey Road George Harrison",
+        context_sentences=0,
+        max_passages=1,
+    )
+    assert "George Harrison" in passages
+    assert "vaporwave" not in passages.lower()
+
+
+def test_extract_focus_passages_includes_neighboring_context():
+    chunk_id = "doc.pdf#chunk-2"
+    text = (
+        "Earlier unrelated background about critics and live albums. "
+        'George Harrison liked "Something in the Way She Moves" so much that '
+        "he used the beginning as the first line of his 1969 song Something "
+        "from the Beatles album Abbey Road. "
+        "Taylor stated that he never thought George intended to copy the song."
+    )
+    passages = extract_focus_passages(
+        [(chunk_id, text)],
+        "Who interpret the album Abbey Road",
+        context_sentences=1,
+        max_passages=1,
+    )
+    assert "George Harrison" in passages
+    assert "Abbey Road" in passages
+    assert "Taylor stated" in passages
+
+
 def test_extract_focus_passages_ranks_yang_trump_sentences():
     chunk_id = "tests/indexing/input/doc.pdf#chunk-13"
     text = (

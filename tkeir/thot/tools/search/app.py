@@ -36,14 +36,17 @@ from thot.tools.search.query_analyzer import (
     QueryAnalyzerTask,
     build_focus_query_text,
     build_svo_match_query,
+    format_generation_guidance,
     format_query_analysis_for_prompt,
     format_vespa_query_json,
+    is_entity_report_query,
 )
 from thot.tools.search.query_refiner import refine_search_query_text
 from thot.tools.search.rag_config import (
     RagConfig,
     RagPromptConfig,
     load_rag_config,
+    resolve_passage_settings,
 )
 from thot.tools.search.rag_report import (
     apply_chunk_evidence_fallback,
@@ -73,6 +76,24 @@ class QueryRequest(BaseModel):
     query: str = Field(..., min_length=1)
     language: str = Field(default="en", pattern="^(en|fr)$")
     hits: int = Field(default=20, ge=1, le=100)
+    max_passages: int | None = Field(
+        default=None,
+        ge=1,
+        le=20,
+        description="Override prompt.passages.count from rag.yaml",
+    )
+    max_chars_per_passage: int | None = Field(
+        default=None,
+        ge=200,
+        le=8000,
+        description="Override prompt.passages.max_chars from rag.yaml",
+    )
+    focus_context_sentences: int | None = Field(
+        default=None,
+        ge=0,
+        le=10,
+        description="Override prompt.passages.context_sentences from rag.yaml",
+    )
 
 
 class RetrievedChunk(BaseModel):
@@ -199,9 +220,6 @@ def _no_chunks_message(prompt_cfg: dict[str, Any]) -> str:
 
 
 _DEFAULT_MAX_TRIPLES_FOR_PROMPT = 25
-_DEFAULT_MAX_CHARS_PER_CHUNK = 800
-_DEFAULT_MAX_CHUNKS_FOR_PROMPT = 5
-_DEFAULT_MAX_FOCUS_PASSAGES = 4
 _PIPELINE_PRELOAD_LANGUAGES = ("en", "fr")
 
 
@@ -230,6 +248,7 @@ def _build_generation_prompts(
     chunk_excerpts: str,
     query_text: str,
     query_analysis: str,
+    generation_guidance: str,
     unavailable_answer: str,
     user_prompt_template: str | None = None,
     system_prompt_template: str | None = None,
@@ -237,9 +256,9 @@ def _build_generation_prompts(
     """Build system and user prompts for answer generation.
 
     Example:
-        >>> cfg = {"user": "Q:{query_text} A:{query_analysis}", "system": "S:{unavailable_answer}"}
-        >>> _build_generation_prompts(cfg, fused_summary="", focus_passages="p", chunk_excerpts="", query_text="Hi", query_analysis="- terms: hi", unavailable_answer="N/A")
-        ('S:N/A', 'Q:Hi A:- terms: hi')
+        >>> cfg = {"user": "Q:{query_text} G:{generation_guidance}", "system": "S:{unavailable_answer}"}
+        >>> _build_generation_prompts(cfg, fused_summary="", focus_passages="p", chunk_excerpts="", query_text="Hi", query_analysis="- terms: hi", generation_guidance="Mode: general", unavailable_answer="N/A")
+        ('S:N/A', 'Q:Hi G:Mode: general')
     """
     format_kwargs = {
         "fused_graph_triples_or_summary": fused_summary,
@@ -247,6 +266,7 @@ def _build_generation_prompts(
         "chunk_excerpts": chunk_excerpts,
         "query_text": query_text,
         "query_analysis": query_analysis,
+        "generation_guidance": generation_guidance,
         "unavailable_answer": unavailable_answer,
     }
     user_template = user_prompt_template or prompt_cfg["user"]
@@ -757,7 +777,7 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
     prompt_chunks = filter_query_relevant_chunks(
         retrieved_chunks,
         focus_query_text,
-        max_chunks=_DEFAULT_MAX_CHUNKS_FOR_PROMPT,
+        max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
     )
     prompt_chunk_ids = {chunk.chunk_id for chunk in prompt_chunks}
     prompt_rdf_payloads = [
@@ -806,8 +826,14 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         query_text=svo_match_query,
         chunks=prompt_chunks,
         empty_message=_no_chunks_message(prompt_cfg),
-        max_chars_per_chunk=_DEFAULT_MAX_CHARS_PER_CHUNK,
-        max_chunks=_DEFAULT_MAX_CHUNKS_FOR_PROMPT,
+        max_chars_per_chunk=state.rag_config.prompt.max_chars_per_chunk,
+        max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
+    )
+    passage_settings = resolve_passage_settings(
+        defaults=state.rag_config.prompt.passages,
+        count=request.max_passages,
+        max_chars=request.max_chars_per_passage,
+        context_sentences=request.focus_context_sentences,
     )
     focus_passages = extract_focus_passages(
         [
@@ -815,8 +841,30 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
             for chunk in prompt_chunks
         ],
         focus_query_text,
-        max_passages=_DEFAULT_MAX_FOCUS_PASSAGES,
+        max_passages=passage_settings.count,
+        context_sentences=passage_settings.context_sentences,
+        max_chars_per_passage=passage_settings.max_chars,
     )
+    generation_guidance = format_generation_guidance(
+        query_text,
+        query_analysis,
+        language=request.language,
+    )
+    if svo_only_prompt and is_entity_report_query(query_text, query_analysis):
+        supplement = _format_chunk_excerpts(
+            prompt_chunks,
+            empty_message="",
+            max_chars_per_chunk=state.rag_config.prompt.max_chars_per_chunk,
+            max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
+        )
+        if supplement.strip():
+            chunk_excerpts = (
+                f"SOURCE EXCERPTS (read first for reports):\n{supplement}\n\n"
+                f"STRUCTURED SVO FACTS:\n{chunk_excerpts}"
+                if chunk_excerpts.strip()
+                and chunk_excerpts != _no_chunks_message(prompt_cfg)
+                else supplement
+            )
     system_prompt, user_prompt = _build_generation_prompts(
         prompt_cfg,
         fused_summary=fused_summary,
@@ -824,6 +872,7 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
         chunk_excerpts=chunk_excerpts,
         query_text=query_text,
         query_analysis=query_analysis_context,
+        generation_guidance=generation_guidance,
         unavailable_answer=unavailable_answer,
         user_prompt_template=user_prompt_template,
         system_prompt_template=system_prompt_template,
@@ -889,7 +938,7 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
     used_chunk_evidence = False
     short_answer, detailed_report, used_chunk_evidence = (
         apply_chunk_evidence_fallback(
-            query_text=focus_query_text,
+            query_text=query_text,
             short_answer=short_answer,
             detailed_report=detailed_report,
             chunks=prompt_chunks,

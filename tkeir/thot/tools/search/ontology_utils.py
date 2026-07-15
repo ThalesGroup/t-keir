@@ -11,7 +11,11 @@ from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, Namespace
 
 from thot.core.KeywordRules import is_valid_keyword_label
-from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
+from thot.tools.search.chunk_index_labels import is_chunk_protocol_sentence
+from thot.tools.search.vespa_client import (
+    clean_chunk_text_for_prompt,
+    trim_passage_leading_noise,
+)
 
 TKEIR = Namespace("http://tkeir.local/ontology/")
 
@@ -119,56 +123,29 @@ def serialize_graph_json_ld(graph: Graph) -> str:
     return graph.serialize(format="json-ld")
 
 
-_FOCUS_STOPWORDS = frozenset(
-    {
-        "who",
-        "what",
-        "when",
-        "where",
-        "why",
-        "how",
-        "had",
-        "has",
-        "have",
-        "was",
-        "were",
-        "are",
-        "been",
-        "being",
-        "the",
-        "and",
-        "for",
-        "that",
-        "this",
-        "with",
-        "from",
-        "into",
-        "your",
-        "you",
-        "did",
-        "does",
-        "do",
-        "replace",
-        "replaced",
-        "interpret",
-        "interprets",
-        "interpreted",
-        "who",
-        "album",
-    }
-)
+def _focus_query_terms(
+    query_text: str,
+    analysis: dict[str, Any] | None = None,
+) -> set[str]:
+    """Return query terms suited for passage ranking.
 
-
-def _focus_query_terms(query_text: str) -> set[str]:
-    """Return query terms suited for passage ranking (stopwords removed).
+    Prefers NLP lemmas/search terms from query analysis when available.
 
     Example:
         >>> terms = _focus_query_terms("Who report Yang had replace Donald Trump ?")
-        >>> {"yang", "trump", "donald", "report"}.issubset(terms)
+        >>> {"yang", "trump", "donald"}.issubset(terms)
         True
     """
-    terms = _query_terms(query_text) - _FOCUS_STOPWORDS
-    return terms or _query_terms(query_text)
+    if analysis:
+        ranked: list[str] = []
+        for key in ("lemmas", "search_terms"):
+            for token in analysis.get(key) or []:
+                text = str(token).strip().lower()
+                if len(text) >= 2:
+                    ranked.append(text)
+        if ranked:
+            return set(ranked)
+    return _query_terms(query_text)
 
 
 def _is_metadata_sentence(sentence: str) -> bool:
@@ -178,15 +155,7 @@ def _is_metadata_sentence(sentence: str) -> bool:
         >>> _is_metadata_sentence("Topic: critic Jon Landau regards song")
         True
     """
-    stripped = sentence.strip()
-    if re.match(
-        r"^(Active entities|Topic:|Previous context|Next focus|Upcoming entities)\b",
-        stripped,
-        re.I,
-    ):
-        return True
-    first = stripped.split()[0].lower().rstrip(":") if stripped else ""
-    return first in {"topic", "active", "previous", "next", "upcoming", "hide"}
+    return is_chunk_protocol_sentence(sentence)
 
 
 def _split_sentences(text: str) -> list[str]:
@@ -230,27 +199,213 @@ def _sentence_relevance(
     return score
 
 
+def _window_proximity_score(
+    sentences: list[str],
+    start: int,
+    end: int,
+    terms: set[str],
+    query_text: str,
+    sentence_scores: list[int],
+) -> int:
+    """Score a contiguous window by query overlap divided by sentence span.
+
+    Tighter windows with strong query alignment rank above loose windows that
+    include distant filler sentences.
+
+    Example:
+        >>> sentences = [
+        ...     "Unrelated filler about music.",
+        ...     "George Harrison liked Abbey Road.",
+        ...     "More unrelated filler.",
+        ... ]
+        >>> scores = [
+        ...     _sentence_relevance(s, {"abbey", "road", "harrison"}, "Abbey Road")
+        ...     for s in sentences
+        ... ]
+        >>> tight = _window_proximity_score(
+        ...     sentences, 1, 1, {"abbey", "road", "harrison"}, "Abbey Road", scores
+        ... )
+        >>> loose = _window_proximity_score(
+        ...     sentences, 0, 2, {"abbey", "road", "harrison"}, "Abbey Road", scores
+        ... )
+        >>> tight > loose
+        True
+    """
+    span = end - start + 1
+    if span <= 0:
+        return 0
+    window_sentences = sentences[start : end + 1]
+    if all(_is_metadata_sentence(sentence) for sentence in window_sentences):
+        return -10_000
+
+    total = sum(sentence_scores[start : end + 1])
+    window_text = " ".join(window_sentences).lower()
+    term_coverage = sum(1 for term in terms if term in window_text)
+    phrase_bonus = 0
+    if query_text:
+        for label in extract_query_highlight_terms(query_text):
+            if len(label.split()) >= 2 and label.lower() in window_text:
+                phrase_bonus += 4
+
+    numer = total + term_coverage + phrase_bonus
+    return (numer * 1000) // span if numer > 0 else 0
+
+
+def _find_best_proximity_passage(
+    sentences: list[str],
+    terms: set[str],
+    query_text: str,
+    *,
+    min_sentence_score: int,
+    max_chars: int,
+    context_sentences: int,
+) -> tuple[str, int] | None:
+    """Return the tightest window whose sentences best match the query.
+
+    Example:
+        >>> result = _find_best_proximity_passage(
+        ...     ["Alice arrived.", "Bob reported the claim.", "Later events."],
+        ...     {"bob", "report"},
+        ...     "Who reported the claim?",
+        ...     min_sentence_score=1,
+        ...     max_chars=500,
+        ...     context_sentences=1,
+        ... )
+        >>> result is not None and "Bob reported" in result[0]
+        True
+    """
+    if not sentences:
+        return None
+
+    sentence_scores = [
+        _sentence_relevance(sentence, terms, query_text)
+        for sentence in sentences
+    ]
+    if not any(score >= min_sentence_score for score in sentence_scores):
+        return None
+
+    best_score = -1
+    best_start = 0
+    best_end = 0
+    for start, _sentence in enumerate(sentences):
+        for end in range(start, len(sentences)):
+            if not any(
+                sentence_scores[index] >= min_sentence_score
+                for index in range(start, end + 1)
+            ):
+                continue
+            score = _window_proximity_score(
+                sentences,
+                start,
+                end,
+                terms,
+                query_text,
+                sentence_scores,
+            )
+            if score > best_score:
+                best_score = score
+                best_start = start
+                best_end = end
+
+    start = max(0, best_start - max(0, context_sentences))
+    end = min(len(sentences) - 1, best_end + max(0, context_sentences))
+    passage = truncate_for_prompt(
+        " ".join(sentences[start : end + 1]),
+        max_chars=max_chars,
+    )
+    return passage, best_score
+
+
+def _build_passage_window(
+    sentences: list[str],
+    center_index: int,
+    *,
+    before: int,
+    after: int,
+    max_chars: int,
+) -> str:
+    """Join neighboring sentences around a high-scoring sentence for context.
+
+    Example:
+        >>> sentences = ["Alice arrived.", "Bob reported the claim.", "Later events."]
+        >>> window = _build_passage_window(sentences, 1, before=1, after=1, max_chars=500)
+        >>> "Alice arrived." in window and "Later events." in window
+        True
+    """
+    start = max(0, center_index - before)
+    end = min(len(sentences), center_index + after + 1)
+    passage = " ".join(sentences[start:end])
+    return truncate_for_prompt(passage, max_chars=max_chars)
+
+
+def _dedupe_focus_passages(
+    scored: list[tuple[int, int, str, str]],
+    *,
+    max_passages: int,
+) -> list[tuple[int, int, str, str]]:
+    """Drop overlapping passages from the same chunk, keeping higher scores.
+
+    Example:
+        >>> scored = [
+        ...     (10, 0, "c1", "Alice arrived. Bob reported."),
+        ...     (8, 1, "c1", "Bob reported the claim."),
+        ... ]
+        >>> kept = _dedupe_focus_passages(scored, max_passages=2)
+        >>> len(kept) == 2 and kept[0][0] > kept[1][0]
+        True
+    """
+    selected: list[tuple[int, int, str, str]] = []
+    for item in scored:
+        _score, _rank, chunk_id, passage = item
+        passage_lower = passage.lower()
+        if any(
+            existing_chunk == chunk_id
+            and (
+                passage_lower in existing_passage.lower()
+                or existing_passage.lower() in passage_lower
+            )
+            for _s, _r, existing_chunk, existing_passage in selected
+        ):
+            continue
+        selected.append(item)
+        if len(selected) >= max_passages:
+            break
+    return selected
+
+
 def extract_focus_passages(
     chunk_texts: list[tuple[str, str]],
     query_text: str,
     *,
     max_passages: int = 8,
+    context_sentences: int = 2,
+    max_chars_per_passage: int = 1800,
 ) -> str:
-    """Rank sentences from retrieved chunks that best match the user query.
+    """Rank tight sentence windows in each chunk that best match the query.
 
     Args:
         chunk_texts: ``(chunk_id, text_raw)`` pairs in retrieval order.
         query_text: User question used to score sentences.
         max_passages: Maximum number of passages to return.
+        context_sentences: Optional padding around the best proximity window.
+        max_chars_per_passage: Maximum characters kept per expanded passage.
 
     Returns:
         Bullet list of focused passages or a fallback message.
 
     Example:
-        >>> extract_focus_passages([
-        ...     ("c1", "National Review reported Yang replaced Donald Trump."),
-        ... ], "Who reported Yang Trump?")
-        '- [c1] National Review reported Yang replaced Donald Trump.'
+        >>> text = (
+        ...     "Unrelated music essay. "
+        ...     "National Review reported Yang replaced Donald Trump. "
+        ...     "More unrelated music content."
+        ... )
+        >>> passages = extract_focus_passages(
+        ...     [("c1", text)],
+        ...     "Who report Yang Trump?",
+        ...     context_sentences=0,
+        ... )
+        >>> "National Review" in passages and "Unrelated music essay" not in passages
+        True
     """
     terms = _focus_query_terms(query_text)
     if not terms:
@@ -258,21 +413,33 @@ def extract_focus_passages(
 
     scored: list[tuple[int, int, str, str]] = []
     min_score = 2 if len(terms) >= 2 else 1
+    context = max(0, context_sentences)
     for rank, (chunk_id, text_raw) in enumerate(chunk_texts):
-        for sentence in _split_sentences(text_raw):
-            score = _sentence_relevance(sentence, terms, query_text)
-            if score >= min_score:
-                scored.append((score, -rank, chunk_id, sentence))
+        sentences = _split_sentences(text_raw)
+        result = _find_best_proximity_passage(
+            sentences,
+            terms,
+            query_text,
+            min_sentence_score=min_score,
+            max_chars=max_chars_per_passage,
+            context_sentences=context,
+        )
+        if result is None:
+            continue
+        passage, score = result
+        scored.append((score, -rank, chunk_id, passage))
 
     if not scored:
         return "No focused passages identified."
 
     scored.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    selected = _dedupe_focus_passages(scored, max_passages=max_passages)
+    focal_entity = query_text.strip() if len(query_text.split()) <= 5 else ""
     lines = [
-        f"- [{chunk_id}] {sentence}"
-        for _score, _rank, chunk_id, sentence in scored[:max_passages]
+        f"- [{chunk_id}] {trim_passage_leading_noise(passage, focal_entity)}"
+        for _score, _rank, chunk_id, passage in selected
     ]
-    return "\n".join(lines)
+    return "\n".join(line for line in lines if line.split("]", 1)[-1].strip())
 
 
 def truncate_for_prompt(

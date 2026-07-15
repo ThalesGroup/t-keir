@@ -16,6 +16,15 @@ _DEFAULT_MAX_ENTITIES = 120
 _DEFAULT_MAX_KEYWORDS = 60
 _DEFAULT_CHUNK_CONTEXT_MODE = "chunk_excerpts"
 _DEFAULT_MAX_SVO_TRIPLES = 80
+_DEFAULT_PASSAGE_COUNT = 3
+_DEFAULT_PASSAGE_MAX_CHARS = 1800
+_DEFAULT_PASSAGE_CONTEXT_SENTENCES = 2
+_DEFAULT_MAX_CHARS_PER_CHUNK = 1800
+_DEFAULT_MAX_CHUNKS_FOR_PROMPT = 6
+# Legacy flat YAML keys (still supported).
+_DEFAULT_MAX_FOCUS_PASSAGES = _DEFAULT_PASSAGE_COUNT
+_DEFAULT_MAX_CHARS_PER_PASSAGE = _DEFAULT_PASSAGE_MAX_CHARS
+_DEFAULT_FOCUS_CONTEXT_SENTENCES = _DEFAULT_PASSAGE_CONTEXT_SENTENCES
 _ALLOWED_CHUNK_CONTEXT_MODES = frozenset({"chunk_excerpts", "svo_ontology"})
 
 
@@ -44,11 +53,65 @@ class RagSearchConfig:
 
 
 @dataclass(frozen=True)
+class RagPassageConfig:
+    """KEY PASSAGE sizing for LLM prompt generation."""
+
+    count: int = _DEFAULT_PASSAGE_COUNT
+    max_chars: int = _DEFAULT_PASSAGE_MAX_CHARS
+    context_sentences: int = _DEFAULT_PASSAGE_CONTEXT_SENTENCES
+
+
+@dataclass(frozen=True)
 class RagPromptConfig:
     """Prompt assembly settings for RAG answer generation."""
 
     chunk_context_mode: str
     max_svo_triples: int
+    passages: RagPassageConfig = RagPassageConfig()
+    max_chars_per_chunk: int = _DEFAULT_MAX_CHARS_PER_CHUNK
+    max_chunks_for_prompt: int = _DEFAULT_MAX_CHUNKS_FOR_PROMPT
+
+    @property
+    def max_focus_passages(self) -> int:
+        """Backward-compatible alias for :attr:`passages.count`.
+
+        Example:
+            >>> RagPromptConfig(
+            ...     chunk_context_mode="svo_ontology",
+            ...     max_svo_triples=10,
+            ...     passages=RagPassageConfig(count=7),
+            ... ).max_focus_passages
+            7
+        """
+        return self.passages.count
+
+    @property
+    def max_chars_per_passage(self) -> int:
+        """Backward-compatible alias for :attr:`passages.max_chars`.
+
+        Example:
+            >>> RagPromptConfig(
+            ...     chunk_context_mode="svo_ontology",
+            ...     max_svo_triples=10,
+            ...     passages=RagPassageConfig(max_chars=900),
+            ... ).max_chars_per_passage
+            900
+        """
+        return self.passages.max_chars
+
+    @property
+    def focus_context_sentences(self) -> int:
+        """Backward-compatible alias for :attr:`passages.context_sentences`.
+
+        Example:
+            >>> RagPromptConfig(
+            ...     chunk_context_mode="svo_ontology",
+            ...     max_svo_triples=10,
+            ...     passages=RagPassageConfig(context_sentences=3),
+            ... ).focus_context_sentences
+            3
+        """
+        return self.passages.context_sentences
 
 
 @dataclass(frozen=True)
@@ -96,6 +159,75 @@ def _as_bool(value: object, default: bool) -> bool:
     if isinstance(value, bool):
         return value
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _passage_config_from_mapping(
+    prompt_cfg: dict[str, Any],
+) -> RagPassageConfig:
+    """Build passage sizing from ``prompt.passages`` or legacy flat keys.
+
+    Example:
+        >>> cfg = _passage_config_from_mapping(
+        ...     {"passages": {"count": 5, "max_chars": 2400, "context_sentences": 1}}
+        ... )
+        >>> (cfg.count, cfg.max_chars, cfg.context_sentences)
+        (5, 2400, 1)
+    """
+    passages = prompt_cfg.get("passages") or {}
+    if not isinstance(passages, dict):
+        passages = {}
+
+    count = passages.get("count", prompt_cfg.get("max_focus_passages"))
+    max_chars = passages.get(
+        "max_chars", prompt_cfg.get("max_chars_per_passage")
+    )
+    context_sentences = passages.get(
+        "context_sentences", prompt_cfg.get("focus_context_sentences")
+    )
+    if context_sentences is None:
+        context_sentences = _DEFAULT_PASSAGE_CONTEXT_SENTENCES
+    if count is None:
+        count = _DEFAULT_PASSAGE_COUNT
+    if max_chars is None:
+        max_chars = _DEFAULT_PASSAGE_MAX_CHARS
+
+    return RagPassageConfig(
+        count=max(1, int(count)),
+        max_chars=max(200, int(max_chars)),
+        context_sentences=max(0, int(context_sentences)),
+    )
+
+
+def resolve_passage_settings(
+    *,
+    defaults: RagPassageConfig,
+    count: int | None = None,
+    max_chars: int | None = None,
+    context_sentences: int | None = None,
+) -> RagPassageConfig:
+    """Merge per-request passage overrides with config defaults.
+
+    Example:
+        >>> base = RagPassageConfig(count=3, max_chars=1800, context_sentences=2)
+        >>> resolved = resolve_passage_settings(defaults=base, count=5)
+        >>> resolved.count
+        5
+    """
+    return RagPassageConfig(
+        count=max(1, int(count if count is not None else defaults.count)),
+        max_chars=max(
+            200,
+            int(max_chars if max_chars is not None else defaults.max_chars),
+        ),
+        context_sentences=max(
+            0,
+            int(
+                context_sentences
+                if context_sentences is not None
+                else defaults.context_sentences
+            ),
+        ),
+    )
 
 
 def _search_config_from_mapping(
@@ -187,6 +319,23 @@ def load_rag_config() -> RagConfig:
                 1,
                 int(
                     prompt_cfg.get("max_svo_triples", _DEFAULT_MAX_SVO_TRIPLES)
+                ),
+            ),
+            passages=_passage_config_from_mapping(prompt_cfg),
+            max_chars_per_chunk=max(
+                200,
+                int(
+                    prompt_cfg.get(
+                        "max_chars_per_chunk", _DEFAULT_MAX_CHARS_PER_CHUNK
+                    )
+                ),
+            ),
+            max_chunks_for_prompt=max(
+                1,
+                int(
+                    prompt_cfg.get(
+                        "max_chunks_for_prompt", _DEFAULT_MAX_CHUNKS_FOR_PROMPT
+                    )
                 ),
             ),
         ),

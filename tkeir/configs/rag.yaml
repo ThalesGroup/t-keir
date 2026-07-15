@@ -12,6 +12,14 @@ prompt:
   # svo_ontology: KEY PASSAGES + deduplicated SVO facts (no raw chunk excerpts).
   chunk_context_mode: svo_ontology
   max_svo_triples: 80
+  # KEY PASSAGES injected into the LLM prompt (proximity-ranked windows).
+  passages:
+    count: 5              # number of passages
+    max_chars: 1800       # max characters per passage
+    context_sentences: 2  # neighbor sentences around the best window
+  # Chunk excerpts (chunk_excerpts mode) and prompt chunk filtering.
+  max_chars_per_chunk: 1800
+  max_chunks_for_prompt: 10
 
 search:
   # When enabled, raw queries are analyzed with the full NLP pipeline and the

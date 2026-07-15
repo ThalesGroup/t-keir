@@ -5,46 +5,9 @@ from __future__ import annotations
 
 import re
 
-_PREFERRED_NER_LABELS = frozenset(
-    {
-        "person",
-        "per",
-        "organization",
-        "org",
-        "company",
-        "product",
-        "event",
-        "facility",
-        "location",
-        "loc",
-        "gpe",
-    }
-)
-
-_BOILERPLATE_TOKENS = frozenset(
-    {
-        "donate",
-        "create",
-        "account",
-        "log",
-        "article",
-        "talk",
-        "read",
-        "edit",
-        "view",
-        "history",
-        "languages",
-        "wikipedia",
-        "encyclopedia",
-        "copyright",
-        "privacy",
-        "policy",
-        "cookie",
-        "mobile",
-    }
-)
-
 _WHITESPACE_RE = re.compile(r"\s+")
+_WORD_RE = re.compile(r"\w+", re.UNICODE)
+_CONTENT_POS = frozenset({"NOUN", "PROPN", "ADJ", "NUM"})
 
 
 def _normalize_title(text: str, max_length: int) -> str:
@@ -75,40 +38,197 @@ def _has_title(tkeir_doc: dict) -> bool:
     return bool((tkeir_doc.get("title") or "").strip())
 
 
+def _morphosyntax_slice(
+    morphosyntax: list[dict],
+    start: int,
+    end: int,
+) -> list[dict]:
+    """Return morphosyntax tokens covered by a token index range."""
+    if not morphosyntax:
+        return []
+    start = max(0, start)
+    end = min(len(morphosyntax), end)
+    return morphosyntax[start:end]
+
+
+def _named_content_score(morph_slice: list[dict]) -> tuple[int, int]:
+    """Return ``(propn_count, noun_count)`` for a morphosyntax slice."""
+    propn = sum(1 for token in morph_slice if token.get("pos") == "PROPN")
+    nouns = sum(1 for token in morph_slice if token.get("pos") == "NOUN")
+    return propn, nouns
+
+
+def _is_navigation_like(morph_slice: list[dict]) -> bool:
+    """Return whether a token span looks like UI/navigation rather than a title.
+
+    Example:
+        >>> nav = [
+        ...     {"text": "Donate", "pos": "VERB"},
+        ...     {"text": "Create", "pos": "VERB"},
+        ...     {"text": "account", "pos": "NOUN"},
+        ...     {"text": "Log", "pos": "VERB"},
+        ...     {"text": "in", "pos": "ADP"},
+        ... ]
+        >>> _is_navigation_like(nav)
+        True
+        >>> content = [
+        ...     {"text": "Quarterly", "pos": "ADJ"},
+        ...     {"text": "revenue", "pos": "NOUN"},
+        ...     {"text": "increased", "pos": "VERB"},
+        ... ]
+        >>> _is_navigation_like(content)
+        False
+    """
+    if not morph_slice:
+        return True
+
+    propn, nouns = _named_content_score(morph_slice)
+    if propn >= 1:
+        return False
+
+    content_tokens = sum(
+        1 for token in morph_slice if token.get("pos") in _CONTENT_POS
+    )
+    if content_tokens == 0:
+        return True
+
+    verbs = sum(1 for token in morph_slice if token.get("pos") == "VERB")
+    if verbs >= 2 and nouns <= 1:
+        return True
+
+    adps = sum(1 for token in morph_slice if token.get("pos") == "ADP")
+    if verbs >= 1 and adps >= 1 and nouns == 0:
+        return True
+    return False
+
+
+def _is_boilerplate_sentence(
+    text: str,
+    morph_slice: list[dict] | None = None,
+) -> bool:
+    """Return whether text looks like UI/navigation noise rather than a title.
+
+    Uses morphosyntax POS tags when available; otherwise length structure only.
+
+    Example:
+        >>> _is_boilerplate_sentence(
+        ...     "Read edit view history",
+        ...     [
+        ...         {"text": "Read", "pos": "VERB"},
+        ...         {"text": "edit", "pos": "VERB"},
+        ...         {"text": "view", "pos": "VERB"},
+        ...         {"text": "history", "pos": "NOUN"},
+        ...     ],
+        ... )
+        True
+        >>> _is_boilerplate_sentence("Quarterly revenue increased.")
+        False
+    """
+    if morph_slice:
+        return _is_navigation_like(morph_slice)
+
+    tokens = _WORD_RE.findall(text)
+    if not tokens:
+        return True
+    if any(len(token) >= 8 for token in tokens):
+        return False
+    return len(tokens) >= 3
+
+
+def _is_low_value_ner_span(
+    text: str,
+    morph_slice: list[dict],
+) -> bool:
+    """Return whether an NER span is unlikely to be a document title."""
+    cleaned = (text or "").strip()
+    if not cleaned or cleaned.isdigit():
+        return True
+    if morph_slice:
+        return _is_navigation_like(morph_slice) or (
+            sum(_named_content_score(morph_slice)) == 0
+        )
+    return not any(part[:1].isupper() for part in cleaned.split())
+
+
 def _title_from_early_ner(
     tkeir_doc: dict,
     max_token_window: int,
 ) -> str:
-    """Title from early ner helper.
+    """Pick the earliest NER span whose POS tags look like a named title.
 
     Example:
-        >>> from thot.tasks.keywords.TitleGenerator import _title_from_early_ner
-        >>> callable(_title_from_early_ner)
-        True
+        >>> doc = {
+        ...     "content_morphosyntax": [
+        ...         {"text": "Rob", "pos": "PROPN"},
+        ...         {"text": "Brown", "pos": "PROPN"},
+        ...     ],
+        ...     "content_ner": [
+        ...         {"start": 0, "end": 2, "label": "person", "text": "Rob Brown"},
+        ...     ],
+        ... }
+        >>> _title_from_early_ner(doc, 120)
+        'Rob Brown'
     """
-    best: tuple[int, int, str] | None = None
+    morphosyntax = tkeir_doc.get("content_morphosyntax") or []
+    best: tuple[int, int, int, str] | None = None
     for span in tkeir_doc.get("content_ner") or []:
-        label = (span.get("label") or "").lower()
-        if label not in _PREFERRED_NER_LABELS:
-            continue
         start = int(span.get("start", 0))
+        end = int(span.get("end", start))
         if start > max_token_window:
             continue
         text = (span.get("text") or "").strip()
-        if not text:
+        if not text or len(text.split()) > 12:
             continue
-        word_count = len(text.split())
-        if word_count > 12:
+        morph_slice = _morphosyntax_slice(morphosyntax, start, end)
+        if _is_low_value_ner_span(text, morph_slice):
             continue
-        candidate = (start, -word_count, text)
+        propn, nouns = _named_content_score(morph_slice)
+        named_score = propn * 2 + nouns
+        candidate = (start, -named_score, -len(text.split()), text)
         if best is None or candidate < best:
             best = candidate
-    return best[2] if best else ""
+    return best[3] if best else ""
+
+
+def _sentence_spans(morphosyntax: list[dict]) -> list[tuple[int, int]]:
+    """Return ``(start, end)`` token spans for each sentence."""
+    if not morphosyntax:
+        return []
+    starts = [0]
+    for index, token in enumerate(morphosyntax):
+        if index > 0 and token.get("is_sent_start"):
+            starts.append(index)
+    starts.append(len(morphosyntax))
+    return [
+        (starts[index], starts[index + 1])
+        for index in range(len(starts) - 1)
+    ]
+
+
+def _phrase_in_boilerplate_sentence(
+    phrase: str,
+    morphosyntax: list[dict],
+) -> bool:
+    """Return whether a keyword phrase only appears inside navigation-like text."""
+    normalized = _WHITESPACE_RE.sub(" ", phrase.strip().lower())
+    if not normalized:
+        return True
+    for start, end in _sentence_spans(morphosyntax):
+        sentence = _sentence_text(morphosyntax, start, end)
+        if normalized not in sentence.lower():
+            continue
+        if _is_boilerplate_sentence(
+            sentence,
+            _morphosyntax_slice(morphosyntax, start, end),
+        ):
+            return True
+    return False
 
 
 def _title_from_keywords(
     content_keywords: list[tuple],
     max_length: int,
+    morphosyntax: list[dict] | None = None,
 ) -> str:
     """Title from keywords helper.
 
@@ -125,8 +245,11 @@ def _title_from_keywords(
         word_count = len(phrase.split())
         if word_count < 2 or word_count > 10:
             continue
-        lowered = phrase.lower()
-        if any(token in _BOILERPLATE_TOKENS for token in lowered.split()):
+        if morphosyntax and _phrase_in_boilerplate_sentence(
+            phrase, morphosyntax
+        ):
+            continue
+        if _is_boilerplate_sentence(phrase):
             continue
         length_penalty = abs(word_count - 4)
         candidate = (float(score), length_penalty, phrase)
@@ -150,24 +273,6 @@ def _sentence_text(morphosyntax: list[dict], start: int, end: int) -> str:
     ).strip()
 
 
-def _is_boilerplate_sentence(text: str) -> bool:
-    """Is boilerplate sentence helper.
-
-    Example:
-        >>> _is_boilerplate_sentence('Read edit view history')
-        True
-        >>> _is_boilerplate_sentence('Quarterly revenue increased.')
-        False
-    """
-    tokens = [token.lower() for token in re.findall(r"[A-Za-z']+", text)]
-    if not tokens:
-        return True
-    boilerplate_hits = sum(
-        1 for token in tokens if token in _BOILERPLATE_TOKENS
-    )
-    return boilerplate_hits >= max(2, len(tokens) // 2)
-
-
 def _title_from_first_sentence(
     tkeir_doc: dict,
     max_length: int,
@@ -184,20 +289,13 @@ def _title_from_first_sentence(
     if not morphosyntax:
         return ""
 
-    sentence_starts = [0]
-    for index, token in enumerate(morphosyntax):
-        if index > 0 and token.get("is_sent_start"):
-            sentence_starts.append(index)
-    sentence_starts.append(len(morphosyntax))
-
-    for start_index in range(len(sentence_starts) - 1):
-        start = sentence_starts[start_index]
-        end = sentence_starts[start_index + 1]
+    for start, end in _sentence_spans(morphosyntax):
         token_count = end - start
         if token_count < 3 or token_count > max_tokens:
             continue
+        morph_slice = _morphosyntax_slice(morphosyntax, start, end)
         sentence = _sentence_text(morphosyntax, start, end)
-        if not sentence or _is_boilerplate_sentence(sentence):
+        if not sentence or _is_boilerplate_sentence(sentence, morph_slice):
             continue
         return _normalize_title(sentence, max_length)
     return ""
@@ -216,6 +314,7 @@ def _title_from_content_lines(tkeir_doc: dict, max_length: int) -> str:
     if not raw_text:
         return ""
 
+    morphosyntax = tkeir_doc.get("content_morphosyntax") or []
     for line in raw_text.splitlines():
         candidate = _WHITESPACE_RE.sub(" ", line).strip()
         if not candidate:
@@ -223,7 +322,16 @@ def _title_from_content_lines(tkeir_doc: dict, max_length: int) -> str:
         word_count = len(candidate.split())
         if word_count < 2 or word_count > 16:
             continue
-        if _is_boilerplate_sentence(candidate):
+        morph_slice: list[dict] | None = None
+        if morphosyntax and candidate.lower() in " ".join(
+            token.get("text", "") for token in morphosyntax
+        ).lower():
+            for start, end in _sentence_spans(morphosyntax):
+                sentence = _sentence_text(morphosyntax, start, end)
+                if candidate.lower() in sentence.lower():
+                    morph_slice = _morphosyntax_slice(morphosyntax, start, end)
+                    break
+        if _is_boilerplate_sentence(candidate, morph_slice):
             continue
         return _normalize_title(candidate, max_length)
     return ""
@@ -245,13 +353,18 @@ def generate_missing_title(
     if _has_title(tkeir_doc):
         return ""
 
+    morphosyntax = tkeir_doc.get("content_morphosyntax") or []
     candidates: list[tuple[int, str]] = []
 
     ner_title = _title_from_early_ner(tkeir_doc, max_ner_token_window)
     if ner_title:
         candidates.append((100, ner_title))
 
-    keyword_title = _title_from_keywords(content_keywords or [], max_length)
+    keyword_title = _title_from_keywords(
+        content_keywords or [],
+        max_length,
+        morphosyntax=morphosyntax,
+    )
     if keyword_title:
         candidates.append((80, keyword_title))
 

@@ -173,17 +173,27 @@ def extract_keyword_terms(keywords: list[dict[str, Any]]) -> list[str]:
     return terms
 
 
+# Universal Dependencies content POS tags (language-agnostic).
+_CONTENT_POS = frozenset({"NOUN", "PROPN", "VERB", "ADJ", "NUM"})
+
+
 def extract_lemma_terms(morphosyntax: list[dict[str, Any]]) -> list[str]:
-    """Extract lemma tokens from morphosyntax output.
+    """Extract content-bearing lemmas from morphosyntax (UD POS filter).
 
     Example:
-        >>> morph = [{"text": "acquired", "lemma": "acquire", "pos": "VERB"}]
+        >>> morph = [
+        ...     {"text": "the", "lemma": "the", "pos": "DET"},
+        ...     {"text": "acquired", "lemma": "acquire", "pos": "VERB"},
+        ... ]
         >>> extract_lemma_terms(morph)
         ['acquire']
     """
     lemmas: list[str] = []
     seen: set[str] = set()
     for token in morphosyntax or []:
+        pos = str(token.get("pos") or "").upper()
+        if pos and pos not in _CONTENT_POS:
+            continue
         lemma = str(token.get("lemma") or token.get("text") or "").strip()
         if not lemma:
             continue
@@ -285,7 +295,10 @@ def build_question_embedding_text(analysis: QueryAnalysis) -> str:
 
 
 def build_chunk_embedding_text(analysis: QueryAnalysis) -> str:
-    """Build the cleaned query string for ``q_chunk_emb``.
+    """Build the query string for ``q_chunk_emb``.
+
+    Prefer the raw query so paraphrase / stance mismatch still embeds; fall
+    back to the lexical projection when the raw string is empty.
 
     Example:
         >>> analysis = QueryAnalysis(
@@ -294,9 +307,49 @@ def build_chunk_embedding_text(analysis: QueryAnalysis) -> str:
         ...     lexical_query="Microsoft acquire",
         ... )
         >>> build_chunk_embedding_text(analysis)
-        'Microsoft acquire'
+        'What did Microsoft acquire?'
     """
-    return analysis.lexical_query or analysis.raw_query
+    return (analysis.raw_query or analysis.lexical_query or "").strip()
+
+
+def select_ranking_profile(analysis: QueryAnalysis) -> str:
+    """Choose a Vespa rank profile from structural query signals.
+
+    Uses only counts derived from NLP output (NER / lemmas / SVO / terms) —
+    no language-specific word lists.
+
+    Args:
+        analysis: Query analysis from the linguistic pipeline.
+
+    Returns:
+        One of ``hybrid_semantic``, ``hybrid_lexical``, ``hybrid_2_level``.
+
+    Example:
+        >>> select_ranking_profile(QueryAnalysis(
+        ...     raw_query="x", language="en",
+        ...     ner_entities=[NerEntity("Microsoft", "ORG")],
+        ...     search_terms=["Microsoft"],
+        ... ))
+        'hybrid_lexical'
+    """
+    terms = analysis.search_terms or []
+    ner_count = len(analysis.ner_entities)
+    lemma_count = len(analysis.lemmas)
+    raw_tokens = max(
+        1, len([part for part in analysis.raw_query.split() if part])
+    )
+    entity_ratio = ner_count / max(1, len(terms))
+    lemma_ratio = lemma_count / raw_tokens
+    # Sparse lexical anchors → rely on dense similarity (paraphrase/stance).
+    if len(terms) <= 2 or lemma_ratio < 0.35:
+        return "hybrid_semantic"
+    # Entity-anchored queries → lexical hybrid.
+    if entity_ratio >= 0.4 and ner_count >= 1:
+        return "hybrid_lexical"
+    # Structured SVO without strong entity anchors → balanced.
+    if analysis.svo_triples and ner_count == 0:
+        return "hybrid_semantic"
+    return "hybrid_2_level"
 
 
 def build_hybrid_yql(
@@ -379,11 +432,14 @@ def build_vespa_search_payload(
         >>> payload["ranking.profile"]
         'hybrid_2_level'
     """
+    profile = (config.ranking_profile or "auto").strip()
+    if profile == "auto":
+        profile = select_ranking_profile(analysis)
     payload: dict[str, Any] = {
         "yql": build_hybrid_yql(analysis, config, hits=hits),
         "hits": hits,
         "timeout": f"{int(timeout_seconds)}s",
-        "ranking.profile": config.ranking_profile,
+        "ranking.profile": profile,
     }
     if config.use_chunk_embedding:
         payload["input.query(q_chunk_emb)"] = build_chunk_tensor(
@@ -928,7 +984,7 @@ class QueryAnalyzerTask:
             ...         return [0.0] * 384
             >>> task = QueryAnalyzerTask(None, _LLM(), RagSearchConfig())  # doctest: +SKIP
             >>> task.config.ranking_profile  # doctest: +SKIP
-            'hybrid_2_level'
+            'auto'
         """
         return self._config
 

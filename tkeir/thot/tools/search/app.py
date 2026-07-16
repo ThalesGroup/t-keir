@@ -48,6 +48,7 @@ from thot.tools.search.rag_config import (
     load_rag_config,
     resolve_passage_settings,
 )
+from thot.tools.search.rerank import rerank_vespa_children
 from thot.tools.search.rag_report import (
     apply_chunk_evidence_fallback,
     assemble_report_markdown,
@@ -607,6 +608,11 @@ async def lifespan(app: FastAPI):
     state.llm = UnifiedLLMWrapper()
     state.vespa = VespaClient()
     state.pipeline_runners = await asyncio.to_thread(_load_pipeline_runners)
+    if state.llm is not None:
+        await state.llm.verify_provider(
+            pull_missing=True,
+            include_reranker=state.rag_config.search.rerank.enabled,
+        )
     app.state.rag = state
     try:
         yield
@@ -677,6 +683,10 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
     query_analysis: dict[str, Any] | None = None
     vespa_payload: dict[str, Any] | None = None
     try:
+        rerank_cfg = state.rag_config.search.rerank
+        first_stage_hits = request.hits
+        if rerank_cfg.enabled:
+            first_stage_hits = max(request.hits, rerank_cfg.candidates)
         if (
             state.rag_config.search.enabled
             and pipeline_runner is not None
@@ -692,7 +702,7 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
             analyzed = await analyzer.process(
                 query_text,
                 language=request.language,
-                hits=request.hits,
+                hits=first_stage_hits,
             )
             vespa_payload = analyzed["payload"]
             search_response = await state.vespa.search(vespa_payload)
@@ -715,7 +725,7 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
                 search_query_text,
                 query_embedding,
                 query_embedding,
-                hits=request.hits,
+                hits=first_stage_hits,
             )
             search_response = await state.vespa.search(vespa_payload)
             query_analysis = {
@@ -723,6 +733,22 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
                 "lexical_query": search_query_text,
                 "search_terms": search_query_text.split(),
             }
+        if (
+            rerank_cfg.enabled
+            and state.llm is not None
+            and search_response is not None
+        ):
+            root = dict(search_response.get("root") or {})
+            children = list(root.get("children") or [])
+            candidate_n = min(len(children), rerank_cfg.candidates)
+            reranked = await rerank_vespa_children(
+                state.llm,
+                query_text,
+                children[:candidate_n],
+                top_n=request.hits,
+            )
+            root["children"] = reranked
+            search_response = {**search_response, "root": root}
     except Exception as error:
         LOGGER.exception("Query generation failed")
         raise HTTPException(

@@ -220,12 +220,76 @@ def _select_diverse_questions(
                 selected.append(question)
 
     while len(selected) < settings.min_questions and candidates:
+        before = len(selected)
         for question in candidates:
             if question not in selected:
                 selected.append(question)
             if len(selected) >= settings.min_questions:
                 break
+        if len(selected) == before:
+            break
     return selected[: settings.max_questions]
+
+
+def _structural_projection_questions(chunk: dict) -> list[dict]:
+    """Build language-agnostic embedding texts from SVO / NER / snippet.
+
+    Uses only structural pipeline signals (no language templates).
+
+    Args:
+        chunk: Golden chunk with ``metadata`` and ``text_raw``.
+
+    Returns:
+        Candidate question dicts for embedding.
+
+    Example:
+        >>> qs = _structural_projection_questions({
+        ...     'text_raw': 'Alice built a parser.',
+        ...     'metadata': {
+        ...         'svo_triplets': [['Alice', 'built', 'parser']],
+        ...         'primary_entities': {'person': ['Alice']},
+        ...     },
+        ... })
+        >>> any('Alice' in q['question_text'] for q in qs)
+        True
+    """
+    questions: list[dict] = []
+    metadata = chunk.get("metadata") or {}
+    for triplet in (metadata.get("svo_triplets") or [])[:3]:
+        if isinstance(triplet, (list, tuple)) and len(triplet) >= 2:
+            parts = [_clean(part) for part in triplet[:3] if _clean(part)]
+        elif isinstance(triplet, dict):
+            parts = [
+                _clean(triplet.get(key) or "")
+                for key in ("subject", "verb", "object")
+            ]
+            parts = [part for part in parts if part]
+        else:
+            continue
+        if len(parts) < 2:
+            continue
+        questions.append(
+            {
+                "question_text": " ".join(parts),
+                "question_type": "SVO-driven",
+            }
+        )
+    for entity in _top_entities(chunk):
+        questions.append(
+            {
+                "question_text": entity,
+                "question_type": "Entity-driven",
+            }
+        )
+    snippet = _summary_snippet(chunk.get("text_raw") or "")
+    if snippet:
+        questions.append(
+            {
+                "question_text": snippet,
+                "question_type": "Summary-driven",
+            }
+        )
+    return questions
 
 
 def generate_chunk_questions(
@@ -235,9 +299,12 @@ def generate_chunk_questions(
 ) -> list[dict]:
     """Generate synthetic questions for a single golden chunk.
 
+    Projections are built from SVO / entity / snippet structure so the
+    embedding text stays language-agnostic (no hard-coded prompt phrases).
+
     Args:
         chunk: Golden chunk with text and metadata.
-        language: Two-letter language code.
+        language: Two-letter language code (kept for API compatibility).
         settings: Question generation limits and flags.
 
     Returns:
@@ -260,71 +327,16 @@ def generate_chunk_questions(
         >>> len(questions) >= 1
         True
     """
-    templates = _question_templates(language, settings.enable_multilingual)
-    questions: list[dict] = []
-    metadata = chunk.get("metadata") or {}
-    svo_triplets = metadata.get("svo_triplets") or []
-    text_raw = chunk.get("text_raw") or ""
-
-    for subject, verb, obj in svo_triplets[:2]:
-        subject = _clean(subject)
-        verb = _clean(verb)
-        obj = _clean(obj)
-        if not subject or not verb:
-            continue
-        for template in templates["SVO-driven"]:
-            question = template.format(
-                subject=subject, verb=verb, object=obj or "this topic"
-            )
-            questions.append(
-                {
-                    "question_text": _clean(question),
-                    "question_type": "SVO-driven",
-                }
-            )
-
-    for entity in _top_entities(chunk):
-        for template in templates["Entity-driven"]:
-            questions.append(
-                {
-                    "question_text": _clean(template.format(entity=entity)),
-                    "question_type": "Entity-driven",
-                }
-            )
-
-    snippet = _summary_snippet(text_raw)
-    for template in templates["Summary-driven"]:
-        question = template
-        if "{snippet}" in template:
-            question = template.format(snippet=snippet)
-        questions.append(
-            {
-                "question_text": _clean(question),
-                "question_type": "Summary-driven",
-            }
-        )
-
-    if language != "en" and settings.enable_multilingual:
-        questions.append(
-            {
-                "question_text": _clean(
-                    "What information does this section contain? / "
-                    + "Quelles informations cette section contient-elle?"
-                ),
-                "question_type": "Summary-driven",
-            }
-        )
-
+    del language  # structural projections do not use language templates
+    questions = _structural_projection_questions(chunk)
     questions = _dedupe_questions(questions)
     if len(questions) < settings.min_questions:
-        fallback = _clean(text_raw)
+        fallback = _clean(chunk.get("text_raw") or "")
         if fallback:
             questions.append(
                 {
                     "question_text": (
-                        "What can be learned from: "
-                        + fallback[:180]
-                        + ("..." if len(fallback) > 180 else "")
+                        fallback[:180] + ("..." if len(fallback) > 180 else "")
                     ),
                     "question_type": "Summary-driven",
                 }

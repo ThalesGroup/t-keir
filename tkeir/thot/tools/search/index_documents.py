@@ -244,7 +244,7 @@ async def _async_main(args: argparse.Namespace) -> int:
             llm._config.embedding_model,
             llm._config.ollama_base_url,
         )
-        await llm.verify_provider()
+        await llm.verify_provider(pull_missing=True, include_reranker=False)
         if not await vespa.health():
             raise SystemExit(
                 "Vespa is not ready (config server, deployed application, "

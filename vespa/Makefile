@@ -1,4 +1,4 @@
-.PHONY: sync start init bootstrap check test test-py clean clean-db logs index index-fixtures rag rag-query
+.PHONY: sync start init bootstrap check test test-py clean clean-db logs index index-fixtures rag rag-query beir-eval pull-models
 
 UV ?= uv
 VESPA_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
@@ -10,10 +10,22 @@ RAG_URL ?= http://localhost:8090
 RAG_QUERY ?= Who is Rob Brown?
 RAG_LANGUAGE ?= en
 RAG_HITS ?= 20
+BEIR_DATASETS_DIR ?= $(REPO_ROOT)/datasets
+BEIR_REPORT ?= $(REPO_ROOT)/evaluation_report.md
+BEIR_DATASETS ?= scifact fiqa arguana
+BEIR_DENSE_MODEL ?= sentence-transformers/all-MiniLM-L6-v2
+# Dedicated Vespa volume so BEIR reindex does not wipe the primary corpus.
+BEIR_VESPA_NAME ?= vespa
+BEIR_VESPA_VOLUME ?= beir_eval_data:/opt/vespa/var
 
 # Sync T-KEIR Python dependencies (tools live under thot/tools/)
 sync:
 	cd $(TKEIR_DIR) && $(UV) sync --group dev --python 3.11
+
+# Pull embedding / LLM / reranker models (env → configs/rag.yaml → defaults).
+# Ollama: uses /api/pull for bge-m3, mistral-nemo, qllama/bge-reranker-v2-m3, …
+pull-models: sync
+	cd $(TKEIR_DIR) && $(UV) run --python 3.11 python -m thot.tools.search.pull_models
 
 # Start Vespa container
 start:
@@ -77,6 +89,33 @@ rag-query:
 		-H "Content-Type: application/json" \
 		-d "$$(jq -nc --arg query "$(RAG_QUERY)" --arg language "$(RAG_LANGUAGE)" --argjson hits $(RAG_HITS) '{query:$$query,language:$$language,hits:$$hits}')" \
 		| jq .
+
+# BEIR IR evaluation: T-KEIR pipeline + local BM25/dense vs leaderboard
+# → evaluation_report.md
+# Default T-KEIR index mode is ``chunking`` (NLP + structural questions;
+# avoids ontology stall from ``--tkeir-index-mode full``).
+# Full run (indexes each dataset into Vespa via T-KEIR embeddings):
+#   make beir-eval
+# Offline baselines only (no Vespa / T-KEIR):
+#   make beir-eval BEIR_EXTRA=--skip-tkeir
+# SciFact smoke (skip MiniLM dense, keep T-KEIR):
+#   make beir-eval BEIR_DATASETS=scifact BEIR_EXTRA=--skip-dense
+# Fast index smoke (50 docs, no document NLP):
+#   make beir-eval BEIR_DATASETS=scifact BEIR_EXTRA='--skip-dense --tkeir-index-mode fast --tkeir-max-docs 50'
+beir-eval:
+	# Keep beir+models in one sync: a models-only sync (install-spacy-models)
+	# would uninstall the beir optional group.
+	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python 3.11
+	cd $(TKEIR_DIR) && \
+		VESPA_NAME="$(BEIR_VESPA_NAME)" \
+		VESPA_VOLUME="$(BEIR_VESPA_VOLUME)" \
+		$(UV) run --python 3.11 --group beir --group models \
+		python -m thot.tools.search.beir_eval \
+		--datasets $(BEIR_DATASETS) \
+		--datasets-dir "$(BEIR_DATASETS_DIR)" \
+		--report "$(BEIR_REPORT)" \
+		--dense-model "$(BEIR_DENSE_MODEL)" \
+		$(BEIR_EXTRA)
 
 # Wipe Vespa indexed data (container + docker volume)
 clean-db:

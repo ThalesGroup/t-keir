@@ -20,6 +20,10 @@ tkeir/site
 .pytest_cache/
 reports/
 coverage-reports/
+datasets/
+**/datasets/
+evaluation_report.md
+**/evaluation_report.md
 output/
 !tkeir/tests/indexing/output/
 !tkeir/tests/indexing/output/**

@@ -61,6 +61,7 @@ tkeir-index-documents = "thot.tools.search.index_documents:main"
 tkeir-rag = "thot.tools.search.app:main"
 tkeir-init-vespa = "thot.tools.search.init_vespa:main"
 tkeir-create-annotation-resource = "thot.tools.annotation.create_annotation_resource:main"
+tkeir-beir-eval = "thot.tools.search.beir_eval:main"
 
 [dependency-groups]
 dev = [
@@ -73,6 +74,11 @@ dev = [
     "xenon>=0.9.1",
     "pip-audit>=2.7.0",
     "cyclonedx-bom>=7.3.0",
+]
+beir = [
+    "beir>=2.0.0",
+    "rank-bm25>=0.2.2",
+    "sentence-transformers>=3.0.0",
 ]
 models = [
     "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl",

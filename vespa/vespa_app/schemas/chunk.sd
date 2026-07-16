@@ -30,6 +30,8 @@ schema chunk {
         }
     }
 
+    # Balanced hybrid (default). Dense slightly above classic BM25 to close
+    # BEIR gaps on paraphrase / counterargument / jargon mismatch.
     rank-profile hybrid_2_level {
         inputs {
             query(q_chunk_emb) tensor<float>(x[384])
@@ -37,15 +39,55 @@ schema chunk {
         }
         first-phase {
             expression {
-                closeness(field, chunk_embedding) * 0.30 +
-                closeness(field, questions_embeddings) * 0.10 +
-                bm25(text_raw) * 0.40 +
-                bm25(parent_content) * 0.20
+                closeness(field, chunk_embedding) * 0.38 +
+                closeness(field, questions_embeddings) * 0.17 +
+                bm25(text_raw) * 0.28 +
+                bm25(parent_content) * 0.17
             }
         }
         second-phase {
-            expression: firstPhase + 0.15 * bm25(parent_title)
-            rerank-count: 30
+            expression: firstPhase + 0.12 * bm25(parent_title)
+            rerank-count: 50
+        }
+    }
+
+    # Semantic-heavy: paraphrase / opposing-stance / jargon mismatch.
+    rank-profile hybrid_semantic {
+        inputs {
+            query(q_chunk_emb) tensor<float>(x[384])
+            query(q_question_emb) tensor<float>(x[384])
+        }
+        first-phase {
+            expression {
+                closeness(field, chunk_embedding) * 0.52 +
+                closeness(field, questions_embeddings) * 0.23 +
+                bm25(text_raw) * 0.15 +
+                bm25(parent_content) * 0.10
+            }
+        }
+        second-phase {
+            expression: firstPhase + 0.05 * bm25(parent_title)
+            rerank-count: 50
+        }
+    }
+
+    # Lexical-heavy: entity/claim anchored short queries.
+    rank-profile hybrid_lexical {
+        inputs {
+            query(q_chunk_emb) tensor<float>(x[384])
+            query(q_question_emb) tensor<float>(x[384])
+        }
+        first-phase {
+            expression {
+                closeness(field, chunk_embedding) * 0.18 +
+                closeness(field, questions_embeddings) * 0.07 +
+                bm25(text_raw) * 0.48 +
+                bm25(parent_content) * 0.27
+            }
+        }
+        second-phase {
+            expression: firstPhase + 0.20 * bm25(parent_title)
+            rerank-count: 50
         }
     }
 }

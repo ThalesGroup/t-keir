@@ -11,6 +11,7 @@ from thot.tasks.chunk_questions.ChunkQuestionGenerator import (
 )
 from thot.tasks.chunk_questions.QuestionBuilder import (
     QuestionGenerationSettings,
+    _select_diverse_questions,
     enrich_golden_chunks_with_questions,
     generate_chunk_questions,
 )
@@ -57,6 +58,15 @@ class TestQuestionBuilder:
         }
         chunks = enrich_golden_chunks_with_questions(document)
         assert chunks[0]["synthetic_questions"]
+
+    def test_select_diverse_questions_does_not_spin_when_few_candidates(self):
+        """Regression: min_questions > len(candidates) must not loop forever."""
+        settings = QuestionGenerationSettings(min_questions=3, max_questions=5)
+        candidates = [
+            {"question_text": "only one", "question_type": "Summary-driven"},
+        ]
+        selected = _select_diverse_questions(candidates, settings)
+        assert len(selected) == 1
 
 
 class TestChunkQuestionGenerator:

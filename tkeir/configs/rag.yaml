@@ -1,5 +1,23 @@
 # RAG API runtime configuration (retrieval UI and ontology export).
 # Keep ontology.min_keyword_length aligned with keywords.json → min-keyword-length.
+#
+# Model resolution for search/index (highest wins):
+#   1. environment variables (PROVIDER, EMBEDDING_MODEL, LLM_MODEL,
+#      RERANKER_MODEL, EMBEDDING_DIM)
+#   2. models: section below
+#   3. provider hard-coded defaults in thot.core.LlmWrapper
+
+models:
+  # provider: ollama
+  embedding_model: bge-m3
+  llm_model: mistral-nemo
+  # Prefer a true reranker when the backend exposes /api/rerank or /v1/rerank
+  # (or OpenAI-compat /rerank). Otherwise LlmWrapper scores via /api/generate
+  # (Ollama) / chat completions (OpenAI, vLLM), falling back to llm_model if
+  # the reranker cannot load as a generate model (common for cross-encoders
+  # on stock Ollama).
+  reranker_model: qllama/bge-reranker-v2-m3
+  embedding_dim: 384
 
 ontology:
   # Minimum number of characters for a keyword label exposed in the HMI/RAG API.
@@ -34,12 +52,21 @@ search:
   use_svo: true
   use_keywords: true
   use_lemmas: true
-  ranking_profile: hybrid_2_level
+  # auto → QueryAnalyzer picks hybrid_semantic / hybrid_lexical / hybrid_2_level
+  # from structural NLP signals (no language word lists).
+  ranking_profile: auto
   hits: 20
-  max_yql_terms: 32
+  max_yql_terms: 48
   # Informational weights aligned with chunk.sd hybrid_2_level rank profile.
-  weight_chunk_embedding: 0.30
-  weight_question_embedding: 0.10
-  weight_text_raw_bm25: 0.40
-  weight_parent_content_bm25: 0.20
-  weight_parent_title_bm25: 0.15
+  weight_chunk_embedding: 0.38
+  weight_question_embedding: 0.17
+  weight_text_raw_bm25: 0.28
+  weight_parent_content_bm25: 0.17
+  weight_parent_title_bm25: 0.12
+  # Second-stage rerank via UnifiedLLMWrapper.rerank
+  # (native /rerank when available, else generate/chat scoring).
+  rerank:
+    enabled: true
+    # First-stage Vespa hits sent to the reranker (truncated to search.hits after).
+    # Keep modest when using generate/chat scoring (LLM-as-judge) for latency.
+    candidates: 20

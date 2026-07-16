@@ -363,10 +363,10 @@ class VespaConfig:
 
     @classmethod
     def from_env(cls) -> VespaConfig:
-        """Build Vespa client settings from environment variables.
+        """Build Vespa client settings from environment / rag.yaml / defaults.
 
         Reads ``VESPA_URL``, ``VESPA_CONFIG_URL``, ``VESPA_TIMEOUT_SECONDS``,
-        and ``EMBEDDING_DIM``.
+        and ``EMBEDDING_DIM`` (env → ``configs/rag.yaml`` models → 384).
 
         Returns:
             Frozen configuration for :class:`VespaClient`.
@@ -377,16 +377,19 @@ class VespaConfig:
             >>> cfg.embedding_dim
             384
         """
+        from thot.core.LlmWrapper import WrapperConfig
+
         base_url = os.getenv("VESPA_URL", "http://localhost:8080").rstrip("/")
         config_url = os.getenv(
             "VESPA_CONFIG_URL", "http://localhost:19071"
         ).rstrip("/")
+        models = WrapperConfig.from_env()
         return cls(
             document_api_url=f"{base_url}/document/v1",
             search_api_url=f"{base_url}/search/",
             config_server_url_base=config_url,
             timeout_seconds=float(os.getenv("VESPA_TIMEOUT_SECONDS", "60")),
-            embedding_dim=int(os.getenv("EMBEDDING_DIM", "384")),
+            embedding_dim=models.embedding_dim,
         )
 
     def config_server_url(self) -> str:

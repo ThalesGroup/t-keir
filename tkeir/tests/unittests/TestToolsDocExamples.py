@@ -202,7 +202,7 @@ class TestRagAppDocExamples:
 class TestLlmWrapperDocExamples:
     def test_wrapper_config_from_env_example(self, monkeypatch):
         monkeypatch.setenv("PROVIDER", "ollama")
-        cfg = WrapperConfig.from_env()
+        cfg = WrapperConfig.from_env(file_models={})
         assert cfg.provider is Provider.OLLAMA
 
 

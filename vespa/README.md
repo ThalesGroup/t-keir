@@ -24,6 +24,8 @@ make bootstrap
 export PROVIDER=ollama
 export EMBEDDING_MODEL=bge-m3
 export LLM_MODEL=mistral-nemo
+export RERANKER_MODEL=qllama/bge-reranker-v2-m3
+make pull-models      # ollama pull embedding + llm + reranker
 make index-fixtures   # PDFs in tkeir/tests/indexing/input → output/
 make index
 
@@ -38,13 +40,20 @@ Default indexing input: `tkeir/tests/indexing/output` (override with `INDEX_INPU
 
 ## Environment variables
 
+Model settings resolve as **environment → `configs/rag.yaml` `models:` → hard-coded defaults**.
+
 | Variable | Default | Purpose |
 |---|---|---|
 | `PROVIDER` | `ollama` | `openai`, `ollama`, or `vllm` |
-| `EMBEDDING_MODEL` | provider-specific | Embedding model name |
-| `LLM_MODEL` | provider-specific | Generation model name |
+| `EMBEDDING_MODEL` | provider-specific / `rag.yaml` | Embedding model name |
+| `LLM_MODEL` | provider-specific / `rag.yaml` | Generation model name |
+| `RERANKER_MODEL` | `qllama/bge-reranker-v2-m3` | Reranker model (native `/rerank` if present, else generate/chat scoring; falls back to `LLM_MODEL`) |
 | `EMBEDDING_DIM` | `384` | Embedding dimension (must match schemas) |
 | `VESPA_URL` | `http://localhost:8080` | Vespa endpoint |
+| `VESPA_NAME` | `vespa` | Docker container name |
+| `VESPA_VOLUME` | `vespa_data:/opt/vespa/var` | Docker volume mount for Vespa data |
+| `BEIR_DATASETS_DIR` | `<repo>/datasets` | Cache for BEIR dataset downloads |
+| `BEIR_REPORT` | `<repo>/evaluation_report.md` | BEIR Markdown evaluation report path |
 | `OPENAI_API_KEY` | — | API key for OpenAI / vLLM |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama endpoint |
 | `VLLM_BASE_URL` | `http://localhost:8000/v1` | vLLM OpenAI-compatible endpoint |
@@ -64,18 +73,68 @@ linked to retrieved `chunk_ids`.
 ## Makefile targets
 
 ```bash
-make sync       # uv sync in tkeir/
-make start      # docker run Vespa
-make init       # deploy schemas (Vespa already running)
-make bootstrap  # start + deploy schemas
-make check      # health check
-make test       # Vespa query smoke test
-make test-py    # Python unit tests (tkeir)
+make sync        # uv sync in tkeir/
+make pull-models # ollama pull embedding + llm + reranker (env / rag.yaml)
+make start       # docker run Vespa
+make init        # deploy schemas (Vespa already running)
+make bootstrap   # start + deploy schemas
+make check       # health check
+make test        # Vespa query smoke test
+make test-py     # Python unit tests (tkeir)
 make index-fixtures  # pipeline on tkeir/tests/indexing/input → output/ (PIPELINE_TYPE=auto)
 make index           # requires *.pipeline.json in tkeir/tests/indexing/output
-make rag        # start FastAPI RAG API
-make rag-query  # curl sample RAG request
-make clean-db   # wipe Vespa data volume (then run make bootstrap)
+make rag         # FastAPI RAG (hybrid retrieval + Ollama rerank when enabled)
+make rag-query   # curl sample RAG request
+make clean-db    # wipe Vespa data volume (then run make bootstrap)
+make beir-eval   # BEIR BM25 + dense eval → evaluation_report.md
+```
+
+## BEIR evaluation
+
+```bash
+cd vespa
+# Full benchmark: T-KEIR pipeline + local BM25/dense vs BEIR leaderboard
+make beir-eval
+
+# Offline baselines only (no Vespa / embeddings):
+make beir-eval BEIR_EXTRA=--skip-tkeir
+
+# SciFact smoke (skip MiniLM dense, keep T-KEIR):
+make beir-eval BEIR_DATASETS=scifact BEIR_EXTRA=--skip-dense
+
+# Fast index smoke (no document NLP; useful if chunking looks stalled):
+make beir-eval BEIR_DATASETS=scifact \
+  BEIR_EXTRA='--skip-dense --tkeir-index-mode fast --tkeir-max-docs 50'
+```
+
+Default T-KEIR index mode is `--tkeir-index-mode chunking` (NLP through
+chunking + structural questions). Avoid `--tkeir-index-mode full` for large
+corpora — that pulls ontology via `chunk-questions` and can stall for hours
+with little progress logging.
+
+Downloads SciFact / FiQA / ArguAna into `./datasets/` (if missing), then:
+
+1. **T-KEIR (retrieval only)** — NLP (`chunking` + structural question
+   projections) → embed/index → `QueryAnalyzerTask` + Vespa hybrid →
+   optional cross-encoder rerank via `UnifiedLLMWrapper.rerank`
+   (`RERANKER_MODEL` / `search.rerank` in `rag.yaml`).
+   **No answer generation** (`RetrievalEmbeddingClient` rejects `generate`)
+2. **Local BM25** / **Local dense** — in-process baselines for contrast
+3. Metrics NDCG@10 / MAP@100 / Recall@100 + **gap to best published** system
+4. Writes `evaluation_report.md` with leaderboard comparison
+
+Requires a working embedding + (when enabled) rerank provider
+(`PROVIDER` / `EMBEDDING_MODEL` / `RERANKER_MODEL` / `OLLAMA_BASE_URL`) and
+spaCy models. Prefetch with `make pull-models`. Rerank prefers native
+`/api/rerank` / `/v1/rerank` / OpenAI-compat `/rerank`, then scores via
+standard Ollama `/api/generate` or OpenAI/vLLM chat completions (auto-falls
+back to `LLM_MODEL` if the pulled cross-encoder cannot run as generate).
+Reindex uses volume `beir_eval_data` by default — set `BEIR_VESPA_VOLUME` /
+`BEIR_VESPA_NAME` to isolate from your primary corpus. Redeploy Vespa after
+schema changes:
+
+```bash
+cd vespa && make clean-db && make bootstrap
 ```
 
 ## CLI entry points (from tkeir/)

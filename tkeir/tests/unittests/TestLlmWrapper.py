@@ -23,6 +23,9 @@ def _config(provider: Provider, **overrides: object) -> WrapperConfig:
         provider=provider,
         embedding_model=str(overrides.get("embedding_model", "embed-model")),
         llm_model=str(overrides.get("llm_model", "llm-model")),
+        reranker_model=str(
+            overrides.get("reranker_model", "rerank-model")
+        ),
         embedding_dim=cast(int, overrides.get("embedding_dim", 3)),
         timeout_seconds=cast(float, overrides.get("timeout_seconds", 5.0)),
         openai_api_key=cast(str | None, overrides.get("openai_api_key")),
@@ -233,8 +236,90 @@ def test_async_context_manager_closes_wrapper():
 
 def test_wrapper_config_from_env_example(monkeypatch):
     monkeypatch.setenv("PROVIDER", "vllm")
-    cfg = WrapperConfig.from_env()
+    cfg = WrapperConfig.from_env(file_models={})
     assert cfg.provider is Provider.VLLM
+    assert cfg.reranker_model
+
+
+def test_wrapper_config_env_overrides_file_models(monkeypatch):
+    monkeypatch.setenv("PROVIDER", "ollama")
+    monkeypatch.setenv("EMBEDDING_MODEL", "env-embed")
+    monkeypatch.setenv("RERANKER_MODEL", "env-rerank")
+    cfg = WrapperConfig.from_env(
+        file_models={
+            "embedding_model": "file-embed",
+            "reranker_model": "file-rerank",
+            "llm_model": "file-llm",
+        }
+    )
+    assert cfg.embedding_model == "env-embed"
+    assert cfg.reranker_model == "env-rerank"
+    assert cfg.llm_model == "file-llm"
+
+
+def test_ollama_rerank_uses_api_endpoint():
+    client = AsyncMock()
+    client.post = AsyncMock(
+        return_value=_json_response(
+            {
+                "results": [
+                    {"index": 1, "relevance_score": 0.9},
+                    {"index": 0, "relevance_score": 0.1},
+                ]
+            }
+        )
+    )
+    wrapper = UnifiedLLMWrapper(
+        _config(Provider.OLLAMA, reranker_model="qllama/bge-reranker-v2-m3"),
+        client=client,
+    )
+
+    async def _run() -> list[dict]:
+        return await wrapper.rerank("query", ["a", "b"], top_n=2)
+
+    ranked = asyncio.run(_run())
+    assert ranked[0]["index"] == 1
+    assert ranked[0]["relevance_score"] == 0.9
+    assert client.post.await_args.args[0].endswith("/api/rerank")
+
+
+def test_ollama_rerank_falls_back_to_generate():
+    not_found = MagicMock()
+    not_found.status_code = 404
+    not_found.raise_for_status = MagicMock(
+        side_effect=httpx.HTTPStatusError(
+            "404", request=MagicMock(), response=not_found
+        )
+    )
+
+    generate_ok = _json_response({"response": "0.91"})
+
+    async def _post(url: str, **kwargs):
+        del kwargs
+        if url.endswith("/api/generate"):
+            return generate_ok
+        return not_found
+
+    client = AsyncMock()
+    client.post = AsyncMock(side_effect=_post)
+    wrapper = UnifiedLLMWrapper(
+        _config(
+            Provider.OLLAMA,
+            reranker_model="mistral-nemo",
+            llm_model="mistral-nemo",
+        ),
+        client=client,
+    )
+
+    async def _run() -> list[dict]:
+        return await wrapper.rerank("query", ["only-doc"], top_n=1)
+
+    ranked = asyncio.run(_run())
+    assert ranked == [{"index": 0, "relevance_score": 0.91}]
+    assert any(
+        call.args[0].endswith("/api/generate")
+        for call in client.post.await_args_list
+    )
 
 
 def test_sync_entry_points_use_asyncio_for_context_exit():

@@ -6,6 +6,10 @@ if [ -z "${VESPA_NAME:-}" ]; then
     VESPA_NAME=vespa
 fi
 
+if [ -z "${VESPA_VOLUME:-}" ]; then
+    VESPA_VOLUME=vespa_data:/opt/vespa/var
+fi
+
 echo "[+] Ensuring Vespa container '${VESPA_NAME}' is running..."
 
 if docker ps -a --format '{{.Names}}' | grep -qx "${VESPA_NAME}"; then
@@ -19,7 +23,7 @@ else
     echo "[+] Creating Vespa container..."
     docker run -d --name "${VESPA_NAME}" \
       -p 8080:8080 -p 19071:19071 -p 19050:19050 \
-      -v vespa_data:/opt/vespa/var \
+      -v "${VESPA_VOLUME}" \
       vespaengine/vespa
 fi
 

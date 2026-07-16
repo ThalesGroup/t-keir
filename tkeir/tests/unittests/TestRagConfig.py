@@ -24,7 +24,16 @@ def test_load_rag_config_reads_min_keyword_length():
     assert config.prompt.passages.max_chars >= 200
     assert config.prompt.passages.context_sentences >= 0
     assert isinstance(config.search.enabled, bool)
-    assert config.search.ranking_profile == "hybrid_2_level"
+    assert config.search.ranking_profile in {
+        "auto",
+        "hybrid_2_level",
+        "hybrid_semantic",
+        "hybrid_lexical",
+    }
+    assert isinstance(config.search.rerank.enabled, bool)
+    assert config.search.rerank.candidates >= 1
+    assert config.models.embedding_model
+    assert config.models.reranker_model
 
 
 def test_passage_config_from_nested_mapping():

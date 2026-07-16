@@ -13,12 +13,15 @@ from thot.tools.search.query_analyzer import (
     QueryAnalyzerTask,
     SvoTriple,
     analyze_query_document,
+    build_chunk_embedding_text,
     build_hybrid_yql,
     build_search_terms,
     build_vespa_search_payload,
     extract_keyword_terms,
+    extract_lemma_terms,
     extract_ner_entities,
     extract_svo_triples,
+    select_ranking_profile,
 )
 from thot.tools.search.rag_config import RagSearchConfig
 from thot.tools.search.vespa_client import (
@@ -163,7 +166,11 @@ def test_build_vespa_payload_includes_tensors_and_ranking():
         embedding_dim=384,
     )
     assert payload["hits"] == 15
-    assert payload["ranking.profile"] == "hybrid_2_level"
+    assert payload["ranking.profile"] in {
+        "hybrid_2_level",
+        "hybrid_semantic",
+        "hybrid_lexical",
+    }
     assert len(payload["input.query(q_chunk_emb)"]) == 384
     assert len(payload["input.query(q_question_emb)"]) == 384
     assert "ranking.weights" not in payload
@@ -336,3 +343,49 @@ def test_format_vespa_query_json():
     assert '"yql"' in rendered
     assert '"omitted": true' in rendered
     assert "0.1" not in rendered
+
+
+def test_extract_lemma_terms_keeps_content_pos_only():
+    lemmas = extract_lemma_terms(
+        MICROSOFT_PIPELINE_OUTPUT["content_morphosyntax"]
+    )
+    assert "acquire" in lemmas
+    assert "Microsoft" in lemmas
+    assert "2026" in lemmas
+    assert "what" not in {lemma.lower() for lemma in lemmas}
+    assert "do" not in {lemma.lower() for lemma in lemmas}
+
+
+def test_chunk_embedding_uses_raw_query():
+    analysis = QueryAnalysis(
+        raw_query="What did Microsoft acquire?",
+        language="en",
+        lexical_query="Microsoft acquire",
+    )
+    assert (
+        build_chunk_embedding_text(analysis) == "What did Microsoft acquire?"
+    )
+
+
+def test_select_ranking_profile_entity_anchored_is_lexical():
+    analysis = QueryAnalysis(
+        raw_query="Microsoft GitHub deal",
+        language="en",
+        ner_entities=[
+            NerEntity("Microsoft", "ORG"),
+            NerEntity("GitHub", "ORG"),
+        ],
+        lemmas=["Microsoft", "GitHub", "deal"],
+        search_terms=["Microsoft", "GitHub", "deal"],
+    )
+    assert select_ranking_profile(analysis) == "hybrid_lexical"
+
+
+def test_select_ranking_profile_sparse_terms_is_semantic():
+    analysis = QueryAnalysis(
+        raw_query="a b c d e f",
+        language="en",
+        search_terms=["a", "b"],
+        lemmas=["a"],
+    )
+    assert select_ranking_profile(analysis) == "hybrid_semantic"

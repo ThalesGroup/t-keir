@@ -26,6 +26,27 @@ _DEFAULT_MAX_FOCUS_PASSAGES = _DEFAULT_PASSAGE_COUNT
 _DEFAULT_MAX_CHARS_PER_PASSAGE = _DEFAULT_PASSAGE_MAX_CHARS
 _DEFAULT_FOCUS_CONTEXT_SENTENCES = _DEFAULT_PASSAGE_CONTEXT_SENTENCES
 _ALLOWED_CHUNK_CONTEXT_MODES = frozenset({"chunk_excerpts", "svo_ontology"})
+_DEFAULT_RERANK_ENABLED = True
+_DEFAULT_RERANK_CANDIDATES = 50
+
+
+@dataclass(frozen=True)
+class RagModelsConfig:
+    """Model names for search / index (overridden by env vars when set)."""
+
+    provider: str | None = None
+    embedding_model: str | None = None
+    llm_model: str | None = None
+    reranker_model: str | None = None
+    embedding_dim: int | None = None
+
+
+@dataclass(frozen=True)
+class RagRerankConfig:
+    """Cross-encoder rerank stage after Vespa hybrid retrieval."""
+
+    enabled: bool = _DEFAULT_RERANK_ENABLED
+    candidates: int = _DEFAULT_RERANK_CANDIDATES
 
 
 @dataclass(frozen=True)
@@ -42,14 +63,15 @@ class RagSearchConfig:
     use_svo: bool = True
     use_keywords: bool = True
     use_lemmas: bool = True
-    ranking_profile: str = "hybrid_2_level"
+    ranking_profile: str = "auto"
     hits: int = 20
-    max_yql_terms: int = 32
-    weight_chunk_embedding: float = 0.30
-    weight_question_embedding: float = 0.10
-    weight_text_raw_bm25: float = 0.40
-    weight_parent_content_bm25: float = 0.20
-    weight_parent_title_bm25: float = 0.15
+    max_yql_terms: int = 48
+    weight_chunk_embedding: float = 0.38
+    weight_question_embedding: float = 0.17
+    weight_text_raw_bm25: float = 0.28
+    weight_parent_content_bm25: float = 0.17
+    weight_parent_title_bm25: float = 0.12
+    rerank: RagRerankConfig = RagRerankConfig()
 
 
 @dataclass(frozen=True)
@@ -130,6 +152,7 @@ class RagConfig:
     ontology: RagOntologyConfig
     prompt: RagPromptConfig
     search: RagSearchConfig
+    models: RagModelsConfig = RagModelsConfig()
 
 
 def _normalize_chunk_context_mode(value: object) -> str:
@@ -230,6 +253,61 @@ def resolve_passage_settings(
     )
 
 
+def _rerank_config_from_mapping(
+    mapping: dict[str, Any] | None,
+) -> RagRerankConfig:
+    """Build :class:`RagRerankConfig` from ``search.rerank`` YAML.
+
+    Example:
+        >>> _rerank_config_from_mapping({"enabled": False, "candidates": 20})
+        RagRerankConfig(enabled=False, candidates=20)
+    """
+    cfg = mapping if isinstance(mapping, dict) else {}
+    return RagRerankConfig(
+        enabled=_as_bool(cfg.get("enabled"), _DEFAULT_RERANK_ENABLED),
+        candidates=max(
+            1, int(cfg.get("candidates", _DEFAULT_RERANK_CANDIDATES))
+        ),
+    )
+
+
+def _models_config_from_mapping(
+    mapping: dict[str, Any] | None,
+) -> RagModelsConfig:
+    """Build :class:`RagModelsConfig` from the top-level ``models`` YAML.
+
+    Example:
+        >>> _models_config_from_mapping({"embedding_model": "bge-m3"}).embedding_model
+        'bge-m3'
+    """
+    cfg = mapping if isinstance(mapping, dict) else {}
+    dim_raw = cfg.get("embedding_dim")
+    embedding_dim = int(dim_raw) if dim_raw is not None else None
+    return RagModelsConfig(
+        provider=(
+            str(cfg["provider"]).strip()
+            if cfg.get("provider") not in (None, "")
+            else None
+        ),
+        embedding_model=(
+            str(cfg["embedding_model"]).strip()
+            if cfg.get("embedding_model") not in (None, "")
+            else None
+        ),
+        llm_model=(
+            str(cfg["llm_model"]).strip()
+            if cfg.get("llm_model") not in (None, "")
+            else None
+        ),
+        reranker_model=(
+            str(cfg["reranker_model"]).strip()
+            if cfg.get("reranker_model") not in (None, "")
+            else None
+        ),
+        embedding_dim=embedding_dim,
+    )
+
+
 def _search_config_from_mapping(
     mapping: dict[str, Any] | None,
 ) -> RagSearchConfig:
@@ -256,7 +334,7 @@ def _search_config_from_mapping(
         use_svo=_as_bool(cfg.get("use_svo"), True),
         use_keywords=_as_bool(cfg.get("use_keywords"), True),
         use_lemmas=_as_bool(cfg.get("use_lemmas"), True),
-        ranking_profile=str(cfg.get("ranking_profile", "hybrid_2_level")),
+        ranking_profile=str(cfg.get("ranking_profile", "auto")),
         hits=max(1, int(cfg.get("hits", 20))),
         max_yql_terms=max(1, int(cfg.get("max_yql_terms", 32))),
         weight_chunk_embedding=float(cfg.get("weight_chunk_embedding", 0.30)),
@@ -270,6 +348,7 @@ def _search_config_from_mapping(
         weight_parent_title_bm25=float(
             cfg.get("weight_parent_title_bm25", 0.15)
         ),
+        rerank=_rerank_config_from_mapping(cfg.get("rerank")),
     )
 
 
@@ -304,6 +383,10 @@ def load_rag_config() -> RagConfig:
     search_cfg = payload.get("search") or {}
     if not isinstance(search_cfg, dict):
         search_cfg = {}
+
+    models_cfg = payload.get("models") or {}
+    if not isinstance(models_cfg, dict):
+        models_cfg = {}
 
     return RagConfig(
         ontology=RagOntologyConfig(
@@ -340,6 +423,7 @@ def load_rag_config() -> RagConfig:
             ),
         ),
         search=_search_config_from_mapping(search_cfg),
+        models=_models_config_from_mapping(models_cfg),
     )
 
 

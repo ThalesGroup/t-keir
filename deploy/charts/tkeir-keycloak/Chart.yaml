@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tkeir-keycloak
+description: Dev/demo Keycloak for T-KEIR (realm import from ConfigMap)
+type: application
+version: 0.1.0
+appVersion: "26.0"

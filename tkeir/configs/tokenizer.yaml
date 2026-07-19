@@ -1,0 +1,9 @@
+logger:
+  logging-level: info
+tokenizers:
+  segmenters:
+  - language: en
+    resources-base-path: resources/modeling/tokenizer/en
+    use-mwe: false
+    normalization-rules: tokenizer-rules.json
+    annotation-resources-reference: annotation-resources.json

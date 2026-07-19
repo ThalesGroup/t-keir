@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/thalesgroup/t-keir/tkeir-governor
+  tag: ""
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8094
+
+mode: observe
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    memory: 512Mi
+
+env:
+  TKEIR_SERVICE: tkeir-governor
+  TKEIR_ENV: dev
+  GOVERNOR_AUTH_ENABLED: "false"
+  GOVERNOR_DEFAULT_DOC_BUDGET: "10000"
+  GOVERNOR_DEFAULT_LLM_TOKEN_BUDGET: "500000"
+
+serviceAccount:
+  create: true
+
+securityContext:
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001

@@ -1,0 +1,47 @@
+name: Helm Charts
+
+on:
+  pull_request:
+    paths:
+      - "deploy/charts/**"
+      - "deploy/versions.lock.yaml"
+      - "Makefile"
+  push:
+    branches: [main]
+    paths:
+      - "deploy/charts/**"
+      - "deploy/versions.lock.yaml"
+      - "Makefile"
+
+jobs:
+  lint-and-render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint umbrella chart
+        run: make helm-lint
+
+      - name: Chart-testing (ct) lint when available
+        run: |
+          if command -v ct >/dev/null 2>&1; then
+            ct lint --config deploy/charts/ct.yaml
+          else
+            echo "ct not installed — helm lint already ran; install chart-testing for full ct lint"
+          fi
+
+      - name: Render k8s-dev
+        run: make helm-template PROFILE=k8s-dev >/tmp/tkeir-k8s-dev.yaml
+
+      - name: Render k8s-secure
+        run: make helm-template PROFILE=k8s-secure >/tmp/tkeir-k8s-secure.yaml
+
+      - name: Render platform
+        run: make helm-template PROFILE=platform >/tmp/tkeir-platform.yaml
+
+      - name: Realm JSON sanity
+        run: python3 -c "import json; json.load(open('deploy/keycloak/realm-tkeir.json')); print('realm ok')"

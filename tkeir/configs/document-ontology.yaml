@@ -1,0 +1,14 @@
+logger:
+  logging-level: info
+document-ontology:
+  builders:
+  - language: en
+    include-title-triples: true
+    include-content-triples: true
+    min-keyword-length: 3
+    max-repair-attempts: 2
+    alignment:
+      enabled: true
+      similarity-threshold: 0.85
+      min-cluster-size: 2
+    save-alignment: false

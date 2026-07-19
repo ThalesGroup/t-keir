@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: otel-collector
+    static_configs:
+      - targets: ["otel-collector:8889"]
+  - job_name: tkeir-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tkeir-api:8090"]
+  - job_name: tkeir-ingest
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tkeir-ingest:8091"]
+  - job_name: tkeir-audit
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tkeir-audit:8093"]
+  - job_name: tkeir-governor
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["tkeir-governor:8094"]

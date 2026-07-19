@@ -1,0 +1,22 @@
+enabled: true
+replicaCount: 1
+image:
+  repository: quay.io/keycloak/keycloak
+  tag: "26.0.7"
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 8080
+admin:
+  username: admin
+  existingSecret: ""
+  # Dev only — override via secret in production
+  password: change-me
+realm:
+  # Mount deploy/keycloak/realm-tkeir.json via ConfigMap created by umbrella
+  configMapName: tkeir-keycloak-realm
+  fileName: realm-tkeir.json
+resources: {}
+serviceAccount:
+  create: true
+  name: ""

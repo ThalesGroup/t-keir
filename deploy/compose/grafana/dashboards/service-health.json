@@ -1,0 +1,41 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "T-KEIR Service Health",
+      "type": "text",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "## T-KEIR / Service Health\n\nPrometheus scrapes `/metrics` from `tkeir-api`, `tkeir-ingest`, `tkeir-audit`, and `tkeir-governor` via the Compose `observability` profile.\n\nDrill traces by `correlation_id` in Tempo; logs in Loki; audit reports via HMI `/admin`."
+      }
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "id": 1,
+      "targets": [
+        {
+          "expr": "up{job=~\"tkeir-.*\"}",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Scrape up",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["tkeir"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "T-KEIR / Service Health",
+  "uid": "tkeir-service-health",
+  "version": 1
+}

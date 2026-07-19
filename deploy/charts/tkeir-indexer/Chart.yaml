@@ -1,0 +1,10 @@
+apiVersion: v2
+name: tkeir-indexer
+description: T-KEIR pipeline + Vespa indexer Job
+type: application
+version: 0.1.0
+appVersion: "2.0.0"
+dependencies:
+  - name: tkeir-lib
+    version: "0.1.0"
+    repository: "file://../tkeir-lib"

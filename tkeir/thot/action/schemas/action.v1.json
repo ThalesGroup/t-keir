@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://thalesgroup.github.io/t-keir/schemas/action.v1.json",
+  "title": "T-KEIR ActionRecord v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "action_id",
+    "correlation_id",
+    "occurred_at",
+    "actor",
+    "intent",
+    "context",
+    "decision",
+    "execution",
+    "result",
+    "impact",
+    "evidence",
+    "privacy"
+  ],
+  "properties": {
+    "schema": { "const": "tkeir.action.v1" },
+    "action_id": { "type": "string", "minLength": 26, "maxLength": 26 },
+    "correlation_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "parent_action_id": { "type": ["string", "null"] },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "actor": {
+      "type": "object",
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "enum": ["human", "service", "agent"] },
+        "id": { "type": "string" },
+        "spiffe_id": { "type": ["string", "null"] },
+        "session_id": { "type": ["string", "null"] }
+      }
+    },
+    "delegation_chain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from_sub", "to_client", "jti", "expires_at"],
+        "properties": {
+          "from_sub": { "type": "string" },
+          "to_client": { "type": "string" },
+          "jti": { "type": "string" },
+          "expires_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "intent": {
+      "type": "object",
+      "required": ["declared", "scope_source"],
+      "properties": {
+        "declared": { "type": "string" },
+        "scope_source": { "enum": ["oauth-scope", "manual"] },
+        "mandate_ref": { "type": ["string", "null"] }
+      }
+    },
+    "context": {
+      "type": "object",
+      "required": ["env", "service", "versions", "request_hash"],
+      "properties": {
+        "env": { "type": "string" },
+        "service": { "type": "string" },
+        "versions": { "type": "object" },
+        "request_hash": { "type": "string" }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "required": ["policy_result"],
+      "properties": {
+        "policy_result": { "enum": ["allow", "deny", "escalate"] },
+        "rules_fired": { "type": "array", "items": { "type": "string" } },
+        "model": { "type": "object" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "started_at": { "type": "string" },
+        "ended_at": { "type": "string" },
+        "status": {
+          "enum": ["success", "failure", "blocked", "rolled_back"]
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "output_hash": { "type": "string" },
+        "doc_ids": { "type": "array", "items": { "type": "string" } },
+        "chunk_ids": { "type": "array", "items": { "type": "string" } },
+        "scores_digest": { "type": "string" },
+        "error": { "type": ["string", "null"] }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "required": ["class"],
+      "properties": {
+        "class": {
+          "enum": ["read", "write", "destructive", "financial"]
+        },
+        "budget_consumed": {
+          "type": "object",
+          "properties": {
+            "units": { "type": "string" },
+            "amount": { "type": "number" }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "trace_id": { "type": "string" },
+        "log_stream": { "type": "string" },
+        "prev_hash": { "type": "string" },
+        "record_hash": { "type": "string" },
+        "signature": { "type": ["string", "null"] },
+        "worm_segment": { "type": ["string", "null"] }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "properties": {
+        "subject_refs": { "type": "array", "items": { "type": "string" } },
+        "pii": { "type": "boolean" }
+      }
+    },
+    "ext": { "type": "object" }
+  },
+  "additionalProperties": false
+}

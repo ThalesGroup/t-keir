@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tkeir-vespa.fullname" . }}
+  labels:
+    {{- include "tkeir-vespa.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.query.type }}
+  ports:
+    - name: query
+      port: {{ .Values.service.query.port }}
+      targetPort: query
+    - name: config
+      port: {{ .Values.service.config.port }}
+      targetPort: config
+  selector:
+    {{- include "tkeir-vespa.selectorLabels" . | nindent 4 }}

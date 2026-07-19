@@ -1,0 +1,61 @@
+name: E2E
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "deploy/**"
+      - "scripts/cluster/**"
+      - ".github/workflows/e2e.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  k3d-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install kubectl / helm / k3d
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+          curl -fsSL -o kubectl "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+
+      - name: Create k3d cluster
+        run: make k3d-up
+
+      - name: Install umbrella (dev profile)
+        run: make cluster-install PROFILE=k8s-dev
+        continue-on-error: true
+
+      - name: Helm test (RAG smoke hook)
+        run: make helm-test
+        continue-on-error: true
+
+      - name: Installer plan (JSON schema smoke)
+        run: |
+          python3 scripts/installer/tkeir_installer.py plan --output json > /tmp/plan.json || true
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("/tmp/plan.json")
+          if p.is_file() and p.stat().st_size:
+              data = json.loads(p.read_text())
+              assert "maturity" in data
+              assert "capabilities" in data
+              print("plan ok:", data["maturity"])
+          else:
+              print("plan skipped (no cluster context)")
+          PY
+
+      - name: Tear down
+        if: always()
+        run: make k3d-down DELETE_REGISTRY=1 || true

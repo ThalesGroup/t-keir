@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://t-keir.local/schemas/eu-compliance-input.schema.json",
+  "title": "T-KEIR EU Compliance OPA Input",
+  "type": "object",
+  "required": ["meta", "evidence", "ai_act", "cra", "gdpr", "nis2", "dora", "pld"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "generated_at": { "type": "string" },
+        "repo_root": { "type": "string" },
+        "tool": { "type": "string" }
+      }
+    },
+    "product": { "type": "object" },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["boolean", "integer", "null"]
+      }
+    },
+    "ai_act": {
+      "type": "object",
+      "required": ["classification"],
+      "properties": {
+        "classification": {
+          "type": "object",
+          "required": ["determined_category"],
+          "properties": {
+            "determined_category": {
+              "type": "string",
+              "enum": [
+                "UNACCEPTABLE",
+                "HIGH_RISK",
+                "LIMITED_RISK",
+                "MINIMAL_RISK",
+                "GPAI_STANDARD",
+                "GPAI_SYSTEMIC"
+              ]
+            },
+            "is_ai_system": { "type": "boolean" },
+            "is_gpai_model": { "type": "boolean" },
+            "gpai_systemic_risk": { "type": "boolean" },
+            "annex_iii_applies": { "type": "boolean" },
+            "prohibited_practices": { "type": "object" }
+          }
+        },
+        "attestation": { "type": "object" }
+      }
+    },
+    "cra": { "type": "object" },
+    "gdpr": { "type": "object" },
+    "nis2": {
+      "type": "object",
+      "properties": {
+        "entity_type": {
+          "type": "string",
+          "enum": ["ESSENTIAL", "IMPORTANT", "OUT_OF_SCOPE"]
+        }
+      }
+    },
+    "dora": {
+      "type": "object",
+      "properties": {
+        "in_scope": { "type": "boolean" }
+      }
+    },
+    "pld": {
+      "type": "object",
+      "properties": {
+        "in_scope": { "type": "boolean" }
+      }
+    }
+  }
+}

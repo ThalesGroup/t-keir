@@ -1,0 +1,33 @@
+CHART NAME: {{ .Chart.Name }}
+CHART VERSION: {{ .Chart.Version }}
+APP VERSION: {{ .Chart.AppVersion }}
+
+Enabled components:
+{{- if index .Values "vespa" "enabled" }}
+  - vespa  (query :8080, config :19071)
+{{- end }}
+{{- if index .Values "api" "enabled" }}
+  - api    (RAG :8090)  →  kubectl port-forward svc/{{ .Release.Name }}-api 8090:8090
+{{- end }}
+{{- if index .Values "hmi" "enabled" }}
+  - hmi    (:3000)      →  kubectl port-forward svc/{{ .Release.Name }}-hmi 3000:3000
+{{- end }}
+{{- if index .Values "indexer" "enabled" }}
+  - indexer (CronJob; suspended unless schedule set)
+{{- end }}
+{{- if index .Values "inference" "enabled" }}
+  - inference (mode={{ index .Values "inference" "mode" }})
+{{- end }}
+
+Smoke:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ .Release.Name }}-api 8090:8090
+  curl -fsS http://127.0.0.1:8090/health
+  curl -fsS -D- -X POST http://127.0.0.1:8090/rag/query \
+    -H 'content-type: application/json' \
+    -d '{"query":"ping","language":"en","hits":3}' | head
+
+Helm test:
+  helm test {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+Disable a component:
+  helm upgrade {{ .Release.Name }} . -f values-dev.yaml --set api.enabled=false

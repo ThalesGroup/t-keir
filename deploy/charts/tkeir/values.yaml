@@ -1,0 +1,78 @@
+# Default umbrella values — permissive k8s-dev profile.
+# Override with values-dev.yaml / values-secure.yaml / values-platform.yaml
+
+global:
+  imageRegistry: ghcr.io/thalesgroup/t-keir
+  imageTag: "2.0.0"
+  env: dev
+
+vespa:
+  enabled: true
+  nameOverride: vespa
+  resourceProfile: laptop
+  persistence:
+    enabled: true
+    size: 10Gi
+
+api:
+  enabled: true
+  nameOverride: api
+  image:
+    repository: ghcr.io/thalesgroup/t-keir/tkeir-api
+    tag: "2.0.0"
+  env:
+    PROVIDER: ollama
+    EMBEDDING_MODEL: bge-m3
+    LLM_MODEL: mistral-nemo
+    # host.docker.internal works on Docker Desktop / OrbStack; override for k3d
+    OLLAMA_BASE_URL: http://host.docker.internal:11434
+    TKEIR_ENV: dev
+    # VESPA_* filled by values-dev / NOTES guidance when empty
+
+hmi:
+  enabled: true
+  nameOverride: hmi
+  image:
+    repository: ghcr.io/thalesgroup/t-keir/tkeir-hmi
+    tag: "2.0.0"
+  env:
+    AUTH_ENABLED: "false"
+    API_PROXY_TIMEOUT_MS: "300000"
+
+indexer:
+  enabled: true
+  nameOverride: indexer
+  image:
+    repository: ghcr.io/thalesgroup/t-keir/tkeir-indexer
+    tag: "2.0.0"
+  schedule: ""
+  env:
+    PROVIDER: ollama
+    EMBEDDING_MODEL: bge-m3
+    OLLAMA_BASE_URL: http://host.docker.internal:11434
+
+inference:
+  enabled: true
+  nameOverride: inference
+  mode: external
+  provider: ollama
+  embeddingModel: bge-m3
+  llmModel: mistral-nemo
+  ollama:
+    enabled: false
+
+# Phase 3+ components
+ingest:
+  enabled: false
+governor:
+  enabled: false
+  mode: observe
+audit:
+  enabled: false
+keycloak:
+  enabled: false
+  useExisting: false
+
+oidc:
+  issuer: ""
+  clientId: tkeir-hmi

@@ -1,0 +1,64 @@
+# Digests: see deploy/versions.lock.yaml (node_base). Aligns with .devcontainer Node 22.
+ARG NODE_BASE=node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+
+# ---------------------------------------------------------------------------
+# Dependencies
+# ---------------------------------------------------------------------------
+FROM ${NODE_BASE} AS deps
+WORKDIR /app
+COPY tkeir-hmi/package.json tkeir-hmi/package-lock.json ./
+# Prefer npm ci when the lockfile is complete; fall back to install for
+# optional platform optionalDeps (emnapi) that some lockfile revisions omit.
+RUN npm ci || npm install
+
+# ---------------------------------------------------------------------------
+# Build (Next.js standalone)
+# ---------------------------------------------------------------------------
+FROM ${NODE_BASE} AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY tkeir-hmi/ ./
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+# ---------------------------------------------------------------------------
+# Runtime — server-side env only (API_URL, OIDC_*); never NEXT_PUBLIC_API_URL
+# ---------------------------------------------------------------------------
+FROM ${NODE_BASE} AS runtime
+
+ARG VERSION=0.0.0-dev
+ARG GIT_COMMIT=unknown
+ARG BUILD_DATE=unknown
+
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0 \
+    TKEIR_SERVICE=tkeir-hmi \
+    API_URL=http://tkeir-api:8090 \
+    API_PROXY_TIMEOUT_MS=300000
+
+RUN groupadd --gid 10001 tkeir \
+    && useradd --uid 10001 --gid 10001 --create-home --shell /usr/sbin/nologin tkeir
+
+WORKDIR /app
+COPY --from=build --chown=10001:10001 /app/public ./public
+COPY --from=build --chown=10001:10001 /app/.next/standalone ./
+COPY --from=build --chown=10001:10001 /app/.next/static ./.next/static
+
+USER 10001
+EXPOSE 3000
+
+LABEL org.opencontainers.image.title="tkeir-hmi" \
+      org.opencontainers.image.description="T-KEIR Next.js Human-Machine Interface" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.source="https://github.com/ThalesGroup/t-keir" \
+      org.opencontainers.image.vendor="Thales Group" \
+      org.opencontainers.image.licenses="MIT"
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+CMD ["node", "server.js"]

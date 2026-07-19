@@ -1,0 +1,15 @@
+# T-KEIR MCP server (Phase A — read-only tools)
+service: tkeir-mcp
+host: "0.0.0.0"
+port: 8093
+# When true, require Bearer JWT with intent:search (or MCP_DEV_TOKEN).
+auth_enabled: false
+# observe = missing scope allowed (logged); enforce = deny
+governor_mode: observe
+# Optional RAG HTTP base for rag_query generation (e.g. http://tkeir-api:8090)
+rag_url: ""
+tools:
+  search: true
+  rag_query: true
+  ontology_query: true
+  document_get: true

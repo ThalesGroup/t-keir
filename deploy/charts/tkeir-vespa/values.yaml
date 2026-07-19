@@ -1,0 +1,53 @@
+# laptop | small | production — memory floors are honest minima
+resourceProfile: laptop
+
+image:
+  repository: vespaengine/vespa
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  query:
+    type: ClusterIP
+    port: 8080
+  config:
+    type: ClusterIP
+    port: 19071
+
+persistence:
+  enabled: true
+  size: 20Gi
+  storageClass: ""
+
+resources:
+  laptop:
+    requests:
+      cpu: 500m
+      memory: 4Gi
+    limits:
+      memory: 8Gi
+  small:
+    requests:
+      cpu: "1"
+      memory: 8Gi
+    limits:
+      memory: 16Gi
+  production:
+    requests:
+      cpu: "2"
+      memory: 16Gi
+    limits:
+      memory: 32Gi
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  readOnlyRootFilesystem: false
+
+serviceAccount:
+  create: true
+  name: ""

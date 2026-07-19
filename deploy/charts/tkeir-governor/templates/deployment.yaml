@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tkeir-governor.fullname" . }}
+  labels:
+    {{- include "tkeir-governor.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "tkeir-governor.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "tkeir-governor.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "tkeir-governor.serviceAccountName" . }}
+      securityContext:
+        {{- include "tkeir-lib.securityContext" . | nindent 8 }}
+      containers:
+        - name: tkeir-governor
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          env:
+            - name: GOVERNOR_HOST
+              value: "0.0.0.0"
+            - name: GOVERNOR_PORT
+              value: {{ .Values.service.port | quote }}
+            - name: GOVERNOR_MODE
+              value: {{ .Values.mode | quote }}
+            - name: GOVERNOR_STATE_ROOT
+              value: /var/tkeir/governor
+            {{- range $k, $v := .Values.env }}
+            {{- if $v }}
+            - name: {{ $k }}
+              value: {{ $v | quote }}
+            {{- end }}
+            {{- end }}
+          livenessProbe:
+            {{- include "tkeir-lib.livenessProbe" (dict "port" "http" "path" "/health" "initialDelaySeconds" 20) | nindent 12 }}
+          readinessProbe:
+            {{- include "tkeir-lib.readinessProbe" (dict "port" "http" "path" "/ready" "initialDelaySeconds" 10) | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: state
+              mountPath: /var/tkeir/governor
+      volumes:
+        - name: state
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "tkeir-governor.fullname" . }}-state
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

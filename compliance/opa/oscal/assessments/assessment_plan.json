@@ -1,0 +1,49 @@
+{
+  "assessment-plan": {
+    "uuid": "f6a7b8c9-d0e1-5f2a-3b4c-5d6e7f8091a2",
+    "metadata": {
+      "title": "T-KEIR EU Compliance Assessment Plan (OPA automated)",
+      "last-modified": "2026-07-18T00:00:00Z",
+      "version": "2.0.0",
+      "oscal-version": "1.1.2"
+    },
+    "import-ssp": { "href": "../ssp/tkeir_ssp.json" },
+    "reviewed-controls": {
+      "control-selections": [{ "include-all": {} }]
+    },
+    "assessment-subjects": [
+      {
+        "type": "component",
+        "description": "T-KEIR repository and generated evidence under reports/",
+        "include-all": {}
+      }
+    ],
+    "assessment-assets": {
+      "components": [
+        {
+          "uuid": "a7b8c9d0-e1f2-5a3b-4c5d-6e7f8091a2b3",
+          "type": "software",
+          "title": "Open Policy Agent (OPA)",
+          "description": "Evaluates compliance/opa/policies/*.rego against generated input JSON.",
+          "status": { "state": "operational" },
+          "props": [
+            { "name": "make-target", "value": "make audit-compliance" },
+            { "name": "policy-root", "value": "compliance/opa/policies/" }
+          ]
+        }
+      ]
+    },
+    "tasks": [
+      {
+        "uuid": "b8c9d0e1-f2a3-5b4c-5d6e-7f8091a2b3c4",
+        "type": "action",
+        "title": "Run OPA EU compliance evaluation",
+        "description": "make audit-compliance → opa eval of eu.ai_act, eu.cra, eu.gdpr, eu.nis2, eu.dora, eu.pld summaries; then opa_to_oscal.py.",
+        "props": [
+          { "name": "method", "value": "AUTOMATED" },
+          { "name": "command", "value": "make audit-compliance" }
+        ]
+      }
+    ]
+  }
+}

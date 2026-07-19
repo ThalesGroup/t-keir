@@ -1,0 +1,10 @@
+apiVersion: v2
+name: tkeir-governor
+description: T-KEIR runtime governor (enforce, budgets, kill switch)
+type: application
+version: 0.1.0
+appVersion: "2.0.0"
+dependencies:
+  - name: tkeir-lib
+    version: "0.1.0"
+    repository: "file://../tkeir-lib"

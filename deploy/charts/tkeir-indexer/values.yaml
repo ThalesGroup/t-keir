@@ -1,0 +1,35 @@
+# CronJob schedule; empty = Deployment-less Job on demand via helm hooks only
+schedule: ""
+
+image:
+  repository: ghcr.io/thalesgroup/t-keir/tkeir-indexer
+  tag: ""
+  pullPolicy: IfNotPresent
+
+env:
+  PROVIDER: ollama
+  EMBEDDING_MODEL: bge-m3
+  LLM_MODEL: mistral-nemo
+  OLLAMA_BASE_URL: ""
+  VESPA_URL: ""
+  PIPELINE_INPUT: /data/in
+  PIPELINE_OUTPUT: /data/out
+  TKEIR_SERVICE: tkeir-indexer
+
+command: ["pipeline-index"]
+
+resources:
+  requests:
+    memory: 2Gi
+  limits:
+    memory: 8Gi
+
+securityContext:
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  readOnlyRootFilesystem: false
+
+serviceAccount:
+  create: true
+  name: ""

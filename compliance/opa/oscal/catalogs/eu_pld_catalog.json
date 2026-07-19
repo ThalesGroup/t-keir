@@ -1,0 +1,740 @@
+{
+  "catalog": {
+    "uuid": "10a87869-7737-5bd5-8747-89986575e44f",
+    "metadata": {
+      "title": "EU PLD (Directive 2024/2853) — OSCAL Control Catalog",
+      "last-modified": "2024-08-01T00:00:00Z",
+      "version": "2024/2853",
+      "oscal-version": "1.1.2",
+      "roles": [
+        {
+          "id": "creator",
+          "title": "T-KEIR Compliance Team"
+        }
+      ],
+      "parties": [
+        {
+          "uuid": "5754a984-d25b-59c5-9b6a-0b9eb8cfcc26",
+          "type": "organization",
+          "name": "Thales Group"
+        }
+      ]
+    },
+    "groups": [
+      {
+        "id": "gate-in_scope",
+        "title": "Controls (gate: in_scope)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "in_scope"
+          }
+        ],
+        "controls": [
+          {
+            "id": "pld-art-4",
+            "class": "pld-obligation",
+            "title": "Art.4 — Product includes software and AI systems.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.4"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "is_software"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-4-statement",
+                "name": "statement",
+                "prose": "Product includes software and AI systems."
+              },
+              {
+                "id": "pld-art-4-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Set product.is_software=true in overrides."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-5",
+            "class": "pld-obligation",
+            "title": "Art.5 — Defective product — proof chain (damage/defect/causal link) supported by audit.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.5"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "correlation_id_in_code, action_records_bind_versions"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-5-statement",
+                "name": "statement",
+                "prose": "Defective product — proof chain (damage/defect/causal link) supported by audit."
+              },
+              {
+                "id": "pld-art-5-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Use `make audit-report CID=…`."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-6-1",
+            "class": "pld-obligation",
+            "title": "Art.6(1) — Product defectiveness criteria (inventory + vuln evidence).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.6(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "sbom_cyclonedx_present, trivy_report_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-6-1-statement",
+                "name": "statement",
+                "prose": "Product defectiveness criteria (inventory + vuln evidence)."
+              },
+              {
+                "id": "pld-art-6-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish SBOM and trivy reports."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-6-2",
+            "class": "pld-obligation",
+            "title": "Art.6(2) — Legitimate expectations of product safety.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.6(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "values_secure_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-6-2-statement",
+                "name": "statement",
+                "prose": "Legitimate expectations of product safety."
+              },
+              {
+                "id": "pld-art-6-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship values-secure.yaml."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-6-3",
+            "class": "pld-obligation",
+            "title": "Art.6(3) — Defect includes software updates introducing defects.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.6(3)"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "versions_lock_present, changelog_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-6-3-statement",
+                "name": "statement",
+                "prose": "Defect includes software updates introducing defects."
+              },
+              {
+                "id": "pld-art-6-3-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Maintain versions.lock.yaml and CHANGELOG."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-7",
+            "class": "pld-obligation",
+            "title": "Art.7 — Economic operator liable (manufacturer / importer / authorised rep).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.7"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "economic_operator_role_documented"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-7-statement",
+                "name": "statement",
+                "prose": "Economic operator liable (manufacturer / importer / authorised rep)."
+              },
+              {
+                "id": "pld-art-7-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest economic_operator_role_documented."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-8",
+            "class": "pld-obligation",
+            "title": "Art.8 — Rebuttable presumptions of defect.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.8"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "rebuttable_presumptions_acknowledged"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-8-statement",
+                "name": "statement",
+                "prose": "Rebuttable presumptions of defect."
+              },
+              {
+                "id": "pld-art-8-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest rebuttable_presumptions_acknowledged."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-9",
+            "class": "pld-obligation",
+            "title": "Art.9 — Damage covered (including data corruption) — WORM integrity.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_verify_target, audit_worm_retention_set"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-9-statement",
+                "name": "statement",
+                "prose": "Damage covered (including data corruption) — WORM integrity."
+              },
+              {
+                "id": "pld-art-9-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make audit-verify`; retain WORM segments."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-10",
+            "class": "pld-obligation",
+            "title": "Art.10 — Exemptions from liability.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.10"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "liability_exemptions_documented"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-10-statement",
+                "name": "statement",
+                "prose": "Exemptions from liability."
+              },
+              {
+                "id": "pld-art-10-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest liability_exemptions_documented."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-11-1",
+            "class": "pld-obligation",
+            "title": "Art.11(1) — Liability limited to 10 years from market placement (version history).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.11(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "changelog_present, sbom_cyclonedx_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-11-1-statement",
+                "name": "statement",
+                "prose": "Liability limited to 10 years from market placement (version history)."
+              },
+              {
+                "id": "pld-art-11-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Maintain CHANGELOG.md and SBOM history."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-12",
+            "class": "pld-obligation",
+            "title": "Art.12 — Disclosure of evidence — manufacturer must disclose relevant data.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.12"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "correlation_id_in_code, action_records_bind_versions"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-12-statement",
+                "name": "statement",
+                "prose": "Disclosure of evidence — manufacturer must disclose relevant data."
+              },
+              {
+                "id": "pld-art-12-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Use `make audit-report CID=…`."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-13",
+            "class": "pld-obligation",
+            "title": "Art.13 — Court power to order disclosure — process documented.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "court_disclosure_process"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-13-statement",
+                "name": "statement",
+                "prose": "Court power to order disclosure — process documented."
+              },
+              {
+                "id": "pld-art-13-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest court_disclosure_process."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-14",
+            "class": "pld-obligation",
+            "title": "Art.14 — Relevant evidence preserved (retention ≥ 3650 days).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_worm_retention_days"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-14-statement",
+                "name": "statement",
+                "prose": "Relevant evidence preserved (retention ≥ 3650 days)."
+              },
+              {
+                "id": "pld-art-14-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Set AUDIT_WORM_RETENTION_DAYS >= 3650; run audit-verify."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-15",
+            "class": "pld-obligation",
+            "title": "Art.15 — Burden of proof (rebuttable presumption where evidence withheld).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.15"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-15-statement",
+                "name": "statement",
+                "prose": "Burden of proof (rebuttable presumption where evidence withheld)."
+              },
+              {
+                "id": "pld-art-15-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make audit-evidence`."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-16",
+            "class": "pld-obligation",
+            "title": "Art.16 — Limitation period — 3 years from awareness of damage (retention sufficient).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_worm_retention_days"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-16-statement",
+                "name": "statement",
+                "prose": "Limitation period — 3 years from awareness of damage (retention sufficient)."
+              },
+              {
+                "id": "pld-art-16-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ensure AUDIT_WORM_RETENTION_DAYS covers ≥ 3 years."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-17",
+            "class": "pld-obligation",
+            "title": "Art.17 — Long-stop period — 10 years from market placement (version history).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "versions_lock_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-17-statement",
+                "name": "statement",
+                "prose": "Long-stop period — 10 years from market placement (version history)."
+              },
+              {
+                "id": "pld-art-17-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Maintain deploy/versions.lock.yaml version history."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-18",
+            "class": "pld-obligation",
+            "title": "Art.18 — Right to full compensation.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.18"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "right_to_full_compensation"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-18-statement",
+                "name": "statement",
+                "prose": "Right to full compensation."
+              },
+              {
+                "id": "pld-art-18-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest right_to_full_compensation."
+              }
+            ]
+          },
+          {
+            "id": "pld-art-22",
+            "class": "pld-obligation",
+            "title": "Art.22 — Contractual exclusions prohibited.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.22"
+              },
+              {
+                "name": "applies-to",
+                "value": "in_scope"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.pld.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "contractual_exclusions_prohibited"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "pld-art-22-statement",
+                "name": "statement",
+                "prose": "Contractual exclusions prohibited."
+              },
+              {
+                "id": "pld-art-22-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest contractual_exclusions_prohibited."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

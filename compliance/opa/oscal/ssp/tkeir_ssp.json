@@ -1,0 +1,55 @@
+{
+  "system-security-plan": {
+    "uuid": "c3d4e5f6-a7b8-5c9d-0e1f-2a3b4c5d6e7f",
+    "metadata": {
+      "title": "T-KEIR System Security Plan (EU Compliance)",
+      "last-modified": "2026-07-18T00:00:00Z",
+      "version": "2.0.0",
+      "oscal-version": "1.1.2"
+    },
+    "import-profile": {
+      "href": "../profiles/tkeir_eu_profile.json"
+    },
+    "system-characteristics": {
+      "system-ids": [
+        { "id": "tkeir", "identifier-type": "https://github.com/ThalesGroup/t-keir" }
+      ],
+      "system-name": "T-KEIR",
+      "description": "Thales Knowledge Extraction to Information Retrieval — document analysis, Vespa RAG, ingest, audit, and governor stack.",
+      "security-sensitivity-level": "moderate",
+      "system-information": {
+        "information-types": [
+          {
+            "uuid": "d4e5f6a7-b8c9-5d0e-1f2a-3b4c5d6e7f80",
+            "title": "Document analysis and RAG operational data",
+            "description": "Ingested documents, embeddings, ActionRecords (request_hash by default), audit WORM segments.",
+            "confidentiality-impact": { "base": "moderate" },
+            "integrity-impact": { "base": "high" },
+            "availability-impact": { "base": "moderate" }
+          }
+        ]
+      },
+      "security-impact-level": {
+        "security-objective-confidentiality": "moderate",
+        "security-objective-integrity": "high",
+        "security-objective-availability": "moderate"
+      },
+      "status": { "state": "operational" }
+    },
+    "system-implementation": {
+      "components": [
+        {
+          "uuid": "e5f6a7b8-c9d0-5e1f-2a3b-4c5d6e7f8091",
+          "type": "this-system",
+          "title": "T-KEIR platform",
+          "description": "Umbrella system covering pipeline, Vespa RAG, HMI, ingest, audit, governor, and Keycloak.",
+          "status": { "state": "operational" }
+        }
+      ]
+    },
+    "control-implementation": {
+      "description": "Control implementations are documented in ../component-definitions/tkeir_components.json and assessed via OPA policies under compliance/opa/policies/.",
+      "implemented-requirements": []
+    }
+  }
+}

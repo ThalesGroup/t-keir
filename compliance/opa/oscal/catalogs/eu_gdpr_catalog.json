@@ -1,0 +1,1715 @@
+{
+  "catalog": {
+    "uuid": "9bf3fe13-f951-5b4b-b2f5-5290361d29f3",
+    "metadata": {
+      "title": "EU GDPR (Regulation 2016/679) — OSCAL Control Catalog",
+      "last-modified": "2024-08-01T00:00:00Z",
+      "version": "2016/679",
+      "oscal-version": "1.1.2",
+      "roles": [
+        {
+          "id": "creator",
+          "title": "T-KEIR Compliance Team"
+        }
+      ],
+      "parties": [
+        {
+          "uuid": "5754a984-d25b-59c5-9b6a-0b9eb8cfcc26",
+          "type": "organization",
+          "name": "Thales Group"
+        }
+      ]
+    },
+    "groups": [
+      {
+        "id": "gate-all",
+        "title": "Controls (gate: all)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "all"
+          }
+        ],
+        "controls": [
+          {
+            "id": "gdpr-art-5-1-a",
+            "class": "gdpr-obligation",
+            "title": "Art.5(1)(a) — Lawfulness, fairness, transparency.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.5(1)(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "lawfulness_fairness_transparency"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-5-1-a-statement",
+                "name": "statement",
+                "prose": "Lawfulness, fairness, transparency."
+              },
+              {
+                "id": "gdpr-art-5-1-a-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest lawfulness_fairness_transparency."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-5-1-b",
+            "class": "gdpr-obligation",
+            "title": "Art.5(1)(b) — Purpose limitation.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.5(1)(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "purpose_limitation"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-5-1-b-statement",
+                "name": "statement",
+                "prose": "Purpose limitation."
+              },
+              {
+                "id": "gdpr-art-5-1-b-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest purpose_limitation."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-5-1-c",
+            "class": "gdpr-obligation",
+            "title": "Art.5(1)(c) — Data minimisation (request_hash only).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.5(1)(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "action_schema_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-5-1-c-statement",
+                "name": "statement",
+                "prose": "Data minimisation (request_hash only)."
+              },
+              {
+                "id": "gdpr-art-5-1-c-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Keep ActionRecord request_hash-only by default."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-5-1-d",
+            "class": "gdpr-obligation",
+            "title": "Art.5(1)(d) — Accuracy.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.5(1)(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "accuracy"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-5-1-d-statement",
+                "name": "statement",
+                "prose": "Accuracy."
+              },
+              {
+                "id": "gdpr-art-5-1-d-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest accuracy."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-5-1-e",
+            "class": "gdpr-obligation",
+            "title": "Art.5(1)(e) — Storage limitation (retention configured).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.5(1)(e)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_worm_retention_set"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-5-1-e-statement",
+                "name": "statement",
+                "prose": "Storage limitation (retention configured)."
+              },
+              {
+                "id": "gdpr-art-5-1-e-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Configure AUDIT_WORM_RETENTION_DAYS."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-5-1-f",
+            "class": "gdpr-obligation",
+            "title": "Art.5(1)(f) — Integrity and confidentiality.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.5(1)(f)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "privacy_py_present, audit_worm_retention_set"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-5-1-f-statement",
+                "name": "statement",
+                "prose": "Integrity and confidentiality."
+              },
+              {
+                "id": "gdpr-art-5-1-f-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship privacy.py and WORM hash chain."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-5-2",
+            "class": "gdpr-obligation",
+            "title": "Art.5(2) — Accountability demonstrated.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.5(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-5-2-statement",
+                "name": "statement",
+                "prose": "Accountability demonstrated."
+              },
+              {
+                "id": "gdpr-art-5-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make audit-evidence`."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-6",
+            "class": "gdpr-obligation",
+            "title": "Art.6 — Legal basis for processing documented.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.6"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "legal_basis_documented"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-6-statement",
+                "name": "statement",
+                "prose": "Legal basis for processing documented."
+              },
+              {
+                "id": "gdpr-art-6-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest legal_basis_documented."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-9-1",
+            "class": "gdpr-obligation",
+            "title": "Art.9(1) — Special categories not processed without Art.9(2) basis.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "special_categories_basis"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-9-1-statement",
+                "name": "statement",
+                "prose": "Special categories not processed without Art.9(2) basis."
+              },
+              {
+                "id": "gdpr-art-9-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest special_categories_basis."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-12",
+            "class": "gdpr-obligation",
+            "title": "Art.12 — Transparent communication to data subjects.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.12"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "transparent_communication"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-12-statement",
+                "name": "statement",
+                "prose": "Transparent communication to data subjects."
+              },
+              {
+                "id": "gdpr-art-12-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest transparent_communication."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-13",
+            "class": "gdpr-obligation",
+            "title": "Art.13 — Information provided at collection.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "information_at_collection"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-13-statement",
+                "name": "statement",
+                "prose": "Information provided at collection."
+              },
+              {
+                "id": "gdpr-art-13-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest information_at_collection."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-14",
+            "class": "gdpr-obligation",
+            "title": "Art.14 — Information where data not collected from subject.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "information_not_from_subject"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-14-statement",
+                "name": "statement",
+                "prose": "Information where data not collected from subject."
+              },
+              {
+                "id": "gdpr-art-14-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest information_not_from_subject."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-15",
+            "class": "gdpr-obligation",
+            "title": "Art.15 — Right of access implemented.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.15"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "right_of_access"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-15-statement",
+                "name": "statement",
+                "prose": "Right of access implemented."
+              },
+              {
+                "id": "gdpr-art-15-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest right_of_access."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-16",
+            "class": "gdpr-obligation",
+            "title": "Art.16 — Right to rectification.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "right_to_rectification"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-16-statement",
+                "name": "statement",
+                "prose": "Right to rectification."
+              },
+              {
+                "id": "gdpr-art-16-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest right_to_rectification."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-17",
+            "class": "gdpr-obligation",
+            "title": "Art.17 — Right to erasure — crypto-shredding.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "privacy_py_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-17-statement",
+                "name": "statement",
+                "prose": "Right to erasure — crypto-shredding."
+              },
+              {
+                "id": "gdpr-art-17-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship thot/audit/privacy.py (`tkeir-audit forget`)."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-18",
+            "class": "gdpr-obligation",
+            "title": "Art.18 — Right to restriction of processing.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.18"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "right_to_restriction"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-18-statement",
+                "name": "statement",
+                "prose": "Right to restriction of processing."
+              },
+              {
+                "id": "gdpr-art-18-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest right_to_restriction."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-19",
+            "class": "gdpr-obligation",
+            "title": "Art.19 — Notification obligation on erasure/restriction.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.19"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "notification_on_erasure"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-19-statement",
+                "name": "statement",
+                "prose": "Notification obligation on erasure/restriction."
+              },
+              {
+                "id": "gdpr-art-19-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest notification_on_erasure."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-20",
+            "class": "gdpr-obligation",
+            "title": "Art.20 — Right to data portability.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.20"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "right_to_portability"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-20-statement",
+                "name": "statement",
+                "prose": "Right to data portability."
+              },
+              {
+                "id": "gdpr-art-20-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest right_to_portability."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-21",
+            "class": "gdpr-obligation",
+            "title": "Art.21 — Right to object.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.21"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "right_to_object"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-21-statement",
+                "name": "statement",
+                "prose": "Right to object."
+              },
+              {
+                "id": "gdpr-art-21-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest right_to_object."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-22",
+            "class": "gdpr-obligation",
+            "title": "Art.22 — Automated decision-making safeguards / human approval.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.22"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "governor_approvals_present, automated_decision_safeguards"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-22-statement",
+                "name": "statement",
+                "prose": "Automated decision-making safeguards / human approval."
+              },
+              {
+                "id": "gdpr-art-22-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest automated_decision_safeguards; use governor approvals."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-24",
+            "class": "gdpr-obligation",
+            "title": "Art.24 — Controller responsibility and accountability.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.24"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty, compliance_gdpr_doc"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-24-statement",
+                "name": "statement",
+                "prose": "Controller responsibility and accountability."
+              },
+              {
+                "id": "gdpr-art-24-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make audit-evidence` / maintain gdpr.md."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-25",
+            "class": "gdpr-obligation",
+            "title": "Art.25 — Data protection by design and by default.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.25"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "privacy_py_present, action_schema_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-25-statement",
+                "name": "statement",
+                "prose": "Data protection by design and by default."
+              },
+              {
+                "id": "gdpr-art-25-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship privacy.py and ActionRecord minimisation."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-26",
+            "class": "gdpr-obligation",
+            "title": "Art.26 — Joint controller agreement.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.26"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "joint_controller_agreement"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-26-statement",
+                "name": "statement",
+                "prose": "Joint controller agreement."
+              },
+              {
+                "id": "gdpr-art-26-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest joint_controller_agreement."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-27",
+            "class": "gdpr-obligation",
+            "title": "Art.27 — Representative in EU designated.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.27"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "representative_in_eu"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "LOW"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-27-statement",
+                "name": "statement",
+                "prose": "Representative in EU designated."
+              },
+              {
+                "id": "gdpr-art-27-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest representative_in_eu."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-28",
+            "class": "gdpr-obligation",
+            "title": "Art.28 — Processor agreement in place.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.28"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "processor_agreement"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-28-statement",
+                "name": "statement",
+                "prose": "Processor agreement in place."
+              },
+              {
+                "id": "gdpr-art-28-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest processor_agreement."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-29",
+            "class": "gdpr-obligation",
+            "title": "Art.29 — Processing under controller/processor authority only.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.29"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "processing_under_authority_only"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-29-statement",
+                "name": "statement",
+                "prose": "Processing under controller/processor authority only."
+              },
+              {
+                "id": "gdpr-art-29-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest processing_under_authority_only."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-30",
+            "class": "gdpr-obligation",
+            "title": "Art.30 — Records of processing activities (RoPA).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.30"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "records_of_processing"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-30-statement",
+                "name": "statement",
+                "prose": "Records of processing activities (RoPA)."
+              },
+              {
+                "id": "gdpr-art-30-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest records_of_processing."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-31",
+            "class": "gdpr-obligation",
+            "title": "Art.31 — Cooperation with supervisory authority.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.31"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "cooperation_supervisory_authority"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "LOW"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-31-statement",
+                "name": "statement",
+                "prose": "Cooperation with supervisory authority."
+              },
+              {
+                "id": "gdpr-art-31-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest cooperation_supervisory_authority."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-32-1-a",
+            "class": "gdpr-obligation",
+            "title": "Art.32(1)(a) — Pseudonymisation and encryption.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.32(1)(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "privacy_py_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-32-1-a-statement",
+                "name": "statement",
+                "prose": "Pseudonymisation and encryption."
+              },
+              {
+                "id": "gdpr-art-32-1-a-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship thot/audit/privacy.py with envelope keys outside WORM."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-32-1-b",
+            "class": "gdpr-obligation",
+            "title": "Art.32(1)(b) — Ongoing confidentiality, integrity, availability.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.32(1)(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_worm_retention_set"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-32-1-b-statement",
+                "name": "statement",
+                "prose": "Ongoing confidentiality, integrity, availability."
+              },
+              {
+                "id": "gdpr-art-32-1-b-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Enable WORM + hot store hash chain."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-32-1-c",
+            "class": "gdpr-obligation",
+            "title": "Art.32(1)(c) — Ability to restore data after incident.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.32(1)(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "rollback_target_in_makefile, audit_verify_target"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-32-1-c-statement",
+                "name": "statement",
+                "prose": "Ability to restore data after incident."
+              },
+              {
+                "id": "gdpr-art-32-1-c-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Expose rollback-index and audit-verify."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-32-1-d",
+            "class": "gdpr-obligation",
+            "title": "Art.32(1)(d) — Process for regular testing.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.32(1)(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_verify_target, security_report_target"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-32-1-d-statement",
+                "name": "statement",
+                "prose": "Process for regular testing."
+              },
+              {
+                "id": "gdpr-art-32-1-d-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run audit-verify and security-report."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-33",
+            "class": "gdpr-obligation",
+            "title": "Art.33 — Data breach notification to SA ≤72h.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.33"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "breach_notification_72h"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-33-statement",
+                "name": "statement",
+                "prose": "Data breach notification to SA ≤72h."
+              },
+              {
+                "id": "gdpr-art-33-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest breach_notification_72h."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-34",
+            "class": "gdpr-obligation",
+            "title": "Art.34 — Communication to data subjects.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.34"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "communicate_to_subjects"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-34-statement",
+                "name": "statement",
+                "prose": "Communication to data subjects."
+              },
+              {
+                "id": "gdpr-art-34-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest communicate_to_subjects."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-35",
+            "class": "gdpr-obligation",
+            "title": "Art.35 — Data protection impact assessment (DPIA).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.35"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "dpia"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-35-statement",
+                "name": "statement",
+                "prose": "Data protection impact assessment (DPIA)."
+              },
+              {
+                "id": "gdpr-art-35-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest dpia."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-36",
+            "class": "gdpr-obligation",
+            "title": "Art.36 — Prior consultation with supervisory authority.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.36"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "prior_consultation"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-36-statement",
+                "name": "statement",
+                "prose": "Prior consultation with supervisory authority."
+              },
+              {
+                "id": "gdpr-art-36-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest prior_consultation."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-37",
+            "class": "gdpr-obligation",
+            "title": "Art.37 — DPO designated where required.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.37"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "dpo_designated"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-37-statement",
+                "name": "statement",
+                "prose": "DPO designated where required."
+              },
+              {
+                "id": "gdpr-art-37-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest dpo_designated."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-38",
+            "class": "gdpr-obligation",
+            "title": "Art.38 — DPO position and resources.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.38"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "dpo_position_resources"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "LOW"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-38-statement",
+                "name": "statement",
+                "prose": "DPO position and resources."
+              },
+              {
+                "id": "gdpr-art-38-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest dpo_position_resources."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-39",
+            "class": "gdpr-obligation",
+            "title": "Art.39 — DPO tasks.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.39"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "dpo_tasks"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "LOW"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-39-statement",
+                "name": "statement",
+                "prose": "DPO tasks."
+              },
+              {
+                "id": "gdpr-art-39-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest dpo_tasks."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-44",
+            "class": "gdpr-obligation",
+            "title": "Art.44 — Transfers only with adequate protection.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.44"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "transfers_adequate_protection"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-44-statement",
+                "name": "statement",
+                "prose": "Transfers only with adequate protection."
+              },
+              {
+                "id": "gdpr-art-44-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest transfers_adequate_protection."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-45",
+            "class": "gdpr-obligation",
+            "title": "Art.45 — Adequacy decision basis.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.45"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "adequacy_decision_basis"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-45-statement",
+                "name": "statement",
+                "prose": "Adequacy decision basis."
+              },
+              {
+                "id": "gdpr-art-45-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest adequacy_decision_basis."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-46",
+            "class": "gdpr-obligation",
+            "title": "Art.46 — Appropriate safeguards (SCCs, BCR).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.46"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "appropriate_safeguards"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-46-statement",
+                "name": "statement",
+                "prose": "Appropriate safeguards (SCCs, BCR)."
+              },
+              {
+                "id": "gdpr-art-46-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest appropriate_safeguards."
+              }
+            ]
+          },
+          {
+            "id": "gdpr-art-49",
+            "class": "gdpr-obligation",
+            "title": "Art.49 — Derogations for specific situations.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.49"
+              },
+              {
+                "name": "applies-to",
+                "value": "all"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.gdpr.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "transfer_derogations"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "LOW"
+              }
+            ],
+            "parts": [
+              {
+                "id": "gdpr-art-49-statement",
+                "name": "statement",
+                "prose": "Derogations for specific situations."
+              },
+              {
+                "id": "gdpr-art-49-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Attest transfer_derogations."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

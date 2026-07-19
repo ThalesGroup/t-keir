@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tkeir.thalesgroup/schemas/ingest.manifest.v1.json",
+  "title": "T-KEIR ingest manifest v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "ingest_id",
+    "correlation_id",
+    "doc_id",
+    "source",
+    "pipeline_config_sha256",
+    "embedder",
+    "status",
+    "created_at"
+  ],
+  "properties": {
+    "schema": {
+      "const": "tkeir.ingest.manifest.v1"
+    },
+    "ingest_id": {
+      "type": "string",
+      "minLength": 26,
+      "maxLength": 26
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "doc_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source": {
+      "type": "object",
+      "required": ["uri"],
+      "properties": {
+        "uri": { "type": "string" },
+        "filename": { "type": "string" },
+        "content_type": { "type": "string" },
+        "size_bytes": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "pipeline_config_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "embedder": {
+      "type": "object",
+      "required": ["model", "sha256"],
+      "properties": {
+        "model": { "type": "string" },
+        "provider": { "type": "string" },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "lineage": {
+      "type": "object",
+      "properties": {
+        "parent_ingest_id": { "type": ["string", "null"] },
+        "supersedes": { "type": ["string", "null"] },
+        "batch_id": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "enum": ["pending", "running", "indexed", "noop", "failed"]
+    },
+    "chunk_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "indexed_at": {
+      "type": ["string", "null"]
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "error": {
+      "type": ["string", "null"]
+    },
+    "origin": {
+      "type": ["string", "null"],
+      "description": "Content origin; use agent-generated for agent publications"
+    },
+    "run_id": {
+      "type": ["string", "null"],
+      "description": "Agent/workflow run id when origin is agent-generated"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,4443 @@
+{
+  "catalog": {
+    "uuid": "a4a4b281-cd01-5c39-918d-24d06f1b1b9e",
+    "metadata": {
+      "title": "EU AI Act (Regulation 2024/1689) — OSCAL Control Catalog",
+      "last-modified": "2024-08-01T00:00:00Z",
+      "version": "2024/1689",
+      "oscal-version": "1.1.2",
+      "roles": [
+        {
+          "id": "creator",
+          "title": "T-KEIR Compliance Team"
+        }
+      ],
+      "parties": [
+        {
+          "uuid": "5754a984-d25b-59c5-9b6a-0b9eb8cfcc26",
+          "type": "organization",
+          "name": "Thales Group"
+        }
+      ]
+    },
+    "groups": [
+      {
+        "id": "title-ii",
+        "title": "Title II — Prohibited AI Practices",
+        "controls": [
+          {
+            "id": "ai-act-art-5-1-a",
+            "class": "prohibited-practice",
+            "title": "Art.5(1)(a) — No subliminal manipulation",
+            "props": [
+              {
+                "name": "regulation",
+                "value": "EU AI Act 2024/1689"
+              },
+              {
+                "name": "article",
+                "value": "Art.5(1)(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "ALL"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "overrides.yaml prohibited_practices.subliminal_manipulation"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-5-1-a-statement",
+                "name": "statement",
+                "prose": "No subliminal manipulation"
+              },
+              {
+                "id": "ai-act-art-5-1-a-guidance",
+                "name": "guidance",
+                "prose": "Check overrides.yaml prohibited_practices.subliminal_manipulation. Evidence: authorised representative attestation."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-5-1-b",
+            "class": "prohibited-practice",
+            "title": "Art.5(1)(b) — No exploitation of vulnerabilities",
+            "props": [
+              {
+                "name": "regulation",
+                "value": "EU AI Act 2024/1689"
+              },
+              {
+                "name": "article",
+                "value": "Art.5(1)(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "ALL"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "overrides.yaml prohibited_practices.exploits_vulnerabilities"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-5-1-b-statement",
+                "name": "statement",
+                "prose": "No exploitation of vulnerabilities"
+              },
+              {
+                "id": "ai-act-art-5-1-b-guidance",
+                "name": "guidance",
+                "prose": "Check overrides.yaml prohibited_practices.exploits_vulnerabilities. Evidence: authorised representative attestation."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-5-1-c",
+            "class": "prohibited-practice",
+            "title": "Art.5(1)(c) — No public-authority social scoring",
+            "props": [
+              {
+                "name": "regulation",
+                "value": "EU AI Act 2024/1689"
+              },
+              {
+                "name": "article",
+                "value": "Art.5(1)(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "ALL"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "overrides.yaml prohibited_practices.social_scoring_public_authority"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-5-1-c-statement",
+                "name": "statement",
+                "prose": "No public-authority social scoring"
+              },
+              {
+                "id": "ai-act-art-5-1-c-guidance",
+                "name": "guidance",
+                "prose": "Check overrides.yaml prohibited_practices.social_scoring_public_authority. Evidence: authorised representative attestation."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-5-1-d",
+            "class": "prohibited-practice",
+            "title": "Art.5(1)(d) — No real-time remote biometric ID in public spaces",
+            "props": [
+              {
+                "name": "regulation",
+                "value": "EU AI Act 2024/1689"
+              },
+              {
+                "name": "article",
+                "value": "Art.5(1)(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "ALL"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "overrides.yaml prohibited_practices.real_time_biometric_public_space"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-5-1-d-statement",
+                "name": "statement",
+                "prose": "No real-time remote biometric ID in public spaces"
+              },
+              {
+                "id": "ai-act-art-5-1-d-guidance",
+                "name": "guidance",
+                "prose": "Check overrides.yaml prohibited_practices.real_time_biometric_public_space. Evidence: authorised representative attestation."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-5-1-e",
+            "class": "prohibited-practice",
+            "title": "Art.5(1)(e) — No emotion recognition in workplace/education",
+            "props": [
+              {
+                "name": "regulation",
+                "value": "EU AI Act 2024/1689"
+              },
+              {
+                "name": "article",
+                "value": "Art.5(1)(e)"
+              },
+              {
+                "name": "applies-to",
+                "value": "ALL"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "overrides.yaml prohibited_practices.emotion_recognition_workplace_education"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-5-1-e-statement",
+                "name": "statement",
+                "prose": "No emotion recognition in workplace/education"
+              },
+              {
+                "id": "ai-act-art-5-1-e-guidance",
+                "name": "guidance",
+                "prose": "Check overrides.yaml prohibited_practices.emotion_recognition_workplace_education. Evidence: authorised representative attestation."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-5-1-f",
+            "class": "prohibited-practice",
+            "title": "Art.5(1)(f) — No biometric categorisation by sensitive attributes",
+            "props": [
+              {
+                "name": "regulation",
+                "value": "EU AI Act 2024/1689"
+              },
+              {
+                "name": "article",
+                "value": "Art.5(1)(f)"
+              },
+              {
+                "name": "applies-to",
+                "value": "ALL"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "overrides.yaml prohibited_practices.biometric_categorisation_sensitive_attributes"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-5-1-f-statement",
+                "name": "statement",
+                "prose": "No biometric categorisation by sensitive attributes"
+              },
+              {
+                "id": "ai-act-art-5-1-f-guidance",
+                "name": "guidance",
+                "prose": "Check overrides.yaml prohibited_practices.biometric_categorisation_sensitive_attributes. Evidence: authorised representative attestation."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-5-1-g",
+            "class": "prohibited-practice",
+            "title": "Art.5(1)(g) — No predictive policing targeting individuals",
+            "props": [
+              {
+                "name": "regulation",
+                "value": "EU AI Act 2024/1689"
+              },
+              {
+                "name": "article",
+                "value": "Art.5(1)(g)"
+              },
+              {
+                "name": "applies-to",
+                "value": "ALL"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "overrides.yaml prohibited_practices.predictive_policing_individual"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-5-1-g-statement",
+                "name": "statement",
+                "prose": "No predictive policing targeting individuals"
+              },
+              {
+                "id": "ai-act-art-5-1-g-guidance",
+                "name": "guidance",
+                "prose": "Check overrides.yaml prohibited_practices.predictive_policing_individual. Evidence: authorised representative attestation."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-high_risk",
+        "title": "Controls (gate: high_risk)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "high_risk"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-6",
+            "class": "ai-act-obligation",
+            "title": "Art.6 — High-risk classification is documented (Annex III / Art.6).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.6"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "annex_iv_dir_non_empty, risk_management_system"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-6-statement",
+                "name": "statement",
+                "prose": "High-risk classification is documented (Annex III / Art.6)."
+              },
+              {
+                "id": "ai-act-art-6-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Document annex_iii_applies and Annex IV classification rationale (`make annex-iv`)."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-7",
+            "class": "ai-act-obligation",
+            "title": "Art.7 — Classification rules for high-risk AI are applied and recorded.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.7"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "annex_iv_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-7-statement",
+                "name": "statement",
+                "prose": "Classification rules for high-risk AI are applied and recorded."
+              },
+              {
+                "id": "ai-act-art-7-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Track Annex III amendments and record classification outcomes in the Annex IV file."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-9-1",
+            "class": "ai-act-obligation",
+            "title": "Art.9(1) — Risk management system established.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "risk_management_system"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-9-1-statement",
+                "name": "statement",
+                "prose": "Risk management system established."
+              },
+              {
+                "id": "ai-act-art-9-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest risk_management_system"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-9-2",
+            "class": "ai-act-obligation",
+            "title": "Art.9(2) — Risk management covers identification, estimation and evaluation.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "risk_mgmt_identification_estimation_evaluation"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-9-2-statement",
+                "name": "statement",
+                "prose": "Risk management covers identification, estimation and evaluation."
+              },
+              {
+                "id": "ai-act-art-9-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest risk_mgmt_identification_estimation_evaluation"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-9-3",
+            "class": "ai-act-obligation",
+            "title": "Art.9(3) — Residual risks tested after market placement.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(3)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty, residual_risk_tested_post_market"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-9-3-statement",
+                "name": "statement",
+                "prose": "Residual risks tested after market placement."
+              },
+              {
+                "id": "ai-act-art-9-3-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make audit-evidence` and attest residual_risk_tested_post_market."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-9-4",
+            "class": "ai-act-obligation",
+            "title": "Art.9(4) — Risk management measures adopted.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(4)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "risk_management_measures_adopted"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-9-4-statement",
+                "name": "statement",
+                "prose": "Risk management measures adopted."
+              },
+              {
+                "id": "ai-act-art-9-4-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest risk_management_measures_adopted"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-9-5",
+            "class": "ai-act-obligation",
+            "title": "Art.9(5) — Testing against defined metrics before market placement.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(5)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "beir_eval_report_present, conformity_assessment_standards"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-9-5-statement",
+                "name": "statement",
+                "prose": "Testing against defined metrics before market placement."
+              },
+              {
+                "id": "ai-act-art-9-5-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make beir-eval`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-9-6",
+            "class": "ai-act-obligation",
+            "title": "Art.9(6) — Testing on real-world conditions where applicable.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(6)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "beir_eval_report_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-9-6-statement",
+                "name": "statement",
+                "prose": "Testing on real-world conditions where applicable."
+              },
+              {
+                "id": "ai-act-art-9-6-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make beir-eval` / publish evaluation_report.md."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-9-7",
+            "class": "ai-act-obligation",
+            "title": "Art.9(7) — Serious incident testing feedback loop in place.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(7)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty, feedback_loop_controls"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-9-7-statement",
+                "name": "statement",
+                "prose": "Serious incident testing feedback loop in place."
+              },
+              {
+                "id": "ai-act-art-9-7-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make audit-evidence` and attest feedback_loop_controls."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-9-8",
+            "class": "ai-act-obligation",
+            "title": "Art.9(8) — Conformity assessment standards applied.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.9(8)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "conformity_assessment_standards"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-9-8-statement",
+                "name": "statement",
+                "prose": "Conformity assessment standards applied."
+              },
+              {
+                "id": "ai-act-art-9-8-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest conformity_assessment_standards"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-10-1",
+            "class": "ai-act-obligation",
+            "title": "Art.10(1) — Training/validation/test data governance via AIBOM.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.10(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "aibom_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-10-1-statement",
+                "name": "statement",
+                "prose": "Training/validation/test data governance via AIBOM."
+              },
+              {
+                "id": "ai-act-art-10-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish AIBOM under reports/bom/ (`make bom`)."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-10-2",
+            "class": "ai-act-obligation",
+            "title": "Art.10(2) — Data governance practices documented in AIBOM entries.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.10(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "aibom_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-10-2-statement",
+                "name": "statement",
+                "prose": "Data governance practices documented in AIBOM entries."
+              },
+              {
+                "id": "ai-act-art-10-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish AIBOM entries under reports/bom/."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-10-3",
+            "class": "ai-act-obligation",
+            "title": "Art.10(3) — Data relevant, representative, free of errors (inventory present).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.10(3)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "sbom_cyclonedx_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-10-3-statement",
+                "name": "statement",
+                "prose": "Data relevant, representative, free of errors (inventory present)."
+              },
+              {
+                "id": "ai-act-art-10-3-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish SBOM/AIBOM under reports/bom/."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-10-4",
+            "class": "ai-act-obligation",
+            "title": "Art.10(4) — Examination for biases performed.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.10(4)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "data_bias_examination"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-10-4-statement",
+                "name": "statement",
+                "prose": "Examination for biases performed."
+              },
+              {
+                "id": "ai-act-art-10-4-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest data_bias_examination"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-10-5",
+            "class": "ai-act-obligation",
+            "title": "Art.10(5) — Special-category data processing justified.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.10(5)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "compliance_gdpr_doc, special_category_data_justified"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-10-5-statement",
+                "name": "statement",
+                "prose": "Special-category data processing justified."
+              },
+              {
+                "id": "ai-act-art-10-5-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Document Art.10(5) justification; maintain compliance/gdpr.md."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-11-1",
+            "class": "ai-act-obligation",
+            "title": "Art.11(1) — Technical documentation drawn up (Annex IV).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.11(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "annex_iv_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-11-1-statement",
+                "name": "statement",
+                "prose": "Technical documentation drawn up (Annex IV)."
+              },
+              {
+                "id": "ai-act-art-11-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make annex-iv`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-11-2",
+            "class": "ai-act-obligation",
+            "title": "Art.11(2) — Technical documentation kept up to date.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.11(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "annex_iv_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-11-2-statement",
+                "name": "statement",
+                "prose": "Technical documentation kept up to date."
+              },
+              {
+                "id": "ai-act-art-11-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Keep reports/compliance/annex-iv/ non-empty and current."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-12-1",
+            "class": "ai-act-obligation",
+            "title": "Art.12(1) — Automatic logging enabled throughout lifecycle.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.12(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "action_schema_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-12-1-statement",
+                "name": "statement",
+                "prose": "Automatic logging enabled throughout lifecycle."
+              },
+              {
+                "id": "ai-act-art-12-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship action.v1.json ActionRecord schema."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-12-2",
+            "class": "ai-act-obligation",
+            "title": "Art.12(2) — Logs automatically generated.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.12(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty, action_schema_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-12-2-statement",
+                "name": "statement",
+                "prose": "Logs automatically generated."
+              },
+              {
+                "id": "ai-act-art-12-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Enable dual audit sink / hot store and retain evidence."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-12-3",
+            "class": "ai-act-obligation",
+            "title": "Art.12(3) — Logs kept for period appropriate to intended purpose.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.12(3)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_worm_retention_set, action_schema_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-12-3-statement",
+                "name": "statement",
+                "prose": "Logs kept for period appropriate to intended purpose."
+              },
+              {
+                "id": "ai-act-art-12-3-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Configure AUDIT_WORM_RETENTION_DAYS."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-13-1",
+            "class": "ai-act-obligation",
+            "title": "Art.13(1) — System designed to be sufficiently transparent.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "system_sufficiently_transparent"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-13-1-statement",
+                "name": "statement",
+                "prose": "System designed to be sufficiently transparent."
+              },
+              {
+                "id": "ai-act-art-13-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest system_sufficiently_transparent"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-13-2",
+            "class": "ai-act-obligation",
+            "title": "Art.13(2) — Instructions for use provided.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "instructions_for_use_provided"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-13-2-statement",
+                "name": "statement",
+                "prose": "Instructions for use provided."
+              },
+              {
+                "id": "ai-act-art-13-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest instructions_for_use_provided"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-13-3-a",
+            "class": "ai-act-obligation",
+            "title": "Art.13(3)(a) — Instructions include provider identity and contact.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13(3)(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "instructions_provider_identity"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-13-3-a-statement",
+                "name": "statement",
+                "prose": "Instructions include provider identity and contact."
+              },
+              {
+                "id": "ai-act-art-13-3-a-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest instructions_provider_identity"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-13-3-b",
+            "class": "ai-act-obligation",
+            "title": "Art.13(3)(b) — Instructions include capabilities and limitations.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13(3)(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "instructions_capabilities_limitations"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-13-3-b-statement",
+                "name": "statement",
+                "prose": "Instructions include capabilities and limitations."
+              },
+              {
+                "id": "ai-act-art-13-3-b-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest instructions_capabilities_limitations"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-13-3-c",
+            "class": "ai-act-obligation",
+            "title": "Art.13(3)(c) — Instructions include expected accuracy levels.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13(3)(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "beir_eval_report_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-13-3-c-statement",
+                "name": "statement",
+                "prose": "Instructions include expected accuracy levels."
+              },
+              {
+                "id": "ai-act-art-13-3-c-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish evaluation_report.md via `make beir-eval`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-13-3-d",
+            "class": "ai-act-obligation",
+            "title": "Art.13(3)(d) — Instructions include human oversight measures.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13(3)(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "kill_switch_runbook_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-13-3-d-statement",
+                "name": "statement",
+                "prose": "Instructions include human oversight measures."
+              },
+              {
+                "id": "ai-act-art-13-3-d-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish runbooks/kill-switch.md."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-13-3-e",
+            "class": "ai-act-obligation",
+            "title": "Art.13(3)(e) — Instructions include computational resource requirements.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.13(3)(e)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "instructions_compute_resources"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "LOW"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-13-3-e-statement",
+                "name": "statement",
+                "prose": "Instructions include computational resource requirements."
+              },
+              {
+                "id": "ai-act-art-13-3-e-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest instructions_compute_resources"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-1",
+            "class": "ai-act-obligation",
+            "title": "Art.14(1) — Human oversight measures built in (governor flags).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "governor_flags_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-1-statement",
+                "name": "statement",
+                "prose": "Human oversight measures built in (governor flags)."
+              },
+              {
+                "id": "ai-act-art-14-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship tkeir/thot/governor/flags.py."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-2",
+            "class": "ai-act-obligation",
+            "title": "Art.14(2) — System designed for human oversight implementation.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "hmi_admin_page_present, governor_flags_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-2-statement",
+                "name": "statement",
+                "prose": "System designed for human oversight implementation."
+              },
+              {
+                "id": "ai-act-art-14-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship HMI /admin and governor enforce mode."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-3-a",
+            "class": "ai-act-obligation",
+            "title": "Art.14(3)(a) — Oversight persons can understand capabilities and limitations.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(3)(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "oversight_understand_capabilities"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-3-a-statement",
+                "name": "statement",
+                "prose": "Oversight persons can understand capabilities and limitations."
+              },
+              {
+                "id": "ai-act-art-14-3-a-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest oversight_understand_capabilities"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-3-b",
+            "class": "ai-act-obligation",
+            "title": "Art.14(3)(b) — Oversight persons can detect anomalies.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(3)(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty, audit_verify_target"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-3-b-statement",
+                "name": "statement",
+                "prose": "Oversight persons can detect anomalies."
+              },
+              {
+                "id": "ai-act-art-14-3-b-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Expose audit-report / incident tooling."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-3-c",
+            "class": "ai-act-obligation",
+            "title": "Art.14(3)(c) — Oversight persons can interrupt the system.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(3)(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "governor_kill_target, kill_switch_runbook_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-3-c-statement",
+                "name": "statement",
+                "prose": "Oversight persons can interrupt the system."
+              },
+              {
+                "id": "ai-act-art-14-3-c-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Expose `make governor-kill`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-3-d",
+            "class": "ai-act-obligation",
+            "title": "Art.14(3)(d) — Oversight persons can override output.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(3)(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "governor_approvals_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-3-d-statement",
+                "name": "statement",
+                "prose": "Oversight persons can override output."
+              },
+              {
+                "id": "ai-act-art-14-3-d-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship governor/approvals.py."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-3-e",
+            "class": "ai-act-obligation",
+            "title": "Art.14(3)(e) — Oversight persons can decide not to use output.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(3)(e)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "hmi_admin_page_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-3-e-statement",
+                "name": "statement",
+                "prose": "Oversight persons can decide not to use output."
+              },
+              {
+                "id": "ai-act-art-14-3-e-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship HMI /admin approval queue."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-5",
+            "class": "ai-act-obligation",
+            "title": "Art.14(5) — Automated control measures for fully automated deployment.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(5)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "governor_flags_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-5-statement",
+                "name": "statement",
+                "prose": "Automated control measures for fully automated deployment."
+              },
+              {
+                "id": "ai-act-art-14-5-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship governor flags for automated control."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-15-1",
+            "class": "ai-act-obligation",
+            "title": "Art.15(1) — Appropriate accuracy, robustness and cybersecurity.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.15(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "beir_eval_report_present, trivy_report_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-15-1-statement",
+                "name": "statement",
+                "prose": "Appropriate accuracy, robustness and cybersecurity."
+              },
+              {
+                "id": "ai-act-art-15-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make beir-eval` and `make trivy`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-15-2",
+            "class": "ai-act-obligation",
+            "title": "Art.15(2) — Performance metrics declared.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.15(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "beir_eval_report_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-15-2-statement",
+                "name": "statement",
+                "prose": "Performance metrics declared."
+              },
+              {
+                "id": "ai-act-art-15-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish tkeir/docs/evaluation_report.md."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-15-3",
+            "class": "ai-act-obligation",
+            "title": "Art.15(3) — Resilience against adversarial inputs.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.15(3)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "adversarial_resilience"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-15-3-statement",
+                "name": "statement",
+                "prose": "Resilience against adversarial inputs."
+              },
+              {
+                "id": "ai-act-art-15-3-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest adversarial_resilience"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-15-4",
+            "class": "ai-act-obligation",
+            "title": "Art.15(4) — Technical measures against feedback-loop risks.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.15(4)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "feedback_loop_controls"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-15-4-statement",
+                "name": "statement",
+                "prose": "Technical measures against feedback-loop risks."
+              },
+              {
+                "id": "ai-act-art-15-4-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest feedback_loop_controls"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-15-5",
+            "class": "ai-act-obligation",
+            "title": "Art.15(5) — Cybersecurity measures in place.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.15(5)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "security_report_target, trivy_report_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-15-5-statement",
+                "name": "statement",
+                "prose": "Cybersecurity measures in place."
+              },
+              {
+                "id": "ai-act-art-15-5-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make security-report` / `make bom`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-a",
+            "class": "ai-act-obligation",
+            "title": "Art.16(a) — Quality management system implemented.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "quality_management_system"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-a-statement",
+                "name": "statement",
+                "prose": "Quality management system implemented."
+              },
+              {
+                "id": "ai-act-art-16-a-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest quality_management_system"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-b",
+            "class": "ai-act-obligation",
+            "title": "Art.16(b) — Technical documentation drawn up.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "annex_iv_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-b-statement",
+                "name": "statement",
+                "prose": "Technical documentation drawn up."
+              },
+              {
+                "id": "ai-act-art-16-b-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make annex-iv`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-c",
+            "class": "ai-act-obligation",
+            "title": "Art.16(c) — Logging capability implemented.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "action_schema_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-c-statement",
+                "name": "statement",
+                "prose": "Logging capability implemented."
+              },
+              {
+                "id": "ai-act-art-16-c-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship ActionRecord schema / hot store."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-d",
+            "class": "ai-act-obligation",
+            "title": "Art.16(d) — Conformity assessment performed.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "conformity_assessment.performed"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-d-statement",
+                "name": "statement",
+                "prose": "Conformity assessment performed."
+              },
+              {
+                "id": "ai-act-art-16-d-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest conformity_assessment.performed"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-e",
+            "class": "ai-act-obligation",
+            "title": "Art.16(e) — EU declaration of conformity drawn up.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(e)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "eu_declaration_of_conformity"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-e-statement",
+                "name": "statement",
+                "prose": "EU declaration of conformity drawn up."
+              },
+              {
+                "id": "ai-act-art-16-e-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest eu_declaration_of_conformity"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-f",
+            "class": "ai-act-obligation",
+            "title": "Art.16(f) — CE marking affixed.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(f)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "ce_marking_affixed"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-f-statement",
+                "name": "statement",
+                "prose": "CE marking affixed."
+              },
+              {
+                "id": "ai-act-art-16-f-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest ce_marking_affixed"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-g",
+            "class": "ai-act-obligation",
+            "title": "Art.16(g) — Registration in EU database.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(g)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "eu_database_registration"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-g-statement",
+                "name": "statement",
+                "prose": "Registration in EU database."
+              },
+              {
+                "id": "ai-act-art-16-g-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest eu_database_registration"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-h",
+            "class": "ai-act-obligation",
+            "title": "Art.16(h) — Corrective actions taken without undue delay.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(h)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "rollback_target_in_makefile, governor_kill_target"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-h-statement",
+                "name": "statement",
+                "prose": "Corrective actions taken without undue delay."
+              },
+              {
+                "id": "ai-act-art-16-h-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Expose rollback-index and governor-kill."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-i",
+            "class": "ai-act-obligation",
+            "title": "Art.16(i) — Competent authorities informed of serious incidents.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(i)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "incident_runbook_present, serious_incident_report_within_15_days"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-i-statement",
+                "name": "statement",
+                "prose": "Competent authorities informed of serious incidents."
+              },
+              {
+                "id": "ai-act-art-16-i-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Use tkeir-audit incident --kind early-warning / serious."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-16-j",
+            "class": "ai-act-obligation",
+            "title": "Art.16(j) — Competent authorities informed upon request.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.16(j)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "competent_authorities_on_request"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-16-j-statement",
+                "name": "statement",
+                "prose": "Competent authorities informed upon request."
+              },
+              {
+                "id": "ai-act-art-16-j-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest competent_authorities_on_request"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-1-a",
+            "class": "ai-act-obligation",
+            "title": "Art.17(1)(a) — QMS covers strategy for regulatory compliance.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(1)(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "qms_regulatory_strategy"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-1-a-statement",
+                "name": "statement",
+                "prose": "QMS covers strategy for regulatory compliance."
+              },
+              {
+                "id": "ai-act-art-17-1-a-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest qms_regulatory_strategy"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-1-b",
+            "class": "ai-act-obligation",
+            "title": "Art.17(1)(b) — QMS covers techniques for design development.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(1)(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "qms_design_techniques"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-1-b-statement",
+                "name": "statement",
+                "prose": "QMS covers techniques for design development."
+              },
+              {
+                "id": "ai-act-art-17-1-b-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest qms_design_techniques"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-1-c",
+            "class": "ai-act-obligation",
+            "title": "Art.17(1)(c) — QMS covers system testing and validation.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(1)(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "beir_eval_report_present, audit_verify_target"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-1-c-statement",
+                "name": "statement",
+                "prose": "QMS covers system testing and validation."
+              },
+              {
+                "id": "ai-act-art-17-1-c-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run beir-eval and audit-verify."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-1-d",
+            "class": "ai-act-obligation",
+            "title": "Art.17(1)(d) — QMS covers technical documentation.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(1)(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "annex_iv_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-1-d-statement",
+                "name": "statement",
+                "prose": "QMS covers technical documentation."
+              },
+              {
+                "id": "ai-act-art-17-1-d-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make annex-iv`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-1-e",
+            "class": "ai-act-obligation",
+            "title": "Art.17(1)(e) — QMS covers data management.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(1)(e)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "aibom_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-1-e-statement",
+                "name": "statement",
+                "prose": "QMS covers data management."
+              },
+              {
+                "id": "ai-act-art-17-1-e-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish AIBOM under reports/bom/."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-1-f",
+            "class": "ai-act-obligation",
+            "title": "Art.17(1)(f) — QMS covers risk management.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(1)(f)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "risk_management_system"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-1-f-statement",
+                "name": "statement",
+                "prose": "QMS covers risk management."
+              },
+              {
+                "id": "ai-act-art-17-1-f-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest risk_management_system"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-1-g",
+            "class": "ai-act-obligation",
+            "title": "Art.17(1)(g) — QMS covers post-market monitoring.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(1)(g)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty, feedback_loop_controls"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-1-g-statement",
+                "name": "statement",
+                "prose": "QMS covers post-market monitoring."
+              },
+              {
+                "id": "ai-act-art-17-1-g-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make audit-evidence` / `make audit-report`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-1-h",
+            "class": "ai-act-obligation",
+            "title": "Art.17(1)(h) — QMS covers serious incident reporting.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(1)(h)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "incident_runbook_present, serious_incident_report_within_15_days"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-1-h-statement",
+                "name": "statement",
+                "prose": "QMS covers serious incident reporting."
+              },
+              {
+                "id": "ai-act-art-17-1-h-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Use tkeir-audit incident tooling."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-17-2",
+            "class": "ai-act-obligation",
+            "title": "Art.17(2) — QMS implemented and documented.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.17(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "qms_documented"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-17-2-statement",
+                "name": "statement",
+                "prose": "QMS implemented and documented."
+              },
+              {
+                "id": "ai-act-art-17-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest qms_documented"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-18",
+            "class": "ai-act-obligation",
+            "title": "Art.18 — Technical documentation retained 10 years (or attested).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.18"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_worm_retention_days, qms_documented"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-18-statement",
+                "name": "statement",
+                "prose": "Technical documentation retained 10 years (or attested)."
+              },
+              {
+                "id": "ai-act-art-18-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Set AUDIT_WORM_RETENTION_DAYS >= 3650 or attest retention."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-19",
+            "class": "ai-act-obligation",
+            "title": "Art.19 — Automatically generated logs kept by provider.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.19"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_worm_retention_set"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-19-statement",
+                "name": "statement",
+                "prose": "Automatically generated logs kept by provider."
+              },
+              {
+                "id": "ai-act-art-19-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Configure AUDIT_WORM_RETENTION_DAYS."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-20-1",
+            "class": "ai-act-obligation",
+            "title": "Art.20(1) — Serious incidents reported to authorities.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.20(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "incident_runbook_present, serious_incident_report_within_15_days"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-20-1-statement",
+                "name": "statement",
+                "prose": "Serious incidents reported to authorities."
+              },
+              {
+                "id": "ai-act-art-20-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Use tkeir-audit incident --kind serious."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-20-2",
+            "class": "ai-act-obligation",
+            "title": "Art.20(2) — Serious incident reported within 15 days of becoming aware.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.20(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "serious_incident_report_within_15_days"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "CRITICAL"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-20-2-statement",
+                "name": "statement",
+                "prose": "Serious incident reported within 15 days of becoming aware."
+              },
+              {
+                "id": "ai-act-art-20-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest serious_incident_report_within_15_days"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-21",
+            "class": "ai-act-obligation",
+            "title": "Art.21 — Cooperation with competent authorities.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.21"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "competent_authorities_on_request"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-21-statement",
+                "name": "statement",
+                "prose": "Cooperation with competent authorities."
+              },
+              {
+                "id": "ai-act-art-21-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest competent_authorities_on_request"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-22",
+            "class": "ai-act-obligation",
+            "title": "Art.22 — Authorised representative designated (non-EU providers).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.22"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "authorised_representative_non_eu"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-22-statement",
+                "name": "statement",
+                "prose": "Authorised representative designated (non-EU providers)."
+              },
+              {
+                "id": "ai-act-art-22-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest authorised_representative_non_eu"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-25-1",
+            "class": "ai-act-obligation",
+            "title": "Art.25(1) — Deployer obligations for inputs under their control.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.25(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "deployer_uses_per_instructions"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-25-1-statement",
+                "name": "statement",
+                "prose": "Deployer obligations for inputs under their control."
+              },
+              {
+                "id": "ai-act-art-25-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest deployer_uses_per_instructions"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-25-3",
+            "class": "ai-act-obligation",
+            "title": "Art.25(3) — Deployers use system according to instructions.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.25(3)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "deployer_uses_per_instructions"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-25-3-statement",
+                "name": "statement",
+                "prose": "Deployers use system according to instructions."
+              },
+              {
+                "id": "ai-act-art-25-3-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest deployer_uses_per_instructions"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-25-5",
+            "class": "ai-act-obligation",
+            "title": "Art.25(5) — Deployers implement human oversight.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.25(5)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "governor_approvals_present, hmi_admin_page_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-25-5-statement",
+                "name": "statement",
+                "prose": "Deployers implement human oversight."
+              },
+              {
+                "id": "ai-act-art-25-5-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Ship governor approvals and HMI /admin."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-25-6",
+            "class": "ai-act-obligation",
+            "title": "Art.25(6) — Deployers inform affected persons.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.25(6)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "deployer_informs_affected_persons"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-25-6-statement",
+                "name": "statement",
+                "prose": "Deployers inform affected persons."
+              },
+              {
+                "id": "ai-act-art-25-6-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest deployer_informs_affected_persons"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-25-9",
+            "class": "ai-act-obligation",
+            "title": "Art.25(9) — Deployers perform DPIA where required.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.25(9)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "compliance_gdpr_doc, deployer_dpia"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-25-9-statement",
+                "name": "statement",
+                "prose": "Deployers perform DPIA where required."
+              },
+              {
+                "id": "ai-act-art-25-9-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Maintain compliance/gdpr.md and attest deployer_dpia."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-26-1",
+            "class": "ai-act-obligation",
+            "title": "Art.26(1) — EU declaration of conformity drawn up.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.26(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "eu_declaration_of_conformity"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-26-1-statement",
+                "name": "statement",
+                "prose": "EU declaration of conformity drawn up."
+              },
+              {
+                "id": "ai-act-art-26-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest eu_declaration_of_conformity"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-26-2",
+            "class": "ai-act-obligation",
+            "title": "Art.26(2) — EU DoC contains information from Annex V.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.26(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "eu_declaration_of_conformity"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-26-2-statement",
+                "name": "statement",
+                "prose": "EU DoC contains information from Annex V."
+              },
+              {
+                "id": "ai-act-art-26-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest eu_declaration_of_conformity"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-27-1",
+            "class": "ai-act-obligation",
+            "title": "Art.27(1) — CE marking affixed before market placement.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.27(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "ce_marking_affixed"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-27-1-statement",
+                "name": "statement",
+                "prose": "CE marking affixed before market placement."
+              },
+              {
+                "id": "ai-act-art-27-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest ce_marking_affixed"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-27-2",
+            "class": "ai-act-obligation",
+            "title": "Art.27(2) — CE marking requirements (visible, legible, indelible).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.27(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "ce_marking_affixed"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-27-2-statement",
+                "name": "statement",
+                "prose": "CE marking requirements (visible, legible, indelible)."
+              },
+              {
+                "id": "ai-act-art-27-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest ce_marking_affixed"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-28",
+            "class": "ai-act-obligation",
+            "title": "Art.28 — High-risk AI systems registered in EU database.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.28"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "eu_database_registration"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-28-statement",
+                "name": "statement",
+                "prose": "High-risk AI systems registered in EU database."
+              },
+              {
+                "id": "ai-act-art-28-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest eu_database_registration"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-29-1",
+            "class": "ai-act-obligation",
+            "title": "Art.29(1) — Fundamental rights impact assessment performed.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.29(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "fundamental_rights_impact_assessment"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-29-1-statement",
+                "name": "statement",
+                "prose": "Fundamental rights impact assessment performed."
+              },
+              {
+                "id": "ai-act-art-29-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest fundamental_rights_impact_assessment"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-high_risk_biometric",
+        "title": "Controls (gate: high_risk_biometric)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "high_risk_biometric"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-12-4",
+            "class": "ai-act-obligation",
+            "title": "Art.12(4) — Biometric identification system logging specifics present.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.12(4)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_biometric"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-12-4-statement",
+                "name": "statement",
+                "prose": "Biometric identification system logging specifics present."
+              },
+              {
+                "id": "ai-act-art-12-4-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Extend biometric ID logging per Art.12(4)."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-14-4",
+            "class": "ai-act-obligation",
+            "title": "Art.14(4) — Specific oversight measures for biometric systems.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.14(4)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_biometric"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "hmi_admin_page_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-14-4-statement",
+                "name": "statement",
+                "prose": "Specific oversight measures for biometric systems."
+              },
+              {
+                "id": "ai-act-art-14-4-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Require human verification UI for biometric outputs."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-high_risk_importer",
+        "title": "Controls (gate: high_risk_importer)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "high_risk_importer"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-23-1",
+            "class": "ai-act-obligation",
+            "title": "Art.23(1) — Importers verify CE marking and Annex IV / DoC.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.23(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_importer"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "eu_declaration_of_conformity"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-23-1-statement",
+                "name": "statement",
+                "prose": "Importers verify CE marking and Annex IV / DoC."
+              },
+              {
+                "id": "ai-act-art-23-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Verify CE marking and Annex IV before import."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-high_risk_distributor",
+        "title": "Controls (gate: high_risk_distributor)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "high_risk_distributor"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-24-1",
+            "class": "ai-act-obligation",
+            "title": "Art.24(1) — Distributors verify CE marking.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.24(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_distributor"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "ce_marking_affixed"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-24-1-statement",
+                "name": "statement",
+                "prose": "Distributors verify CE marking."
+              },
+              {
+                "id": "ai-act-art-24-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Verify CE marking before making available."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-high_risk_notified_body",
+        "title": "Controls (gate: high_risk_notified_body)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "high_risk_notified_body"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-33",
+            "class": "ai-act-obligation",
+            "title": "Art.33 — Notified body designated and notified.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.33"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_notified_body"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "conformity_assessment.notified_body_designated"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-33-statement",
+                "name": "statement",
+                "prose": "Notified body designated and notified."
+              },
+              {
+                "id": "ai-act-art-33-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest conformity_assessment.notified_body_designated"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-34",
+            "class": "ai-act-obligation",
+            "title": "Art.34 — Notified body organisational requirements met.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.34"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_notified_body"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "conformity_assessment.notified_body_org_requirements"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-34-statement",
+                "name": "statement",
+                "prose": "Notified body organisational requirements met."
+              },
+              {
+                "id": "ai-act-art-34-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest conformity_assessment.notified_body_org_requirements"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-43-1",
+            "class": "ai-act-obligation",
+            "title": "Art.43(1) — Conformity assessment procedure followed.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.43(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_notified_body"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "conformity_assessment.procedure_followed"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-43-1-statement",
+                "name": "statement",
+                "prose": "Conformity assessment procedure followed."
+              },
+              {
+                "id": "ai-act-art-43-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest conformity_assessment.procedure_followed"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-43-2",
+            "class": "ai-act-obligation",
+            "title": "Art.43(2) — Harmonised standards applied or CS used.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.43(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_notified_body"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "conformity_assessment.harmonised_standards_or_cs"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-43-2-statement",
+                "name": "statement",
+                "prose": "Harmonised standards applied or CS used."
+              },
+              {
+                "id": "ai-act-art-43-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest conformity_assessment.harmonised_standards_or_cs"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-43-4",
+            "class": "ai-act-obligation",
+            "title": "Art.43(4) — Third-party assessment where required.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.43(4)"
+              },
+              {
+                "name": "applies-to",
+                "value": "high_risk_notified_body"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "conformity_assessment.third_party_assessment"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-43-4-statement",
+                "name": "statement",
+                "prose": "Third-party assessment where required."
+              },
+              {
+                "id": "ai-act-art-43-4-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest conformity_assessment.third_party_assessment"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-limited_or_high",
+        "title": "Controls (gate: limited_or_high)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "limited_or_high"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-50-1",
+            "class": "ai-act-obligation",
+            "title": "Art.50(1) — Persons informed they are interacting with AI.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.50(1)"
+              },
+              {
+                "name": "applies-to",
+                "value": "limited_or_high"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "transparency.persons_informed_interacting_with_ai"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-50-1-statement",
+                "name": "statement",
+                "prose": "Persons informed they are interacting with AI."
+              },
+              {
+                "id": "ai-act-art-50-1-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest transparency.persons_informed_interacting_with_ai"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-50-4",
+            "class": "ai-act-obligation",
+            "title": "Art.50(4) — AI-generated content labelling.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.50(4)"
+              },
+              {
+                "name": "applies-to",
+                "value": "limited_or_high"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "transparency.ai_generated_content_labelling"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-50-4-statement",
+                "name": "statement",
+                "prose": "AI-generated content labelling."
+              },
+              {
+                "id": "ai-act-art-50-4-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest transparency.ai_generated_content_labelling"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-limited_or_high_emotion",
+        "title": "Controls (gate: limited_or_high_emotion)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "limited_or_high_emotion"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-50-2",
+            "class": "ai-act-obligation",
+            "title": "Art.50(2) — Emotion recognition disclosure to natural persons.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.50(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "limited_or_high_emotion"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "transparency.persons_informed_interacting_with_ai"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-50-2-statement",
+                "name": "statement",
+                "prose": "Emotion recognition disclosure to natural persons."
+              },
+              {
+                "id": "ai-act-art-50-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Disclose emotion-recognition use to affected persons."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-limited_or_high_biometric_cat",
+        "title": "Controls (gate: limited_or_high_biometric_cat)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "limited_or_high_biometric_cat"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-50-3",
+            "class": "ai-act-obligation",
+            "title": "Art.50(3) — Biometric categorisation disclosure to natural persons.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.50(3)"
+              },
+              {
+                "name": "applies-to",
+                "value": "limited_or_high_biometric_cat"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "transparency.persons_informed_interacting_with_ai"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-50-3-statement",
+                "name": "statement",
+                "prose": "Biometric categorisation disclosure to natural persons."
+              },
+              {
+                "id": "ai-act-art-50-3-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Disclose biometric categorisation use to affected persons."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-gpai",
+        "title": "Controls (gate: gpai)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "gpai"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-53-1-a",
+            "class": "ai-act-obligation",
+            "title": "Art.53(1)(a) — Technical documentation provided to downstream providers (AIBOM).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.53(1)(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "aibom_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-53-1-a-statement",
+                "name": "statement",
+                "prose": "Technical documentation provided to downstream providers (AIBOM)."
+              },
+              {
+                "id": "ai-act-art-53-1-a-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish AIBOM under reports/bom/."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-53-1-b",
+            "class": "ai-act-obligation",
+            "title": "Art.53(1)(b) — Information and documentation for downstream providers.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.53(1)(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "annex_iv_dir_non_empty"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-53-1-b-statement",
+                "name": "statement",
+                "prose": "Information and documentation for downstream providers."
+              },
+              {
+                "id": "ai-act-art-53-1-b-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make annex-iv`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-53-1-c",
+            "class": "ai-act-obligation",
+            "title": "Art.53(1)(c) — Copyright compliance policy.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.53(1)(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "gpai.copyright_compliance_policy"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-53-1-c-statement",
+                "name": "statement",
+                "prose": "Copyright compliance policy."
+              },
+              {
+                "id": "ai-act-art-53-1-c-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest gpai.copyright_compliance_policy"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-53-1-d",
+            "class": "ai-act-obligation",
+            "title": "Art.53(1)(d) — Summary of training data published.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.53(1)(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "aibom_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-53-1-d-statement",
+                "name": "statement",
+                "prose": "Summary of training data published."
+              },
+              {
+                "id": "ai-act-art-53-1-d-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Publish training-data summary via AIBOM."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-53-2",
+            "class": "ai-act-obligation",
+            "title": "Art.53(2) — Copyright compliance obligations.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.53(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "gpai.copyright_obligations"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-53-2-statement",
+                "name": "statement",
+                "prose": "Copyright compliance obligations."
+              },
+              {
+                "id": "ai-act-art-53-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest gpai.copyright_obligations"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-54",
+            "class": "ai-act-obligation",
+            "title": "Art.54 — Authorised representative for non-EU GPAI providers.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.54"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "gpai.authorised_representative_non_eu"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-54-statement",
+                "name": "statement",
+                "prose": "Authorised representative for non-EU GPAI providers."
+              },
+              {
+                "id": "ai-act-art-54-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest gpai.authorised_representative_non_eu"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-gpai_systemic",
+        "title": "Controls (gate: gpai_systemic)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "gpai_systemic"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-55-1-a",
+            "class": "ai-act-obligation",
+            "title": "Art.55(1)(a) — Model evaluation per standardised protocols.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.55(1)(a)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai_systemic"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "gpai.model_evaluation_protocols"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-55-1-a-statement",
+                "name": "statement",
+                "prose": "Model evaluation per standardised protocols."
+              },
+              {
+                "id": "ai-act-art-55-1-a-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest gpai.model_evaluation_protocols"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-55-1-b",
+            "class": "ai-act-obligation",
+            "title": "Art.55(1)(b) — Adversarial testing (red-teaming).",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.55(1)(b)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai_systemic"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "gpai.adversarial_red_teaming"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-55-1-b-statement",
+                "name": "statement",
+                "prose": "Adversarial testing (red-teaming)."
+              },
+              {
+                "id": "ai-act-art-55-1-b-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest gpai.adversarial_red_teaming"
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-55-1-c",
+            "class": "ai-act-obligation",
+            "title": "Art.55(1)(c) — Serious incidents reported to AI Office within 2 weeks.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.55(1)(c)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai_systemic"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "incident_runbook_present, serious_incident_report_within_15_days"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-55-1-c-statement",
+                "name": "statement",
+                "prose": "Serious incidents reported to AI Office within 2 weeks."
+              },
+              {
+                "id": "ai-act-art-55-1-c-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Use tkeir-audit incident --kind ai-office."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-55-1-d",
+            "class": "ai-act-obligation",
+            "title": "Art.55(1)(d) — Cybersecurity protection for systemic-risk GPAI.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.55(1)(d)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai_systemic"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "security_report_target, trivy_report_present"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-55-1-d-statement",
+                "name": "statement",
+                "prose": "Cybersecurity protection for systemic-risk GPAI."
+              },
+              {
+                "id": "ai-act-art-55-1-d-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make security-report` / `make trivy`."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-55-2",
+            "class": "ai-act-obligation",
+            "title": "Art.55(2) — Codes of practice followed.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.55(2)"
+              },
+              {
+                "name": "applies-to",
+                "value": "gpai_systemic"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "gpai.codes_of_practice"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-55-2-statement",
+                "name": "statement",
+                "prose": "Codes of practice followed."
+              },
+              {
+                "id": "ai-act-art-55-2-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Satisfy the control: attest gpai.codes_of_practice"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gate-ai_system_active",
+        "title": "Controls (gate: ai_system_active)",
+        "props": [
+          {
+            "name": "applies-to-category",
+            "value": "ai_system_active"
+          }
+        ],
+        "controls": [
+          {
+            "id": "ai-act-art-72",
+            "class": "ai-act-obligation",
+            "title": "Art.72 — Serious incident notification to market surveillance.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.72"
+              },
+              {
+                "name": "applies-to",
+                "value": "ai_system_active"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "incident_runbook_present, serious_incident_report_within_15_days"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "HIGH"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-72-statement",
+                "name": "statement",
+                "prose": "Serious incident notification to market surveillance."
+              },
+              {
+                "id": "ai-act-art-72-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Use tkeir-audit incident --kind serious."
+              }
+            ]
+          },
+          {
+            "id": "ai-act-art-73",
+            "class": "ai-act-obligation",
+            "title": "Art.73 — Post-market monitoring plan in place.",
+            "props": [
+              {
+                "name": "article",
+                "value": "Art.73"
+              },
+              {
+                "name": "applies-to",
+                "value": "ai_system_active"
+              },
+              {
+                "name": "opa-rule",
+                "value": "eu.ai_act.violations"
+              },
+              {
+                "name": "tkeir-evidence",
+                "value": "audit_evidence_dir_non_empty, feedback_loop_controls"
+              },
+              {
+                "name": "severity-if-violated",
+                "value": "MEDIUM"
+              }
+            ],
+            "parts": [
+              {
+                "id": "ai-act-art-73-statement",
+                "name": "statement",
+                "prose": "Post-market monitoring plan in place."
+              },
+              {
+                "id": "ai-act-art-73-tkeir-implementation",
+                "name": "tkeir-implementation",
+                "prose": "Run `make audit-evidence` / `make audit-report`."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

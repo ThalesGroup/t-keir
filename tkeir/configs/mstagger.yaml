@@ -1,0 +1,10 @@
+logger:
+  logging-level: info
+morphosyntax:
+  taggers:
+  - language: en
+    resources-base-path: resources/modeling/tokenizer/en
+    use-mwe: false
+    pre-sentencizer: true
+    pre-tagging-with-concept: false
+    add-concept-in-knowledge-graph: false

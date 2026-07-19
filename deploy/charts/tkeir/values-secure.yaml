@@ -1,0 +1,39 @@
+# Profile: k8s-secure (P3) — governor enforce + audit; SPIRE deferred (ADR-0004)
+
+global:
+  env: staging
+
+vespa:
+  enabled: true
+  resourceProfile: small
+
+api:
+  enabled: true
+  env:
+    TKEIR_ENV: staging
+
+hmi:
+  enabled: true
+  env:
+    AUTH_ENABLED: "true"
+
+indexer:
+  enabled: true
+
+inference:
+  enabled: true
+  mode: external
+
+governor:
+  enabled: true
+  mode: enforce
+
+audit:
+  enabled: true
+
+keycloak:
+  enabled: true
+  useExisting: false
+
+ingest:
+  enabled: true

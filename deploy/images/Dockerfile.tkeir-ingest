@@ -1,0 +1,71 @@
+# Digests resolved 2026-07-17 from Docker Hub OCI indexes (multi-arch).
+ARG PYTHON_BASE=python:3.11-slim@sha256:db3ff2e1800a8581e2c48a27c3995339d47bdf046da21c7627accd3d51053a93
+
+FROM ${PYTHON_BASE} AS builder
+
+ARG MODEL_MODE=fetch
+ENV DEBIAN_FRONTEND=noninteractive \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_DOWNLOADS=0
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -LsSf https://astral.sh/uv/install.sh \
+      | env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh \
+    && chmod 755 /usr/local/bin/uv
+
+WORKDIR /opt/tkeir
+COPY tkeir/pyproject.toml tkeir/uv.lock tkeir/README.md ./
+COPY tkeir/thot ./thot
+COPY tkeir/configs ./configs
+COPY tkeir/resources ./resources
+
+RUN uv sync --frozen --no-dev
+
+FROM ${PYTHON_BASE} AS runtime
+
+ARG VERSION=0.0.0-dev
+ARG GIT_COMMIT=unknown
+ARG BUILD_DATE=unknown
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH=/opt/tkeir/.venv/bin:$PATH \
+    TKEIR_SERVICE=tkeir-ingest \
+    INGEST_HOST=0.0.0.0 \
+    INGEST_PORT=8091 \
+    INGEST_ROOT=/var/tkeir/ingest \
+    TRANSFORMERS_CACHE=/tmp/transformers \
+    HF_HOME=/tmp/huggingface
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 10001 tkeir \
+    && useradd --uid 10001 --gid 10001 --create-home --shell /usr/sbin/nologin tkeir \
+    && mkdir -p /tmp/transformers /tmp/huggingface /var/tkeir/ingest \
+    && chown -R 10001:10001 /tmp/transformers /tmp/huggingface /var/tkeir/ingest
+
+WORKDIR /opt/tkeir
+COPY --from=builder --chown=10001:10001 /opt/tkeir /opt/tkeir
+
+USER 10001
+EXPOSE 8091
+
+LABEL org.opencontainers.image.title="tkeir-ingest" \
+      org.opencontainers.image.description="T-KEIR document ingest FastAPI" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.source="https://github.com/ThalesGroup/t-keir" \
+      org.opencontainers.image.vendor="Thales Group" \
+      org.opencontainers.image.licenses="MIT"
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${INGEST_PORT}/health" || exit 1
+
+ENTRYPOINT ["tkeir-ingest"]

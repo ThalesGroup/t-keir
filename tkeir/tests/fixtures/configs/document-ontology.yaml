@@ -1,0 +1,8 @@
+logger:
+  logging-level: error
+document-ontology:
+  builders:
+  - language: en
+    include-title-triples: true
+    include-content-triples: true
+    max-repair-attempts: 2

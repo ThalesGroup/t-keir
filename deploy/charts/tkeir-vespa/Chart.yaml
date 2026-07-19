@@ -1,0 +1,10 @@
+apiVersion: v2
+name: tkeir-vespa
+description: Vespa for T-KEIR (dev single-node; prod split later)
+type: application
+version: 0.1.0
+appVersion: "8"
+dependencies:
+  - name: tkeir-lib
+    version: "0.1.0"
+    repository: "file://../tkeir-lib"

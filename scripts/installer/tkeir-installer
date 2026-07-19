@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Wrapper for tkeir-installer (plan / apply / destroy).
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+exec python3 "${ROOT}/scripts/installer/tkeir_installer.py" "$@"

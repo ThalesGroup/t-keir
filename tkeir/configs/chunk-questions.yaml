@@ -1,0 +1,8 @@
+logger:
+  logging-level: info
+chunk-questions:
+  generators:
+  - language: en
+    min-questions: 3
+    max-questions: 5
+    enable-multilingual: true

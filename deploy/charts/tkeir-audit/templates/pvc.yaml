@@ -1,0 +1,27 @@
+{{- if .Values.persistence.worm.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "tkeir-audit.fullname" . }}-worm
+  labels:
+    {{- include "tkeir-audit.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.worm.size }}
+{{- end }}
+---
+{{- if .Values.persistence.hot.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "tkeir-audit.fullname" . }}-hot
+  labels:
+    {{- include "tkeir-audit.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.persistence.hot.size }}
+{{- end }}

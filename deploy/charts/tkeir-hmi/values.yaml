@@ -1,0 +1,58 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/thalesgroup/t-keir/tkeir-hmi
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    memory: 512Mi
+
+securityContext:
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  readOnlyRootFilesystem: true
+
+# Server-side only — never NEXT_PUBLIC_API_URL in containers.
+env:
+  API_URL: ""
+  API_PROXY_TIMEOUT_MS: "300000"
+  AUTH_ENABLED: "false"
+  AUTH_URL: "http://localhost:3000"
+  AUTH_KEYCLOAK_ID: tkeir-hmi
+  AUTH_KEYCLOAK_ISSUER: ""
+  TKEIR_SERVICE: tkeir-hmi
+
+existingSecret: ""
+
+ingress:
+  enabled: false
+  className: ""
+  hosts:
+    - host: tkeir.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+serviceAccount:
+  create: true
+  name: ""
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

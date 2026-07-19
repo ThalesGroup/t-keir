@@ -1,0 +1,7 @@
+logger:
+  logging-level: error
+syntax:
+  taggers:
+  - language: en
+    resources-base-path: /Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en
+    syntactic-rules: syntactic-rules.json

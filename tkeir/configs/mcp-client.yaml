@@ -1,0 +1,18 @@
+# Outbound MCP client (Phase D) — egress allow-list for external tools.
+# Internal T-KEIR tools never go through this path.
+governor_mode: observe
+# Hosts/ports the agent runtime may call. Empty deny-all for remote HTTP.
+egress_allowlist:
+  - host: "127.0.0.1"
+    ports: [8099]
+    tools: ["echo_cite"]
+  - host: "localhost"
+    ports: [8099]
+    tools: ["echo_cite"]
+# Named external servers (optional). Tests inject in-process transports.
+servers: {}
+# Example:
+# servers:
+#   echo:
+#     base_url: "http://127.0.0.1:8099"
+#     tools: ["echo_cite"]

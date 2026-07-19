@@ -1,0 +1,8 @@
+logger:
+  logging-level: info
+syntax:
+  taggers:
+  - language: en
+    resources-base-path: resources/modeling/tokenizer/en
+    use-mwe: false
+    syntactic-rules: syntactic-rules.json

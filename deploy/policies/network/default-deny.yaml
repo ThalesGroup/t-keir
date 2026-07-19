@@ -1,0 +1,10 @@
+# Default-deny NetworkPolicy template for the tkeir namespace.
+# Applied when values-secure enables networkPolicy.
+# Explicit allows are rendered by the umbrella chart / Cilium CNPs.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tkeir-default-deny
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]

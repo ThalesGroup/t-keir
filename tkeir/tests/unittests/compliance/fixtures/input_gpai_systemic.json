@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "tool": "fixture"
+  },
+  "product": {
+    "name": "T-KEIR",
+    "is_software": true,
+    "role": "manufacturer",
+    "cra_class": null
+  },
+  "evidence": {
+    "sbom_cyclonedx_present": false,
+    "aibom_present": false,
+    "trivy_report_present": false,
+    "pip_audit_run_in_ci": false,
+    "owasp_dc_present": false,
+    "security_manifest_present": false,
+    "images_signed": false,
+    "versions_lock_present": false,
+    "security_md_present": false,
+    "changelog_present": false,
+    "annex_iv_dir_non_empty": false,
+    "audit_evidence_dir_non_empty": false,
+    "beir_eval_report_present": false,
+    "action_schema_present": false,
+    "governor_flags_present": false,
+    "governor_approvals_present": false,
+    "governor_tokens_present": false,
+    "kill_switch_runbook_present": false,
+    "hmi_admin_page_present": false,
+    "privacy_py_present": false,
+    "ingest_manifest_schema": false,
+    "audit_worm_retention_set": false,
+    "incident_runbook_present": false,
+    "networkpolicy_template": false,
+    "keycloak_realm_present": false,
+    "values_secure_present": false,
+    "compose_auth_profile": false,
+    "observability_profile": false,
+    "rollback_target_in_makefile": false,
+    "audit_verify_target": false,
+    "governor_kill_target": false,
+    "security_report_target": false,
+    "beir_eval_target": false,
+    "ci_security_workflow": false,
+    "correlation_id_in_code": false,
+    "action_records_bind_versions": false,
+    "compliance_gdpr_doc": false,
+    "values_dev_present": false,
+    "audit_worm_retention_days": 0
+  },
+  "ai_act": {
+    "classification": {
+      "is_ai_system": true,
+      "is_gpai_model": true,
+      "gpai_systemic_risk": true,
+      "annex_iii_applies": false,
+      "safety_component_regulated_product": false,
+      "intended_interaction_with_natural_persons": false,
+      "processes_biometric_data": false,
+      "determined_category": "GPAI_SYSTEMIC",
+      "prohibited_practices": {
+        "subliminal_manipulation": false,
+        "exploits_vulnerabilities": false,
+        "social_scoring_public_authority": false,
+        "real_time_biometric_public_space": false,
+        "emotion_recognition_workplace_education": false,
+        "biometric_categorisation_sensitive_attributes": false,
+        "predictive_policing_individual": false
+      }
+    },
+    "attestation": {}
+  },
+  "cra": {
+    "attestation": {}
+  },
+  "gdpr": {
+    "attestation": {}
+  },
+  "nis2": {
+    "entity_type": "OUT_OF_SCOPE",
+    "attestation": {}
+  },
+  "dora": {
+    "in_scope": false,
+    "attestation": {}
+  },
+  "pld": {
+    "in_scope": false,
+    "attestation": {}
+  }
+}

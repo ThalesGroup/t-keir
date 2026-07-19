@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Convert source document to tkeir indexer document
 Author: Eric Blaudez (Eric Blaudez)
 
@@ -11,7 +10,6 @@ import os
 import sys
 import unittest
 
-from thot.core.LoggerConfiguration import LoggerConfiguration
 from thot.core.ThotLogger import LogUserContext, ThotLogger
 
 
@@ -33,7 +31,7 @@ class TestThotLogger(unittest.TestCase):
             with open("/tmp/cfg.json", "w") as f:
                 json.dump(test_dict, f)
                 f.close()
-        except Exception as e:
+        except Exception:
             self.assertFalse(True)
         fh = open("/tmp/cfg.json")
         ThotLogger.load(fh, logger_name="test")

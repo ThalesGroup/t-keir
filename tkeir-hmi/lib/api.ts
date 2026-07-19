@@ -14,7 +14,12 @@ export class RagApiError extends Error {
   }
 }
 
-export async function queryRag(request: QueryRequest): Promise<QueryResponse> {
+export interface RagQueryResult {
+  response: QueryResponse;
+  correlationId: string | null;
+}
+
+export async function queryRag(request: QueryRequest): Promise<RagQueryResult> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE}/rag/query`, {
@@ -26,9 +31,13 @@ export async function queryRag(request: QueryRequest): Promise<QueryResponse> {
     const message =
       error instanceof Error ? error.message : "Network request failed";
     throw new RagApiError(
-      `Cannot reach RAG API (${message}). Start with: cd vespa && make rag`,
+      `Cannot reach RAG API (${message}). Start with: make rag`,
     );
   }
+
+  const correlationId =
+    response.headers.get("x-correlation-id") ||
+    response.headers.get("X-Correlation-Id");
 
   if (!response.ok) {
     let detail = `Request failed (${response.status})`;
@@ -44,7 +53,10 @@ export async function queryRag(request: QueryRequest): Promise<QueryResponse> {
   }
 
   const raw = (await response.json()) as QueryResponse;
-  return enrichQueryResponse(raw, request.query, request.language);
+  return {
+    response: enrichQueryResponse(raw, request.query, request.language),
+    correlationId,
+  };
 }
 
 export async function checkHealth(): Promise<boolean> {

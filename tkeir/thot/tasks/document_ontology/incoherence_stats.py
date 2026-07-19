@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Compact SHACL incoherence statistics for pipeline output."""
 
 from __future__ import annotations
@@ -6,7 +5,6 @@ from __future__ import annotations
 from collections import Counter
 
 from rdflib import Graph, URIRef
-from rdflib.namespace import RDF
 
 
 def _local_name_from_uri(value: str) -> str:

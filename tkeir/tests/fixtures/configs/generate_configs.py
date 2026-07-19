@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generate functional test service configs without Jinja placeholders."""
 
-import json
 import os
+
+import yaml
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.abspath(
@@ -11,13 +12,13 @@ RES = os.path.abspath(
 LOGGER = {"logging-level": "error"}
 
 CONFIGS = {
-    "converter.json": {
+    "converter.yaml": {
         "logger": LOGGER,
         "converter": {
             "settings": {"output": {"zip": True}},
         },
     },
-    "tokenizer.json": {
+    "tokenizer.yaml": {
         "logger": LOGGER,
         "tokenizers": {
             "segmenters": [
@@ -32,7 +33,7 @@ CONFIGS = {
             ],
         },
     },
-    "mstagger.json": {
+    "mstagger.yaml": {
         "logger": LOGGER,
         "morphosyntax": {
             "taggers": [
@@ -46,7 +47,7 @@ CONFIGS = {
             ],
         },
     },
-    "nertagger.json": {
+    "nertagger.yaml": {
         "logger": LOGGER,
         "named-entities": {
             "label": [
@@ -59,7 +60,7 @@ CONFIGS = {
             ],
         },
     },
-    "syntactic-tagger.json": {
+    "syntactic-tagger.yaml": {
         "logger": LOGGER,
         "syntax": {
             "taggers": [
@@ -71,7 +72,7 @@ CONFIGS = {
             ],
         },
     },
-    "keywords.json": {
+    "keywords.yaml": {
         "logger": LOGGER,
         "keywords": {
             "extractors": [
@@ -84,7 +85,7 @@ CONFIGS = {
             ],
         },
     },
-    "golden-chunking.json": {
+    "golden-chunking.yaml": {
         "logger": LOGGER,
         "golden-chunking": {
             "chunkers": [
@@ -98,7 +99,7 @@ CONFIGS = {
             ],
         },
     },
-    "document-ontology.json": {
+    "document-ontology.yaml": {
         "logger": LOGGER,
         "document-ontology": {
             "builders": [
@@ -111,7 +112,7 @@ CONFIGS = {
             ],
         },
     },
-    "chunk-questions.json": {
+    "chunk-questions.yaml": {
         "logger": LOGGER,
         "chunk-questions": {
             "generators": [
@@ -129,4 +130,4 @@ CONFIGS = {
 if __name__ == "__main__":
     for name, data in CONFIGS.items():
         with open(os.path.join(DIR, name), "w", encoding="utf-8") as fh:
-            json.dump(data, fh, indent=4)
+            yaml.safe_dump(data, fh, default_flow_style=False, sort_keys=False)

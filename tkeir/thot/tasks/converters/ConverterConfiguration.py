@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Converter configuration."""
 
-from thot.core.ConfigurationUtils import load_json_configuration
+from thot.core.ConfigurationUtils import load_configuration
 from thot.core.LoggerConfiguration import LoggerConfiguration
 
 
@@ -18,10 +17,10 @@ class ConverterConfiguration:
         self.configuration = {}
 
     def load(self, config_f=None, path: list = []):
-        """Load converter configuration from a JSON file handle.
+        """Load converter configuration from a YAML/JSON file handle.
 
         Args:
-            config_f: Open file-like object containing JSON.
+            config_f: Open file-like object containing YAML or JSON.
             path: Unused legacy parameter kept for API compatibility.
 
         Example:
@@ -29,7 +28,7 @@ class ConverterConfiguration:
             >>> isinstance(cfg.load, type(cfg.loads))
             True
         """
-        self.loads(load_json_configuration(config_f))
+        self.loads(load_configuration(config_f))
 
     def loads(self, configuration: dict | None = None):
         """Load converter configuration from a dictionary.

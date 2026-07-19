@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Aggregate pipeline output statistics for result documents."""
 
 from __future__ import annotations

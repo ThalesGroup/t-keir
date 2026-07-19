@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for chunk-level synthetic question generation."""
 
 import os
@@ -77,7 +76,7 @@ class TestChunkQuestionGenerator:
 
         config = ChunkQuestionGeneratorConfiguration()
         with open(
-            os.path.join(configs_dir(), "chunk-questions.json"),
+            os.path.join(configs_dir(), "chunk-questions.yaml"),
             encoding="utf-8",
         ) as handle:
             config.load(handle)

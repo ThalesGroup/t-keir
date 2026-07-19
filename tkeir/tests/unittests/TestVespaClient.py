@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for Vespa feed helpers."""
 
 from thot.tools.search.vespa_client import (
@@ -76,6 +75,43 @@ def test_build_text_raw_contains_or_clause_escapes_quotes():
     assert build_text_raw_contains_or_clause('say "hi"') == (
         '(text_raw contains "say \\"hi\\"" OR text_raw contains "say" OR text_raw contains "\\"hi\\"")'
     )
+
+
+def test_normalize_user_space_and_streaming_ids():
+    from thot.tools.search.vespa_client import (
+        _parse_vespa_id,
+        chunk_vespa_id,
+        document_vespa_id,
+        normalize_user_space,
+    )
+
+    assert normalize_user_space("bad:group") == "bad_group"
+    doc_id = document_vespa_id("file://a.pdf", user_space="alice")
+    assert doc_id.startswith("id:default:tkeir_document:g=alice:")
+    ns, schema, group, key = _parse_vespa_id(doc_id)
+    assert (ns, schema, group) == ("default", "tkeir_document", "alice")
+    assert len(key) == 32
+    chunk_id = chunk_vespa_id("c1", user_space="alice")
+    assert _parse_vespa_id(chunk_id)[2] == "alice"
+
+
+def test_build_hybrid_search_payload_sets_streaming_group():
+    from thot.tools.search.vespa_client import VespaClient, VespaConfig
+
+    client = VespaClient(
+        config=VespaConfig(
+            document_api_url="http://localhost:8080/document/v1",
+            search_api_url="http://localhost:8080/search/",
+            config_server_url_base="http://localhost:19071",
+            timeout_seconds=60.0,
+            embedding_dim=384,
+            user_space="default",
+        )
+    )
+    payload = client.build_hybrid_search_payload(
+        "hello", [0.0] * 384, [0.0] * 384, user_space="tenant-1"
+    )
+    assert payload["streaming.groupname"] == "tenant-1"
 
 
 def test_build_text_raw_contains_or_clause_empty():

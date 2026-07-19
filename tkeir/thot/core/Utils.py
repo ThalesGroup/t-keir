@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Utilitary functions
 
 Author: Eric Blaudez (Eric Blaudez)

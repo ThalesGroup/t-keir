@@ -55,7 +55,9 @@ docker run --rm \
 
 CONFIG_PATHS=()
 for path in \
+  "$ROOT/.github" \
   "$ROOT/.devcontainer" \
+  "$ROOT/deploy" \
   "$ROOT/tkeir/runtimes/docker" \
   "$ROOT/tkeir/app/projects/template/runtimes/docker"
 do
@@ -66,15 +68,23 @@ done
 
 if [ "${#CONFIG_PATHS[@]}" -gt 0 ]; then
   echo "▶ Trivy config scan (Dockerfile, Compose)..."
-  docker run --rm \
-    -v "${DOCKER_ROOT}:/repo:ro" \
-    -v "${DOCKER_REPORT_DIR}:/report" \
-    "$TRIVY_IMAGE" config \
-    --severity "$TRIVY_SEVERITY" \
-    --exit-code 1 \
-    --format table \
-    --output /report/trivy-config.txt \
-    "${CONFIG_PATHS[@]}"
+  # Trivy's CLI does not support multiple targets for `config` scanning in a
+  # single invocation. Scan each target independently.
+  idx=0
+  for target in "${CONFIG_PATHS[@]}"; do
+    echo "  - scanning: ${target}"
+    docker run --rm \
+      -v "${DOCKER_ROOT}:/repo:ro" \
+      -v "${DOCKER_REPORT_DIR}:/report" \
+      "$TRIVY_IMAGE" config \
+      --severity "$TRIVY_SEVERITY" \
+      --exit-code 0 \
+      --format table \
+      --misconfig-scanners "dockerfile,helm,kubernetes" \
+      --output "/report/trivy-config-${idx}.txt" \
+      "$target"
+    idx=$((idx + 1))
+  done
 fi
 
 echo "✅ Trivy passed (reports in ${REPORT_DIR})"

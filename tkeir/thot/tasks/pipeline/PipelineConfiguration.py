@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
 """Pipeline configuration loader."""
 
-import os
-
-from thot.core.ConfigurationUtils import load_json_configuration
+from thot.core.ConfigurationUtils import (
+    load_configuration,
+    resolve_config_path,
+)
 from thot.core.LoggerConfiguration import LoggerConfiguration
 from thot.core.TkeirPaths import (
     configs_dir,
     effective_resources_path,
-    resolve_path,
 )
 from thot.core.Utils import apply_use_mwe_to_entries
 from thot.tasks.chunk_questions.ChunkQuestionGeneratorConfiguration import (
@@ -59,23 +58,23 @@ class PipelineConfiguration:
         self.task_configs = {}
 
     def load(self, config_f):
-        """Load pipeline configuration from a JSON file handle.
+        """Load pipeline configuration from a YAML/JSON file handle.
 
         Args:
-            config_f: Open file-like object containing JSON.
+            config_f: Open file-like object containing YAML or JSON.
 
         Example:
             >>> cfg = PipelineConfiguration()
             >>> isinstance(cfg.load, type(cfg.loads))
             True
         """
-        self.loads(load_json_configuration(config_f))
+        self.loads(load_configuration(config_f))
 
     def loads(self, configuration: dict):
         """Load pipeline configuration from a dictionary.
 
         Args:
-            configuration: Parsed pipeline JSON configuration.
+            configuration: Parsed pipeline configuration.
 
         Example:
             >>> cfg = PipelineConfiguration()
@@ -100,7 +99,7 @@ class PipelineConfiguration:
 
         Args:
             task_name: Pipeline task name.
-            config_path: Path to the task JSON configuration.
+            config_path: Path to the task YAML/JSON configuration.
 
         Returns:
             Loaded task configuration object.
@@ -120,11 +119,7 @@ class PipelineConfiguration:
         """
         if task_name not in self.TASK_CONFIG_CLASSES:
             raise ValueError("Unsupported pipeline task: " + task_name)
-        resolved = config_path
-        if not os.path.isabs(resolved):
-            resolved = os.path.join(
-                configs_dir(), os.path.basename(config_path)
-            )
+        resolved = resolve_config_path(config_path, search_dir=configs_dir())
         config = self.TASK_CONFIG_CLASSES[task_name]()
         with open(resolved, encoding="utf-8") as handle:
             config.load(handle)  # type: ignore[attr-defined]

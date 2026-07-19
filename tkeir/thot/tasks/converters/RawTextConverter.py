@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Convert plain text documents to tkeir format."""
 
 from bs4 import BeautifulSoup

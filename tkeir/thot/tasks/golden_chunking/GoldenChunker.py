@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Golden chunking task for hierarchical indexing."""
 
 from thot.tasks.golden_chunking import (

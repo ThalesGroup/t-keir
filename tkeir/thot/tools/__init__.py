@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Standalone CLI tools for T-KEIR.
 
 Subpackages:

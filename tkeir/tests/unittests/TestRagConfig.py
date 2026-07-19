@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for RAG runtime configuration loading."""
 
 from thot.tools.search.rag_config import (
@@ -32,8 +31,38 @@ def test_load_rag_config_reads_min_keyword_length():
     }
     assert isinstance(config.search.rerank.enabled, bool)
     assert config.search.rerank.candidates >= 1
+    assert config.search.rerank.strategy in {
+        "cross_encoder",
+        "embedding_cosine",
+    }
     assert config.models.embedding_model
     assert config.models.reranker_model
+    assert config.vespa.url.startswith("http")
+    assert config.vespa.config_url.startswith("http")
+    assert config.vespa.timeout_seconds >= 1.0
+    assert config.vespa.concurrency.index_workers >= 1
+    assert config.vespa.concurrency.chunk_workers >= 1
+    assert config.vespa.concurrency.query_workers >= 1
+    assert config.vespa.concurrency.enrich_workers >= 1
+
+
+def test_vespa_config_from_mapping():
+    from thot.tools.search.rag_config import _vespa_config_from_mapping
+
+    cfg = _vespa_config_from_mapping(
+        {
+            "url": "http://vespa:8080/",
+            "config_url": "http://vespa:19071/",
+            "timeout_seconds": 45,
+            "concurrency": {"index_workers": 2, "query_workers": 3},
+        }
+    )
+    assert cfg.url == "http://vespa:8080"
+    assert cfg.config_url == "http://vespa:19071"
+    assert cfg.timeout_seconds == 45.0
+    assert cfg.concurrency.index_workers == 2
+    assert cfg.concurrency.query_workers == 3
+    assert cfg.concurrency.chunk_workers >= 1
 
 
 def test_passage_config_from_nested_mapping():

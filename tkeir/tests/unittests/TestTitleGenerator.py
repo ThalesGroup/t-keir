@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for automatic title generation."""
 
 from thot.tasks.keywords.TitleGenerator import generate_missing_title

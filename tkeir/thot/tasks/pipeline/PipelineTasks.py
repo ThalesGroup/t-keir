@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Pipeline task ordering and dependency resolution."""
 
 from __future__ import annotations

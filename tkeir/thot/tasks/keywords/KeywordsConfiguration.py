@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Keyword configuration
 Author: Eric Blaudez (Eric Blaudez)
 
@@ -6,8 +5,7 @@ Copyright (c) 2022 THALES
 All Rights Reserved.
 """
 
-import json
-
+from thot.core.ConfigurationUtils import load_configuration
 from thot.core.LoggerConfiguration import LoggerConfiguration
 
 
@@ -73,7 +71,7 @@ class KeywordsConfiguration:
                     >>> callable(KeywordsConfiguration().load)
                     True
         """
-        json_config = json.load(config_f)
+        json_config = load_configuration(config_f)
         self.loads(json_config)
 
     def loads(self, configuration: dict | None = None):

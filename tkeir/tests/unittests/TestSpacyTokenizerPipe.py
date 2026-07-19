@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Regression tests for SpacyTokenizerPipe without MWE."""
 
 from spacy.tokens import Doc

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Detect and verify converter input formats before conversion."""
 
 from __future__ import annotations

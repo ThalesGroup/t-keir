@@ -8,9 +8,10 @@ import asyncio
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from thot.core.LlmWrapper import UnifiedLLMWrapper
+from thot.tools.search.rag_config import load_rag_config
 from thot.tools.search.vespa_client import (
     VespaClient,
     build_chunk_tensor,
@@ -22,6 +23,31 @@ from thot.tools.search.vespa_client import (
 )
 
 LOGGER = logging.getLogger(__name__)
+
+# Serialize embedding calls: concurrent Ollama/vLLM requests stall easily.
+_EMBED_LOCK = asyncio.Lock()
+
+
+class EmbeddingProvider(Protocol):
+    """Minimal embedding surface used while indexing into Vespa."""
+
+    async def embed(self, text: str) -> list[float]:
+        """Embed one text.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(EmbeddingProvider.embed)
+            True
+        """
+
+    async def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        """Embed a batch of texts.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(EmbeddingProvider.embed_batch)
+            True
+        """
 
 
 def _load_pipeline_document(path: Path) -> dict[str, Any]:
@@ -95,18 +121,72 @@ def _document_fields(document: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+async def _embed_batch_locked(
+    llm: EmbeddingProvider, texts: list[str]
+) -> list[list[float]]:
+    """Run ``embed_batch`` under the process-wide embedding lock."""
+    if not texts:
+        return []
+    async with _EMBED_LOCK:
+        return await llm.embed_batch(texts)
+
+
+async def _upsert_chunk_fields(
+    *,
+    chunk: dict[str, Any],
+    chunk_embedding: list[float],
+    question_embeddings: list[list[float]],
+    document: dict[str, Any],
+    parent_ref: str,
+    vespa: VespaClient,
+    user_space: str,
+) -> bool:
+    """Upsert one chunk (embeddings already computed). Returns True on success."""
+    chunk_id = chunk.get("chunk_id")
+    index_text = chunk_embedding_text(chunk)
+    if not chunk_id or not index_text:
+        return False
+
+    fields = {
+        "chunk_id": sanitize_vespa_string(chunk_id),
+        "doc_ref": parent_ref,
+        "parent_title": sanitize_vespa_string(document.get("title") or ""),
+        "parent_content": sanitize_vespa_strings(
+            document.get("content") or []
+        ),
+        "text_raw": index_text,
+        "chunk_embedding": build_chunk_tensor(
+            chunk_embedding,
+            vespa.config.embedding_dim,
+        ),
+        "questions_embeddings": build_questions_tensor(
+            question_embeddings,
+            vespa.config.embedding_dim,
+        ),
+    }
+    await vespa.upsert_chunk(fields, chunk_id, user_space=user_space)
+    return True
+
+
 async def index_pipeline_document(
     document: dict[str, Any],
     *,
     vespa: VespaClient,
-    llm: UnifiedLLMWrapper,
+    llm: EmbeddingProvider,
+    max_chunk_workers: int | None = None,
+    user_space: str | None = None,
 ) -> tuple[int, int]:
     """Index one pipeline document and its golden chunks into Vespa.
+
+    Embeddings are batched and serialized (safe for Ollama). Only Vespa
+    chunk upserts may run concurrently (``vespa.concurrency.chunk_workers``).
 
     Args:
         document: Parsed pipeline JSON with ``golden_chunks``.
         vespa: Connected Vespa client.
         llm: Embedding provider used for chunk and question vectors.
+        max_chunk_workers: Optional override for parallel chunk upserts.
+        user_space: Streaming group (Keycloak principal); defaults to config.
 
     Returns:
         Tuple ``(document_count, chunk_count)`` where ``document_count`` is
@@ -117,48 +197,86 @@ async def index_pipeline_document(
         >>> from thot.tools.search.index_documents import index_pipeline_document
         >>> asyncio.run(index_pipeline_document({}, vespa=None, llm=None))  # doctest: +SKIP
     """
-    source_doc_id = document["source_doc_id"]
-    await vespa.upsert_document(_document_fields(document), source_doc_id)
-    parent_ref = document_vespa_id(source_doc_id)
+    from thot.tools.search.user_space import resolve_vespa_user_space
+    from thot.tools.search.vespa_client import normalize_user_space
 
-    chunk_count = 0
+    source_doc_id = document["source_doc_id"]
+    space = normalize_user_space(user_space or resolve_vespa_user_space(None))
+    await vespa.upsert_document(
+        _document_fields(document), source_doc_id, user_space=space
+    )
+    parent_ref = document_vespa_id(source_doc_id, user_space=space)
+
+    ready_chunks: list[dict[str, Any]] = []
+    index_texts: list[str] = []
+    question_groups: list[list[str]] = []
     for chunk in document.get("golden_chunks") or []:
         chunk_id = chunk.get("chunk_id")
         index_text = chunk_embedding_text(chunk)
         if not chunk_id or not index_text:
             continue
-
-        chunk_embedding = await llm.embed(index_text)
+        ready_chunks.append(chunk)
+        index_texts.append(index_text)
         question_texts = [
             (item.get("question_text") or "").strip()
             for item in chunk.get("synthetic_questions") or []
         ]
-        question_texts = [text for text in question_texts if text]
-        question_embeddings = (
-            await llm.embed_batch(question_texts) if question_texts else []
+        question_groups.append([text for text in question_texts if text])
+
+    if not ready_chunks:
+        return 1, 0
+
+    chunk_embeddings = await _embed_batch_locked(llm, index_texts)
+
+    flat_questions = [text for group in question_groups for text in group]
+    flat_question_embeddings = await _embed_batch_locked(llm, flat_questions)
+    question_embeddings_by_chunk: list[list[list[float]]] = []
+    cursor = 0
+    for group in question_groups:
+        n = len(group)
+        question_embeddings_by_chunk.append(
+            flat_question_embeddings[cursor : cursor + n]
         )
+        cursor += n
 
-        fields = {
-            "chunk_id": sanitize_vespa_string(chunk_id),
-            "doc_ref": parent_ref,
-            "parent_title": sanitize_vespa_string(document.get("title") or ""),
-            "parent_content": sanitize_vespa_strings(
-                document.get("content") or []
-            ),
-            "text_raw": index_text,
-            "chunk_embedding": build_chunk_tensor(
-                chunk_embedding,
-                vespa.config.embedding_dim,
-            ),
-            "questions_embeddings": build_questions_tensor(
-                question_embeddings,
-                vespa.config.embedding_dim,
-            ),
-        }
-        await vespa.upsert_chunk(fields, chunk_id)
-        chunk_count += 1
+    workers = max(
+        1,
+        int(
+            max_chunk_workers
+            if max_chunk_workers is not None
+            else load_rag_config().vespa.concurrency.chunk_workers
+        ),
+    )
+    semaphore = asyncio.Semaphore(workers)
 
-    return 1, chunk_count
+    async def _one(
+        chunk: dict[str, Any],
+        embedding: list[float],
+        question_embeddings: list[list[float]],
+    ) -> bool:
+        async with semaphore:
+            return await _upsert_chunk_fields(
+                chunk=chunk,
+                chunk_embedding=embedding,
+                question_embeddings=question_embeddings,
+                document=document,
+                parent_ref=parent_ref,
+                vespa=vespa,
+                user_space=space,
+            )
+
+    outcomes = await asyncio.gather(
+        *(
+            _one(chunk, embedding, q_embs)
+            for chunk, embedding, q_embs in zip(
+                ready_chunks,
+                chunk_embeddings,
+                question_embeddings_by_chunk,
+                strict=True,
+            )
+        )
+    )
+    return 1, sum(1 for ok in outcomes if ok)
 
 
 async def index_directory(
@@ -166,15 +284,20 @@ async def index_directory(
     *,
     pattern: str,
     vespa: VespaClient,
-    llm: UnifiedLLMWrapper,
+    llm: EmbeddingProvider,
+    max_workers: int | None = None,
 ) -> tuple[int, int]:
     """Index every pipeline file matching ``pattern`` under ``input_dir``.
+
+    Documents are processed with a bounded worker pool
+    (``vespa.concurrency.index_workers``). Embeddings stay serialized.
 
     Args:
         input_dir: Directory containing pipeline JSON files.
         pattern: Glob pattern passed to :meth:`Path.glob`.
         vespa: Connected Vespa client.
         llm: Embedding provider used for chunk and question vectors.
+        max_workers: Optional override for parallel document indexing.
 
     Returns:
         Tuple ``(document_count, chunk_count)`` aggregated across all files.
@@ -185,31 +308,43 @@ async def index_directory(
         >>> from thot.tools.search.index_documents import index_directory
         >>> asyncio.run(index_directory(Path("."), pattern="*.json", vespa=None, llm=None))  # doctest: +SKIP
     """
-    document_count = 0
-    chunk_count = 0
     paths = sorted(input_dir.glob(pattern))
     if not paths:
         LOGGER.warning(
             "No pipeline files found in %s (%s)", input_dir, pattern
         )
+        return 0, 0
 
-    for path in paths:
-        try:
-            pipeline_document = _load_pipeline_document(path)
-            docs, chunks = await index_pipeline_document(
-                pipeline_document,
-                vespa=vespa,
-                llm=llm,
-            )
-            document_count += docs
-            chunk_count += chunks
-            LOGGER.info(
-                "Indexed %s (%d chunks)",
-                path.name,
-                chunks,
-            )
-        except Exception:
-            LOGGER.exception("Failed to index %s", path)
+    workers = max(
+        1,
+        int(
+            max_workers
+            if max_workers is not None
+            else load_rag_config().vespa.concurrency.index_workers
+        ),
+    )
+    semaphore = asyncio.Semaphore(workers)
+
+    async def _one(path: Path) -> tuple[int, int]:
+        async with semaphore:
+            try:
+                pipeline_document = _load_pipeline_document(path)
+                docs, chunks = await index_pipeline_document(
+                    pipeline_document,
+                    vespa=vespa,
+                    llm=llm,
+                )
+                LOGGER.info("Indexed %s (%d chunks)", path.name, chunks)
+                return docs, chunks
+            except Exception:
+                LOGGER.exception("Failed to index %s", path)
+                return 0, 0
+
+    # Bounded concurrency without scheduling the entire corpus at once when
+    # workers==1 (sequential). For workers>1, gather is fine for typical dirs.
+    results = await asyncio.gather(*(_one(path) for path in paths))
+    document_count = sum(docs for docs, _ in results)
+    chunk_count = sum(chunks for _, chunks in results)
     return document_count, chunk_count
 
 
@@ -248,13 +383,14 @@ async def _async_main(args: argparse.Namespace) -> int:
         if not await vespa.health():
             raise SystemExit(
                 "Vespa is not ready (config server, deployed application, "
-                "or document API). Run: cd vespa && make bootstrap"
+                "or document API). Run: make bootstrap"
             )
         documents, chunks = await index_directory(
             input_dir,
             pattern=args.pattern,
             vespa=vespa,
             llm=llm,
+            max_workers=args.workers,
         )
     LOGGER.info(
         "Indexing complete: %d document(s), %d chunk(s)",
@@ -264,7 +400,7 @@ async def _async_main(args: argparse.Namespace) -> int:
     if pipeline_paths and documents == 0:
         raise SystemExit(
             f"Indexing failed: 0/{len(pipeline_paths)} documents indexed. "
-            "Check Vespa logs (`cd vespa && make logs`) and the embedding "
+            "Check Vespa logs (`make logs`) and the embedding "
             "provider (default: Ollama with bge-m3 at "
             "OLLAMA_BASE_URL, e.g. http://host.docker.internal:11434 in devcontainer)."
         )
@@ -291,6 +427,12 @@ def main() -> None:
         "--pattern",
         default="*.pipeline.json",
         help="Glob pattern for pipeline files (default: *.pipeline.json)",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help="Parallel document workers (default: rag.yaml vespa.concurrency.index_workers)",
     )
     raise SystemExit(asyncio.run(_async_main(parser.parse_args())))
 

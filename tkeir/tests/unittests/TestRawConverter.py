@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for raw text converter."""
 
 import os

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test keywords configuration."""
 
 import json

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test converter configuration."""
 
 import json

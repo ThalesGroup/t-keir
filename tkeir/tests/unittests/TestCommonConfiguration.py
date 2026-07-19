@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test Common configuration
 Author: Eric Blaudez (Eric Blaudez)
 
@@ -13,7 +12,6 @@ from thot.core.CommonConfiguration import CommonConfiguration
 
 
 class TestCommonConfiguration(unittest.TestCase):
-
     def test__replace_string_by_type(self):
         test_dict = {
             "test-int": "10",
@@ -24,15 +22,9 @@ class TestCommonConfiguration(unittest.TestCase):
         cfg1 = CommonConfiguration._replace_string_by_type(
             test_dict, "test-int"
         )
-        cfg2 = CommonConfiguration._replace_string_by_type(
-            test_dict, "test-float"
-        )
-        cfg3 = CommonConfiguration._replace_string_by_type(
-            test_dict, "test-bool1"
-        )
-        cfg4 = CommonConfiguration._replace_string_by_type(
-            test_dict, "test-bool2"
-        )
+        CommonConfiguration._replace_string_by_type(test_dict, "test-float")
+        CommonConfiguration._replace_string_by_type(test_dict, "test-bool1")
+        CommonConfiguration._replace_string_by_type(test_dict, "test-bool2")
         self.assertTrue(isinstance(cfg1["test-int"], int))
         self.assertTrue(isinstance(cfg1["test-float"], float))
         self.assertTrue(isinstance(cfg1["test-bool1"], bool))

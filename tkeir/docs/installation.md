@@ -1,163 +1,162 @@
 # Installation
 
-Tested environments:
+> New users: follow **[Zero to Hero](zero_to_hero.md)** end-to-end (P0 → P4).
+> This page is the detailed **P0** install reference.
 
-* ubuntu 20.04
-* Almalinux 8
+This page covers installing T-KEIR for **local development (profile P0)**. All Make
+targets run from the **repository root**. Run `make help` for the full target list.
 
+For Compose, Kubernetes, and secured cluster profiles, see
+[Deployment profiles](deployment/index.md) and the root [INSTALL.md](../../INSTALL.md).
 
-## Installation Pre-requist : prepare T-KEIR
+## Requirements
 
-### Prepare environment
+| Tool | Notes |
+|---|---|
+| **Git** | Clone and version identity (`make build`, `make tag`) |
+| **[uv](https://docs.astral.sh/uv/getting-started/installation/)** | Python package manager (installs Python **3.11** if needed) |
+| **Make** | GNU Make or BSD Make (macOS Command Line Tools) |
+| **Docker** (optional) | Required for the [dev container](devcontainer.md), Vespa, and security scans |
+| **curl** / **jq** (optional) | Required for `make rag-query` and `make smoke-test` |
 
-* install git
+Supported host platforms: Linux (Ubuntu / AlmaLinux / similar), macOS, WSL2.
 
-```shell  title="Example under ubuntu"
-#> sudo apt install git
+Python **≥ 3.10** is required; the Makefile defaults to **3.11** (`PYTHON=3.11`).
+
+## 1. Clone the repository
+
+```bash
+git clone https://github.com/ThalesGroup/t-keir.git
+cd t-keir
 ```
 
-```shell  title="Example under almalinux"
-#> sudo dnf install git
+## 2. Choose an install path
+
+### Option A — Host install (recommended for day-to-day work)
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) if needed:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-* install wget
+From the repository root:
 
-```shell  title="Example under ubuntu"
-#> sudo apt install wget
+```bash
+make setup
 ```
 
-```shell  title="Example under almalinux"
-#> sudo dnf install wget
+This runs, in order:
+
+1. `uv sync` (dev dependencies into `tkeir/.venv`)
+2. spaCy language models
+3. Tesseract OCR check / install helper
+4. tokenizer MWE resource (`tkeir_mwe.pkl`)
+
+Verify:
+
+```bash
+make verify-lockfile
+cd tkeir && uv run --python 3.11 python -c "import thot; print('OK', thot.__file__)"
 ```
 
-* install Python (**>= 3.10**, 3.11 recommended) and [uv](https://docs.astral.sh/uv/getting-started/installation/)
+### Option B — Dev container (recommended for a clean, reproducible env)
 
-When **python** and **pip** package manager are installed you can simply run: 
+Requires Docker Desktop (or Engine + Compose v2) running on the host.
 
-```shell  title="Example under ubuntu"
-#> sudo apt install python3 python3-pip
+```bash
+make devcontainer
+# inside /workspace:
+make setup
 ```
 
-```shell  title="Example under almalinux"
-#> sudo dnf install python3
-#> sudo dnf install python3-pip
+Or in Cursor / VS Code: **Dev Containers: Reopen in Container**, then `make setup`.
+
+Full details: [Dev Container](devcontainer.md).
+
+### Option C — Wheel / workspace install (packaging or deployment)
+
+Build an installable wheel (rebuilds only when sources change):
+
+```bash
+make build
+# → dist/*.whl  (stamp: dist/.build_timestamp)
 ```
 
-```shell  title="Example install uv"
-#> curl -LsSf https://astral.sh/uv/install.sh | sh
+Install into a dedicated workspace directory:
+
+```bash
+make install-workspace WORKSPACE=$HOME/tkeir-workspace
 ```
 
-* clone repository
+Or manually:
 
-```shell  title="Example of repository clonning into 't-keir-oss' directory"
-#> git clone https://github.com/ThalesGroup/t-keir.git t-keir-oss
+```bash
+uv build --directory tkeir
+python3 -m venv $HOME/tkeirenv
+source $HOME/tkeirenv/bin/activate
+pip install dist/tkeir-*.whl
 ```
 
-### T-Keir Directory structure
+## 3. Configuration and resources
 
-* **configs**           : bundled pipeline and task configuration files
-* **docs**              : MkDocs documentation (`make docs` from repository root)
-* **tests**             : unit and functional tests
-* **thot**              : T-KEIR source code and CLI tools (`thot/tools/`)
+| Path | Purpose |
+|---|---|
+| `tkeir/configs/` | Pipeline and task YAML (`pipeline.yaml`, taggers, `rag.yaml`, …) |
+| `tkeir/resources/modeling/tokenizer/<lang>/` | Lexicons, rules, `annotation-resources.json` |
+| `tkeir/resources/modeling/tokenizer/en/tkeir_mwe.pkl` | Compiled MWE trie (`make init-models`) |
 
+Resource paths inside configs are resolved relative to the `tkeir/` package root.
+Override Hugging Face / transformer downloads with:
 
-### Python environment
-
-T-KEIR requires **Python >= 3.10** and **uv** for installation from GitHub.
-From the repository root, run `make setup` (see [Quickstart](ready_to_run.md)).
-
-### Dev container (recommended)
-
-Instead of installing Python and system packages on the host, use the bundled dev
-container: `make devcontainer` or `bash .devcontainer/enter-devcontainer.sh` from the
-host; or open the repository root in Cursor/VS Code → Command Palette →
-**Dev Containers: Reopen in Container**. Step-by-step instructions:
-[Dev Container](devcontainer.md).
-
-
-## Installation running
-
-T-Keir provides a script to install all in one time (section [Quick installation with script](#Quick-installation-with-script)).
-Alternatively and for expert, you can follow the step by step installation (section [Step by step](#Step-by-step)).
-
-### **<span style="color:green">\[RECOMMANDED\]</span>** Quick installation with the installation script
-
-The 'quick installation script' is in the root of T-Keir directory. As pre-requisite you have to make sure **wget** is installed. 
-
-After git repository cloning.
-```shell  title="Install T-Keir"
-#> ./install.sh $HOME/mytkeir
+```bash
+export TRANSFORMERS_CACHE=$PWD/.cache/models
 ```
 
-The script installs dependencies into `tkeir/.venv`. For the current OSS workflow,
-prefer `make setup` from the repository root instead of the legacy `install.sh` path.
+## 4. What to run next
 
+| Goal | Command |
+|---|---|
+| Pipeline demo on fixtures | `make quickstart` → [Quickstart](ready_to_run.md) |
+| Analyse your own files | `make pipeline PIPELINE_INPUT=… PIPELINE_OUTPUT=…` |
+| Vespa + RAG | `make bootstrap && make index-fixtures && make index && make rag` → [Vespa RAG](tools/vespa_rag.md) |
+| Quality gate before push | `make pre-commit` or `make ci` |
+| Docs site | `make docs` |
+| Docs PDF | `make docs-pdf` → `output/docs/tkeir-docs.pdf` |
+| EU compliance OPA audit | `make audit-compliance` → [EU Compliance OPA Audit](compliance/eu-audit.md) |
 
-### **<span style="color:red">\[EXPERT\] </span>** Step by Step
+## Troubleshooting
 
-After git repository cloning.
-```shell  title="Build a python wheel package:"
-#> uv build
+**Enterprise TLS / proxy** — `uv sync` or BEIR downloads fail with certificate errors.
+See [Dev Container — Troubleshooting](devcontainer.md#troubleshooting) and
+`source export_certif_macos.source` on macOS (`SSL_CERT_FILE`, `REQUESTS_CA_BUNDLE`).
+
+**`uv sync` fails on `.venv` inside the dev container** — host and container virtualenvs collide:
+
+```bash
+bash .devcontainer/ensure-venv.sh
+make install
 ```
 
-A wheel file will be created in "**dist**" directory. Then you can simply run a pip install on the created wheel.
-Note that is highly recommanded to run wheel installation in a python virtual environment.
+**Missing spaCy models** — pipeline or RAG query refinement fails:
 
-#### Install from Wheel
-
-You can directly install T-Keir from weel:
-
-Go in "dist" folder (created by uv - under **t-keir-oss** directory created by github cloning)
-
-```shell  title="Create a python virtual environement:"
-#>  python3 -m venv $HOME/tkeirenv`
+```bash
+make install-spacy-models
 ```
 
-```shell  title="Activate you environement:"
-#> source $HOME/tkeirenv/bin/activate
+**Tesseract / PDF OCR** — scanned PDFs need OCR:
+
+```bash
+make install-tesseract
 ```
 
-```shell  title="Install the Wheel:"
-#> pip install <FILE_NAME>.whl
+**`.env` secrets** — never commit `.env`. CI runs `make check-secrets` to block
+tracked credential files and high-confidence secret patterns.
+
+**Lock file drift** — after editing `tkeir/pyproject.toml`:
+
+```bash
+cd tkeir && uv lock
+# or: make deps-update
+make verify-lockfile
 ```
-
-**Troubleshooting** : if there is a problem with **pycurl** install libcurl4-openssl-dev and libssl
-
-```shell  title="E.G under debian/ubuntu:"
-#> sudo apt install libcurl4-openssl-dev libssl-dev
-```
-
-#### Configure the services
-
-Service configuration files are bundled in **tkeir/configs/**. You can copy or edit them directly; paths to lexical resources are resolved relative to the tkeir package root.
-
-##### Initialize tokenizer resources
-
-Build the multi-word expression pickle before the first pipeline run:
-
-```shell
-make init-models
-```
-
-Or explicitly:
-
-```shell
-tkeir-create-annotation-resource \
-  --entries-file resources/modeling/tokenizer/en/annotation-resources.json \
-  --output resources/modeling/tokenizer/en/tkeir_mwe.pkl
-```
-
-Set `TRANSFORMERS_CACHE` when downloading Hugging Face models used by optional tasks.
-
-## Copy or create data
-
-T-Keir comes with default configuration file.
-Nevertheless you can modify or add file. Most of them are configuration (see configuration section).
-
-### Index mappings
-
-Index mapping support has been removed from this distribution.
-
-### Resources
-
-Lexical resources and rule files are stored in **resources/modeling/tokenizer/\[en|fr...\]**. Their usage is described in **resources/modeling/tokenizer/en/annotation-resources.json**.

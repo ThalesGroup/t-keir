@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test morphosyntactic tagger configuration."""
 
 import json

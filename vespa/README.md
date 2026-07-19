@@ -2,6 +2,7 @@
 
 This directory contains the Vespa Docker deployment (schemas, shell scripts).
 Python indexing and RAG services live in `tkeir/thot/tools/search/`.
+All Make targets live in the **repository root** `Makefile` — run them from the repo root.
 
 - **`tkeir_document` schema** — parent documents with BM25 on `title` and `content`
 - **`chunk` schema** — child chunks with HNSW on `chunk_embedding` and
@@ -12,10 +13,10 @@ Python indexing and RAG services live in `tkeir/thot/tools/search/`.
 ## Quick start
 
 ```bash
-cd vespa
+# From repository root
 
-# 1. Install Python dependencies (via tkeir package)
-make sync
+# 1. Install Python dependencies
+make install
 
 # 2. Start Vespa and deploy schemas
 make bootstrap
@@ -24,8 +25,9 @@ make bootstrap
 export PROVIDER=ollama
 export EMBEDDING_MODEL=bge-m3
 export LLM_MODEL=mistral-nemo
-export RERANKER_MODEL=qllama/bge-reranker-v2-m3
-make pull-models      # ollama pull embedding + llm + reranker
+export RERANKER_MODEL=BAAI/bge-reranker-v2-m3
+export RERANK_STRATEGY=cross_encoder
+make pull-models      # ollama pull embedding + llm
 make index-fixtures   # PDFs in tkeir/tests/indexing/input → output/
 make index
 
@@ -47,13 +49,14 @@ Model settings resolve as **environment → `configs/rag.yaml` `models:` → har
 | `PROVIDER` | `ollama` | `openai`, `ollama`, or `vllm` |
 | `EMBEDDING_MODEL` | provider-specific / `rag.yaml` | Embedding model name |
 | `LLM_MODEL` | provider-specific / `rag.yaml` | Generation model name |
-| `RERANKER_MODEL` | `qllama/bge-reranker-v2-m3` | Reranker model (native `/rerank` if present, else generate/chat scoring; falls back to `LLM_MODEL`) |
+| `RERANKER_MODEL` | `BAAI/bge-reranker-v2-m3` | HuggingFace CrossEncoder id (`cross_encoder` strategy) |
+| `RERANK_STRATEGY` | `cross_encoder` | `cross_encoder` (sentence-transformers) or `embedding_cosine` |
 | `EMBEDDING_DIM` | `384` | Embedding dimension (must match schemas) |
 | `VESPA_URL` | `http://localhost:8080` | Vespa endpoint |
 | `VESPA_NAME` | `vespa` | Docker container name |
 | `VESPA_VOLUME` | `vespa_data:/opt/vespa/var` | Docker volume mount for Vespa data |
 | `BEIR_DATASETS_DIR` | `<repo>/datasets` | Cache for BEIR dataset downloads |
-| `BEIR_REPORT` | `<repo>/evaluation_report.md` | BEIR Markdown evaluation report path |
+| `BEIR_REPORT` | _(empty)_ | Optional extra BEIR report copy (docs report always written) |
 | `OPENAI_API_KEY` | — | API key for OpenAI / vLLM |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama endpoint |
 | `VLLM_BASE_URL` | `http://localhost:8000/v1` | vLLM OpenAI-compatible endpoint |
@@ -70,29 +73,31 @@ RAG prompts: `tkeir/configs/rag-prompts.yaml` (`unavailable_answer`, `no_chunks_
 Response includes `ontology` with high-value `entities` (NER) and `keywords`, each
 linked to retrieved `chunk_ids`.
 
-## Makefile targets
+## Makefile targets (repo root)
 
 ```bash
-make sync        # uv sync in tkeir/
-make pull-models # ollama pull embedding + llm + reranker (env / rag.yaml)
-make start       # docker run Vespa
-make init        # deploy schemas (Vespa already running)
-make bootstrap   # start + deploy schemas
-make check       # health check
-make test        # Vespa query smoke test
-make test-py     # Python unit tests (tkeir)
-make index-fixtures  # pipeline on tkeir/tests/indexing/input → output/ (PIPELINE_TYPE=auto)
-make index           # requires *.pipeline.json in tkeir/tests/indexing/output
-make rag         # FastAPI RAG (hybrid retrieval + Ollama rerank when enabled)
-make rag-query   # curl sample RAG request
-make clean-db    # wipe Vespa data volume (then run make bootstrap)
-make beir-eval   # BEIR BM25 + dense eval → evaluation_report.md
+make install / make sync  # uv sync in tkeir/
+make pull-models          # ollama pull embedding + llm (env / rag.yaml)
+make start                # docker run Vespa
+make init                 # deploy schemas (Vespa already running)
+make bootstrap            # start + deploy schemas
+make vespa-check          # health check
+make test-vespa           # Vespa query smoke test
+make test-vespa-py        # Python unit tests (tkeir)
+make index-fixtures       # pipeline on tkeir/tests/indexing/input → output/
+make index                # requires *.pipeline.json in tkeir/tests/indexing/output
+make rag                  # FastAPI RAG (hybrid retrieval + rerank when enabled)
+make rag-query            # curl sample RAG request
+make clean-db             # wipe Vespa data volume (then run make bootstrap)
+make vespa-clean          # stop/remove container (keeps volume)
+make logs                 # tail Vespa Docker logs
+make beir-eval            # BEIR BM25 + dense eval → tkeir/docs/evaluation_report.md
 ```
 
 ## BEIR evaluation
 
 ```bash
-cd vespa
+# From repository root
 # Full benchmark: T-KEIR pipeline + local BM25/dense vs BEIR leaderboard
 make beir-eval
 
@@ -121,25 +126,35 @@ Downloads SciFact / FiQA / ArguAna into `./datasets/` (if missing), then:
    **No answer generation** (`RetrievalEmbeddingClient` rejects `generate`)
 2. **Local BM25** / **Local dense** — in-process baselines for contrast
 3. Metrics NDCG@10 / MAP@100 / Recall@100 + **gap to best published** system
-4. Writes `evaluation_report.md` with leaderboard comparison
+4. Always writes `tkeir/docs/evaluation_report.md` (MkDocs) with leaderboard comparison
 
-Requires a working embedding + (when enabled) rerank provider
-(`PROVIDER` / `EMBEDDING_MODEL` / `RERANKER_MODEL` / `OLLAMA_BASE_URL`) and
-spaCy models. Prefetch with `make pull-models`. Rerank prefers native
-`/api/rerank` / `/v1/rerank` / OpenAI-compat `/rerank`, then scores via
-standard Ollama `/api/generate` or OpenAI/vLLM chat completions (auto-falls
-back to `LLM_MODEL` if the pulled cross-encoder cannot run as generate).
-Reindex uses volume `beir_eval_data` by default — set `BEIR_VESPA_VOLUME` /
+Requires a working embedding provider
+(`PROVIDER` / `EMBEDDING_MODEL` / `OLLAMA_BASE_URL`) and spaCy models.
+When `search.rerank` is enabled, second-stage ranking uses
+`UnifiedLLMWrapper.rerank` with either:
+
+* `cross_encoder` — sentence-transformers CrossEncoder (`RERANKER_MODEL`,
+  default `BAAI/bge-reranker-v2-m3`, downloaded on first use)
+* `embedding_cosine` — cosine over query/doc embeddings from the configured
+  embedding provider
+
+Prefetch Ollama embed/LLM with `make pull-models`. Reindex uses volume
+`beir_eval_data` by default — set `BEIR_VESPA_VOLUME` /
 `BEIR_VESPA_NAME` to isolate from your primary corpus. Redeploy Vespa after
 schema changes:
 
 ```bash
-cd vespa && make clean-db && make bootstrap
+make clean-db && make bootstrap
 ```
+
+If `uv sync` or BEIR downloads fail with TLS / certificate errors behind a
+corporate proxy, see
+[Troubleshooting — enterprise certificates](../tkeir/docs/devcontainer.md#troubleshooting)
+(or `source export_certif_macos.source` on macOS).
 
 ## CLI entry points (from tkeir/)
 
-Equivalent `python -m` modules (used by `vespa/Makefile`):
+Equivalent `python -m` modules (used by the root `Makefile`):
 
 | CLI | Module |
 |---|---|

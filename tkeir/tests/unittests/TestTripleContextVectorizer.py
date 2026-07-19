@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for SVO context TF-IDF clustering."""
 
 from thot.tasks.document_ontology.OntologyAlignment import (

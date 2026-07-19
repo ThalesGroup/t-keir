@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for ontology class/property alignment and SHACL induction."""
 
 from __future__ import annotations

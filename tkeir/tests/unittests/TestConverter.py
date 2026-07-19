@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test converter
 Author: Eric Blaudez (Eric Blaudez)
 
@@ -82,7 +81,7 @@ class TestConverter:
     def test_convert_email_with_config(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         config_path = os.path.abspath(
-            os.path.join(dir_path, "../fixtures/configs/converter.json")
+            os.path.join(dir_path, "../fixtures/configs/converter.yaml")
         )
         mail_path = os.path.abspath(
             os.path.join(dir_path, "../fixtures/test-raw/mail/mail1.txt")

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Logger configuration
 define logger configuration
 
@@ -8,10 +7,10 @@ Copyright (c) 2022 THALES
 All Rights Reserved.
 """
 
-import json
 import logging
 
 from thot.core.CommonConfiguration import CommonConfiguration
+from thot.core.ConfigurationUtils import load_configuration
 
 
 class LoggerConfiguration:
@@ -77,7 +76,7 @@ class LoggerConfiguration:
             'info'
         """
         self.configuration = CommonConfiguration.go_to_configuration_field(
-            json.load(config_f), path
+            load_configuration(config_f), path
         )
         self.logger_name = logger_name
         self._default_load()

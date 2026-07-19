@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """NER Tagger
 
 Author : Eric Blaudez (Eric Blaudez)
@@ -12,9 +11,7 @@ import json
 import os
 import pickle
 import traceback
-from subprocess import call
 
-import spacy
 from spacy.tokens import Span
 
 import thot.core.Constants as Constants

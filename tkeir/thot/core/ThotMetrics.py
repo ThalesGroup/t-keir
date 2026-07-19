@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Observability Metrics
 
 Author: Eric Blaudez (Eric Blaudez)

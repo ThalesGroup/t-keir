@@ -8,8 +8,8 @@ REST service. Tagging uses spaCy models configured per language.
 
 Example of Configuration:
 
-```json title="mstagger.json"
---8<-- "./configs/mstagger.json"
+```yaml title="mstagger.yaml"
+--8<-- "./configs/mstagger.yaml"
 ```
 
 Morphosyntactic tagger configuration contains a top-level `logger` section and morphosyntax-specific `taggers` settings.
@@ -44,7 +44,7 @@ The logger fields is:
 ## Morphosyntactic tagger usage
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks morphosyntax
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks morphosyntax
 ```
 
 ## Morphosyntactic Tagger Tests

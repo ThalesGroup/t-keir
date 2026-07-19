@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Generate a document title when the converter did not provide one."""
 
 from __future__ import annotations

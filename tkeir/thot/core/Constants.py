@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Common configuration
 
 Common configuration function

@@ -8,6 +8,7 @@ import {
   SearchHeader,
   type SearchParams,
 } from "@/components/search-header";
+import { AuthButton } from "@/components/auth-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { checkHealth, queryRag, RagApiError } from "@/lib/api";
@@ -18,6 +19,7 @@ export function RagDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [response, setResponse] = useState<QueryResponse | null>(null);
+  const [correlationId, setCorrelationId] = useState<string | null>(null);
   const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
   const [activeChunkIds, setActiveChunkIds] = useState<Set<string> | null>(
     null,
@@ -47,13 +49,15 @@ export function RagDashboard() {
     setLoading(true);
     setError(null);
     setResponse(null);
+    setCorrelationId(null);
     setSubmittedQuery(query);
     setActiveChunkIds(null);
     setActiveLabel(null);
 
     try {
       const result = await queryRag({ query, language, hits });
-      setResponse(result);
+      setResponse(result.response);
+      setCorrelationId(result.correlationId);
     } catch (caught) {
       const message =
         caught instanceof RagApiError
@@ -63,6 +67,7 @@ export function RagDashboard() {
             : "An unexpected error occurred.";
       setError(message);
       setResponse(null);
+      setCorrelationId(null);
     } finally {
       setLoading(false);
     }
@@ -118,14 +123,29 @@ export function RagDashboard() {
               Two-level retrieval — documents & chunks with fused ontology
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setDarkMode((value) => !value)}
-            aria-label="Toggle dark mode"
-          >
-            {darkMode ? <Sun /> : <Moon />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <a
+              href="/agents"
+              className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+            >
+              Agents
+            </a>
+            <a
+              href="/admin"
+              className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+            >
+              Admin
+            </a>
+            <AuthButton />
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setDarkMode((value) => !value)}
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <Sun /> : <Moon />}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -137,7 +157,7 @@ export function RagDashboard() {
             <AlertDescription>
               Start the FastAPI server with{" "}
               <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                cd vespa &amp;&amp; make rag
+                make rag
               </code>{" "}
               (default port 8090).
             </AlertDescription>
@@ -157,6 +177,7 @@ export function RagDashboard() {
         <RagResults
           submittedQuery={submittedQuery}
           response={response}
+          correlationId={correlationId}
           loading={loading}
           activeChunkIds={activeChunkIds}
           activeLabel={activeLabel}

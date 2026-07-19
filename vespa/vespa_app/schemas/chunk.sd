@@ -1,9 +1,13 @@
 schema chunk {
     document chunk {
+        field user_space type string {
+            indexing: summary | attribute
+        }
         field chunk_id type string {
             indexing: summary | attribute
         }
-        field doc_ref type reference<tkeir_document> {
+        # Parent id string (same streaming group). Avoids global docs.
+        field doc_ref type string {
             indexing: summary | attribute
         }
         field parent_title type string {
@@ -18,15 +22,14 @@ schema chunk {
             indexing: summary | index | attribute
             index: enable-bm25
         }
+        # Streaming mode: exact nearestNeighbor (no HNSW index).
         field chunk_embedding type tensor<float>(x[384]) {
-            indexing: attribute | index
+            indexing: attribute
             attribute { distance-metric: angular }
-            index { hnsw }
         }
         field questions_embeddings type tensor<float>(q{}, x[384]) {
-            indexing: attribute | index
+            indexing: attribute
             attribute { distance-metric: angular }
-            index { hnsw }
         }
     }
 

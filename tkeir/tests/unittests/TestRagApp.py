@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for RAG prompt configuration helpers."""
 
 from thot.tools.search.app import (

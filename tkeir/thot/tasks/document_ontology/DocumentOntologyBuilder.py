@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Document ontology pipeline task."""
 
 from thot.core.KeywordRules import DEFAULT_MIN_KEYWORD_LENGTH

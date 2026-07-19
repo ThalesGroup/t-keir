@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit tests for Vespa ontology utilities."""
 
 from thot.tools.search.ontology_utils import (
@@ -10,7 +9,6 @@ from thot.tools.search.ontology_utils import (
     format_svo_ontology_context,
     merge_rdf_graphs,
     merge_turtle_graphs,
-    serialize_graph_json_ld,
     truncate_for_prompt,
 )
 

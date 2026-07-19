@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Functional tests for unified pipeline CLI."""
 
 import json
@@ -36,14 +35,14 @@ class TestPipelineFunctional:
             config_path = os.path.abspath(
                 os.path.join(
                     os.path.dirname(__file__),
-                    "../fixtures/configs/pipeline.json",
+                    "../fixtures/configs/pipeline.yaml",
                 )
             )
             if not os.path.isfile(config_path):
                 config_path = os.path.abspath(
                     os.path.join(
                         os.path.dirname(__file__),
-                        "../../configs/pipeline.json",
+                        "../../configs/pipeline.yaml",
                     )
                 )
 

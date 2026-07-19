@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Convert source document to tkeir indexer document
 Author: Eric Blaudez (Eric Blaudez)
 
@@ -6,7 +5,6 @@ Copyright (c) 2020 by THALES
 """
 
 import json
-import os
 import unittest
 
 from thot.core.LoggerConfiguration import LoggerConfiguration
@@ -20,7 +18,7 @@ class TestLoggerConfiguration(unittest.TestCase):
             with open("/tmp/cfg.json", "w") as f:
                 json.dump(test_dict, f)
                 f.close()
-        except Exception as e:
+        except Exception:
             self.assertFalse(True)
         fh = open("/tmp/cfg.json")
         logger_config = LoggerConfiguration()

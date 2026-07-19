@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Refine RAG search queries with the T-KEIR NLP pipeline."""
 
 from __future__ import annotations

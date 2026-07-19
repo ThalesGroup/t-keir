@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Resolve bundled T-KEIR configuration and resource paths."""
 
 from __future__ import annotations
@@ -33,7 +32,7 @@ def configs_dir() -> str:
     Example:
         >>> import os
         >>> from thot.core.TkeirPaths import configs_dir
-        >>> os.path.isfile(os.path.join(configs_dir(), "pipeline.json"))
+        >>> os.path.isfile(os.path.join(configs_dir(), "pipeline.yaml"))
         True
     """
     return os.path.join(package_root(), "configs")
@@ -85,7 +84,9 @@ def vespa_dir() -> str:
     Example:
         >>> import os
         >>> from thot.core.TkeirPaths import vespa_dir
-        >>> os.path.isfile(os.path.join(vespa_dir(), "Makefile"))
+        >>> os.path.isdir(vespa_dir())
+        True
+        >>> os.path.isfile(os.path.join(vespa_dir(), "start_vespa.sh"))
         True
     """
     return os.path.join(repo_root(), "vespa")
@@ -121,6 +122,35 @@ def rag_config_path() -> str:
     return os.path.join(configs_dir(), "rag.yaml")
 
 
+def docs_dir() -> str:
+    """Return the MkDocs documentation directory.
+
+    Returns:
+        Absolute path to ``tkeir/docs``.
+
+    Example:
+        >>> import os
+        >>> from thot.core.TkeirPaths import docs_dir
+        >>> os.path.isdir(docs_dir())
+        True
+    """
+    return os.path.join(package_root(), "docs")
+
+
+def evaluation_report_path() -> str:
+    """Return the BEIR evaluation report path under documentation.
+
+    Returns:
+        Absolute path to ``docs/evaluation_report.md``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import evaluation_report_path
+        >>> evaluation_report_path().endswith("docs/evaluation_report.md")
+        True
+    """
+    return os.path.join(docs_dir(), "evaluation_report.md")
+
+
 def resolve_path(path: str) -> str:
     """Expand a path relative to the ``tkeir`` package root.
 
@@ -132,7 +162,7 @@ def resolve_path(path: str) -> str:
 
     Example:
         >>> from thot.core.TkeirPaths import resolve_path
-        >>> resolve_path("configs/pipeline.json").endswith("configs/pipeline.json")
+        >>> resolve_path("configs/pipeline.yaml").endswith("configs/pipeline.yaml")
         True
     """
     if not path or os.path.isabs(path):

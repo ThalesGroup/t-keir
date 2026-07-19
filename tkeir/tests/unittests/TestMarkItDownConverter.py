@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
-import pytest
-
 """Test MarkItDown converter."""
 
 import os
 from unittest.mock import patch
 from uuid import uuid4
+
+import pytest
 
 from thot.core.ThotLogger import LogUserContext
 from thot.tasks.converters.MarkItDownConverter import MarkItDownConverter

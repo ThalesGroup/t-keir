@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Validate document RDF graphs with SHACL."""
 
 from __future__ import annotations

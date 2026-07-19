@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Keyword extractor based on RAKE algorithm
 
 Author: Eric Blaudez (Eric Blaudez)
@@ -29,7 +28,7 @@ class Metric(Enum):
     WORD_FREQUENCY = 2  # Uses f(w) alone as the metric
 
 
-class NLTKRake(object):
+class NLTKRake:
     """Rapid Automatic Keyword Extraction Algorithm."""
 
     def __init__(
@@ -98,11 +97,11 @@ class NLTKRake(object):
             True
         """
         flat_tokens = []
-        for l in doc_token:
-            if isinstance(l, list):
-                flat_tokens = flat_tokens + self.flattern_token_list(l)
+        for item in doc_token:
+            if isinstance(item, list):
+                flat_tokens = flat_tokens + self.flattern_token_list(item)
             else:
-                flat_tokens = flat_tokens + [l]
+                flat_tokens = flat_tokens + [item]
         return flat_tokens
 
     def extract_keywords_from_tkeir(self, tkeir_doc, section_name):

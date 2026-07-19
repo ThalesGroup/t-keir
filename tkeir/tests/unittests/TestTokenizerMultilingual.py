@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Complex multilingual tokenizer integration tests."""
 
 from __future__ import annotations
@@ -8,13 +7,13 @@ import os
 
 import pytest
 
-pytestmark = pytest.mark.slow
-
 from thot.core.SentenceSegmenter import SentenceSegmenter, pysbd_language
 from thot.core.SpacyModelLoader import MULTILINGUAL_MODEL
 from thot.core.ThotLogger import LogUserContext, ThotLogger
 from thot.tasks.tokenizer.Tokenizer import Tokenizer
 from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
+
+pytestmark = pytest.mark.slow
 
 
 def _resources_path() -> str:

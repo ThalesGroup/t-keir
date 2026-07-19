@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests that exercise documented examples in public tool APIs."""
 
 import json
@@ -49,7 +48,7 @@ class TestTkeirPathsDocExamples:
         assert os.path.isdir(os.path.join(package_root(), "thot"))
 
     def test_configs_dir_example(self):
-        assert os.path.isfile(os.path.join(configs_dir(), "pipeline.json"))
+        assert os.path.isfile(os.path.join(configs_dir(), "pipeline.yaml"))
 
     def test_resources_dir_example(self):
         assert os.path.isdir(resources_dir("en"))
@@ -62,8 +61,8 @@ class TestTkeirPathsDocExamples:
         assert os.path.isfile(rag_prompts_path())
 
     def test_resolve_path_example(self):
-        assert resolve_path("configs/pipeline.json").endswith(
-            "configs/pipeline.json"
+        assert resolve_path("configs/pipeline.yaml").endswith(
+            "configs/pipeline.yaml"
         )
 
     def test_resolve_tkeir_paths_example(self):
@@ -116,8 +115,13 @@ class TestVespaClientDocExamples:
         )
 
     def test_document_vespa_id_example(self):
-        assert document_vespa_id("file://doc.pdf").startswith(
-            "id:default:tkeir_document::"
+        assert document_vespa_id(
+            "file://doc.pdf", user_space="demo"
+        ).startswith("id:default:tkeir_document:g=demo:")
+
+    def test_chunk_vespa_id_example(self):
+        assert chunk_vespa_id("doc.pdf#chunk-0", user_space="demo").startswith(
+            "id:default:chunk:g=demo:"
         )
 
     def test_build_questions_tensor_example(self):
@@ -133,11 +137,6 @@ class TestVespaClientDocExamples:
 
     def test_escape_yql_literal_example(self):
         assert escape_yql_literal('say "hello"') == 'say \\"hello\\"'
-
-    def test_chunk_vespa_id_example(self):
-        assert chunk_vespa_id("doc.pdf#chunk-0").startswith(
-            "id:default:chunk::"
-        )
 
 
 class TestOntologyUtilsDocExamples:

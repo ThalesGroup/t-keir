@@ -8,7 +8,7 @@ It runs inside the unified pipeline (`tkeir-pipeline`).
 Example of Configuration:
 
 ```json title="ner.json"
---8<-- "./configs/nertagger.json"
+--8<-- "./configs/nertagger.yaml"
 ```
 
 NER tagger configuration contains a top-level `logger` section and named-entity-specific `label` settings.
@@ -58,7 +58,7 @@ The logger fields is:
 ## NER tagger usage
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks ner
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks ner
 ```
 
 ## NER Tagger Tests

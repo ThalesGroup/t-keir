@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Annotation configuration
 Author : Eric Blaudez (Eric Blaudez)
 
@@ -7,7 +6,7 @@ All Rights Reserved.
 """
 
 from thot.core.CommonConfiguration import CommonConfiguration
-from thot.core.ConfigurationUtils import load_json_configuration
+from thot.core.ConfigurationUtils import load_configuration
 
 
 class AnnotationConfiguration:
@@ -48,9 +47,9 @@ class AnnotationConfiguration:
         """
         if not self.configuration:
             raise ValueError("Bad annotation configuration")
-        if not "data" in self.configuration:
+        if "data" not in self.configuration:
             raise ValueError("'data' field is mandatory")
-        if not "resources-base-path" in self.configuration:
+        if "resources-base-path" not in self.configuration:
             raise ValueError("'resources-base-path' field is mandatory")
 
     def load(self, config_f, path: list = []):
@@ -70,7 +69,7 @@ class AnnotationConfiguration:
             '/tmp'
         """
         self.configuration = CommonConfiguration.go_to_configuration_field(
-            load_json_configuration(config_f), path
+            load_configuration(config_f), path
         )
         self._check_and_update()
 

@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Golden chunking configuration."""
 
-from thot.core.ConfigurationUtils import load_json_configuration
+from thot.core.ConfigurationUtils import load_configuration
 from thot.core.LoggerConfiguration import LoggerConfiguration
 
 
@@ -26,7 +25,7 @@ class GoldenChunkerConfiguration:
             >>> callable(GoldenChunkerConfiguration().load)
             True
         """
-        self.loads(load_json_configuration(config_f))
+        self.loads(load_configuration(config_f))
 
     def loads(self, configuration: dict | None = None):
         """loads API.

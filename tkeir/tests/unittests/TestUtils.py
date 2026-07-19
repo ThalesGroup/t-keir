@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for thot.core.Utils helpers."""
 
 import os

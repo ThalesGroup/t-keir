@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Document ontology generation package."""
 
 __version_document_ontology__ = "2.0.0"

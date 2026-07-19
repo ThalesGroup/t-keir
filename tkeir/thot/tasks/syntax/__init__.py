@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Package initialization
 Author : Eric Blaudez (Eric Blaudez)
 

@@ -3,6 +3,7 @@
 import { memo, useMemo } from "react";
 
 import { AiSynthesis } from "@/components/ai-synthesis";
+import { CorrelationIdBadge } from "@/components/correlation-id";
 import { DocumentResults } from "@/components/document-results";
 import { InputPromptPanel } from "@/components/input-prompt-panel";
 import { VespaQueryPanel } from "@/components/vespa-query-panel";
@@ -17,6 +18,7 @@ import type {
 interface RagResultsProps {
   submittedQuery: string;
   response: QueryResponse | null;
+  correlationId: string | null;
   loading: boolean;
   activeChunkIds: Set<string> | null;
   activeLabel: string | null;
@@ -28,6 +30,7 @@ interface RagResultsProps {
 export const RagResults = memo(function RagResults({
   submittedQuery,
   response,
+  correlationId,
   loading,
   activeChunkIds,
   activeLabel,
@@ -57,6 +60,10 @@ export const RagResults = memo(function RagResults({
         vespaHits={response?.vespa_hits}
         answerUnavailable={response?.answer_unavailable}
       />
+
+      {!loading && correlationId && (
+        <CorrelationIdBadge correlationId={correlationId} />
+      )}
 
       <InputPromptPanel
         inputPrompt={response?.input_prompt ?? null}

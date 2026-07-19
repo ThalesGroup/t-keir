@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Initialize Vespa Docker container and deploy 2-level schemas."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import time
 from pathlib import Path
@@ -111,7 +111,11 @@ def _wait_for_application(search_url: str, timeout_seconds: int) -> None:
     """
     deadline = time.time() + timeout_seconds
     probe_url = f"{search_url.rstrip('/')}/search/"
-    payload = {"yql": "select * from sources * where true limit 1", "hits": 1}
+    payload = {
+        "yql": "select * from sources * where true limit 1",
+        "hits": 1,
+        "streaming.groupname": os.getenv("VESPA_USER_SPACE", "dev@tkeir"),
+    }
     attempt = 0
     while time.time() < deadline:
         attempt += 1

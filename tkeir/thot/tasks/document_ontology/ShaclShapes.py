@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Base SHACL prefixes; document shapes are induced from aligned graphs."""
 
 DOCUMENT_SHACL_SHAPES_TTL = """

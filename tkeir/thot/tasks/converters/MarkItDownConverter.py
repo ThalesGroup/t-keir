@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Convert documents to tkeir format using Microsoft MarkItDown."""
 
 import os

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Logger of library
 
 Author: Eric Blaudez (Eric Blaudez)

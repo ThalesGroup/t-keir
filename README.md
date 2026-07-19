@@ -1,8 +1,10 @@
 # T-KEIR
 
-**T-KEIR 2.0.0** is a document analysis and retrieval toolkit by Theresis / Thales.
+**T-KEIR 2.0.0** is a document analysis and retrieval toolkit by Thales.
 It runs a unified NLP pipeline on documents, indexes them in [Vespa](https://vespa.ai/),
-and exposes hybrid search plus RAG through a FastAPI backend and a Next.js HMI.
+exposes hybrid search plus RAG through a FastAPI backend and a Next.js HMI,
+and includes an **agentic layer** (MCP tools, multi-agent workflows, ontology-driven
+templates) under the platform governor.
 
 Full documentation: [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io/t-keir)
 
@@ -12,7 +14,10 @@ Full documentation: [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io
 - **NLP pipeline** — language detection, tokenizer, morphosyntax, NER, syntax, keywords
 - **Ontology export** — entity/keyword graphs for RAG and the HMI
 - **Vespa RAG** — two-level document/chunk indexing, hybrid retrieval, LLM answers
-- **Web UI** — search, results, ontology explorer (`tkeir-hmi/`)
+- **MCP server** — scoped corpus tools for external MCP clients (`tkeir-mcp`)
+- **Agents & workflows** — configurable researchers/analysts/writers, multi-agent
+  plans, grounded template composition, approval-gated publish (`tkeir-agent`)
+- **Web UI** — search, ontology explorer, agent run monitor (`tkeir-hmi/`)
 
 ## Repository layout
 
@@ -20,10 +25,18 @@ Full documentation: [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io
 |---|---|
 | `tkeir/thot/` | Core pipeline tasks and runtime |
 | `tkeir/thot/tools/` | CLI: `tkeir-pipeline`, Vespa indexer, RAG API |
-| `tkeir/configs/` | Pipeline, taggers, converter OCR, RAG prompts |
-| `vespa/` | Vespa Docker deployment, Makefile for bootstrap / index / RAG |
+| `tkeir/thot/mcp/` | MCP server + outbound client |
+| `tkeir/thot/agent/` | Agent loop, orchestrator, publish |
+| `tkeir/thot/compose/` | Ontology-driven template composition |
+| `tkeir/configs/` | Pipeline, taggers, RAG, agents, workflows, templates |
+| `vespa/` | Vespa Docker schemas and shell scripts (targets in root `Makefile`) |
 | `tkeir-hmi/` | Next.js Human-Machine Interface |
+| `deploy/` | Compose, Helm charts, Keycloak realm, K3s — see [INSTALL.md](INSTALL.md) |
 | `.devcontainer/` | Reproducible dev environment (Python 3.11, uv, Tesseract, Docker socket) |
+
+Installation profiles (P0 local → P4 platform): start with
+**[Zero to Hero](tkeir/docs/zero_to_hero.md)**, then [INSTALL.md](INSTALL.md) and
+[deployment docs](tkeir/docs/deployment/index.md).
 
 ## Quick start
 
@@ -68,9 +81,8 @@ Ollama must be running on the **host** when using the default `PROVIDER=ollama`
 (`ollama serve`, models `bge-m3` and `mistral-nemo`).
 
 ```bash
-cd vespa
-
-make sync              # uv sync in tkeir/
+# From repository root
+make install           # uv sync in tkeir/
 make bootstrap         # start Vespa + deploy schemas
 
 # Build pipeline JSON from example PDFs (if output/ is empty)
@@ -134,7 +146,7 @@ bytes. Use **`-t raw`** only for plain UTF-8 text — never on PDFs or binary fi
 (that would decode bytes as garbage text).
 
 ```bash
-tkeir-pipeline -c tkeir/configs/pipeline.json \
+tkeir-pipeline -c tkeir/configs/pipeline.yaml \
   -i path/to/docs -o output/ -t auto
 ```
 
@@ -148,7 +160,7 @@ make pipeline PIPELINE_INPUT=path/to/docs PIPELINE_OUTPUT=output/
 
 MarkItDown extracts the PDF **text layer** by default. Text trapped in images
 (scans, diagrams, screenshots) is recovered when OCR is enabled in
-`tkeir/configs/converter.json`:
+`tkeir/configs/converter.yaml`:
 
 ```json
 "ocr": {
@@ -171,11 +183,10 @@ Details: [tkeir/docs/tools/converter.md](tkeir/docs/tools/converter.md)
 
 ## Makefile reference
 
-Run `make help` at the repository root for a short list. Two Makefiles drive most workflows:
-the **root** `Makefile` (Python pipeline, tests, docs, devcontainer) and **`vespa/Makefile`**
-(Vespa Docker, indexing, RAG API).
+Run `make help` at the repository root for a short list. One root `Makefile` drives
+setup, pipeline, tests, docs, Vespa, indexing, and RAG.
 
-### Root `Makefile` — setup & pipeline
+### Setup & pipeline
 
 | Target | Description |
 |---|---|
@@ -199,7 +210,7 @@ the **root** `Makefile` (Python pipeline, tests, docs, devcontainer) and **`vesp
 | `PIPELINE_INPUT` | `tkeir/tests/fixtures/test-raw/raw` | Input file or directory |
 | `PIPELINE_OUTPUT` | `/tmp/tkeir-pipeline-out` | Output directory for JSON |
 | `PIPELINE_TYPE` | `auto` | Input type: `auto`, `raw`, `pdf`, … |
-| `PIPELINE_CONFIG` | `tkeir/configs/pipeline.json` | Pipeline configuration |
+| `PIPELINE_CONFIG` | `tkeir/configs/pipeline.yaml` | Pipeline configuration |
 | `TRANSFORMERS_CACHE` | `.cache/models` | Hugging Face / model cache |
 
 Example:
@@ -211,7 +222,7 @@ make pipeline \
   PIPELINE_TYPE=auto
 ```
 
-### Root `Makefile` — quality & docs
+### Quality & docs
 
 | Target | Description |
 |---|---|
@@ -232,26 +243,32 @@ make pipeline \
 | `make docs` | MkDocs dev server → http://127.0.0.1:8000 |
 | `make docs-build` | Static site → `tkeir/site/` |
 
-### `vespa/Makefile` — search & RAG
-
-Run from `cd vespa`:
+### Search & RAG (Vespa)
 
 | Target | Description |
 |---|---|
-| `make sync` | `uv sync` in `tkeir/` |
+| `make pull-models` | Pull Ollama embedding + LLM models |
 | `make start` | Start Vespa Docker container |
 | `make init` | Deploy schemas (Vespa must already be running) |
 | `make bootstrap` | `start` + deploy schemas |
-| `make check` | Vespa health check |
-| `make test` | Vespa query smoke test |
-| `make test-py` | Python unit tests for search tools |
+| `make vespa-check` | Vespa health check |
+| `make test-vespa` | Vespa query smoke test |
+| `make test-vespa-py` | Python unit tests for search tools |
 | `make index-fixtures` | Pipeline on `tkeir/tests/indexing/input/` → `output/` |
 | `make index` | Embed and index `*.pipeline.json` into Vespa |
 | `make rag` | Start FastAPI RAG API on port **8090** |
 | `make rag-query` | `curl` sample RAG request |
+| `make mcp` | Start MCP server on port **8093** |
+| `make agent` | Start agent / workflow service on port **8092** |
+| `make agent-run` | Create a single-agent run and poll (`GOAL=…`) |
+| `make workflow-run` | Create a workflow run and poll (`WORKFLOW=content_brief`) |
+| `make compose` | Ontology template compose (`TEMPLATE=synthesis_note`) |
+| `make beir-eval` | BEIR IR eval → `tkeir/docs/evaluation_report.md` (`BEIR_DATASETS=scifact` for one) |
 | `make clean-db` | Wipe Vespa data volume (then re-run `bootstrap`) |
+| `make vespa-clean` | Stop/remove Vespa container (keeps volume) |
+| `make logs` | Tail Vespa Docker logs |
 
-**Vespa variables:**
+**Vespa / BEIR variables:**
 
 | Variable | Default | Purpose |
 |---|---|---|
@@ -261,6 +278,11 @@ Run from `cd vespa`:
 | `LLM_MODEL` | provider-specific | Generation model (e.g. `mistral-nemo`) |
 | `RAG_QUERY` | `Who is Rob Brown?` | Query for `make rag-query` |
 | `RAG_URL` | `http://localhost:8090` | RAG API base URL |
+| `BEIR_DATASETS` | `scifact fiqa arguana` | Space-separated datasets; one: `BEIR_DATASETS=scifact` |
+| `BEIR_EXTRA` | _(empty)_ | Extra flags, e.g. `--skip-dense` |
+| `BEIR_REPORT` | _(empty)_ | Optional extra report copy (docs report always written) |
+
+All targets run from the **repository root** (`make help` for the short list).
 
 ### Typical command chains
 
@@ -270,7 +292,7 @@ make setup && make quickstart
 
 # Full RAG stack (from repo root)
 make setup
-cd vespa && make bootstrap && make index-fixtures && make index && make rag
+make bootstrap && make index-fixtures && make index && make rag
 
 # CI before pushing
 make ci

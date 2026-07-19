@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Verify every thot function has a Google-style Example section."""
 
 from __future__ import annotations

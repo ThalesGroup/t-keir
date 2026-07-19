@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for task metadata helpers."""
 
 from unittest.mock import patch

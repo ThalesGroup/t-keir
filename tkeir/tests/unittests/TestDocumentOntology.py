@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for document ontology generation and self-healing."""
 
 import os
@@ -177,7 +176,7 @@ class TestDocumentOntologyBuilder:
 
         config = DocumentOntologyConfiguration()
         with open(
-            os.path.join(configs_dir(), "document-ontology.json"),
+            os.path.join(configs_dir(), "document-ontology.yaml"),
             encoding="utf-8",
         ) as handle:
             config.load(handle)

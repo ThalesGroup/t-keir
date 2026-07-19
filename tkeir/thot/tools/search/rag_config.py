@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Load RAG API runtime configuration from ``configs/rag.yaml``."""
 
 from __future__ import annotations
@@ -28,6 +27,38 @@ _DEFAULT_FOCUS_CONTEXT_SENTENCES = _DEFAULT_PASSAGE_CONTEXT_SENTENCES
 _ALLOWED_CHUNK_CONTEXT_MODES = frozenset({"chunk_excerpts", "svo_ontology"})
 _DEFAULT_RERANK_ENABLED = True
 _DEFAULT_RERANK_CANDIDATES = 50
+_DEFAULT_RERANK_STRATEGY = "cross_encoder"
+_ALLOWED_RERANK_STRATEGIES = frozenset({"cross_encoder", "embedding_cosine"})
+_DEFAULT_VESPA_URL = "http://localhost:8080"
+_DEFAULT_VESPA_CONFIG_URL = "http://localhost:19071"
+_DEFAULT_VESPA_TIMEOUT_SECONDS = 60.0
+_DEFAULT_INDEX_WORKERS = 2
+_DEFAULT_CHUNK_WORKERS = 4
+_DEFAULT_QUERY_WORKERS = 1
+_DEFAULT_ENRICH_WORKERS = 8
+
+
+@dataclass(frozen=True)
+class RagVespaConcurrency:
+    """Worker pools for indexing, querying, and hit enrichment."""
+
+    index_workers: int = _DEFAULT_INDEX_WORKERS
+    chunk_workers: int = _DEFAULT_CHUNK_WORKERS
+    query_workers: int = _DEFAULT_QUERY_WORKERS
+    enrich_workers: int = _DEFAULT_ENRICH_WORKERS
+
+
+@dataclass(frozen=True)
+class RagVespaConfig:
+    """Vespa endpoints, timeouts, and concurrency for search/index."""
+
+    url: str = _DEFAULT_VESPA_URL
+    config_url: str = _DEFAULT_VESPA_CONFIG_URL
+    timeout_seconds: float = _DEFAULT_VESPA_TIMEOUT_SECONDS
+    # Streaming group. Keycloak JWT drives the live value; this is the
+    # auth-off / CLI fallback (dev@tkeir). Override with VESPA_USER_SPACE.
+    user_space: str = "dev@tkeir"
+    concurrency: RagVespaConcurrency = RagVespaConcurrency()
 
 
 @dataclass(frozen=True)
@@ -43,10 +74,11 @@ class RagModelsConfig:
 
 @dataclass(frozen=True)
 class RagRerankConfig:
-    """Cross-encoder rerank stage after Vespa hybrid retrieval."""
+    """Second-stage rerank after Vespa hybrid retrieval."""
 
     enabled: bool = _DEFAULT_RERANK_ENABLED
     candidates: int = _DEFAULT_RERANK_CANDIDATES
+    strategy: str = _DEFAULT_RERANK_STRATEGY
 
 
 @dataclass(frozen=True)
@@ -153,6 +185,7 @@ class RagConfig:
     prompt: RagPromptConfig
     search: RagSearchConfig
     models: RagModelsConfig = RagModelsConfig()
+    vespa: RagVespaConfig = RagVespaConfig()
 
 
 def _normalize_chunk_context_mode(value: object) -> str:
@@ -259,14 +292,88 @@ def _rerank_config_from_mapping(
     """Build :class:`RagRerankConfig` from ``search.rerank`` YAML.
 
     Example:
-        >>> _rerank_config_from_mapping({"enabled": False, "candidates": 20})
-        RagRerankConfig(enabled=False, candidates=20)
+        >>> _rerank_config_from_mapping(
+        ...     {"enabled": False, "candidates": 20, "strategy": "embedding_cosine"}
+        ... )
+        RagRerankConfig(enabled=False, candidates=20, strategy='embedding_cosine')
     """
     cfg = mapping if isinstance(mapping, dict) else {}
+    strategy = (
+        str(cfg.get("strategy", _DEFAULT_RERANK_STRATEGY)).strip().lower()
+    )
+    if strategy not in _ALLOWED_RERANK_STRATEGIES:
+        strategy = _DEFAULT_RERANK_STRATEGY
     return RagRerankConfig(
         enabled=_as_bool(cfg.get("enabled"), _DEFAULT_RERANK_ENABLED),
         candidates=max(
             1, int(cfg.get("candidates", _DEFAULT_RERANK_CANDIDATES))
+        ),
+        strategy=strategy,
+    )
+
+
+def _vespa_config_from_mapping(
+    mapping: dict[str, Any] | None,
+) -> RagVespaConfig:
+    """Build :class:`RagVespaConfig` from the top-level ``vespa`` YAML.
+
+    Example:
+        >>> cfg = _vespa_config_from_mapping(
+        ...     {"url": "http://vespa:8080", "concurrency": {"index_workers": 2}}
+        ... )
+        >>> cfg.url
+        'http://vespa:8080'
+        >>> cfg.concurrency.index_workers
+        2
+    """
+    cfg = mapping if isinstance(mapping, dict) else {}
+    concurrency_raw = cfg.get("concurrency") or {}
+    if not isinstance(concurrency_raw, dict):
+        concurrency_raw = {}
+    return RagVespaConfig(
+        url=str(cfg.get("url") or _DEFAULT_VESPA_URL).rstrip("/"),
+        config_url=str(
+            cfg.get("config_url") or _DEFAULT_VESPA_CONFIG_URL
+        ).rstrip("/"),
+        timeout_seconds=max(
+            1.0,
+            float(cfg.get("timeout_seconds", _DEFAULT_VESPA_TIMEOUT_SECONDS)),
+        ),
+        user_space=str(cfg.get("user_space") or "dev@tkeir").strip()
+        or "dev@tkeir",
+        concurrency=RagVespaConcurrency(
+            index_workers=max(
+                1,
+                int(
+                    concurrency_raw.get(
+                        "index_workers", _DEFAULT_INDEX_WORKERS
+                    )
+                ),
+            ),
+            chunk_workers=max(
+                1,
+                int(
+                    concurrency_raw.get(
+                        "chunk_workers", _DEFAULT_CHUNK_WORKERS
+                    )
+                ),
+            ),
+            query_workers=max(
+                1,
+                int(
+                    concurrency_raw.get(
+                        "query_workers", _DEFAULT_QUERY_WORKERS
+                    )
+                ),
+            ),
+            enrich_workers=max(
+                1,
+                int(
+                    concurrency_raw.get(
+                        "enrich_workers", _DEFAULT_ENRICH_WORKERS
+                    )
+                ),
+            ),
         ),
     )
 
@@ -388,6 +495,10 @@ def load_rag_config() -> RagConfig:
     if not isinstance(models_cfg, dict):
         models_cfg = {}
 
+    vespa_cfg = payload.get("vespa") or {}
+    if not isinstance(vespa_cfg, dict):
+        vespa_cfg = {}
+
     return RagConfig(
         ontology=RagOntologyConfig(
             min_keyword_length=max(1, min_keyword_length),
@@ -424,6 +535,7 @@ def load_rag_config() -> RagConfig:
         ),
         search=_search_config_from_mapping(search_cfg),
         models=_models_config_from_mapping(models_cfg),
+        vespa=_vespa_config_from_mapping(vespa_cfg),
     )
 
 

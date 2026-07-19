@@ -8,8 +8,8 @@ pipeline (`tkeir-pipeline`).
 Example of Configuration:
 
 
-```json title="keywords.json"
---8<-- "./configs/keywords.json"
+```yaml title="keywords.yaml"
+--8<-- "./configs/keywords.yaml"
 ```
 
 Keywords extractor configuration contains a top-level `logger` section and keywords-specific `extractors` settings.
@@ -60,7 +60,7 @@ The logger fields is:
 ## Keywords extractor usage
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks keywords
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks keywords
 ```
 
 ## Keywords extractor Tests

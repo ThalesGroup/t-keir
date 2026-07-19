@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for RAG query refinement helpers."""
 
 from thot.tools.search.query_refiner import meaningful_tokens_from_morphosyntax

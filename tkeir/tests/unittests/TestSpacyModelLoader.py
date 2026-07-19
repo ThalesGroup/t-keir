@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for spaCy model selection."""
 
 from unittest.mock import patch

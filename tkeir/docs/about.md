@@ -3,9 +3,7 @@ hide:
   - navigation
   - toc
 ---
-# About 
-
-![Screenshot](resources/images/t-keir-journey.png)
+# About
 
 Copyright © 2022 THALES
 

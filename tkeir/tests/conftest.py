@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Shared pytest fixtures for T-KEIR tests."""
 
 from __future__ import annotations

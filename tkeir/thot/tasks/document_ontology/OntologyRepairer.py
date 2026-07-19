@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 """Repair SHACL violations in document ontology graphs (rule-based only)."""
 
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, XSD

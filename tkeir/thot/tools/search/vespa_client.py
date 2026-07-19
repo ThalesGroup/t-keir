@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Vespa HTTP client for 2-level document/chunk indexing and search."""
 
 from __future__ import annotations
@@ -164,39 +163,85 @@ def stable_document_key(source_doc_id: str) -> str:
     return digest
 
 
-def document_vespa_id(source_doc_id: str) -> str:
+def normalize_user_space(user_space: str | None = None) -> str:
+    """Normalize a streaming group / user-space name for Vespa.
+
+    Args:
+        user_space: Explicit space, or ``None`` to read ``VESPA_USER_SPACE``
+            (fallback ``dev@tkeir`` for local/dev when unset).
+
+    Returns:
+        Safe non-empty group name.
+
+    Example:
+        >>> from thot.tools.search.vespa_client import normalize_user_space
+        >>> normalize_user_space("alice@example.com")
+        'alice@example.com'
+        >>> normalize_user_space("bad:group")
+        'bad_group'
+        >>> normalize_user_space("dev@tkeir")
+        'dev@tkeir'
+    """
+    from thot.tools.search.user_space import DEV_USER_SPACE
+
+    if user_space is None:
+        raw = os.getenv("VESPA_USER_SPACE", DEV_USER_SPACE)
+    else:
+        raw = user_space
+    value = (raw or DEV_USER_SPACE).strip() or DEV_USER_SPACE
+    # ':' separates id components; keep common identity punctuation.
+    return re.sub(r"[^A-Za-z0-9._@+-]+", "_", value)[:200]
+
+
+def document_vespa_id(
+    source_doc_id: str, *, user_space: str | None = None
+) -> str:
     """Build the Vespa document reference for a parent document.
+
+    Streaming mode requires a group (``g=<user_space>``) so each user's
+    corpus is co-located and searched via ``streaming.groupname``.
 
     Args:
         source_doc_id: Pipeline ``source_doc_id`` value.
+        user_space: Streaming group; defaults to ``VESPA_USER_SPACE`` / default.
 
     Returns:
         Vespa id string for schema ``tkeir_document``.
 
     Example:
         >>> from thot.tools.search.vespa_client import document_vespa_id
-        >>> document_vespa_id("file://doc.pdf").startswith("id:default:tkeir_document::")
+        >>> document_vespa_id("file://doc.pdf", user_space="demo").startswith(
+        ...     "id:default:tkeir_document:g=demo:"
+        ... )
         True
     """
-    return f"id:default:tkeir_document::{stable_document_key(source_doc_id)}"
+    group = normalize_user_space(user_space)
+    return (
+        f"id:default:tkeir_document:g={group}:"
+        f"{stable_document_key(source_doc_id)}"
+    )
 
 
-def chunk_vespa_id(chunk_id: str) -> str:
+def chunk_vespa_id(chunk_id: str, *, user_space: str | None = None) -> str:
     """Build the Vespa document reference for a chunk.
 
     Args:
         chunk_id: Golden chunk identifier.
+        user_space: Streaming group; defaults to ``VESPA_USER_SPACE`` / default.
 
     Returns:
         Vespa id string for schema ``chunk``.
 
     Example:
         >>> from thot.tools.search.vespa_client import chunk_vespa_id
-        >>> chunk_vespa_id("doc.pdf#chunk-0").startswith("id:default:chunk::")
+        >>> chunk_vespa_id("doc.pdf#chunk-0", user_space="demo").startswith(
+        ...     "id:default:chunk:g=demo:"
+        ... )
         True
     """
+    group = normalize_user_space(user_space)
     digest = hashlib.sha256(chunk_id.encode("utf-8")).hexdigest()[:32]
-    return f"id:default:chunk::{digest}"
+    return f"id:default:chunk:g={group}:{digest}"
 
 
 def build_questions_tensor(
@@ -360,13 +405,18 @@ class VespaConfig:
     config_server_url_base: str
     timeout_seconds: float
     embedding_dim: int
+    user_space: str = "dev@tkeir"
 
     @classmethod
     def from_env(cls) -> VespaConfig:
         """Build Vespa client settings from environment / rag.yaml / defaults.
 
-        Reads ``VESPA_URL``, ``VESPA_CONFIG_URL``, ``VESPA_TIMEOUT_SECONDS``,
-        and ``EMBEDDING_DIM`` (env → ``configs/rag.yaml`` models → 384).
+        Resolution order (highest wins):
+        1. ``VESPA_URL``, ``VESPA_CONFIG_URL``, ``VESPA_TIMEOUT_SECONDS``,
+           ``VESPA_USER_SPACE``, ``EMBEDDING_DIM``
+        2. ``configs/rag.yaml`` ``vespa:`` / ``models.embedding_dim``
+        3. ``http://localhost:8080``, ``:19071``, ``60s``, space ``dev@tkeir``,
+           dim ``384``
 
         Returns:
             Frozen configuration for :class:`VespaClient`.
@@ -376,20 +426,37 @@ class VespaConfig:
             >>> cfg = VespaConfig.from_env()
             >>> cfg.embedding_dim
             384
+            >>> bool(cfg.user_space)
+            True
         """
         from thot.core.LlmWrapper import WrapperConfig
+        from thot.tools.search.rag_config import load_rag_config
 
-        base_url = os.getenv("VESPA_URL", "http://localhost:8080").rstrip("/")
+        try:
+            rag_vespa = load_rag_config().vespa
+        except Exception:  # noqa: BLE001
+            from thot.tools.search.rag_config import RagVespaConfig
+
+            rag_vespa = RagVespaConfig()
+
+        base_url = os.getenv("VESPA_URL", rag_vespa.url).rstrip("/")
         config_url = os.getenv(
-            "VESPA_CONFIG_URL", "http://localhost:19071"
+            "VESPA_CONFIG_URL", rag_vespa.config_url
         ).rstrip("/")
+        timeout_raw = os.getenv(
+            "VESPA_TIMEOUT_SECONDS", str(rag_vespa.timeout_seconds)
+        )
+        user_space = normalize_user_space(
+            os.getenv("VESPA_USER_SPACE", rag_vespa.user_space)
+        )
         models = WrapperConfig.from_env()
         return cls(
             document_api_url=f"{base_url}/document/v1",
             search_api_url=f"{base_url}/search/",
             config_server_url_base=config_url,
-            timeout_seconds=float(os.getenv("VESPA_TIMEOUT_SECONDS", "60")),
+            timeout_seconds=float(timeout_raw),
             embedding_dim=models.embedding_dim,
+            user_space=user_space,
         )
 
     def config_server_url(self) -> str:
@@ -540,22 +607,27 @@ class VespaClient:
         document_type: str,
         document_key: str,
         fields: dict[str, Any],
+        *,
+        user_space: str | None = None,
     ) -> None:
-        """POST document fields to the Vespa document API.
+        """POST document fields to the Vespa document API (streaming group).
 
         Args:
             namespace: Vespa namespace (for example ``default``).
             document_type: Schema name (for example ``chunk``).
             document_key: Stable document key within the schema.
             fields: Field payload indexed by Vespa.
+            user_space: Streaming group; defaults to client config.
 
         Example:
             >>> import asyncio
             >>> from thot.tools.search.vespa_client import VespaClient
             >>> asyncio.run(VespaClient()._upsert_fields("default", "chunk", "k", {}))  # doctest: +SKIP
         """
+        group = normalize_user_space(user_space or self._config.user_space)
         url = (
-            f"{self._config.document_api_url}/{namespace}/{document_type}/docid/"
+            f"{self._config.document_api_url}/{namespace}/{document_type}/"
+            f"group/{quote(group, safe='')}/"
             f"{quote(document_key, safe='')}"
         )
         response = await self._client.post(url, json={"fields": fields})
@@ -568,44 +640,63 @@ class VespaClient:
             )
 
     async def upsert_document(
-        self, fields: dict[str, Any], source_doc_id: str
+        self,
+        fields: dict[str, Any],
+        source_doc_id: str,
+        *,
+        user_space: str | None = None,
     ) -> None:
         """Create or update a parent ``tkeir_document`` record.
 
         Args:
             fields: Sanitized parent document fields.
             source_doc_id: Pipeline ``source_doc_id`` used to derive the key.
+            user_space: Streaming group for this user's corpus.
 
         Example:
             >>> import asyncio
             >>> from thot.tools.search.vespa_client import VespaClient
             >>> asyncio.run(VespaClient().upsert_document({"title": "Doc"}, "doc.pdf"))  # doctest: +SKIP
         """
+        space = normalize_user_space(user_space or self._config.user_space)
+        payload = dict(fields)
+        payload.setdefault("user_space", space)
         await self._upsert_fields(
             "default",
             "tkeir_document",
             stable_document_key(source_doc_id),
-            fields,
+            payload,
+            user_space=space,
         )
 
     async def upsert_chunk(
         self,
         fields: dict[str, Any],
         chunk_id: str,
+        *,
+        user_space: str | None = None,
     ) -> None:
         """Create or update a ``chunk`` record linked to a parent document.
 
         Args:
             fields: Sanitized chunk fields including embeddings.
             chunk_id: Golden chunk identifier.
+            user_space: Streaming group (must match the parent document).
 
         Example:
             >>> import asyncio
             >>> from thot.tools.search.vespa_client import VespaClient
             >>> asyncio.run(VespaClient().upsert_chunk({"text_raw": "hi"}, "c1"))  # doctest: +SKIP
         """
-        _, _, key = _parse_vespa_id(chunk_vespa_id(chunk_id))
-        await self._upsert_fields("default", "chunk", key, fields)
+        space = normalize_user_space(user_space or self._config.user_space)
+        _, _, _group, key = _parse_vespa_id(
+            chunk_vespa_id(chunk_id, user_space=space)
+        )
+        payload = dict(fields)
+        payload.setdefault("user_space", space)
+        await self._upsert_fields(
+            "default", "chunk", key, payload, user_space=space
+        )
 
     async def get_document_by_ref(self, doc_ref: str) -> dict[str, Any]:
         """Fetch parent document fields by Vespa document reference.
@@ -622,11 +713,17 @@ class VespaClient:
             >>> ref = document_vespa_id("file://doc.pdf")
             >>> asyncio.run(VespaClient().get_document_by_ref(ref))  # doctest: +SKIP
         """
-        _, _, key = _parse_vespa_id(doc_ref)
-        url = (
-            f"{self._config.document_api_url}/default/tkeir_document/docid/"
-            f"{quote(key, safe='')}"
-        )
+        namespace, _schema, group, key = _parse_vespa_id(doc_ref)
+        if group:
+            url = (
+                f"{self._config.document_api_url}/{namespace}/tkeir_document/"
+                f"group/{quote(group, safe='')}/{quote(key, safe='')}"
+            )
+        else:
+            url = (
+                f"{self._config.document_api_url}/{namespace}/tkeir_document/"
+                f"docid/{quote(key, safe='')}"
+            )
         response = await self._client.get(url)
         response.raise_for_status()
         payload = response.json()
@@ -650,16 +747,19 @@ class VespaClient:
         q_question_emb: list[float],
         *,
         hits: int = 20,
+        user_space: str | None = None,
     ) -> dict[str, Any]:
         """Build the Vespa hybrid search HTTP payload without executing it.
 
         Example:
             >>> from thot.tools.search.vespa_client import VespaClient
             >>> payload = VespaClient().build_hybrid_search_payload(
-            ...     "hello", [0.0] * 384, [0.0] * 384
+            ...     "hello", [0.0] * 384, [0.0] * 384, user_space="demo"
             ... )
             >>> payload["ranking.profile"]
             'hybrid_2_level'
+            >>> payload["streaming.groupname"]
+            'demo'
         """
         text_clause = build_text_raw_contains_or_clause(query_text)
         yql_parts = [
@@ -669,11 +769,13 @@ class VespaClient:
         if text_clause:
             yql_parts.append(text_clause)
         yql = "select * from chunk where " + " or ".join(yql_parts)
+        space = normalize_user_space(user_space or self._config.user_space)
         return {
             "yql": yql,
             "hits": hits,
             "timeout": f"{int(self._config.timeout_seconds)}s",
             "ranking.profile": "hybrid_2_level",
+            "streaming.groupname": space,
             "input.query(q_chunk_emb)": q_chunk_emb[
                 : self._config.embedding_dim
             ],
@@ -689,6 +791,7 @@ class VespaClient:
         q_question_emb: list[float],
         *,
         hits: int = 20,
+        user_space: str | None = None,
     ) -> dict[str, Any]:
         """Run hybrid vector and keyword search over chunk documents.
 
@@ -697,6 +800,7 @@ class VespaClient:
             q_chunk_emb: Query embedding for ``chunk_embedding`` NN search.
             q_question_emb: Query embedding for ``questions_embeddings`` NN search.
             hits: Maximum number of hits to request.
+            user_space: Streaming group to search (required for isolation).
 
         Returns:
             Parsed JSON response from the Vespa search API.
@@ -711,9 +815,11 @@ class VespaClient:
             q_chunk_emb,
             q_question_emb,
             hits=hits,
+            user_space=user_space,
         )
         ThotLogger.info(
-            f"Vespa hybrid search query={query_text!r} yql={payload['yql']}"
+            f"Vespa hybrid search query={query_text!r} "
+            f"group={payload.get('streaming.groupname')!r} yql={payload['yql']}"
         )
         response = await self._client.post(
             self._config.search_api_url,
@@ -744,24 +850,34 @@ class VespaClient:
         return response.json()
 
 
-def _parse_vespa_id(doc_id: str) -> tuple[str, str, str]:
-    """Split a Vespa document id into namespace, schema, and key.
+def _parse_vespa_id(doc_id: str) -> tuple[str, str, str | None, str]:
+    """Split a Vespa document id into namespace, schema, group, and key.
 
     Args:
-        doc_id: Vespa id in the form ``id:namespace:schema::key``.
+        doc_id: Vespa id ``id:ns:type:g=group:key`` or ``id:ns:type::key``.
 
     Returns:
-        Tuple ``(namespace, schema, key)``.
+        Tuple ``(namespace, schema, group_or_none, key)``.
 
     Raises:
         ValueError: When ``doc_id`` does not match the expected format.
 
     Example:
         >>> from thot.tools.search.vespa_client import _parse_vespa_id
-        >>> _parse_vespa_id("id:default:tkeir_document::abc123")
-        ('default', 'tkeir_document', 'abc123')
+        >>> _parse_vespa_id("id:default:tkeir_document:g=demo:abc123")
+        ('default', 'tkeir_document', 'demo', 'abc123')
+        >>> _parse_vespa_id("id:default:chunk::legacy")
+        ('default', 'chunk', None, 'legacy')
     """
+    grouped = re.match(r"id:([^:]+):([^:]+):g=([^:]+):(.+)", doc_id)
+    if grouped:
+        return (
+            grouped.group(1),
+            grouped.group(2),
+            grouped.group(3),
+            grouped.group(4),
+        )
     match = re.match(r"id:([^:]+):([^:]+)::(.+)", doc_id)
     if not match:
         raise ValueError(f"Invalid Vespa document id: {doc_id}")
-    return match.group(1), match.group(2), match.group(3)
+    return match.group(1), match.group(2), None, match.group(3)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for pipeline CLI helpers."""
 
 import json
@@ -56,7 +55,7 @@ class TestPipeline:
             }
             config_path = os.path.abspath(
                 os.path.join(
-                    os.path.dirname(__file__), "../../configs/pipeline.json"
+                    os.path.dirname(__file__), "../../configs/pipeline.yaml"
                 )
             )
 
@@ -99,7 +98,7 @@ class TestPipeline:
             }
             config_path = os.path.abspath(
                 os.path.join(
-                    os.path.dirname(__file__), "../../configs/pipeline.json"
+                    os.path.dirname(__file__), "../../configs/pipeline.yaml"
                 )
             )
 
@@ -138,7 +137,7 @@ class TestPipeline:
             }
             config_path = os.path.abspath(
                 os.path.join(
-                    os.path.dirname(__file__), "../../configs/pipeline.json"
+                    os.path.dirname(__file__), "../../configs/pipeline.yaml"
                 )
             )
 
@@ -175,7 +174,7 @@ class TestPipeline:
                     config_path = os.path.abspath(
                         os.path.join(
                             os.path.dirname(__file__),
-                            "../../configs/pipeline.json",
+                            "../../configs/pipeline.yaml",
                         )
                     )
                     pipeline_cli.main(
@@ -255,7 +254,7 @@ class TestPipeline:
             runner.run.side_effect = _run_effect
             config_path = os.path.abspath(
                 os.path.join(
-                    os.path.dirname(__file__), "../../configs/pipeline.json"
+                    os.path.dirname(__file__), "../../configs/pipeline.yaml"
                 )
             )
 

@@ -1,5 +1,8 @@
 schema tkeir_document {
     document tkeir_document {
+        field user_space type string {
+            indexing: summary | attribute
+        }
         field source_doc_id type string {
             indexing: summary | attribute
         }

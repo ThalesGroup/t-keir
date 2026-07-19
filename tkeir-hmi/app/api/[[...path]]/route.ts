@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const API_URL = (process.env.API_URL ?? "http://localhost:8090").replace(
@@ -25,6 +26,28 @@ async function proxyRequest(
     headers.set("accept", accept);
   }
 
+  // Propagate W3C trace context and inbound correlation id.
+  const traceparent = request.headers.get("traceparent");
+  if (traceparent) {
+    headers.set("traceparent", traceparent);
+  }
+  const correlationId = request.headers.get("x-correlation-id");
+  if (correlationId) {
+    headers.set("x-correlation-id", correlationId);
+  }
+
+  // Forward bearer from Auth.js session when present.
+  if (process.env.AUTH_ENABLED === "true") {
+    const session = await auth();
+    if (session?.accessToken) {
+      headers.set("authorization", `Bearer ${session.accessToken}`);
+    }
+  }
+  const inboundAuth = request.headers.get("authorization");
+  if (inboundAuth && !headers.has("authorization")) {
+    headers.set("authorization", inboundAuth);
+  }
+
   const init: RequestInit = {
     method: request.method,
     headers,
@@ -44,6 +67,21 @@ async function proxyRequest(
     if (upstreamType) {
       responseHeaders.set("content-type", upstreamType);
     }
+    const upstreamCorrelation =
+      upstream.headers.get("x-correlation-id") ||
+      upstream.headers.get("X-Correlation-Id");
+    if (upstreamCorrelation) {
+      responseHeaders.set("x-correlation-id", upstreamCorrelation);
+    }
+    const upstreamTrace = upstream.headers.get("traceparent");
+    if (upstreamTrace) {
+      responseHeaders.set("traceparent", upstreamTrace);
+    }
+    // Expose correlation header to browser JS (fetch).
+    responseHeaders.set(
+      "access-control-expose-headers",
+      "x-correlation-id, traceparent",
+    );
     return new NextResponse(body, {
       status: upstream.status,
       headers: responseHeaders,

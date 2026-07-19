@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for pipeline configuration."""
 
 import os
@@ -11,7 +10,7 @@ class TestPipelineConfiguration:
     def test_load_pipeline_config(self):
         config = PipelineConfiguration()
         with open(
-            os.path.join(configs_dir(), "pipeline.json"), encoding="utf-8"
+            os.path.join(configs_dir(), "pipeline.yaml"), encoding="utf-8"
         ) as handle:
             config.load(handle)
         assert config.configuration["default-language"] == "en"
@@ -23,7 +22,7 @@ class TestPipelineConfiguration:
     def test_apply_language_sets_resources(self):
         config = PipelineConfiguration()
         with open(
-            os.path.join(configs_dir(), "pipeline.json"), encoding="utf-8"
+            os.path.join(configs_dir(), "pipeline.yaml"), encoding="utf-8"
         ) as handle:
             config.load(handle)
         resource_path = resources_dir("en")
@@ -44,7 +43,7 @@ class TestPipelineConfiguration:
     def test_apply_language_without_resources(self):
         config = PipelineConfiguration()
         with open(
-            os.path.join(configs_dir(), "pipeline.json"), encoding="utf-8"
+            os.path.join(configs_dir(), "pipeline.yaml"), encoding="utf-8"
         ) as handle:
             config.load(handle)
         original = config.task_configs["ner"].configuration["label"][0][
@@ -61,7 +60,7 @@ class TestPipelineConfiguration:
     def test_apply_language_uses_spacy_language_for_models(self):
         config = PipelineConfiguration()
         with open(
-            os.path.join(configs_dir(), "pipeline.json"), encoding="utf-8"
+            os.path.join(configs_dir(), "pipeline.yaml"), encoding="utf-8"
         ) as handle:
             config.load(handle)
         resource_path = resources_dir("en")
@@ -82,7 +81,7 @@ class TestPipelineConfiguration:
     def test_apply_use_mwe(self):
         config = PipelineConfiguration()
         with open(
-            os.path.join(configs_dir(), "pipeline.json"), encoding="utf-8"
+            os.path.join(configs_dir(), "pipeline.yaml"), encoding="utf-8"
         ) as handle:
             config.load(handle)
         config.apply_use_mwe(True)

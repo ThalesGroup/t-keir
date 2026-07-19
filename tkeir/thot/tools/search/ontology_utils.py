@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """In-memory RDF graph merge and HMI-oriented ontology export."""
 
 from __future__ import annotations

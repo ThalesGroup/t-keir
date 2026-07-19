@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
 """Cluster and align synonymous RDF classes and properties in document graphs."""
 
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, cast
+from typing import cast
 
 import numpy as np
-from rdflib import Graph, Literal, URIRef
-from rdflib.namespace import RDF, RDFS
+from rdflib import Graph, URIRef
+from rdflib.namespace import RDF
 from rdflib.term import Node
 from sklearn.cluster import AgglomerativeClustering
 

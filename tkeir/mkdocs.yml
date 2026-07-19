@@ -5,15 +5,32 @@ site_author: 'Thales'
 site_url: 'https://github.com/ThalesGroup/t-keir/'
 nav:
     - Home: 'index.md'
+    - Zero to Hero: 'zero_to_hero.md'
     - Overview: 'overview.md'
     - Conception: 'conception.md'
     - Installation: 'installation.md'
     - Dev Container: 'devcontainer.md'
     - Quickstart: 'ready_to_run.md'
-    - Tools: 
+    - Deployment:
+        - Profiles: 'deployment/index.md'
+        - Compose (P1): 'deployment/compose.md'
+        - Kubernetes (P2): 'deployment/k8s.md'
+        - Token exchange (RFC 8693): 'deployment/token-exchange.md'
+        - Ingestion (Phase 3): 'deployment/ingest.md'
+        - Audit store (Phase 4): 'deployment/audit.md'
+        - Governor (Phase 5): 'deployment/governor.md'
+        - Secure cluster (P3): 'deployment/k8s-secure.md'
+        - macOS notes: 'deployment/macos.md'
+    - Evaluation:
+        - Overview: 'evaluation.md'
+        - BEIR report: 'evaluation_report.md'
+    - Tools:
         - Tools overview: 'tools/tools_overview.md'
         - API reference: 'tools/api_reference.md'
         - Vespa RAG: 'tools/vespa_rag.md'
+        - MCP server: 'tools/mcp.md'
+        - Agents: 'tools/agents.md'
+        - Templates: 'tools/templates.md'
         - HMI: 'hmi.md'
         - Converter: 'tools/converter.md'
         - Tokenizer: 'tools/tokenizer.md'
@@ -21,6 +38,39 @@ nav:
         - Named Entities Tagger: 'tools/nertagger.md'
         - Syntactic Tagger : 'tools/syntactictagger.md'
         - Keywords Extraction: 'tools/keywords.md'
+    - Regularity component:
+        - Identity of Action: 'regularity-component/action-identiy.md'
+        - Mastering of Action: 'regularity-component/action-mastering.md'
+    - Compliance:
+        - Overview: 'compliance/index.md'
+        - EU Compliance OPA Audit: 'compliance/eu-audit.md'
+        - Latest audit results: 'compliance/latest-results.md'
+        - Legal / reviewer checklist: 'compliance/legal-review-checklist.md'
+        - CI and evidence pipeline: 'compliance/ci-evidence.md'
+        - EU AI Act: 'compliance/ai-act.md'
+        - CRA: 'compliance/cra.md'
+        - NIS2: 'compliance/nis2.md'
+        - DORA: 'compliance/dora.md'
+        - GDPR: 'compliance/gdpr.md'
+        - PLD: 'compliance/pld.md'
+    - Runbooks:
+        - Overview: 'runbooks/index.md'
+        - Kill switch: 'runbooks/kill-switch.md'
+        - Agent runaway: 'runbooks/agent-runaway.md'
+        - Injection incident: 'runbooks/injection-incident.md'
+        - Retract generated: 'runbooks/retract-generated.md'
+        - Incident: 'runbooks/incident.md'
+        - Rollback: 'runbooks/rollback.md'
+        - DSR (forget): 'runbooks/dsr.md'
+    - ADR:
+        - Index: 'adr/index.md'
+        - 0001 Platform operations architecture: 'adr/0001-platform-architecture.md'
+        - 0002 Ingest supersede and rollback: 'adr/0002-ingest-supersede.md'
+        - 0003 Two-tier audit store + WORM: 'adr/0003-audit-store-worm.md'
+        - 0004 Defer SPIRE / SPIFFE: 'adr/0004-defer-spire.md'
+        - 0005 Agent architecture: 'adr/0005-agent-architecture.md'
+        - 0006 Per-tenant fused KG: 'adr/0006-kg-store.md'
+        - 0007 Agent-generated content: 'adr/0007-generated-content.md'
     - Security: 'security.md'
     - Operation and Management: 'oam.md'
     - About: 'about.md'
@@ -33,6 +83,10 @@ markdown_extensions:
   - pymdownx.snippets
   - pymdownx.superfences
 
+# Article tables are snippet sources only (included into regulation pages).
+exclude_docs: |
+  compliance/generated/**
+
 # Repository
 repo_name: 'ThalesGroup/t-keir'
 repo_url: 'https://github.com/ThalesGroup/t-keir/'
@@ -43,7 +97,6 @@ copyright: |
 
 # Configuration
 theme:
-  logo: 'logos/png/T-KEIR_logo_FIN-04.png'
   name: 'material'
   language: 'en'
   palette:
@@ -57,7 +110,6 @@ theme:
 
 # Customization
 extra:
-  manifest: 'manifest.webmanifest'
   social:
     - icon: 'fontawesome/brands/github-alt'
       link: 'https://github.com/ThalesGroup'

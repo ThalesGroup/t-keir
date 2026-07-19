@@ -8,8 +8,8 @@ Tokenizer resources are compiled with `tkeir-create-annotation-resource`
 
 Example of Configuration:
 
-```json title="tokenizer.json"
---8<-- "./configs/tokenizer.json"
+```yaml title="tokenizer.yaml"
+--8<-- "./configs/tokenizer.yaml"
 ```
 
 Tokenizer configuration contains a top-level `logger` section and tokenizer-specific `segmenters` settings.
@@ -66,7 +66,7 @@ tkeir-create-annotation-resource --entries-file=...
 Run tokenization through the unified pipeline:
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks tokenizer
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks tokenizer
 ```
 
 

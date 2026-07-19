@@ -20,6 +20,11 @@ ACTIVE_TESTS=(
     unittests/TestTkeirPaths.py
     unittests/TestVespaClient.py
     unittests/TestOntologyUtils.py
+    unittests/TestActionLayer.py
+    unittests/TestIngest.py
+    unittests/TestAudit.py
+    unittests/TestGovernor.py
+    unittests/TestInstaller.py
     unittests/TestToolsDocExamples.py
     unittests/TestAllDocExamples.py
     unittests/TestDocExampleCoverage.py
@@ -46,6 +51,7 @@ ACTIVE_TESTS=(
     unittests/TestThotLogger.py
     unittests/TestUtils.py
     unittests/TestLlmWrapper.py
+    unittests/TestConfigurationUtils.py
     unittests/TestQueryAnalyzer.py
     functional_tests/TestPipeline.py
 )
@@ -54,7 +60,12 @@ uv run --python 3.11 python -m coverage run \
     --rcfile=../pyproject.toml --source=thot \
     -m pytest "${ACTIVE_TESTS[@]}" -q
 
-uv run --python 3.11 python -m coverage report --rcfile=../pyproject.toml --fail-under=90
+COVERAGE_FAIL_UNDER="${COVERAGE_FAIL_UNDER:-90}"
+COVERAGE_REPORT_DIR="${COVERAGE_REPORT_DIR:-../../coverage-reports}"
+
+uv run --python 3.11 python -m coverage report \
+    --rcfile=../pyproject.toml \
+    --fail-under="${COVERAGE_FAIL_UNDER}"
 uv run --python 3.11 python -m coverage xml
-mkdir -p ../../coverage-reports
-mv coverage.xml ../../coverage-reports/
+mkdir -p "${COVERAGE_REPORT_DIR}"
+mv coverage.xml "${COVERAGE_REPORT_DIR}/"

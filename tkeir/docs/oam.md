@@ -7,7 +7,7 @@ This section describes how to run and check the T-KEIR pipeline locally.
 From the repository root:
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
 ```
 
 Use `-t raw` for plain text only. `make pipeline` defaults to `PIPELINE_TYPE=auto`.
@@ -15,7 +15,7 @@ Use `-t raw` for plain text only. `make pipeline` defaults to `PIPELINE_TYPE=aut
 Run a subset of tasks:
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT> -o <OUTPUT> -t raw --tasks tokenizer,morphosyntax
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT> -o <OUTPUT> -t raw --tasks tokenizer,morphosyntax
 ```
 
 ## Validate configuration
@@ -31,6 +31,23 @@ python3 -m pytest tkeir/tests/unittests/TestPipelineConfiguration.py
 ## Observability
 
 T-KEIR records counters through **OpenTelemetry** (`thot.core.ThotMetrics`). Metrics are exposed in Prometheus exposition format for scraping by Prometheus, Grafana, or any OTLP-compatible collector.
+
+The RAG API (`tkeir-rag`) exposes:
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /health` | Liveness — Vespa reachable |
+| `GET /ready` | Readiness — Vespa + configured `PROVIDER` |
+| `GET /metrics` | Prometheus exposition |
+
+Every HTTP response includes `X-Correlation-Id` (W3C trace-id). Non-probe
+requests emit an observe-mode [ActionRecord](regularity-component/action-identiy.md) into the
+in-process sink (audit store lands in a later profile).
+
+Structured JSON logs (fields `ts`, `level`, `service`, `version`,
+`correlation_id`, `action_id`, `actor`, `msg`) are configured for the RAG
+service via `thot.core.StructuredLogging`. Set `TKEIR_SERVICE` to override the
+service name.
 
 Logger error events increment the `logger_errors` counter automatically. Custom counters can be created with `ThotMetrics.create_counter()` and `ThotMetrics.increment_counter()`.
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Language-aware sentence segmentation using pySBD."""
 
 from __future__ import annotations

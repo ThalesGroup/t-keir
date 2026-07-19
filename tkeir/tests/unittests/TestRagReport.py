@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for RAG report assembly helpers."""
 
 from thot.tools.search.app import RetrievedChunk

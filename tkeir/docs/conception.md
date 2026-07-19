@@ -1,9 +1,5 @@
 # Conception
 
-
-![Screenshot](resources/images/conception1.png)
-
-
 ## Data preparation
 
 Data preparation consists in
@@ -11,8 +7,6 @@ Data preparation consists in
 - transform the documents into a format adapted to the tools,
 - build terminological and structured resources (such as ontology concepts for example),
 - construct the evaluation data.
-
-![Screenshot](resources/images/conception2.png)
 
 ### Construction of terminological lists
 
@@ -23,17 +17,25 @@ as well as generic data such as city names (to improve the detection of named en
 
 The evaluation data are constructed to know the relevance of the results returned by the
 search system. We seek to have a set of queries associated with the relevant documents to be returned.
-The goal is ultimately to assess the capacity of the search engine
+The goal is ultimately to assess the capacity of the search engine.
+
+For the current BEIR retrieval benchmark and latest scores, see
+[Evaluation](evaluation.md) and the [BEIR evaluation report](evaluation_report.md).
 
 ## Document Analysis
 
-![Screenshot](resources/images/TheresisNLP.png)
+Pipeline stages (in order): **converter → language detection → resource selection →
+tokenizer → morphosyntax → NER → syntax → keywords** (optional ontology / chunking for RAG).
+
+Downstream of the pipeline, T-KEIR can index into Vespa for hybrid RAG, expose
+read-only **MCP** tools over the caller's `user_space`, and run **agents /
+workflows** that compose grounded documents from the fused ontology (see
+[Overview — Agentic layer](overview.md#agentic-layer), [Agents](tools/agents.md),
+[Templates](tools/templates.md)).
 
 ### Tokenization
 
 The tokenization phase allows a text to be segmented into linguistic units: sentences, phrases, words.
-
-![Screenshot](resources/images/conception3.png)
 
 Principles
 Segmentation is a delicate phase that requires the use of regular expressions and strategies to group compound word.
@@ -67,30 +69,29 @@ into a Trie structure. This data structure can be configured to remove diacritic
 (add-ascii-folding option), to add a morphosyntaxic label (pos option) or a named entity
 label (label option)
 
+**Example of resource configuration** — see
+`resources/modeling/tokenizer/en/annotation-resources.json`:
 
-** Example of resource configuration file **
+```json
+{
+  "name": "geoname-country",
+  "path": "countryInfo.txt",
+  "pos": "PROPN",
+  "add-ascii-folding": true,
+  "label": "location.country",
+  "type": "named-entity",
+  "weight": 10
+}
+```
 
-![Screenshot](resources/images/annotation.png)
-
-
-** Example of resource file **
-
-![Screenshot](resources/images/example-resource.png)
-
+Compile the MWE trie with `make init-models` (writes `tkeir_mwe.pkl`).
 
 #### Normalization rule
 
 T-Keir tools provide the ability to normalize words and perform spell checking of the most
-common mistakes. Here simple transformation rules are set up by means of configuration files.
-
-** Example of typo configuration file  **
-
-![Screenshot](resources/images/example-typo.png)
-
-** Example of normalization configuration file **
-
-![Screenshot](resources/images/example-normalization.png)
-
+common mistakes. Here simple transformation rules are set up by means of configuration files
+under `resources/modeling/tokenizer/<lang>/` (typo and normalization rule lists referenced
+from the annotation resources file).
 
 ### Morphosyntax
 
@@ -101,13 +102,9 @@ the tags of phrases and terminology often unrecognized by the original morphosyn
 It is also this module which provides the lemmatized form (this is the canonical form of a word,
 for example the verb "doing" has the lemma "do") of words.
 
-![Screenshot](resources/images/example-ms.png)
-
+Configuration: `configs/mstagger.yaml`.
 
 ### Named entities extraction
-
-![Screenshot](resources/images/conception5.png)
-
 
 Named feature extraction involves labeling textual elements. They can be seen as (text, label) pairs : where the label is the type of data, for example "city", "person", "organization", ...
 
@@ -120,14 +117,10 @@ morphosyntactic elements.
 #### Use validation rules
 
 Validation rules help to avoid basic errors such as associating a city name with a verb.
-
-![Screenshot](resources/images/validation-rules.png)
-
+Rule files live under `resources/modeling/tokenizer/<lang>/` (see NER configuration in
+`configs/nertagger.yaml`).
 
 ### Dependencies analysis & triple (Subject, Verb, Object) extraction
-
-![Screenshot](resources/images/conception4.png)
-
 
 Dependency analysis allows the discovery of relationships between the different structuring
 elements of a sentence.
@@ -147,7 +140,7 @@ in a configuration file.
 
 The syntactic rules allow the definition of patterns corresponding to phrases, verbal groups
 or prepositional groups. The creation of these rules is governed by the syntax defined in the
-Spacy library.
+Spacy library. Configuration: `configs/syntactic-tagger.yaml`.
 
 ### Keywords extraction
 
@@ -164,3 +157,4 @@ Dave & Cramer, Nick & Cowley, Wendy. (2010). Automatic Keyword Extraction from I
 T-KEIR uses a modified version of Rake taking into account lemmatized forms and their
 morphosyntaxic tags. Thus empty words will be associated with the labels of determinants and
 other conjunctions while the delimiters will be associated with the punctuation tags.
+Configuration: `configs/keywords.yaml`.

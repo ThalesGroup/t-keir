@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test Annotation Configuration
 Author: Eric Blaudez (Eric Blaudez)
 
@@ -11,7 +10,6 @@ from thot.core.DictionaryTrie import Trie, end_trie, make_trie, prefix_trie
 
 
 class TestDictionaryTrie(unittest.TestCase):
-
     test_data = {
         "a": {
             "b": {

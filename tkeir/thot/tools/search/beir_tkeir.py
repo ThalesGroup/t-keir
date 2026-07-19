@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """T-KEIR full NLP pipeline + Vespa hybrid retrieval for BEIR evaluation.
 
 Indexes each BEIR document through :class:`PipelineRunner` (tokenizer →
@@ -43,7 +42,15 @@ _BEIR_QUESTION_SETTINGS = None  # lazy import to avoid circular deps
 
 
 def _beir_question_settings():
-    """Return capped question settings for BEIR indexing (fast, no stall)."""
+    """Return capped question settings for BEIR indexing (fast, no stall).
+
+    Example:
+        >>> settings = _beir_question_settings()
+        >>> settings.min_questions
+        1
+        >>> settings.max_questions
+        2
+    """
     global _BEIR_QUESTION_SETTINGS
     if _BEIR_QUESTION_SETTINGS is None:
         from thot.tasks.chunk_questions.QuestionBuilder import (
@@ -102,6 +109,7 @@ class RetrievalEmbeddingClient:
         documents: list[str],
         *,
         top_n: int | None = None,
+        strategy: str | None = None,
     ) -> list[dict[str, Any]]:
         """Rerank candidates (allowed for IR eval; not answer generation).
 
@@ -110,7 +118,12 @@ class RetrievalEmbeddingClient:
             >>> inspect.iscoroutinefunction(RetrievalEmbeddingClient.rerank)
             True
         """
-        return await self._llm.rerank(query, documents, top_n=top_n)
+        return await self._llm.rerank(
+            query,
+            documents,
+            top_n=top_n,
+            strategy=strategy,
+        )
 
     async def generate(self, prompt: str, *, temperature: float = 0.1) -> str:
         """Hard-fail: IR evaluation must not run T-KEIR answer generation.
@@ -353,9 +366,7 @@ def prepare_index_document(
         )
 
     if mode == "fast":
-        seed = seed_pipeline_document(
-            dataset, doc_id, doc, language=language
-        )
+        seed = seed_pipeline_document(dataset, doc_id, doc, language=language)
         text = document_text(doc) or seed["source_doc_id"]
         seed["golden_chunks"] = [
             {
@@ -439,7 +450,7 @@ def load_pipeline_runner() -> PipelineRunner:
     """
     config = PipelineConfiguration()
     with open(
-        os.path.join(configs_dir(), "pipeline.json"),
+        os.path.join(configs_dir(), "pipeline.yaml"),
         encoding="utf-8",
     ) as handle:
         config.load(handle)
@@ -546,11 +557,15 @@ async def index_beir_corpus(
     language: str = "en",
     index_mode: str = "chunking",
     progress_every: int = 25,
+    max_workers: int | None = None,
 ) -> int:
     """Run NLP pipeline + Vespa indexing for every BEIR document.
 
-    Uses embeddings only (no answer generation). Logs rate + ETA so long
-    corpora do not look stalled.
+    Documents are processed **sequentially**. The shared
+    :class:`PipelineRunner` and local embedding providers (Ollama) do not
+    tolerate concurrent NLP/embed load; parallel workers previously stalled
+    long BEIR runs. ``max_workers`` is accepted for API compatibility and
+    ignored when greater than 1 (a warning is logged).
 
     Args:
         dataset: Dataset name embedded in document ids.
@@ -561,6 +576,7 @@ async def index_beir_corpus(
         language: Document processing language.
         index_mode: ``fast`` / ``chunking`` / ``full``.
         progress_every: Log every N documents (always log first 3).
+        max_workers: Unused (sequential indexing); kept for callers.
 
     Returns:
         Number of successfully indexed documents.
@@ -571,11 +587,18 @@ async def index_beir_corpus(
     """
     import time
 
+    if max_workers is not None and max_workers > 1:
+        LOGGER.warning(
+            "BEIR indexing is sequential (ignoring max_workers=%s); "
+            "concurrent NLP/embed stalls Ollama and the shared pipeline",
+            max_workers,
+        )
+
     indexed = 0
     total = len(corpus)
     started = time.perf_counter()
     LOGGER.info(
-        "T-KEIR indexing %d docs for %s (mode=%s, retrieval-only)",
+        "T-KEIR indexing %d docs for %s (mode=%s, sequential, retrieval-only)",
         total,
         dataset,
         index_mode,
@@ -665,13 +688,14 @@ def _aggregate_hits_to_beir(
         Mapping ``beir_doc_id → relevance``.
 
     Example:
-        >>> _aggregate_hits_to_beir(
+        >>> scores = _aggregate_hits_to_beir(
         ...     {"root": {"children": [
         ...         {"fields": {"chunk_id": "beir:scifact:9#chunk-0-a"}, "relevance": 0.8}
         ...     ]}},
         ...     "scifact",
         ... )
-        {'9': 0.8}
+        >>> round(scores["9"], 6)
+        0.834657
     """
     best: dict[str, float] = {}
     counts: dict[str, int] = {}
@@ -705,11 +729,14 @@ async def retrieve_with_tkeir(
     runner: PipelineRunner,
     language: str = "en",
     top_k: int = 100,
+    max_workers: int | None = None,
 ) -> dict[str, dict[str, float]]:
     """Run T-KEIR QueryAnalyzer + Vespa hybrid search for every query.
 
     Retrieval only: NLP query analysis, embeddings, and Vespa search.
-    Does not call RAG answer generation.
+    Queries run **sequentially** (shared pipeline + embedding provider).
+    ``max_workers`` is accepted for API compatibility; values > 1 log a
+    warning and are ignored.
 
     Args:
         dataset: BEIR dataset name (for hit id filtering).
@@ -719,6 +746,7 @@ async def retrieve_with_tkeir(
         runner: Linguistic pipeline runner for query analysis.
         language: Pipeline language code.
         top_k: Hits requested from Vespa.
+        max_workers: Unused (sequential retrieval); kept for callers.
 
     Returns:
         BEIR results dict ``{qid: {doc_id: score}}``.
@@ -727,6 +755,12 @@ async def retrieve_with_tkeir(
         >>> asyncio.run(retrieve_with_tkeir("scifact", {}, vespa=None, llm=None, runner=None))  # doctest: +SKIP
         {}
     """
+    if max_workers is not None and max_workers > 1:
+        LOGGER.warning(
+            "BEIR retrieval is sequential (ignoring max_workers=%s)",
+            max_workers,
+        )
+
     config = tkeir_search_config(hits=top_k)
     analyzer = QueryAnalyzerTask(
         runner,
@@ -734,6 +768,7 @@ async def retrieve_with_tkeir(
         config,
         embedding_dim=vespa.config.embedding_dim,
         timeout_seconds=vespa.config.timeout_seconds,
+        user_space=vespa.config.user_space,
     )
     rerank_cfg = config.rerank
     results: dict[str, dict[str, float]] = {}
@@ -753,6 +788,7 @@ async def retrieve_with_tkeir(
                     qtext,
                     children[:candidate_n],
                     top_n=top_k,
+                    strategy=rerank_cfg.strategy,
                 )
                 root["children"] = reranked
                 response = {**response, "root": root}
@@ -836,7 +872,7 @@ async def run_tkeir_eval(
         if not await vespa.health():
             raise RuntimeError(
                 "Vespa is not ready for T-KEIR BEIR evaluation. "
-                "Run: cd vespa && make bootstrap"
+                "Run: make bootstrap"
             )
         indexed = await index_beir_corpus(
             dataset,

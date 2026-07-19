@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """FastAPI RAG application over Vespa 2-level document/chunk retrieval."""
 
 from __future__ import annotations
@@ -11,15 +10,21 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 import yaml
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from rdflib import Graph
 
 from thot import __version__ as TKEIR_VERSION
+from thot.action.middleware import ActionCorrelationMiddleware
+from thot.action.readiness import readiness_report
 from thot.core.LlmWrapper import UnifiedLLMWrapper
+from thot.core.StructuredLogging import configure_json_logging
 from thot.core.ThotLogger import ThotLogger
+from thot.core.ThotMetrics import ThotMetrics
 from thot.core.TkeirPaths import configs_dir, rag_prompts_path
+from thot.governor.wiring import wire_governor_middleware
 from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
 from thot.tools.search.ontology_utils import (
@@ -48,7 +53,6 @@ from thot.tools.search.rag_config import (
     load_rag_config,
     resolve_passage_settings,
 )
-from thot.tools.search.rerank import rerank_vespa_children
 from thot.tools.search.rag_report import (
     apply_chunk_evidence_fallback,
     assemble_report_markdown,
@@ -59,6 +63,9 @@ from thot.tools.search.rag_report import (
     parse_structured_generation,
     query_highlight_terms,
 )
+from thot.tools.search.rerank import rerank_vespa_children
+from thot.tools.search.search_aggregate import aggregate_chunks_to_documents
+from thot.tools.search.user_space import resolve_vespa_user_space
 from thot.tools.search.vespa_client import (
     VespaClient,
     clean_chunk_text_for_prompt,
@@ -102,6 +109,44 @@ class RetrievedChunk(BaseModel):
     text_raw: str
     parent_doc_id: str
     relevance: float | None = None
+
+
+class SearchRequest(BaseModel):
+    """Retrieval-only request (no LLM answer generation)."""
+
+    query: str = Field(..., min_length=1)
+    language: str = Field(default="en", pattern="^(en|fr)$")
+    hits: int = Field(default=20, ge=1, le=100)
+
+
+class SearchChunk(BaseModel):
+    """Reranked chunk hit with score."""
+
+    chunk_id: str
+    text_raw: str
+    parent_doc_id: str
+    score: float
+    title: str = ""
+
+
+class SearchDocument(BaseModel):
+    """Document aggregated from reranked chunk hits."""
+
+    document_id: str
+    score: float
+    chunk_ids: list[str] = Field(default_factory=list)
+    title: str = ""
+    hit_count: int = 0
+
+
+class SearchResponse(BaseModel):
+    """Reranked chunks and documents for a search query."""
+
+    query: str
+    chunks: list[SearchChunk]
+    documents: list[SearchDocument]
+    vespa_hits: int
+    ranking_profile: str | None = None
 
 
 class SemanticEntity(BaseModel):
@@ -434,15 +479,41 @@ async def _enrich_hits(
 ) -> tuple[list[RetrievedChunk], list[str]]:
     """Attach parent document metadata to Vespa chunk hits.
 
+    Parent fetches run concurrently (bounded by
+    ``vespa.concurrency.enrich_workers``).
+
     Example:
         >>> import inspect
         >>> inspect.iscoroutinefunction(_enrich_hits)
         True
     """
+    parent_cache: dict[str, dict[str, Any]] = {}
+    doc_refs = {
+        str(fields.get("doc_ref") or "")
+        for fields, _ in parsed_hits
+        if fields.get("doc_ref")
+    }
+    workers = max(1, state.rag_config.vespa.concurrency.enrich_workers)
+    semaphore = asyncio.Semaphore(workers)
+
+    async def _fetch_parent(doc_ref: str) -> tuple[str, dict[str, Any]]:
+        if state.vespa is None:
+            return doc_ref, {}
+        async with semaphore:
+            try:
+                return doc_ref, await state.vespa.get_document_by_ref(doc_ref)
+            except Exception:
+                LOGGER.warning("Unable to fetch parent document %s", doc_ref)
+                return doc_ref, {}
+
+    if doc_refs and state.vespa is not None:
+        fetched = await asyncio.gather(
+            *(_fetch_parent(doc_ref) for doc_ref in doc_refs)
+        )
+        parent_cache.update(fetched)
+
     retrieved_chunks: list[RetrievedChunk] = []
     rdf_payloads: list[str] = []
-    parent_cache: dict[str, dict[str, Any]] = {}
-
     for fields, relevance in parsed_hits:
         chunk_id = str(fields.get("chunk_id") or "")
         text_raw = str(fields.get("text_raw") or "")
@@ -450,20 +521,7 @@ async def _enrich_hits(
         if not chunk_id or not text_raw:
             continue
 
-        parent_fields: dict[str, Any] = {}
-        if doc_ref:
-            if doc_ref not in parent_cache and state.vespa is not None:
-                try:
-                    parent_cache[doc_ref] = (
-                        await state.vespa.get_document_by_ref(doc_ref)
-                    )
-                except Exception:
-                    LOGGER.warning(
-                        "Unable to fetch parent document %s", doc_ref
-                    )
-                    parent_cache[doc_ref] = {}
-            parent_fields = parent_cache.get(doc_ref, {})
-
+        parent_fields = parent_cache.get(doc_ref, {}) if doc_ref else {}
         parent_doc_id = str(
             parent_fields.get("source_doc_id") or doc_ref or ""
         )
@@ -478,6 +536,100 @@ async def _enrich_hits(
         rdf_payloads.append(_extract_parent_rdf(parent_fields))
 
     return retrieved_chunks, rdf_payloads
+
+
+async def _retrieve_and_rerank(
+    state: AppState,
+    *,
+    query_text: str,
+    language: str,
+    hits: int,
+    user_space: str | None = None,
+) -> tuple[dict[str, Any], dict[str, Any] | None, dict[str, Any] | None, str]:
+    """Run query analysis, Vespa search, and optional second-stage rerank.
+
+    Returns:
+        ``(search_response, vespa_payload, query_analysis, search_query_text)``.
+    """
+    assert state.vespa is not None
+    space = user_space or state.vespa.config.user_space
+    pipeline_runner = _pipeline_runner_for_language(state, language)
+    search_query_text = query_text
+    query_analysis: dict[str, Any] | None = None
+    vespa_payload: dict[str, Any] | None = None
+    rerank_cfg = state.rag_config.search.rerank
+    first_stage_hits = hits
+    if rerank_cfg.enabled:
+        first_stage_hits = max(hits, rerank_cfg.candidates)
+
+    if (
+        state.rag_config.search.enabled
+        and pipeline_runner is not None
+        and state.llm is not None
+        and state.vespa is not None
+    ):
+        analyzer = QueryAnalyzerTask(
+            pipeline_runner,
+            state.llm,
+            state.rag_config.search,
+            embedding_dim=state.vespa.config.embedding_dim,
+            timeout_seconds=state.vespa.config.timeout_seconds,
+            user_space=space,
+        )
+        analyzed = await analyzer.process(
+            query_text,
+            language=language,
+            hits=first_stage_hits,
+        )
+        vespa_payload = analyzed["payload"]
+        search_response = await state.vespa.search(vespa_payload)
+        query_analysis = analyzed["analysis"]
+        search_query_text = query_analysis.get("lexical_query") or query_text
+    else:
+        assert state.llm is not None and state.vespa is not None
+        query_embedding = await state.llm.embed(query_text)
+        if pipeline_runner is None:
+            search_query_text = query_text
+        else:
+            search_query_text = await asyncio.to_thread(
+                refine_search_query_text,
+                pipeline_runner,
+                query_text,
+                language=language,
+            )
+        vespa_payload = state.vespa.build_hybrid_search_payload(
+            search_query_text,
+            query_embedding,
+            query_embedding,
+            hits=first_stage_hits,
+            user_space=space,
+        )
+        search_response = await state.vespa.search(vespa_payload)
+        query_analysis = {
+            "raw_query": query_text,
+            "lexical_query": search_query_text,
+            "search_terms": search_query_text.split(),
+        }
+
+    if (
+        rerank_cfg.enabled
+        and state.llm is not None
+        and search_response is not None
+    ):
+        root = dict(search_response.get("root") or {})
+        children = list(root.get("children") or [])
+        candidate_n = min(len(children), rerank_cfg.candidates)
+        reranked = await rerank_vespa_children(
+            state.llm,
+            query_text,
+            children[:candidate_n],
+            top_n=hits,
+            strategy=rerank_cfg.strategy,
+        )
+        root["children"] = reranked
+        search_response = {**search_response, "root": root}
+
+    return search_response, vespa_payload, query_analysis, search_query_text
 
 
 def _parse_hits(
@@ -516,7 +668,7 @@ def _load_pipeline_configuration() -> PipelineConfiguration:
     """
     config = PipelineConfiguration()
     with open(
-        os.path.join(configs_dir(), "pipeline.json"),
+        os.path.join(configs_dir(), "pipeline.yaml"),
         encoding="utf-8",
     ) as handle:
         config.load(handle)
@@ -603,6 +755,7 @@ async def lifespan(app: FastAPI):
         >>> callable(lifespan)
         True
     """
+    configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-api"))
     state = AppState()
     state.prompts = _load_prompts()
     state.llm = UnifiedLLMWrapper()
@@ -639,6 +792,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Outermost: correlation + observe-mode ActionRecords on every request.
+app.add_middleware(ActionCorrelationMiddleware)
+wire_governor_middleware(app, service=os.getenv("TKEIR_SERVICE", "tkeir-api"))
 
 
 @app.get("/health")
@@ -656,8 +812,167 @@ async def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/ready")
+async def ready() -> dict:
+    """Readiness probe: Vespa + configured PROVIDER endpoint.
+
+    Returns HTTP 200 when both checks pass, otherwise 503.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(ready)
+        True
+    """
+    state: AppState | None = getattr(app.state, "rag", None)
+    vespa_ok = False
+    llm = None
+    if state is not None:
+        llm = state.llm
+        if state.vespa is not None:
+            vespa_ok = await state.vespa.health()
+    report = await readiness_report(vespa_ok=vespa_ok, llm=llm)
+    if report["status"] != "ready":
+        raise HTTPException(status_code=503, detail=report)
+    return report
+
+
+@app.get("/metrics")
+async def metrics() -> Response:
+    """Prometheus exposition of OpenTelemetry counters.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(metrics)
+        True
+    """
+    ThotMetrics.create_counter(
+        short_name="rag_http",
+        function_name="tkeir_rag_http_requests_total",
+        counter_description="RAG HTTP requests observed",
+    )
+    payload = ThotMetrics.generateMetricsResponse()
+    return Response(
+        content=payload,
+        media_type=ThotMetrics.METRIC_MIME_TYPE,
+    )
+
+
+@app.post("/search", response_model=SearchResponse)
+async def search(
+    request: SearchRequest,
+    authorization: str | None = Header(default=None),
+) -> SearchResponse:
+    """Hybrid retrieval + rerank without LLM answer generation.
+
+    Returns reranked chunks and documents aggregated from those chunks
+    (``max(chunk_score) + 0.05 * log1p(hit_count)``).
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(search)
+        True
+    """
+    state: AppState = app.state.rag
+    if state.llm is None or state.vespa is None:
+        raise HTTPException(
+            status_code=503, detail="Application is not initialized"
+        )
+
+    user_space = resolve_vespa_user_space(authorization)
+    query_text = request.query.strip()
+    request_started = time.perf_counter()
+    try:
+        (
+            search_response,
+            vespa_payload,
+            query_analysis,
+            _,
+        ) = await _retrieve_and_rerank(
+            state,
+            query_text=query_text,
+            language=request.language,
+            hits=request.hits,
+            user_space=user_space,
+        )
+        parsed_hits = _parse_hits(search_response)
+        retrieved_chunks, _rdf = await _enrich_hits(state, parsed_hits)
+    except Exception as error:
+        LOGGER.exception("Search failed")
+        raise HTTPException(
+            status_code=502, detail=f"Search failed: {error}"
+        ) from error
+
+    title_by_chunk = {
+        str(fields.get("chunk_id") or ""): (
+            str(fields.get("parent_title") or "").strip()
+        )
+        for fields, _ in parsed_hits
+    }
+    search_chunks = [
+        SearchChunk(
+            chunk_id=chunk.chunk_id,
+            text_raw=chunk.text_raw,
+            parent_doc_id=chunk.parent_doc_id,
+            score=float(chunk.relevance or 0.0),
+            title=title_by_chunk.get(chunk.chunk_id, ""),
+        )
+        for chunk in retrieved_chunks
+    ]
+    aggregated = aggregate_chunks_to_documents(
+        [
+            {
+                "document_id": chunk.parent_doc_id,
+                "chunk_id": chunk.chunk_id,
+                "score": chunk.score,
+                "title": chunk.title,
+            }
+            for chunk in search_chunks
+        ]
+    )
+    ranking_profile = None
+    if isinstance(vespa_payload, dict):
+        ranking_profile = vespa_payload.get("ranking.profile") or (
+            vespa_payload.get("ranking")
+            if isinstance(vespa_payload.get("ranking"), str)
+            else None
+        )
+        if ranking_profile is None and isinstance(
+            vespa_payload.get("ranking"), dict
+        ):
+            ranking_profile = vespa_payload["ranking"].get("profile")
+    if ranking_profile is None and isinstance(query_analysis, dict):
+        ranking_profile = query_analysis.get("ranking_profile")
+
+    _log_rag_step(
+        "search-total",
+        request_started,
+        query=repr(query_text),
+        chunks=len(search_chunks),
+        documents=len(aggregated),
+    )
+    return SearchResponse(
+        query=query_text,
+        chunks=search_chunks,
+        documents=[
+            SearchDocument(
+                document_id=doc.document_id,
+                score=doc.score,
+                chunk_ids=doc.chunk_ids,
+                title=doc.title,
+                hit_count=doc.hit_count,
+            )
+            for doc in aggregated
+        ],
+        vespa_hits=len(parsed_hits),
+        ranking_profile=str(ranking_profile) if ranking_profile else None,
+    )
+
+
 @app.post("/rag/query", response_model=QueryResponse)
-async def rag_query(request: QueryRequest) -> QueryResponse:
+async def rag_query(
+    request: QueryRequest,
+    authorization: str | None = Header(default=None),
+) -> QueryResponse:
     """Run hybrid retrieval and optional LLM answer generation.
 
     Example:
@@ -671,84 +986,24 @@ async def rag_query(request: QueryRequest) -> QueryResponse:
             status_code=503, detail="Application is not initialized"
         )
 
+    user_space = resolve_vespa_user_space(authorization)
     query_text = request.query.strip()
     request_started = time.perf_counter()
 
     step_started = time.perf_counter()
-    pipeline_runner = _pipeline_runner_for_language(
-        state,
-        request.language,
-    )
-    search_query_text = query_text
-    query_analysis: dict[str, Any] | None = None
-    vespa_payload: dict[str, Any] | None = None
     try:
-        rerank_cfg = state.rag_config.search.rerank
-        first_stage_hits = request.hits
-        if rerank_cfg.enabled:
-            first_stage_hits = max(request.hits, rerank_cfg.candidates)
-        if (
-            state.rag_config.search.enabled
-            and pipeline_runner is not None
-            and state.llm is not None
-        ):
-            analyzer = QueryAnalyzerTask(
-                pipeline_runner,
-                state.llm,
-                state.rag_config.search,
-                embedding_dim=state.vespa.config.embedding_dim,
-                timeout_seconds=state.vespa.config.timeout_seconds,
-            )
-            analyzed = await analyzer.process(
-                query_text,
-                language=request.language,
-                hits=first_stage_hits,
-            )
-            vespa_payload = analyzed["payload"]
-            search_response = await state.vespa.search(vespa_payload)
-            query_analysis = analyzed["analysis"]
-            search_query_text = (
-                query_analysis.get("lexical_query") or query_text
-            )
-        else:
-            query_embedding = await state.llm.embed(query_text)
-            if pipeline_runner is None:
-                search_query_text = query_text
-            else:
-                search_query_text = await asyncio.to_thread(
-                    refine_search_query_text,
-                    pipeline_runner,
-                    query_text,
-                    language=request.language,
-                )
-            vespa_payload = state.vespa.build_hybrid_search_payload(
-                search_query_text,
-                query_embedding,
-                query_embedding,
-                hits=first_stage_hits,
-            )
-            search_response = await state.vespa.search(vespa_payload)
-            query_analysis = {
-                "raw_query": query_text,
-                "lexical_query": search_query_text,
-                "search_terms": search_query_text.split(),
-            }
-        if (
-            rerank_cfg.enabled
-            and state.llm is not None
-            and search_response is not None
-        ):
-            root = dict(search_response.get("root") or {})
-            children = list(root.get("children") or [])
-            candidate_n = min(len(children), rerank_cfg.candidates)
-            reranked = await rerank_vespa_children(
-                state.llm,
-                query_text,
-                children[:candidate_n],
-                top_n=request.hits,
-            )
-            root["children"] = reranked
-            search_response = {**search_response, "root": root}
+        (
+            search_response,
+            vespa_payload,
+            query_analysis,
+            search_query_text,
+        ) = await _retrieve_and_rerank(
+            state,
+            query_text=query_text,
+            language=request.language,
+            hits=request.hits,
+            user_space=user_space,
+        )
     except Exception as error:
         LOGGER.exception("Query generation failed")
         raise HTTPException(

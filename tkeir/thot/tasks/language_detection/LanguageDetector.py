@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Detect document language from plain text."""
 
 from dataclasses import dataclass

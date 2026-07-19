@@ -5,7 +5,7 @@
 T-KEIR analysis runs as a single in-process pipeline. Each step enriches one JSON document with tokens, morphosyntax, named entities, syntax, triples, and keywords.
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <input file or directory> -o <output directory> -t auto
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <input file or directory> -o <output directory> -t auto
 ```
 
 Use `-t raw` for plain text only; use `-t auto` (or `make pipeline` default) for PDFs and Office files.
@@ -13,7 +13,7 @@ Use `-t raw` for plain text only; use `-t auto` (or `make pipeline` default) for
 From the source tree:
 
 ```shell
-python3 -m thot.tools.pipeline -c tkeir/configs/pipeline.json -i <input> -o <output> -t auto
+python3 -m thot.tools.pipeline -c tkeir/configs/pipeline.yaml -i <input> -o <output> -t auto
 ```
 
 ### Pipeline steps
@@ -33,6 +33,24 @@ python3 -m thot.tools.pipeline -c tkeir/configs/pipeline.json -i <input> -o <out
 
 After pipeline output is produced, index fixtures or your own JSON under
 `tkeir/tests/indexing/` and start the RAG stack — see [Vespa RAG](vespa_rag.md).
+
+### Agentic layer (MCP, agents, templates)
+
+T-KEIR also exposes the indexed corpus to **agents** and external **MCP**
+clients, and can **compose** grounded documents from the fused ontology:
+
+| Capability | Make / docs |
+|---|---|
+| MCP read-only tools | `make mcp` — [MCP server](mcp.md) |
+| Single-agent / workflows | `make agent`, `make workflow-run` — [Agents](agents.md) |
+| Ontology templates | `make compose TEMPLATE=synthesis_note` — [Templates](templates.md) |
+| HMI run monitor | `/agents` — [HMI](../hmi.md) |
+
+Base agents ship as YAML under `tkeir/configs/agents/` (`researcher`,
+`analyst`, `writer`, `reviewer`). Workflows live under
+`tkeir/configs/workflows/` (for example `content_brief`). The runtime is
+implemented in `thot/agent/` and `thot/mcp/` **without** third-party agent
+frameworks; governance uses the same ActionRecord / governor path as ingest.
 
 ### Initialize tokenizer resources
 
@@ -54,4 +72,4 @@ python3 -m thot.tools.annotation.create_annotation_resource \
 
 ### Per-task configuration
 
-`pipeline.json` references individual task configs under `tkeir/configs/` (converter, tokenizer, mstagger, nertagger, syntactic-tagger, keywords). See the tool-specific pages for configuration field descriptions.
+`pipeline.yaml` references individual task configs under `tkeir/configs/` (converter, tokenizer, mstagger, nertagger, syntactic-tagger, keywords). See the tool-specific pages for configuration field descriptions.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Analyze user queries and build structured Vespa hybrid search payloads."""
 
 from __future__ import annotations
@@ -8,7 +7,6 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from thot.core.LlmWrapper import UnifiedLLMWrapper
 from thot.core.ThotLogger import ThotLogger
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
 from thot.tools.search.query_refiner import meaningful_tokens_from_morphosyntax
@@ -330,7 +328,7 @@ def select_ranking_profile(analysis: QueryAnalysis) -> str:
         ...     ner_entities=[NerEntity("Microsoft", "ORG")],
         ...     search_terms=["Microsoft"],
         ... ))
-        'hybrid_lexical'
+        'hybrid_semantic'
     """
     terms = analysis.search_terms or []
     ner_count = len(analysis.ner_entities)
@@ -415,6 +413,7 @@ def build_vespa_search_payload(
     hits: int,
     timeout_seconds: float,
     embedding_dim: int,
+    user_space: str | None = None,
 ) -> dict[str, Any]:
     """Build a Vespa HTTP search payload from analysis and embeddings.
 
@@ -428,9 +427,12 @@ def build_vespa_search_payload(
         ...     hits=10,
         ...     timeout_seconds=30.0,
         ...     embedding_dim=384,
+        ...     user_space="demo",
         ... )
         >>> payload["ranking.profile"]
-        'hybrid_2_level'
+        'hybrid_semantic'
+        >>> payload["streaming.groupname"]
+        'demo'
     """
     profile = (config.ranking_profile or "auto").strip()
     if profile == "auto":
@@ -441,6 +443,9 @@ def build_vespa_search_payload(
         "timeout": f"{int(timeout_seconds)}s",
         "ranking.profile": profile,
     }
+    from thot.tools.search.vespa_client import normalize_user_space
+
+    payload["streaming.groupname"] = normalize_user_space(user_space)
     if config.use_chunk_embedding:
         payload["input.query(q_chunk_emb)"] = build_chunk_tensor(
             q_chunk_emb,
@@ -961,6 +966,7 @@ class QueryAnalyzerTask:
         *,
         embedding_dim: int = 384,
         timeout_seconds: float = 60.0,
+        user_space: str | None = None,
     ):
         """Initialize the analyzer with pipeline, embedder, and search config.
 
@@ -968,11 +974,14 @@ class QueryAnalyzerTask:
             >>> callable(QueryAnalyzerTask)
             True
         """
+        from thot.tools.search.vespa_client import normalize_user_space
+
         self._runner = runner
         self._llm = llm
         self._config = config
         self._embedding_dim = embedding_dim
         self._timeout_seconds = timeout_seconds
+        self._user_space = normalize_user_space(user_space)
 
     @property
     def config(self) -> RagSearchConfig:
@@ -1089,6 +1098,7 @@ class QueryAnalyzerTask:
             hits=hits or self._config.hits,
             timeout_seconds=self._timeout_seconds,
             embedding_dim=self._embedding_dim,
+            user_space=self._user_space,
         )
 
     async def process(

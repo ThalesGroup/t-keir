@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for pySBD sentence segmentation."""
 
 from thot.core.SentenceSegmenter import (

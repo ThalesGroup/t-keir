@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Induce SHACL node shapes from aligned document RDF graphs."""
 
 from __future__ import annotations

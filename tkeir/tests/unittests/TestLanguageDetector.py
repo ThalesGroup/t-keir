@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for language detection."""
 
 from unittest.mock import patch

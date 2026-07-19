@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 """Run the full T-KEIR NLP pipeline in process."""
 
 import copy
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from thot.core.ThotLogger import ThotLogger
 from thot.tasks.chunk_questions.ChunkQuestionGenerator import (
@@ -298,7 +297,7 @@ class PipelineRunner:
             >>> PipelineRunner._run_timed_step.__name__
             '_run_timed_step'
         """
-        started_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        started_at = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
         start = time.perf_counter()
         ThotLogger.info(
             "Pipeline task '"

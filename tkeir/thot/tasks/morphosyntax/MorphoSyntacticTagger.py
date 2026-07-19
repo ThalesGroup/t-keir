@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Morphosyntactic tagger
 
 Author: Eric Blaudez (Eric Blaudez)
@@ -58,15 +57,7 @@ class MorphoSyntacticTagger:
             self._add_concept_in_kg = config.configuration["taggers"][0][
                 "add-concept-in-knowledge-graph"
             ]
-        if language == "en":
-            self._nlp, self._spacy_model = load_spacy_model(
-                language,
-                size="md",
-                call_context=call_context,
-                download_if_missing=True,
-                task_name="morphosyntax",
-            )
-        elif language == "fr":
+        if language == "en" or language == "fr":
             self._nlp, self._spacy_model = load_spacy_model(
                 language,
                 size="md",

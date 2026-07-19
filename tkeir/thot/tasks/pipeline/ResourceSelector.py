@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Select lexical resource directory for a detected language."""
 
 import os

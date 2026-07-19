@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 """TF-IDF clustering of subjects, objects, and predicates from SVO context."""
 
 from __future__ import annotations
 
 from collections import Counter, defaultdict
-from typing import Callable, Literal
+from collections.abc import Callable
+from typing import Literal
 
 import numpy as np
 from scipy.sparse import hstack
@@ -344,10 +344,12 @@ def cluster_entities_by_triple_context(
             documents,
             similarity_threshold=similarity_threshold,
             min_cluster_size=min_cluster_size,
-            canonical_picker=lambda members, matrix: _canonical_predicate_class(
-                members,
-                matrix,
-                predicate_frequencies,
+            canonical_picker=lambda members, matrix: (
+                _canonical_predicate_class(
+                    members,
+                    matrix,
+                    predicate_frequencies,
+                )
             ),
         )
         return {
@@ -361,11 +363,13 @@ def cluster_entities_by_triple_context(
         documents,
         similarity_threshold=similarity_threshold,
         min_cluster_size=min_cluster_size,
-        canonical_picker=lambda members, matrix: _canonical_subject_or_object_class(
-            members,
-            matrix,
-            context_bags,
-            ner_hints,
+        canonical_picker=lambda members, matrix: (
+            _canonical_subject_or_object_class(
+                members,
+                matrix,
+                context_bags,
+                ner_hints,
+            )
         ),
     )
     return {

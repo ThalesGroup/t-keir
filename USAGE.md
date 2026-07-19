@@ -1,8 +1,10 @@
 # T-KEIR usage (legacy entry point)
 
-> **Prefer the MkDocs site:** from `tkeir/`, run `make docs` (root Makefile) or
-> `uv run mkdocs serve` and open [Dev Container](devcontainer.md),
-> [Quickstart](ready_to_run.md), and [Vespa RAG](tools/vespa_rag.md).
+> **Prefer:** [Zero to Hero](tkeir/docs/zero_to_hero.md) (dev → prod), or from
+> `tkeir/` run `uv run mkdocs serve` and open that page in the nav.
+>
+> Also: [Dev Container](devcontainer.md), [Quickstart](ready_to_run.md),
+> [Vespa RAG](tools/vespa_rag.md).
 
 This file summarizes the current OSS workflow. REST `_svc.py` / `_client.py` services
 were removed; analysis runs through the unified in-process pipeline.
@@ -23,7 +25,7 @@ were removed; analysis runs through the unified in-process pipeline.
 | `tkeir/configs/` | Pipeline and tagger configuration |
 | `tkeir/resources/modeling/tokenizer/` | Lexicons and `tkeir_mwe.pkl` |
 | `tkeir/tests/indexing/` | Portable PDF + pipeline JSON fixtures for Vespa |
-| `vespa/` | Vespa Docker deployment |
+| `vespa/` | Vespa Docker schemas/scripts (use root `Makefile` targets) |
 | `tkeir-hmi/` | Next.js Search & RAG web interface |
 
 ## Setup
@@ -40,7 +42,7 @@ Use **`-t raw`** only for plain-text inputs (`.txt`, `.md`, …).
 
 ```bash
 tkeir-pipeline \
-  -c tkeir/configs/pipeline.json \
+  -c tkeir/configs/pipeline.yaml \
   -i <INPUT FILE OR DIR> \
   -o <OUTPUT DIR> \
   -t auto
@@ -59,8 +61,14 @@ detection is **disabled** by default (`use-mwe: false` in configs); pass
 
 ## Vespa indexing and RAG
 
+Vespa uses **streaming mode**. Without Keycloak, index and query use the
+shared group **`dev@tkeir`** (`VESPA_USER_SPACE`). Signed-in users get an
+isolated group from the JWT — see [Vespa RAG](tkeir/docs/tools/vespa_rag.md)
+and [Zero to Hero](tkeir/docs/zero_to_hero.md).
+
 ```bash
-cd vespa
+# From repository root
+export VESPA_USER_SPACE=dev@tkeir   # optional; this is already the default
 make bootstrap
 make index-fixtures   # optional: (re)build tkeir/tests/indexing/output from PDFs
 make index
@@ -70,11 +78,13 @@ make rag-query RAG_QUERY="your question"
 
 `make index` requires `*.pipeline.json` files under `tkeir/tests/indexing/output`.
 Run `make index-fixtures` first if that directory is empty.
+After switching from indexed → streaming, wipe Vespa (`bash vespa/clean_db.sh`)
+then re-bootstrap and re-index.
 
 ## Human-Machine Interface (tkeir-hmi)
 
 ```bash
-cd vespa && make rag          # terminal 1 — FastAPI on :8090
+make rag                                    # terminal 1 — FastAPI on :8090
 cd tkeir-hmi && npm install && npm run dev   # terminal 2 — UI on :3000
 ```
 

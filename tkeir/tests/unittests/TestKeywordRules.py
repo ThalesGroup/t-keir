@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for shared keyword label validation."""
 
 from thot.core.KeywordRules import (

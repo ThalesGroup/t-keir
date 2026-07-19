@@ -27,13 +27,17 @@ These tools work on \*nix, WSL and docker environment.
 T-KEIR is a python software; **Python >= 3.10** (3.11 recommended) and **uv** are necessary for an installation from gitlab/github.
 Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker
 
-![Screenshot](tkeir/docs/resources/images/doc-tkeir-install-strategies.png)
+Installation options:
 
+1. **uv / wheel** (recommended OSS path) — `make setup` or `uv build` + `pip install`
+2. **Dev container** — reopen in `.devcontainer/` then `make setup`
+3. **Docker / workspace install** — `make install-workspace` (see root `Makefile`)
 
-To run the document go in directory **tkeir** and run mkdocs server:
+To run the documentation go to the repository root and run:
 
 ```shell  title="Run the documentation server with mkdocs"
-mkdocs serve
+make docs
+# or: cd tkeir && uv run mkdocs serve
 ```
 
 ## Installation
@@ -99,9 +103,6 @@ The descriptions of these file are in **resources/modeling/tokenizer/en/annotati
 
 # Quick start
 
-![Screenshot](tkeir/docs/resources/images/doc-tkeir-quickstart-flow.png)
-
-
 This section describes the steps to run the T-KEIR document analysis pipeline.
 
 ## Run the installation part
@@ -125,7 +126,7 @@ Run the unified pipeline on your documents. Use **`-t auto`** for PDFs and Offic
 files; use **`-t raw`** for plain text only.
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
 ```
 
 The pipeline runs in order: converter → language detection → resource selection → tokenizer → morphosyntax → NER → syntax → keywords. Each step enriches the output JSON document.
@@ -139,14 +140,14 @@ compound-word detection.
 Pipeline outputs (`*.pipeline.json`) can be indexed into Vespa for hybrid retrieval:
 
 ```shell
-cd vespa
+# From repository root
 make bootstrap    # start Vespa + deploy schemas
 make index-fixtures   # build tkeir/tests/indexing/output from PDF fixtures
 make index        # index *.pipeline.json (default: tkeir/tests/indexing/output)
 make rag          # FastAPI RAG on :8090
 ```
 
-Python modules live under `thot/tools/search/`; the Vespa Makefile invokes them via `python -m thot.tools.search.*`.
+Python modules live under `thot/tools/search/`; the root `Makefile` invokes them via `python -m thot.tools.search.*`.
 
 ### Tool layout (`thot/tools/`)
 

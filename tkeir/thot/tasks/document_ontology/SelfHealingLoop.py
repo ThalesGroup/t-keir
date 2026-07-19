@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Self-healing SHACL validation loop for document ontologies."""
 
 from __future__ import annotations

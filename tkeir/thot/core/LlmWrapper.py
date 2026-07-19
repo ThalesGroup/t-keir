@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 """Unified embedding and LLM wrapper for OpenAI, Ollama, and vLLM."""
 
 from __future__ import annotations
 
 import asyncio
+import math
 import os
-import re
 import time
 from dataclasses import dataclass
 from enum import Enum
@@ -15,15 +14,18 @@ import httpx
 
 from thot.core.ThotLogger import ThotLogger
 
-_SCORE_RE = re.compile(
-    r"(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)"
-)
-
 
 class Provider(str, Enum):
     OPENAI = "openai"
     OLLAMA = "ollama"
     VLLM = "vllm"
+
+
+class RerankStrategy(str, Enum):
+    """Supported second-stage rerank strategies."""
+
+    CROSS_ENCODER = "cross_encoder"
+    EMBEDDING_COSINE = "embedding_cosine"
 
 
 DEFAULT_EMBEDDING_DIM = 384
@@ -37,12 +39,17 @@ DEFAULT_LLM_MODELS = {
     Provider.OLLAMA: "mistral-nemo",
     Provider.VLLM: "mistral-nemo",
 }
-# Ollama library tag for BAAI/bge-reranker-v2-m3 (requires /api/rerank support).
+# HuggingFace CrossEncoder id (sentence-transformers).
+DEFAULT_RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
 DEFAULT_RERANKER_MODELS = {
-    Provider.OPENAI: "BAAI/bge-reranker-v2-m3",
-    Provider.OLLAMA: "qllama/bge-reranker-v2-m3",
-    Provider.VLLM: "BAAI/bge-reranker-v2-m3",
+    Provider.OPENAI: DEFAULT_RERANKER_MODEL,
+    Provider.OLLAMA: DEFAULT_RERANKER_MODEL,
+    Provider.VLLM: DEFAULT_RERANKER_MODEL,
 }
+DEFAULT_RERANK_STRATEGY = RerankStrategy.CROSS_ENCODER
+_ALLOWED_RERANK_STRATEGIES = frozenset(
+    strategy.value for strategy in RerankStrategy
+)
 
 
 class EmbeddingClient(Protocol):
@@ -109,7 +116,8 @@ def _load_file_model_overrides() -> dict[str, Any]:
     try:
         from thot.tools.search.rag_config import load_rag_config
 
-        models = load_rag_config().models
+        config = load_rag_config()
+        models = config.models
     except Exception:  # noqa: BLE001
         return {}
     return {
@@ -118,7 +126,40 @@ def _load_file_model_overrides() -> dict[str, Any]:
         "llm_model": models.llm_model,
         "reranker_model": models.reranker_model,
         "embedding_dim": models.embedding_dim,
+        "rerank_strategy": config.search.rerank.strategy,
     }
+
+
+def _normalize_rerank_strategy(value: object) -> str:
+    """Normalize a rerank strategy name to a supported value.
+
+    Example:
+        >>> from thot.core.LlmWrapper import _normalize_rerank_strategy
+        >>> _normalize_rerank_strategy("EMBEDDING_COSINE")
+        'embedding_cosine'
+    """
+    strategy = str(value or DEFAULT_RERANK_STRATEGY.value).strip().lower()
+    if strategy not in _ALLOWED_RERANK_STRATEGIES:
+        return DEFAULT_RERANK_STRATEGY.value
+    return strategy
+
+
+def _cosine_similarity(left: list[float], right: list[float]) -> float:
+    """Return cosine similarity of two equal-length vectors.
+
+    Example:
+        >>> from thot.core.LlmWrapper import _cosine_similarity
+        >>> round(_cosine_similarity([1.0, 0.0], [1.0, 0.0]), 3)
+        1.0
+    """
+    if not left or not right or len(left) != len(right):
+        return 0.0
+    dot = sum(a * b for a, b in zip(left, right, strict=True))
+    norm_left = math.sqrt(sum(a * a for a in left))
+    norm_right = math.sqrt(sum(b * b for b in right))
+    if norm_left == 0.0 or norm_right == 0.0:
+        return 0.0
+    return float(dot / (norm_left * norm_right))
 
 
 @dataclass(frozen=True)
@@ -127,6 +168,7 @@ class WrapperConfig:
     embedding_model: str
     llm_model: str
     reranker_model: str
+    rerank_strategy: str
     embedding_dim: int
     timeout_seconds: float
     openai_api_key: str | None
@@ -144,8 +186,9 @@ class WrapperConfig:
         Resolution order for each model field:
 
         1. Environment variable (``PROVIDER``, ``EMBEDDING_MODEL``,
-           ``LLM_MODEL``, ``RERANKER_MODEL``, ``EMBEDDING_DIM``)
-        2. ``configs/rag.yaml`` → ``models:`` (or ``file_models`` override)
+           ``LLM_MODEL``, ``RERANKER_MODEL``, ``RERANK_STRATEGY``,
+           ``EMBEDDING_DIM``)
+        2. ``configs/rag.yaml`` → ``models:`` / ``search.rerank.strategy``
         3. Provider-specific hard-coded defaults
 
         Args:
@@ -202,6 +245,13 @@ class WrapperConfig:
                 DEFAULT_RERANKER_MODELS[provider],
             )
             or DEFAULT_RERANKER_MODELS[provider],
+            rerank_strategy=_normalize_rerank_strategy(
+                _first_non_empty(
+                    os.getenv("RERANK_STRATEGY"),
+                    file_cfg.get("rerank_strategy"),
+                    DEFAULT_RERANK_STRATEGY.value,
+                )
+            ),
             embedding_dim=int(embedding_dim_raw or DEFAULT_EMBEDDING_DIM),
             timeout_seconds=float(os.getenv("HTTP_TIMEOUT_SECONDS", "120")),
             openai_api_key=os.getenv("OPENAI_API_KEY"),
@@ -299,6 +349,7 @@ class UnifiedLLMWrapper:
             timeout=self._config.timeout_seconds
         )
         self._owns_client = client is None
+        self._cross_encoder = None
 
     async def aclose(self) -> None:
         """Close the owned HTTP client when this wrapper created it.
@@ -338,16 +389,17 @@ class UnifiedLLMWrapper:
         self,
         *,
         pull_missing: bool = False,
-        include_reranker: bool = True,
+        include_reranker: bool = False,
     ) -> None:
         """Fail fast when the configured embedding/LLM backend is unreachable.
 
         When ``pull_missing`` is True and the provider is Ollama, missing
-        embedding / LLM / reranker models are pulled automatically.
+        embedding / LLM models are pulled automatically. Cross-encoder
+        rerankers are HuggingFace models (not Ollama pulls).
 
         Args:
             pull_missing: Pull absent Ollama models before returning.
-            include_reranker: Also ensure the configured reranker model.
+            include_reranker: Unused (kept for call-site compatibility).
 
         Raises:
             SystemExit: When the provider health check fails.
@@ -357,6 +409,7 @@ class UnifiedLLMWrapper:
             >>> from thot.core.LlmWrapper import UnifiedLLMWrapper
             >>> asyncio.run(UnifiedLLMWrapper().verify_provider())  # doctest: +SKIP
         """
+        del include_reranker
         if self._config.provider is not Provider.OLLAMA:
             return
         url = self._config.ollama_base_url
@@ -367,42 +420,43 @@ class UnifiedLLMWrapper:
             raise SystemExit(
                 f"Cannot reach Ollama at {url} ({exc}). "
                 "On the host: run `ollama serve` and "
-                f"`ollama pull {self._config.embedding_model}` / "
-                f"`ollama pull {self._config.reranker_model}`. "
+                f"`ollama pull {self._config.embedding_model}`. "
                 "Inside the devcontainer use "
                 "OLLAMA_BASE_URL=http://host.docker.internal:11434 "
                 "(default in .devcontainer/docker-compose.yml)."
             ) from exc
         if pull_missing:
-            await self.ensure_ollama_models(include_reranker=include_reranker)
+            await self.ensure_ollama_models(include_reranker=False)
 
     async def ensure_ollama_models(
         self,
         *,
-        include_reranker: bool = True,
+        include_reranker: bool = False,
     ) -> None:
-        """Pull configured Ollama models when they are not already present.
+        """Pull configured Ollama embedding / LLM models when missing.
 
         Args:
-            include_reranker: Also pull ``reranker_model``.
+            include_reranker: Ignored — rerankers use sentence-transformers /
+                HuggingFace, not Ollama pulls.
 
         Example:
             >>> import asyncio
             >>> asyncio.run(UnifiedLLMWrapper().ensure_ollama_models())  # doctest: +SKIP
         """
+        del include_reranker
         if self._config.provider is not Provider.OLLAMA:
             return
-        names = [
-            self._config.embedding_model,
-            self._config.llm_model,
-        ]
-        if include_reranker and self._config.reranker_model:
-            names.append(self._config.reranker_model)
-        for name in names:
+        for name in (self._config.embedding_model, self._config.llm_model):
             await self._ollama_pull_if_missing(name)
 
     async def _ollama_local_model_names(self) -> set[str]:
-        """Return installed Ollama model names (including tags)."""
+        """Return installed Ollama model names (including tags).
+
+        Example:
+            >>> import asyncio
+            >>> asyncio.run(UnifiedLLMWrapper()._ollama_local_model_names())  # doctest: +SKIP
+            set()
+        """
         response = await self._client.get(
             f"{self._config.ollama_base_url}/api/tags"
         )
@@ -446,31 +500,31 @@ class UnifiedLLMWrapper:
         documents: list[str],
         *,
         top_n: int | None = None,
+        strategy: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Score documents against ``query`` with the configured reranker.
+        """Score documents against ``query`` with the configured strategy.
 
-        Strategy (first success wins):
+        Strategies (``RERANK_STRATEGY`` / ``search.rerank.strategy``):
 
-        1. Native rerank API when available
-           (``/api/rerank``, ``/v1/rerank``, or ``{base}/rerank``)
-        2. Standard generate / chat completions scoring
-           (Ollama ``/api/generate``, OpenAI/vLLM ``/chat/completions``)
-
-        If ``RERANKER_MODEL`` fails on the generate path, falls back to
-        ``LLM_MODEL`` once (useful when a pulled cross-encoder cannot run
-        under the chat/generate runtime).
+        * ``cross_encoder`` — HuggingFace CrossEncoder via sentence-transformers
+          (default ``BAAI/bge-reranker-v2-m3``)
+        * ``embedding_cosine`` — embed query + docs with the configured
+          embedding provider, rank by cosine similarity
 
         Args:
             query: User / claim query text.
             documents: Candidate document texts (same order as first stage).
             top_n: Optional max results; defaults to ``len(documents)``.
+            strategy: Optional per-call override of ``rerank_strategy``.
 
         Returns:
             List of ``{"index": int, "relevance_score": float}`` sorted by
             score descending. ``index`` refers to the input ``documents`` list.
 
         Raises:
-            RuntimeError: When no usable rerank strategy succeeds.
+            ValueError: When the configured strategy is unknown.
+            RuntimeError: When sentence-transformers is missing for
+                ``cross_encoder``.
 
         Example:
             >>> import asyncio
@@ -480,346 +534,109 @@ class UnifiedLLMWrapper:
         if not documents:
             return []
         keep = len(documents) if top_n is None else max(1, int(top_n))
-        if self._config.provider is Provider.OLLAMA:
-            return await self._ollama_rerank(query, documents, top_n=keep)
-        base = (
-            self._config.openai_base_url
-            if self._config.provider is Provider.OPENAI
-            else self._config.vllm_base_url
+        chosen = _normalize_rerank_strategy(
+            strategy or self._config.rerank_strategy
         )
-        return await self._openai_compatible_rerank(
-            base, query, documents, top_n=keep
-        )
-
-    @staticmethod
-    def _normalize_rerank_results(
-        payload: dict[str, Any],
-        document_count: int,
-        top_n: int,
-    ) -> list[dict[str, Any]]:
-        """Normalize Ollama / Jina rerank JSON to ``[{index, relevance_score}]``.
-
-        Example:
-            >>> UnifiedLLMWrapper._normalize_rerank_results(
-            ...     {"results": [{"index": 1, "relevance_score": 0.8}]},
-            ...     2,
-            ...     2,
-            ... )
-            [{'index': 1, 'relevance_score': 0.8}]
-        """
-        raw = payload.get("results")
-        if raw is None:
-            raw = payload.get("data")
-        if not isinstance(raw, list):
-            raise RuntimeError(
-                "Rerank response missing results/data list: "
-                + str(sorted(payload.keys()))
+        if chosen == RerankStrategy.CROSS_ENCODER.value:
+            return await self._cross_encoder_rerank(
+                query, documents, top_n=keep
             )
-        scored: list[dict[str, Any]] = []
-        for item in raw:
-            if not isinstance(item, dict):
-                continue
-            if "index" not in item:
-                continue
-            index = int(item["index"])
-            if index < 0 or index >= document_count:
-                continue
-            score = item.get("relevance_score", item.get("score"))
-            if score is None:
-                continue
-            scored.append(
-                {"index": index, "relevance_score": float(score)}
+        if chosen == RerankStrategy.EMBEDDING_COSINE.value:
+            return await self._embedding_cosine_rerank(
+                query, documents, top_n=keep
             )
-        scored.sort(key=lambda row: row["relevance_score"], reverse=True)
-        return scored[:top_n]
+        raise ValueError(f"Unknown rerank strategy: {chosen!r}")
 
-    @staticmethod
-    def _parse_relevance_score(text: str) -> float:
-        """Extract a numeric relevance score from model text.
+    def _get_cross_encoder(self):
+        """Lazily load the sentence-transformers CrossEncoder.
 
         Example:
-            >>> UnifiedLLMWrapper._parse_relevance_score("Score: 0.73")
-            0.73
+            >>> UnifiedLLMWrapper()._get_cross_encoder()  # doctest: +SKIP
         """
-        match = _SCORE_RE.search(text or "")
-        if not match:
-            raise RuntimeError(
-                f"Could not parse relevance score from {text!r}"
-            )
-        return float(match.group(1))
-
-    @staticmethod
-    def _rerank_score_prompt(query: str, document: str) -> str:
-        """Build a language-agnostic numeric relevance scoring prompt.
-
-        Example:
-            >>> 'Query:' in UnifiedLLMWrapper._rerank_score_prompt('q', 'd')
-            True
-        """
-        return (
-            "Score how relevant the document is to the query from 0.0 to 1.0. "
-            "Reply with only a number.\n"
-            f"Query: {query}\n"
-            f"Document: {document}\n"
-            "Score:"
-        )
-
-    async def _ollama_rerank(
-        self,
-        query: str,
-        documents: list[str],
-        *,
-        top_n: int,
-    ) -> list[dict[str, Any]]:
-        """Rerank via native Ollama endpoints, else ``/api/generate`` scoring.
-
-        Example:
-            >>> import asyncio
-            >>> asyncio.run(UnifiedLLMWrapper()._ollama_rerank("q", ["a"], top_n=1))  # doctest: +SKIP
-        """
-        base = self._config.ollama_base_url
-        model = self._config.reranker_model
-        body = {
-            "model": model,
-            "query": query,
-            "documents": documents,
-            "top_n": top_n,
-        }
-        for path in ("/api/rerank", "/v1/rerank"):
+        if self._cross_encoder is None:
             try:
-                response = await self._client.post(f"{base}{path}", json=body)
-                if response.status_code == 404:
-                    continue
-                response.raise_for_status()
-                ranked = self._normalize_rerank_results(
-                    response.json(), len(documents), top_n
-                )
-                ThotLogger.info(
-                    "LLM rerank "
-                    + f"provider=ollama path={path} "
-                    + f"model={model} docs={len(documents)} kept={len(ranked)}"
-                )
-                return ranked
-            except httpx.HTTPError:
-                continue
-
-        try:
-            return await self._ollama_generate_rerank(
-                query, documents, top_n=top_n, model=model
-            )
-        except Exception as primary_exc:  # noqa: BLE001
-            if model == self._config.llm_model:
+                from sentence_transformers import CrossEncoder
+            except ImportError as exc:  # pragma: no cover - env dependent
                 raise RuntimeError(
-                    "Ollama generate-rerank failed for "
-                    f"{model!r}: {primary_exc}"
-                ) from primary_exc
-            ThotLogger.warning(
-                "Reranker model "
-                + f"{model!r} failed on /api/generate ({primary_exc}); "
-                + f"falling back to LLM_MODEL={self._config.llm_model!r}"
+                    "sentence-transformers is required for "
+                    "RERANK_STRATEGY=cross_encoder. "
+                    "Install with: uv sync  (or uv add sentence-transformers)"
+                ) from exc
+            ThotLogger.info(
+                "Loading CrossEncoder reranker "
+                + f"model={self._config.reranker_model}"
             )
-            return await self._ollama_generate_rerank(
-                query,
-                documents,
-                top_n=top_n,
-                model=self._config.llm_model,
-            )
+            self._cross_encoder = CrossEncoder(self._config.reranker_model)
+        return self._cross_encoder
 
-    async def _ollama_generate_rerank(
+    async def _cross_encoder_rerank(
         self,
         query: str,
         documents: list[str],
         *,
         top_n: int,
-        model: str,
     ) -> list[dict[str, Any]]:
-        """Score each document with Ollama ``/api/generate``.
+        """Rerank with a sentence-transformers CrossEncoder.
 
         Example:
             >>> import asyncio
-            >>> asyncio.run(UnifiedLLMWrapper()._ollama_generate_rerank(
-            ...     "q", ["a"], top_n=1, model="mistral-nemo",
+            >>> asyncio.run(UnifiedLLMWrapper()._cross_encoder_rerank(
+            ...     "q", ["a"], top_n=1,
             ... ))  # doctest: +SKIP
         """
-        semaphore = asyncio.Semaphore(4)
+        model = self._get_cross_encoder()
+        pairs = [(query, document) for document in documents]
 
-        async def _score_one(index: int, document: str) -> dict[str, Any]:
-            async with semaphore:
-                response = await self._client.post(
-                    f"{self._config.ollama_base_url}/api/generate",
-                    json={
-                        "model": model,
-                        "prompt": self._rerank_score_prompt(query, document),
-                        "stream": False,
-                        "options": {"temperature": 0.0, "num_predict": 16},
-                    },
-                )
-                response.raise_for_status()
-                text = str(response.json().get("response") or "")
-                return {
-                    "index": index,
-                    "relevance_score": self._parse_relevance_score(text),
-                }
+        def _predict() -> list[float]:
+            scores = model.predict(pairs, show_progress_bar=False)
+            return [float(score) for score in scores]
 
-        scored = list(
-            await asyncio.gather(
-                *[
-                    _score_one(index, document)
-                    for index, document in enumerate(documents)
-                ]
-            )
-        )
-        scored.sort(key=lambda row: row["relevance_score"], reverse=True)
-        ranked = scored[:top_n]
+        scores = await asyncio.to_thread(_predict)
+        ranked = [
+            {"index": index, "relevance_score": score}
+            for index, score in enumerate(scores)
+        ]
+        ranked.sort(key=lambda row: row["relevance_score"], reverse=True)
+        kept = ranked[:top_n]
         ThotLogger.info(
-            "LLM rerank "
-            + "provider=ollama path=/api/generate "
-            + f"model={model} docs={len(documents)} kept={len(ranked)}"
+            "LLM rerank strategy=cross_encoder "
+            + f"model={self._config.reranker_model} "
+            + f"docs={len(documents)} kept={len(kept)}"
         )
-        return ranked
+        return kept
 
-    async def _openai_compatible_rerank(
+    async def _embedding_cosine_rerank(
         self,
-        base_url: str,
         query: str,
         documents: list[str],
         *,
         top_n: int,
     ) -> list[dict[str, Any]]:
-        """Native ``/rerank`` when present, else chat-completions scoring.
+        """Rerank by cosine similarity of query/document embeddings.
 
         Example:
             >>> import asyncio
-            >>> asyncio.run(UnifiedLLMWrapper()._openai_compatible_rerank(
-            ...     "http://localhost:8000/v1", "q", ["a"], top_n=1,
+            >>> asyncio.run(UnifiedLLMWrapper()._embedding_cosine_rerank(
+            ...     "q", ["a"], top_n=1,
             ... ))  # doctest: +SKIP
         """
-        headers = {"Content-Type": "application/json"}
-        if self._config.openai_api_key:
-            headers["Authorization"] = f"Bearer {self._config.openai_api_key}"
-        url = f"{base_url.rstrip('/')}/rerank"
-        try:
-            response = await self._client.post(
-                url,
-                headers=headers,
-                json={
-                    "model": self._config.reranker_model,
-                    "query": query,
-                    "documents": documents,
-                    "top_n": top_n,
-                },
-            )
-            if response.status_code != 404:
-                response.raise_for_status()
-                ranked = self._normalize_rerank_results(
-                    response.json(), len(documents), top_n
-                )
-                ThotLogger.info(
-                    "LLM rerank "
-                    + f"provider={self._config.provider.value} "
-                    + f"path=/rerank model={self._config.reranker_model} "
-                    + f"docs={len(documents)} kept={len(ranked)}"
-                )
-                return ranked
-        except httpx.HTTPError:
-            pass
-
-        model = self._config.reranker_model
-        try:
-            return await self._chat_completions_rerank(
-                base_url,
-                query,
-                documents,
-                top_n=top_n,
-                model=model,
-                headers=headers,
-            )
-        except Exception as primary_exc:  # noqa: BLE001
-            if model == self._config.llm_model:
-                raise RuntimeError(
-                    "Chat-completions rerank failed for "
-                    f"{model!r}: {primary_exc}"
-                ) from primary_exc
-            ThotLogger.warning(
-                "Reranker model "
-                + f"{model!r} failed on chat completions ({primary_exc}); "
-                + f"falling back to LLM_MODEL={self._config.llm_model!r}"
-            )
-            return await self._chat_completions_rerank(
-                base_url,
-                query,
-                documents,
-                top_n=top_n,
-                model=self._config.llm_model,
-                headers=headers,
-            )
-
-    async def _chat_completions_rerank(
-        self,
-        base_url: str,
-        query: str,
-        documents: list[str],
-        *,
-        top_n: int,
-        model: str,
-        headers: dict[str, str],
-    ) -> list[dict[str, Any]]:
-        """Score documents with OpenAI-compatible chat completions.
-
-        Example:
-            >>> import asyncio
-            >>> asyncio.run(UnifiedLLMWrapper()._chat_completions_rerank(
-            ...     "http://localhost:8000/v1", "q", ["a"],
-            ...     top_n=1, model="m", headers={},
-            ... ))  # doctest: +SKIP
-        """
-        semaphore = asyncio.Semaphore(4)
-        url = f"{base_url.rstrip('/')}/chat/completions"
-
-        async def _score_one(index: int, document: str) -> dict[str, Any]:
-            async with semaphore:
-                response = await self._client.post(
-                    url,
-                    headers=headers,
-                    json={
-                        "model": model,
-                        "temperature": 0.0,
-                        "messages": [
-                            {
-                                "role": "user",
-                                "content": self._rerank_score_prompt(
-                                    query, document
-                                ),
-                            }
-                        ],
-                    },
-                )
-                response.raise_for_status()
-                text = response.json()["choices"][0]["message"][
-                    "content"
-                ].strip()
-                return {
-                    "index": index,
-                    "relevance_score": self._parse_relevance_score(text),
-                }
-
-        scored = list(
-            await asyncio.gather(
-                *[
-                    _score_one(index, document)
-                    for index, document in enumerate(documents)
-                ]
-            )
-        )
-        scored.sort(key=lambda row: row["relevance_score"], reverse=True)
-        ranked = scored[:top_n]
+        vectors = await self.embed_batch([query, *documents])
+        query_vec = vectors[0]
+        ranked = [
+            {
+                "index": index,
+                "relevance_score": _cosine_similarity(query_vec, doc_vec),
+            }
+            for index, doc_vec in enumerate(vectors[1:])
+        ]
+        ranked.sort(key=lambda row: row["relevance_score"], reverse=True)
+        kept = ranked[:top_n]
         ThotLogger.info(
-            "LLM rerank "
-            + f"provider={self._config.provider.value} "
-            + "path=/chat/completions "
-            + f"model={model} docs={len(documents)} kept={len(ranked)}"
+            "LLM rerank strategy=embedding_cosine "
+            + f"model={self._config.embedding_model} "
+            + f"docs={len(documents)} kept={len(kept)}"
         )
-        return ranked
+        return kept
 
     async def embed(self, text: str) -> list[float]:
         """Embed a single text string.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for ontology vocabulary naming helpers."""
 
 from rdflib import Graph, Literal, URIRef

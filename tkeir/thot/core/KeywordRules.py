@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Shared keyword label validation rules for extraction and RAG export."""
 
 from __future__ import annotations

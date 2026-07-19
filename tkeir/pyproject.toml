@@ -27,6 +27,7 @@ dependencies = [
     "opentelemetry-exporter-prometheus>=0.48b0",
     "protobuf>=5.29.6,<6.0",
     "fastapi>=0.100.0",
+    "python-multipart>=0.0.9",
     "uvicorn[standard]>=0.23.0",
     "spacy==3.6.1",
     "scikit-learn>=1.5.0",
@@ -47,6 +48,12 @@ dependencies = [
     "httpx>=0.24.0",
     "pyyaml>=6.0",
     "nltk>=3.10.0",
+    "sentence-transformers>=3.0.0",
+]
+
+[project.optional-dependencies]
+mcp = [
+    "mcp>=1.0.0",
 ]
 
 [project.urls]
@@ -59,9 +66,15 @@ Releases = "https://github.com/ThalesGroup/t-keir/releases"
 tkeir-pipeline = "thot.tools.pipeline:main"
 tkeir-index-documents = "thot.tools.search.index_documents:main"
 tkeir-rag = "thot.tools.search.app:main"
+tkeir-ingest = "thot.ingest.app:main"
+tkeir-audit = "thot.audit.app:main"
+tkeir-governor = "thot.governor.app:main"
 tkeir-init-vespa = "thot.tools.search.init_vespa:main"
 tkeir-create-annotation-resource = "thot.tools.annotation.create_annotation_resource:main"
 tkeir-beir-eval = "thot.tools.search.beir_eval:main"
+tkeir-mcp = "thot.mcp.server:main"
+tkeir-agent = "thot.agent.service:main"
+tkeir-compose = "thot.compose.__main__:main"
 
 [dependency-groups]
 dev = [
@@ -74,6 +87,9 @@ dev = [
     "xenon>=0.9.1",
     "pip-audit>=2.7.0",
     "cyclonedx-bom>=7.3.0",
+]
+audit = [
+    "psycopg[binary]>=3.2",
 ]
 beir = [
     "beir>=2.0.0",
@@ -104,6 +120,8 @@ packages = ["thot"]
 [tool.hatch.build.targets.wheel.force-include]
 "configs" = "tkeir/configs"
 "resources" = "tkeir/resources"
+"thot/action/schemas" = "thot/action/schemas"
+"thot/ingest/schemas" = "thot/ingest/schemas"
 
 [tool.coverage.run]
 source = ["thot"]
@@ -112,6 +130,10 @@ branch = false
 [tool.coverage.report]
 include = [
     "*/thot/core/*",
+    "*/thot/action/*",
+    "*/thot/ingest/*",
+    "*/thot/audit/*",
+    "*/thot/governor/*",
     "*/thot/tasks/*Configuration.py",
     "*/thot/tasks/converters/*",
     "*/thot/tasks/keywords/*",
@@ -132,6 +154,30 @@ skip_covered = false
 
 [tool.isort]
 profile = "black"
+
+[tool.ruff]
+line-length = 79
+target-version = "py311"
+src = ["thot", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E4", # import
+    "E7", # statement
+    "E9", # runtime
+    "F",  # pyflakes
+]
+ignore = [
+    "E501", # line length handled by formatter / black
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E402"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
 
 [tool.black]
 line-length = 79

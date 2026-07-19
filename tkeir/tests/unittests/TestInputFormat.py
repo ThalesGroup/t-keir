@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for converter input format detection."""
 
 import os
@@ -10,7 +9,6 @@ from thot.tasks.converters.InputFormat import (
     AUTO_DATATYPE,
     detect_input_format,
     has_extractable_text,
-    is_binary_document,
 )
 
 PDF_BYTES = b"%PDF-1.4\n1 0 obj\n<<>>\nendobj\n"

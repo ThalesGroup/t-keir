@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for QueryAnalyzerTask and Vespa payload generation."""
 
 from __future__ import annotations
@@ -17,7 +16,6 @@ from thot.tools.search.query_analyzer import (
     build_hybrid_yql,
     build_search_terms,
     build_vespa_search_payload,
-    extract_keyword_terms,
     extract_lemma_terms,
     extract_ner_entities,
     extract_svo_triples,

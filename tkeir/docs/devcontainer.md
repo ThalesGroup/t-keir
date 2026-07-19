@@ -139,7 +139,6 @@ make setup
 make quickstart
 
 # 3. Start Vespa + index test fixtures + RAG API
-cd vespa
 make bootstrap
 make index-fixtures   # if tests/indexing/output is empty
 make index
@@ -204,3 +203,37 @@ make install
 contains a virtualenv built on the host. Inside the container run
 `bash .devcontainer/ensure-venv.sh` then `make install`, or from the host remove
 `tkeir/.venv` and rerun `make devcontainer`.
+
+**TLS / certificate errors behind an enterprise proxy** — corporate HTTPS
+interception (or a custom CA) breaks `uv` package downloads and BEIR dataset
+fetches (`requests`) with errors such as `CERTIFICATE_VERIFY_FAILED`,
+`SSLCertVerificationError`, or `unable to get local issuer certificate`.
+
+Point TLS clients at a PEM bundle that includes your enterprise CA, then
+re-run `make install` / `make beir-eval` in the **same shell**:
+
+```bash
+# macOS: export system keychain certs (includes IT-installed corporate CAs)
+security find-certificate -a -p /Library/Keychains/System.keychain > /tmp/all-certs.pem
+
+# uv / OpenSSL / httpx
+export SSL_CERT_FILE=/tmp/all-certs.pem
+
+# BEIR (and other Python `requests` callers)
+export REQUESTS_CA_BUNDLE=/tmp/all-certs.pem
+
+# Optional: if IT gives a dedicated CA file instead of the keychain dump
+# export SSL_CERT_FILE=~/enterprise-ca.pem
+# export REQUESTS_CA_BUNDLE=~/enterprise-ca.pem
+
+# Optional: HTTP(S) proxy (ask IT for the URL)
+# export HTTPS_PROXY=http://proxy.example.com:8080
+# export HTTP_PROXY=http://proxy.example.com:8080
+
+make install
+make beir-eval BEIR_DATASETS=scifact BEIR_EXTRA=--skip-dense
+```
+
+A helper sketch lives at the repo root as `export_certif_macos.source`
+(`source export_certif_macos.source`). On Linux, build or obtain a PEM that
+contains the corporate root/intermediate CA and set the same two variables.

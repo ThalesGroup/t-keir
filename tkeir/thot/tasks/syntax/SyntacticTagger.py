@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Syntax tagger
 Author : Eric Blaudez (Eric Blaudez)
 
@@ -13,27 +12,13 @@ import json
 import os
 import warnings
 from operator import attrgetter
-from typing import Iterable, List, Optional, Pattern, Tuple
 
 import numpy
-import spacy
+from spacy.attrs import ENT_TYPE, IS_ALPHA, LOWER, POS
 from spacy.matcher import Matcher
 from spacy.symbols import (
-    AUX,
-    VERB,
     agent,
-    attr,
-    aux,
-    auxpass,
-    csubj,
-    csubjpass,
     dobj,
-    neg,
-    nsubj,
-    nsubjpass,
-    obj,
-    pobj,
-    xcomp,
 )
 from spacy.tokens import Doc, Span, Token
 
@@ -47,8 +32,6 @@ from thot.tasks.syntax.SyntacticTaggerConfiguration import (
 from thot.tasks.TaskInfo import TaskInfo
 
 warnings.filterwarnings("ignore")
-
-from spacy.attrs import ENT_TYPE, IS_ALPHA, LOWER, POS
 
 
 def remove_tokens_on_match(doc):
@@ -72,7 +55,7 @@ def remove_tokens_on_match(doc):
     return doc2
 
 
-SVOTriple: Tuple[List[Token], List[Token], List[Token]] = (
+SVOTriple: tuple[list[Token], list[Token], list[Token]] = (
     collections.namedtuple("SVOTriple", ["subject", "verb", "object"])
 )
 
@@ -103,15 +86,7 @@ class SyntacticTagger:
         language = config.configuration["taggers"][0][
             "language"
         ]  # TODO : management multiple language
-        if language == "en":
-            self._nlp, self._spacy_model = load_spacy_model(
-                language,
-                size="md",
-                call_context=call_context,
-                download_if_missing=True,
-                task_name="syntax",
-            )
-        elif language == "fr":
+        if language == "en" or language == "fr":
             self._nlp, self._spacy_model = load_spacy_model(
                 language,
                 size="md",
@@ -267,7 +242,7 @@ class SyntacticTagger:
                     rule_applied = True
         return rule_applied
 
-    def expand_noun(self, tok: Token) -> List[Token]:
+    def expand_noun(self, tok: Token) -> list[Token]:
         """expand_noun API.
 
         Example:
@@ -283,7 +258,7 @@ class SyntacticTagger:
         ]
         return tok_and_conjuncts + compounds
 
-    def expand_verb(self, tok: Token) -> List[Token]:
+    def expand_verb(self, tok: Token) -> list[Token]:
         """Expand a verb token to include all associated auxiliary and negation tokens.
 
         Example:

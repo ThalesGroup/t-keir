@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unified T-KEIR pipeline CLI."""
 
 from __future__ import annotations

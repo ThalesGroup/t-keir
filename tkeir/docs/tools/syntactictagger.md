@@ -9,8 +9,8 @@ The syntactic tagger builds dependency parses and knowledge-graph triples from
 Example of Configuration:
 
 
-```json title="syntactic-tagger.json"
---8<-- "./configs/syntactic-tagger.json"
+```yaml title="syntactic-tagger.yaml"
+--8<-- "./configs/syntactic-tagger.yaml"
 ```
 
 Syntactic tagger configuration contains a top-level `logger` section and syntax-specific `taggers` settings.
@@ -20,7 +20,7 @@ Syntactic Rules allows to define rule for triple Subject, Predicate, Object extr
 Example of Configuration:
 
 
-```json title="syntactic-tagger.json"
+```yaml title="syntactic-tagger.yaml"
 --8<-- "./resources/modeling/tokenizer/en/syntactic-rules.json"
 ```
 
@@ -58,7 +58,7 @@ The logger fields is:
 ## Syntactic tagger usage
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks syntax
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks syntax
 ```
 
 ## Syntactic tagger Tests

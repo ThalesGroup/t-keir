@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Annotation resources
 It reads a configuration file in JSON format. This file contains link to resources (like list, syntactic dictionary ..)
 
@@ -140,7 +139,7 @@ class AnnotationResources:
                                             exc_f.read().split("\n")
                                         )
                                         exc_f.close()
-                                except Exception as e:
+                                except Exception:
                                     ThotLogger.error(
                                         "Cannot open file '" + except_i + "'"
                                     )

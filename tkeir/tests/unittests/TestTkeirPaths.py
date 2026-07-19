@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 
 from thot.core.ConfigurationUtils import load_json_configuration
@@ -42,7 +41,7 @@ class TestTkeirPaths:
         )
 
     def test_load_json_configuration(self):
-        config_path = os.path.join(configs_dir(), "converter.json")
+        config_path = os.path.join(configs_dir(), "converter.yaml")
         with open(config_path, encoding="utf-8") as config_f:
             configuration = load_json_configuration(config_f)
         assert "converter" in configuration

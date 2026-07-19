@@ -7,8 +7,8 @@ It is the first step of the unified pipeline (`tkeir-pipeline`).
 
 Example of Configuration:
 
-```json title="converter.json"
---8<-- "./configs/converter.json"
+```yaml title="converter.yaml"
+--8<-- "./configs/converter.yaml"
 ```
 
 
@@ -50,7 +50,7 @@ Documents are converted with [Microsoft MarkItDown](https://github.com/microsoft
 
 The pipeline CLI and `make pipeline` default to `PIPELINE_TYPE=auto`.
 
-MarkItDown extracts only the PDF **text layer** by default. Text inside embedded images (diagrams, scans) is recovered when OCR is enabled in `converter.json`:
+MarkItDown extracts only the PDF **text layer** by default. Text inside embedded images (diagrams, scans) is recovered when OCR is enabled in `converter.yaml`:
 
 ```json
 "ocr": {
@@ -68,13 +68,13 @@ MarkItDown extracts only the PDF **text layer** by default. Text inside embedded
 Run conversion through the unified pipeline:
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks converter
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t raw --tasks converter
 ```
 
 Or run the full pipeline (converter is the first step by default):
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.json -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
 ```
 
 ## Converter Tests

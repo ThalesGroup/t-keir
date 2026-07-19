@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Build semantic golden chunks from analyzed T-KEIR documents."""
 
 from __future__ import annotations

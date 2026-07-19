@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Chunk-level synthetic question generation task."""
 
 from thot.tasks.chunk_questions import (

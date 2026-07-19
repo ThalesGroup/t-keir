@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Packge Init
 Author : Eric Blaudez (Eric Blaudez)
 

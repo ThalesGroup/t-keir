@@ -1,14 +1,15 @@
 # T-KEIR Human-Machine Interface (tkeir-hmi)
 
 Modern Next.js dashboard for the T-KEIR two-level RAG stack: hybrid Vespa
-retrieval at document and chunk levels, LLM answer synthesis, and an
-interactive fused ontology navigator.
+retrieval (streaming mode, per-user group) at document and chunk levels,
+LLM answer synthesis, and an interactive fused ontology navigator.
 
 ## Prerequisites
 
 - Node.js **20+** and npm
-- Running T-KEIR RAG API (`cd vespa && make rag` on port **8090**)
-- Indexed Vespa corpus (`cd vespa && make bootstrap && make index`)
+- Running T-KEIR RAG API (`make rag` on port **8090**, from repo root)
+- Indexed Vespa corpus (`make bootstrap && make index` into `dev@tkeir`, or
+  ingest while signed in to Keycloak)
 
 ## Install
 
@@ -29,7 +30,10 @@ Open [http://localhost:3000](http://localhost:3000).
 The UI proxies API calls through a Next.js **API route** (`app/api/[[...path]]`)
 with a long timeout (default **5 minutes**) for RAG + LLM generation. Browser
 requests go to `/api/*`; the server forwards to `API_URL` (default
-`http://localhost:8090`).
+`http://localhost:8090`). When Auth.js has a Keycloak session, proxies attach
+`Authorization: Bearer <access_token>` so the RAG/ingest APIs set Vespa
+`streaming.groupname` from the JWT (`preferred_username` → `email` → `sub`).
+Without auth, the API falls back to **`dev@tkeir`**.
 
 CORS is enabled on the FastAPI server for `localhost:3000` if you set
 `NEXT_PUBLIC_API_URL=http://localhost:8090` for direct browser access.
@@ -49,9 +53,9 @@ proxy target). For slow LLM backends, increase `API_PROXY_TIMEOUT_MS` (default
 
 ```mermaid
 flowchart LR
-  UI[tkeir-hmi Next.js] -->|POST /api/rag/query| Proxy[Next.js API route]
-  Proxy -->|POST /rag/query| API[FastAPI thot.tools.search.app]
-  API --> Vespa[Vespa hybrid search]
+  UI[tkeir-hmi Next.js] -->|POST /api/rag/query + Bearer| Proxy[Next.js API route]
+  Proxy -->|Authorization forwarded| API[FastAPI thot.tools.search.app]
+  API -->|streaming.groupname| Vespa[Vespa hybrid search]
   API --> LLM[UnifiedLLMWrapper]
   API -->|JSON| UI
 ```
@@ -61,9 +65,11 @@ flowchart LR
 1. The user submits a natural-language question from the search header
    (language defaults to **fr**, max hits configurable).
 2. The client sends `POST /api/rag/query` with `{ query, language, hits }`.
-3. FastAPI embeds the query, runs Vespa hybrid search, enriches chunk hits
-   with parent document metadata, merges RDF graphs into a fused ontology, and
-   generates a grounded answer.
+   With Keycloak login, the proxy adds `Authorization: Bearer …`.
+3. FastAPI resolves Vespa `user_space` from the JWT (or `dev@tkeir`), embeds
+   the query, runs hybrid search scoped to that streaming group, enriches
+   chunk hits with parent document metadata, merges RDF graphs into a fused
+   ontology, and generates a grounded answer.
 4. The dashboard renders synchronized views from the JSON payload:
 
 | UI region | API fields | Behaviour |
@@ -87,14 +93,35 @@ Toggle the same entity/keyword again to clear the filter.
 | Variable | Default | Purpose |
 |---|---|---|
 | `NEXT_PUBLIC_API_URL` | `/api` | Browser-facing API base (proxied) |
-| `API_URL` | `http://localhost:8090` | Server-side proxy target |
+| `API_URL` | `http://localhost:8090` | Server-side proxy target (RAG) |
+| `AGENT_URL` | `http://localhost:8092` | Server-side proxy for agent runs (`/api/agent/*`) |
+| `GOVERNOR_URL` | `http://localhost:8094` | Governor proxy (`/api/governor/*`) |
 | `API_PROXY_TIMEOUT_MS` | `300000` | Upstream timeout for RAG queries (ms) |
+| `AUTH_ENABLED` | unset / `false` | When `true`, require Keycloak OIDC login |
+| `AUTH_SECRET` | — | Auth.js secret (required if AUTH_ENABLED) |
+| `AUTH_KEYCLOAK_ID` | `tkeir-hmi` | Public OIDC client |
+| `AUTH_KEYCLOAK_ISSUER` | `http://localhost:8082/realms/tkeir` | Keycloak realm issuer |
+| `AUTH_URL` | `http://localhost:3000` | Canonical HMI URL for callbacks |
+
+## Agent run monitor
+
+`/agents` starts workflows against `tkeir-agent`, polls
+`GET /agent/runs/{id}`, and offers **Publish** (ApprovalQueue-gated in enforce
+mode). See [Agents](tools/agents.md) and ADR-0007.
+
+## Correlation ID
+
+Every proxied RAG response exposes `X-Correlation-Id`. The dashboard shows it
+under the short answer (copy + “Audit this answer” → `/admin?correlation_id=…`).
 
 ## Stack
 
 - Next.js 15 (App Router) + TypeScript
+- Auth.js (`next-auth` v5) + Keycloak (optional)
 - Tailwind CSS + Shadcn/ui (Accordion, Tabs, Cards, Badges, Select)
 - Lucide React icons
 - React hooks + `fetch` with loading/error states
 
-See also [Vespa RAG backend](../tkeir/docs/tools/vespa_rag.md).
+See also [Vespa RAG backend](tools/vespa_rag.md),
+[Agents](tools/agents.md), [MCP server](tools/mcp.md), and
+[Compose deployment](deployment/compose.md).

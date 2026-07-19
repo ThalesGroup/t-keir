@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# -*- coding: utf-8 -*-
 """Tests for pipeline runner orchestration."""
 
 import base64
@@ -19,7 +16,7 @@ class TestPipelineRunner:
     def _pipeline_config(self):
         self.config = PipelineConfiguration()
         with open(
-            os.path.join(configs_dir(), "pipeline.json"), encoding="utf-8"
+            os.path.join(configs_dir(), "pipeline.yaml"), encoding="utf-8"
         ) as handle:
             self.config.load(handle)
 

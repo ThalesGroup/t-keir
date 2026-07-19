@@ -11,11 +11,14 @@
     </http>
   </container>
 
+  <!-- Streaming mode: per-user (group) document spaces.
+       Document ids MUST use g=<user_space>:… and queries MUST set
+       streaming.groupname. See tkeir/docs/tools/vespa_rag.md. -->
   <content id="content" version="1.0">
     <redundancy>1</redundancy>
     <documents>
-      <document type="tkeir_document" mode="index" global="true" />
-      <document type="chunk" mode="index" />
+      <document type="tkeir_document" mode="streaming" />
+      <document type="chunk" mode="streaming" />
     </documents>
     <nodes>
       <node distribution-key="0" hostalias="node1" />

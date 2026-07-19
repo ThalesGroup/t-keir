@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Load spaCy models by language with multilingual fallback."""
 
 from __future__ import annotations

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test Annotation Configuration
 Author: Eric Blaudez (Eric Blaudez)
 
@@ -6,7 +5,6 @@ Copyright (c) 2020 by THALES
 """
 
 import json
-import os
 import unittest
 
 from thot.tools.annotation.AnnotationConfiguration import (
@@ -15,7 +13,6 @@ from thot.tools.annotation.AnnotationConfiguration import (
 
 
 class TestAnnotationConfiguration(unittest.TestCase):
-
     test_dict = {
         "logger": {"logging-level": "debug"},
         "resources-base-path": "/home/tkeir_svc/tkeir/thot/tests/data",
@@ -110,7 +107,7 @@ class TestAnnotationConfiguration(unittest.TestCase):
             with open("/tmp/cfg.json", "w") as f:
                 json.dump(TestAnnotationConfiguration.test_dict, f)
                 f.close()
-        except Exception as e:
+        except Exception:
             self.assertFalse(True)
 
         fh = open("/tmp/cfg.json")

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for pipeline summary metadata."""
 
 from thot.tasks.pipeline.PipelineSummary import (

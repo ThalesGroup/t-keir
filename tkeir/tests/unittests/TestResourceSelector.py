@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 """Tests for resource selection."""
-
-import os
 
 from thot.core.TkeirPaths import resources_dir
 from thot.tasks.pipeline.ResourceSelector import ResourceSelector

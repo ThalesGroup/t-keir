@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Generate synthetic retrieval questions for golden chunks."""
 
 from __future__ import annotations

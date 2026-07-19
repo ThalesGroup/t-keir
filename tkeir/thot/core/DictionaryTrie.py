@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Trie structure for lexical resources
 
 Author: Eric Blaudez (Eric Blaudez)
@@ -107,7 +106,7 @@ class Trie(dict):
             >>> trie["N"]["e"]["w"][" "]["Y"]["o"]["r"]["k"][Trie.LEAF]["in_vocab"]
             True
         """
-        super(Trie, self).__init__()
+        super().__init__()
         self.current_string = ""
         if strings:
             for string in strings:

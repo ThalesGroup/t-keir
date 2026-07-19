@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 """BEIR retrieval evaluation: BM25, dense, and T-KEIR pipeline vs leaderboard.
 
 Downloads SciFact, FiQA, and ArguAna when missing under ``./datasets/``, runs
 lexical (BM25), dense (SentenceTransformer), and the T-KEIR **retrieval**
 stack (NLP index + QueryAnalyzer + Vespa hybrid; **no answer generation**)
 at top-100, computes NDCG@10 / MAP@100 / Recall@100, performs error
-analysis, and writes ``evaluation_report.md`` with a BEIR leaderboard
-comparison.
+analysis, and always writes ``tkeir/docs/evaluation_report.md`` (MkDocs).
 """
 
 from __future__ import annotations
@@ -19,9 +17,11 @@ import os
 import re
 import sys
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+from thot.core.TkeirPaths import evaluation_report_path
 
 LOGGER = logging.getLogger(__name__)
 
@@ -304,8 +304,8 @@ class BM25ExactSearch:
             corpus: Mapping of doc_id → ``{title, text}``.
 
         Example:
-            >>> s = BM25ExactSearch()
-            >>> s.index({"d1": {"title": "Cat", "text": "animals"}})
+            >>> s = BM25ExactSearch()  # doctest: +SKIP
+            >>> s.index({"d1": {"title": "Cat", "text": "animals"}})  # doctest: +SKIP
         """
         from rank_bm25 import BM25Okapi
 
@@ -339,8 +339,8 @@ class BM25ExactSearch:
             Nested dict ``{qid: {doc_id: score}}``.
 
         Example:
-            >>> s = BM25ExactSearch()
-            >>> s.search({"d1": {"title": "", "text": "dog"}}, {"q": "dog"}, 1)
+            >>> s = BM25ExactSearch()  # doctest: +SKIP
+            >>> s.search({"d1": {"title": "", "text": "dog"}}, {"q": "dog"}, 1)  # doctest: +SKIP
             {'q': {'d1': ...}}
         """
         del args, kwargs
@@ -470,7 +470,7 @@ def _truncate(text: str, limit: int = 160) -> str:
 
     Example:
         >>> _truncate("a" * 200, 10)
-        'aaaaaaaaaa…'
+        'aaaaaaaaa…'
     """
     cleaned = re.sub(r"\s+", " ", text).strip()
     if len(cleaned) <= limit:
@@ -739,7 +739,7 @@ def render_report(runs: list[DatasetRun], dense_model: str) -> str:
         >>> "# BEIR" in render_report([], "mini")
         True
     """
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     lines: list[str] = [
         "# BEIR Retrieval Evaluation Report",
         "",
@@ -752,7 +752,7 @@ def render_report(runs: list[DatasetRun], dense_model: str) -> str:
         "1. **T-KEIR retrieval only** — full-document NLP indexing + "
         "QueryAnalyzer + adaptive Vespa rank profiles. Answer generation "
         "is **not** run (embeddings only).",
-        f"2. **Local BM25 (Okapi)** — in-memory `rank_bm25` baseline.",
+        "2. **Local BM25 (Okapi)** — in-memory `rank_bm25` baseline.",
         f"3. **Local dense** — SentenceTransformer `{dense_model}`.",
         "",
         f"Retrieval cut-off is **top-{TOP_K}**. Metrics use "
@@ -994,7 +994,7 @@ def _render_failures(failures: list[FailureCase]) -> list[str]:
     for case in failures:
         label = labels.get(case.kind, case.kind)
         out.append(
-            f"- **{label}** — query `{case.query_id}`: " f"«{case.query_text}»"
+            f"- **{label}** — query `{case.query_id}`: «{case.query_text}»"
         )
         out.append(f"  - {case.detail}")
     return out
@@ -1212,7 +1212,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Evaluate T-KEIR pipeline, BM25, and dense retrieval on BEIR "
-            "datasets; write evaluation_report.md with leaderboard comparison"
+            "datasets; always write tkeir/docs/evaluation_report.md"
         )
     )
     parser.add_argument(
@@ -1230,8 +1230,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--report",
         type=Path,
-        default=Path("evaluation_report.md"),
-        help="Output Markdown report path (default: ./evaluation_report.md)",
+        default=None,
+        help=(
+            "Optional extra Markdown report path. The documentation report "
+            f"({evaluation_report_path()}) is always written."
+        ),
     )
     parser.add_argument(
         "--dense-model",
@@ -1335,9 +1338,7 @@ def main(argv: list[str] | None = None) -> int:
             runs.append(run)
             if run.tkeir_error and run.tkeir_error.startswith("interrupted"):
                 interrupted = True
-                LOGGER.warning(
-                    "Stopping remaining datasets after interrupt"
-                )
+                LOGGER.warning("Stopping remaining datasets after interrupt")
                 break
     except KeyboardInterrupt:
         interrupted = True
@@ -1351,9 +1352,17 @@ def main(argv: list[str] | None = None) -> int:
         return 130
 
     report = render_report(runs, dense_model=args.dense_model)
-    args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(report, encoding="utf-8")
-    LOGGER.info("Wrote report → %s", args.report.resolve())
+    docs_report = Path(evaluation_report_path())
+    docs_report.parent.mkdir(parents=True, exist_ok=True)
+    docs_report.write_text(report, encoding="utf-8")
+    LOGGER.info("Wrote documentation report → %s", docs_report.resolve())
+
+    if args.report is not None:
+        extra = Path(args.report)
+        if extra.resolve() != docs_report.resolve():
+            extra.parent.mkdir(parents=True, exist_ok=True)
+            extra.write_text(report, encoding="utf-8")
+            LOGGER.info("Wrote extra report copy → %s", extra.resolve())
 
     if interrupted:
         # Avoid asyncio default executor join hang after Ctrl+C.

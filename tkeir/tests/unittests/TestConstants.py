@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test Annotation Configuration
 Author: Eric Blaudez (Eric Blaudez)
 

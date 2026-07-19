@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Create annotation MWE trie from lexicon configuration."""
 
 from __future__ import annotations

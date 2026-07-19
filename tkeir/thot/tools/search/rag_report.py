@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """RAG report assembly: structured answers, markdown export, highlight labels."""
 
 from __future__ import annotations
@@ -475,16 +474,12 @@ def build_chunk_evidence_answer(
         "in the following retrieved document(s):\n" + "\n".join(doc_lines)
     )
     if passage_answer and len(by_document) > 1:
-        short_answer = (
-            f"{passage_answer}\n\n"
-            "Also mentioned in: "
-            + ", ".join(
-                _format_document_name(parent_doc_id)
-                for parent_doc_id in by_document
-            )
+        short_answer = f"{passage_answer}\n\nAlso mentioned in: " + ", ".join(
+            _format_document_name(parent_doc_id)
+            for parent_doc_id in by_document
         )
     elif passage_answer and doc_lines:
-        short_answer = f"{passage_answer}\n\n" "Source: " + ", ".join(
+        short_answer = f"{passage_answer}\n\nSource: " + ", ".join(
             _format_document_name(parent_doc_id)
             for parent_doc_id in by_document
         )

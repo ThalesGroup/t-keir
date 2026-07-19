@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Extract text from images embedded in PDF documents."""
 
 import base64

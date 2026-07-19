@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for golden chunking."""
 
 import os
@@ -316,7 +315,7 @@ class TestGoldenChunker:
     def _load_config(self) -> GoldenChunkerConfiguration:
         config = GoldenChunkerConfiguration()
         with open(
-            os.path.join(configs_dir(), "golden-chunking.json"),
+            os.path.join(configs_dir(), "golden-chunking.yaml"),
             encoding="utf-8",
         ) as handle:
             config.load(handle)

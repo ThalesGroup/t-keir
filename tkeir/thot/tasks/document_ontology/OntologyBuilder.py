@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Build document RDF graphs from T-KEIR SVO triples and NER spans."""
 
 from __future__ import annotations
@@ -6,8 +5,8 @@ from __future__ import annotations
 import hashlib
 import os
 import re
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass
-from typing import Callable, Iterable, Iterator
 
 from rdflib import Graph, Literal, Namespace, URIRef
 from rdflib.namespace import RDF, RDFS, XSD

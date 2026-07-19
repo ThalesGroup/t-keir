@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Run doctest examples embedded in thot package docstrings."""
 
 from __future__ import annotations

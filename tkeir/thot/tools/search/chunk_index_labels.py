@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Fixed protocol labels emitted by golden-chunk indexing (not document language)."""
 
 from __future__ import annotations

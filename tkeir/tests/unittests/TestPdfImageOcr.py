@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for PDF image OCR enrichment."""
 
 import os

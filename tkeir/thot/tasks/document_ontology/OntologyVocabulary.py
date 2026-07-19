@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Per-document ontology vocabulary derived from clustering and auto-labeling."""
 
 from __future__ import annotations

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-"""Pull embedding / LLM / reranker models for the configured provider."""
+"""Pull embedding / LLM models for the configured provider."""
 
 from __future__ import annotations
 
@@ -9,26 +8,30 @@ import logging
 import sys
 
 from thot.core.LlmWrapper import UnifiedLLMWrapper, WrapperConfig
-from thot.tools.search.rag_config import load_rag_config
 
 LOGGER = logging.getLogger(__name__)
 
 
-async def _run(*, include_reranker: bool) -> int:
-    """Pull configured Ollama models and exit with status code."""
+async def _run() -> int:
+    """Pull configured Ollama embedding / LLM models and exit with status.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_run)
+        True
+    """
     config = WrapperConfig.from_env()
     LOGGER.info(
-        "Pulling models provider=%s embedding=%s llm=%s reranker=%s",
+        "Pulling models provider=%s embedding=%s llm=%s "
+        "(reranker=%s strategy=%s is local/HF, not Ollama-pulled)",
         config.provider.value,
         config.embedding_model,
         config.llm_model,
-        config.reranker_model if include_reranker else "(skipped)",
+        config.reranker_model,
+        config.rerank_strategy,
     )
     async with UnifiedLLMWrapper(config) as llm:
-        await llm.verify_provider(
-            pull_missing=True,
-            include_reranker=include_reranker,
-        )
+        await llm.verify_provider(pull_missing=True, include_reranker=False)
     return 0
 
 
@@ -41,15 +44,11 @@ def main(argv: list[str] | None = None) -> int:
     """
     parser = argparse.ArgumentParser(
         description=(
-            "Ensure search/index models are present "
+            "Ensure search/index embedding+LLM models are present "
             "(env → configs/rag.yaml → defaults). "
-            "For Ollama: pulls embedding, llm, and reranker via /api/pull."
+            "For Ollama: pulls via /api/pull. Cross-encoder rerankers are "
+            "downloaded by sentence-transformers on first use."
         )
-    )
-    parser.add_argument(
-        "--skip-reranker",
-        action="store_true",
-        help="Do not pull the configured reranker model",
     )
     parser.add_argument(
         "-v",
@@ -63,10 +62,7 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         datefmt="%H:%M:%S",
     )
-    include_reranker = (
-        not args.skip_reranker and load_rag_config().search.rerank.enabled
-    )
-    return asyncio.run(_run(include_reranker=include_reranker))
+    return asyncio.run(_run())
 
 
 if __name__ == "__main__":

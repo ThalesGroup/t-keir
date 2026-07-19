@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for TF-IDF lemma vectorization used in ontology clustering."""
 
 import numpy as np

@@ -1,6 +1,9 @@
-"""Convert source document to tkeir indexer document
+"""T-KEIR top-level package.
+
 Author: Eric Blaudez (Eric Blaudez)
-All rights Reserved.
-Copyright (c) 2022 by THALES
+
+Copyright (c) 2026 by THALES
+All Rights Reserved.
 """
-__version__="2.0.0"
+
+__version__ = "2.0.0"

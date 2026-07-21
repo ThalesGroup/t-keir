@@ -140,6 +140,170 @@ class SpacyTokenizerPipe:
             word = normalized_word
         return word
 
+    def _collect_punctuated_compound(
+        self, doc, token_i, word, max_word_length
+    ):
+        wtrie = prefix_trie(self._punctuation_words, word.lower())
+        current_pos = token_i + 1
+        current_word = word
+        compound_table = []
+        doc_len = len(doc)
+        while (
+            wtrie
+            and (len(current_word) < max_word_length)
+            and (current_pos < doc_len)
+        ):
+            if end_trie(wtrie):
+                compound_table.append(current_pos - 1)
+            current_word = doc[current_pos].text
+            wtrie = prefix_trie(wtrie, current_word.lower())
+            if wtrie and end_trie(wtrie):
+                compound_table.append(current_pos)
+            current_pos = current_pos + 1
+        return compound_table
+
+    def _build_words_with_mwes(self, doc):
+        words = []
+        token_compounds = []
+        doc_len = len(doc)
+        token_i = 0
+        max_word_length = self._mwes["max-word-length"] + 1
+        trie = self._mwes["trie"]
+        while token_i < doc_len:
+            token = doc[token_i]
+            word = self._normalize_word(token.text)
+            compound_table = self._collect_punctuated_compound(
+                doc, token_i, word, max_word_length
+            )
+            if compound_table:
+                compound_word = doc[token_i : compound_table[-1] + 1]
+                words.append(compound_word.text.replace(" ", ""))
+                token_i = compound_table[-1]
+                token_compounds.append(
+                    {
+                        "data": trie[words[-1].lower()][Trie.LEAF][
+                            "label_info"
+                        ],
+                        "is-compound": False,
+                    }
+                )
+            else:
+                words.append(word)
+                token_compounds.append(token._.compound_word)
+            token_i = token_i + 1
+        return words, token_compounds
+
+    def _build_words_without_mwes(self, doc):
+        words = []
+        doc_len = len(doc)
+        token_i = 0
+        while token_i < doc_len:
+            words.append(self._normalize_word(doc[token_i].text))
+            token_i = token_i + 1
+        return words
+
+    def _attach_compound_metadata(self, doc, token_compounds):
+        doc_len = len(doc)
+        for token_i in range(doc_len):
+            doc[token_i]._.compound_word = token_compounds[token_i]
+
+    def _walk_mwe_trie(self, doc, i, max_pattern_length):
+        j = i
+        trie = self._mwes["trie"]
+        last_trie = None
+        leaf_at = []
+        last_is_hyphen = True
+        trie_tagged_word = False
+        to_pattern_i = min(i + max_pattern_length, len(doc))
+        while j < to_pattern_i:
+            lower_text = doc[j].text.lower().strip()
+            if lower_text:
+                if lower_text == "-":
+                    last_is_hyphen = True
+                    hyphen_toks = []
+                else:
+                    last_is_hyphen = False
+                    hyphen_toks = lower_text.split("-")
+                for doc_text in hyphen_toks:
+                    last_trie = trie
+                    if doc_text in trie:
+                        trie = trie[doc_text]
+                        if Trie.LEAF in trie:
+                            leaf_at.append(
+                                {"data": trie[Trie.LEAF], "idx": j + 1}
+                            )
+                    elif (i != j) and ("-" in trie):
+                        trie = trie["-"]
+                        if doc_text in trie:
+                            trie = trie[doc_text]
+                            if Trie.LEAF in trie:
+                                leaf_at.append(
+                                    {
+                                        "data": trie[Trie.LEAF],
+                                        "idx": j + 1,
+                                    }
+                                )
+                        else:
+                            trie_tagged_word = True
+                            break
+                    else:
+                        trie_tagged_word = True
+                        break
+                if trie_tagged_word or (
+                    (last_trie == trie) and (len(hyphen_toks) > 0)
+                ):
+                    break
+            j = j + 1
+        return leaf_at, last_is_hyphen
+
+    def _try_merge_mwe_match(self, doc, retokenizer, i, max_pattern_length):
+        if doc[i].text.lower() not in self._mwes["trie"]:
+            return 1
+        leaf_at, last_is_hyphen = self._walk_mwe_trie(
+            doc, i, max_pattern_length
+        )
+        if not leaf_at:
+            return 1
+        j_idx = leaf_at[-1]["idx"]
+        if last_is_hyphen:
+            j_idx = j_idx - 1
+        if (j_idx - i) <= 1:
+            return 1
+        retokenizer.merge(doc[i:j_idx], attrs={})
+        doc[i]._.compound_word = {
+            "is-compound": True,
+            "data": leaf_at[-1]["data"]["label_info"],
+        }
+        return j_idx - i
+
+    def _try_merge_special_token(self, doc, retokenizer, i):
+        if len(set(doc[i].text) & set(string.punctuation + "\\_")) == len(
+            set(doc[i].text)
+        ):
+            retokenizer.merge(doc[i : i + 1], attrs={"POS": "PUNCT"})
+            return True
+        if doc[i].like_url:
+            retokenizer.merge(doc[i : i + 1], attrs={"POS": "NOUN"})
+            return True
+        if doc[i].like_email:
+            retokenizer.merge(doc[i : i + 1], attrs={"POS": "ADJ"})
+            return True
+        return False
+
+    def _retokenize_compound_patterns(self, doc):
+        with doc.retokenize() as retokenizer:
+            i = 0
+            n = len(doc)
+            max_pattern_length = self._mwes["max-pattern-length"] + 1
+            while i < n:
+                skip_i = self._try_merge_mwe_match(
+                    doc, retokenizer, i, max_pattern_length
+                )
+                if skip_i == 1:
+                    self._try_merge_special_token(doc, retokenizer, i)
+                i += skip_i
+                n = len(doc)
+
     def __call__(self, doc: Doc):
         """Call tokenizer trought spacy pipeline
 
@@ -153,155 +317,16 @@ class SpacyTokenizerPipe:
                     >>> callable(SpacyTokenizerPipe.__call__)
                     True
         """
-        words = []
-        doc_len = len(doc)
-        token_i = 0
         if self._mwes:
-            max_word_length = self._mwes["max-word-length"] + 1
-            current_word = ""
-            token_compounds = []
-            trie = self._mwes["trie"]
-        while token_i < doc_len:
-            token = doc[token_i]
-            # fix common typos and normalize
-            word = self._normalize_word(token.text)
-            if self._mwes:
-                wtrie = prefix_trie(self._punctuation_words, word.lower())
-                current_pos = token_i + 1
-                current_word = word
-                compound_table = []
-                while (
-                    wtrie
-                    and (len(current_word) < max_word_length)
-                    and (current_pos < doc_len)
-                ):
-                    if end_trie(wtrie):
-                        compound_table.append(current_pos - 1)
-                    current_word = doc[current_pos].text
-                    wtrie = prefix_trie(wtrie, current_word.lower())
-                    if wtrie and end_trie(wtrie):
-                        compound_table.append(current_pos)
-                    current_pos = current_pos + 1
-                if compound_table:
-                    compound_word = doc[token_i : compound_table[-1] + 1]
-                    words.append(compound_word.text.replace(" ", ""))
-                    token_i = compound_table[-1]
-                    token_compounds.append(
-                        {
-                            "data": trie[words[-1].lower()][Trie.LEAF][
-                                "label_info"
-                            ],
-                            "is-compound": False,
-                        }
-                    )
-                else:
-                    words.append(word)
-                    token_compounds.append(token._.compound_word)
-            else:
-                words.append(word)
-            token_i = token_i + 1
+            words, token_compounds = self._build_words_with_mwes(doc)
+        else:
+            words = self._build_words_without_mwes(doc)
+            token_compounds = None
 
         doc = Doc(doc.vocab, words=words)
         if self._mwes:
-            doc_len = len(doc)
-            for token_i in range(doc_len):
-                doc[token_i]._.compound_word = token_compounds[token_i]
-        if self._mwes:
-            # compound words
-            with doc.retokenize() as retokenizer:
-                i = 0
-                n = len(doc)
-                trie = self._mwes["trie"]
-
-                max_pattern_length = self._mwes["max-pattern-length"] + 1
-                max_word_length = self._mwes["max-word-length"] + 1
-                while i < n:
-                    skip_i = 1
-                    if doc[i].text.lower() in self._mwes["trie"]:
-                        # possible MWE match
-                        j = i
-                        trie = self._mwes["trie"]
-                        last_trie = None
-                        leaf_at = []
-                        last_is_hyphen = True
-                        trie_tagged_word = False
-                        to_pattern_i = i + max_pattern_length
-                        if to_pattern_i > len(doc):
-                            to_pattern_i = len(doc)
-
-                        while j < to_pattern_i:
-                            lower_text = doc[j].text.lower()
-                            lower_text = lower_text.strip()
-                            if lower_text:
-                                if lower_text == "-":
-                                    last_is_hyphen = True
-                                    hyphen_toks = []
-                                else:
-                                    last_is_hyphen = False
-                                    hyphen_toks = lower_text.split("-")
-                                for doc_text in hyphen_toks:
-                                    last_trie = trie
-                                    if doc_text in trie:
-                                        trie = trie[doc_text]
-                                        if Trie.LEAF in trie:
-                                            leaf_at.append(
-                                                {
-                                                    "data": trie[Trie.LEAF],
-                                                    "idx": j + 1,
-                                                }
-                                            )
-                                    elif (i != j) and ("-" in trie):
-                                        trie = trie["-"]
-                                        if doc_text in trie:
-                                            trie = trie[doc_text]
-                                            if Trie.LEAF in trie:
-                                                leaf_at.append(
-                                                    {
-                                                        "data": trie[
-                                                            Trie.LEAF
-                                                        ],
-                                                        "idx": j + 1,
-                                                    }
-                                                )
-                                        else:
-                                            trie_tagged_word = True
-                                            break
-                                    else:
-                                        trie_tagged_word = True
-                                        break
-                                if trie_tagged_word or (
-                                    (last_trie == trie)
-                                    and (len(hyphen_toks) > 0)
-                                ):
-                                    break
-                            j = j + 1
-                        if len(leaf_at) > 0:
-                            # success!
-                            j_idx = leaf_at[-1]["idx"]
-                            if last_is_hyphen:
-                                j_idx = j_idx - 1
-                            if (j_idx - i) > 1:
-                                attrs = {}
-                                n = len(doc)
-                                retokenizer.merge(doc[i:j_idx], attrs=attrs)
-                                doc[i]._.compound_word = {
-                                    "is-compound": True,
-                                    "data": leaf_at[-1]["data"]["label_info"],
-                                }
-                                n = len(doc)
-                                skip_i = j_idx - i
-                    elif len(
-                        set(doc[i].text) & set(string.punctuation + "\\_")
-                    ) == len(set(doc[i].text)):
-                        attrs = {"POS": "PUNCT"}
-                        retokenizer.merge(doc[i : i + 1], attrs=attrs)
-                    elif doc[i].like_url:
-                        attrs = {"POS": "NOUN"}
-                        retokenizer.merge(doc[i : i + 1], attrs=attrs)
-                    elif doc[i].like_email:
-                        attrs = {"POS": "ADJ"}
-                        retokenizer.merge(doc[i : i + 1], attrs=attrs)
-                    i += skip_i
+            self._attach_compound_metadata(doc, token_compounds)
+            self._retokenize_compound_patterns(doc)
 
         return doc
 

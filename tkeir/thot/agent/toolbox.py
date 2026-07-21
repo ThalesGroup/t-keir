@@ -11,39 +11,51 @@ from thot.mcp.handlers import McpHandlers
 from thot.mcp.tools_catalog import TOOLS, get_tool
 
 
-def _validate_args(schema: dict[str, Any], arguments: dict[str, Any]) -> None:
-    """Minimal JSON Schema checks (required + additionalProperties=false)."""
-    required = schema.get("required") or []
-    for key in required:
+def _validate_required(
+    schema: dict[str, Any], arguments: dict[str, Any]
+) -> None:
+    for key in schema.get("required") or []:
         if key not in arguments:
             raise ValueError(f"missing required argument: {key}")
-    if schema.get("additionalProperties") is False:
-        allowed = set((schema.get("properties") or {}).keys())
-        extra = set(arguments) - allowed
-        if extra:
-            raise ValueError(f"unexpected arguments: {sorted(extra)}")
+
+
+def _validate_no_extra_props(
+    schema: dict[str, Any], arguments: dict[str, Any]
+) -> None:
+    if schema.get("additionalProperties") is not False:
+        return
+    allowed = set((schema.get("properties") or {}).keys())
+    extra = set(arguments) - allowed
+    if extra:
+        raise ValueError(f"unexpected arguments: {sorted(extra)}")
+
+
+def _validate_prop_type(key: str, value: Any, prop: dict[str, Any]) -> None:
+    expected = prop.get("type")
+    type_checks: dict[str, tuple[type, str]] = {
+        "string": (str, "string"),
+        "integer": (int, "integer"),
+        "boolean": (bool, "boolean"),
+    }
+    if expected in type_checks:
+        py_type, label = type_checks[expected]
+        if not isinstance(value, py_type):
+            raise ValueError(f"{key} must be {label}")
+    if expected != "integer":
+        return
+    if "minimum" in prop and value < prop["minimum"]:
+        raise ValueError(f"{key} below minimum")
+    if "maximum" in prop and value > prop["maximum"]:
+        raise ValueError(f"{key} above maximum")
+
+
+def _validate_args(schema: dict[str, Any], arguments: dict[str, Any]) -> None:
+    """Minimal JSON Schema checks (required + additionalProperties=false)."""
+    _validate_required(schema, arguments)
+    _validate_no_extra_props(schema, arguments)
     props = schema.get("properties") or {}
     for key, value in arguments.items():
-        prop = props.get(key) or {}
-        expected = prop.get("type")
-        if expected == "string" and not isinstance(value, str):
-            raise ValueError(f"{key} must be string")
-        if expected == "integer" and not isinstance(value, int):
-            raise ValueError(f"{key} must be integer")
-        if expected == "boolean" and not isinstance(value, bool):
-            raise ValueError(f"{key} must be boolean")
-        if (
-            expected == "integer"
-            and "minimum" in prop
-            and value < prop["minimum"]
-        ):
-            raise ValueError(f"{key} below minimum")
-        if (
-            expected == "integer"
-            and "maximum" in prop
-            and value > prop["maximum"]
-        ):
-            raise ValueError(f"{key} above maximum")
+        _validate_prop_type(key, value, props.get(key) or {})
 
 
 class ToolRegistry:

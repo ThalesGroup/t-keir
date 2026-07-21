@@ -545,6 +545,157 @@ def _add_svo_to_graph(
         graph.add((subject_uri, predicate_uri, Literal("")))
 
 
+def _add_keyword_to_graph(
+    graph: Graph,
+    doc_uri: URIRef,
+    doc_key: str,
+    keyword: dict,
+    morphosyntax: list[dict],
+    settings: OntologyBuildSettings,
+    seen_keywords: set[str],
+) -> None:
+    text = str(keyword.get("text", "")).strip()
+    normalized = text.lower()
+    if (
+        not text
+        or normalized in seen_keywords
+        or not is_valid_keyword_label(
+            text,
+            min_length=settings.min_keyword_length,
+        )
+    ):
+        return
+
+    span = keyword.get("span") or {}
+    start = span.get("start")
+    end = span.get("end")
+    if start is None or end is None:
+        return
+
+    start_idx = int(start)
+    end_idx = int(end)
+    if not (0 <= start_idx <= end_idx <= len(morphosyntax)):
+        return
+
+    candidate = " ".join(
+        str(token.get("text", "")).strip()
+        for token in morphosyntax[start_idx:end_idx]
+    )
+    if text.lower() not in candidate.lower():
+        return
+
+    seen_keywords.add(normalized)
+    keyword_uri = TKEIRDOC[f"{doc_key}/Keyword/{_slug(text)}"]
+    graph.add((keyword_uri, RDF.type, TKEIR.Keyword))
+    graph.add((keyword_uri, RDFS.label, Literal(text)))
+    graph.add((doc_uri, TKEIR.hasKeyword, keyword_uri))
+
+
+def _enrich_field_analysis(
+    graph: Graph,
+    document: dict,
+    doc_uri: URIRef,
+    doc_key: str,
+    spec: DocumentFieldSpec,
+    entity_node: Callable[..., URIRef],
+    entity_index: dict[str, str],
+    keywords: list[dict],
+    settings: OntologyBuildSettings,
+    seen_keywords: set[str],
+    vocabulary: OntologyVocabulary | None = None,
+) -> None:
+    morphosyntax = document.get(spec.morph_key) or []
+
+    for span in document.get(spec.ner_key) or []:
+        text = str(span.get("text", "")).strip()
+        if text:
+            graph.add((doc_uri, TKEIR.hasMention, entity_node(text)))
+
+    for subject_text, verb_text, object_text in _dependency_relations(
+        document.get(spec.deps_key) or []
+    ):
+        _add_svo_to_graph(
+            graph=graph,
+            doc_uri=doc_uri,
+            entity_node=entity_node,
+            entity_index=entity_index,
+            subject_text=subject_text,
+            verb_text=verb_text,
+            object_text=object_text,
+            vocabulary=vocabulary,
+        )
+
+    for keyword in keywords:
+        _add_keyword_to_graph(
+            graph,
+            doc_uri,
+            doc_key,
+            keyword,
+            morphosyntax,
+            settings,
+            seen_keywords,
+        )
+
+
+def _enrich_tags(
+    graph: Graph,
+    doc_uri: URIRef,
+    doc_key: str,
+    document: dict,
+) -> None:
+    seen_tags: set[str] = set()
+    for tag in _iter_tag_kg_entries(document):
+        normalized = tag.lower()
+        if normalized in seen_tags:
+            continue
+        seen_tags.add(normalized)
+
+        tag_uri = TKEIRDOC[f"{doc_key}/Tag/{_slug(tag)}"]
+        graph.add((tag_uri, RDF.type, TKEIR.Tag))
+        graph.add((tag_uri, RDFS.label, Literal(tag)))
+        graph.add((doc_uri, TKEIR.hasTag, tag_uri))
+        graph.add((tag_uri, TKEIR.isTagOf, doc_uri))
+
+
+def _enrich_golden_chunks(
+    graph: Graph,
+    document: dict,
+    doc_uri: URIRef,
+    doc_key: str,
+    entity_node: Callable[..., URIRef],
+    entity_index: dict[str, str],
+    vocabulary: OntologyVocabulary | None = None,
+) -> None:
+    for index, chunk in enumerate(document.get("golden_chunks") or []):
+        chunk_id = str(chunk.get("chunk_id") or f"chunk-{index}")
+        chunk_uri = TKEIRDOC[f"{doc_key}/Chunk/{_slug(chunk_id)}"]
+
+        graph.add((chunk_uri, RDF.type, TKEIR.DocumentChunk))
+        graph.add((chunk_uri, RDFS.label, Literal(chunk_id)))
+        graph.add((doc_uri, TKEIR.hasChunk, chunk_uri))
+
+        metadata = chunk.get("metadata") or {}
+        for entities in (metadata.get("primary_entities") or {}).values():
+            for entity_text in entities:
+                text = str(entity_text).strip()
+                if text:
+                    graph.add((chunk_uri, TKEIR.hasMention, entity_node(text)))
+
+        for triplet in metadata.get("svo_triplets") or []:
+            if len(triplet) < 3:
+                continue
+            _add_svo_to_graph(
+                graph=graph,
+                doc_uri=chunk_uri,
+                entity_node=entity_node,
+                entity_index=entity_index,
+                subject_text=str(triplet[0]).strip(),
+                verb_text=str(triplet[1]).strip(),
+                object_text=str(triplet[2]).strip(),
+                vocabulary=vocabulary,
+            )
+
+
 def _enrich_graph_from_analysis(
     graph: Graph,
     document: dict,
@@ -568,109 +719,32 @@ def _enrich_graph_from_analysis(
     for spec in _field_specs(settings):
         if not spec.include:
             continue
+        _enrich_field_analysis(
+            graph=graph,
+            document=document,
+            doc_uri=doc_uri,
+            doc_key=doc_key,
+            spec=spec,
+            entity_node=entity_node,
+            entity_index=entity_index,
+            keywords=keywords,
+            settings=settings,
+            seen_keywords=seen_keywords,
+            vocabulary=vocabulary,
+        )
 
-        morphosyntax = document.get(spec.morph_key) or []
-
-        for span in document.get(spec.ner_key) or []:
-            text = str(span.get("text", "")).strip()
-            if text:
-                graph.add((doc_uri, TKEIR.hasMention, entity_node(text)))
-
-        for subject_text, verb_text, object_text in _dependency_relations(
-            document.get(spec.deps_key) or []
-        ):
-            _add_svo_to_graph(
-                graph=graph,
-                doc_uri=doc_uri,
-                entity_node=entity_node,
-                entity_index=entity_index,
-                subject_text=subject_text,
-                verb_text=verb_text,
-                object_text=object_text,
-                vocabulary=vocabulary,
-            )
-
-        for keyword in keywords:
-            text = str(keyword.get("text", "")).strip()
-            normalized = text.lower()
-            if (
-                not text
-                or normalized in seen_keywords
-                or not is_valid_keyword_label(
-                    text,
-                    min_length=settings.min_keyword_length,
-                )
-            ):
-                continue
-
-            span = keyword.get("span") or {}
-            start = span.get("start")
-            end = span.get("end")
-            if start is None or end is None:
-                continue
-
-            start_idx = int(start)
-            end_idx = int(end)
-            if not (0 <= start_idx <= end_idx <= len(morphosyntax)):
-                continue
-
-            candidate = " ".join(
-                str(token.get("text", "")).strip()
-                for token in morphosyntax[start_idx:end_idx]
-            )
-            if text.lower() not in candidate.lower():
-                continue
-
-            seen_keywords.add(normalized)
-            keyword_uri = TKEIRDOC[f"{doc_key}/Keyword/{_slug(text)}"]
-            graph.add((keyword_uri, RDF.type, TKEIR.Keyword))
-            graph.add((keyword_uri, RDFS.label, Literal(text)))
-            graph.add((doc_uri, TKEIR.hasKeyword, keyword_uri))
-
-    seen_tags: set[str] = set()
-    for tag in _iter_tag_kg_entries(document):
-        normalized = tag.lower()
-        if normalized in seen_tags:
-            continue
-        seen_tags.add(normalized)
-
-        tag_uri = TKEIRDOC[f"{doc_key}/Tag/{_slug(tag)}"]
-        graph.add((tag_uri, RDF.type, TKEIR.Tag))
-        graph.add((tag_uri, RDFS.label, Literal(tag)))
-        graph.add((doc_uri, TKEIR.hasTag, tag_uri))
-        graph.add((tag_uri, TKEIR.isTagOf, doc_uri))
+    _enrich_tags(graph, doc_uri, doc_key, document)
 
     if settings.include_content_triples:
-        for index, chunk in enumerate(document.get("golden_chunks") or []):
-            chunk_id = str(chunk.get("chunk_id") or f"chunk-{index}")
-            chunk_uri = TKEIRDOC[f"{doc_key}/Chunk/{_slug(chunk_id)}"]
-
-            graph.add((chunk_uri, RDF.type, TKEIR.DocumentChunk))
-            graph.add((chunk_uri, RDFS.label, Literal(chunk_id)))
-            graph.add((doc_uri, TKEIR.hasChunk, chunk_uri))
-
-            metadata = chunk.get("metadata") or {}
-            for entities in (metadata.get("primary_entities") or {}).values():
-                for entity_text in entities:
-                    text = str(entity_text).strip()
-                    if text:
-                        graph.add(
-                            (chunk_uri, TKEIR.hasMention, entity_node(text))
-                        )
-
-            for triplet in metadata.get("svo_triplets") or []:
-                if len(triplet) < 3:
-                    continue
-                _add_svo_to_graph(
-                    graph=graph,
-                    doc_uri=chunk_uri,
-                    entity_node=entity_node,
-                    entity_index=entity_index,
-                    subject_text=str(triplet[0]).strip(),
-                    verb_text=str(triplet[1]).strip(),
-                    object_text=str(triplet[2]).strip(),
-                    vocabulary=vocabulary,
-                )
+        _enrich_golden_chunks(
+            graph,
+            document,
+            doc_uri,
+            doc_key,
+            entity_node,
+            entity_index,
+            vocabulary,
+        )
 
 
 def _triple_parts(triple: dict) -> tuple[str, str, str]:

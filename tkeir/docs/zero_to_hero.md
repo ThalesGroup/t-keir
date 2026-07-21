@@ -47,8 +47,9 @@ templates, and an MCP server — see [Agents](tools/agents.md), [MCP](tools/mcp.
 - **P1** — you demo the full stack in Compose (Keycloak, ingest, audit, Grafana).
   Each Keycloak user gets an isolated Vespa corpus (`preferred_username` / email).
 - **P2** — you install the same stack with Helm on a local Kubernetes (k3d).
-- **P3** — you harden (auth on, governor enforce, network policies). SPIRE is
-  **deferred** ([ADR-0004](adr/0004-defer-spire.md)) — not required for P3.
+- **P3** — you harden (auth on, governor enforce, network policies). Agent
+  workloads use SPIFFE ([ADR-0008](adr/0008-spire-agent-identity.md)); enable
+  Compose profile `spire` with `agents`.
 - **P4** — you add Kubeflow lineage and automated compliance evidence.
 
 ---
@@ -138,6 +139,63 @@ More detail: [Quickstart](ready_to_run.md).
 **Checkpoint:** Your output directory contains `*.json` with `content_tokens` /
 NER fields.
 
+### 3.4 Generate the demo corpora (recommended)
+
+The fixture files cover only a minimal smoke test. For a realistic demo across
+two independent themes, seven formats, and two languages, run the corpus generator:
+
+```bash
+make corpus
+```
+
+This generates two offline corpora under `workspace/`:
+
+| Corpus | Theme | Default user | Documents | Formats |
+|--------|-------|-------------|-----------|---------|
+| `corpus_nato/` | NATO C4ISR OSINT (SITREP, INTSUM, OPORD…) | `demo-user` | 1 500 | txt md html json csv pdf docx |
+| `corpus_enterprise/` | AcmeSystems internal docs (specs, HR, finance…) | `demo-admin` | 500 | txt md html pdf docx json csv |
+
+Each document carries a `user_space` and a `topic_id` (sub-folder within the
+corpus). Six NATO C2SIM/C4ISR ontologies are written to
+`workspace/corpus_nato/ontologies/` and are ready for the ontology-driven
+template phase ([Templates](tools/templates.md)).
+
+Online? Fetch the official SISO C2SIM ontology artifacts
+(OpenC2SIM/C2SIMArtifacts on GitHub) and a slice of the EnterpriseRAG-Bench
+dataset (onyx-dot-app/EnterpriseRAG-Bench on HuggingFace, MIT license):
+
+```bash
+make corpus-download
+```
+
+The build remains fully functional offline: embedded generators produce all
+1 500 + 500 documents without any network access.
+
+**Checkpoint:** `ls workspace/corpus_nato/manifest.json
+workspace/corpus_enterprise/manifest.json
+workspace/corpus_nato/ontologies/*.owl` all exist.
+`python3 -c "import json; m=json.load(open('workspace/corpus_nato/manifest.json'));
+print(m['count_generated'])"` prints `1500`.
+
+### 3.5 Ingest the corpora (P0 — offline)
+
+Without Keycloak, both corpora land in the shared `dev@tkeir` space. The
+`--fallback-index` flag automatically uses `make index` when `tkeir-ingest`
+is not running:
+
+```bash
+make corpus-ingest
+```
+
+Or generate and ingest in one command:
+
+```bash
+make corpus-demo
+```
+
+**Checkpoint:** `workspace/ingest_report.json` exists and shows `"failed": 0`.
+`make rag-query RAG_QUERY="SITREP Objective ALPHA"` returns chunk hits.
+
 ---
 
 ## 4. P0 — Vespa RAG + HMI
@@ -177,6 +235,17 @@ make rag-query RAG_QUERY="What is T-KEIR?"
 
 API listens on **:8090**. Queries without a Bearer token search **`dev@tkeir`**.
 Each answer carries `X-Correlation-Id` for audit later.
+
+For the richer demo corpus (§3.4), substitute the fixture index:
+
+```bash
+make corpus-demo                                     # generate + ingest (P0)
+make rag-query RAG_QUERY="SITREP Objective ALPHA"   # OSINT hits
+make rag-query RAG_QUERY="AcmeSystems Project ATLAS" # Enterprise hits (same space in P0)
+```
+
+With P1 Compose and the two users loaded (§5.5), the same queries return
+results only for the user who owns the matching corpus.
 
 ### 4.3 Open the HMI
 
@@ -270,6 +339,60 @@ Admin panel: **http://localhost:3000/admin** (auditor/admin).
 observability profile is up); two Keycloak users see **isolated** search
 results when they hold different corpora.
 
+### 5.5 Per-user and per-topic corpus segregation (P1)
+
+With Keycloak running (`make compose-up PROFILES=core,auth,ingest`), each
+Keycloak user owns a completely isolated Vespa streaming group. The corpus
+generator assigns each document to a target user; the ingest script routes
+it there automatically.
+
+**Ingest the OSINT corpus as demo-user:**
+
+```bash
+make corpus-ingest-user
+
+# or with a specific topic only:
+python3 tools/corpus/ingest_corpus.py \
+  --corpus-dir workspace \
+  --corpus osint --topics intelligence \
+  --username demo-user --password demo-user \
+  --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token
+```
+
+**Ingest the Enterprise corpus as demo-admin:**
+
+```bash
+make corpus-ingest-admin
+```
+
+**Prefer the web interface?** Get the full step-by-step guide (HMI
+drag-and-drop and curl variants with real filenames):
+
+```bash
+make corpus-ingest-web
+```
+
+**Verifying isolation**
+
+Sign in as `demo-user` → query *"AcmeSystems Project ATLAS"* → 0 results.
+Sign in as `demo-admin` → query *"SITREP Objective ALPHA"* → 0 results.
+
+From the CLI:
+
+```bash
+# demo-user cannot see enterprise docs
+TOKEN_U=$(python3 tools/corpus/ingest_corpus.py --print-token \
+  --username demo-user --password demo-user \
+  --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token)
+curl -s -H "Authorization: Bearer $TOKEN_U" \
+  "http://localhost:8090/rag/query?q=AcmeSystems+Project+ATLAS" \
+  | python3 -c "import sys,json; print('hits:', len(json.load(sys.stdin).get('chunks',[])))"
+# → hits: 0
+```
+
+**Checkpoint:** `workspace/ingest_user.json` and `workspace/ingest_admin.json` both
+show `"failed": 0`; cross-user isolation queries return 0 hits.
+
 ---
 
 ## 6. P2 Kubernetes dev (k3d)
@@ -313,8 +436,8 @@ smoke succeeds when configured.
 
 ## 7. P3 Secure cluster
 
-P3 turns on **governor enforce**, **audit**, and **auth**. SPIRE is **not**
-required (ADR-0004).
+P3 turns on **governor enforce**, **audit**, and **auth**. When agents are
+enabled, SPIRE/SPIFFE identity is required for mastering (ADR-0008).
 
 ### Path A — Linux / cloud K3s
 
@@ -392,12 +515,23 @@ uv run pytest tests/unittests/TestDocExampleCoverage.py -q
 
 Catalog: [Tools API reference](tools/api_reference.md).
 
+### Architecture reference
+
+Formal diagrams and the typed class/schema reference live in the
+[Architecture](architecture/index.md) section. They are generated from the
+source during the same CI run that checks docstring examples:
+
+```bash
+make docs-build
+```
+
 ---
 
 ## Where to go next
 
 | If you want… | Open |
 |--------------|------|
+| Architecture diagrams & data model | [Architecture](architecture/index.md) |
 | Pipeline stages | [Tools overview](tools/tools_overview.md) |
 | Vespa schema / RAG | [Vespa RAG](tools/vespa_rag.md) |
 | MCP / agents / templates | [MCP](tools/mcp.md), [Agents](tools/agents.md), [Templates](tools/templates.md) |

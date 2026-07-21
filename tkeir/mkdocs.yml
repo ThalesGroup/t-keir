@@ -7,6 +7,11 @@ nav:
     - Home: 'index.md'
     - Zero to Hero: 'zero_to_hero.md'
     - Overview: 'overview.md'
+    - Architecture:
+        - Overview & service topology: 'architecture/index.md'
+        - Data flows & sequences: 'architecture/sequences.md'
+        - Data model & schemas: 'architecture/data-model.md'
+        - Decision log (ADRs): 'architecture/decisions.md'
     - Conception: 'conception.md'
     - Installation: 'installation.md'
     - Dev Container: 'devcontainer.md'
@@ -20,6 +25,7 @@ nav:
         - Audit store (Phase 4): 'deployment/audit.md'
         - Governor (Phase 5): 'deployment/governor.md'
         - Secure cluster (P3): 'deployment/k8s-secure.md'
+        - SPIRE / SPIFFE (agents): 'deployment/spire.md'
         - macOS notes: 'deployment/macos.md'
     - Evaluation:
         - Overview: 'evaluation.md'
@@ -31,6 +37,7 @@ nav:
         - MCP server: 'tools/mcp.md'
         - Agents: 'tools/agents.md'
         - Templates: 'tools/templates.md'
+        - Corpus & Ontologies: 'tools/corpus.md'
         - HMI: 'hmi.md'
         - Converter: 'tools/converter.md'
         - Tokenizer: 'tools/tokenizer.md'
@@ -38,6 +45,7 @@ nav:
         - Named Entities Tagger: 'tools/nertagger.md'
         - Syntactic Tagger : 'tools/syntactictagger.md'
         - Keywords Extraction: 'tools/keywords.md'
+        - Document ontology: 'tools/document_ontology.md'
     - Regularity component:
         - Identity of Action: 'regularity-component/action-identiy.md'
         - Mastering of Action: 'regularity-component/action-mastering.md'
@@ -67,10 +75,11 @@ nav:
         - 0001 Platform operations architecture: 'adr/0001-platform-architecture.md'
         - 0002 Ingest supersede and rollback: 'adr/0002-ingest-supersede.md'
         - 0003 Two-tier audit store + WORM: 'adr/0003-audit-store-worm.md'
-        - 0004 Defer SPIRE / SPIFFE: 'adr/0004-defer-spire.md'
+        - 0004 Defer SPIRE / SPIFFE (superseded): 'adr/0004-defer-spire.md'
         - 0005 Agent architecture: 'adr/0005-agent-architecture.md'
         - 0006 Per-tenant fused KG: 'adr/0006-kg-store.md'
         - 0007 Agent-generated content: 'adr/0007-generated-content.md'
+        - 0008 SPIRE agent identity: 'adr/0008-spire-agent-identity.md'
     - Security: 'security.md'
     - Operation and Management: 'oam.md'
     - About: 'about.md'
@@ -81,7 +90,11 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 # Article tables are snippet sources only (included into regulation pages).
 exclude_docs: |

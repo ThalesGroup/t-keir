@@ -108,6 +108,77 @@ uv run pytest tests/unittests/TestDocExampleCoverage.py tests/unittests/TestAllD
 |---|---|
 | `tkeir-create-annotation-resource` | Build `tkeir_mwe.pkl` from lexicon JSON |
 
+## Agent service (`thot.agent.service`) — CLI `tkeir-agent`
+
+| Endpoint / symbol | Purpose |
+|---|---|
+| `POST /agent/runs` | Enqueue `RunState` (returns `run_id`, `spiffe_id`, `user_space`) |
+| `GET /agent/runs/{run_id}` | Poll run + steps |
+| `POST /agent/runs/{run_id}/cancel` | Request cancel |
+| `POST /agent/runs/{run_id}/publish` | Approval-gated publish |
+| `GET /ready` | Lists agents/workflows + `spiffe_id` |
+
+### Classes (`thot.agent.models`)
+
+| Field (RunState) | Type | Description |
+|---|---|---|
+| `run_id` | `str` | ULID |
+| `agent` / `workflow` | `str` | Spec names |
+| `user_space` | `str` | Vespa streaming group |
+| `spiffe_id` | `str \| None` | Workload SPIFFE ID (ADR-0008) |
+| `status` | Literal | `queued`…`killed` |
+| `budgets` / `usage` | models | Token / tool / wall limits |
+
+Example (from docstring CI):
+
+```python
+>>> from thot.agent.spiffe import synthesize_dev_spiffe_id
+>>> synthesize_dev_spiffe_id("researcher")
+'spiffe://tkeir.local/agent/researcher'
+```
+
+## SPIFFE helpers (`thot.agent.spiffe`)
+
+| Function | Parameters | Returns | Description |
+|---|---|---|---|
+| `resolve_agent_spiffe_id` | `agent_name` | `str \| None` | Env / file / Workload API / `dev` synthesize |
+| `require_agent_spiffe_id` | `agent_name` | `str` | Enforced allow-listed ID |
+| `is_allowed_agent_spiffe_id` | `spiffe_id` | `bool` | Prefix allow-list check |
+
+## Document ontology derivation (`thot.tasks.document_ontology.OntologyDerivation`)
+
+| Function | Parameters | Returns | Description |
+|---|---|---|---|
+| `load_reference_graph` | `paths` | `Graph` | Load/merge TTL/OWL references |
+| `derive_document_graph` | `doc`, `ref`, `settings` | `(Graph, report)` | Add subclass/type/sameAs links |
+| `parse_derivation_settings` | `raw` | `DerivationSettings` | Parse `derive-from` YAML |
+
+See [Document ontology](document_ontology.md) and [Architecture data model](../architecture/data-model.md).
+
+## Ingest API (`thot.ingest.app`) — CLI `tkeir-ingest`
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /ingest/document` | Accept one document |
+| `POST /ingest/batch` | Accept batch |
+| `GET /ingest/status/{ingest_id}` | Job status |
+
+### Key classes (`thot.ingest.models`)
+
+| Class | Notable fields |
+|---|---|
+| `IngestManifest` | `doc_id`, `pipeline_config_sha256`, `embedder`, `lineage` |
+| `IngestJob` | `status`, `correlation_id` |
+| `DocumentIngestRequest` | request body for single ingest |
+
+## RAG API (`thot.tools.search.app`) — CLI `tkeir-rag`
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /search` | Hybrid Vespa search |
+| `POST /rag/query` | Full RAG answer path |
+| `GET /health` `/ready` `/metrics` | Ops |
+
 Run example tests:
 
 ```bash

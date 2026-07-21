@@ -121,6 +121,48 @@ class MorphoSyntacticTagger:
             "field_type": "concept",
         }
 
+    def _token_assignment(self, tok_i):
+        return self._retag_punct(
+            {
+                "pos": tok_i.pos_,
+                "lemma": tok_i.lemma_,
+                "text": tok_i.text,
+                "is_oov": tok_i.is_oov,
+                "is_sent_start": bool(tok_i.is_sent_start),
+            }
+        )
+
+    def _concept_triples_for_token(self, tok_i):
+        if not self._add_concept_in_kg or not isinstance(
+            tok_i._.advanced_tag, list
+        ):
+            return []
+        triples = []
+        for concept_i in tok_i._.advanced_tag:
+            for concept_label in concept_i:
+                if concept_i[concept_label]["type"] != "concept":
+                    continue
+                if "concept" not in concept_i[concept_label]:
+                    continue
+                triples.append(
+                    self._do_concept(
+                        tok_i.i,
+                        tok_i.text,
+                        tok_i.lemma_,
+                        [concept_i[concept_label]["concept"]],
+                        concept_label,
+                    )
+                )
+        return triples
+
+    def _process_doc_tokens(self, doc_tokens):
+        morphosyntax = []
+        kg = []
+        for tok_i in doc_tokens:
+            morphosyntax.append(self._token_assignment(tok_i))
+            kg.extend(self._concept_triples_for_token(tok_i))
+        return morphosyntax, kg
+
     def tag(self, tkeir_doc: dict):
         """POS tag the tkeir document
 
@@ -148,59 +190,9 @@ class MorphoSyntacticTagger:
         if "content_tokens" in tkeir_doc:
             contentDoc = self._nlp.tokenizer(tkeir_doc["content_tokens"])
             doc_content = self._nlp(contentDoc, disable=["parser", "ner"])
-        title = []
-        content = []
-        kg = []
-        for tok_i in doc_title:
-            tok_assign = {
-                "pos": tok_i.pos_,
-                "lemma": tok_i.lemma_,
-                "text": tok_i.text,
-                "is_oov": tok_i.is_oov,
-                "is_sent_start": bool(tok_i.is_sent_start),
-            }
-            title.append(self._retag_punct(tok_assign))
-            if self._add_concept_in_kg and isinstance(
-                tok_i._.advanced_tag, list
-            ):
-                for concept_i in tok_i._.advanced_tag:
-                    for concept_label in concept_i:
-                        if concept_i[concept_label]["type"] == "concept":
-                            if "concept" in concept_i[concept_label]:
-                                kg.append(
-                                    self._do_concept(
-                                        tok_i.i,
-                                        tok_i.text,
-                                        tok_i.lemma_,
-                                        [concept_i[concept_label]["concept"]],
-                                        concept_label,
-                                    )
-                                )
-        for tok_i in doc_content:
-            tok_assign = {
-                "pos": tok_i.pos_,
-                "lemma": tok_i.lemma_,
-                "text": tok_i.text,
-                "is_oov": tok_i.is_oov,
-                "is_sent_start": bool(tok_i.is_sent_start),
-            }
-            content.append(self._retag_punct(tok_assign))
-            if self._add_concept_in_kg and isinstance(
-                tok_i._.advanced_tag, list
-            ):
-                for concept_i in tok_i._.advanced_tag:
-                    for concept_label in concept_i:
-                        if concept_i[concept_label]["type"] == "concept":
-                            if "concept" in concept_i[concept_label]:
-                                kg.append(
-                                    self._do_concept(
-                                        tok_i.i,
-                                        tok_i.text,
-                                        tok_i.lemma_,
-                                        [concept_i[concept_label]["concept"]],
-                                        concept_label,
-                                    )
-                                )
+        title, title_kg = self._process_doc_tokens(doc_title)
+        content, content_kg = self._process_doc_tokens(doc_content)
+        kg = title_kg + content_kg
         tkeir_doc["title_morphosyntax"] = title
         tkeir_doc["content_morphosyntax"] = content
         if kg:

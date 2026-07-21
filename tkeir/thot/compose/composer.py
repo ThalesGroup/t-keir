@@ -296,6 +296,148 @@ def fill_slot(
     )
 
 
+def _slot_fill_from_param_override(slot: Slot, override: Any) -> SlotFill:
+    if isinstance(override, dict) and "value" in override:
+        prov = override.get("provenance") or {}
+        return SlotFill(
+            name=slot.name,
+            filled=True,
+            value=override["value"],
+            provenance=SlotProvenance(
+                chunk_ids=list(prov.get("chunk_ids") or []),
+                document_ids=list(prov.get("document_ids") or []),
+                source="param",
+            ),
+        )
+    return SlotFill(
+        name=slot.name,
+        filled=False,
+        reason_unfilled="param override missing provenance wrapper",
+    )
+
+
+def _fill_all_slots(
+    spec: TemplateSpec,
+    *,
+    kg: UserSpaceKG,
+    topic: str,
+    writer: SlotWriter,
+    params: dict[str, Any],
+) -> list[SlotFill]:
+    fills: list[SlotFill] = []
+    for slot in spec.slots:
+        if slot.name in params and params[slot.name] is not None:
+            fills.append(
+                _slot_fill_from_param_override(slot, params[slot.name])
+            )
+            continue
+        fills.append(
+            fill_slot(
+                slot,
+                kg=kg,
+                topic=topic,
+                writer=writer,
+                prior_fills=fills,
+            )
+        )
+    return fills
+
+
+def _enforce_slot_constraints(
+    fills: list[SlotFill], spec: TemplateSpec
+) -> list[SlotFill]:
+    slot_by_name = {s.name: s for s in spec.slots}
+    finalized: list[SlotFill] = []
+    for fill in fills:
+        slot_def = slot_by_name.get(fill.name)
+        if (
+            fill.filled
+            and slot_def
+            and isinstance(fill.value, list)
+            and len(fill.value) < slot_def.constraints.min_items
+        ):
+            finalized.append(
+                SlotFill(
+                    name=fill.name,
+                    filled=False,
+                    reason_unfilled=(
+                        f"below min_items={slot_def.constraints.min_items}"
+                    ),
+                )
+            )
+            continue
+        if (
+            not fill.filled
+            and slot_def
+            and slot_def.constraints.required
+            and not fill.reason_unfilled
+        ):
+            fill = SlotFill(
+                name=fill.name,
+                filled=False,
+                reason_unfilled="required slot unfilled",
+            )
+        finalized.append(fill)
+    return finalized
+
+
+def _build_render_context(
+    fills: list[SlotFill],
+    *,
+    spec: TemplateSpec,
+    topic: str,
+    kg: UserSpaceKG,
+) -> tuple[dict[str, Any], dict[str, list[str]], dict[str, Any], list[str]]:
+    structured: dict[str, Any] = {}
+    citations: dict[str, list[str]] = {}
+    unfilled: list[str] = []
+    ctx: dict[str, Any] = {
+        "topic": topic,
+        "user_space": kg.user_space,
+        "template": spec.name,
+        "unfilled": unfilled,
+    }
+    for fill in fills:
+        if fill.filled:
+            structured[fill.name] = fill.value
+            citations[fill.name] = list(fill.provenance.chunk_ids)
+            ctx[fill.name] = fill.value
+            ctx[f"{fill.name}_citations"] = fill.provenance.chunk_ids
+            ctx[f"{fill.name}_documents"] = fill.provenance.document_ids
+        else:
+            note = fill.reason_unfilled or "unfilled"
+            unfilled.append(f"{fill.name}: {note}")
+            ctx[fill.name] = None
+    return structured, citations, ctx, unfilled
+
+
+def _render_compose_markdown(
+    spec: TemplateSpec,
+    ctx: dict[str, Any],
+    citations: dict[str, list[str]],
+    unfilled: list[str],
+) -> str:
+    env = _jinja_env()
+    try:
+        markdown = env.from_string(spec.markdown_template or "").render(**ctx)
+    except Exception as exc:  # noqa: BLE001
+        markdown = f"# Compose error\n\n{exc}\n"
+
+    if not citations:
+        return markdown
+
+    lines = ["", "---", "", "## Citations", ""]
+    for name, chunks in citations.items():
+        lines.append(
+            f"- **{name}**: {', '.join(chunks) or '(documents only)'}"
+        )
+    if unfilled:
+        lines.extend(["", "## Unfilled slots", ""])
+        for item in unfilled:
+            lines.append(f"- {item}")
+    return markdown.rstrip() + "\n" + "\n".join(lines) + "\n"
+
+
 def compose(
     template: str | TemplateSpec,
     *,
@@ -356,117 +498,16 @@ def compose(
     params = dict(params or {})
     topic = topic or str(params.get("topic") or params.get("entity") or "")
 
-    fills: list[SlotFill] = []
-    for slot in spec.slots:
-        # Param override (still must carry provenance if provided)
-        if slot.name in params and params[slot.name] is not None:
-            override = params[slot.name]
-            if isinstance(override, dict) and "value" in override:
-                prov = override.get("provenance") or {}
-                fill = SlotFill(
-                    name=slot.name,
-                    filled=True,
-                    value=override["value"],
-                    provenance=SlotProvenance(
-                        chunk_ids=list(prov.get("chunk_ids") or []),
-                        document_ids=list(prov.get("document_ids") or []),
-                        source="param",
-                    ),
-                )
-            else:
-                fill = SlotFill(
-                    name=slot.name,
-                    filled=False,
-                    reason_unfilled="param override missing provenance wrapper",
-                )
-            fills.append(fill)
-            continue
-        fills.append(
-            fill_slot(
-                slot,
-                kg=kg,
-                topic=topic,
-                writer=writer,
-                prior_fills=fills,
-            )
-        )
-
+    fills = _fill_all_slots(
+        spec, kg=kg, topic=topic, writer=writer, params=params
+    )
     fills = reviewer.validate(fills)
+    fills = _enforce_slot_constraints(fills, spec)
 
-    # Enforce required constraints
-    slot_by_name = {s.name: s for s in spec.slots}
-    finalized: list[SlotFill] = []
-    for fill in fills:
-        slot_def = slot_by_name.get(fill.name)
-        if (
-            fill.filled
-            and slot_def
-            and isinstance(fill.value, list)
-            and len(fill.value) < slot_def.constraints.min_items
-        ):
-            finalized.append(
-                SlotFill(
-                    name=fill.name,
-                    filled=False,
-                    reason_unfilled=(
-                        f"below min_items={slot_def.constraints.min_items}"
-                    ),
-                )
-            )
-            continue
-        if (
-            not fill.filled
-            and slot_def
-            and slot_def.constraints.required
-            and not fill.reason_unfilled
-        ):
-            fill = SlotFill(
-                name=fill.name,
-                filled=False,
-                reason_unfilled="required slot unfilled",
-            )
-        finalized.append(fill)
-    fills = finalized
-
-    structured: dict[str, Any] = {}
-    citations: dict[str, list[str]] = {}
-    unfilled: list[str] = []
-    ctx: dict[str, Any] = {
-        "topic": topic,
-        "user_space": kg.user_space,
-        "template": spec.name,
-        "unfilled": unfilled,
-    }
-    for fill in fills:
-        if fill.filled:
-            structured[fill.name] = fill.value
-            citations[fill.name] = list(fill.provenance.chunk_ids)
-            ctx[fill.name] = fill.value
-            ctx[f"{fill.name}_citations"] = fill.provenance.chunk_ids
-            ctx[f"{fill.name}_documents"] = fill.provenance.document_ids
-        else:
-            note = fill.reason_unfilled or "unfilled"
-            unfilled.append(f"{fill.name}: {note}")
-            ctx[fill.name] = None
-
-    env = _jinja_env()
-    try:
-        markdown = env.from_string(spec.markdown_template or "").render(**ctx)
-    except Exception as exc:  # noqa: BLE001
-        markdown = f"# Compose error\n\n{exc}\n"
-
-    # Append citations footer
-    if citations:
-        lines = ["", "---", "", "## Citations", ""]
-        for name, chunks in citations.items():
-            lines.append(
-                f"- **{name}**: {', '.join(chunks) or '(documents only)'}"
-            )
-        if unfilled:
-            lines.extend(["", "## Unfilled slots", ""])
-            for item in unfilled:
-                lines.append(f"- {item}")
-        markdown = markdown.rstrip() + "\n" + "\n".join(lines) + "\n"
+    structured, citations, ctx, unfilled = _build_render_context(
+        fills, spec=spec, topic=topic, kg=kg
+    )
+    markdown = _render_compose_markdown(spec, ctx, citations, unfilled)
 
     return ComposeResult(
         template=spec.name,

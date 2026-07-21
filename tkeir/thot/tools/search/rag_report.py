@@ -241,53 +241,63 @@ def _extract_person_from_sentence(
     return None
 
 
-def _best_focus_sentence(
+def _who_question_key_phrases(query_text: str) -> list[str]:
+    """Return multi-word highlight phrases for a who-question."""
+    return [
+        label.lower()
+        for label in extract_query_highlight_terms(query_text)
+        if len(label.split()) >= 2
+    ]
+
+
+def _score_who_focus_sentence(
+    sentence: str,
+    *,
+    predicate: str | None,
+    terms: set[str],
+    key_phrases: list[str],
+) -> int | None:
+    """Score a sentence for who-question focus ranking, or None if irrelevant."""
+    if _is_metadata_sentence(sentence):
+        return None
+    sentence_lower = sentence.lower()
+    if predicate and predicate in sentence_lower:
+        return sum(1 for term in terms if term in sentence_lower)
+    if key_phrases and any(phrase in sentence_lower for phrase in key_phrases):
+        return 5 + sum(1 for term in terms if term in sentence_lower)
+    return None
+
+
+def _best_who_focus_sentence(
     matching: list[RetrievedChunk],
     query_text: str,
 ) -> tuple[str, str] | None:
-    """Return the best ``(chunk_id, sentence)`` pair for the query.
+    """Return the best who-question ``(chunk_id, sentence)`` pair when possible."""
+    predicate = _who_predicate_token(query_text)
+    terms = _focus_query_terms(query_text)
+    key_phrases = _who_question_key_phrases(query_text)
+    best: tuple[str, str] | None = None
+    best_score = -999
+    for chunk in matching:
+        for sentence in _split_sentences(chunk.text_raw):
+            score = _score_who_focus_sentence(
+                sentence,
+                predicate=predicate,
+                terms=terms,
+                key_phrases=key_phrases,
+            )
+            if score is None or score <= best_score:
+                continue
+            best_score = score
+            best = (chunk.chunk_id, sentence.strip())
+    return best
 
-    Example:
-        >>> from thot.tools.search.app import RetrievedChunk
-        >>> chunks = [RetrievedChunk(
-        ...     chunk_id='c1',
-        ...     text_raw='George Harrison liked the song.',
-        ...     parent_doc_id='file://doc.pdf',
-        ... )]
-        >>> _best_focus_sentence(chunks, 'Who liked the song')
-        ('c1', 'George Harrison liked the song.')
-    """
-    if re.match(r"^\s*who\b", query_text, re.I):
-        predicate = _who_predicate_token(query_text)
-        terms = _focus_query_terms(query_text)
-        key_phrases = [
-            label.lower()
-            for label in extract_query_highlight_terms(query_text)
-            if len(label.split()) >= 2
-        ]
-        best: tuple[str, str] | None = None
-        best_score = -999
-        for chunk in matching:
-            for sentence in _split_sentences(chunk.text_raw):
-                if _is_metadata_sentence(sentence):
-                    continue
-                sentence_lower = sentence.lower()
-                if predicate and predicate in sentence_lower:
-                    score = sum(1 for term in terms if term in sentence_lower)
-                elif key_phrases and any(
-                    phrase in sentence_lower for phrase in key_phrases
-                ):
-                    score = 5 + sum(
-                        1 for term in terms if term in sentence_lower
-                    )
-                else:
-                    continue
-                if score > best_score:
-                    best_score = score
-                    best = (chunk.chunk_id, sentence.strip())
-        if best is not None:
-            return best
 
+def _focus_sentence_from_passages(
+    matching: list[RetrievedChunk],
+    query_text: str,
+) -> tuple[str, str] | None:
+    """Return the top focus passage as a ``(chunk_id, sentence)`` pair."""
     focus = extract_focus_passages(
         [
             (
@@ -307,6 +317,29 @@ def _best_focus_sentence(
         return match.group(1), match.group(2).strip()
     chunk_id = matching[0].chunk_id if matching else ""
     return chunk_id, line.lstrip("- ").strip()
+
+
+def _best_focus_sentence(
+    matching: list[RetrievedChunk],
+    query_text: str,
+) -> tuple[str, str] | None:
+    """Return the best ``(chunk_id, sentence)`` pair for the query.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunks = [RetrievedChunk(
+        ...     chunk_id='c1',
+        ...     text_raw='George Harrison liked the song.',
+        ...     parent_doc_id='file://doc.pdf',
+        ... )]
+        >>> _best_focus_sentence(chunks, 'Who liked the song')
+        ('c1', 'George Harrison liked the song.')
+    """
+    if re.match(r"^\s*who\b", query_text, re.I):
+        who_best = _best_who_focus_sentence(matching, query_text)
+        if who_best is not None:
+            return who_best
+    return _focus_sentence_from_passages(matching, query_text)
 
 
 def _top_focus_sentence(

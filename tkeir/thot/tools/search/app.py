@@ -968,6 +968,329 @@ async def search(
     )
 
 
+def _select_prompt_rdf_payloads(
+    rdf_payloads: list[str],
+    retrieved_chunks: list[RetrievedChunk],
+    prompt_chunks: list[RetrievedChunk],
+) -> list[str]:
+    """Keep RDF payloads aligned with chunks selected for prompt assembly."""
+    prompt_chunk_ids = {chunk.chunk_id for chunk in prompt_chunks}
+    prompt_rdf_payloads = [
+        payload
+        for payload, chunk in zip(rdf_payloads, retrieved_chunks, strict=False)
+        if getattr(chunk, "chunk_id", None) in prompt_chunk_ids
+    ]
+    if not prompt_rdf_payloads:
+        prompt_rdf_payloads = rdf_payloads[: len(prompt_chunks)]
+    return prompt_rdf_payloads
+
+
+def _maybe_supplement_entity_report_excerpts(
+    *,
+    chunk_excerpts: str,
+    prompt_chunks: list[RetrievedChunk],
+    prompt_cfg: dict[str, Any],
+    query_text: str,
+    query_analysis: dict[str, Any] | None,
+    prompt_settings: RagPromptConfig,
+    svo_only_prompt: bool,
+) -> str:
+    """Prepend source excerpts for entity-report queries in SVO-only mode."""
+    if not svo_only_prompt or not is_entity_report_query(
+        query_text, query_analysis
+    ):
+        return chunk_excerpts
+    supplement = _format_chunk_excerpts(
+        prompt_chunks,
+        empty_message="",
+        max_chars_per_chunk=prompt_settings.max_chars_per_chunk,
+        max_chunks=prompt_settings.max_chunks_for_prompt,
+    )
+    if not supplement.strip():
+        return chunk_excerpts
+    no_chunks_message = _no_chunks_message(prompt_cfg)
+    if chunk_excerpts.strip() and chunk_excerpts != no_chunks_message:
+        return (
+            f"SOURCE EXCERPTS (read first for reports):\n{supplement}\n\n"
+            f"STRUCTURED SVO FACTS:\n{chunk_excerpts}"
+        )
+    return supplement
+
+
+def _build_rag_prompt_bundle(
+    state: AppState,
+    request: QueryRequest,
+    *,
+    retrieved_chunks: list[RetrievedChunk],
+    rdf_payloads: list[str],
+    query_text: str,
+    query_analysis: dict[str, Any] | None,
+    focus_query_text: str,
+    query_analysis_context: str,
+    svo_match_query: str,
+) -> tuple[
+    str,
+    str,
+    str,
+    str,
+    str,
+    FusedOntology,
+    str,
+    list[RetrievedChunk],
+]:
+    """Build prompts, ontology, and generation inputs for ``rag_query``."""
+    prompt_chunks = filter_query_relevant_chunks(
+        retrieved_chunks,
+        focus_query_text,
+        max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
+    )
+    prompt_rdf_payloads = _select_prompt_rdf_payloads(
+        rdf_payloads,
+        retrieved_chunks,
+        prompt_chunks,
+    )
+    fused_graph = merge_rdf_graphs(prompt_rdf_payloads)
+    svo_only_prompt = _uses_svo_only_prompt(state.rag_config.prompt)
+    fused_summary = ""
+    if not svo_only_prompt:
+        fused_summary = summarize_graph_for_prompt(
+            fused_graph,
+            svo_match_query,
+            max_triples=_DEFAULT_MAX_TRIPLES_FOR_PROMPT,
+        )
+    hmi_ontology = build_hmi_ontology(
+        rdf_payloads,
+        [chunk.chunk_id for chunk in retrieved_chunks],
+        chunk_texts={
+            chunk.chunk_id: chunk.text_raw for chunk in retrieved_chunks
+        },
+        max_entities=state.rag_config.ontology.max_entities,
+        max_keywords=state.rag_config.ontology.max_keywords,
+        min_keyword_length=state.rag_config.ontology.min_keyword_length,
+    )
+    ontology = FusedOntology.model_validate(hmi_ontology)
+
+    prompt_cfg = _language_prompt_cfg(state.prompts, request.language)
+    unavailable_answer = _unavailable_answer(prompt_cfg, request.language)
+    user_prompt_template = _resolve_user_prompt_template(
+        prompt_cfg,
+        state.rag_config.prompt,
+    )
+    system_prompt_template = _resolve_system_prompt_template(
+        prompt_cfg,
+        state.rag_config.prompt,
+    )
+    chunk_excerpts = _format_chunk_context(
+        prompt_settings=state.rag_config.prompt,
+        graph=fused_graph,
+        query_text=svo_match_query,
+        chunks=prompt_chunks,
+        empty_message=_no_chunks_message(prompt_cfg),
+        max_chars_per_chunk=state.rag_config.prompt.max_chars_per_chunk,
+        max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
+    )
+    passage_settings = resolve_passage_settings(
+        defaults=state.rag_config.prompt.passages,
+        count=request.max_passages,
+        max_chars=request.max_chars_per_passage,
+        context_sentences=request.focus_context_sentences,
+    )
+    focus_passages = extract_focus_passages(
+        [
+            (chunk.chunk_id, clean_chunk_text_for_prompt(chunk.text_raw))
+            for chunk in prompt_chunks
+        ],
+        focus_query_text,
+        max_passages=passage_settings.count,
+        context_sentences=passage_settings.context_sentences,
+        max_chars_per_passage=passage_settings.max_chars,
+    )
+    generation_guidance = format_generation_guidance(
+        query_text,
+        query_analysis,
+        language=request.language,
+    )
+    chunk_excerpts = _maybe_supplement_entity_report_excerpts(
+        chunk_excerpts=chunk_excerpts,
+        prompt_chunks=prompt_chunks,
+        prompt_cfg=prompt_cfg,
+        query_text=query_text,
+        query_analysis=query_analysis,
+        prompt_settings=state.rag_config.prompt,
+        svo_only_prompt=svo_only_prompt,
+    )
+    system_prompt, user_prompt = _build_generation_prompts(
+        prompt_cfg,
+        fused_summary=fused_summary,
+        focus_passages=focus_passages,
+        chunk_excerpts=chunk_excerpts,
+        query_text=query_text,
+        query_analysis=query_analysis_context,
+        generation_guidance=generation_guidance,
+        unavailable_answer=unavailable_answer,
+        user_prompt_template=user_prompt_template,
+        system_prompt_template=system_prompt_template,
+    )
+    input_prompt = format_input_prompt(system_prompt, user_prompt)
+    return (
+        system_prompt,
+        user_prompt,
+        input_prompt,
+        focus_passages,
+        chunk_excerpts,
+        ontology,
+        unavailable_answer,
+        prompt_chunks,
+    )
+
+
+def _build_rag_unavailable_response(
+    *,
+    query_text: str,
+    request: QueryRequest,
+    retrieved_chunks: list[RetrievedChunk],
+    parsed_hits: list[tuple[dict[str, Any], float | None]],
+    ontology: FusedOntology,
+    unavailable_answer: str,
+    focus_passages: str,
+    chunk_excerpts: str,
+    input_prompt: str,
+    vespa_query_json: str,
+    step_started: float,
+    request_started: float,
+) -> QueryResponse:
+    """Return the standard unavailable response when retrieval is empty."""
+    entity_labels, keyword_labels = extract_highlight_labels(ontology)
+    query_term_labels = query_highlight_terms(query_text, retrieved_chunks)
+    report_markdown = assemble_report_markdown(
+        query=query_text,
+        language=request.language,
+        short_answer=unavailable_answer,
+        detailed_report=build_fallback_detailed_report(
+            focus_passages=focus_passages,
+            chunk_excerpts=chunk_excerpts,
+        ),
+        chunks=retrieved_chunks,
+        ontology=ontology,
+        vespa_hits=len(parsed_hits),
+        input_prompt=input_prompt,
+        vespa_query=vespa_query_json,
+    )
+    _log_rag_step(
+        "answer-building",
+        step_started,
+        generated=False,
+        chunks=len(retrieved_chunks),
+    )
+    _log_rag_step("rag-query-total", request_started, query=repr(query_text))
+    return QueryResponse(
+        answer=unavailable_answer,
+        report_markdown=report_markdown,
+        input_prompt=input_prompt,
+        vespa_query=vespa_query_json,
+        highlight_entities=entity_labels,
+        highlight_keywords=keyword_labels,
+        highlight_query_terms=query_term_labels,
+        used_chunk_evidence=False,
+        answer_unavailable=True,
+        chunks=retrieved_chunks,
+        ontology=ontology,
+        vespa_hits=len(parsed_hits),
+    )
+
+
+async def _generate_rag_answer(
+    state: AppState,
+    *,
+    user_prompt: str,
+    system_prompt: str,
+    query_text: str,
+    prompt_chunks: list[RetrievedChunk],
+    unavailable_answer: str,
+    focus_passages: str,
+    chunk_excerpts: str,
+) -> tuple[str, str, bool]:
+    """Run LLM generation and apply chunk-evidence fallback when needed."""
+    try:
+        raw_generation = await state.llm.generate(
+            user_prompt,
+            system=system_prompt or None,
+        )
+    except Exception as error:
+        LOGGER.exception("Generation failed")
+        raise HTTPException(
+            status_code=502, detail=f"Generation failed: {error}"
+        ) from error
+
+    short_answer, detailed_report = parse_structured_generation(
+        raw_generation,
+        unavailable_answer=unavailable_answer,
+    )
+    short_answer, detailed_report, used_chunk_evidence = (
+        apply_chunk_evidence_fallback(
+            query_text=query_text,
+            short_answer=short_answer,
+            detailed_report=detailed_report,
+            chunks=prompt_chunks,
+            unavailable_answer=unavailable_answer,
+        )
+    )
+    if not detailed_report.strip():
+        detailed_report = build_fallback_detailed_report(
+            focus_passages=focus_passages,
+            chunk_excerpts=chunk_excerpts,
+        )
+    return short_answer, detailed_report, used_chunk_evidence
+
+
+def _build_rag_success_response(
+    *,
+    query_text: str,
+    request: QueryRequest,
+    retrieved_chunks: list[RetrievedChunk],
+    parsed_hits: list[tuple[dict[str, Any], float | None]],
+    ontology: FusedOntology,
+    unavailable_answer: str,
+    input_prompt: str,
+    vespa_query_json: str,
+    short_answer: str,
+    detailed_report: str,
+    used_chunk_evidence: bool,
+) -> QueryResponse:
+    """Build the successful ``QueryResponse`` after generation."""
+    entity_labels, keyword_labels = extract_highlight_labels(ontology)
+    query_term_labels = query_highlight_terms(query_text, retrieved_chunks)
+    report_markdown = assemble_report_markdown(
+        query=query_text,
+        language=request.language,
+        short_answer=short_answer,
+        detailed_report=detailed_report,
+        chunks=retrieved_chunks,
+        ontology=ontology,
+        vespa_hits=len(parsed_hits),
+        input_prompt=input_prompt,
+        vespa_query=vespa_query_json,
+    )
+    return QueryResponse(
+        answer=short_answer,
+        report_markdown=report_markdown,
+        input_prompt=input_prompt,
+        vespa_query=vespa_query_json,
+        highlight_entities=entity_labels,
+        highlight_keywords=keyword_labels,
+        highlight_query_terms=query_term_labels,
+        used_chunk_evidence=used_chunk_evidence,
+        answer_unavailable=is_unavailable_short_answer(
+            short_answer,
+            unavailable_answer,
+        )
+        and not used_chunk_evidence,
+        chunks=retrieved_chunks,
+        ontology=ontology,
+        vespa_hits=len(parsed_hits),
+    )
+
+
 @app.post("/rag/query", response_model=QueryResponse)
 async def rag_query(
     request: QueryRequest,
@@ -1055,195 +1378,58 @@ async def rag_query(
         retrieved_chunks,
         focus_query_text,
     )
-    prompt_chunks = filter_query_relevant_chunks(
-        retrieved_chunks,
-        focus_query_text,
-        max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
-    )
-    prompt_chunk_ids = {chunk.chunk_id for chunk in prompt_chunks}
-    prompt_rdf_payloads = [
-        payload
-        for payload, chunk in zip(rdf_payloads, retrieved_chunks, strict=False)
-        if getattr(chunk, "chunk_id", None) in prompt_chunk_ids
-    ]
-    if not prompt_rdf_payloads:
-        prompt_rdf_payloads = rdf_payloads[: len(prompt_chunks)]
 
     step_started = time.perf_counter()
-    fused_graph = merge_rdf_graphs(prompt_rdf_payloads)
-    svo_only_prompt = _uses_svo_only_prompt(state.rag_config.prompt)
-    fused_summary = ""
-    if not svo_only_prompt:
-        fused_summary = summarize_graph_for_prompt(
-            fused_graph,
-            svo_match_query,
-            max_triples=_DEFAULT_MAX_TRIPLES_FOR_PROMPT,
-        )
-    hmi_ontology = build_hmi_ontology(
-        rdf_payloads,
-        [chunk.chunk_id for chunk in retrieved_chunks],
-        chunk_texts={
-            chunk.chunk_id: chunk.text_raw for chunk in retrieved_chunks
-        },
-        max_entities=state.rag_config.ontology.max_entities,
-        max_keywords=state.rag_config.ontology.max_keywords,
-        min_keyword_length=state.rag_config.ontology.min_keyword_length,
-    )
-    ontology = FusedOntology.model_validate(hmi_ontology)
-
-    prompt_cfg = _language_prompt_cfg(state.prompts, request.language)
-    unavailable_answer = _unavailable_answer(prompt_cfg, request.language)
-    user_prompt_template = _resolve_user_prompt_template(
-        prompt_cfg,
-        state.rag_config.prompt,
-    )
-    system_prompt_template = _resolve_system_prompt_template(
-        prompt_cfg,
-        state.rag_config.prompt,
-    )
-    chunk_excerpts = _format_chunk_context(
-        prompt_settings=state.rag_config.prompt,
-        graph=fused_graph,
-        query_text=svo_match_query,
-        chunks=prompt_chunks,
-        empty_message=_no_chunks_message(prompt_cfg),
-        max_chars_per_chunk=state.rag_config.prompt.max_chars_per_chunk,
-        max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
-    )
-    passage_settings = resolve_passage_settings(
-        defaults=state.rag_config.prompt.passages,
-        count=request.max_passages,
-        max_chars=request.max_chars_per_passage,
-        context_sentences=request.focus_context_sentences,
-    )
-    focus_passages = extract_focus_passages(
-        [
-            (chunk.chunk_id, clean_chunk_text_for_prompt(chunk.text_raw))
-            for chunk in prompt_chunks
-        ],
-        focus_query_text,
-        max_passages=passage_settings.count,
-        context_sentences=passage_settings.context_sentences,
-        max_chars_per_passage=passage_settings.max_chars,
-    )
-    generation_guidance = format_generation_guidance(
-        query_text,
-        query_analysis,
-        language=request.language,
-    )
-    if svo_only_prompt and is_entity_report_query(query_text, query_analysis):
-        supplement = _format_chunk_excerpts(
-            prompt_chunks,
-            empty_message="",
-            max_chars_per_chunk=state.rag_config.prompt.max_chars_per_chunk,
-            max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
-        )
-        if supplement.strip():
-            chunk_excerpts = (
-                f"SOURCE EXCERPTS (read first for reports):\n{supplement}\n\n"
-                f"STRUCTURED SVO FACTS:\n{chunk_excerpts}"
-                if chunk_excerpts.strip()
-                and chunk_excerpts != _no_chunks_message(prompt_cfg)
-                else supplement
-            )
-    system_prompt, user_prompt = _build_generation_prompts(
-        prompt_cfg,
-        fused_summary=fused_summary,
-        focus_passages=focus_passages,
-        chunk_excerpts=chunk_excerpts,
+    (
+        system_prompt,
+        user_prompt,
+        input_prompt,
+        focus_passages,
+        chunk_excerpts,
+        ontology,
+        unavailable_answer,
+        prompt_chunks,
+    ) = _build_rag_prompt_bundle(
+        state,
+        request,
+        retrieved_chunks=retrieved_chunks,
+        rdf_payloads=rdf_payloads,
         query_text=query_text,
-        query_analysis=query_analysis_context,
-        generation_guidance=generation_guidance,
-        unavailable_answer=unavailable_answer,
-        user_prompt_template=user_prompt_template,
-        system_prompt_template=system_prompt_template,
+        query_analysis=query_analysis,
+        focus_query_text=focus_query_text,
+        query_analysis_context=query_analysis_context,
+        svo_match_query=svo_match_query,
     )
-    input_prompt = format_input_prompt(system_prompt, user_prompt)
 
     if not retrieved_chunks:
-        entity_labels, keyword_labels = extract_highlight_labels(ontology)
-        query_term_labels = query_highlight_terms(query_text, retrieved_chunks)
-        report_markdown = assemble_report_markdown(
-            query=query_text,
-            language=request.language,
-            short_answer=unavailable_answer,
-            detailed_report=build_fallback_detailed_report(
-                focus_passages=focus_passages,
-                chunk_excerpts=chunk_excerpts,
-            ),
-            chunks=retrieved_chunks,
-            ontology=ontology,
-            vespa_hits=len(parsed_hits),
-            input_prompt=input_prompt,
-            vespa_query=vespa_query_json,
-        )
-        _log_rag_step(
-            "answer-building",
-            step_started,
-            generated=False,
-            chunks=len(retrieved_chunks),
-        )
-        _log_rag_step(
-            "rag-query-total", request_started, query=repr(query_text)
-        )
-        return QueryResponse(
-            answer=unavailable_answer,
-            report_markdown=report_markdown,
-            input_prompt=input_prompt,
-            vespa_query=vespa_query_json,
-            highlight_entities=entity_labels,
-            highlight_keywords=keyword_labels,
-            highlight_query_terms=query_term_labels,
-            used_chunk_evidence=False,
-            answer_unavailable=True,
-            chunks=retrieved_chunks,
-            ontology=ontology,
-            vespa_hits=len(parsed_hits),
-        )
-
-    try:
-        raw_generation = await state.llm.generate(
-            user_prompt,
-            system=system_prompt or None,
-        )
-    except Exception as error:
-        LOGGER.exception("Generation failed")
-        raise HTTPException(
-            status_code=502, detail=f"Generation failed: {error}"
-        ) from error
-
-    short_answer, detailed_report = parse_structured_generation(
-        raw_generation,
-        unavailable_answer=unavailable_answer,
-    )
-    used_chunk_evidence = False
-    short_answer, detailed_report, used_chunk_evidence = (
-        apply_chunk_evidence_fallback(
+        return _build_rag_unavailable_response(
             query_text=query_text,
-            short_answer=short_answer,
-            detailed_report=detailed_report,
-            chunks=prompt_chunks,
+            request=request,
+            retrieved_chunks=retrieved_chunks,
+            parsed_hits=parsed_hits,
+            ontology=ontology,
             unavailable_answer=unavailable_answer,
-        )
-    )
-    if not detailed_report.strip():
-        detailed_report = build_fallback_detailed_report(
             focus_passages=focus_passages,
             chunk_excerpts=chunk_excerpts,
+            input_prompt=input_prompt,
+            vespa_query_json=vespa_query_json,
+            step_started=step_started,
+            request_started=request_started,
         )
 
-    entity_labels, keyword_labels = extract_highlight_labels(ontology)
-    query_term_labels = query_highlight_terms(query_text, retrieved_chunks)
-    report_markdown = assemble_report_markdown(
-        query=query_text,
-        language=request.language,
-        short_answer=short_answer,
-        detailed_report=detailed_report,
-        chunks=retrieved_chunks,
-        ontology=ontology,
-        vespa_hits=len(parsed_hits),
-        input_prompt=input_prompt,
-        vespa_query=vespa_query_json,
+    (
+        short_answer,
+        detailed_report,
+        used_chunk_evidence,
+    ) = await _generate_rag_answer(
+        state,
+        user_prompt=user_prompt,
+        system_prompt=system_prompt,
+        query_text=query_text,
+        prompt_chunks=prompt_chunks,
+        unavailable_answer=unavailable_answer,
+        focus_passages=focus_passages,
+        chunk_excerpts=chunk_excerpts,
     )
 
     _log_rag_step(
@@ -1254,23 +1440,18 @@ async def rag_query(
     )
     _log_rag_step("rag-query-total", request_started, query=repr(query_text))
 
-    return QueryResponse(
-        answer=short_answer,
-        report_markdown=report_markdown,
-        input_prompt=input_prompt,
-        vespa_query=vespa_query_json,
-        highlight_entities=entity_labels,
-        highlight_keywords=keyword_labels,
-        highlight_query_terms=query_term_labels,
-        used_chunk_evidence=used_chunk_evidence,
-        answer_unavailable=is_unavailable_short_answer(
-            short_answer,
-            unavailable_answer,
-        )
-        and not used_chunk_evidence,
-        chunks=retrieved_chunks,
+    return _build_rag_success_response(
+        query_text=query_text,
+        request=request,
+        retrieved_chunks=retrieved_chunks,
+        parsed_hits=parsed_hits,
         ontology=ontology,
-        vespa_hits=len(parsed_hits),
+        unavailable_answer=unavailable_answer,
+        input_prompt=input_prompt,
+        vespa_query_json=vespa_query_json,
+        short_answer=short_answer,
+        detailed_report=detailed_report,
+        used_chunk_evidence=used_chunk_evidence,
     )
 
 

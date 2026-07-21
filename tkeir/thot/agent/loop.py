@@ -64,28 +64,33 @@ def _estimate_tokens(text: str) -> int:
     return max(1, len(text) // 4)
 
 
+def _finding_from_item(item: Any) -> GroundedFinding | None:
+    if not isinstance(item, dict):
+        return None
+    claim = str(item.get("claim") or "").strip()
+    if not claim:
+        return None
+    chunk_ids = [str(c) for c in item.get("chunk_ids") or [] if c]
+    doc_ids = [str(d) for d in item.get("document_ids") or [] if d]
+    if not chunk_ids and not doc_ids:
+        # No provenance → move to unfilled rather than hallucinate support
+        return None
+    return GroundedFinding(
+        claim=claim,
+        chunk_ids=chunk_ids,
+        document_ids=doc_ids,
+        confidence=float(item.get("confidence") or 0.0),
+    )
+
+
 def _findings_from_final(
     payload: dict[str, Any], goal: str
 ) -> GroundedFindings:
     findings: list[GroundedFinding] = []
     for item in payload.get("findings") or []:
-        if not isinstance(item, dict):
-            continue
-        claim = str(item.get("claim") or "").strip()
-        chunk_ids = [str(c) for c in item.get("chunk_ids") or [] if c]
-        doc_ids = [str(d) for d in item.get("document_ids") or [] if d]
-        if claim and not chunk_ids and not doc_ids:
-            # No provenance → move to unfilled rather than hallucinate support
-            continue
-        if claim:
-            findings.append(
-                GroundedFinding(
-                    claim=claim,
-                    chunk_ids=chunk_ids,
-                    document_ids=doc_ids,
-                    confidence=float(item.get("confidence") or 0.0),
-                )
-            )
+        finding = _finding_from_item(item)
+        if finding is not None:
+            findings.append(finding)
     unfilled = [str(u) for u in payload.get("unfilled") or [] if u]
     # Any claim without provenance already dropped; note if empty
     if not findings and goal:
@@ -120,16 +125,7 @@ class AgentLoop:
         self.llm = llm
         self.toolbox = toolbox
 
-    async def run(
-        self,
-        state: RunState,
-        spec: AgentSpec,
-        *,
-        authorization: str | None = None,
-        step_offset: int = 0,
-        finalize: bool = True,
-        goal_override: str | None = None,
-    ) -> RunState:
+    def _emit_agent_runs_metric(self) -> None:
         ThotMetrics.create_counter(
             short_name="agent_runs",
             function_name="agent_runs_total",
@@ -141,6 +137,16 @@ class AgentLoop:
             path="/agent/runs",
             status=200,
         )
+
+    def _prepare_run(
+        self,
+        state: RunState,
+        spec: AgentSpec,
+        *,
+        authorization: str | None,
+        finalize: bool,
+    ) -> tuple[ToolRegistry, McpPrincipal]:
+        self._emit_agent_runs_metric()
         toolbox = self.toolbox or ToolRegistry(spec.tools)
         principal = McpPrincipal(
             user_space=state.user_space,
@@ -157,6 +163,253 @@ class AgentLoop:
             if not state.started_at:
                 state.started_at = utc_now_rfc3339()
             self.store.write_state(state)
+        return toolbox, principal
+
+    def _handle_guard_deny(self, state: RunState, decision: Any) -> RunState:
+        state.status = (
+            "killed" if "kill switch" in decision.message else "blocked"
+        )
+        state.error = decision.message
+        state.ended_at = utc_now_rfc3339()
+        self.store.write_state(state)
+        self.store.move_to_dlq(state.run_id, decision.message)
+        self.guard.emit(
+            kind="agent.step",
+            state=state,
+            status="blocked",
+            decision="deny",
+            error=decision.message,
+        )
+        return state
+
+    def _handle_llm_failure(
+        self, state: RunState, step: StepRecord, exc: Exception
+    ) -> RunState:
+        step.status = "error"
+        step.error = str(exc)
+        step.ended_at = utc_now_rfc3339()
+        self.store.write_step(state.run_id, step)
+        state.status = "failed"
+        state.error = str(exc)
+        state.ended_at = utc_now_rfc3339()
+        self.store.write_state(state)
+        self.store.move_to_dlq(state.run_id, str(exc))
+        return state
+
+    def _handle_parse_repair(
+        self,
+        state: RunState,
+        step: StepRecord,
+        raw: str,
+        exc: Exception,
+        history: list[dict[str, Any]],
+    ) -> bool:
+        history.append(
+            {
+                "role": "assistant",
+                "content": wrap_untrusted(raw, source="model"),
+            }
+        )
+        history.append(
+            {
+                "role": "user",
+                "content": (
+                    "Parse error. Reply with a single valid JSON "
+                    f"fence only. Error: {exc}"
+                ),
+            }
+        )
+        step.status = "parse_error"
+        step.error = str(exc)
+        step.ended_at = utc_now_rfc3339()
+        self.store.write_step(state.run_id, step)
+        return True
+
+    def _handle_parse_failure(
+        self,
+        state: RunState,
+        step: StepRecord,
+        exc: Exception,
+    ) -> RunState:
+        step.status = "parse_error"
+        step.error = f"parse failed after repair: {exc}"
+        step.ended_at = utc_now_rfc3339()
+        self.store.write_step(state.run_id, step)
+        state.status = "failed"
+        state.error = step.error
+        state.ended_at = utc_now_rfc3339()
+        self.store.write_state(state)
+        return state
+
+    def _complete_with_final(
+        self,
+        state: RunState,
+        step: StepRecord,
+        parsed: dict[str, Any],
+        *,
+        phase_goal: str,
+        step_index: int,
+        finalize: bool,
+    ) -> RunState:
+        findings = _findings_from_final(parsed, phase_goal)
+        step.final = findings
+        step.ended_at = utc_now_rfc3339()
+        self.store.write_step(state.run_id, step)
+        state.result = findings
+        state.steps_completed = step_index + 1
+        if finalize:
+            state.status = "succeeded"
+            state.ended_at = utc_now_rfc3339()
+        self.store.write_state(state)
+        self.guard.emit(
+            kind="agent.step",
+            state=state,
+            chunk_ids=[
+                cid
+                for finding in findings.findings
+                for cid in finding.chunk_ids
+            ],
+        )
+        return state
+
+    def _handle_invalid_tool_payload(
+        self,
+        state: RunState,
+        step: StepRecord,
+        history: list[dict[str, Any]],
+    ) -> None:
+        history.append(
+            {
+                "role": "user",
+                "content": "Invalid tool payload; use tool or final JSON.",
+            }
+        )
+        step.status = "parse_error"
+        step.error = "missing tool/arguments"
+        step.ended_at = utc_now_rfc3339()
+        self.store.write_step(state.run_id, step)
+
+    def _observation_chunk_ids(self, observation: dict[str, Any]) -> list[str]:
+        from_chunks = [
+            str(c.get("chunk_id"))
+            for c in observation.get("chunks") or []
+            if isinstance(c, dict) and c.get("chunk_id")
+        ]
+        if from_chunks:
+            return from_chunks
+        return [str(c) for c in observation.get("chunk_ids") or []]
+
+    async def _invoke_tool(
+        self,
+        state: RunState,
+        step: StepRecord,
+        *,
+        toolbox: ToolRegistry,
+        tool_name: str,
+        arguments: dict[str, Any],
+        principal: McpPrincipal,
+    ) -> dict[str, Any]:
+        step.tool_call = ToolCall(name=tool_name, arguments=arguments)
+        try:
+            observation = await toolbox.invoke(
+                tool_name,
+                arguments,
+                principal=principal,
+            )
+            state.usage.tool_calls += 1
+            ThotMetrics.increment_counter(
+                short_name="agent_tool_calls",
+                method="AGENT",
+                path=f"/tool/{tool_name}",
+                status=200,
+            )
+            self.guard.emit(
+                kind="tool.invoke",
+                state=state,
+                intent="tool.invoke",
+                ext={"tool": tool_name},
+                chunk_ids=self._observation_chunk_ids(observation),
+            )
+            return observation
+        except Exception as exc:  # noqa: BLE001
+            step.status = "error"
+            step.error = str(exc)
+            step.ended_at = utc_now_rfc3339()
+            self.store.write_step(state.run_id, step)
+            return {
+                "error": str(exc),
+                "_untrusted_view": wrap_untrusted(
+                    {"error": str(exc)}, source="tool-error"
+                ),
+            }
+
+    def _record_tool_observation(
+        self,
+        state: RunState,
+        step: StepRecord,
+        *,
+        step_index: int,
+        tool_name: str,
+        arguments: dict[str, Any],
+        observation: dict[str, Any],
+        history: list[dict[str, Any]],
+    ) -> None:
+        step.observation = {
+            k: v for k, v in observation.items() if k != "_untrusted_view"
+        }
+        step.ended_at = utc_now_rfc3339()
+        self.store.write_step(state.run_id, step)
+        self.store.append_blackboard(
+            state.run_id,
+            {
+                "step": step_index,
+                "agent": state.agent,
+                "tool": tool_name,
+                "chunk_ids": self._observation_chunk_ids(observation),
+            },
+        )
+        history.append(
+            {
+                "role": "assistant",
+                "content": wrap_untrusted(
+                    {"tool": tool_name, "arguments": arguments},
+                    source="assistant-tool",
+                ),
+            }
+        )
+        history.append(
+            {
+                "role": "user",
+                "content": (
+                    observation.get("_untrusted_view")
+                    or wrap_untrusted(observation, source=tool_name)
+                ),
+            }
+        )
+        state.steps_completed = step_index + 1
+        self.store.write_state(state)
+
+    def _fail_max_steps(self, state: RunState) -> RunState:
+        state.status = "failed"
+        state.error = "max_steps exceeded without final"
+        state.ended_at = utc_now_rfc3339()
+        self.store.write_state(state)
+        self.store.move_to_dlq(state.run_id, state.error)
+        return state
+
+    async def run(
+        self,
+        state: RunState,
+        spec: AgentSpec,
+        *,
+        authorization: str | None = None,
+        step_offset: int = 0,
+        finalize: bool = True,
+        goal_override: str | None = None,
+    ) -> RunState:
+        toolbox, principal = self._prepare_run(
+            state, spec, authorization=authorization, finalize=finalize
+        )
 
         wall_started = time.monotonic()
         history: list[dict[str, Any]] = []
@@ -169,23 +422,7 @@ class AgentLoop:
                 state, spec, wall_started=wall_started
             )
             if decision.result == "deny":
-                state.status = (
-                    "killed"
-                    if "kill switch" in decision.message
-                    else "blocked"
-                )
-                state.error = decision.message
-                state.ended_at = utc_now_rfc3339()
-                self.store.write_state(state)
-                self.store.move_to_dlq(state.run_id, decision.message)
-                self.guard.emit(
-                    kind="agent.step",
-                    state=state,
-                    status="blocked",
-                    decision="deny",
-                    error=decision.message,
-                )
-                return state
+                return self._handle_guard_deny(state, decision)
 
             ThotMetrics.increment_counter(
                 short_name="agent_steps",
@@ -204,16 +441,7 @@ class AgentLoop:
                     temperature=spec.temperature,
                 )
             except Exception as exc:  # noqa: BLE001
-                step.status = "error"
-                step.error = str(exc)
-                step.ended_at = utc_now_rfc3339()
-                self.store.write_step(state.run_id, step)
-                state.status = "failed"
-                state.error = str(exc)
-                state.ended_at = utc_now_rfc3339()
-                self.store.write_state(state)
-                self.store.move_to_dlq(state.run_id, str(exc))
-                return state
+                return self._handle_llm_failure(state, step, exc)
 
             state.usage.llm_tokens += _estimate_tokens(
                 prompt
@@ -226,73 +454,24 @@ class AgentLoop:
             except (json.JSONDecodeError, ValueError) as exc:
                 if not repair_used:
                     repair_used = True
-                    history.append(
-                        {
-                            "role": "assistant",
-                            "content": wrap_untrusted(raw, source="model"),
-                        }
-                    )
-                    history.append(
-                        {
-                            "role": "user",
-                            "content": (
-                                "Parse error. Reply with a single valid JSON "
-                                f"fence only. Error: {exc}"
-                            ),
-                        }
-                    )
-                    step.status = "parse_error"
-                    step.error = str(exc)
-                    step.ended_at = utc_now_rfc3339()
-                    self.store.write_step(state.run_id, step)
+                    self._handle_parse_repair(state, step, raw, exc, history)
                     continue
-                step.status = "parse_error"
-                step.error = f"parse failed after repair: {exc}"
-                step.ended_at = utc_now_rfc3339()
-                self.store.write_step(state.run_id, step)
-                state.status = "failed"
-                state.error = step.error
-                state.ended_at = utc_now_rfc3339()
-                self.store.write_state(state)
-                return state
+                return self._handle_parse_failure(state, step, exc)
 
             if parsed.get("final") is True:
-                findings = _findings_from_final(parsed, phase_goal)
-                step.final = findings
-                step.ended_at = utc_now_rfc3339()
-                self.store.write_step(state.run_id, step)
-                state.result = findings
-                state.steps_completed = step_index + 1
-                if finalize:
-                    state.status = "succeeded"
-                    state.ended_at = utc_now_rfc3339()
-                self.store.write_state(state)
-                self.guard.emit(
-                    kind="agent.step",
-                    state=state,
-                    chunk_ids=[
-                        cid
-                        for finding in findings.findings
-                        for cid in finding.chunk_ids
-                    ],
+                return self._complete_with_final(
+                    state,
+                    step,
+                    parsed,
+                    phase_goal=phase_goal,
+                    step_index=step_index,
+                    finalize=finalize,
                 )
-                return state
 
             tool_name = str(parsed.get("tool") or "")
             arguments = parsed.get("arguments") or {}
             if not tool_name or not isinstance(arguments, dict):
-                history.append(
-                    {
-                        "role": "user",
-                        "content": (
-                            "Invalid tool payload; use tool or final JSON."
-                        ),
-                    }
-                )
-                step.status = "parse_error"
-                step.error = "missing tool/arguments"
-                step.ended_at = utc_now_rfc3339()
-                self.store.write_step(state.run_id, step)
+                self._handle_invalid_tool_payload(state, step, history)
                 continue
 
             if self.guard.is_agents_killed() or state.cancel_requested:
@@ -302,92 +481,25 @@ class AgentLoop:
                 self.store.write_state(state)
                 return state
 
-            step.tool_call = ToolCall(name=tool_name, arguments=arguments)
-            try:
-                observation = await toolbox.invoke(
-                    tool_name,
-                    arguments,
-                    principal=principal,
-                )
-                state.usage.tool_calls += 1
-                ThotMetrics.increment_counter(
-                    short_name="agent_tool_calls",
-                    method="AGENT",
-                    path=f"/tool/{tool_name}",
-                    status=200,
-                )
-                self.guard.emit(
-                    kind="tool.invoke",
-                    state=state,
-                    intent="tool.invoke",
-                    ext={"tool": tool_name},
-                    chunk_ids=[
-                        str(c.get("chunk_id"))
-                        for c in observation.get("chunks") or []
-                        if isinstance(c, dict) and c.get("chunk_id")
-                    ]
-                    or [str(c) for c in observation.get("chunk_ids") or []],
-                )
-            except Exception as exc:  # noqa: BLE001
-                step.status = "error"
-                step.error = str(exc)
-                step.ended_at = utc_now_rfc3339()
-                self.store.write_step(state.run_id, step)
-                observation = {
-                    "error": str(exc),
-                    "_untrusted_view": wrap_untrusted(
-                        {"error": str(exc)}, source="tool-error"
-                    ),
-                }
+            observation = await self._invoke_tool(
+                state,
+                step,
+                toolbox=toolbox,
+                tool_name=tool_name,
+                arguments=arguments,
+                principal=principal,
+            )
+            self._record_tool_observation(
+                state,
+                step,
+                step_index=step_index,
+                tool_name=tool_name,
+                arguments=arguments,
+                observation=observation,
+                history=history,
+            )
 
-            step.observation = {
-                k: v for k, v in observation.items() if k != "_untrusted_view"
-            }
-            step.ended_at = utc_now_rfc3339()
-            self.store.write_step(state.run_id, step)
-            self.store.append_blackboard(
-                state.run_id,
-                {
-                    "step": step_index,
-                    "agent": state.agent,
-                    "tool": tool_name,
-                    "chunk_ids": (
-                        [
-                            str(c.get("chunk_id"))
-                            for c in observation.get("chunks") or []
-                            if isinstance(c, dict) and c.get("chunk_id")
-                        ]
-                        or [str(c) for c in observation.get("chunk_ids") or []]
-                    ),
-                },
-            )
-            history.append(
-                {
-                    "role": "assistant",
-                    "content": wrap_untrusted(
-                        {"tool": tool_name, "arguments": arguments},
-                        source="assistant-tool",
-                    ),
-                }
-            )
-            history.append(
-                {
-                    "role": "user",
-                    "content": (
-                        observation.get("_untrusted_view")
-                        or wrap_untrusted(observation, source=tool_name)
-                    ),
-                }
-            )
-            state.steps_completed = step_index + 1
-            self.store.write_state(state)
-
-        state.status = "failed"
-        state.error = "max_steps exceeded without final"
-        state.ended_at = utc_now_rfc3339()
-        self.store.write_state(state)
-        self.store.move_to_dlq(state.run_id, state.error)
-        return state
+        return self._fail_max_steps(state)
 
     def _build_prompt(
         self,

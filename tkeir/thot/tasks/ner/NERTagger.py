@@ -299,6 +299,96 @@ class NERTagger:
                 discard_ner_entry = True
         return discard_ner_entry
 
+    _NLP_DISABLE = [
+        "tok2vec",
+        "tagger",
+        "parser",
+        "attribute_ruler",
+        "lemmatizer",
+    ]
+
+    def _nlp_from_tokens(self, tokens):
+        doc = self._nlp.tokenizer(tokens)
+        return self._nlp(doc, disable=self._NLP_DISABLE)
+
+    def _apply_morphosyntax(self, doc, morphosyntax):
+        len_doc = len(doc)
+        with doc.retokenize() as retokenizer:
+            for token_i in range(len_doc):
+                attrs = {
+                    "POS": morphosyntax[token_i]["pos"],
+                    "LEMMA": morphosyntax[token_i]["lemma"],
+                }
+                retokenizer.merge(doc[token_i : token_i + 1], attrs=attrs)
+
+    def _collect_mapped_entities(self, doc):
+        entities = []
+        for ent_i in doc.ents:
+            if ent_i.label_ not in self._entities_mapping:
+                continue
+            if self.discard_ner(ent_i, doc):
+                continue
+            entities.append(
+                {
+                    "start": ent_i.start,
+                    "end": ent_i.end,
+                    "label": self._entities_mapping[ent_i.label_],
+                    "text": ent_i.text,
+                }
+            )
+        return entities
+
+    def _tag_title_section(self, doc_title, tkeir_doc):
+        if "title_morphosyntax" not in tkeir_doc:
+            raise ValueError("Morphosyntactic tagger MUST be applied")
+        if len(doc_title):
+            self._apply_morphosyntax(
+                doc_title, tkeir_doc["title_morphosyntax"]
+            )
+        return self._collect_mapped_entities(doc_title)
+
+    def _tag_content_section(self, doc_content, tkeir_doc):
+        if len(doc_content):
+            if "content_morphosyntax" not in tkeir_doc:
+                raise ValueError("Morphosyntactic tagger MUST be applied")
+            self._apply_morphosyntax(
+                doc_content, tkeir_doc["content_morphosyntax"]
+            )
+        return self._collect_mapped_entities(doc_content)
+
+    def _ner_spans_overlap(self, ner_a, ner_b):
+        return (
+            (
+                (ner_a["start"] <= ner_b["start"])
+                and (ner_a["end"] <= ner_b["end"])
+            )
+            or (
+                (ner_a["start"] >= ner_b["start"])
+                and (ner_a["end"] <= ner_b["end"])
+            )
+            or (
+                (ner_a["start"] <= ner_b["end"])
+                and (ner_a["end"] >= ner_b["end"])
+            )
+        )
+
+    def _merge_mwe_ners(self, mwe_ners, existing_ners, doc, target_list):
+        for ner_mwe in mwe_ners:
+            has_overlap = any(
+                self._ner_spans_overlap(ner_mwe, cmp_ner)
+                for cmp_ner in existing_ners
+            )
+            if has_overlap:
+                continue
+            ent = Span(
+                doc,
+                start=ner_mwe["start"],
+                end=ner_mwe["end"],
+                label=ner_mwe["label"],
+            )
+            if not self.discard_ner(ent, doc, with_mapping=False):
+                target_list.append(ner_mwe)
+
     def tag(self, tkeir_doc: dict):
         """Extract an tag in named entities
 
@@ -315,29 +405,9 @@ class NERTagger:
         doc_title = []
         doc_content = []
         if "title_tokens" in tkeir_doc:
-            doc = self._nlp.tokenizer(tkeir_doc["title_tokens"])
-            doc_title = self._nlp(
-                doc,
-                disable=[
-                    "tok2vec",
-                    "tagger",
-                    "parser",
-                    "attribute_ruler",
-                    "lemmatizer",
-                ],
-            )
+            doc_title = self._nlp_from_tokens(tkeir_doc["title_tokens"])
         if "content_tokens" in tkeir_doc:
-            doc = self._nlp.tokenizer(tkeir_doc["content_tokens"])
-            doc_content = self._nlp(
-                doc,
-                disable=[
-                    "tok2vec",
-                    "tagger",
-                    "parser",
-                    "attribute_ruler",
-                    "lemmatizer",
-                ],
-            )
+            doc_content = self._nlp_from_tokens(tkeir_doc["content_tokens"])
         title = []
         content = []
         tkeir_doc["error"] = False
@@ -347,66 +417,9 @@ class NERTagger:
                 "Tagger need title_tokens and/or content_tokens fields"
             )
         if doc_title:
-            len_doc = len(doc_title)
-            if "title_morphosyntax" not in tkeir_doc:
-                raise ValueError("Morphosyntactic tagger MUST be applied")
-            if len_doc:
-                with doc_title.retokenize() as retokenizer:
-                    for token_i in range(len_doc):
-                        attrs = {
-                            "POS": tkeir_doc["title_morphosyntax"][token_i][
-                                "pos"
-                            ],
-                            "LEMMA": tkeir_doc["title_morphosyntax"][token_i][
-                                "lemma"
-                            ],
-                        }
-                        retokenizer.merge(
-                            doc_title[token_i : token_i + 1], attrs=attrs
-                        )
-            for ent_i in doc_title.ents:
-                if ent_i.label_ in self._entities_mapping:
-                    discard_ner_entry = self.discard_ner(ent_i, doc_title)
-                    if not discard_ner_entry:
-                        title.append(
-                            {
-                                "start": ent_i.start,
-                                "end": ent_i.end,
-                                "label": self._entities_mapping[ent_i.label_],
-                                "text": ent_i.text,
-                            }
-                        )
+            title = self._tag_title_section(doc_title, tkeir_doc)
         if doc_content:
-            len_doc = len(doc_content)
-            if len_doc:
-                if "content_morphosyntax" not in tkeir_doc:
-                    raise ValueError("Morphosyntactic tagger MUST be applied")
-                with doc_content.retokenize() as retokenizer:
-                    for token_i in range(len_doc):
-                        attrs = {
-                            "POS": tkeir_doc["content_morphosyntax"][token_i][
-                                "pos"
-                            ],
-                            "LEMMA": tkeir_doc["content_morphosyntax"][
-                                token_i
-                            ]["lemma"],
-                        }
-                        retokenizer.merge(
-                            doc_content[token_i : token_i + 1], attrs=attrs
-                        )
-
-            for ent_i in doc_content.ents:
-                if ent_i.label_ in self._entities_mapping:
-                    discard_ner_entry = self.discard_ner(ent_i, doc_content)
-                    if not discard_ner_entry:
-                        content.append(
-                            {
-                                "start": ent_i.start,
-                                "end": ent_i.end,
-                                "label": self._entities_mapping[ent_i.label_],
-                                "text": ent_i.text,
-                            }
-                        )
+            content = self._tag_content_section(doc_content, tkeir_doc)
 
         mwe_ner_content = []
         mwe_ner_title = []
@@ -416,60 +429,8 @@ class NERTagger:
             )
         if "title_morphosyntax" in tkeir_doc:
             mwe_ner_title = self._ner_from_mwe(tkeir_doc["title_morphosyntax"])
-        for ner_title in mwe_ner_title:
-            has_overlap = False
-            for cmp_ner in title:
-                if (
-                    (
-                        (ner_title["start"] <= cmp_ner["start"])
-                        and (ner_title["end"] <= cmp_ner["end"])
-                    )
-                    or (
-                        (ner_title["start"] >= cmp_ner["start"])
-                        and (ner_title["end"] <= cmp_ner["end"])
-                    )
-                    or (
-                        (ner_title["start"] <= cmp_ner["end"])
-                        and (ner_title["end"] >= cmp_ner["end"])
-                    )
-                ):
-                    has_overlap = True
-            if not has_overlap:
-                ent = Span(
-                    doc_title,
-                    start=ner_title["start"],
-                    end=ner_title["end"],
-                    label=ner_title["label"],
-                )
-                if not self.discard_ner(ent, doc_title, with_mapping=False):
-                    title.append(ner_title)
-        for ner_content in mwe_ner_content:
-            has_overlap = False
-            for cmp_ner in content:
-                if (
-                    (
-                        (ner_content["start"] <= cmp_ner["start"])
-                        and (ner_content["end"] <= cmp_ner["end"])
-                    )
-                    or (
-                        (ner_content["start"] >= cmp_ner["start"])
-                        and (ner_content["end"] <= cmp_ner["end"])
-                    )
-                    or (
-                        (ner_content["start"] <= cmp_ner["end"])
-                        and (ner_content["end"] >= cmp_ner["end"])
-                    )
-                ):
-                    has_overlap = True
-            if not has_overlap:
-                ent = Span(
-                    doc_content,
-                    start=ner_content["start"],
-                    end=ner_content["end"],
-                    label=ner_content["label"],
-                )
-                if not self.discard_ner(ent, doc_content, with_mapping=False):
-                    content.append(ner_content)
+        self._merge_mwe_ners(mwe_ner_title, title, doc_title, title)
+        self._merge_mwe_ners(mwe_ner_content, content, doc_content, content)
         tkeir_doc["title_ner"] = title
         tkeir_doc["content_ner"] = content
         taskInfo = TaskInfo(

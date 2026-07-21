@@ -19,7 +19,7 @@ endif
 .PHONY: help setup install check-uv check-docker check-git check-jq check-curl check-python-version check-secrets \
 	install-tesseract install-spacy-models build wheel init-models \
 	test test-unit test-functional test-coverage coverage \
-	lint format typecheck liccheck complexity pip-audit \
+	lint format typecheck liccheck complexity complexity-report pip-licenses license-report quality-docs pip-audit \
 	deps-check deps-update deps-update-safe verify-lockfile tag changelog \
 	bom sbom aibom trivy owasp-dependency-check security-report \
 	docs docs-build docs-pdf pipeline quickstart install-workspace ci-deps ci pre-commit clean devcontainer \
@@ -32,7 +32,9 @@ endif
 	k3d-up k3d-down helm-deps helm-lint helm-template cluster-install cluster-plan cluster-uninstall \
 	k3s-server k3s-agent k3s-check cilium-install lima-k3s-up lima-k3s-down \
 	keycloak-export-realm seal kubeflow-install kubeflow-uninstall kubeflow-register-models kubeflow-run-ingest \
-	lineage-report audit-evidence annex-iv
+	lineage-report audit-evidence annex-iv \
+	corpus corpus-ontologies corpus-download corpus-ingest corpus-ingest-user corpus-ingest-admin \
+	corpus-ingest-web corpus-demo corpus-clean
 
 # Composite targets (setup, ci) use sequential $(MAKE) recipes so
 # `make -j setup` / `make -j ci` cannot race on .venv or coverage files.
@@ -131,6 +133,10 @@ WHEEL_SOURCES := $(TKEIR_DIR)/pyproject.toml $(TKEIR_DIR)/uv.lock \
 XENON_MAX_ABSOLUTE ?= F
 XENON_MAX_MODULES ?= F
 XENON_MAX_AVERAGE ?= A
+# Hard gates for production package (thot/): grade B average, no grade D+.
+CC_AVERAGE_MAX ?= 7.0
+QUALITY_REPORT_DIR ?= $(ROOT)/reports/quality
+COMPLEXITY_SOURCES ?= thot
 
 # Minimum test coverage percentage — CI fails below this threshold.
 COVERAGE_FAIL_UNDER ?= 90
@@ -166,7 +172,7 @@ help: ## Show available targets (VERBOSE=1 prints recipes)
 	$(Q)printf '%s\n' ""
 	$(Q)printf '%s\n' "Common vars: PIPELINE_* INDEX_INPUT RAG_QUERY BEIR_* COVERAGE_FAIL_UNDER VERSION WORKSPACE VERBOSE"
 	$(Q)printf '%s\n' "Image vars:  IMAGE_REGISTRY IMAGE_TAG PLATFORMS MODEL_MODE"
-	$(Q)printf '%s\n' "Compose:     PROFILES=$(PROFILES) (core,auth,ingest,audit,governor,observability,objectstore,mcp,agents)"
+	$(Q)printf '%s\n' "Compose:     PROFILES=$(PROFILES) (core,auth,ingest,audit,governor,observability,objectstore,mcp,agents,spire)"
 
 # ---------------------------------------------------------------------------
 # Environment guards
@@ -219,8 +225,8 @@ check-secrets-staged: ## Scan staged files only (fast pre-commit path)
 # Install / sync
 # ---------------------------------------------------------------------------
 
-install: check-uv check-python-version ## Sync Python env (dev group) in tkeir/
-	$(UV) sync --directory $(TKEIR_DIR) --group dev --python $(PYTHON)
+install: check-uv check-python-version ## Sync Python env (dev + models groups) in tkeir/
+	$(UV) sync --directory $(TKEIR_DIR) --group dev --group models --python $(PYTHON)
 
 sync: install ## Alias for install (legacy vespa workflow)
 
@@ -346,7 +352,7 @@ liccheck: ci-deps ## Verify dependency licenses (liccheck.ini)
 		-r .requirements-liccheck.txt
 	rm -f $(TKEIR_DIR)/.requirements-liccheck.txt
 
-complexity: ci-deps ## radon + xenon complexity gates
+complexity: ci-deps ## radon + xenon complexity gates (avg ≤ 7.0 on thot/, no grade D+)
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		radon cc $(PYTHON_SOURCES) -a -nb
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
@@ -354,6 +360,75 @@ complexity: ci-deps ## radon + xenon complexity gates
 			--max-modules $(XENON_MAX_MODULES) \
 			--max-average $(XENON_MAX_AVERAGE) \
 			$(PYTHON_SOURCES)
+	$(Q)mkdir -p "$(QUALITY_REPORT_DIR)"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+		radon cc $(COMPLEXITY_SOURCES) -a -s --total-average \
+		| tee "$(QUALITY_REPORT_DIR)/radon_cc_gate.txt"
+	@# Fail if average CC on thot/ exceeds CC_AVERAGE_MAX (default 7.0)
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+		radon cc $(COMPLEXITY_SOURCES) -a --total-average \
+		| awk -v lim="$(CC_AVERAGE_MAX)" ' \
+			/Average complexity:/ { \
+				gsub(/[()]/, "", $$NF); \
+				avg=$$NF+0; \
+				if (avg > lim+0) { \
+					printf "FAIL: CC average %.4f > %s\n", avg, lim; exit 1 \
+				} else { \
+					printf "OK: CC average %.4f ≤ %s\n", avg, lim \
+				} \
+			}'
+	@# Fail if any function in thot/ is grade D or worse (CC > 20)
+	$(Q)out=$$(cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+		radon cc $(COMPLEXITY_SOURCES) -n D -s); \
+	if [ -n "$$out" ]; then \
+		echo "$$out"; \
+		echo "FAIL: functions at grade D or worse exist (see above)"; \
+		exit 1; \
+	fi; \
+	echo "OK: no functions at grade D or worse in $(COMPLEXITY_SOURCES)/"
+
+complexity-report: ci-deps ## generate radon CC + MI reports to reports/quality/
+	$(Q)mkdir -p "$(QUALITY_REPORT_DIR)"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+		radon cc $(COMPLEXITY_SOURCES) -s -j \
+		> "$(QUALITY_REPORT_DIR)/radon_cc.json"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+		radon mi $(COMPLEXITY_SOURCES) -s -j \
+		> "$(QUALITY_REPORT_DIR)/radon_mi.json"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+		radon mi $(COMPLEXITY_SOURCES) -s \
+		> "$(QUALITY_REPORT_DIR)/radon_mi.txt"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+		radon cc $(COMPLEXITY_SOURCES) -a -s --total-average \
+		> "$(QUALITY_REPORT_DIR)/radon_cc_summary.txt"
+	$(Q)echo "Reports written to $(QUALITY_REPORT_DIR)/"
+
+pip-licenses: ci-deps ## generate dependency licence inventory → reports/quality/licenses.*
+	$(Q)mkdir -p "$(QUALITY_REPORT_DIR)"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) --with pip-licenses \
+		pip-licenses \
+		--format=json \
+		--with-urls \
+		--with-description \
+		--output-file="$(QUALITY_REPORT_DIR)/licenses.json"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) --with pip-licenses \
+		pip-licenses \
+		--format=markdown \
+		--with-urls \
+		--with-description \
+		--output-file="$(QUALITY_REPORT_DIR)/licenses.md"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) --with pip-licenses \
+		pip-licenses \
+		--format=csv \
+		--with-urls \
+		--output-file="$(QUALITY_REPORT_DIR)/licenses.csv"
+	$(Q)echo "Licence report written to $(QUALITY_REPORT_DIR)/licenses.*"
+
+license-report: pip-licenses ## alias for pip-licenses
+
+quality-docs: complexity-report pip-licenses ## regenerate tkeir/docs/quality/index.md
+	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
+		python "$(ROOT)/tools/quality/gen_quality_doc.py"
 
 # Documented pip-audit ignores (comments above each flag; += keeps Make syntax valid).
 # CVE-2026-49851 — transitive / advisory noise on locked stack; upgrade blocked pending dependency review | fix blocked by: TBD | target resolution: 2026-09-01 | ticket: N/A
@@ -501,7 +576,7 @@ docs: ci-deps ## MkDocs dev server (override DOCS_PORT; default 8000)
 		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger-plugin \
 		mkdocs serve -a 127.0.0.1:$(DOCS_PORT)
 
-docs-build: ci-deps ## Build static MkDocs site under tkeir/site/
+docs-build: ci-deps quality-docs ## Build static MkDocs site under tkeir/site/
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
 		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger-plugin \
 		mkdocs build
@@ -552,6 +627,8 @@ ci: ## Full quality gate (serialized; safe under make -j)
 	$(MAKE) coverage
 	$(MAKE) liccheck
 	$(MAKE) complexity
+	$(MAKE) complexity-report
+	$(MAKE) pip-licenses
 	$(MAKE) pip-audit
 	$(MAKE) bom
 	$(MAKE) trivy
@@ -850,8 +927,12 @@ index: install init ## Embed + index pipeline JSON into Vespa
 	$(Q)echo "Indexing from $(INDEX_INPUT)"
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.search.index_documents -i "$(INDEX_INPUT)"
 
+GOVERNOR_STATE_ROOT ?= $(WORKSPACE)/governor
+
 rag: install install-spacy-models ## Start FastAPI RAG API (:8090)
-	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.search.app
+	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)"
+	cd $(TKEIR_DIR) && GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		$(UV) run --python $(PYTHON) python -m thot.tools.search.app
 
 rag-query: check-curl check-jq ## Sample curl against RAG API (/rag/query)
 	curl -fsS "$(RAG_URL)/rag/query" \
@@ -929,16 +1010,103 @@ workflow-run: check-curl check-jq ## Create workflow run and poll (GOAL=… WORK
 TEMPLATE ?= synthesis_note
 TOPIC ?= Acme
 COMPOSE_OUT ?= $(CURDIR)/.tkeir-compose
+COMPOSE_TURTLE_DIR ?=
 
 compose: ## Ontology template compose (TEMPLATE=synthesis_note TOPIC=Acme)
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.compose \
 		--template "$(TEMPLATE)" \
 		--topic "$(TOPIC)" \
 		--out "$(COMPOSE_OUT)" \
-		--demo
+		$(if $(strip $(COMPOSE_TURTLE_DIR)),--turtle-dir "$(COMPOSE_TURTLE_DIR)" --no-demo,--demo)
 
 compose-list: ## List ontology-driven templates
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.compose --list
+
+# ---------------------------------------------------------------------------
+# Multi-thematic corpus: NATO OSINT + Enterprise (Zero-to-Hero §3.4 + §5.5)
+# ---------------------------------------------------------------------------
+CORPUS_OUT           ?= $(WORKSPACE)
+CORPUS_SEED          ?= 42
+CORPUS_COUNT_OSINT   ?= 1500
+CORPUS_COUNT_ENT     ?= 500
+CORPUS_FLAGS         ?=
+INGEST_API_URL       ?= http://localhost:8091
+INGEST_TOKEN_URL     ?= http://localhost:8082/realms/tkeir/protocol/openid-connect/token
+INGEST_WORKERS       ?= 4
+INGEST_FLAGS         ?=
+
+_CORPUS_PY  := $(ROOT)/tools/corpus/generate_tkeir_corpus.py
+_INGEST_PY  := $(ROOT)/tools/corpus/ingest_corpus.py
+_CORPUS_RUN := cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python
+
+corpus: ## [corpus] Generate OSINT (1 500 docs) + Enterprise (500 docs) corpora offline
+	$(_CORPUS_RUN) $(_CORPUS_PY) \
+	  --output $(CORPUS_OUT) \
+	  --count-osint $(CORPUS_COUNT_OSINT) \
+	  --count-enterprise $(CORPUS_COUNT_ENT) \
+	  --seed $(CORPUS_SEED) \
+	  $(CORPUS_FLAGS)
+	@echo "Next: make corpus-ingest (P0) | make corpus-ingest-user + corpus-ingest-admin (P1)"
+
+corpus-ontologies: ## [corpus] Generate C2SIM/C4ISR ontologies only
+	$(_CORPUS_RUN) $(_CORPUS_PY) \
+	  --output $(CORPUS_OUT) --only-ontologies $(CORPUS_FLAGS)
+
+corpus-download: ## [corpus] Best-effort: fetch official SISO C2SIM artifacts + EnterpriseRAG-Bench slice
+	$(_CORPUS_RUN) $(_CORPUS_PY) \
+	  --output $(CORPUS_OUT) --download $(CORPUS_FLAGS)
+
+corpus-ingest: ## [corpus] Ingest both corpora (CLI, P0-safe with --fallback-index)
+	$(_CORPUS_RUN) $(_INGEST_PY) \
+	  --corpus-dir $(CORPUS_OUT) \
+	  --api-url $(INGEST_API_URL) \
+	  --user-space dev@tkeir \
+	  --workers $(INGEST_WORKERS) \
+	  --fallback-index \
+	  --output-report $(CORPUS_OUT)/ingest_report.json \
+	  $(INGEST_FLAGS)
+
+corpus-ingest-user: ## [corpus] Ingest OSINT corpus as demo-user (P1, Keycloak required)
+	$(_CORPUS_RUN) $(_INGEST_PY) \
+	  --corpus-dir $(CORPUS_OUT) \
+	  --api-url $(INGEST_API_URL) \
+	  --corpus osint \
+	  --username demo-user --password demo-user \
+	  --token-url $(INGEST_TOKEN_URL) \
+	  --workers $(INGEST_WORKERS) \
+	  --status-poll \
+	  --output-report $(CORPUS_OUT)/ingest_user.json \
+	  $(INGEST_FLAGS)
+
+corpus-ingest-admin: ## [corpus] Ingest Enterprise corpus as demo-admin (P1, Keycloak required)
+	$(_CORPUS_RUN) $(_INGEST_PY) \
+	  --corpus-dir $(CORPUS_OUT) \
+	  --api-url $(INGEST_API_URL) \
+	  --corpus enterprise \
+	  --username demo-admin --password demo-admin \
+	  --token-url $(INGEST_TOKEN_URL) \
+	  --workers $(INGEST_WORKERS) \
+	  --status-poll \
+	  --output-report $(CORPUS_OUT)/ingest_admin.json \
+	  $(INGEST_FLAGS)
+
+corpus-ingest-web: ## [corpus] Print HMI drag-and-drop + curl guide for web ingestion
+	$(_CORPUS_RUN) $(_INGEST_PY) \
+	  --corpus-dir $(CORPUS_OUT) \
+	  --api-url $(INGEST_API_URL) \
+	  --token-url $(INGEST_TOKEN_URL) \
+	  --print-web-guide
+
+corpus-demo: corpus corpus-ingest ## [corpus] One-shot: generate → ingest (P0, dev@tkeir)
+	@echo "=== Corpus demo ready (P0 / dev@tkeir) ==="
+	@echo "  RAG: make rag-query RAG_QUERY=\"SITREP Objective ALPHA\""
+	@echo "  HMI: http://localhost:3000"
+	@echo "  For P1 isolation: make compose-up PROFILES=core,auth,ingest"
+	@echo "                    make corpus-ingest-user && make corpus-ingest-admin"
+
+corpus-clean: ## [corpus] Remove generated corpora under workspace/
+	rm -rf $(CORPUS_OUT)/corpus_nato $(CORPUS_OUT)/corpus_enterprise
+	@echo "Cleaned $(CORPUS_OUT)/corpus_nato and $(CORPUS_OUT)/corpus_enterprise"
 
 smoke-test: check-curl check-jq ## Post-deploy RAG /health check (SMOKE_TARGET_URL)
 	$(Q)echo "=== Smoke test [env=$(ENVIRONMENT)] -> $(SMOKE_TARGET_URL) ==="

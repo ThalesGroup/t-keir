@@ -55,6 +55,11 @@ dependencies = [
 mcp = [
     "mcp>=1.0.0",
 ]
+# Optional Workload API client (import guarded in thot.agent.spiffe).
+# PyPI package is currently 0.3.x; env/file SPIFFE_ID works without it.
+spiffe = [
+    "spiffe>=0.2.0,<0.4",
+]
 
 [project.urls]
 Homepage = "https://github.com/ThalesGroup/t-keir"
@@ -85,6 +90,7 @@ dev = [
     "setuptools<81",
     "radon>=6.0.1",
     "xenon>=0.9.1",
+    "pip-licenses>=4.0",
     "pip-audit>=2.7.0",
     "cyclonedx-bom>=7.3.0",
 ]

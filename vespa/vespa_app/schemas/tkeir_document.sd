@@ -7,11 +7,11 @@ schema tkeir_document {
             indexing: summary | attribute
         }
         field title type string {
-            indexing: summary | index | attribute
+            indexing: summary | index
             index: enable-bm25
         }
         field content type array<string> {
-            indexing: summary | index | attribute
+            indexing: summary | index
             index: enable-bm25
         }
         field json_ld type string {
@@ -20,5 +20,9 @@ schema tkeir_document {
         field shacl_status type string {
             indexing: summary | attribute
         }
+    }
+
+    fieldset default {
+        fields: title, content
     }
 }

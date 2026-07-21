@@ -152,8 +152,8 @@ def detect(kubeconfig: str | None) -> list[Capability]:
         Capability(
             name="SPIRE",
             present=spire,
-            detail="detected" if spire else "deferred (ADR-0004)",
-            action="reuse trust domain" if spire else "skip (deferred)",
+            detail="detected" if spire else "absent (install for agents — ADR-0008)",
+            action="reuse trust domain" if spire else "install SPIRE (agents profile)",
         )
     )
 
@@ -164,7 +164,9 @@ def maturity(caps: list[Capability]) -> str:
     """Rough M1–M3 maturity from detection results."""
     names = {c.name: c.present for c in caps}
     if names.get("Kyverno") and names.get("cert-manager") and names.get("IdP / OIDC issuer"):
-        return "M2 (secure controls present; SPIFFE optional)"
+        if names.get("SPIRE"):
+            return "M2 (secure controls + agent SPIFFE)"
+        return "M2 (secure controls present; install SPIRE for agents)"
     if names.get("Prometheus Operator") or names.get("IdP / OIDC issuer"):
         return "M1 (correlated records + optional platform reuse)"
     return "M0/M1 (bootstrap cluster — install umbrella defaults)"
@@ -176,11 +178,12 @@ def cmd_plan(args: argparse.Namespace) -> int:
         return 2
     caps = detect(args.kubeconfig)
     level = maturity(caps)
+    spire_present = any(c.name == "SPIRE" and c.present for c in caps)
     payload: dict[str, Any] = {
         "maturity": level,
         "capabilities": [asdict(c) for c in caps],
         "chart": str(CHART),
-        "spire": "deferred",
+        "spire": "present" if spire_present else "optional-for-agents",
     }
     if args.output == "json":
         print(json.dumps(payload, indent=2))
@@ -190,7 +193,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
         print("-" * 72)
         for c in caps:
             print(f"{c.name:<28} {str(c.present):<8} {c.action}")
-        print("\nSPIRE: deferred (ADR-0004)")
+        print("\nSPIRE: required for agents (ADR-0008); optional for RAG-only")
     return 0
 
 

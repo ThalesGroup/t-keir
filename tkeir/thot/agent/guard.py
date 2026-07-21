@@ -22,6 +22,11 @@ from thot.action.models import (
 )
 from thot.action.sink import default_action_sink
 from thot.agent.models import AgentSpec, RunState
+from thot.agent.spiffe import (
+    is_allowed_agent_spiffe_id,
+    resolve_agent_spiffe_id,
+    spiffe_enforce,
+)
 from thot.core.ThotMetrics import ThotMetrics
 from thot.governor.approvals import ApprovalQueue
 from thot.governor.flags import RuntimeFlagsStore
@@ -120,6 +125,18 @@ class AgentGuard:
                 result="deny",
                 message="kill switch scope=agents is active",
             )
+        if not state.spiffe_id:
+            state.spiffe_id = resolve_agent_spiffe_id(state.agent)
+        if spiffe_enforce() and not is_allowed_agent_spiffe_id(
+            state.spiffe_id
+        ):
+            return GuardDecision(
+                result="deny",
+                message=(
+                    "agent SPIFFE identity missing or not allowed "
+                    f"(spiffe_id={state.spiffe_id!r})"
+                ),
+            )
         elapsed = time.monotonic() - wall_started
         state.usage.wall_seconds = elapsed
         limits = spec.budgets
@@ -175,9 +192,15 @@ class AgentGuard:
         chunk_ids: list[str] | None = None,
     ) -> ActionRecord:
         """Append an ActionRecord for plan/step/tool/handoff."""
+        if not state.spiffe_id:
+            state.spiffe_id = resolve_agent_spiffe_id(state.agent)
         record = ActionRecord(
             correlation_id=state.correlation_id or ("0" * 32),
-            actor=ActorInfo(type="agent", id=state.user_space),
+            actor=ActorInfo(
+                type="agent",
+                id=state.user_space,
+                spiffe_id=state.spiffe_id,
+            ),
             intent=IntentInfo(declared=intent, scope_source="manual"),
             context=ActionContext(
                 env=os.getenv("TKEIR_ENV", "dev"),
@@ -203,6 +226,7 @@ class AgentGuard:
                 "run_id": state.run_id,
                 "user_space": state.user_space,
                 "agent": state.agent,
+                "spiffe_id": state.spiffe_id,
                 **(ext or {}),
             },
         )

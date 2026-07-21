@@ -19,7 +19,9 @@ STATUS=$(curl -fsS "${CONFIG_ENDPOINT}/application/v2/tenant/default/application
 echo "$STATUS" | jq .
 
 print_header "Checking document APIs"
-curl -fsS "${DOC_ENDPOINT}/document/v1/" | jq .
+# Root listing is not always enabled; probe a streaming group path instead.
+curl -fsS -o /dev/null -w "document_api_http=%{http_code}\n" \
+  "${DOC_ENDPOINT}/document/v1/default/chunk/group/${USER_SPACE}/" || true
 
 print_header "Inserting test parent document (streaming group=${USER_SPACE})"
 DOC_KEY="healthcheck-doc"
@@ -59,11 +61,13 @@ PY
   }" | jq .
 
 print_header "Streaming search smoke (group=${USER_SPACE})"
+# Use unranked — hybrid profiles expect query embedding tensors.
 curl -fsS -X POST "${DOC_ENDPOINT}/search/" \
   -H "Content-Type: application/json" \
   -d "{
-    \"yql\": \"select * from chunk where true\",
+    \"yql\": \"select chunk_id, text_raw from chunk where true\",
     \"hits\": 1,
+    \"ranking.profile\": \"unranked\",
     \"streaming.groupname\": \"${USER_SPACE}\"
   }" | jq .
 

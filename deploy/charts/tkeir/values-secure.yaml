@@ -1,4 +1,4 @@
-# Profile: k8s-secure (P3) — governor enforce + audit; SPIRE deferred (ADR-0004)
+# Profile: k8s-secure (P3) — governor enforce + audit; agent SPIFFE (ADR-0008)
 
 global:
   env: staging

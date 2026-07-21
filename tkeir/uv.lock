@@ -2697,11 +2697,14 @@ wheels = [
 
 [[package]]
 name = "pyjwt"
-version = "2.11.0"
+version = "2.13.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5c/5a/b46fa56bf322901eee5b0454a34343cdbdae202cd421775a8ee4e42fd519/pyjwt-2.11.0.tar.gz", hash = "sha256:35f95c1f0fbe5d5ba6e43f00271c275f7a1a4db1dab27bf708073b75318ea623", size = 98019, upload-time = "2026-01-30T19:59:55.694Z" }
+dependencies = [
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz", hash = "sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423", size = 107515, upload-time = "2026-05-21T19:54:36.618Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6f/01/c26ce75ba460d5cd503da9e13b21a33804d38c2165dec7b716d06b13010c/pyjwt-2.11.0-py3-none-any.whl", hash = "sha256:94a6bde30eb5c8e04fee991062b534071fd1439ef58d2adc9ccb823e7bcd0469", size = 28224, upload-time = "2026-01-30T19:59:54.539Z" },
+    { url = "https://files.pythonhosted.org/packages/a3/5e/ecf12fdb62546d64385c158514e9b2b671f7832108ef2ecd2020ce0af2d1/pyjwt-2.13.0-py3-none-any.whl", hash = "sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728", size = 31274, upload-time = "2026-05-21T19:54:35.362Z" },
 ]
 
 [package.optional-dependencies]
@@ -3577,7 +3580,7 @@ wheels = [
 
 [[package]]
 name = "spiffe"
-version = "0.2.4"
+version = "0.2.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -3588,9 +3591,9 @@ dependencies = [
     { name = "pyasn1-modules" },
     { name = "pyjwt", extra = ["crypto"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/c1/b29f0116943aa238e2e6f7024464ff49e586a1ea80c6b6c9be8d54570e48/spiffe-0.2.4.tar.gz", hash = "sha256:7a057e21dafcddaebc799a402ca93e33ddf6a9bcba04b731824c687f92c020b1", size = 38843, upload-time = "2026-02-24T17:17:02.081Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6a/73/97d5a9e5f79e2d61555066f4197e06279e2adfddd3ad67125b9f3776f772/spiffe-0.2.3.tar.gz", hash = "sha256:28f754eba056caa3a5c2b7bd816ac9bf24fad20333b2989ca6977dff51372c41", size = 34912, upload-time = "2026-01-17T19:06:57.048Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b3/0c/2392ce96a94d71e4f7d87644721f67e9bf552722bccc4d19881bf986c47e/spiffe-0.2.4-py3-none-any.whl", hash = "sha256:a385ac924d8c74b819625a4c8e205efb4cd1eca0d22cf0c5ba7bb5ed603bff51", size = 58265, upload-time = "2026-02-24T17:17:03.219Z" },
+    { url = "https://files.pythonhosted.org/packages/15/4d/f867f134a350e8dc9eb83b4f92cb68fdeaed0437450aaffbd1e73fa09658/spiffe-0.2.3-py3-none-any.whl", hash = "sha256:562fcee9e611953fc7622b3d5638e9ce1652015d29216fd6d4a82dac309673d9", size = 56061, upload-time = "2026-01-17T19:06:55.528Z" },
 ]
 
 [[package]]

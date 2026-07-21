@@ -1,4 +1,4 @@
-"""Unit tests for tkeir-installer plan JSON shape (SPIRE deferred)."""
+"""Unit tests for tkeir-installer plan JSON shape (SPIRE for agents)."""
 
 from __future__ import annotations
 
@@ -56,8 +56,8 @@ def test_maturity_and_plan_json(monkeypatch, capsys):
         installer.Capability(
             name="SPIRE",
             present=False,
-            detail="deferred (ADR-0004)",
-            action="skip (deferred)",
+            detail="absent (install for agents — ADR-0008)",
+            action="install SPIRE (agents profile)",
         ),
     ]
     monkeypatch.setattr(installer, "detect", lambda _kc: caps)
@@ -67,7 +67,7 @@ def test_maturity_and_plan_json(monkeypatch, capsys):
     rc = installer.cmd_plan(SimpleNamespace(kubeconfig=None, output="json"))
     assert rc == 0
     payload = json.loads(capsys.readouterr().out)
-    assert payload["spire"] == "deferred"
+    assert payload["spire"] == "optional-for-agents"
     assert "maturity" in payload
     assert any(c["name"] == "SPIRE" for c in payload["capabilities"])
 
@@ -87,7 +87,7 @@ def test_apply_dry_run_prints_helm(capsys):
     assert "values-dev.yaml" in out
 
 
-def test_detect_marks_spire_deferred():
+def test_detect_marks_spire_for_agents():
     with patch.object(installer, "_kubectl") as kubectl:
         kubectl.return_value = SimpleNamespace(
             returncode=1, stdout="", stderr="not found"
@@ -95,7 +95,4 @@ def test_detect_marks_spire_deferred():
         caps = installer.detect(None)
     spire = next(c for c in caps if c.name == "SPIRE")
     assert spire.present is False
-    assert (
-        "deferred" in spire.detail.lower()
-        or "deferred" in spire.action.lower()
-    )
+    assert "ADR-0008" in spire.detail or "agents" in spire.action.lower()

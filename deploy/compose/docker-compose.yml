@@ -1,7 +1,7 @@
-# T-KEIR Compose stack (P1). Profiles: core, auth, ingest, audit, governor,
-# observability, objectstore, mcp.
+# T-KEIR Compose stack (P1+). Profiles: core, auth, ingest, audit, governor,
+# observability, objectstore, mcp, agents, spire.
 #
-#   make compose-up PROFILES=core,auth,ingest,observability,objectstore,audit,governor,mcp
+#   make compose-up PROFILES=core,auth,ingest,observability,objectstore,audit,governor,mcp,agents,spire
 #   make compose-down
 #
 # macOS: run Ollama on the host (Metal):
@@ -518,13 +518,62 @@ services:
       GOVERNOR_MODE: ${GOVERNOR_MODE:-observe}
       GOVERNOR_STATE_ROOT: /var/tkeir/governor
       MCP_RAG_URL: ${MCP_RAG_URL:-http://tkeir-api:8090}
+      # Agent SPIFFE identity (ADR-0008). Default synthesize; set workload when SPIRE joined.
+      SPIFFE_MODE: ${SPIFFE_MODE:-dev}
+      SPIFFE_TRUST_DOMAIN: ${SPIFFE_TRUST_DOMAIN:-tkeir.local}
+      SPIFFE_ID: ${SPIFFE_ID:-spiffe://tkeir.local/agent/tkeir-agent}
+      SPIFFE_ENFORCE: ${SPIFFE_ENFORCE:-false}
+      SPIFFE_AGENT_ID_PREFIX: ${SPIFFE_AGENT_ID_PREFIX:-spiffe://tkeir.local/agent/}
+      SPIFFE_ENDPOINT_SOCKET: ${SPIFFE_ENDPOINT_SOCKET:-unix:///run/spire/sockets/agent.sock}
     ports:
       - "8092:8092"
     volumes:
       - agent_data:/var/tkeir/agent
       - governor_state:/var/tkeir/governor
+      - spire_agent_sockets:/run/spire/sockets:ro
+    # required: false so `PROFILES=spire,agents` validates without core;
+    # production demos still use PROFILES=core,agents (or full stack).
     depends_on:
       vespa:
+        condition: service_healthy
+        required: false
+    networks: [tkeir]
+
+  spire-server:
+    profiles: ["spire"]
+    image: ghcr.io/spiffe/spire-server:${SPIRE_TAG:-1.15.2}
+    container_name: tkeir-spire-server
+    hostname: spire-server
+    user: "0:0"
+    command: ["-config", "/opt/spire/conf/server/server.conf"]
+    volumes:
+      - ../spire/server.conf:/opt/spire/conf/server/server.conf:ro
+      - spire_server_data:/run/spire/data/server
+      - spire_server_sockets:/run/spire/sockets
+    networks: [tkeir]
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8081'"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  spire-agent:
+    profiles: ["spire"]
+    image: ghcr.io/spiffe/spire-agent:${SPIRE_TAG:-1.15.2}
+    container_name: tkeir-spire-agent
+    hostname: spire-agent
+    user: "0:0"
+    command: ["-config", "/opt/spire/conf/agent/agent.conf"]
+    environment:
+      # Operator must create a join token and set SPIRE_JOIN_TOKEN before first start.
+      SPIRE_JOIN_TOKEN: ${SPIRE_JOIN_TOKEN:-}
+    volumes:
+      - ../spire/agent.conf:/opt/spire/conf/agent/agent.conf:ro
+      - spire_agent_data:/run/spire/data/agent
+      - spire_agent_sockets:/run/spire/sockets
+    depends_on:
+      spire-server:
         condition: service_healthy
     networks: [tkeir]
 
@@ -546,3 +595,7 @@ volumes:
   loki_data:
   tempo_data:
   grafana_data:
+  spire_server_data:
+  spire_server_sockets:
+  spire_agent_data:
+  spire_agent_sockets:

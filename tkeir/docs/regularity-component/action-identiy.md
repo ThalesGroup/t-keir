@@ -5,11 +5,14 @@ This is an engineering design document, **not legal advice**.
 
 ## Goal
 
-Every query, ingest, index, delete, admin override, and auth lifecycle event is
-attributable to a managed identity (human Keycloak `sub`, machine client, or
-optional `spiffe_id` when an integrator provides it) and joinable through a
-**Correlation ID** (W3C trace-id). SPIRE/SPIFFE is **not** deployed by default
-(see [ADR-0004](../adr/0004-defer-spire.md)).
+Every query, ingest, index, delete, admin override, auth lifecycle event, and
+**agent** plan/step/tool invoke is attributable to a managed identity (human
+Keycloak `sub`, service client, or **agent SPIFFE ID**) and joinable through a
+**Correlation ID** (W3C trace-id).
+
+Agent workloads obtain SPIFFE IDs via SPIRE ([ADR-0008](../adr/0008-spire-agent-identity.md);
+Compose profile `spire`). Non-agent services may still omit `spiffe_id` until
+mesh expansion.
 
 ## ActionRecord v1 (summary)
 
@@ -19,7 +22,7 @@ One JSON-Schema-validated record per action. Core fields:
 |-------|------|
 | `action_id` | ULID |
 | `correlation_id` | 32-hex W3C trace-id |
-| `actor` | `human` \| `service` \| `agent` + id (+ optional `spiffe_id`) |
+| `actor` | `human` \| `service` \| `agent` + id (+ **`spiffe_id` required for agents**) |
 | `delegation_chain` | Token-exchange hops (`jti`, clients, expiry) |
 | `intent` | Declared from OAuth scope (`intent:search`, …) |
 | `decision` | allow \| deny \| escalate + policy rules + model SHAs |
@@ -53,7 +56,7 @@ Detailed choice: [ADR-0003](../adr/0003-audit-store-worm.md) (Phase 4).
 | Level | Profile | Guarantees |
 |-------|---------|------------|
 | **M1** | P2+ | Correlated records, signed images, audit reports |
-| **M2** | P3 | Keycloak actors, token-exchange delegation, OPA SHA, hash chain + WORM + anchors (SPIFFE optional — ADR-0004) |
+| **M2** | P3 | Keycloak actors, token-exchange delegation, OPA SHA, hash chain + WORM + anchors; **agent SPIFFE** (ADR-0008) |
 | **M3** | P4 (partial) | Instant revocation, proof-cost telemetry; adaptive policies = future |
 
 ## Emission points (target)

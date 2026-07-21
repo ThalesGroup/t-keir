@@ -21,8 +21,19 @@ ontologies with `COMPOSE_TURTLE_DIR=/path/to/ttl`.
 |------|------|
 | `synthesis_note` | `tkeir/configs/templates/synthesis_note.yaml` |
 | `entity_profile` | `tkeir/configs/templates/entity_profile.yaml` |
+| `nato_synthesis_note` | `tkeir/configs/templates/nato_synthesis_note.yaml` |
 
 Slot types: `entity`, `svo_pattern`, `keyword`, `sparql`, `freeform_grounded`.
+
+Seed the fused knowledge graph with the NATO C2SIM ontologies from Zero-to-Hero §3.4:
+
+```bash
+COMPOSE_TURTLE_DIR=workspace/corpus_nato/ontologies \
+make compose TEMPLATE=nato_synthesis_note TOPIC="CWIX 2023"
+```
+
+**Checkpoint:** `.tkeir-compose/nato_synthesis_note.json` has non-empty
+`citations_map`; ungrounded slots appear in `unfilled` (never hallucinated).
 
 ## Agents (YAML)
 

@@ -12,3 +12,22 @@ document-ontology:
       similarity-threshold: 0.85
       min-cluster-size: 2
     save-alignment: false
+    # Enrich document graphs from existing ontologies (e.g. C2SIM) before Vespa.
+    # Paths may be absolute, relative to cwd/workspace, or use ${ENV} expansion.
+    # Per-document override: derive_from_ontologies: [path, ...]
+    derive-from:
+      enabled: false
+      paths: []
+      # Example (after `make corpus`):
+      # paths:
+      #   - workspace/corpus_nato/ontologies/c2sim_combined.ttl
+      #   - workspace/corpus_nato/ontologies/c2sim_c4isr.ttl
+      similarity-threshold: 0.8
+      match-classes: true
+      match-individuals: true
+      add-subclass-links: true
+      add-type-links: true
+      add-same-as-links: true
+      include-matched-axioms: false
+      save-report: false
+    save-derivation: false

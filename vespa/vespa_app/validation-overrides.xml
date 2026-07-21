@@ -1,0 +1,6 @@
+<validation-overrides>
+  <!-- Allow local wipe/redeploy when switching indexed ↔ streaming (max 30 days). -->
+  <allow until="2026-08-19">indexing-mode-change</allow>
+  <allow until="2026-08-19">global-document-change</allow>
+  <allow until="2026-08-19">field-type-change</allow>
+</validation-overrides>

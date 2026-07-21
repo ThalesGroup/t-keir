@@ -525,22 +525,26 @@ source during the same CI run that checks docstring examples:
 make docs-build
 ```
 
-### Complexity and licence gates
+### Complexity, coverage, and licence gates
 
-`make ci` enforces two additional quality gates:
+`make ci` publishes the following on the
+[Code quality dashboard](quality/index.md):
 
-- **Cyclomatic complexity** — `make complexity` / `make complexity-report` runs
-  Radon on `thot/` and fails if the average CC exceeds 7.0 (grade B) or any
-  function reaches grade D (CC > 20). Results are published to the
-  [Code quality dashboard](quality/index.md).
+- **Test coverage** — `make coverage` runs the scoped suite
+  (`CoverageFast.sh`) and fails below `COVERAGE_FAIL_UNDER` (default 90%).
+  Totals land in `reports/quality/coverage_*.*`.
+- **Cyclomatic complexity** — `make complexity` / `make complexity-report`
+  runs Radon on `thot/` and fails if the average CC exceeds 7.0 (grade B) or
+  any function reaches grade D (CC > 20).
 - **Dependency licences** — `make pip-licenses` inventories locked
-  dependencies. Results appear in the same dashboard. Copyleft strings
-  require a review entry in `compliance/licenses-allowlist.txt` before merge
-  (runtime policy remains `make liccheck`).
+  dependencies. Copyleft strings require a review entry in
+  `compliance/licenses-allowlist.txt` before merge (runtime policy remains
+  `make liccheck`).
 
-Regenerate the dashboard after any refactoring pass:
+Regenerate the dashboard after any refactoring or coverage pass:
 
 ```bash
+make coverage       # refreshes reports/quality/coverage_*.*
 make quality-docs   # writes tkeir/docs/quality/index.md from latest reports
 make docs-build     # rebuilds the full MkDocs site
 ```
@@ -552,7 +556,7 @@ make docs-build     # rebuilds the full MkDocs site
 | If you want… | Open |
 |--------------|------|
 | Architecture diagrams & data model | [Architecture](architecture/index.md) |
-| Code quality (CC + licences) | [Quality dashboard](quality/index.md) |
+| Code quality (coverage + CC + licences) | [Quality dashboard](quality/index.md) |
 | Pipeline stages | [Tools overview](tools/tools_overview.md) |
 | Vespa schema / RAG | [Vespa RAG](tools/vespa_rag.md) |
 | MCP / agents / templates | [MCP](tools/mcp.md), [Agents](tools/agents.md), [Templates](tools/templates.md) |

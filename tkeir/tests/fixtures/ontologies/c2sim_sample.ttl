@@ -1,0 +1,21 @@
+@prefix c2sim: <http://www.sisostds.org/ontologies/C2SIM#> .
+@prefix lox: <http://www.sisostds.org/ontologies/lox#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+c2sim:OperationalEntity a owl:Class ;
+  rdfs:label "OperationalEntity"@en .
+
+lox:GroundUnit a owl:Class ;
+  rdfs:label "GroundUnit"@en ;
+  rdfs:subClassOf c2sim:OperationalEntity .
+
+c2sim:Unit_ALPHA a lox:GroundUnit , owl:NamedIndividual ;
+  rdfs:label "Task Group ALPHA"@en .
+
+c2sim:Unit_BRAVO a lox:GroundUnit , owl:NamedIndividual ;
+  rdfs:label "CWIX 2023 Force BRAVO"@en .
+
+c2sim:Obj_ALPHA a owl:Class ;
+  rdfs:label "Objective ALPHA"@en .

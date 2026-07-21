@@ -72,9 +72,9 @@ For stronger security posture outside P0 local development:
 ## Known gaps and future work
 
 The current repository does **not** claim full compliance or full production
-hardening by default. Notable deferred items include:
+hardening by default. Notable remaining gaps include:
 
-- SPIRE / SPIFFE workload identity is intentionally deferred
+- Full-mesh SPIFFE for non-agent services (agents use SPIRE — ADR-0008)
 - full NetworkPolicy allow-listing for every service path
 - deeper rollback automation for index mutations
 - regulation-specific compliance evidence packs under `tkeir/docs/compliance/`

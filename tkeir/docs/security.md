@@ -57,7 +57,7 @@ object lock) are described in [Identity of Action](regularity-component/action-i
 
 ## Supply chain and containers (progressive)
 
-- Third-party pins: [`deploy/versions.lock.yaml`](../../deploy/versions.lock.yaml).
+- Third-party pins: `deploy/versions.lock.yaml`.
 - Images published as `ghcr.io/thalesgroup/t-keir/*`, multi-arch, non-root,
   digest-pinned bases; Cosign signing in CI (Workstream I).
 - P3 adds image verification (Kyverno), sealed-secrets, NetworkPolicies /
@@ -81,4 +81,4 @@ evidence.
 
 - [Deployment profiles](deployment/index.md)
 - [ADR-0001](adr/0001-platform-architecture.md)
-- Root [SECURITY.md](../../SECURITY.md) (vulnerability disclosure)
+- Root `SECURITY.md` (vulnerability disclosure)

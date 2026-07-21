@@ -30,12 +30,17 @@ make compose-down
 | `governor` | tkeir-governor | 8094 |
 | `observability` | otel-collector, prometheus, loki, tempo, grafana | **3001**, 9090, 3100, 3200, 4317/4318 |
 | `objectstore` | minio (+ bucket init) | **9000**, 9001 |
+| `mcp` | tkeir-mcp | 8093 (when not conflicting) |
+| `agents` | tkeir-agent | **8092** |
+| `spire` | spire-server, spire-agent | Workload API socket (internal) |
 
 Example full demo stack:
 
 ```bash
-make compose-up PROFILES=core,auth,ingest,audit,governor,observability,objectstore
+make compose-up PROFILES=core,auth,ingest,audit,governor,observability,objectstore,agents,spire
 ```
+
+Agent SPIFFE: [SPIRE / SPIFFE](spire.md) · ADR-0008.
 
 After `make compose-up`, run `make compose-smoke` to verify health endpoints
 (including Grafana/MinIO when those profiles are up).
@@ -89,5 +94,5 @@ answer with copy + “Audit this answer” (opens `/admin?correlation_id=…`).
 
 ## Images
 
-See [deploy/images/README.md](../../../deploy/images/README.md) and
-[`versions.lock.yaml`](../../../deploy/versions.lock.yaml).
+See `deploy/images/README.md` and
+`deploy/versions.lock.yaml`.

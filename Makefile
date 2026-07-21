@@ -297,9 +297,10 @@ test-coverage: coverage ## Alias for coverage
 
 coverage: ci-deps ## Coverage suite (fail-under COVERAGE_FAIL_UNDER, default 90%)
 	$(Q)echo "Coverage threshold: $(COVERAGE_FAIL_UNDER)%"
-	$(Q)mkdir -p "$(COVERAGE_REPORT_DIR)"
+	$(Q)mkdir -p "$(COVERAGE_REPORT_DIR)" "$(QUALITY_REPORT_DIR)"
 	cd $(TESTS_DIR) && COVERAGE_FAIL_UNDER=$(COVERAGE_FAIL_UNDER) \
 		COVERAGE_REPORT_DIR="$(COVERAGE_REPORT_DIR)" \
+		QUALITY_REPORT_DIR="$(QUALITY_REPORT_DIR)" \
 		bash CoverageFast.sh
 
 lint: ci-deps ## ruff + black + isort checks on thot/ and tests/
@@ -427,6 +428,11 @@ pip-licenses: ci-deps ## generate dependency licence inventory → reports/quali
 license-report: pip-licenses ## alias for pip-licenses
 
 quality-docs: complexity-report pip-licenses ## regenerate tkeir/docs/quality/index.md
+	$(Q)mkdir -p "$(QUALITY_REPORT_DIR)"
+	$(Q)if [ ! -f "$(QUALITY_REPORT_DIR)/coverage_summary.txt" ] \
+		&& [ -f "$(COVERAGE_REPORT_DIR)/coverage.xml" ]; then \
+		cp "$(COVERAGE_REPORT_DIR)/coverage.xml" "$(QUALITY_REPORT_DIR)/coverage.xml"; \
+	fi
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		python "$(ROOT)/tools/quality/gen_quality_doc.py"
 
@@ -451,6 +457,8 @@ PIP_AUDIT_IGNORE += --ignore-vuln PYSEC-2026-1994
 PIP_AUDIT_IGNORE += --ignore-vuln PYSEC-2026-1996
 # PYSEC-2026-3447 — advisory retained pending package upgrade path | fix blocked by: TBD | target resolution: 2026-09-01 | ticket: N/A
 PIP_AUDIT_IGNORE += --ignore-vuln PYSEC-2026-3447
+# GHSA-537c-gmf6-5ccf — cryptography>=48 blocked by optional spiffe extra (cryptography<47) | fix blocked by: spiffe upstream | target resolution: 2026-09-01 | ticket: N/A
+PIP_AUDIT_IGNORE += --ignore-vuln GHSA-537c-gmf6-5ccf
 
 pip-audit: ci-deps ## Scan Python dependencies for known CVEs
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \

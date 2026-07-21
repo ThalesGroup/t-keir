@@ -12,6 +12,7 @@ Platform packaging for T-KEIR installation profiles P1–P4.
 | `k3s/` | Hardened K3s + Lima macOS path (Workstream F) |
 | `kubeflow/` | Pipelines standalone + Model Registry (Workstream G) |
 | `policies/` | Network / app authz / image verify bundles |
+| `spire/` | SPIRE server/agent configs for agent SPIFFE (ADR-0008) |
 
 Canonical docs: [tkeir/docs/deployment/](../tkeir/docs/deployment/index.md).
 Image registry: `ghcr.io/thalesgroup/t-keir`.

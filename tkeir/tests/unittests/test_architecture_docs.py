@@ -97,18 +97,18 @@ def test_index_has_enough_diagrams() -> None:
     keyword = _diagram_keyword()
     text = (ARCH_DIR / "index.md").read_text(encoding="utf-8")
     count = _count_diagram_blocks(text, keyword)
-    assert count >= 3, (
-        f"architecture/index.md should have ≥3 diagrams ({keyword}), found {count}"
-    )
+    assert (
+        count >= 3
+    ), f"architecture/index.md should have ≥3 diagrams ({keyword}), found {count}"
 
 
 def test_sequences_has_enough_diagrams() -> None:
     keyword = _diagram_keyword()
     text = (ARCH_DIR / "sequences.md").read_text(encoding="utf-8")
     count = _count_diagram_blocks(text, keyword)
-    assert count >= 2, (
-        f"architecture/sequences.md should have ≥2 sequence diagrams, found {count}"
-    )
+    assert (
+        count >= 2
+    ), f"architecture/sequences.md should have ≥2 sequence diagrams, found {count}"
 
 
 def test_data_model_has_class_and_erd() -> None:
@@ -116,10 +116,12 @@ def test_data_model_has_class_and_erd() -> None:
     text = (ARCH_DIR / "data-model.md").read_text(encoding="utf-8")
     total = _count_diagram_blocks(text, keyword)
     has_erd = "erDiagram" in text
-    assert total >= 2, (
-        f"architecture/data-model.md should have ≥2 diagrams, found {total}"
-    )
-    assert has_erd, "architecture/data-model.md should include at least one ERD"
+    assert (
+        total >= 2
+    ), f"architecture/data-model.md should have ≥2 diagrams, found {total}"
+    assert (
+        has_erd
+    ), "architecture/data-model.md should include at least one ERD"
 
 
 def test_decisions_covers_all_adrs() -> None:
@@ -180,6 +182,6 @@ def test_docs_build() -> None:
         for line in (result.stderr or "").splitlines()
         if "ERROR" in line.upper()
     ]
-    assert result.returncode == 0, (
-        "Docs build failed:\n" + "\n".join(errors[:20] or [result.stderr[-2000:]])
+    assert result.returncode == 0, "Docs build failed:\n" + "\n".join(
+        errors[:20] or [result.stderr[-2000:]]
     )

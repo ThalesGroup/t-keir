@@ -692,7 +692,7 @@ class SyntacticTagger:
         deps_key,
         field_type,
     ):
-        if not len(doc):
+        if doc is None or not len(doc):
             return
 
         self._apply_morphosyntax(doc, tkeir_doc[morph_key])
@@ -724,8 +724,8 @@ class SyntacticTagger:
         """
         self._cache_svos = set()
         self._validate_tag_input(tkeir_doc)
-        doc_title = self._nlp.make_doc("")
-        doc_content = self._nlp.make_doc("")
+        doc_title = None
+        doc_content = None
         if "title_tokens" in tkeir_doc:
             doc_title = self._prepare_spacy_doc(tkeir_doc["title_tokens"])
         if "content_tokens" in tkeir_doc:

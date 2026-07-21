@@ -38,8 +38,11 @@ Workflow: `tkeir/configs/workflows/content_brief.yaml`.
 - Kill-switch scope **`agents`**: `make governor-kill SCOPE=agents ACTIVE=true`
 - Budgets per run: `llm_tokens`, `tool_calls`, `wall_seconds` (80% throttle /
   100% block + ApprovalQueue in `enforce`)
-- Every plan / step / tool / handoff → `ActionRecord` (`actor.type=agent`)
+- Every plan / step / tool / handoff → `ActionRecord` (`actor.type=agent`,
+  **`actor.spiffe_id`** set — [ADR-0008](../adr/0008-spire-agent-identity.md))
 - Tenant: `user_space` from Bearer / `VESPA_USER_SPACE`; tool args cannot override
+- SPIFFE: `SPIFFE_MODE=dev|workload`, `SPIFFE_ENFORCE` with governor enforce;
+  Compose `PROFILES=…,spire,agents` — see [SPIRE / SPIFFE](../deployment/spire.md)
 
 ## Outbound MCP (Phase D)
 

@@ -1,11 +1,11 @@
 # Secure Kubernetes (P3)
 
-> **Status:** Progressive hardening — **no SPIRE** during software development
-> (see [ADR-0004](../adr/0004-defer-spire.md)).
+> **Status:** Progressive hardening — SPIRE for **agents**
+> ([ADR-0008](../adr/0008-spire-agent-identity.md)); JWT + correlation for
+> RAG/ingest until mesh expansion.
 
-P3 adds stricter **values presets** and optional cluster controls. Identity and
-traceability rely on Keycloak JWTs, W3C correlation IDs, and the audit hot store —
-not SPIFFE agents.
+P3 adds stricter **values presets** and optional cluster controls. Human
+identity uses Keycloak JWTs; agent workloads carry SPIFFE IDs for mastering.
 
 ## What P3 includes (now)
 
@@ -15,13 +15,14 @@ not SPIFFE agents.
 | Audit + WORM | `audit.enabled: true` |
 | HMI auth | `hmi.env.AUTH_ENABLED: "true"` |
 | Staging env | `global.env: staging` |
-| Policy bundle | `deploy/policies/app/tkeir-intents.rego` (stub; governor evaluates in-process) |
+| Policy bundle | `deploy/policies/app/tkeir-intents.rego` (agent SPIFFE when enforce) |
+| Agent SPIFFE | Compose `spire` / cluster SPIRE Agent socket → `SPIFFE_MODE=workload` |
 
 ## What P3 explicitly excludes (this stage)
 
 | Item | Reason |
 |------|--------|
-| **SPIRE / SPIFFE** | No agents; JWT + correlation + ActionRecord suffice for dev/pre-prod |
+| Full-mesh SPIFFE for every service | Agent path first (ADR-0008); RAG/ingest later |
 | Full default-deny NetworkPolicy mesh | Needs per-service allow rules; tracked separately |
 | cert-manager / sealed-secrets | Installer detection (Phase 7) |
 
@@ -46,5 +47,6 @@ See [macOS notes](macos.md) for Cilium / Lima and flannel fallback.
 ## Related
 
 - [Deployment profiles](index.md)
-- [ADR-0004 — Defer SPIRE](../adr/0004-defer-spire.md)
+- [SPIRE / SPIFFE](spire.md)
+- [ADR-0008 — SPIRE agent identity](../adr/0008-spire-agent-identity.md)
 - [Governor](governor.md)

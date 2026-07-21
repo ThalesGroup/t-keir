@@ -33,6 +33,11 @@ P0 without login uses `dev@tkeir` for a single local corpus. Multi-tenant /
 personal indexes come from Keycloak at request time.
 
 **Migration:** switching from indexed → streaming requires a clean Vespa volume
+(`make clean-db` then `make bootstrap`). Text fields used with `bm25()` must be
+declared as `indexing: summary | index` with `index: enable-bm25` — do **not**
+mix `attribute` on those fields or deploy fails with “Expected field to be an
+index field”. Streaming has no corpus term stats; rank profiles set
+`bm25(...).averageFieldLength` explicitly.
 (`vespa/clean_db.sh`) then `make bootstrap` and re-index.
 
 ## Quick start

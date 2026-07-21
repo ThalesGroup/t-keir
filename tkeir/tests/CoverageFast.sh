@@ -62,10 +62,38 @@ uv run --python 3.11 python -m coverage run \
 
 COVERAGE_FAIL_UNDER="${COVERAGE_FAIL_UNDER:-90}"
 COVERAGE_REPORT_DIR="${COVERAGE_REPORT_DIR:-../../coverage-reports}"
+QUALITY_REPORT_DIR="${QUALITY_REPORT_DIR:-../../reports/quality}"
+export COVERAGE_FAIL_UNDER COVERAGE_REPORT_DIR QUALITY_REPORT_DIR
+
+mkdir -p "${COVERAGE_REPORT_DIR}" "${QUALITY_REPORT_DIR}"
 
 uv run --python 3.11 python -m coverage report \
     --rcfile=../pyproject.toml \
-    --fail-under="${COVERAGE_FAIL_UNDER}"
-uv run --python 3.11 python -m coverage xml
-mkdir -p "${COVERAGE_REPORT_DIR}"
-mv coverage.xml "${COVERAGE_REPORT_DIR}/"
+    --fail-under="${COVERAGE_FAIL_UNDER}" \
+    | tee "${QUALITY_REPORT_DIR}/coverage_report.txt"
+
+uv run --python 3.11 python -m coverage xml -o "${COVERAGE_REPORT_DIR}/coverage.xml"
+cp "${COVERAGE_REPORT_DIR}/coverage.xml" "${QUALITY_REPORT_DIR}/coverage.xml"
+
+uv run --python 3.11 python -m coverage json \
+    --rcfile=../pyproject.toml \
+    -o "${QUALITY_REPORT_DIR}/coverage.json"
+
+# Compact summary for the quality dashboard (TOTAL line from the scoped report).
+{
+  echo "threshold_percent=${COVERAGE_FAIL_UNDER}"
+  grep -E '^TOTAL' "${QUALITY_REPORT_DIR}/coverage_report.txt" || true
+  python3 - <<'PY'
+import json
+import os
+from pathlib import Path
+
+path = Path(os.environ["QUALITY_REPORT_DIR"]) / "coverage.json"
+data = json.loads(path.read_text(encoding="utf-8"))
+totals = data.get("totals", {})
+print(f"percent_covered={totals.get('percent_covered')}")
+print(f"num_statements={totals.get('num_statements')}")
+print(f"covered_lines={totals.get('covered_lines')}")
+print(f"missing_lines={totals.get('missing_lines')}")
+PY
+} > "${QUALITY_REPORT_DIR}/coverage_summary.txt"

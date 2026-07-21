@@ -1,10 +1,36 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-07-21 18:59 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-07-21 19:30 UTC**.
 
 Baseline before the B-grade refactoring pass (``thot/`` only): average was
 already within band after hotspots were reduced; gate target remains
 **average ≤ 7.0 (grade B)** with **zero functions at grade D or worse**.
+
+---
+
+## Test coverage
+
+Scoped line coverage from `make coverage` / `CoverageFast.sh` (same
+`[tool.coverage.report]` include list and `COVERAGE_FAIL_UNDER` gate used in CI).
+
+| Metric | Value | Target | Status |
+|--------|-------|--------|--------|
+| Scoped line coverage | 91.52% | ≥ 90% | PASS |
+| Full ``thot/`` XML line-rate | 72.33% | informational | — |
+| Statements (scoped) | 5144 | — | — |
+| Covered lines | 4708 | — | — |
+| Missing lines | 436 | — | — |
+
+### Coverage report (TOTAL)
+
+```
+Name                                                                                                  Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                  5144    436    92%
+```
+
+Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
+`coverage_report.txt`, and `coverage-reports/coverage.xml`.
 
 ---
 
@@ -33,10 +59,8 @@ already within band after hotspots were reduced; gate target remains
 ### Full report (summary)
 
 ```
-    F 204:0 _merge_layout_blocks - B (10)
-    F 111:0 _split_layout_blocks - A (3)
 1470 blocks (classes, functions, methods) analyzed.
-Average complexity: A (3.86734693877551)
+Average complexity: A (3.868707482993197)
 
 Full per-function JSON: reports/quality/radon_cc.json
 ```
@@ -160,7 +184,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | pydantic_core | 2.46.4 | MIT | https://github.com/pydantic |
 | pydub | 0.25.1 | MIT License | http://pydub.com |
 | Pygments | 2.20.0 | BSD-2-Clause | https://pygments.org |
-| PyJWT | 2.11.0 | MIT | https://github.com/jpadilla/pyjwt |
+| PyJWT | 2.13.0 | MIT | https://github.com/jpadilla/pyjwt |
 | pymupdf | 1.28.0 | Dual Licensed - GNU AFFERO GPL 3.0 or Artifex Commercial License | https://github.com/pymupdf/pymupdf |
 | pyparsing | 3.3.2 | MIT | https://github.com/pyparsing/pyparsing/ |
 | pysbd | 0.3.4 | MIT License | http://nipunsadvilkar.github.io/ |
@@ -233,6 +257,10 @@ All runtime and optional Python dependencies from the locked dependency set
 
 ## Acting on this page
 
+**Coverage < 90%:** run `make coverage`; open
+`reports/quality/coverage_report.txt` / `coverage.json`; add tests for
+modules listed under the scoped include set in `tkeir/pyproject.toml`.
+
 **CC average > 7.0:** run `make complexity-report`; open
 `reports/quality/radon_cc.json`; refactor functions at grade C or worse.
 
@@ -242,12 +270,14 @@ copyleft licences (GPL, AGPL, EUPL) require legal review before merge.
 Runtime licence policy remains enforced by `make liccheck`
 ([`tkeir/liccheck.ini`](../../liccheck.ini)).
 
-**CI gate:** `make ci` runs `make complexity` (average ≤ 7.0 on `thot/`, no
-grade-D functions) plus `make complexity-report` and `make pip-licenses`.
+**CI gate:** `make ci` runs `make coverage` (fail-under 90%),
+`make complexity` (average ≤ 7.0 on `thot/`, no grade-D functions), plus
+`make complexity-report` and `make pip-licenses`.
 
 Regenerate:
 
 ```bash
+make coverage      # refreshes reports/quality/coverage_*.*
 make quality-docs
 make docs-build
 ```

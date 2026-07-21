@@ -54,4 +54,4 @@ Full outcomes from the last `make audit-compliance` / `make ci` run (also on
 - [Identity of Action](../regularity-component/action-identiy.md)
 - [Mastering of Action](../regularity-component/action-mastering.md)
 - [CI and evidence pipeline](ci-evidence.md)
-- ADR-0003 (audit + WORM), ADR-0004 (SPIRE deferred)
+- ADR-0003 (audit + WORM), ADR-0008 (agent SPIFFE / SPIRE)

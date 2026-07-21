@@ -1,7 +1,8 @@
 # ADR-0004 — Defer SPIRE / SPIFFE to late production
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0008](0008-spire-agent-identity.md)
 - **Date:** 2026-07-17
+- **Superseded:** 2026-07-21
 - **Deciders:** T-KEIR maintainers
 - **Tags:** identity, spire, spiffe, deployment
 
@@ -25,9 +26,9 @@ There are **no SPIRE agents** in the current charts or Compose stack, and none
 are planned until a customer cluster explicitly requires mTLS workload identity
 beyond what the platform IdP and NetworkPolicies provide.
 
-## Decision
+## Decision (historical)
 
-1. **Do not install SPIRE** in P0–P2 (dev-local, Compose, k8s-dev) or during
+1. **Do not install SPIRE** in P0–P2 (dev-local, Compose, k3d-dev) or during
    active feature work (Phases 3–6).
 2. **Do not block P3 `k8s-secure`** on SPIRE. Secure profile means governor
    `enforce`, audit enabled, auth on, optional NetworkPolicies — not SPIRE.
@@ -37,15 +38,16 @@ beyond what the platform IdP and NetworkPolicies provide.
 4. Until then, populate `ActionRecord.actor.spiffe_id` only when explicitly set
    by an integrator; leave it `null` in default deployments.
 
-## Consequences
+## Supersession
 
-- `k8s-secure` documentation and installer detection **exclude** SPIRE.
-- Identity milestones in [Identity of Action](../regularity-component/action-identiy.md) treat
-  SPIFFE as **M2-late / optional**, not a Phase 6 gate.
-- No `deploy/spire/` chart or Compose service is added in this tranche.
+Agent workloads (`tkeir-agent`) need attested machine identity for mastering
+(kill switch `agents`, budgets, ActionRecord attribution). **ADR-0008** adopts
+SPIRE/SPIFFE for the agent path while keeping non-agent services on JWT +
+correlation until a later mesh workstream.
 
 ## Related
 
+- [ADR-0008](0008-spire-agent-identity.md)
 - [ADR-0001](0001-platform-architecture.md)
 - [Secure cluster](../deployment/k8s-secure.md)
 - [Identity of Action](../regularity-component/action-identiy.md)

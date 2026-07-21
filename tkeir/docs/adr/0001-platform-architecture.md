@@ -24,8 +24,9 @@ compliance.
    a parallel `ui/`.
 3. **Identity:** Keycloak realm `tkeir` is a first-class component (Compose
    `auth` profile, Helm optional dependency). BYO IdP via `keycloak.useExisting`
-   / `oidc.*`. Machine actors use confidential clients; SPIFFE is optional
-   (deferred — [ADR-0004](../adr/0004-defer-spire.md)).
+   / `oidc.*`. Machine **agent** actors use SPIFFE IDs via SPIRE (Compose
+   `spire` profile — [ADR-0008](0008-spire-agent-identity.md)); other services
+   keep confidential clients + correlation until mesh expansion.
 4. **Action layer:** ActionRecord v1 with W3C correlation IDs; hot store =
    append-only PostgreSQL + hash chain; compliance tier = S3/MinIO **object
    lock** (WORM). Detailed store choice is ADR-0002 (Phase 4).

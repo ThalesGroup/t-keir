@@ -73,6 +73,26 @@ images:
       docker pull postgres:16-alpine
       docker inspect --format='{{index .RepoDigests 0}}' postgres:16-alpine
 
+  spire_server:
+    ref: ghcr.io/spiffe/spire-server
+    tag: "1.15.2"
+    digest: null
+    note: "Agent SPIFFE (ADR-0008); pin digest before prod"
+    upstream: https://github.com/spiffe/spire/pkgs/container/spire-server
+    update: |
+      docker pull ghcr.io/spiffe/spire-server:1.15.2
+      docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/spiffe/spire-server:1.15.2
+
+  spire_agent:
+    ref: ghcr.io/spiffe/spire-agent
+    tag: "1.15.2"
+    digest: null
+    note: "Workload API socket for tkeir-agent (ADR-0008)"
+    upstream: https://github.com/spiffe/spire/pkgs/container/spire-agent
+    update: |
+      docker pull ghcr.io/spiffe/spire-agent:1.15.2
+      docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/spiffe/spire-agent:1.15.2
+
   minio:
     ref: minio/minio
     tag: "RELEASE.2025-04-22T22-12-26Z"
@@ -154,7 +174,7 @@ charts:
     name: cilium
     repo: https://helm.cilium.io/
     version: "1.17.2"
-    note: "Linux / Lima only (ADR-0001); SPIRE still deferred"
+    note: "Linux / Lima only (ADR-0001); agent SPIFFE via ADR-0008"
   cert_manager:
     name: cert-manager
     repo: https://charts.jetstack.io

@@ -25,10 +25,15 @@ approvals).
 4. Ship base agents as YAML (`configs/agents/`) and workflows as YAML
    (`configs/workflows/`); sequential orchestration first.
 5. Service: `tkeir-agent` on `:8092`.
+6. **Workload identity:** every agent run carries a SPIFFE ID
+   (`spiffe://{trust}/agent/{name}`) on `RunState` and
+   `ActionRecord.actor.spiffe_id` ([ADR-0008](0008-spire-agent-identity.md)).
+   Governor enforce mode denies agent steps without an allow-listed ID.
 
 ## Consequences
 
 - No framework lock-in; CI docstring/example gates apply to new modules.
 - Multi-agent fan-out and streaming UI remain future work (Phase E surfaces a
   minimal poll monitor only).
-- See [Agents](../tools/agents.md), [MCP](../tools/mcp.md).
+- See [Agents](../tools/agents.md), [MCP](../tools/mcp.md),
+  [SPIRE / SPIFFE](../deployment/spire.md).

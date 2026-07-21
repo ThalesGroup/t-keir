@@ -24,4 +24,4 @@ spec:
           verifyDigest: true
           required: true
 # Note: requires cosign keyless identities configured for the CI OIDC issuer.
-# SPIRE is deferred (ADR-0004); this policy covers image trust only.
+# SPIRE is required for agents (ADR-0008); this policy covers image trust only.

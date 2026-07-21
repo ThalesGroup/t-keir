@@ -27,6 +27,8 @@ python3 -m thot.tools.pipeline -c tkeir/configs/pipeline.yaml -i <input> -o <out
 7. **syntax** — dependencies and knowledge-graph triples
 8. **keywords** — RAKE keywords
 9. **ontology** — RDF graph serialization for downstream search/RAG
+   (optional **derive-from** existing ontologies such as C2SIM — see
+   [Document ontology](document_ontology.md))
 10. **golden-chunking** — retrieval-oriented chunks with context payloads
 
 ### Vespa indexing and RAG

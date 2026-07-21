@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install a hardened single-node K3s server (Linux). SPIRE is NOT installed (ADR-0004).
+# Install a hardened single-node K3s server (Linux). SPIRE for agents: see deploy/spire (ADR-0008).
 set -euo pipefail
 
 # CIS-oriented defaults: secrets encryption, audit log path, protect kernel defaults.

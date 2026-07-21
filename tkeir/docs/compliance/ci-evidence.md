@@ -38,6 +38,7 @@ These commands produce auditable outputs consumed by OPA `input.evidence`:
 | `make bom` | `reports/bom/` CycloneDX SBOM + AIBOM | `sbom_cyclonedx_present`, `aibom_present` |
 | `make security-report` | `reports/security/manifest.json` | `security_manifest_present` |
 | `make complexity-report` | `reports/quality/radon_cc.json` + `radon_cc_summary.txt` | CC average ≤ 7.0 on `thot/`, zero grade-D functions |
+| `make coverage` | `coverage-reports/coverage.xml` + `reports/quality/coverage_*.*` | Scoped line coverage ≥ `COVERAGE_FAIL_UNDER` (default 90%) |
 | `make pip-licenses` | `reports/quality/licenses.json` + `licenses.md` | Full dependency licence inventory |
 | `make annex-iv` | `reports/compliance/annex-iv/` | `annex_iv_dir_non_empty` |
 | `make audit-evidence` | `reports/evidence/<version>/` | `audit_evidence_dir_non_empty` |

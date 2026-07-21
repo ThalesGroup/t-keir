@@ -20,6 +20,13 @@ from thot.tasks.document_ontology.OntologyBuilder import (
     build_document_graph,
     compute_ontology_text_coverage,
 )
+from thot.tasks.document_ontology.OntologyDerivation import (
+    DerivationSettings,
+    derivation_paths_for_document,
+    derive_document_graph,
+    load_reference_graph,
+    parse_derivation_settings,
+)
 from thot.tasks.document_ontology.SelfHealingLoop import (
     SelfHealingSettings,
     run_self_healing_validation,
@@ -32,7 +39,23 @@ from thot.tools.search.ontology_utils import serialize_graph_json_ld
 
 
 class DocumentOntologyBuilder:
-    """Build and validate RDF document ontologies from T-KEIR analysis."""
+    """Build and validate RDF document ontologies from T-KEIR analysis.
+
+    Optionally derives links from reference ontologies (``derive-from``) before
+    SHACL validation and JSON-LD serialization for Vespa.
+
+    Example:
+        >>> from thot.tasks.document_ontology.DocumentOntologyBuilder import (
+        ...     DocumentOntologyBuilder,
+        ... )
+        >>> from thot.tasks.document_ontology.DocumentOntologyConfiguration import (
+        ...     DocumentOntologyConfiguration,
+        ... )
+        >>> cfg = DocumentOntologyConfiguration()
+        >>> cfg.loads({'document-ontology': {'builders': [{}]}})
+        >>> isinstance(DocumentOntologyBuilder(cfg), DocumentOntologyBuilder)
+        True
+    """
 
     def __init__(
         self,
@@ -109,9 +132,28 @@ class DocumentOntologyBuilder:
                 builder_cfg.get("save_alignment", False),
             )
         )
+        derive_cfg = builder_cfg.get("derive-from") or builder_cfg.get(
+            "derive_from"
+        )
+        self._derivation_settings = parse_derivation_settings(
+            derive_cfg if isinstance(derive_cfg, dict) else {}
+        )
+        self._save_derivation = bool(
+            builder_cfg.get(
+                "save-derivation",
+                builder_cfg.get(
+                    "save_derivation",
+                    self._derivation_settings.save_report,
+                ),
+            )
+        )
 
     def build(self, tkeir_doc: dict, call_context=None) -> dict:
         """Build, validate, and serialize the document ontology.
+
+        Optionally derives links from reference ontologies configured under
+        ``derive-from`` (or ``derive_from_ontologies`` on the document) before
+        SHACL validation and JSON-LD serialization for Vespa.
 
         Args:
             tkeir_doc: Analyzed T-KEIR document with ``kg``.
@@ -168,6 +210,61 @@ class DocumentOntologyBuilder:
             vocabulary_report,
             graph_alignment_report,
         )
+        derivation_report: dict = {
+            "enabled": self._derivation_settings.enabled,
+            "status": "SKIPPED",
+        }
+        derive_paths = derivation_paths_for_document(
+            tkeir_doc, self._derivation_settings
+        )
+        if self._derivation_settings.enabled or derive_paths:
+            if not derive_paths:
+                derivation_report = {
+                    "enabled": True,
+                    "status": "NO_PATHS",
+                    "matches": 0,
+                }
+            else:
+                try:
+                    reference = load_reference_graph(
+                        derive_paths, call_context=call_context
+                    )
+                    settings = self._derivation_settings
+                    if not settings.enabled and derive_paths:
+                        # Per-document paths enable derivation even if config
+                        # flag is false.
+                        settings = DerivationSettings(
+                            enabled=True,
+                            paths=settings.paths,
+                            similarity_threshold=settings.similarity_threshold,
+                            match_classes=settings.match_classes,
+                            match_individuals=settings.match_individuals,
+                            match_properties=settings.match_properties,
+                            add_subclass_links=settings.add_subclass_links,
+                            add_type_links=settings.add_type_links,
+                            add_same_as_links=settings.add_same_as_links,
+                            include_matched_axioms=settings.include_matched_axioms,
+                            min_label_length=settings.min_label_length,
+                            save_report=settings.save_report,
+                        )
+                    graph, derivation_report = derive_document_graph(
+                        graph,
+                        reference,
+                        settings=settings,
+                        call_context=call_context,
+                    )
+                    derivation_report["paths"] = derive_paths
+                except FileNotFoundError as exc:
+                    ThotLogger.warning(
+                        f"Document ontology derive-from skipped: {exc}",
+                        context=call_context,
+                    )
+                    derivation_report = {
+                        "enabled": True,
+                        "status": "MISSING_REFERENCE",
+                        "error": str(exc),
+                        "paths": derive_paths,
+                    }
         shapes_ttl = induce_document_shacl_shapes(graph, alignment_report)
         text_coverage = compute_ontology_text_coverage(
             tkeir_doc,
@@ -208,6 +305,28 @@ class DocumentOntologyBuilder:
         }
         if self._save_alignment:
             document_ontology["alignment"] = alignment_report
+        if self._save_derivation or derivation_report.get("status") not in {
+            "SKIPPED",
+            None,
+        }:
+            # Always attach a compact derivation summary when enabled/attempted;
+            # full details when save-derivation is true.
+            if self._save_derivation:
+                document_ontology["derivation"] = derivation_report
+            else:
+                document_ontology["derivation"] = {
+                    k: derivation_report.get(k)
+                    for k in (
+                        "enabled",
+                        "status",
+                        "matches",
+                        "subclass_links",
+                        "type_links",
+                        "same_as_links",
+                        "paths",
+                    )
+                    if k in derivation_report
+                }
         tkeir_doc["document_ontology"] = document_ontology
         task_info = TaskInfo(
             task_name="document-ontology",

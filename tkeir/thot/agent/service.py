@@ -29,6 +29,11 @@ from thot.agent.orchestrator import Orchestrator
 from thot.agent.publish import publish_run
 from thot.agent.registry import list_agent_names, load_agent_spec
 from thot.agent.runs import RunStore
+from thot.agent.spiffe import (
+    is_allowed_agent_spiffe_id,
+    resolve_agent_spiffe_id,
+    spiffe_enforce,
+)
 from thot.agent.workflows import list_workflow_names, load_workflow
 from thot.core.LlmWrapper import UnifiedLLMWrapper
 from thot.core.StructuredLogging import configure_json_logging
@@ -149,11 +154,14 @@ async def health() -> dict[str, str]:
 async def ready(request: Request) -> dict[str, Any]:
     """Readiness probe."""
     state: AppState = request.app.state.agent
+    workload_id = resolve_agent_spiffe_id("tkeir-agent")
     return {
         "status": "ready",
         "agents": list_agent_names(),
         "workflows": list_workflow_names(),
         "root": str(state.root),
+        "spiffe_id": workload_id,
+        "spiffe_enforce": spiffe_enforce(),
     }
 
 
@@ -201,14 +209,25 @@ async def create_run(
 
     cid = current_correlation_id() or generate_trace_id()
     space = _resolve_space(authorization)
+    agent_name = body.agent if not body.workflow else "supervisor"
+    spiffe_id = resolve_agent_spiffe_id(agent_name)
+    if spiffe_enforce() and not is_allowed_agent_spiffe_id(spiffe_id):
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "agent SPIFFE identity missing or not allowed "
+                f"(spiffe_id={spiffe_id!r})"
+            ),
+        )
     params = dict(body.params)
     if body.template:
         params.setdefault("template", body.template)
     run = RunState(
-        agent=body.agent if not body.workflow else "supervisor",
+        agent=agent_name,
         workflow=body.workflow,
         goal=body.goal.strip(),
         user_space=space,
+        spiffe_id=spiffe_id,
         correlation_id=cid,
         status="queued",
         params=params,
@@ -229,6 +248,7 @@ async def create_run(
         "status": run.status,
         "workflow": run.workflow,
         "user_space": run.user_space,
+        "spiffe_id": run.spiffe_id,
         "correlation_id": run.correlation_id,
     }
 

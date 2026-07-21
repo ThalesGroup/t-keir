@@ -1211,6 +1211,10 @@ async def _generate_rag_answer(
     chunk_excerpts: str,
 ) -> tuple[str, str, bool]:
     """Run LLM generation and apply chunk-evidence fallback when needed."""
+    if state.llm is None:
+        raise HTTPException(
+            status_code=503, detail="Application is not initialized"
+        )
     try:
         raw_generation = await state.llm.generate(
             user_prompt,

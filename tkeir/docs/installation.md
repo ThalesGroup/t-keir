@@ -7,7 +7,7 @@ This page covers installing T-KEIR for **local development (profile P0)**. All M
 targets run from the **repository root**. Run `make help` for the full target list.
 
 For Compose, Kubernetes, and secured cluster profiles, see
-[Deployment profiles](deployment/index.md) and the root [INSTALL.md](../../INSTALL.md).
+[Deployment profiles](deployment/index.md) and the root `INSTALL.md`.
 
 ## Requirements
 

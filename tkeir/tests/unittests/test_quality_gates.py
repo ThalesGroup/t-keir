@@ -154,7 +154,7 @@ def test_no_unexpected_copyleft_licences() -> None:
 
 
 def test_quality_dashboard_page_exists() -> None:
-    """``tkeir/docs/quality/index.md`` must exist and cover CC + licences."""
+    """``tkeir/docs/quality/index.md`` must exist and cover CC, coverage, licences."""
     assert (
         DOCS_QUALITY.exists()
     ), "tkeir/docs/quality/index.md missing — run `make quality-docs`"
@@ -162,6 +162,9 @@ def test_quality_dashboard_page_exists() -> None:
     assert (
         "Cyclomatic" in content or "radon" in content.lower()
     ), "Quality page must mention cyclomatic complexity"
+    assert "coverage" in content.lower(), (
+        "Quality page must mention test coverage"
+    )
     assert (
         "licen" in content.lower()
     ), "Quality page must mention dependency licences"

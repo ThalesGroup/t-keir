@@ -13,3 +13,6 @@ PYSEC-2026-1999
 PYSEC-2026-1998
 PYSEC-2026-1994
 PYSEC-2026-1996
+# cryptography 46.x ships OpenSSL advisory; upgrade to 48+ blocked by optional
+# spiffe extra (cryptography<47). Same ignore as Makefile PIP_AUDIT_IGNORE.
+GHSA-537c-gmf6-5ccf

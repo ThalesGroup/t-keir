@@ -169,6 +169,7 @@ class RunState(BaseModel):
     workflow: str | None = None
     goal: str = ""
     user_space: str = "dev@tkeir"
+    spiffe_id: str | None = None
     correlation_id: str = ""
     status: Literal[
         "queued",

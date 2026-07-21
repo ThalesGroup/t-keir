@@ -119,7 +119,7 @@ class LlmWriter:
         self.llm = llm
         self.agent_name = agent_name
 
-    def write(
+    def _build_user_prompt(
         self,
         slot: Slot,
         *,
@@ -127,16 +127,9 @@ class LlmWriter:
         context: str,
         evidence_chunk_ids: list[str],
         evidence_document_ids: list[str],
-    ) -> SlotFill:
-        if not evidence_chunk_ids and not evidence_document_ids:
-            return SlotFill(
-                name=slot.name,
-                filled=False,
-                reason_unfilled="no grounded evidence for freeform slot",
-            )
-        spec = load_agent_spec(self.agent_name)
+    ) -> str:
         allowed = evidence_chunk_ids or []
-        user = (
+        return (
             f"Slot: {slot.name}\n"
             f"Description: {slot.description}\n"
             f"Topic: {topic}\n"
@@ -148,29 +141,53 @@ class LlmWriter:
             '{"text": "...", "chunk_ids": ["..."], "document_ids": []}\n'
             "Only use chunk_ids from the allowed list."
         )
+
+    def _run_llm(self, user: str, system: str, temperature: float) -> str:
         import asyncio
 
         async def _gen() -> str:
             return await self.llm.generate(
-                user, system=spec.system_prompt, temperature=spec.temperature
+                user, system=system, temperature=temperature
             )
 
         try:
-            raw = asyncio.get_event_loop().run_until_complete(_gen())
+            return asyncio.get_event_loop().run_until_complete(_gen())
         except RuntimeError:
-            raw = asyncio.run(_gen())
-        data = _parse_json_object(raw) or {}
+            return asyncio.run(_gen())
+
+    def _grounded_citations(
+        self,
+        data: dict[str, Any],
+        *,
+        allowed: list[str],
+        evidence_document_ids: list[str],
+    ) -> tuple[str, list[str], list[str]]:
         text = str(data.get("text") or "").strip()
+        allowed_set = set(allowed)
         cited = [
             c
             for c in data.get("chunk_ids") or []
-            if isinstance(c, str) and c in set(allowed)
+            if isinstance(c, str) and c in allowed_set
         ]
+        doc_set = set(evidence_document_ids)
         docs = [
             d
             for d in data.get("document_ids") or []
-            if isinstance(d, str) and d in set(evidence_document_ids)
+            if isinstance(d, str) and d in doc_set
         ]
+        return text, cited, docs
+
+    def _slot_fill_from_response(
+        self,
+        slot: Slot,
+        *,
+        text: str,
+        cited: list[str],
+        docs: list[str],
+        allowed: list[str],
+        evidence_chunk_ids: list[str],
+        evidence_document_ids: list[str],
+    ) -> SlotFill:
         if not text or (allowed and not cited and not docs):
             return SlotFill(
                 name=slot.name,
@@ -188,6 +205,47 @@ class LlmWriter:
                 document_ids=docs or list(evidence_document_ids),
                 source="writer",
             ),
+        )
+
+    def write(
+        self,
+        slot: Slot,
+        *,
+        topic: str,
+        context: str,
+        evidence_chunk_ids: list[str],
+        evidence_document_ids: list[str],
+    ) -> SlotFill:
+        if not evidence_chunk_ids and not evidence_document_ids:
+            return SlotFill(
+                name=slot.name,
+                filled=False,
+                reason_unfilled="no grounded evidence for freeform slot",
+            )
+        spec = load_agent_spec(self.agent_name)
+        allowed = evidence_chunk_ids or []
+        user = self._build_user_prompt(
+            slot,
+            topic=topic,
+            context=context,
+            evidence_chunk_ids=evidence_chunk_ids,
+            evidence_document_ids=evidence_document_ids,
+        )
+        raw = self._run_llm(user, spec.system_prompt, spec.temperature)
+        data = _parse_json_object(raw) or {}
+        text, cited, docs = self._grounded_citations(
+            data,
+            allowed=allowed,
+            evidence_document_ids=evidence_document_ids,
+        )
+        return self._slot_fill_from_response(
+            slot,
+            text=text,
+            cited=cited,
+            docs=docs,
+            allowed=allowed,
+            evidence_chunk_ids=evidence_chunk_ids,
+            evidence_document_ids=evidence_document_ids,
         )
 
 

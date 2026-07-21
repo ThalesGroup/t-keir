@@ -561,39 +561,35 @@ def _collect_document_ner_labels(document: dict) -> list[str]:
     return sorted(labels)
 
 
-def _collect_dynamic_class_labels(document: dict) -> list[str]:
-    """Collect class label candidates from NER, chunks, KG, and entity text.
-
-    Example:
-        >>> from thot.tasks.document_ontology.OntologyAlignment import _collect_dynamic_class_labels
-        >>> labels = _collect_dynamic_class_labels(
-        ...     {"content_ner": [{"label": "organization", "text": "Acme Corp"}]}
-        ... )
-        >>> "Organization" in labels
-        True
-    """
-    candidates: set[str] = set()
-
+def _add_ner_label_candidates(candidates: set[str], document: dict) -> None:
     for label in _collect_document_ner_labels(document):
         candidates.add(label)
         candidates.add(title_case_label(label))
 
+
+def _add_ner_head_candidates(candidates: set[str], document: dict) -> None:
     for key in ("title_ner", "content_ner"):
         for span in document.get(key) or []:
             text = str(span.get("text", "")).strip()
-            if text:
-                head = text.split()[0]
-                if len(head) > 2:
-                    candidates.add(title_case_label(head))
+            if not text:
+                continue
+            head = text.split()[0]
+            if len(head) > 2:
+                candidates.add(title_case_label(head))
 
+
+def _add_chunk_entity_candidates(candidates: set[str], document: dict) -> None:
     for chunk in document.get("golden_chunks") or []:
         metadata = chunk.get("metadata") or {}
         for entity_key in metadata.get("primary_entities") or {}:
             key_text = str(entity_key).strip()
-            if key_text:
-                candidates.add(key_text.lower())
-                candidates.add(title_case_label(key_text))
+            if not key_text:
+                continue
+            candidates.add(key_text.lower())
+            candidates.add(title_case_label(key_text))
 
+
+def _add_kg_head_candidates(candidates: set[str], document: dict) -> None:
     for triple in document.get("kg") or []:
         for part in ("subject", "value"):
             content = (triple.get(part) or {}).get("content", [])
@@ -606,6 +602,8 @@ def _collect_dynamic_class_labels(document: dict) -> list[str]:
             if len(head) > 2:
                 candidates.add(title_case_label(head))
 
+
+def _filter_class_candidates(candidates: set[str]) -> list[str]:
     return sorted(
         candidate
         for candidate in candidates
@@ -613,6 +611,25 @@ def _collect_dynamic_class_labels(document: dict) -> list[str]:
         and candidate not in _STRUCTURAL_CLASSES
         and candidate not in {FALLBACK_ENTITY_CLASS, METRIC_CLASS}
     )
+
+
+def _collect_dynamic_class_labels(document: dict) -> list[str]:
+    """Collect class label candidates from NER, chunks, KG, and entity text.
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _collect_dynamic_class_labels
+        >>> labels = _collect_dynamic_class_labels(
+        ...     {"content_ner": [{"label": "organization", "text": "Acme Corp"}]}
+        ... )
+        >>> "Organization" in labels
+        True
+    """
+    candidates: set[str] = set()
+    _add_ner_label_candidates(candidates, document)
+    _add_ner_head_candidates(candidates, document)
+    _add_chunk_entity_candidates(candidates, document)
+    _add_kg_head_candidates(candidates, document)
+    return _filter_class_candidates(candidates)
 
 
 def _nested_report_value(

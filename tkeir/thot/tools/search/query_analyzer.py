@@ -494,6 +494,27 @@ def build_svo_match_query(
     return (lexical_query or raw_query).strip()
 
 
+def _append_unique_analysis_terms(
+    parts: list[str],
+    existing: str,
+    analysis: dict[str, Any],
+) -> None:
+    """Append NER, SVO, and search terms not already present in ``existing``."""
+    for entity in analysis.get("ner_entities") or []:
+        text = str(entity.get("text", "")).strip()
+        if text and text.lower() not in existing:
+            parts.append(text)
+    for triple in analysis.get("svo_triples") or []:
+        for key in ("subject", "verb", "object"):
+            text = str(triple.get(key, "")).strip()
+            if text and text.lower() not in existing:
+                parts.append(text)
+    for term in analysis.get("search_terms") or []:
+        text = str(term).strip()
+        if text and text.lower() not in existing:
+            parts.append(text)
+
+
 def build_focus_query_text(
     *,
     raw_query: str,
@@ -520,20 +541,7 @@ def build_focus_query_text(
     if normalized:
         parts.append(normalized)
     if analysis:
-        existing = normalized.lower()
-        for entity in analysis.get("ner_entities") or []:
-            text = str(entity.get("text", "")).strip()
-            if text and text.lower() not in existing:
-                parts.append(text)
-        for triple in analysis.get("svo_triples") or []:
-            for key in ("subject", "verb", "object"):
-                text = str(triple.get(key, "")).strip()
-                if text and text.lower() not in existing:
-                    parts.append(text)
-        for term in analysis.get("search_terms") or []:
-            text = str(term).strip()
-            if text and text.lower() not in existing:
-                parts.append(text)
+        _append_unique_analysis_terms(parts, normalized.lower(), analysis)
     if parts:
         return " ".join(dict.fromkeys(parts))
     return normalized
@@ -795,6 +803,43 @@ def build_svo_question_restatement(
     return "; ".join(readings)
 
 
+def _format_svo_analysis_section(
+    svo_triples: list[dict[str, Any]],
+) -> list[str]:
+    """Format the SVO section for prompt query analysis."""
+    lines = ["PRIMARY — question structure (SVO):"]
+    for triple in svo_triples:
+        subject = str(triple.get("subject", "")).strip()
+        verb = str(triple.get("verb", "")).strip()
+        obj = str(triple.get("object", "")).strip()
+        if subject or verb or obj:
+            lines.append(f"  - {subject} | {verb} | {obj}")
+    restatement = build_svo_question_restatement(svo_triples)
+    if restatement:
+        lines.append(f"- SVO-aligned reading: {restatement}")
+    lines.extend(
+        [
+            "Interpret the user question through this SVO structure first; "
+            "prefer facts and passages that match these subject-verb-object relations.",
+            "",
+        ]
+    )
+    return lines
+
+
+def _format_ner_analysis_section(
+    ner_entities: list[dict[str, Any]],
+) -> list[str]:
+    """Format the named-entity section for prompt query analysis."""
+    lines = ["- Named entities:"]
+    for entity in ner_entities:
+        text = str(entity.get("text", "")).strip()
+        label = str(entity.get("label", "entity")).strip()
+        if text:
+            lines.append(f"  - {text} ({label})")
+    return lines
+
+
 def format_query_analysis_for_prompt(
     *,
     raw_query: str,
@@ -822,21 +867,7 @@ def format_query_analysis_for_prompt(
     svo_triples = (analysis or {}).get("svo_triples") or []
 
     if svo_triples:
-        lines.append("PRIMARY — question structure (SVO):")
-        for triple in svo_triples:
-            subject = str(triple.get("subject", "")).strip()
-            verb = str(triple.get("verb", "")).strip()
-            obj = str(triple.get("object", "")).strip()
-            if subject or verb or obj:
-                lines.append(f"  - {subject} | {verb} | {obj}")
-        restatement = build_svo_question_restatement(svo_triples)
-        if restatement:
-            lines.append(f"- SVO-aligned reading: {restatement}")
-        lines.append(
-            "Interpret the user question through this SVO structure first; "
-            "prefer facts and passages that match these subject-verb-object relations."
-        )
-        lines.append("")
+        lines.extend(_format_svo_analysis_section(svo_triples))
 
     lines.extend(
         [
@@ -855,12 +886,7 @@ def format_query_analysis_for_prompt(
 
     ner_entities = analysis.get("ner_entities") or []
     if ner_entities:
-        lines.append("- Named entities:")
-        for entity in ner_entities:
-            text = str(entity.get("text", "")).strip()
-            label = str(entity.get("label", "entity")).strip()
-            if text:
-                lines.append(f"  - {text} ({label})")
+        lines.extend(_format_ner_analysis_section(ner_entities))
 
     keywords = analysis.get("keywords") or []
     if keywords:

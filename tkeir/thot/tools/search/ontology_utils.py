@@ -793,6 +793,67 @@ def _keyword_in_chunk_text(keyword: str, chunk_text: str) -> bool:
     )
 
 
+def _collect_entity_chunks_for_retrieved(
+    graph: Graph,
+    retrieved_ids: list[str],
+    chunk_uri_by_id: dict[str, str],
+) -> tuple[dict[tuple[str, str], set[str]], dict[str, set[str]]]:
+    """Map retrieved chunks to entity labels and document chunk groups."""
+    entity_chunks: dict[tuple[str, str], set[str]] = defaultdict(set)
+    chunks_by_doc: dict[str, set[str]] = defaultdict(set)
+    for chunk_id in retrieved_ids:
+        chunk_uri = URIRef(chunk_uri_by_id[chunk_id])
+        doc_uri = _document_uri_for_chunk(graph, chunk_uri)
+        if doc_uri is not None:
+            chunks_by_doc[str(doc_uri)].add(chunk_id)
+
+        for _subject, _predicate, entity in graph.triples(
+            (chunk_uri, TKEIR.hasMention, None)
+        ):
+            if not isinstance(entity, URIRef):
+                continue
+            entity_type = _node_type(graph, entity)
+            if entity_type in _STRUCTURAL_ENTITY_TYPES:
+                continue
+            label = _node_label(graph, entity).strip()
+            if not label:
+                continue
+            entity_chunks[(label, entity_type)].add(chunk_id)
+    return entity_chunks, chunks_by_doc
+
+
+def _collect_keyword_chunks_for_docs(
+    graph: Graph,
+    chunks_by_doc: dict[str, set[str]],
+    chunk_texts: dict[str, str],
+    *,
+    min_keyword_length: int,
+) -> dict[str, set[str]]:
+    """Map document keywords to retrieved chunk ids when text matches."""
+    keyword_chunks: dict[str, set[str]] = defaultdict(set)
+    for doc_uri, chunk_ids in chunks_by_doc.items():
+        doc_ref = URIRef(doc_uri)
+        for _subject, _predicate, keyword_node in graph.triples(
+            (doc_ref, TKEIR.hasKeyword, None)
+        ):
+            if not isinstance(keyword_node, URIRef):
+                continue
+            if _node_type(graph, keyword_node) != "Keyword":
+                continue
+            label = _node_label(graph, keyword_node).strip()
+            if not label or not is_valid_keyword_label(
+                label,
+                min_length=min_keyword_length,
+            ):
+                continue
+            for chunk_id in chunk_ids:
+                if _keyword_in_chunk_text(
+                    label, chunk_texts.get(chunk_id, "")
+                ):
+                    keyword_chunks[label].add(chunk_id)
+    return keyword_chunks
+
+
 def build_hmi_ontology(
     rdf_documents: list[str],
     retrieved_chunk_ids: list[str],
@@ -835,49 +896,17 @@ def build_hmi_ontology(
         if chunk_id in chunk_uri_by_id
     ]
 
-    entity_chunks: dict[tuple[str, str], set[str]] = defaultdict(set)
-    keyword_chunks: dict[str, set[str]] = defaultdict(set)
-    chunks_by_doc: dict[str, set[str]] = defaultdict(set)
-
-    for chunk_id in retrieved_ids:
-        chunk_uri = URIRef(chunk_uri_by_id[chunk_id])
-        doc_uri = _document_uri_for_chunk(graph, chunk_uri)
-        if doc_uri is not None:
-            chunks_by_doc[str(doc_uri)].add(chunk_id)
-
-        for _subject, _predicate, entity in graph.triples(
-            (chunk_uri, TKEIR.hasMention, None)
-        ):
-            if not isinstance(entity, URIRef):
-                continue
-            entity_type = _node_type(graph, entity)
-            if entity_type in _STRUCTURAL_ENTITY_TYPES:
-                continue
-            label = _node_label(graph, entity).strip()
-            if not label:
-                continue
-            entity_chunks[(label, entity_type)].add(chunk_id)
-
-    for doc_uri, chunk_ids in chunks_by_doc.items():
-        doc_ref = URIRef(doc_uri)
-        for _subject, _predicate, keyword_node in graph.triples(
-            (doc_ref, TKEIR.hasKeyword, None)
-        ):
-            if not isinstance(keyword_node, URIRef):
-                continue
-            if _node_type(graph, keyword_node) != "Keyword":
-                continue
-            label = _node_label(graph, keyword_node).strip()
-            if not label or not is_valid_keyword_label(
-                label,
-                min_length=min_keyword_length,
-            ):
-                continue
-            for chunk_id in chunk_ids:
-                if _keyword_in_chunk_text(
-                    label, chunk_texts.get(chunk_id, "")
-                ):
-                    keyword_chunks[label].add(chunk_id)
+    entity_chunks, chunks_by_doc = _collect_entity_chunks_for_retrieved(
+        graph,
+        retrieved_ids,
+        chunk_uri_by_id,
+    )
+    keyword_chunks = _collect_keyword_chunks_for_docs(
+        graph,
+        chunks_by_doc,
+        chunk_texts,
+        min_keyword_length=min_keyword_length,
+    )
 
     entities = [
         {

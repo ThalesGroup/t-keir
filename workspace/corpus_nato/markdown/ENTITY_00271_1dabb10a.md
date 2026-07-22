@@ -1,8 +1,0 @@
-# ENTITY 00271 — Baltic Sea
-
-ENTITY PROFILE
-Designation: Task Group 47
-Category: military organization
-Area of interest: Baltic Sea
-Known capability: command and control coordination
-Source reliability: B2.

@@ -1,8 +1,0 @@
-# ENTITY 00816 — North Atlantic
-
-ENTITY PROFILE
-Designation: Task Group 47
-Category: military organization
-Area of interest: North Atlantic
-Known capability: command and control coordination
-Source reliability: B2.

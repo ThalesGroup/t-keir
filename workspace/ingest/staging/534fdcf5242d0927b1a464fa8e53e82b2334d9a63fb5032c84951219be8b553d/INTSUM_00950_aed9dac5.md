@@ -1,6 +1,0 @@
-# INTSUM 00950 — North Atlantic
-
-INTELLIGENCE SUMMARY
-Reporting period: 2026-07-15T01:20Z
-Assessment: activity near North Atlantic is consistent with scheduled logistics. Confidence: moderate.
-Collection priorities: force posture, maritime approaches, communications indicators.

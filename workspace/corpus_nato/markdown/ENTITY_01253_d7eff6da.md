@@ -1,8 +1,0 @@
-# ENTITY 01253 — North Atlantic
-
-ENTITY PROFILE
-Designation: Maritime Component
-Category: military organization
-Area of interest: North Atlantic
-Known capability: command and control coordination
-Source reliability: B2.

@@ -42,3 +42,4 @@ deploy/compose/.env
 # Helm dependency packages (regenerate: make helm-deps)
 deploy/charts/**/charts/
 deploy/charts/**/tmpcharts/
+workspace

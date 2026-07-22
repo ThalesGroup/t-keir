@@ -1,0 +1,10 @@
+# OPORD 01103 — Training Area 7
+
+OPERATION ORDER
+1. Situation: maintain awareness in Training Area 7.
+2. Mission: Maritime Component monitors assigned area.
+3. Execution: synchronize ISR and maritime reporting.
+4. Sustainment: report logistics constraints.
+5. Command and Signal: use approved NATO C2 channels.
+
+Note linguistique: diffusion de travail en français; situation opérationnelle stable.

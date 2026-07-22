@@ -1,0 +1,178 @@
+Hybrid Deployment Packages and Consumption Guidelines
+
+Summary
+-------
+This document defines a set of hybrid deployment packages (hosted+demanded dedicated capacity+private overlay) and the recommended consumption/pricing guidelines for engineering, sales, and finance. It covers package definitions, billing primitives, quota semantics, migration/upgrade flows, acceptance criteria, and rollout milestones. The goal is to provide predictable economics for customers that mix Hosted API traffic with Reserved/Dedicated and Private nodes while preserving latency SLAs and predictable unit economics for Redwood.
+
+Intended audience
+------------------
+- Product managers and pricing owners
+- Solutions engineers and sales
+- Billing & finance
+- Infra and runtime engineering (capacity and runtime teams)
+- Customer success / account teams for enterprise adoption
+
+Motivation and background
+-------------------------
+Large customers routinely require a mixture of: (A) occasional burst traffic routed through Hosted API, (B) reserved Dedicated pools for baseline throughput, and (C) a Private deployment for sensitive data/regions. Today our SKU model treats these as separate product silos which complicates quoting and causes friction on migration paths. A hybrid packaging model aligns incentives, simplifies quoting, and enables smoother onboarding to Dedicated/Private while retaining predictable unit economics.
+
+High-level goals
+------------------
+1. Provide 3 composable packages (Baseline, Burst, Private Overlay) that map to customer deployment patterns.
+2. Ensure unit economics are preserved: per-token or per-embedding price floor for hosted traffic, committed-rate pricing for Dedicated, and flat subscription for Private control plane.
+3. Define clear quota and failover semantics when customers exceed reserved capacity.
+4. Provide migration and rollback procedures that minimize service disruption and billing disputes.
+5. Ship with billing primitives that allow proration, usage breakouts by route/model, and credits for cache/quantization savings.
+
+Package definitions (summary table)
+----------------------------------
+| Package name | Primary intent | Billing primitives | Included guarantees | Typical customer fit |
+|-------------|----------------|--------------------|---------------------|----------------------|
+| Baseline | Host most traffic via Hosted API; low friction | per-token pricing, rate limits, monthly invoice | 99.9% control-plane SLA, 95th percentile latency targets | Startups, mid-market teams |
+| Reserved (Dedicated Commit) | Predictable throughput and isolation | monthly commit ($/vGPU-hour) + overage at discounted rate | Dedicated pool with throughput SLOs, priority capacity | High-throughput SaaS, regulated workloads |
+| Private Overlay | Private control plane + optional on-prem agents | subscription + per-node license | VPC/VPN support, audit logs, custom KMS | Enterprise with compliance requirements |
+
+Billing primitives and formulas
+-------------------------------
+- Hosted unit price: P_hosted ($ per 1k tokens)
+- Reserved commit price: P_commit ($ per vGPU-hour committed)
+- Reserved overage price: P_overage (discounted per-token or per-vGPU-hour beyond commit)
+- Private subscription: S_private (flat monthly) + N_node * L_node (per-node license)
+
+Example blended cost calculation (monthly)
+1. Customer commits to 500 vGPU-hours at $X per vGPU-hour (Reserved baseline).
+2. Expected monthly hosted traffic: 200M tokens @ P_hosted.
+3. Observed cache savings: 12% of token cost (credited).
+4. Overage (burst) consumed: 120 vGPU-hours charged at P_overage.
+Total = (500 * P_commit) + (200M/1k * P_hosted * (1 - 0.12)) + (120 * P_overage) + S_private (if applicable).
+
+Quota semantics and failover rules
+----------------------------------
+1. Baseline traffic is charged against Hosted quota first.
+2. If customer has an active Reserved commit and the routing policy is set to "prefer-dedicated", traffic is routed to Dedicated until commit capacity is consumed.
+3. When dedicated commit is exhausted within a billing period:
+   a. If auto-burst enabled -> traffic continues to be served via Dedicated at P_overage up to configured burst cap.
+   b. If auto-burst disabled -> traffic is routed to Hosted and invoiced at P_hosted.
+4. Private Overlay customers may opt to enforce strict isolation (no failover to Hosted) or allow graceful fallback to Dedicated/Hosted depending on contract.
+
+Configuration options (customer-facing)
+--------------------------------------
+- routing.preference: ["prefer-dedicated", "prefer-hosted", "isolate-private"]
+- auto_burst: [true|false]
+- burst_cap_hours: integer (max vGPU-hours per billing period)
+- cache_credit_enabled: [true|false]
+
+API/CLI example (billing config)
+--------------------------------
+```json
+{
+  "account_id": "acct_123",
+  "billing_package": "hybrid-500-reserved",
+  "routing": {
+    "preference": "prefer-dedicated",
+    "auto_burst": true,
+    "burst_cap_hours": 200
+  },
+  "private_overlay": {
+    "enabled": false
+  }
+}
+```
+
+Key product requirements (PRD-style acceptance items)
+------------------------------------------------------
+1. Billing: Backend emits line-items that break down costs by primitive (hosted_tokens, reserved_commit_hours, reserved_overage_hours, private_subscription). Line-items must be queryable via the Billing API.
+2. Quota & routing: Control plane must evaluate routing.preference and route to runtime pools accordingly with deterministic tie-breakers.
+3. Observability: Console must show per-route token counts, commit consumption live, cache credits applied, and projected month-end overage estimate.
+4. Invoicing: Support proration for mid-period changes to commit size and immediate reconciliation for credits.
+5. Contract language: Support isolation clauses where Private Overlay customers can opt-out of cross-surface failover.
+6. Tests & safeguards: Synthetic load tests that validate billing alignment to observed commit consumption within 2% for 95% of test scenarios.
+
+Design notes and engineering implications
+----------------------------------------
+- Runtime routing hooks: Add routing decision API to router that accepts a BillingProfile and routing.preference to make deterministic routing decisions.
+- Metering: Route-level metering tags (route_id, model_variant, surface) must be included in every emitted metric/trace for billing aggregation.
+- Cache credits: Implement a monthly ledger that converts observed cache/quantization savings into a negative line-item applied against hosted token usage.
+- Capacity model: SRE must provide capacity guidelines to guarantee that a 20% overcommit buffer exists for Dedicated pools with auto-burst enabled.
+
+Roadmap & milestones
+---------------------
+1. Q1 2027 (alpha): API primitives, billing line-item prototype, routing.preference flag, internal-only console view.
+2. Q2 2027 (beta): Console UI for commit consumption, proration, auto-burst controls, basic invoice breakout.
+3. Q3 2027 (general availability): Sales quoting flow, private overlay contract templates, GA billing export formats (CSV + BI connectors).
+
+Rollout and sales enablement checklist
+-------------------------------------
+1. Complete billing contract templates and legal sign-off. (Owner: Finance & Legal)
+2. Build quoting calculator and SFDC product packages. (Owner: GTM/Product)
+3. Run two pilot customers for Reserved+Hosted hybrid (3 month pilots). (Owner: Solutions Eng)
+4. Publish migration guides and training for Customer Success. (Owner: Customer Success & Docs)
+
+Migration & upgrade flow (high level)
+-------------------------------------
+1. Discovery: Assess current usage patterns and recommend hybrid package via estimator.
+2. Pilot commit: Customer purchases a small Reserved commit (30–90 days). Configure routing.preference to prefer-dedicated.
+3. Observe: Monitor commit consumption; enable auto-burst for controlled ramp.
+4. Scale: Increase commit or enable Private Overlay depending on compliance needs.
+5. Rollback: If SLA or cost regression occurs, disable prefer-dedicated and route back to Hosted within 15 minutes.
+
+Operational playbook (when commit consumption unexpected)
+---------------------------------------------------------
+1. Alert: Billing forecast shows projected commit exhaustion in <48 hours.
+2. Action: Notify customer success and account owner; suggest increasing commit or enabling temporary burst cap.
+3. If customer is private-isolate-true: Engage SRE & Solutions Eng to plan capacity.
+4. Reconciliation: Apply cache credits/discounts if behavior was traced to config mismatch.
+
+Acceptance criteria
+--------------------
+- Console displays live commit consumption within 60s latency of ingestion.
+- Billing exports include route-level breakdowns and cache credit line-items.
+- Pilot customers report no more than 1% increase in latency after switching to prefer-dedicated routing.
+
+Ownership and stakeholders
+--------------------------
+- Product (packaging & pricing): Maya Chen
+- Billing & Finance: Priya Nair
+- Runtime & Routing API: Daniel Kim (eng-serving-runtime)
+- SRE / Capacity: Elena Rossi
+- Sales & Solutions Eng: Arjun Patel
+- Legal & Contracts: Thomas Weaver
+
+Appendix A — Example customer scenarios
+---------------------------------------
+Scenario A: SaaS company with spiky traffic
+- Needs: predictable monthly cost with ability to burst during launches.
+- Recommended: Reserved 300 vGPU-hours commit + auto_burst=true, burst_cap_hours=150.
+- Expected: ~30% unit cost reduction vs pure-hosted at scale.
+
+Scenario B: Regulated enterprise migrating from on-prem model
+- Needs: Private control plane + governed fallback to Redwood Dedicated in region.
+- Recommended: Private Overlay subscription + a 100 vGPU-hours Dedicated commit for baseline.
+
+Appendix B — Example billing line-item CSV schema
+--------------------------------------------------
+| invoice_id | account_id | period_start | period_end | line_type | quantity | unit | unit_price | amount | tags |
+|------------|------------|--------------|------------|-----------|----------|------|------------|--------|------|
+Example line_types: hosted_tokens, reserved_commit_hours, reserved_overage_hours, private_subscription, cache_credit
+
+Appendix C — Quick CLI to preview cost (internal tool)
+-------------------------------------------------------
+$ redwood-cost-estimator --account acct_123 --commit-hours 500 --expected-tokens 200000000 --cache-savings 0.12
+Estimated monthly: $XX,XXX (breakdown: commit=$YY,YYY hosted(after credits)=$ZZ,ZZZ overage=$A,AAA)
+
+Notes and open questions
+-------------------------
+- Should we expose per-model quantization discounts as explicit line-items or fold them into cache credits? Tradeoff: visibility vs complexity.
+- Pricing: finalize P_overage and burst caps with Finance to ensure margin targets are met for 95th percentile usage patterns.
+- Compliance: Private Overlay customers may require dedicated billing accounts; confirm with Payments team.
+
+Next steps
+----------
+1. Align with Billing & Finance on P_commit and P_overage floors by 2026-12-10.
+2. Implement routing.preference flag and prototype metering tags (engineering spike) by 2027-01-15.
+3. Schedule first pilot customer onboarding for Q1 2027.
+
+References
+----------
+- Deployment surface and consumption implications (internal): /confluence/product-docs/product-overview/deployment-surface-consumption-pricing-implications-2026
+- Token bundle & enterprise metering: /confluence/product-docs/pricing-and-packaging/token-bundle-flex-enterprise-metering-2026-08-20

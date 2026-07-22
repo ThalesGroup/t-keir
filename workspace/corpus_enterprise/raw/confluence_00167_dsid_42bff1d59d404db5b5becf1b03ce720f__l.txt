@@ -1,0 +1,170 @@
+Local Developer Runtime and Sandbox – Design Spec
+
+Overview
+
+This design spec describes the Local Developer Runtime (LDR) and Sandbox: a lightweight, offline-capable packaging of Redwood inference primitives intended for fast iteration, reproducible QA, and preflight performance/cost simulation. The LDR lets developers run a constrained subset of Redwood features locally or in CI with realistic latency and cost signals while preserving safety and telemetry guarantees for product analytics.
+
+Goals
+
+- Provide a low-friction developer experience for prototyping integrations, prompt engineering, and tests without requiring hosted credentials or GPU access.
+- Surface representative latency and token-cost estimates that are consistent with hosted Redwood economics for small-scale workloads.
+- Support parity with a subset of API features: text generation, chat, embeddings, and function/tool calling.
+- Enable CI/integration tests to run deterministically using recorded sample models or micro-models.
+- Offer clear upgrade paths to Hosted, Dedicated, and Private deployment modes.
+
+Non-Goals
+
+- The LDR is not intended to replicate production throughput or horizontal scalability.
+- It will not expose reserved capacity management, multi-tenant billing, or SLA-backed telemetry retention.
+- It is not a vehicle for serving customer traffic in production.
+
+User Personas
+
+1) Product Engineers: rapid prompt iteration and local experiment harnesses.
+2) Platform Engineers: CI validation of integration and telemetry.
+3) Solutions Engineers / SEs: demoing to customers in air-gapped environments.
+
+High-level Architecture
+
+The LDR is a single-package distribution composed of three layers:
+
+1. Core runtime shim: a small, CPU-optimized binary that implements Redwood API compatibility (request/response shapes, streaming hooks, function-calls). The shim routes requests either to: a) bundled micro-model (small distilled model for deterministic output) or b) a remote-hosted proxy when the developer chooses to exercise hosted models.
+
+2. Model artifacts: one or more pinned micro-model weights (quantized FP16/INT8 where license allows) plus a test catalog (prompt sets, sample KV-cache dumps).
+
+3. Developer tooling: CLI, local dashboard (single-page static UI), and test harness libraries for Node/Python to simulate token accounting and telemetry in alignment with backend heuristics.
+
+Data and Control Flow (textual diagram)
+
+- Developer client (SDK/CLI) -> LDR runtime shim -> (bundled micro-model | remote proxy) -> LDR telemetry sink (local file / optional forwarded telemetry).
+
+Compatibility and Feature Matrix
+
+| Feature | LDR v1 | Notes |
+|---|---:|---|
+| Text generation (sync) | Supported | Uses micro-model; deterministic sampling by default. |
+| Streaming responses | Supported | Buffered streaming emulation with configurable latency knobs. |
+| Chat state management | Supported | In-memory conversation storage; optional KV-cache snapshot load. |
+| Embeddings | Supported (reduced-dim) | Must flag `--low-dim` to match offline models. |
+| Function/tool calling | Supported (sync) | Handler hooks mirror production API; no external tool sandboxing. |
+| Adaptive batching | Not supported | Out of scope for V1. |
+| Quantization profiles | Supported | Shipping INT8 profiles for CPU inference as examples. |
+
+Security and Licensing
+
+- All included model artifacts will be cleared by Legal and Research before release. Only models with redistributable licenses will be bundled.
+- The runtime will validate API keys for remote proxy calls; local mode can be started without keys but will emit an audit banner.
+- Telemetry is opt-in by default. When enabled, telemetry is scrubbed of PII and batched locally. A clear `--telemetry=off|local|forward` flag controls behavior.
+
+Developer UX: CLI and SDK
+
+1) CLI quickstart:
+
+- Install: pipx / npm / brew package (packaging TBD).
+- Start local sandbox: `rdw sandbox start --mode local --port 8080`
+- Send a request via curl:
+
+```
+curl -X POST http://localhost:8080/v1/generate -H 'Content-Type: application/json' -d '{"model":"ldr-micro-v1","input":"Summarize: Redwood Inference platform"}'
+```
+
+2) Python SDK snippet (local):
+
+```
+from redwood_sdk import Client
+client = Client(endpoint="http://localhost:8080", api_key=None)
+resp = client.generate(model="ldr-micro-v1", prompt="Explain caching in one paragraph")
+print(resp.text)
+```
+
+Telemetry and Cost Simulation
+
+- Token accounting follows the hosted token model. LDR exposes a `--cost-extractor` service that logs token counts and maps them to a local cost estimate using the same per-token formulas used in Redwood pricing (configurable in `cost.yaml`).
+- Default `cost.yaml` (example):
+
+```
+per_token_generation_usd: 0.0000025
+per_token_prompt_usd: 0.0000010
+embedding_unit_usd: 0.00005
+```
+
+- Telemetry events: request_start, request_end, token_count, sampled_output_hash. Events are JSON lines written to `~/.redwood/ldr/telemetry.log` when local forwarding is disabled.
+
+Acceptance Criteria (MUST for GA)
+
+1. Startup on macOS/Linux with no external GPU dependency.
+2. SDK compatibility: Node 18+ and Python 3.10+ example apps run without code changes.
+3. Cost estimates within ±20% of hosted micro-benchmark for sample prompts (documented sample set).
+4. Deterministic outputs for the provided canonical prompt set at default settings.
+
+Packaging, Distribution, and Licensing Options
+
+- Freemium model: LDR binary + micro-models distributed under open license; free for individual developers.
+- Enterprise bundle: additional sample datasets, longer KV-cache snapshots, and an offline telemetry-forwarding plugin under commercial license.
+
+Pricing table (proposed)
+
+| SKU | Distribution | Price | Notes |
+|---|---:|---:|---|
+| LDR Community | Binary + micro-models | Free | Individual developers, redistributable. |
+| LDR Enterprise | Binary + extended artifacts + plugin | $12k / year | Includes support, license to use extended artifacts in air-gapped demos. |
+
+Roadmap and Phases
+
+- Phase 0 (Q4 2025): internal alpha for SEs and Platform.
+- Phase 1 (Q1 2026): external beta, packaging improvements, telemetry opt-in UX.
+- Phase 2 (Q2 2026): enterprise bundle and onboarding playbook; marketplace listing.
+
+Rollout and Migration Plan
+
+1. Internal dogfood: SE demos and developer productivity teams (2 weeks).
+2. Private beta: 10 strategic customers (4 weeks) — collect feedback on model fidelity and license implications.
+3. Public beta: open to wider community with clear license and telemetry defaults (6 weeks).
+4. GA: announce in Console and Docs; provide migration checklist for customers moving from LDR proxy to Hosted/Dedicated/Private endpoints.
+
+Operational and Support Considerations
+
+- Support: Developer experience first-line with escalation to Research for model fidelity questions.
+- Metrics to track: installs (opt-in), telemetry forward rate, mismatch rate between LDR cost estimate and hosted cost for matched prompts.
+- Known limits: LDR does not emulate preemption behavior or dedicated GPU latency characteristics.
+
+Open Risks and Mitigations
+
+- Licensing risk: Mitigation — Legal signoff and conservative model selection; feature flags to remove suspect artifacts quickly.
+- Customer confusion about production-readiness: Mitigation — Strong UI/UX banners and docs emphasizing LDR as not-for-production.
+- Telemetry privacy concerns: Mitigation — default off and local-first design; clear docs and opt-in prompts.
+
+Acceptance Tests and QA Checklist
+
+1. End-to-end sample app runs locally and matches snapshot responses.
+2. Cost estimator exercised with 1000 sample prompts; error within acceptance bounds.
+3. SDK examples run in CI containers (Linux) and report telemetry to local file.
+
+Owners and Next Steps
+
+- Product lead: Maya Chen (owner).
+- Engineering lead: Rafael Ortiz.
+- Research lead: Priya Nair.
+- Next steps: finalize packaging format, complete legal/model clearance, and schedule private beta for 2026-03.
+
+Appendix: Configuration Reference (example)
+
+- ldr.yaml (example):
+
+```
+mode: local # local | proxy
+port: 8080
+telemetry: local # off | local | forward
+cost_config: ./cost.yaml
+model: ldr-micro-v1
+```
+
+- FAQ (short):
+
+Q: Can I use LDR to benchmark Dedicated capacity?
+A: No. LDR provides representative cost/latency signals for development and should not be used for production capacity planning.
+
+Q: Will LDR outputs match Hosted exactly?
+A: Not necessarily. LDR uses distilled micro-models and deterministic sampling to offer reproducible behavior; fidelity will be documented per prompt set.
+
+End of spec.

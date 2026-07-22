@@ -1,0 +1,70 @@
+@prefix c4isr: <http://www.nato.int/ontologies/c4isr#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix c2sim: <http://www.sisostds.org/ontologies/C2SIM#> .
+@prefix lox: <http://www.sisostds.org/ontologies/lox#> .
+@prefix cwix: <http://www.sisostds.org/ontologies/C2SIM/cwix2023#> .
+@prefix tkeir: <http://tkeir.local/ontology/> .
+@prefix tkeirdoc: <http://tkeir.local/doc/> .
+<http://www.nato.int/ontologies/c4isr#> a owl:Ontology ; rdfs:label "NATO C4ISR"@en .
+c4isr:Class0 a owl:Class ; rdfs:label "NATO C4ISR Class 0"@en .
+c4isr:asset0 a c4isr:Class0 ; rdfs:label "Asset 0"@en .
+c4isr:Class1 a owl:Class ; rdfs:label "NATO C4ISR Class 1"@en ; rdfs:subClassOf c4isr:Class0 .
+c4isr:asset1 a c4isr:Class1 ; rdfs:label "Asset 1"@en .
+c4isr:Class2 a owl:Class ; rdfs:label "NATO C4ISR Class 2"@en ; rdfs:subClassOf c4isr:Class1 .
+c4isr:asset2 a c4isr:Class2 ; rdfs:label "Asset 2"@en .
+c4isr:Class3 a owl:Class ; rdfs:label "NATO C4ISR Class 3"@en ; rdfs:subClassOf c4isr:Class2 .
+c4isr:asset3 a c4isr:Class3 ; rdfs:label "Asset 3"@en .
+c4isr:Class4 a owl:Class ; rdfs:label "NATO C4ISR Class 4"@en ; rdfs:subClassOf c4isr:Class3 .
+c4isr:asset4 a c4isr:Class4 ; rdfs:label "Asset 4"@en .
+c4isr:Class5 a owl:Class ; rdfs:label "NATO C4ISR Class 5"@en ; rdfs:subClassOf c4isr:Class4 .
+c4isr:asset5 a c4isr:Class5 ; rdfs:label "Asset 5"@en .
+c4isr:Class6 a owl:Class ; rdfs:label "NATO C4ISR Class 6"@en ; rdfs:subClassOf c4isr:Class5 .
+c4isr:asset6 a c4isr:Class6 ; rdfs:label "Asset 6"@en .
+c4isr:Class7 a owl:Class ; rdfs:label "NATO C4ISR Class 7"@en ; rdfs:subClassOf c4isr:Class6 .
+c4isr:asset7 a c4isr:Class7 ; rdfs:label "Asset 7"@en .
+c4isr:Class8 a owl:Class ; rdfs:label "NATO C4ISR Class 8"@en ; rdfs:subClassOf c4isr:Class7 .
+c4isr:asset8 a c4isr:Class8 ; rdfs:label "Asset 8"@en .
+c4isr:Class9 a owl:Class ; rdfs:label "NATO C4ISR Class 9"@en ; rdfs:subClassOf c4isr:Class8 .
+c4isr:asset9 a c4isr:Class9 ; rdfs:label "Asset 9"@en .
+c4isr:Class10 a owl:Class ; rdfs:label "NATO C4ISR Class 10"@en ; rdfs:subClassOf c4isr:Class9 .
+c4isr:asset10 a c4isr:Class10 ; rdfs:label "Asset 10"@en .
+c4isr:Class11 a owl:Class ; rdfs:label "NATO C4ISR Class 11"@en ; rdfs:subClassOf c4isr:Class10 .
+c4isr:asset11 a c4isr:Class11 ; rdfs:label "Asset 11"@en .
+c4isr:Class12 a owl:Class ; rdfs:label "NATO C4ISR Class 12"@en ; rdfs:subClassOf c4isr:Class11 .
+c4isr:asset12 a c4isr:Class12 ; rdfs:label "Asset 12"@en .
+c4isr:Class13 a owl:Class ; rdfs:label "NATO C4ISR Class 13"@en ; rdfs:subClassOf c4isr:Class12 .
+c4isr:asset13 a c4isr:Class13 ; rdfs:label "Asset 13"@en .
+c4isr:Class14 a owl:Class ; rdfs:label "NATO C4ISR Class 14"@en ; rdfs:subClassOf c4isr:Class13 .
+c4isr:asset14 a c4isr:Class14 ; rdfs:label "Asset 14"@en .
+c4isr:Class15 a owl:Class ; rdfs:label "NATO C4ISR Class 15"@en ; rdfs:subClassOf c4isr:Class14 .
+c4isr:asset15 a c4isr:Class15 ; rdfs:label "Asset 15"@en .
+c4isr:Class16 a owl:Class ; rdfs:label "NATO C4ISR Class 16"@en ; rdfs:subClassOf c4isr:Class15 .
+c4isr:asset16 a c4isr:Class16 ; rdfs:label "Asset 16"@en .
+c4isr:Class17 a owl:Class ; rdfs:label "NATO C4ISR Class 17"@en ; rdfs:subClassOf c4isr:Class16 .
+c4isr:asset17 a c4isr:Class17 ; rdfs:label "Asset 17"@en .
+c4isr:Class18 a owl:Class ; rdfs:label "NATO C4ISR Class 18"@en ; rdfs:subClassOf c4isr:Class17 .
+c4isr:asset18 a c4isr:Class18 ; rdfs:label "Asset 18"@en .
+c4isr:Class19 a owl:Class ; rdfs:label "NATO C4ISR Class 19"@en ; rdfs:subClassOf c4isr:Class18 .
+c4isr:asset19 a c4isr:Class19 ; rdfs:label "Asset 19"@en .
+c4isr:Class20 a owl:Class ; rdfs:label "NATO C4ISR Class 20"@en ; rdfs:subClassOf c4isr:Class19 .
+c4isr:asset20 a c4isr:Class20 ; rdfs:label "Asset 20"@en .
+c4isr:Class21 a owl:Class ; rdfs:label "NATO C4ISR Class 21"@en ; rdfs:subClassOf c4isr:Class20 .
+c4isr:asset21 a c4isr:Class21 ; rdfs:label "Asset 21"@en .
+c4isr:Class22 a owl:Class ; rdfs:label "NATO C4ISR Class 22"@en ; rdfs:subClassOf c4isr:Class21 .
+c4isr:asset22 a c4isr:Class22 ; rdfs:label "Asset 22"@en .
+c4isr:Class23 a owl:Class ; rdfs:label "NATO C4ISR Class 23"@en ; rdfs:subClassOf c4isr:Class22 .
+c4isr:asset23 a c4isr:Class23 ; rdfs:label "Asset 23"@en .
+c4isr:Class24 a owl:Class ; rdfs:label "NATO C4ISR Class 24"@en ; rdfs:subClassOf c4isr:Class23 .
+c4isr:asset24 a c4isr:Class24 ; rdfs:label "Asset 24"@en .
+c4isr:Class25 a owl:Class ; rdfs:label "NATO C4ISR Class 25"@en ; rdfs:subClassOf c4isr:Class24 .
+c4isr:asset25 a c4isr:Class25 ; rdfs:label "Asset 25"@en .
+c4isr:Class26 a owl:Class ; rdfs:label "NATO C4ISR Class 26"@en ; rdfs:subClassOf c4isr:Class25 .
+c4isr:asset26 a c4isr:Class26 ; rdfs:label "Asset 26"@en .
+c4isr:Class27 a owl:Class ; rdfs:label "NATO C4ISR Class 27"@en ; rdfs:subClassOf c4isr:Class26 .
+c4isr:asset27 a c4isr:Class27 ; rdfs:label "Asset 27"@en .
+c4isr:Class28 a owl:Class ; rdfs:label "NATO C4ISR Class 28"@en ; rdfs:subClassOf c4isr:Class27 .
+c4isr:asset28 a c4isr:Class28 ; rdfs:label "Asset 28"@en .
+c4isr:Class29 a owl:Class ; rdfs:label "NATO C4ISR Class 29"@en ; rdfs:subClassOf c4isr:Class28 .
+c4isr:asset29 a c4isr:Class29 ; rdfs:label "Asset 29"@en .

@@ -1,4 +1,12 @@
-"""Audit report rendering."""
+"""Title: Report
+
+Audit report rendering.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

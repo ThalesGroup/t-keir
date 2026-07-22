@@ -1,0 +1,317 @@
+Dedicated Burst Capacity: Audit Logging Events (Config, Overrides, Administrative Actions)
+
+## 1. Purpose
+This document defines the **audit events** required for the Dedicated **Burst Capacity** feature. The intent is to ensure that:
+- All **customer-impacting configuration changes** are attributable to an actor, traceable to a request, and available for compliance evidence.
+- Any **administrative override** (including emergency actions) is recorded with sufficient context (who/what/why/when).
+- Audit logs are consistent across control plane services and are safe to expose to customers where applicable.
+
+This spec is used by:
+- Platform Control Plane engineering (event production)
+- Security engineering (schema, access controls, retention)
+- SRE (incident forensics)
+- CS/Support (customer explanations)
+- Legal/Finance (contractual statements, dispute resolution)
+
+## 2. Scope
+### In scope
+Audit events for:
+- Tenant-level burst configuration changes (enable/disable, caps/limits, priority tier)
+- Policy guardrail changes that affect admission (e.g., max burst ratio, cooldown windows) when modified outside standard release/config pipelines
+- Administrative actions and overrides (including emergency circuit breaker actions)
+- Permissions and access to sensitive burst debugging tools (who accessed decision explanation, who ran an override)
+
+### Out of scope
+- Standard request/response logs for data plane inference requests (covered by existing gateway telemetry policies)
+- Per-request admission decisions as a full audit trail (too high volume). Instead, we audit **configuration and override state** and provide sampled/aggregated decision telemetry separately.
+
+## 3. Definitions
+- **Tenant**: A Dedicated customer account/environment represented by `tenant_id`.
+- **Burst configuration**: Controls that allow a tenant to temporarily exceed reserved baseline capacity via Redwood-managed burst pools.
+- **Override**: A non-default change that bypasses or modifies admission behavior outside customer-configured limits (e.g., allow temporary burst above cap, force deny bursts for tenant, disable burst in a region).
+- **Actor**: Entity that initiated the change.
+  - Human user (Redwood employee, customer admin)
+  - Service identity (automation, control plane job)
+
+## 4. Systems that must emit events
+| System / service | Responsibility | Notes |
+|---|---|---|
+| `control-plane-api` | Primary authoring surface for tenant burst config | Emits config change events + validation failures when relevant |
+| `policy-engine` | Evaluates admission guardrail rules; stores global/fleet rules | Emits policy change and override events |
+| `burst-admission-controller` | Enforces admission + fairness; implements circuit breaker hooks | Emits events for admin actions (breaker toggles, forced denies) and access to debug endpoints |
+| `console-backend` | Customer-visible surfaces; read-only access paths | Emits events for customer admin actions, and for support impersonation sessions if used |
+| `billing-metering-exporter` | Exports burst usage metering (non-audit) | Not an audit producer; referenced for correlation IDs only |
+
+## 5. Audit event requirements (global)
+### 5.1 Required baseline fields (all events)
+All burst audit events MUST include the following fields in the audit log payload (field names are normative). When a field is not applicable, it must be omitted (not set to null).
+
+**Event identity & timing**
+- `event_id` (UUID)
+- `event_time` (RFC3339/UTC)
+- `event_name` (string; see catalog below)
+- `event_version` (integer; start at 1)
+
+**Actor & access context**
+- `actor_type` (one of: `redwood_employee`, `customer_user`, `service_principal`)
+- `actor_id` (employee id / user id / service principal id)
+- `actor_email` (for humans when available)
+- `actor_roles` (RBAC roles evaluated at time of action; string list serialized, e.g. "[\"support_oncall\",\"platform_admin\"]")
+- `actor_ip` (source IP if available)
+- `user_agent` (if from web/SDK)
+- `authn_method` (e.g. `sso`, `api_key`, `oauth`, `m2m`)
+
+**Request & traceability**
+- `request_id` (control plane request id)
+- `trace_id` (distributed tracing correlation id)
+- `change_ticket` (e.g. Linear/Jira id) when action requires a ticket; see §8
+
+**Target resource**
+- `tenant_id` (if tenant-scoped)
+- `resource_type` (e.g. `burst_config`, `burst_override`, `burst_circuit_breaker`, `burst_feature_flag`)
+- `resource_id` (stable id; for tenant config use `tenant_id`)
+- `region` (if scoped)
+- `hardware_class` (e.g. `h100`, `l40s`) if scoped
+
+**Outcome**
+- `outcome` (`success` | `denied` | `error`)
+- `error_code` (if denied/error)
+- `error_message` (redacted; short)
+
+### 5.2 Change representation rules
+For change events, include:
+- `change_type` (`create` | `update` | `delete` | `enable` | `disable`)
+- `before` and `after` snapshots **only for the fields that changed**.
+
+Sensitive values must be redacted (see §7). For example, do not emit raw API keys, internal capacity pool IDs that could reveal fleet topology beyond what is necessary, or any prompt/content.
+
+### 5.3 Determinism + non-repudiation
+- Events must be written to the audit store **before** acknowledging successful config writes to the caller (best effort: at-most-once log emission is not acceptable for config changes; see §10.2).
+- For asynchronous workflows, emit both:
+  - `...requested` when a change is accepted for processing
+  - `...applied` when it takes effect
+
+## 6. Event catalog (normative)
+Event names follow: `burst.<domain>.<action>`.
+
+### 6.1 Tenant burst configuration
+| Event name | Trigger | Producer | Actor | Required additional attributes | Notes |
+|---|---|---|---|---|---|
+| `burst.config.enabled` | Burst enabled for a tenant | `control-plane-api` | customer user or Redwood employee | `tenant_id`, `after` (enabled=true), `burst_plan` | `burst_plan` is a packaging identifier (e.g. `standard`, `enterprise_gold`) not a price |
+| `burst.config.disabled` | Burst disabled for a tenant | `control-plane-api` | customer user or Redwood employee | `tenant_id`, `before` (enabled=true), `after` (enabled=false) | Emit even if disabled due to incident response |
+| `burst.config.updated` | Any burst limit/guardrail updated at tenant level | `control-plane-api` | customer user or Redwood employee | `tenant_id`, `before`, `after`, `effective_at` (if delayed) | Examples: max burst ratio, per-tenant cap, cooldown window |
+| `burst.config.validation_failed` | Attempted change fails validation | `control-plane-api` | customer user or Redwood employee | `tenant_id` (if known), `validation_errors` | `validation_errors` should be a short string, not a structured object (avoid nested) |
+
+**Tenant config fields that are auditable (when changed)**
+- `enabled` (boolean)
+- `max_burst_ratio` (e.g. 1.0–3.0)
+- `burst_gpu_cap` (integer GPUs or GPU-slices; specify units in field string e.g. "8 gpus")
+- `burst_qps_cap` (if applicable)
+- `cooldown_seconds`
+- `priority_tier` (`standard`, `silver`, `gold`) 
+- `deny_on_slo_regression` (boolean; if this differs per tenant)
+- `regions_allowed` and `hardware_classes_allowed` (if explicitly constrained)
+
+### 6.2 Policy guardrails & global limits
+These changes are restricted to authorized Redwood roles and typically require an approved change ticket.
+
+| Event name | Trigger | Producer | Actor | Required additional attributes | Notes |
+|---|---|---|---|---|---|
+| `burst.policy.rule.created` | New guardrail rule added | `policy-engine` | Redwood employee/service principal | `rule_id`, `after`, `scope` | `scope` as string (e.g. "global" / "region=us-east" / "hardware=h100") |
+| `burst.policy.rule.updated` | Guardrail rule modified | `policy-engine` | Redwood employee/service principal | `rule_id`, `before`, `after`, `scope` | Include `reason` when manually modified during an incident |
+| `burst.policy.rule.deleted` | Guardrail rule removed | `policy-engine` | Redwood employee/service principal | `rule_id`, `before`, `scope` | Deletions require ticket + reviewer approval (see §8) |
+| `burst.policy.slo_gate.updated` | SLO-based gating thresholds changed | `policy-engine` | Redwood employee/service principal | `before`, `after`, `metric_name`, `threshold` | This is highly sensitive; must be restricted access |
+
+### 6.3 Administrative overrides
+Overrides are intended to be time-bounded and attributable.
+
+| Event name | Trigger | Producer | Actor | Required additional attributes | Notes |
+|---|---|---|---|---|---|
+| `burst.override.created` | Create an override (allow/deny/raise cap) | `policy-engine` | Redwood employee | `override_id`, `override_type`, `expires_at`, `after`, `reason`, `change_ticket` | `override_type`: `force_allow`, `force_deny`, `raise_cap`, `lower_cap` |
+| `burst.override.updated` | Modify an override | `policy-engine` | Redwood employee | `override_id`, `before`, `after`, `reason`, `change_ticket` | Any extension of `expires_at` must include explicit reason |
+| `burst.override.deleted` | Remove an override early | `policy-engine` | Redwood employee | `override_id`, `before`, `change_ticket` | Record if removed due to rollback |
+| `burst.override.expired` | Override reaches expiry | `policy-engine` | service principal | `override_id`, `before`, `expires_at` | Actor is the expiry job/service principal |
+
+### 6.4 Circuit breakers & emergency controls
+| Event name | Trigger | Producer | Actor | Required additional attributes | Notes |
+|---|---|---|---|---|---|
+| `burst.circuit_breaker.enabled` | Global or scoped circuit breaker enabled | `burst-admission-controller` | Redwood employee/service principal | `scope`, `reason`, `effective_at` | Scope examples: "global", "region=eu-west", "hardware=h100" |
+| `burst.circuit_breaker.disabled` | Circuit breaker disabled | `burst-admission-controller` | Redwood employee/service principal | `scope`, `reason` | Must reference incident id when applicable |
+| `burst.fleet_safety_cap.updated` | Fleet safety cap changed | `policy-engine` | Redwood employee | `before`, `after`, `scope`, `change_ticket` | Treated like a policy change |
+
+### 6.5 Access to sensitive burst debugging and support tooling
+We audit access to tools that can reveal admission rationale, internal states, or tenant configuration, even if no change is made.
+
+| Event name | Trigger | Producer | Actor | Required additional attributes | Notes |
+|---|---|---|---|---|---|
+| `burst.debug.decision_explained` | Debug endpoint used to explain admit/deny | `burst-admission-controller` | Redwood employee | `tenant_id`, `region`, `hardware_class`, `explanation_mode`, `redaction_level` | Must not include prompts or customer data payloads; log only metadata |
+| `burst.support.impersonation.started` | Support impersonation session begins | `console-backend` | Redwood employee | `tenant_id`, `session_id`, `reason`, `change_ticket` | Only if impersonation is supported; otherwise omit event |
+| `burst.support.impersonation.ended` | Support impersonation session ends | `console-backend` | Redwood employee | `tenant_id`, `session_id` | |
+| `burst.audit.exported` | Audit logs exported (customer request / evidence) | `control-plane-api` | Redwood employee/service principal | `tenant_id`, `time_range`, `export_format`, `reason`, `change_ticket` | No bulk cross-tenant exports without Security approval |
+
+### 6.6 Feature flags (rollout controls)
+Feature flags that change customer behavior must be auditable.
+
+| Event name | Trigger | Producer | Actor | Required additional attributes | Notes |
+|---|---|---|---|---|---|
+| `burst.feature_flag.updated` | Burst rollout gate changed (region/hardware allow-list, per-tenant enablement) | `control-plane-api` | Redwood employee/service principal | `flag_name`, `before`, `after`, `scope`, `change_ticket` | Includes kill-switch toggles |
+
+## 7. Data classification, redaction, and customer sensitivity
+### 7.1 Data classification
+Burst audit logs are classified as **Restricted** because they may contain:
+- Customer identifiers (`tenant_id`, account names via joins)
+- Operational details (regions, hardware classes, guardrail thresholds)
+- Security-sensitive actions (override usage)
+
+### 7.2 Redaction rules
+Never include:
+- API keys, secrets, bearer tokens
+- Prompt text, generated text, embeddings, or user content
+- Raw internal pool instance IDs that reveal exact fleet topology (use `region` + `hardware_class` + logical pool name if needed)
+
+Allowed content:
+- Tenant id
+- Config fields and numeric limits (caps/ratios) 
+- Reason codes and short human-entered reasons (must not include customer content)
+
+If a reason string is free-form, enforce:
+- Max length 512 chars
+- Reject/strip newlines
+- Log pipeline must apply basic PII detection and flag suspicious entries to Security (best-effort)
+
+## 8. Change management requirements (tickets + approvals)
+### 8.1 Actions requiring a change ticket
+The following MUST include `change_ticket`:
+- Any `burst.policy.*` change made outside standard versioned deployment artifacts
+- Any `burst.override.*` create/update/delete
+- Any `burst.fleet_safety_cap.updated`
+- Any cross-tenant `burst.audit.exported`
+
+Recommended ticket systems:
+- Linear: `ENG-*`, `PM-*`
+- Jira (incidents/support): `INC-*`, `INT-*`
+
+### 8.2 Two-person rule (recommended)
+For high-risk actions, require an approval workflow and include `approved_by` as a string field (email) in the event payload:
+- Global circuit breaker disable in peak hours
+- Increasing fleet safety caps
+- Creating overrides affecting multiple tenants
+
+If implementation cannot enforce approvals at execution time, document the manual approval in the ticket and ensure the event includes the `change_ticket`.
+
+## 9. Retention, storage, and access control
+### 9.1 Retention
+- Default retention for burst audit logs: **400 days** (meets typical enterprise/SOC2 evidence needs while limiting risk)
+- For customers under contractual audit retention requirements, retention is handled by the platform’s standard audit retention policy; do not implement per-tenant retention forks in burst services.
+
+### 9.2 Storage and integrity
+- Audit events are written to the central audit pipeline (Append-only store).
+- Storage must support immutable retention windows (WORM-equivalent controls via object lock where applicable).
+
+### 9.3 Access
+- Read access restricted to:
+  - Security engineering and compliance (broad)
+  - SRE on-call (incident-only)
+  - Support/CS (tenant-scoped only, with ticket reference)
+- All access to audit logs should be audited by the existing audit system (meta-audit).
+
+## 10. Implementation guidance
+### 10.1 Event emission points (recommended)
+- Emit audit events at the **command boundary** (where the system decides to apply a change), not in downstream async workers.
+- For multi-step propagation, use `...requested` and `...applied` patterns.
+
+### 10.2 Failure handling
+- If audit write fails, config changes must fail closed for:
+  - `burst.config.*` writes
+  - `burst.override.*`
+  - `burst.circuit_breaker.*`
+
+Exceptions: None for burst controls.
+
+### 10.3 Idempotency
+For config updates and override creates, include:
+- `idempotency_key` when supported by the caller
+- The audit pipeline should deduplicate by (`event_name`, `request_id`) as a safety mechanism, but producers remain responsible for consistent emission.
+
+## 11. Sample audit events (examples)
+### 11.1 Tenant burst enabled
+```json
+{
+  "event_id": "2c3f8b8b-3a71-4ac9-9f6d-88e1f2ef0c1a",
+  "event_time": "2025-03-12T19:22:41Z",
+  "event_name": "burst.config.enabled",
+  "event_version": 1,
+  "actor_type": "redwood_employee",
+  "actor_id": "emp_1842",
+  "actor_email": "miguel.santos@redwoodinference.com",
+  "actor_roles": "[\"customer_success\",\"dedicated_admin\"]",
+  "actor_ip": "203.0.113.10",
+  "authn_method": "sso",
+  "request_id": "cp_req_01HRQY3C0Y1VJ6S0J5K9",
+  "trace_id": "b8d1a8f2a3f7b0b1",
+  "resource_type": "burst_config",
+  "resource_id": "tenant_9d2c",
+  "tenant_id": "tenant_9d2c",
+  "region": "us-east",
+  "hardware_class": "h100",
+  "change_type": "enable",
+  "after": "enabled=true; max_burst_ratio=2.0; burst_gpu_cap=8 gpus; cooldown_seconds=300; priority_tier=standard",
+  "burst_plan": "standard",
+  "outcome": "success"
+}
+```
+
+### 11.2 Override created during incident
+```json
+{
+  "event_id": "37c0d7b6-9f9c-4c71-a59b-2a1f3c0a2c44",
+  "event_time": "2025-05-18T03:11:05Z",
+  "event_name": "burst.override.created",
+  "event_version": 1,
+  "actor_type": "redwood_employee",
+  "actor_id": "emp_0319",
+  "actor_email": "peter.holtz@redwoodinference.com",
+  "actor_roles": "[\"sre_oncall\",\"platform_admin\"]",
+  "actor_ip": "198.51.100.27",
+  "authn_method": "sso",
+  "request_id": "pe_req_01HS9A2P88VZKQ",
+  "trace_id": "0fca2d4f3a992d31",
+  "resource_type": "burst_override",
+  "resource_id": "ovr_7f31",
+  "tenant_id": "tenant_4a11",
+  "region": "eu-west",
+  "hardware_class": "l40s",
+  "override_type": "force_deny",
+  "expires_at": "2025-05-18T04:11:05Z",
+  "after": "force_deny=true; reason_code=FLEET_SAFETY",
+  "reason": "Mitigation: elevated non-burst p95 latency; temporary deny bursts while circuit breaker thresholds are tuned.",
+  "change_ticket": "INC-1842",
+  "outcome": "success"
+}
+```
+
+## 12. Compliance mapping (reference)
+This section helps auditors and internal reviewers understand how these events support common controls.
+
+- **SOC 2 CC7.2 / CC7.3 (change management / monitoring):**
+  - Captures administrative changes to burst configs and guardrails.
+  - Captures incident-driven overrides and breaker toggles.
+- **SOC 2 CC6.x (logical access):**
+  - Captures actor identity, roles, and authentication method.
+  - Captures access to sensitive debug and impersonation tooling.
+- **Customer contractual audit clauses:**
+  - Provides a defensible record of customer-visible configuration changes and Redwood administrative interventions.
+
+## 13. Open questions / future enhancements
+- Customer self-serve audit export: whether we provide tenant-scoped export directly in Console for Dedicated Enterprise plans.
+- Signing audit events at the producer (application-level signatures) vs relying on storage immutability controls.
+- Standardizing `approved_by` workflow enforcement for two-person rule actions.
+
+## 14. Ownership
+- Document owner: Security & Compliance (Naomi Feldman)
+- Implementation owners:
+  - Control plane event emission: Ethan Park
+  - Policy engine rule/override events: Jordan Lee
+  - Admission controller debug + breaker events: Vikram Singh / Sean Gallagher (SRE review)
+
+For questions or to request an exception, file a Security review ticket and link this page.

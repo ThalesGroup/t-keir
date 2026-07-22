@@ -1,4 +1,12 @@
-"""Tests for RAG runtime configuration loading."""
+"""Title: Rag Config
+
+Tests for RAG runtime configuration loading.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tools.search.rag_config import (
     RagPassageConfig,

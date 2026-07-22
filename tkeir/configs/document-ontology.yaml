@@ -12,16 +12,18 @@ document-ontology:
       similarity-threshold: 0.85
       min-cluster-size: 2
     save-alignment: false
-    # Enrich document graphs from existing ontologies (e.g. C2SIM) before Vespa.
-    # Paths may be absolute, relative to cwd/workspace, or use ${ENV} expansion.
-    # Per-document override: derive_from_ontologies: [path, ...]
+    # Enrich document graphs from existing ontologies before Vespa.
+    # Keep enabled=false here; prefer per-request uploads (ingest ontology_file).
+    # Relative names resolve under tkeir/resources/ontologies/ only (not workspace).
+    # Absolute paths (e.g. staged under INGEST_ROOT) are also accepted.
     derive-from:
       enabled: false
       paths: []
-      # Example (after `make corpus`):
+      # Example (bundled generic ontology):
       # paths:
-      #   - workspace/corpus_nato/ontologies/c2sim_combined.ttl
-      #   - workspace/corpus_nato/ontologies/c2sim_c4isr.ttl
+      #   - example-domain.ttl
+      # Example (absolute / operator-mounted):
+      #   - /data/shared/reference.owl
       similarity-threshold: 0.8
       match-classes: true
       match-individuals: true

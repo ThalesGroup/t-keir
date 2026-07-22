@@ -1,0 +1,122 @@
+AWS Marketplace offer preflight playbook (2026): launch checklist + hero copy templates
+
+h1. Purpose
+This playbook is the standard preflight packet for an AWS Marketplace offer (new listing or major revision). It covers:
+- The required artifacts to unblock Procurement/Legal review
+- Recommended SKU structure and metering defaults
+- Approved hero copy templates (with compliance-safe language)
+- A one-page co-sell blurb template for AWS Partner Ops
+
+This page was created after repeated partner asks for a “short checklist + 2–3 hero copy options” to speed internal alignment.
+
+h1. When to use
+Use this playbook when:
+- A partner requests an AWS Marketplace listing (public listing, private offer, or both)
+- A deal is targeting AWS co-sell registration
+- Procurement requests a “preflight checklist” before engaging Legal/Security
+
+h1. Owners and turnaround expectations
+- DRI (Partners/Marketplace): Partnerships Director (default)
+- Messaging: Product Marketing
+- Packaging/Metering: Platform GTM + Product
+- Co-sell: Partner Ops enablement
+
+SLA targets (typical):
+1) Preflight checklist + draft hero copy within 2 business days
+2) Consolidated partner packet within 3 business days
+
+h1. Preflight packet contents (send as one consolidated PDF or folder)
+Deliverables to include:
+1) Offer preflight checklist (see below)
+2) Hero copy options (2–3) + subheadline
+3) SKU + metering summary (1 page)
+4) Co-sell one-pager blurb (paragraph + value props + use cases)
+5) Image guidance notes (or link to latest design guidance)
+
+h1. Offer preflight checklist (required artifacts)
+The table below is the canonical “what we need” list. If a partner asks for a checklist, copy/paste this section into email and offer to provide a filled-in version.
+
+h2. Checklist table
+| Category | Item | Required for | Notes / tips |
+|---|---|---|---|
+| Listing basics | Product name + short description | All offers | Keep description consistent with website naming; avoid unverified superlatives. |
+| Listing basics | Category + keywords | All offers | Use stable keyword set across AWS + website + decks. |
+| Packaging | SKU names + SKU descriptions | All offers | See recommended SKU set below; keep names stable for billing mappings. |
+| Metering | Metering dimension(s) + unit definitions | SaaS offers | Prefer token-based metering where applicable; define rounding/minimums explicitly. |
+| Pricing | Public price card | Public listing | Include any volume tiers and minimum monthly commits if applicable. |
+| Pricing | Private Offer readiness | Enterprise deals | Confirm discount bands and approval path; define start/end dates and renewal term language. |
+| Legal | EULA/contract addendum link | All offers | Confirm latest template; avoid partner-specific edits without Legal review. |
+| Security | SOC 2 / ISO status statement | Most enterprise deals | Provide the “what we can share” summary and the evidence request process. |
+| Support | Support tiers + response times | All offers | Provide business hours, P1 expectations, and escalation channel. |
+| Images | Hero image(s) + logo usage approval | Public listing | Follow AWS image constraints; do not use customer logos without written permission. |
+| Sales enablement | Value props (top 3) + ICP | Co-sell | Must map to measurable outcomes; avoid hard performance numbers unless approved. |
+| Implementation | Getting started steps + prerequisites | All offers | Include IAM/network prerequisites and onboarding timeline ranges. |
+
+h1. SKU and metering guidance (2026 standard)
+This section supersedes older notes that used different metering for dedicated capacity.
+
+h2. Recommended SKU set
+Default recommendation is 3 SKUs (use 2 only if product scope is narrow):
+- Standard (Shared hosted): best for trials, dev/test, and smaller workloads
+- Dedicated (Reserved capacity): best for predictable production workloads needing isolation
+- Enterprise (Private Offer only): used when commercial terms require custom commitments, add-ons, or bundled support
+
+Important: Some partners will ask whether “standard/dedicated” is final so their billing team can map the catalog. For 2026, these names are the preferred defaults; only change if there is an existing contracted naming scheme.
+
+h2. Metering and pricing defaults
+- Primary usage metric (preferred): tokens-in/tokens-out (or “total tokens processed” if a single dimension is required)
+- Dedicated capacity: prefer token-based metering plus a minimum monthly commit rather than vGPU-hour metering, unless Finance explicitly requires capacity-based billing for that product line
+- Pricing footnotes to include:
+  1) Clear definition of what counts as input vs output tokens
+  2) Rounding behavior and any minimum billable unit
+  3) Overages/burst behavior (if enabled)
+
+h2. Private Offer guidance
+- Default: enable Private Offer for initial enterprise customers to accelerate procurement and ensure predictable billing
+- Include in partner packet:
+  - Proposed term (12/24/36 months)
+  - Discount band (if pre-approved)
+  - Start date, renewal behavior, and any ramp schedule
+
+h1. Hero copy templates (compliance-safe)
+Keep hero copy short (target: <= 85 characters for the main line). Avoid unapproved hard claims (exact latency, “X% cheaper”) unless Product + Legal sign-off is recorded.
+
+h2. Options (2026)
+Option A — "LLM inference, production-grade: predictable latency and cost at scale."
+Subline — "Run open and custom models—fast, reliable, and cloud-ready."
+
+Option B — "Ship AI features with zero ops friction: high-throughput inference for teams."
+Subline — "Dedicated capacity, private options, and integrated cost controls."
+
+Option C — "Cut inference costs. Keep quality. Scale confidently."
+Subline — "Unified runtime across hosted, dedicated, and private deployments."
+
+Notes:
+- Option B text reflects the preferred legal-friendly wording (“with zero ops friction”) and replaces older phrasing (“without the ops”).
+- If a partner requests stronger performance language, route to Product for claim substantiation and approval.
+
+h1. Co-sell blurb template (AWS Partner Ops)
+Provide AWS Partner Ops a single paragraph plus 3 value props and 3 use cases.
+
+h2. One-paragraph template
+"Redwood Inference helps teams ship production AI features by providing reliable, cost-controlled model inference across shared hosted and dedicated capacity. Customers use Redwood to reduce operational overhead, improve predictability for latency-sensitive workloads, and scale usage with clear commercial terms through AWS Marketplace."
+
+h2. Top 3 value props (edit to fit product scope)
+- Predictable performance for production inference workloads
+- Cost controls and transparent metering aligned to usage
+- Flexible deployment options (shared, dedicated, private offer commercial paths)
+
+h2. Top 3 use cases (choose the most relevant)
+- Agentic workflows and RAG applications in customer support and knowledge search
+- Real-time personalization and recommendation inference
+- Internal copilots and document automation for operations teams
+
+h1. Email-ready response (copy/paste)
+Subject: AWS Marketplace preflight pack: checklist + hero copy + SKU guidance
+
+Body:
+"Thanks—attached is our AWS Marketplace offer preflight pack. It includes (1) the required artifacts checklist, (2) 3 hero copy options with sublines, (3) recommended SKU/metering defaults, and (4) a co-sell one-paragraph summary + value props/use cases. If Procurement/Legal needs MSA redlines or security evidence, tell us what format they prefer and we’ll prioritize."
+
+h1. Change log
+- 2026-12-10: Updated Option B hero copy to “with zero ops friction” and clarified SKU/metering default to prefer token-based metering for dedicated offers unless Finance requires capacity-based billing.
+- 2026-11-05: Initial publication based on partner request pattern (checklist + 2–3 hero copy options + SKU guidance + co-sell blurb).

@@ -1,4 +1,12 @@
-"""Repair SHACL violations in document ontology graphs (rule-based only)."""
+"""Title: Ontology Repairer
+
+Repair SHACL violations in document ontology graphs (rule-based only).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

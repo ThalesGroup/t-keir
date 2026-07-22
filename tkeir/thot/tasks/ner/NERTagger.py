@@ -1,9 +1,11 @@
-"""NER Tagger
+"""Title: NER Tagger
 
-Author : Eric Blaudez (Eric Blaudez)
+Named-entity recognition for the T-KEIR NLP pipeline.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import gc
@@ -252,6 +254,8 @@ class NERTagger:
                         )
 
         self._count_run = 0
+        if "entity_ruler" in self._nlp.pipe_names:
+            self._nlp.remove_pipe("entity_ruler")
         ruler = self._nlp.add_pipe("entity_ruler")
         ruler.add_patterns(patterns)
 
@@ -431,6 +435,18 @@ class NERTagger:
             mwe_ner_title = self._ner_from_mwe(tkeir_doc["title_morphosyntax"])
         self._merge_mwe_ners(mwe_ner_title, title, doc_title, title)
         self._merge_mwe_ners(mwe_ner_content, content, doc_content, content)
+
+        # Per-document external ontologies → concept spans (no shared model mutation).
+        from thot.tasks.document_ontology.OntologyLexicon import (
+            ontology_ner_spans_for_document,
+        )
+
+        onto_title, onto_content = ontology_ner_spans_for_document(tkeir_doc)
+        if onto_title and doc_title:
+            self._merge_mwe_ners(onto_title, title, doc_title, title)
+        if onto_content and doc_content:
+            self._merge_mwe_ners(onto_content, content, doc_content, content)
+
         tkeir_doc["title_ner"] = title
         tkeir_doc["content_ner"] = content
         taskInfo = TaskInfo(

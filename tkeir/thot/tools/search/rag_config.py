@@ -1,4 +1,12 @@
-"""Load RAG API runtime configuration from ``configs/rag.yaml``."""
+"""Title: Rag config
+
+Load RAG API runtime configuration from ``configs/rag.yaml``.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,12 @@
-"""Pull embedding / LLM models for the configured provider."""
+"""Title: Pull models
+
+Pull embedding / LLM models for the configured provider.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

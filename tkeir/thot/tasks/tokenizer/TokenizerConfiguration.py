@@ -1,8 +1,11 @@
-"""Tokenizer configuration
-Author : Eric Blaudez (Eric Blaudez)
+"""Title: Tokenizer configuration
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Tokenization and MWE handling for T-KEIR documents.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.core.ConfigurationUtils import load_configuration

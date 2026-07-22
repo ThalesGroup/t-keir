@@ -1,4 +1,12 @@
-"""Tests for golden chunking."""
+"""Title: Golden Chunker
+
+Tests for golden chunking.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 

@@ -1,4 +1,12 @@
-"""Test MarkItDown converter."""
+"""Title: Mark It Down Converter
+
+Test MarkItDown converter.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 from unittest.mock import patch

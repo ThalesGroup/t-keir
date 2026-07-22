@@ -8,16 +8,18 @@ AcmeSystems enterprise docs, with per-user (`user_space`) and per-folder
 
 | Corpus | Directory | Default Keycloak user | Docs |
 |--------|-----------|----------------------|------|
-| OSINT / NATO C4ISR | `workspace/corpus_nato/` | `demo-user` | 1 500 |
-| Enterprise (AcmeSystems) | `workspace/corpus_enterprise/` | `demo-admin` | 500 |
+| OSINT / NATO C4ISR | `workspace/corpus_nato/` | `demo-user` | 1 500 generated |
+| Enterprise (AcmeSystems) | `workspace/corpus_enterprise/` | `demo-admin` | 500 generated (+ up to 500 downloaded) |
 
 P0 (auth off) indexes both into `dev@tkeir`. P1 Compose routes each corpus
 to its Keycloak principal so cross-user RAG returns zero hits.
 
 ```bash
-make corpus                  # generate both corpora offline
-make corpus-download         # best-effort SISO + EnterpriseRAG-Bench
-make corpus-ingest           # P0 CLI ingest (--fallback-index)
+make corpus                  # generate both + best-effort SISO / EnterpriseRAG download
+make corpus CORPUS_DOWNLOAD=0  # generate only (fully offline)
+make bootstrap && make ingest  # P0: Vespa + host ingest (:8091), no tkeir containers
+make corpus-ingest           # P0 CLI ingest (fail-fast if API down; capped host fallback)
+make images && make compose-up PROFILES=core,auth,ingest   # P1: local registry images
 make corpus-ingest-user      # P1 OSINT → demo-user
 make corpus-ingest-admin     # P1 Enterprise → demo-admin
 make corpus-ingest-web       # HMI + curl guide
@@ -61,9 +63,10 @@ c4isr:  http://www.nato.int/ontologies/c4isr#
 Official downloads (when network is available) land in
 `ontologies/official/` and never overwrite the generated files.
 
-Point the document-ontology pipeline at these files to enrich each document
-graph before Vespa indexing (`derive-from` in
-`tkeir/configs/document-ontology.yaml`) — see
+Point the document-ontology pipeline at these files **at ingest time** by
+uploading ontology **bytes** with each document (`ontology_file` multipart or
+JSON `content_base64`). The ingest server does not read client paths. Client
+helper: `ingest_corpus.py --ontology-dir`. Details:
 [Document ontology](document_ontology.md).
 
 ## Corpus B — Enterprise
@@ -107,11 +110,19 @@ and KB articles. Prefer EnterpriseRAG-Bench when online:
 | `--corpus-dir` | Root with `corpus_nato/` / `corpus_enterprise/` |
 | `--api-url` | Ingest base (default `:8091`) |
 | `--corpus` | `osint` \| `enterprise` \| `all` |
+| `--ontologies` | Local OWL/TTL/RDF files; client uploads bytes as `ontology_file` |
+| `--ontology-dir` | Local dir; client uploads each file's bytes with every document |
+| `--stop-on-failed` | Abort client + stop ingest server on first failure |
 | `--topics` / `--formats` | Filters |
 | `--user-space` | Override for all docs |
 | `--token` / `--token-url` + `--username` / `--password` | Auth |
 | `--dry-run` | Report only |
-| `--fallback-index` | `make pipeline` + `make index` when ingest is down |
+| `--wait` / `--no-wait` | Wait for each job to finish (default on) so progress/ETA track indexing |
+| `--poll-timeout` | Max seconds to wait per doc when `--wait` (default 3600) |
+| `--progress-every` | Log progress every N docs (default 1) |
+| `--fallback-index` | Allow local pipeline+index if ingest API is down (capped; see `--force-fallback`) |
+| `--force-fallback` | Permit local fallback for large corpora (very slow) |
+| `--fallback-max-docs` | Max docs for unforced fallback (default 50) |
 | `--print-web-guide` | HMI + curl guide with real filenames |
 | `--print-token` | Print Keycloak access token |
 

@@ -1,0 +1,2526 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://d3459401449e54390af30daeb5015a9d723be1033ec2c272510d7d1f1a92e1b3/meeting_minutes_00050_ad5835f3.csv",
+  "title": "AcmeSystems API Gateway Refactor Steering Meeting",
+  "content": [
+    "title,content,topic\r\nAcmeSystems API Gateway Refactor Steering Meeting,Meeting minutes Company: AcmeSystems Chair: Wendy Laurent Project: API Gateway Refactor  Decisions: approve the next integration milestone for AcmeSystems API Gateway Refactor. Actions: Engineering validates interfaces; Operations prepares rollout. Risks: supplier lead time. Next review is Friday.,projects\r\n"
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "minutes",
+          "Company"
+        ],
+        "lemma_content": [
+          "minute",
+          "Company"
+        ],
+        "pos": [
+          "NOUN",
+          "PROPN"
+        ],
+        "positions": [
+          13,
+          14
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "approve"
+        ],
+        "lemma_content": [
+          "approve"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          28
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "integration",
+          "milestone"
+        ],
+        "lemma_content": [
+          "integration",
+          "milestone"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          31,
+          32
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Engineering"
+        ],
+        "lemma_content": [
+          "engineering"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          41
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "validates"
+        ],
+        "lemma_content": [
+          "validate"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          42
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "interfaces"
+        ],
+        "lemma_content": [
+          "interface"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          43
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Operations"
+        ],
+        "lemma_content": [
+          "operation"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          45
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "prepares"
+        ],
+        "lemma_content": [
+          "prepare"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          46
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "rollout"
+        ],
+        "lemma_content": [
+          "rollout"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          47
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Next",
+          "review"
+        ],
+        "lemma_content": [
+          "next",
+          "review"
+        ],
+        "pos": [
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          55,
+          56
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "is"
+        ],
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "AUX"
+        ],
+        "positions": [
+          57
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "Friday"
+        ],
+        "lemma_content": [
+          "Friday"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          58
+        ],
+        "label": "date"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "raw",
+    "source-size-bytes": 380,
+    "image-extraction": {
+      "enabled": false,
+      "used": false,
+      "mode": null,
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:02",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://d3459401449e54390af30daeb5015a9d723be1033ec2c272510d7d1f1a92e1b3/meeting_minutes_00050_ad5835f3.csv",
+  "metadata": {
+    "topic_id": "projects",
+    "corpus": "enterprise",
+    "doc_type": "meeting_minutes",
+    "language": "en",
+    "title": "AcmeSystems API Gateway Refactor Steering Meeting",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "projects",
+  "doc_type": "meeting_minutes",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999969414168597
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "title",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "content",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "topic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "API",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Gateway",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Refactor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Steering",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Meeting",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Meeting",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "minutes",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Company",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Chair",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Wendy",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Laurent",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Project",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "API",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Gateway",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Refactor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Decisions",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "approve",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "next",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "integration",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "milestone",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "for",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "API",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Gateway",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Refactor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Actions",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Engineering",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "validates",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "interfaces",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Operations",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "prepares",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "rollout",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Risks",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "supplier",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "lead",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "time",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Next",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "review",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "is",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Friday",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": ",",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "projects",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "API",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Gateway",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Refactor",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Steering",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Meeting",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "api",
+      "text": "API",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Gateway",
+      "text": "Gateway",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Refactor",
+      "text": "Refactor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Steering",
+      "text": "Steering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "title",
+      "text": "title",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "content",
+      "text": "content",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "topic",
+      "text": "topic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "api",
+      "text": "API",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Gateway",
+      "text": "Gateway",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Refactor",
+      "text": "Refactor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Steering",
+      "text": "Steering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "minute",
+      "text": "minutes",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Company",
+      "text": "Company",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Chair",
+      "text": "Chair",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Wendy",
+      "text": "Wendy",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Laurent",
+      "text": "Laurent",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "api",
+      "text": "API",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Gateway",
+      "text": "Gateway",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Refactor",
+      "text": "Refactor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "decision",
+      "text": "Decisions",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "VERB",
+      "lemma": "approve",
+      "text": "approve",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "next",
+      "text": "next",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "integration",
+      "text": "integration",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "milestone",
+      "text": "milestone",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "ADP",
+      "lemma": "for",
+      "text": "for",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "API",
+      "text": "API",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Gateway",
+      "text": "Gateway",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Refactor",
+      "text": "Refactor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "action",
+      "text": "Actions",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 39
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "engineering",
+      "text": "Engineering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "VERB",
+      "lemma": "validate",
+      "text": "validates",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "interface",
+      "text": "interfaces",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "operation",
+      "text": "Operations",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "VERB",
+      "lemma": "prepare",
+      "text": "prepares",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "rollout",
+      "text": "rollout",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "risk",
+      "text": "Risks",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 49
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "supplier",
+      "text": "supplier",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "lead",
+      "text": "lead",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "time",
+      "text": "time",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 53
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 54
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "next",
+      "text": "Next",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 55
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "review",
+      "text": "review",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 56
+    },
+    {
+      "pos": "AUX",
+      "lemma": "be",
+      "text": "is",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 57
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Friday",
+      "text": "Friday",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 58
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 59
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 60
+    },
+    {
+      "pos": "VERB",
+      "lemma": "project",
+      "text": "projects",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 61
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 0,
+      "end": 6,
+      "label": "organization",
+      "text": "AcmeSystems API Gateway Refactor Steering Meeting"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 5,
+      "end": 11,
+      "label": "organization",
+      "text": "AcmeSystems API Gateway Refactor Steering Meeting"
+    },
+    {
+      "start": 16,
+      "end": 17,
+      "label": "organization",
+      "text": "AcmeSystems"
+    },
+    {
+      "start": 19,
+      "end": 22,
+      "label": "person",
+      "text": "Wendy Laurent Project"
+    },
+    {
+      "start": 34,
+      "end": 38,
+      "label": "product",
+      "text": "AcmeSystems API Gateway Refactor"
+    },
+    {
+      "start": 58,
+      "end": 59,
+      "label": "date",
+      "text": "Friday"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "title",
+      "lemma": "title",
+      "pos": "NOUN",
+      "head": 14,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        10
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "content",
+      "lemma": "content",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "conj",
+      "lefts": [],
+      "rights": [
+        3,
+        4
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 2,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "topic",
+      "lemma": "topic",
+      "pos": "NOUN",
+      "head": 2,
+      "dep": "conj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 7,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "API",
+      "lemma": "api",
+      "pos": "NOUN",
+      "head": 7,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Gateway",
+      "lemma": "Gateway",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "compound",
+      "lefts": [
+        5,
+        6
+      ],
+      "rights": []
+    },
+    {
+      "text": "Refactor",
+      "lemma": "Refactor",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Steering",
+      "lemma": "Steering",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        7,
+        8,
+        9
+      ],
+      "rights": [
+        11
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 13,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "minutes",
+      "lemma": "minute",
+      "pos": "NOUN",
+      "head": 14,
+      "dep": "compound",
+      "lefts": [
+        12
+      ],
+      "rights": []
+    },
+    {
+      "text": "Company",
+      "lemma": "Company",
+      "pos": "PROPN",
+      "head": 28,
+      "dep": "nsubj",
+      "lefts": [
+        0,
+        13
+      ],
+      "rights": [
+        15,
+        17
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 14,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Chair",
+      "lemma": "Chair",
+      "pos": "PROPN",
+      "head": 14,
+      "dep": "appos",
+      "lefts": [
+        16
+      ],
+      "rights": [
+        18,
+        21,
+        27
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 17,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Wendy",
+      "lemma": "Wendy",
+      "pos": "PROPN",
+      "head": 21,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Laurent",
+      "lemma": "Laurent",
+      "pos": "PROPN",
+      "head": 21,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "appos",
+      "lefts": [
+        19,
+        20
+      ],
+      "rights": [
+        22,
+        26
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 21,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "API",
+      "lemma": "api",
+      "pos": "NOUN",
+      "head": 24,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Gateway",
+      "lemma": "Gateway",
+      "pos": "PROPN",
+      "head": 25,
+      "dep": "compound",
+      "lefts": [
+        23
+      ],
+      "rights": []
+    },
+    {
+      "text": "Refactor",
+      "lemma": "Refactor",
+      "pos": "PROPN",
+      "head": 26,
+      "dep": "compound",
+      "lefts": [
+        24
+      ],
+      "rights": []
+    },
+    {
+      "text": "Decisions",
+      "lemma": "decision",
+      "pos": "NOUN",
+      "head": 21,
+      "dep": "appos",
+      "lefts": [
+        25
+      ],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 17,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "approve",
+      "lemma": "approve",
+      "pos": "VERB",
+      "head": 28,
+      "dep": "ROOT",
+      "lefts": [
+        14
+      ],
+      "rights": [
+        32,
+        38
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 32,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "next",
+      "lemma": "next",
+      "pos": "ADJ",
+      "head": 32,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "integration",
+      "lemma": "integration",
+      "pos": "NOUN",
+      "head": 32,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "milestone",
+      "lemma": "milestone",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "dobj",
+      "lefts": [
+        29,
+        30,
+        31
+      ],
+      "rights": [
+        33
+      ]
+    },
+    {
+      "text": "for",
+      "lemma": "for",
+      "pos": "ADP",
+      "head": 32,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        37
+      ]
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 37,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "API",
+      "lemma": "API",
+      "pos": "PROPN",
+      "head": 37,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Gateway",
+      "lemma": "Gateway",
+      "pos": "PROPN",
+      "head": 37,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Refactor",
+      "lemma": "Refactor",
+      "pos": "PROPN",
+      "head": 33,
+      "dep": "pobj",
+      "lefts": [
+        34,
+        35,
+        36
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 28,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Actions",
+      "lemma": "action",
+      "pos": "NOUN",
+      "head": 46,
+      "dep": "dep",
+      "lefts": [],
+      "rights": [
+        40,
+        42
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 39,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Engineering",
+      "lemma": "engineering",
+      "pos": "NOUN",
+      "head": 42,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "validates",
+      "lemma": "validate",
+      "pos": "VERB",
+      "head": 39,
+      "dep": "acl",
+      "lefts": [
+        41
+      ],
+      "rights": [
+        43
+      ]
+    },
+    {
+      "text": "interfaces",
+      "lemma": "interface",
+      "pos": "NOUN",
+      "head": 42,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 46,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Operations",
+      "lemma": "operation",
+      "pos": "NOUN",
+      "head": 46,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "prepares",
+      "lemma": "prepare",
+      "pos": "VERB",
+      "head": 46,
+      "dep": "ROOT",
+      "lefts": [
+        39,
+        44,
+        45
+      ],
+      "rights": [
+        47,
+        48
+      ]
+    },
+    {
+      "text": "rollout",
+      "lemma": "rollout",
+      "pos": "NOUN",
+      "head": 46,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 46,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Risks",
+      "lemma": "risk",
+      "pos": "NOUN",
+      "head": 49,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        50,
+        53,
+        54
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 49,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "supplier",
+      "lemma": "supplier",
+      "pos": "NOUN",
+      "head": 52,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "lead",
+      "lemma": "lead",
+      "pos": "NOUN",
+      "head": 53,
+      "dep": "compound",
+      "lefts": [
+        51
+      ],
+      "rights": []
+    },
+    {
+      "text": "time",
+      "lemma": "time",
+      "pos": "NOUN",
+      "head": 49,
+      "dep": "appos",
+      "lefts": [
+        52
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 49,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Next",
+      "lemma": "next",
+      "pos": "ADJ",
+      "head": 56,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "review",
+      "lemma": "review",
+      "pos": "NOUN",
+      "head": 57,
+      "dep": "nsubj",
+      "lefts": [
+        55
+      ],
+      "rights": []
+    },
+    {
+      "text": "is",
+      "lemma": "be",
+      "pos": "AUX",
+      "head": 57,
+      "dep": "ROOT",
+      "lefts": [
+        56
+      ],
+      "rights": [
+        58,
+        59
+      ]
+    },
+    {
+      "text": "Friday",
+      "lemma": "Friday",
+      "pos": "PROPN",
+      "head": 57,
+      "dep": "attr",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 57,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 61,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "projects",
+      "lemma": "project",
+      "pos": "VERB",
+      "head": 61,
+      "dep": "ROOT",
+      "lefts": [
+        60
+      ],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "API",
+      "lemma": "api",
+      "pos": "NOUN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Gateway",
+      "lemma": "Gateway",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [
+        0,
+        1
+      ],
+      "rights": []
+    },
+    {
+      "text": "Refactor",
+      "lemma": "Refactor",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [
+        2
+      ],
+      "rights": []
+    },
+    {
+      "text": "Steering",
+      "lemma": "Steering",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "ROOT",
+      "lefts": [
+        3,
+        4
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 36,
+      "text": "acmesystems api gateway refactor steering meeting",
+      "span": {
+        "start": 0,
+        "end": 6
+      }
+    },
+    {
+      "score": 38,
+      "text": "topic acmesystems api gateway refactor steering meeting",
+      "span": {
+        "start": 4,
+        "end": 11
+      }
+    },
+    {
+      "score": 19,
+      "text": "acmesystems api gateway refactor",
+      "span": {
+        "start": 34,
+        "end": 38
+      }
+    },
+    {
+      "score": 19,
+      "text": "api gateway refactor decision",
+      "span": {
+        "start": 23,
+        "end": 27
+      }
+    },
+    {
+      "score": 11,
+      "text": "meeting minute company",
+      "span": {
+        "start": 12,
+        "end": 15
+      }
+    },
+    {
+      "score": 9,
+      "text": "wendy laurent project",
+      "span": {
+        "start": 19,
+        "end": 22
+      }
+    },
+    {
+      "score": 9,
+      "text": "supplier lead time",
+      "span": {
+        "start": 51,
+        "end": 54
+      }
+    },
+    {
+      "score": 8,
+      "text": "next integration milestone",
+      "span": {
+        "start": 30,
+        "end": 33
+      }
+    },
+    {
+      "score": 6,
+      "text": "acmesystems chair",
+      "span": {
+        "start": 16,
+        "end": 18
+      }
+    },
+    {
+      "score": 4,
+      "text": "next review",
+      "span": {
+        "start": 55,
+        "end": 57
+      }
+    },
+    {
+      "score": 1,
+      "text": "title",
+      "span": {
+        "start": 0,
+        "end": 1
+      }
+    },
+    {
+      "score": 1,
+      "text": "content",
+      "span": {
+        "start": 2,
+        "end": 3
+      }
+    },
+    {
+      "score": 1,
+      "text": "action",
+      "span": {
+        "start": 39,
+        "end": 40
+      }
+    },
+    {
+      "score": 1,
+      "text": "risk",
+      "span": {
+        "start": 49,
+        "end": 50
+      }
+    },
+    {
+      "score": 1,
+      "text": "friday",
+      "span": {
+        "start": 58,
+        "end": 59
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://d3459401449e54390af30daeb5015a9d723be1033ec2c272510d7d1f1a92e1b3/meeting_minutes_00050_ad5835f3.csv#chunk-0-2cd5d40c4a",
+      "parent_doc_id": "ingest://d3459401449e54390af30daeb5015a9d723be1033ec2c272510d7d1f1a92e1b3/meeting_minutes_00050_ad5835f3.csv",
+      "text_raw": "title , content , topic AcmeSystems API Gateway Refactor Steering Meeting , Meeting minutes Company : AcmeSystems Chair : Wendy Laurent Project : API Gateway Refactor Decisions : approve the next integration milestone for AcmeSystems API Gateway Refactor . Actions : Engineering validates interfaces ; Operations prepares rollout . Risks : supplier lead time . Next review is Friday . , projects",
+      "search_vector_payload": "title , content , topic AcmeSystems API Gateway Refactor Steering Meeting , Meeting minutes Company : AcmeSystems Chair : Wendy Laurent Project : API Gateway Refactor Decisions : approve the next integration milestone for AcmeSystems API Gateway Refactor . Actions : Engineering validates interfaces ; Operations prepares rollout . Risks : supplier lead time . Next review is Friday . , projects",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "AcmeSystems API Gateway Refactor Steering Meeting",
+            "AcmeSystems"
+          ],
+          "person": [
+            "Wendy Laurent Project"
+          ],
+          "product": [
+            "AcmeSystems API Gateway Refactor"
+          ],
+          "date": [
+            "Friday"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "minutes Company",
+            "approve",
+            "integration milestone"
+          ],
+          [
+            "Engineering",
+            "validates",
+            "interfaces"
+          ],
+          [
+            "Operations",
+            "prepares",
+            "rollout"
+          ],
+          [
+            "Next review",
+            "is",
+            "Friday"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 62,
+        "sentence_start": 0,
+        "sentence_end": 5
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "minutes Company approve integration milestone",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Friday",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "title , content , topic AcmeSystems API Gateway Refactor Steering Meeting ,",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "Engineering validates interfaces",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Operations prepares rollout",
+          "question_type": "SVO-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Milestone/milestone-7f7f85b1e7d5\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Milestone\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/acmesystems_chair\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems chair\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Date/friday-e21f3f372a46\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Date\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Friday\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/content\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"content\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/acmesystems_api_gateway_refactor_steering_meeting\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems api gateway refactor steering meeting\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/friday\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"friday\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Interfaces/interfaces-0274021b904c\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Interfaces\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"interfaces\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Company/company-de4743c87973\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Company\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Milestone/milestone-7f7f85b1e7d5\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Company\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Operations/operations-358cc201f87d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Operations\"\n    ],\n    \"http://tkeir.local/ontology/prepare\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Rollout/rollout-a4fa034cc780\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Operations\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Product/acmesystems_api_gateway_refactor-755b8509ceeb\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Product\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems API Gateway Refactor\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Organization/acmesystems_api_gateway_refactor_steering_meeting-50fbec3b790d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems API Gateway Refactor Steering Meeting\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/action\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"action\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/next_review\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"next review\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/supplier_lead_time\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"supplier lead time\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Organization/acmesystems-14032de724d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Friday/friday-e21f3f372a46\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Friday\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Friday\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/risk\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"risk\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/MinutesCompany/minutes_company-0a518a1959e8\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Minutescompany\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/IntegrationMilestone/integration_milestone-43d83ab6227f\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"minutes Company\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/next_integration_milestone\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"next integration milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/acmesystems_api_gateway_refactor\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems api gateway refactor\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/wendy_laurent_project\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"wendy laurent project\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/title\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"title\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Person/wendy_laurent_project-86a1f443bb8d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Person\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Wendy Laurent Project\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Rollout/rollout-a4fa034cc780\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Rollout\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"rollout\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/api_gateway_refactor_decision\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"api gateway refactor decision\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/topic_acmesystems_api_gateway_refactor_steering_meeting\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"topic acmesystems api gateway refactor steering meeting\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Engineering/engineering-729bb48d0f86\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Engineering\"\n    ],\n    \"http://tkeir.local/ontology/validate\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Interfaces/interfaces-0274021b904c\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Engineering\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Review/review-c97ace4c8fef\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Review\"\n    ],\n    \"http://tkeir.local/ontology/be\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Friday/friday-e21f3f372a46\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"review\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Chunk/ingest_d3459401449e54390af30daeb5015a9d723be1033ec2c272510d7d1f1a92e1b3_meeting_minutes_00050_ad5835f3_csv_chunk_0_2cd5d40c4a\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/topic_acmesystems_api_gateway_refactor_steering_meeting\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/acmesystems_api_gateway_refactor\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/api_gateway_refactor_decision\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/wendy_laurent_project\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/supplier_lead_time\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/next_integration_milestone\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/acmesystems_chair\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/next_review\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/title\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/content\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/action\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/risk\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/friday\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Keyword/acmesystems_api_gateway_refactor_steering_meeting\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Organization/acmesystems_api_gateway_refactor_steering_meeting-50fbec3b790d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Person/wendy_laurent_project-86a1f443bb8d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Product/acmesystems_api_gateway_refactor-755b8509ceeb\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Date/friday-e21f3f372a46\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/MinutesCompany/minutes_company-0a518a1959e8\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Engineering/engineering-729bb48d0f86\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Operations/operations-358cc201f87d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/NextReview/next_review-31151e9f9bd4\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Company/company-de4743c87973\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Review/review-c97ace4c8fef\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"meeting_minutes_00050_ad5835f3_csv\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/NextReview/next_review-31151e9f9bd4\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/NextReview\"\n    ],\n    \"http://tkeir.local/ontology/is\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Friday/friday-e21f3f372a46\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Next review\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/IntegrationMilestone/integration_milestone-43d83ab6227f\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/IntegrationMilestone\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"integration milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Chunk/ingest_d3459401449e54390af30daeb5015a9d723be1033ec2c272510d7d1f1a92e1b3_meeting_minutes_00050_ad5835f3_csv_chunk_0_2cd5d40c4a\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Organization/acmesystems_api_gateway_refactor_steering_meeting-50fbec3b790d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Person/wendy_laurent_project-86a1f443bb8d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Product/acmesystems_api_gateway_refactor-755b8509ceeb\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Date/friday-e21f3f372a46\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/MinutesCompany/minutes_company-0a518a1959e8\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Engineering/engineering-729bb48d0f86\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/Operations/operations-358cc201f87d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00050_ad5835f3_csv/NextReview/next_review-31151e9f9bd4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://d3459401449e54390af30daeb5015a9d723be1033ec2c272510d7d1f1a92e1b3/meeting_minutes_00050_ad5835f3.csv#chunk-0-2cd5d40c4a\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 50,
+      "graph_triple_count": 105,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 68,
+    "total_tokens": 68,
+    "covered_characters": 378,
+    "total_characters": 378
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 6,
+  "content-token-count": 62,
+  "token-count": 68,
+  "source-file-size-bytes": 380,
+  "image-extraction": {
+    "enabled": false,
+    "used": false,
+    "mode": null,
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.048,
+    "tasks": {
+      "converter": 0.001,
+      "language-detection": 0.003,
+      "resource-selection": 0.001,
+      "tokenizer": 0.003,
+      "morphosyntax": 0.008,
+      "ner": 0.008,
+      "syntax": 0.008,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.013,
+      "chunk-questions": 0.001
+    }
+  }
+}

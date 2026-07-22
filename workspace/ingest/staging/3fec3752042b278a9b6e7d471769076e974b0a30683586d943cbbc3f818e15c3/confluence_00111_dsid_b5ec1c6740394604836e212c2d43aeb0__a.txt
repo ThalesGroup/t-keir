@@ -1,0 +1,156 @@
+Authorization Evidence Sampling and Archival Guideline
+
+Summary
+
+This guideline defines a company-wide approach to sampling, preserving, and archiving authorization and access evidence across Redwood Inference’s deployments. The goal is to balance forensic readiness, privacy and residency constraints, storage cost, and auditability for regulatory and incident investigations.
+
+Scope
+
+- Applies to all authorization signals produced by Redwood services, control planes (Private / Dedicated / Hosted), identity providers (IdP), and service mesh layers.
+- Includes: access grants/denials, entitlement changes, delegation events, service-to-service tokens, just-in-time activations, privileged-session metadata, and evidence handoffs from CI/CD gates.
+- Excludes user-generated content logs (application payloads) unless explicitly linked to an authorization event.
+
+Definitions
+
+- Evidence record: a normalized, timebound representation of an authorization-relevant event suitable for legal or compliance review.
+- Sampling window: a configured time range and selection policy used to pick records for deeper archival.
+- Proof bundle: a packaged set of evidence records + provenance metadata used for audits.
+
+Principles
+
+1. Minimal Exposure: Preserve only attributes required for forensic reconstruction (who, what, where, when, why) and avoid unnecessary PII in evidence bundles.
+2. Locality Respect: Data residency constraints must be enforced when moving evidence to longer-term archives.
+3. Cost-Aware Retention: Use tiered retention with diminishing fidelity to reduce storage costs while preserving audit value.
+4. Reproducibility: All sampled evidence must include provenance metadata for reconstruction: event hashes, schema versions, collection policy, and ingest pipeline identifiers.
+
+Sampling Policy
+
+- Continuous Tier: Always-capture events (last 90 days, hot store) for high-risk streams: privileged role activations, admin console changes, service-account key operations.
+- Stratified Tier: Periodic sampling of mid-risk streams (90–365 days) using a time-stratified algorithm: random sample 1% per hour plus boundary samples around configuration changes and deploys.
+- Triggered Tier: On-demand capture for low-risk streams when an incident, audit request, or legal hold is opened.
+
+Sampling selection algorithm (high-level):
+1. Identify candidate event streams via labels: [privileged, delegation, token-issue, token-exchange, role-change].
+2. For each 1-hour bucket, include all events matching high-risk labels, and randomly select N events from mid-risk labels where N = max(1, floor(total_events/100)).
+3. Include all events within +/- 15 minutes of a correlated deploy, rollback, or external alert.
+
+Archival Policy and Retention Tiers
+
+- Hot store (90 days): full fidelity evidence, searchable and queryable in the internal audit index. Encrypted at rest with KMS_ENG (per-region keys).
+- Warm store (365 days): summarized records + full provenance pointers. Availability SLA: 24 hours to restore to hot store. Keys: KMS_COMPLIANCE with geographic constraints.
+- Cold archival (7 years or per-legal requirement): compressed proof bundles with integrity manifests and temporal binding. Stored in region-appropriate archival buckets with access via formal request and M-of-N approval.
+
+Retention table (example)
+
+| Evidence Class | Hot | Warm | Cold | Notes |
+| --- | ---: | ---: | ---: | --- |
+| Privileged role activations | 90d | 365d | 7y | Full fidelity required for forensics |
+| Service account key ops | 90d | 365d | 7y | Include key fingerprint and rotation metadata |
+| Entitlement grants/denials | 90d | 365d | 3y | Remove non-essential PII at warm/cold |
+| Delegation events | 90d | 365d | 3y | Preserve delegation chain hashes |
+
+Audit Logging Schema (minimum fields)
+
+All authorization evidence records emitted to the audit pipeline must adhere to the Event Authorization Schema v2: every record is JSON-LD compatible and must include these fields:
+
+- event_id (UUIDv4)
+- timestamp_utc (RFC 3339)
+- actor_type (user|service|system)
+- actor_id (opaque identifier)
+- action (grant|deny|activate|deactivate|exchange|rotate|revoke)
+- target_type (role|resource|token|key|session)
+- target_id (opaque identifier)
+- reason (string, optional)
+- correlation_ids (list of trace IDs)
+- ingest_pipeline_id (string)
+- schema_version (string)
+- residency_tag (list of geo-zone labels)
+- integrity_hash (sha256 hex)
+- redaction_marker (boolean)
+
+Example (single-line JSON):
+{
+  "event_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "timestamp_utc": "2027-09-12T14:22:07Z",
+  "actor_type": "user",
+  "actor_id": "u-0234abcd",
+  "action": "grant",
+  "target_type": "role",
+  "target_id": "r-admin",
+  "correlation_ids": ["trace-9f7e"],
+  "ingest_pipeline_id": "auth-log-v2",
+  "schema_version": "auth-v2",
+  "residency_tag": ["us-east-1"],
+  "integrity_hash": "<sha256>",
+  "redaction_marker": false
+}
+
+RBAC Coordination and Provenance
+
+- Source of truth for role definitions: Identity Catalog (team: identity-platform). Role objects must include stable IDs and lifecycle fields (created_by, created_at, last_modified_by, last_modified_at, deprecation_window).
+- Any entitlement change API call must emit both the pre-image and post-image as separate evidence records within the same correlation_id for reliable roll-forward/roll-back reconstruction.
+- All cross-system entitlement mappings (e.g., IdP -> Redwood role) require a mapping manifest stored as part of the proof bundle.
+
+Secure SDLC Integration
+
+- Gate collection: The CI/CD release gate must snapshot entitlement configuration at deploy time and generate a signed deploy-evidence record. That record is retained in the hot store for 90 days and influences sampling in the 15-minute deploy boundary window.
+- Dependency of evidence collectors on pipeline secrets: collectors must use ephemeral credentials injected via the secrets manager with timebound leases (max 1 hour).
+
+Incident Response and Forensic Workflow
+
+1. Triage: When an incident is flagged (severity >= P2), the incident commander initiates an Evidence Preserve operation in the Forensic Orchestrator.
+2. Preservation: Forensic Orchestrator toggles triggered-tier capture for affected streams and issues hold requests to prevent automated deletion.
+3. Collection: A proof bundle is assembled using the sampling policy but with full-fidelity retention for the incident window (default +/- 7 days).
+4. Access: Proof bundles for active incidents are made available to the incident team for up to 30 days in the hot store. Access requires two approvals: Incident Commander + Security Engineering lead.
+5. Post-incident: Evidence is either moved to warm/cold storage per policy or tagged for extended retention under legal hold.
+
+Exception and Risk Handling
+
+- Emergency Exceptions: Temporary bypasses to locality (moving evidence across regions) require an Exception Request with M-of-N approvers: Security SME, Legal, and Privacy Officer. Document must include risk assessment and expiry timestamp.
+- Sampling Overrides: Product or SRE teams may request higher sampling rates for specific customers or services. Approvals require Security + Compliance + Product owner sign-off and must be timeboxed.
+
+Operational Runbook (quick steps)
+
+1. To mark an incident evidence hold (CLI):
+   - rwi forensic hold create --incident-id INC-1234 --streams privileged,delegation --expires 2028-02-15T00:00:00Z
+2. To request archived proof bundle retrieval:
+   - rwi evidence request --bundle-id pb-20270912-0001 --approvers manager,legal --reason "regulatory audit"
+3. To verify integrity of a proof bundle locally:
+   - cat bundle.tar.gz | sha256sum -c integrity.manifest
+
+Access Controls and SLAs
+
+- Owners: Identity Platform (role definitions), Security (evidence retention and policy), Compliance (regulatory request handling).
+- SLA for evidence restore from warm->hot: 24 hours. SLA for cold->hot under normal requests: 72 hours plus legal approval.
+
+Audit readiness checklist (pre-audit)
+
+- Confirm mapping manifest for all role namespaces and last modified timestamps.
+- Verify Event Authorization Schema version in audit index equals schema_version "auth-v2".
+- Ensure proof bundles for sample period are integrity-verified and keys used to sign them are available in the KMS rotation logs.
+
+Appendix: Examples and Templates
+
+- Evidence request template (email):
+  Subject: Evidence Request - [Customer / Incident / Audit ID]
+  Body: Include incident id, bundle id(s), justification, approvers, and residency constraints.
+
+- Example integrity-check snippet (Bash):
+  # download bundle
+  aws s3 cp s3://redwood-archival/pb-20270912-0001.tar.gz ./
+  # verify manifest
+  tar -xzf pb-20270912-0001.tar.gz manifest.json integrity.manifest
+  sha256sum -c integrity.manifest
+
+Change Log
+
+- 2027-03-15: Created by Aisha Patel (initial draft).
+- 2027-11-02: Added deployment boundary rules and CI/CD snapshot integration (review by Marco Ruiz).
+- 2028-01-10: Finalized approval matrix and updated retention tiers to match legal guidance (review by Janelle Kim).
+
+Contact and Ownership
+
+- Primary owner: Security Evidence & Forensics (security-evidence@redwood.com)
+- Secondary owner: Identity Platform (identity-platform@redwood.com)
+- For operational playbook run-throughs, contact: Owen McCarthy (oncall: #sec-evidence)
+

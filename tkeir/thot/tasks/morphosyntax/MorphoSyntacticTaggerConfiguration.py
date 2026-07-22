@@ -1,8 +1,11 @@
-"""CMorphosyntactic tagger configuration
-Author: Eric Blaudez (Eric Blaudez)
+"""Title: CMorphosyntactic tagger configuration
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Morphosyntactic tagging for T-KEIR documents.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.core.ConfigurationUtils import load_configuration

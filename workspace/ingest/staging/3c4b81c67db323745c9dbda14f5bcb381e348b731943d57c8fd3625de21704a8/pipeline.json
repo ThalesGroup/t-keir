@@ -1,0 +1,2401 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://3c4b81c67db323745c9dbda14f5bcb381e348b731943d57c8fd3625de21704a8/SITREP_00781_1d4e2772.html",
+  "title": "SITREP 00781 — Baltic Sea",
+  "content": [
+    "# SITREP 00781 — Baltic Sea\n\n```\nSITUATION REPORT\nDTG: 2026-07-25T11:38Z\nUnit: NATO Response Cell\nArea: Baltic Sea\nObjective: Objective ALPHA\n\nSITREP Objective ALPHA — operational picture remains stable. ISR collection confirms routine maritime traffic. Commander assesses no immediate escalation indicators.\n```"
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "operational",
+          "picture"
+        ],
+        "lemma_content": [
+          "operational",
+          "picture"
+        ],
+        "pos": [
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          31,
+          32
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "remains"
+        ],
+        "lemma_content": [
+          "remain"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          33
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "stable"
+        ],
+        "lemma_content": [
+          "stable"
+        ],
+        "pos": [
+          "ADJ"
+        ],
+        "positions": [
+          34
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "ISR",
+          "collection"
+        ],
+        "lemma_content": [
+          "ISR",
+          "collection"
+        ],
+        "pos": [
+          "PROPN",
+          "NOUN"
+        ],
+        "positions": [
+          36,
+          37
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "confirms"
+        ],
+        "lemma_content": [
+          "confirm"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          38
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "routine",
+          "maritime",
+          "traffic"
+        ],
+        "lemma_content": [
+          "routine",
+          "maritime",
+          "traffic"
+        ],
+        "pos": [
+          "ADJ",
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          39,
+          40,
+          41
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "ISR"
+        ],
+        "lemma_content": [
+          "ISR"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          36
+        ],
+        "label": "organization"
+      },
+      "property": {
+        "content": [
+          "confirms"
+        ],
+        "lemma_content": [
+          "confirm"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          38
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "routine",
+          "maritime",
+          "traffic"
+        ],
+        "lemma_content": [
+          "routine",
+          "maritime",
+          "traffic"
+        ],
+        "pos": [
+          "ADJ",
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          39,
+          40,
+          41
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "ISR",
+          "collection"
+        ],
+        "lemma_content": [
+          "ISR",
+          "collection"
+        ],
+        "pos": [
+          "PROPN",
+          "NOUN"
+        ],
+        "positions": [
+          36,
+          37
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "confirms"
+        ],
+        "lemma_content": [
+          "confirm"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          38
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "traffic"
+        ],
+        "lemma_content": [
+          "traffic"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          41
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Commander"
+        ],
+        "lemma_content": [
+          "Commander"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          43
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "assesses"
+        ],
+        "lemma_content": [
+          "assess"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          44
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "no",
+          "immediate",
+          "escalation",
+          "indicators"
+        ],
+        "lemma_content": [
+          "no",
+          "immediate",
+          "escalation",
+          "indicator"
+        ],
+        "pos": [
+          "DET",
+          "ADJ",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          45,
+          46,
+          47,
+          48
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Commander"
+        ],
+        "lemma_content": [
+          "Commander"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          43
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "assesses"
+        ],
+        "lemma_content": [
+          "assess"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          44
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "escalation",
+          "indicators"
+        ],
+        "lemma_content": [
+          "escalation",
+          "indicator"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          47,
+          48
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "html",
+    "source-size-bytes": 430,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:55",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:56",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_smx.owl"
+  ],
+  "source": "ingest://3c4b81c67db323745c9dbda14f5bcb381e348b731943d57c8fd3625de21704a8/SITREP_00781_1d4e2772.html",
+  "metadata": {
+    "topic_id": "situational_awareness",
+    "corpus": "osint",
+    "doc_type": "SITREP",
+    "language": "en",
+    "title": "SITREP 00781 — Baltic Sea",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "situational_awareness",
+  "doc_type": "SITREP",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999952814874553
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "#",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "SITREP",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "00781",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Baltic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sea",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "`",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "SITUATION",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "REPORT",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "DTG",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "2026-07-25T11:38Z",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Unit",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "NATO",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Response",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Cell",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Area",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Baltic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sea",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Objective",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Objective",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ALPHA",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "SITREP",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Objective",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ALPHA",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "operational",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "picture",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "remains",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "stable",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "ISR",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "collection",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "confirms",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "routine",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "maritime",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "traffic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Commander",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "assesses",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "no",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "immediate",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "escalation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "indicators",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "`",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "SITREP",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "00781",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Baltic",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Sea",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "SITREP",
+      "text": "SITREP",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00781",
+      "text": "00781",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "SYM",
+      "lemma": "#",
+      "text": "#",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "SITREP",
+      "text": "SITREP",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00781",
+      "text": "00781",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 6
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "situation",
+      "text": "SITUATION",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "ADV",
+      "lemma": "report",
+      "text": "REPORT",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "dtg",
+      "text": "DTG",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NUM",
+      "lemma": "2026-07-25t11:38z",
+      "text": "2026-07-25T11:38Z",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "unit",
+      "text": "Unit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "NATO",
+      "text": "NATO",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Response",
+      "text": "Response",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Cell",
+      "text": "Cell",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "objective",
+      "text": "Objective",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "objective",
+      "text": "Objective",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "alpha",
+      "text": "ALPHA",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "sitrep",
+      "text": "SITREP",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 27
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "objective",
+      "text": "Objective",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "alpha",
+      "text": "ALPHA",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "operational",
+      "text": "operational",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "picture",
+      "text": "picture",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "VERB",
+      "lemma": "remain",
+      "text": "remains",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "stable",
+      "text": "stable",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ISR",
+      "text": "ISR",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 36
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "collection",
+      "text": "collection",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "VERB",
+      "lemma": "confirm",
+      "text": "confirms",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "routine",
+      "text": "routine",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "maritime",
+      "text": "maritime",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "traffic",
+      "text": "traffic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Commander",
+      "text": "Commander",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 43
+    },
+    {
+      "pos": "VERB",
+      "lemma": "assess",
+      "text": "assesses",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "DET",
+      "lemma": "no",
+      "text": "no",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "immediate",
+      "text": "immediate",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "escalation",
+      "text": "escalation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "indicator",
+      "text": "indicators",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 50
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 3,
+      "end": 5,
+      "label": "location",
+      "text": "Baltic Sea"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 0,
+      "end": 3,
+      "label": "money",
+      "text": "# SITREP 00781"
+    },
+    {
+      "start": 4,
+      "end": 6,
+      "label": "location",
+      "text": "Baltic Sea"
+    },
+    {
+      "start": 16,
+      "end": 17,
+      "label": "organization",
+      "text": "NATO"
+    },
+    {
+      "start": 21,
+      "end": 23,
+      "label": "location",
+      "text": "Baltic Sea"
+    },
+    {
+      "start": 36,
+      "end": 37,
+      "label": "organization",
+      "text": "ISR"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "#",
+      "lemma": "#",
+      "pos": "SYM",
+      "head": 1,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SITREP",
+      "lemma": "SITREP",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "00781",
+      "lemma": "00781",
+      "pos": "NUM",
+      "head": 1,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 1,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "appos",
+      "lefts": [
+        4
+      ],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 6,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 14,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SITUATION",
+      "lemma": "situation",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "npadvmod",
+      "lefts": [
+        8
+      ],
+      "rights": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "text": "REPORT",
+      "lemma": "report",
+      "pos": "ADV",
+      "head": 9,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "DTG",
+      "lemma": "dtg",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "2026-07-25T11:38Z",
+      "lemma": "2026-07-25t11:38z",
+      "pos": "NUM",
+      "head": 14,
+      "dep": "nummod",
+      "lefts": [
+        9
+      ],
+      "rights": []
+    },
+    {
+      "text": "Unit",
+      "lemma": "unit",
+      "pos": "NOUN",
+      "head": 14,
+      "dep": "ROOT",
+      "lefts": [
+        7,
+        13
+      ],
+      "rights": [
+        15,
+        19,
+        24,
+        26
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 14,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "NATO",
+      "lemma": "NATO",
+      "pos": "PROPN",
+      "head": 19,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Response",
+      "lemma": "Response",
+      "pos": "PROPN",
+      "head": 19,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Cell",
+      "lemma": "Cell",
+      "pos": "PROPN",
+      "head": 19,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 14,
+      "dep": "appos",
+      "lefts": [
+        16,
+        17,
+        18
+      ],
+      "rights": [
+        20,
+        23
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "PROPN",
+      "head": 22,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "PROPN",
+      "head": 23,
+      "dep": "compound",
+      "lefts": [
+        21
+      ],
+      "rights": []
+    },
+    {
+      "text": "Objective",
+      "lemma": "objective",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "appos",
+      "lefts": [
+        22
+      ],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 14,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Objective",
+      "lemma": "objective",
+      "pos": "ADJ",
+      "head": 26,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ALPHA",
+      "lemma": "alpha",
+      "pos": "NOUN",
+      "head": 14,
+      "dep": "appos",
+      "lefts": [
+        25
+      ],
+      "rights": []
+    },
+    {
+      "text": "SITREP",
+      "lemma": "sitrep",
+      "pos": "NOUN",
+      "head": 27,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Objective",
+      "lemma": "objective",
+      "pos": "ADJ",
+      "head": 29,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ALPHA",
+      "lemma": "alpha",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "dep",
+      "lefts": [
+        28
+      ],
+      "rights": [
+        30
+      ]
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 29,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "operational",
+      "lemma": "operational",
+      "pos": "ADJ",
+      "head": 32,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "picture",
+      "lemma": "picture",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "nsubj",
+      "lefts": [
+        31
+      ],
+      "rights": []
+    },
+    {
+      "text": "remains",
+      "lemma": "remain",
+      "pos": "VERB",
+      "head": 33,
+      "dep": "ROOT",
+      "lefts": [
+        29,
+        32
+      ],
+      "rights": [
+        34,
+        35
+      ]
+    },
+    {
+      "text": "stable",
+      "lemma": "stable",
+      "pos": "ADJ",
+      "head": 33,
+      "dep": "acomp",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ISR",
+      "lemma": "ISR",
+      "pos": "PROPN",
+      "head": 37,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "collection",
+      "lemma": "collection",
+      "pos": "NOUN",
+      "head": 38,
+      "dep": "nsubj",
+      "lefts": [
+        36
+      ],
+      "rights": []
+    },
+    {
+      "text": "confirms",
+      "lemma": "confirm",
+      "pos": "VERB",
+      "head": 38,
+      "dep": "ROOT",
+      "lefts": [
+        37
+      ],
+      "rights": [
+        41,
+        42
+      ]
+    },
+    {
+      "text": "routine",
+      "lemma": "routine",
+      "pos": "ADJ",
+      "head": 41,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "maritime",
+      "lemma": "maritime",
+      "pos": "ADJ",
+      "head": 41,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "traffic",
+      "lemma": "traffic",
+      "pos": "NOUN",
+      "head": 38,
+      "dep": "dobj",
+      "lefts": [
+        39,
+        40
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 38,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Commander",
+      "lemma": "Commander",
+      "pos": "PROPN",
+      "head": 44,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "assesses",
+      "lemma": "assess",
+      "pos": "VERB",
+      "head": 44,
+      "dep": "ROOT",
+      "lefts": [
+        43
+      ],
+      "rights": [
+        48,
+        49
+      ]
+    },
+    {
+      "text": "no",
+      "lemma": "no",
+      "pos": "DET",
+      "head": 48,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "immediate",
+      "lemma": "immediate",
+      "pos": "ADJ",
+      "head": 48,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "escalation",
+      "lemma": "escalation",
+      "pos": "NOUN",
+      "head": 48,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "indicators",
+      "lemma": "indicator",
+      "pos": "NOUN",
+      "head": 44,
+      "dep": "dobj",
+      "lefts": [
+        45,
+        46,
+        47
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 44,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 50,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 51,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        52
+      ]
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 51,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "SITREP",
+      "lemma": "SITREP",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "text": "00781",
+      "lemma": "00781",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 4,
+      "text": "baltic sea",
+      "span": {
+        "start": 3,
+        "end": 5
+      }
+    },
+    {
+      "score": 16,
+      "text": "nato response cell area",
+      "span": {
+        "start": 16,
+        "end": 20
+      }
+    },
+    {
+      "score": 9,
+      "text": "immediate escalation indicator",
+      "span": {
+        "start": 46,
+        "end": 49
+      }
+    },
+    {
+      "score": 8,
+      "text": "sitrep objective alpha",
+      "span": {
+        "start": 27,
+        "end": 30
+      }
+    },
+    {
+      "score": 7,
+      "text": "baltic sea objective",
+      "span": {
+        "start": 21,
+        "end": 24
+      }
+    },
+    {
+      "score": 5,
+      "text": "objective alpha",
+      "span": {
+        "start": 25,
+        "end": 27
+      }
+    },
+    {
+      "score": 5,
+      "text": "baltic sea",
+      "span": {
+        "start": 4,
+        "end": 6
+      }
+    },
+    {
+      "score": 1,
+      "text": "situation",
+      "span": {
+        "start": 9,
+        "end": 10
+      }
+    },
+    {
+      "score": 1,
+      "text": "dtg",
+      "span": {
+        "start": 11,
+        "end": 12
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://3c4b81c67db323745c9dbda14f5bcb381e348b731943d57c8fd3625de21704a8/SITREP_00781_1d4e2772.html#chunk-0-98c6cfa2fa",
+      "parent_doc_id": "ingest://3c4b81c67db323745c9dbda14f5bcb381e348b731943d57c8fd3625de21704a8/SITREP_00781_1d4e2772.html",
+      "text_raw": "# SITREP 00781 — Baltic Sea ` ` ` SITUATION REPORT DTG : 2026-07-25T11:38Z Unit : NATO Response Cell Area : Baltic Sea Objective : Objective ALPHA SITREP Objective ALPHA — operational picture remains stable . ISR collection confirms routine maritime traffic . Commander assesses no immediate escalation indicators . ` ` `",
+      "search_vector_payload": "# SITREP 00781 — Baltic Sea ` ` ` SITUATION REPORT DTG : 2026-07-25T11:38Z Unit : NATO Response Cell Area : Baltic Sea Objective : Objective ALPHA SITREP Objective ALPHA — operational picture remains stable . ISR collection confirms routine maritime traffic . Commander assesses no immediate escalation indicators . ` ` `",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "money": [
+            "# SITREP 00781"
+          ],
+          "location": [
+            "Baltic Sea"
+          ],
+          "organization": [
+            "NATO",
+            "ISR"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "operational picture",
+            "remains",
+            "stable"
+          ],
+          [
+            "ISR collection",
+            "confirms",
+            "routine maritime traffic"
+          ],
+          [
+            "ISR",
+            "confirms",
+            "routine maritime traffic"
+          ],
+          [
+            "ISR collection",
+            "confirms",
+            "traffic"
+          ],
+          [
+            "Commander",
+            "assesses",
+            "no immediate escalation indicators"
+          ],
+          [
+            "Commander",
+            "assesses",
+            "escalation indicators"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 53,
+        "sentence_start": 0,
+        "sentence_end": 6
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "operational picture remains stable",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Baltic Sea",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "# SITREP 00781 — Baltic Sea ` ` ` SITUATION REPORT DTG",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "ISR collection confirms routine maritime traffic",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "ISR confirms routine maritime traffic",
+          "question_type": "SVO-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/dtg\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"dtg\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/OperationalPicture/operational_picture-33e704f9aa4e\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Operationalpicture\"\n    ],\n    \"http://tkeir.local/ontology/remain\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Stable/stable-f379ccb92b91\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"operational picture\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/baltic_sea_objective\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"baltic sea objective\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Money/sitrep_00781-6425e9608db7\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Money\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"# SITREP 00781\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/nato-ace0fc1bd762\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\",\n      \"http://www.nato.int/ontologies/c4isr#Class0\"\n    ],\n    \"http://tkeir.local/ontology/confirms\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Confirm/routine_maritime_traffic-403e4c668387\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"NATO\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.nato.int/ontologies/c4isr#\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Chunk/ingest_3c4b81c67db323745c9dbda14f5bcb381e348b731943d57c8fd3625de21704a8_sitrep_00781_1d4e2772_html_chunk_0_98c6cfa2fa\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/nato_response_cell_area\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/immediate_escalation_indicator\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/sitrep_objective_alpha\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/baltic_sea_objective\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/objective_alpha\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/baltic_sea\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/situation\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/dtg\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Money/sitrep_00781-6425e9608db7\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Location/baltic_sea-467833b59030\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/nato-ace0fc1bd762\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/isr-99fb5e7c8b05\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/OperationalPicture/operational_picture-33e704f9aa4e\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/isr_collection-a3505a3b7157\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/isr-99fb5e7c8b05\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/commander-16af7be312e1\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Picture/picture-2cea274d0bed\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Collection/collection-fa7496e4ae84\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"sitrep_00781_1d4e2772_html\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/nato_response_cell_area\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"nato response cell area\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Stable/stable-f379ccb92b91\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Stable\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"stable\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Confirm/traffic-075f4ab854e2\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Confirm\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"traffic\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/isr_collection-a3505a3b7157\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://tkeir.local/ontology/confirms\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Confirm/routine_maritime_traffic-403e4c668387\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Confirm/traffic-075f4ab854e2\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ISR collection\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Task_2\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/commander-16af7be312e1\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Commander\"\n    ],\n    \"http://tkeir.local/ontology/assess\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Indicators/indicators-44089be1da32\"\n      }\n    ],\n    \"http://tkeir.local/ontology/assesses\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/no_immediate_escalation_indicators-c83937a16884\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/escalation_indicators-7f27bd3ee7e4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Commander\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/immediate_escalation_indicator\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"immediate escalation indicator\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/escalation_indicators-7f27bd3ee7e4\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Commander\"\n    ],\n    \"http://tkeir.local/ontology/assess\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Indicators/indicators-44089be1da32\"\n      }\n    ],\n    \"http://tkeir.local/ontology/assesses\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/escalation_indicators-7f27bd3ee7e4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"escalation indicators\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/no_immediate_escalation_indicators-c83937a16884\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Commander\"\n    ],\n    \"http://tkeir.local/ontology/assess\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Indicators/indicators-44089be1da32\"\n      }\n    ],\n    \"http://tkeir.local/ontology/assesses\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/escalation_indicators-7f27bd3ee7e4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"no immediate escalation indicators\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Confirm/routine_maritime_traffic-403e4c668387\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Confirm\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"routine maritime traffic\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/isr-99fb5e7c8b05\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\",\n      \"http://www.nato.int/ontologies/c4isr#Class0\"\n    ],\n    \"http://tkeir.local/ontology/confirms\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Confirm/routine_maritime_traffic-403e4c668387\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ISR\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.nato.int/ontologies/c4isr#\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Collection/collection-fa7496e4ae84\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Collection\"\n    ],\n    \"http://tkeir.local/ontology/confirms\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Confirm/traffic-075f4ab854e2\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"collection\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Task_2\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/sitrep_objective_alpha\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"sitrep objective alpha\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Obj_ALPHA\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Indicators/indicators-44089be1da32\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Indicators\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"indicators\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Picture/picture-2cea274d0bed\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Picture\"\n    ],\n    \"http://tkeir.local/ontology/remain\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"picture\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Chunk/ingest_3c4b81c67db323745c9dbda14f5bcb381e348b731943d57c8fd3625de21704a8_sitrep_00781_1d4e2772_html_chunk_0_98c6cfa2fa\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Money/sitrep_00781-6425e9608db7\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Location/baltic_sea-467833b59030\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/nato-ace0fc1bd762\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/isr-99fb5e7c8b05\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/OperationalPicture/operational_picture-33e704f9aa4e\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/isr_collection-a3505a3b7157\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Organization/isr-99fb5e7c8b05\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Commander/commander-16af7be312e1\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://3c4b81c67db323745c9dbda14f5bcb381e348b731943d57c8fd3625de21704a8/SITREP_00781_1d4e2772.html#chunk-0-98c6cfa2fa\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/situation\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"situation\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/baltic_sea\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"baltic sea\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Location/baltic_sea-467833b59030\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Location\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Baltic Sea\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00781_1d4e2772_html/Keyword/objective_alpha\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"objective alpha\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Obj_ALPHA\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 5,
+      "unresolved": 0,
+      "auto_fixed": 5,
+      "affected_node_count": 3,
+      "graph_node_count": 42,
+      "graph_triple_count": 99,
+      "by_result_path": {
+        "assess": 2,
+        "assesses": 2,
+        "confirms": 1
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 58,
+    "total_tokens": 58,
+    "covered_characters": 290,
+    "total_characters": 290,
+    "derivation": {
+      "enabled": true,
+      "status": "APPLIED",
+      "matches": 8,
+      "subclass_links": 0,
+      "type_links": 2,
+      "same_as_links": 6,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JAR4CHN4T3G37V9X0DZNA/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 53,
+  "token-count": 58,
+  "source-file-size-bytes": 430,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.43,
+    "tasks": {
+      "converter": 0.007,
+      "language-detection": 0.005,
+      "resource-selection": 0.001,
+      "tokenizer": 0.003,
+      "morphosyntax": 0.008,
+      "ner": 0.043,
+      "syntax": 0.007,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.355,
+      "chunk-questions": 0.001
+    }
+  }
+}

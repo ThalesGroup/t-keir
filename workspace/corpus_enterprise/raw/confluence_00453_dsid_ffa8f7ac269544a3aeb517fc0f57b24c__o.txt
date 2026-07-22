@@ -1,0 +1,142 @@
+Observability Shift-Left: Capacity Onboarding Manual
+
+Overview:
+
+This document defines the "observability shift-left" approach for capacity onboarding at Redwood Inference. Shift-left means integrating production-grade telemetry, SLO/error-budget alignment, and capacity forecasts earlier in the lifecycle — during service design, CI, and pre-production load validation — to reduce onboarding time and post-launch incidents.
+
+Goals and scope:
+
+- Reduce time-to-safe-launch for new tenants and services by 30% through standardized preflight checks and telemetry templates.
+- Ensure every onboarded workload has clear SLOs, a mapped error-budget policy, and baseline capacity forecasts prior to production traffic.
+- Provide runbooks and automation hooks for predictable ramp, measurement, and rollback.
+
+This manual applies to: new model tenants, major model-version rollouts, new public API routes, and capacity-sensitive feature launches. It does NOT replace service-level runbooks (these remain the responsibility of service owners).
+
+Key principles:
+
+1) Instrument early: teams must add the recommended metrics/traces at code review time, not as a post-launch task.
+2) Preflight parity: telemetry and deployment topology in staging must mirror production for the load profile being validated.
+3) Error-budget policy by design: SLOs and error budget rules are defined and automated before first traffic.
+4) Guardrails over guesswork: use synthetic canaries and CI-driven load validation to catch scale regressions pre-deploy.
+
+Roles and responsibilities:
+
+- Service owner (Product/Feature team): define functional requirements, SLO candidate values, and approve rollback conditions.
+- Platform SRE (Onboarding lead): run preflight checks, validate telemetry, run synthetic load tests, and sign off on capacity forecasts.
+- Observability engineering: provide dashboards, alert rules, and telemetry validators; own golden queries.
+- Capacity planning: convert traffic forecasts into capacity commitments and autoscaling profiles.
+
+Preflight checklist (mandatory items before production traffic):
+
+1) Telemetry and tracing
+   - Metrics present: request_count, request_latency_ms (p50/p95/p99), request_errors, token_consumption_per_request (for model-serving), kv-cache-hit-rate.
+   - Tracing enabled for request path with sampled spans for llama/model and routing decisions.
+   - Metrics exposed to Prometheus-compatible endpoint and pinged by telemetry validator.
+
+2) SLO and error-budget mapping
+   - Candidate SLOs documented (availability and latency buckets). Example: availability 99.95% (5xx and timeouts) ; p95 latency <= 350ms for short-text route.
+   - Error budget policy: throttles, automatic fallbacks, and escalation contacts.
+
+3) Capacity forecast and autoscale profile
+   - 90-day traffic forecast with 95th and 99th percentile burst estimates.
+   - Autoscaling policy (min/max nodes, scale step, cooldown) and expected cold-start penalty documented.
+
+4) Synthetic and stress validation
+   - CI job that runs a 30-minute synthetic canary with production-shaped distribution.
+   - Failure injection scenarios validated (backend timeout, NVMe failure, node eviction).
+
+5) Observability dashboards and alerts
+   - Pre-built per-route dashboard exists and renders in <15s.
+   - Alert thresholds configured for SLO burn rate, CPU/GPU saturation, and queue build-up.
+
+Example SLO table (to be included in service PR):
+
+| SLO name | Metric | Target | Measurement window | Alert action |
+|---|---|---:|---:|---|
+| API availability | 5xx + timeout rate | 99.95% | 30d | Pager at burn-rate > 2 |
+| Embed latency (short) | p95 request_latency_ms | <= 350ms | 7d | Auto-fallback to smaller model |
+| Token throughput | tokens/sec per-node | >= 12k | 7d | Autoscale + add reserved nodes |
+
+Telemetry validators (example Prometheus queries and golden checks):
+
+- Request rate: sum(rate(http_requests_total{job="myservice"}[1m]))
+- p95 latency: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="myservice"}[5m])) by (le))
+- Error rate: sum(rate(http_requests_total{job="myservice",code=~"5.."}[5m])) / sum(rate(http_requests_total{job="myservice"}[5m]))
+
+Preflight automation (CI hooks):
+
+1) ci/telemetry-check: validate presence and formatting of required metrics and labels.
+2) ci/synthetic-canary: run short synthetic load with expected distribution and assert SLO candidates are met in staging.
+3) ci/chaos-smoke: run a 5-minute fault injection (timeouts, GPU preemption) and ensure graceful degradation and fallback triggers.
+
+Sample TPS-to-capacity conversion (example calculation steps):
+
+1) Baseline p95 latency L_p95 and tokens per request T_r.
+2) Target throughput per node = (1 / L_p95) * headroom_factor (0.6 for mixed workloads).
+3) Required nodes = ceil( forecast_peak_tps * T_r / throughput_per_node ).
+
+Operational runbook: onboarding flow (step-by-step)
+
+1) Service owner files "Capacity Onboarding PR" containing: SLO candidate table, telemetry sample (prometheus labels), initial forecast and autoscale policy, and test plan.
+2) Observability engineering runs ci/telemetry-check and returns findings.
+3) Platform SRE schedules a 2-hour synthetic run in pre-prod and collects logs/traces.
+4) If SLO candidates fail, iterate on model/config and re-run canary.
+5) Once green, Platform SRE publishes a "Launch Readiness" note with signed capacity commitment and auto-scaling knobs.
+
+Escalation and rollback policy:
+
+- If burn-rate > 4 within a 1-hour window, SRE on-call should engage platform capacity pool and initiate burst capacity policy.
+- If sustained SLO violation > 6 hours, execute rollback to last-known-good model version and open an incident (Severity P1).
+
+Alert definitions (examples):
+
+- SLO burn-rate alert: burn_rate(SLO_requests) > 2 for 15m -> Pager.
+- GPU saturation alert: avg_gpu_utilization > 85% for 5m -> Slack + on-call.
+- Queue latency alert: request_queue_latency_p95 > 2000ms for 2m -> Runbook stage 1.
+
+Example observability config snippet (YAML) to include in service repo:
+
+telemetry:
+  prometheus_endpoint: /metrics
+  metrics_required:
+    - http_requests_total
+    - http_request_duration_seconds_bucket
+    - request_errors_total
+    - gpu_utilization_percent
+  labels_required:
+    - service
+    - route
+    - model_version
+
+Launch verification checklist (post-launch 72-hour window):
+
+- Hourly review of SLO dashboard for 72 hours.
+- Compare synthetic canary performance vs live.
+- Confirm autoscale events match predictions and no significant cold-start penalty.
+- Customer-impacting errors resolved or mitigated within policy windows.
+
+KPIs and measurement for onboarding efficiency:
+
+- Mean time to onboard (MTTO): measurement from PR creation to signed launch readiness. Target: <= 8 business days.
+- Post-launch incident rate (first 14 days): target < 1 major incident per 20 launches.
+- Telemetry coverage score: percent of mandatory metrics present at launch. Target: 100%.
+
+Appendix: common failure modes and mitigations
+
+1) Telemetry gaps: add fallback exporters; enable service-level push gateway if scrape is blocked.
+2) Unexpected token spikes: enforce per-tenant rate limits and queue shaping in gateway.
+3) Slow cold-start: pre-warm nodes during launch window and use warm-pools for reserved capacity.
+
+References and links:
+- Capacity governance handbook: /confluence/eng-sre/capacity-planning/service-capacity-governance-and-error-budget-handbook-2025
+- Onboarding checklist: /confluence/eng-sre/runbooks/capacity-onboarding-checklist-for-new-model-tenants-2026
+- SLO definitions and burn-rate calculator: /confluence/eng-sre/slo-and-error-budgets/slo-oncall-escalation-and-capacity-triggers-2026
+
+Contact and ownership:
+
+For questions, reach out to Platform SRE (onboarding@redwood.ai) or Observability engineering (obs-eng@redwood.ai).
+
+Revision history:
+- 2025-03-12: Initial draft by Maya Chen.
+- 2025-06-20: Added telemetry validator queries and CI hooks (reviewed by Luca Martinez).
+- 2025-10-02: Updated launch verification checklist and KPIs (finalized after Q3 onboarding retro).

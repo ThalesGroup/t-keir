@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4DDZVEWM8W453DWHEHQ4S7",
+  "reason": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+  "job": {
+    "ingest_id": "01KY4DDZVEWM8W453DWHEHQ4S7",
+    "correlation_id": "d5da4b19cf187261380036f4628d6541",
+    "status": "failed",
+    "doc_id": "04ff8c86e19551a34b3f811338e81c8551f5b0566f98af05998d214edba0d587",
+    "batch_id": null,
+    "manifest_path": "staging/04ff8c86e19551a34b3f811338e81c8551f5b0566f98af05998d214edba0d587/ingest.manifest.json",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+    "created_at": "2026-07-22T08:00:19.310Z",
+    "updated_at": "2026-07-22T08:00:38.738Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4DDZVEWM8W453DWHEHQ4S7",
+    "correlation_id": "d5da4b19cf187261380036f4628d6541",
+    "doc_id": "04ff8c86e19551a34b3f811338e81c8551f5b0566f98af05998d214edba0d587",
+    "source": {
+      "uri": "upload://01KY4DDZVEZ399RXR8GA4925NS/NATOPUB_01048_c7e4cbe5.docx",
+      "filename": "NATOPUB_01048_c7e4cbe5.docx",
+      "content_type": "application/octet-stream",
+      "size_bytes": 993
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T08:00:19.312Z",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']"
+  },
+  "failed_at": "2026-07-22T08:00:38.738Z"
+}

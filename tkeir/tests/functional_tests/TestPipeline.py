@@ -1,4 +1,12 @@
-"""Functional tests for unified pipeline CLI."""
+"""Title: Pipeline
+
+Functional tests for unified pipeline CLI.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import json
 import os

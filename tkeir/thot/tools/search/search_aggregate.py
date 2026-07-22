@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Aggregate chunk hits into document scores for search APIs."""
+"""Title: Search aggregate
+
+Aggregate chunk hits into document scores for search APIs.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

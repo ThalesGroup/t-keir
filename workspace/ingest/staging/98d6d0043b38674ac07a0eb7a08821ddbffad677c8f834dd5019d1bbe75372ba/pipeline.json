@@ -1,0 +1,1985 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://98d6d0043b38674ac07a0eb7a08821ddbffad677c8f834dd5019d1bbe75372ba/AIS_01429_fab522e5.txt",
+  "title": "AIS 01429 — Training Area 7",
+  "content": [
+    "AIS 01429 — Training Area 7\n===========================\n\nAIS MARITIME TRACK\nTrack: NATO-7814\nPosition: 64N 6E\nCourse: 343 degrees\nAssessment: commercial vessel; correlation pending.\n"
+  ],
+  "kg": [],
+  "error": false,
+  "conversion-info": {
+    "datatype": "raw",
+    "source-size-bytes": 184,
+    "image-extraction": {
+      "enabled": false,
+      "used": false,
+      "mode": null,
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:48:07",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_smx.owl"
+  ],
+  "source": "ingest://98d6d0043b38674ac07a0eb7a08821ddbffad677c8f834dd5019d1bbe75372ba/AIS_01429_fab522e5.txt",
+  "metadata": {
+    "topic_id": "situational_awareness",
+    "corpus": "osint",
+    "doc_type": "AIS",
+    "language": "en",
+    "title": "AIS 01429 — Training Area 7",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "situational_awareness",
+  "doc_type": "AIS",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999961876414529
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "AIS",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "01429",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Training",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Area",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "7",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "AIS",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "MARITIME",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "TRACK",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Track",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "NATO-7814",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Position",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "64N",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "6E",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Course",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "343",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "degrees",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Assessment",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "commercial",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "vessel",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "correlation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "pending",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AIS",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "01429",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Training",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Area",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "7",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AIS",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "01429",
+      "text": "01429",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Training",
+      "text": "Training",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NUM",
+      "lemma": "7",
+      "text": "7",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AIS",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "01429",
+      "text": "01429",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Training",
+      "text": "Training",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NUM",
+      "lemma": "7",
+      "text": "7",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "X",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "X",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "SYM",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AIS",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 33
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "MARITIME",
+      "text": "MARITIME",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "track",
+      "text": "TRACK",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Track",
+      "text": "Track",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "NATO-7814",
+      "text": "NATO-7814",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "position",
+      "text": "Position",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "NUM",
+      "lemma": "64n",
+      "text": "64N",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "6E",
+      "text": "6E",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Course",
+      "text": "Course",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "NUM",
+      "lemma": "343",
+      "text": "343",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "degree",
+      "text": "degrees",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "assessment",
+      "text": "Assessment",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "commercial",
+      "text": "commercial",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "vessel",
+      "text": "vessel",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "correlation",
+      "text": "correlation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    },
+    {
+      "pos": "VERB",
+      "lemma": "pende",
+      "text": "pending",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 53
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 54
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [
+    {
+      "start": 45,
+      "end": 47,
+      "label": "quantity",
+      "text": "343 degrees"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "AIS",
+      "lemma": "AIS",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        4,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32
+      ]
+    },
+    {
+      "text": "01429",
+      "lemma": "01429",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Training",
+      "lemma": "Training",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        2,
+        3
+      ],
+      "rights": [
+        5
+      ]
+    },
+    {
+      "text": "7",
+      "lemma": "7",
+      "pos": "NUM",
+      "head": 4,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "X",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "X",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "SYM",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AIS",
+      "lemma": "AIS",
+      "pos": "PROPN",
+      "head": 33,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "MARITIME",
+      "lemma": "MARITIME",
+      "pos": "PROPN",
+      "head": 36,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "TRACK",
+      "lemma": "track",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Track",
+      "lemma": "Track",
+      "pos": "PROPN",
+      "head": 36,
+      "dep": "ROOT",
+      "lefts": [
+        34,
+        35
+      ],
+      "rights": [
+        37,
+        39,
+        52,
+        54
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 36,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "NATO-7814",
+      "lemma": "NATO-7814",
+      "pos": "PROPN",
+      "head": 39,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Position",
+      "lemma": "position",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "appos",
+      "lefts": [
+        38
+      ],
+      "rights": [
+        40,
+        43
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 39,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "64N",
+      "lemma": "64n",
+      "pos": "NUM",
+      "head": 43,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "6E",
+      "lemma": "6E",
+      "pos": "PROPN",
+      "head": 43,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Course",
+      "lemma": "Course",
+      "pos": "PROPN",
+      "head": 39,
+      "dep": "appos",
+      "lefts": [
+        41,
+        42
+      ],
+      "rights": [
+        44,
+        46,
+        51
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 43,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "343",
+      "lemma": "343",
+      "pos": "NUM",
+      "head": 46,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "degrees",
+      "lemma": "degree",
+      "pos": "NOUN",
+      "head": 43,
+      "dep": "appos",
+      "lefts": [
+        45
+      ],
+      "rights": [
+        47,
+        48,
+        50
+      ]
+    },
+    {
+      "text": "Assessment",
+      "lemma": "assessment",
+      "pos": "NOUN",
+      "head": 46,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 46,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "commercial",
+      "lemma": "commercial",
+      "pos": "ADJ",
+      "head": 50,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "vessel",
+      "lemma": "vessel",
+      "pos": "NOUN",
+      "head": 46,
+      "dep": "appos",
+      "lefts": [
+        49
+      ],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 43,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "correlation",
+      "lemma": "correlation",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "appos",
+      "lefts": [],
+      "rights": [
+        53
+      ]
+    },
+    {
+      "text": "pending",
+      "lemma": "pende",
+      "pos": "VERB",
+      "head": 52,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 36,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AIS",
+      "lemma": "AIS",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        4
+      ]
+    },
+    {
+      "text": "01429",
+      "lemma": "01429",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Training",
+      "lemma": "Training",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        2,
+        3
+      ],
+      "rights": [
+        5
+      ]
+    },
+    {
+      "text": "7",
+      "lemma": "7",
+      "pos": "NUM",
+      "head": 4,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 16,
+      "text": "ais maritime track track",
+      "span": {
+        "start": 33,
+        "end": 37
+      }
+    },
+    {
+      "score": 4,
+      "text": "nato-7814 position",
+      "span": {
+        "start": 38,
+        "end": 40
+      }
+    },
+    {
+      "score": 4,
+      "text": "commercial vessel",
+      "span": {
+        "start": 49,
+        "end": 51
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://98d6d0043b38674ac07a0eb7a08821ddbffad677c8f834dd5019d1bbe75372ba/AIS_01429_fab522e5.txt#chunk-0-c2eb407ac5",
+      "parent_doc_id": "ingest://98d6d0043b38674ac07a0eb7a08821ddbffad677c8f834dd5019d1bbe75372ba/AIS_01429_fab522e5.txt",
+      "text_raw": "AIS 01429 — Training Area 7 = = = = = = = = = = = = = = = = = = = = = = = = = = = AIS MARITIME TRACK Track : NATO-7814 Position : 64N 6E Course : 343 degrees Assessment : commercial vessel ; correlation pending .",
+      "search_vector_payload": "AIS 01429 — Training Area 7 = = = = = = = = = = = = = = = = = = = = = = = = = = = AIS MARITIME TRACK Track : NATO-7814 Position : 64N 6E Course : 343 degrees Assessment : commercial vessel ; correlation pending .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "quantity": [
+            "343 degrees"
+          ]
+        },
+        "svo_triplets": [],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 55,
+        "sentence_start": 0,
+        "sentence_end": 2
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "343 degrees",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "AIS 01429 — Training Area 7 = = = = = =",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "AIS 01429 — Training Area 7 = = = = = = = = = = = = = = = = = = = = = = = = = = = AIS MARITIME TRACK Track : NATO-7814 Position : 64N 6E Course : 343 degrees Assessment : commercia...",
+          "question_type": "Summary-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Chunk/ingest_98d6d0043b38674ac07a0eb7a08821ddbffad677c8f834dd5019d1bbe75372ba_ais_01429_fab522e5_txt_chunk_0_c2eb407ac5\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Quantity/343_degrees-47efc4155c83\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://98d6d0043b38674ac07a0eb7a08821ddbffad677c8f834dd5019d1bbe75372ba/AIS_01429_fab522e5.txt#chunk-0-c2eb407ac5\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Keyword/nato_7814_position\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"nato-7814 position\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Quantity/343_degrees-47efc4155c83\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Quantity\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"343 degrees\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Keyword/commercial_vessel\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"commercial vessel\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Chunk/ingest_98d6d0043b38674ac07a0eb7a08821ddbffad677c8f834dd5019d1bbe75372ba_ais_01429_fab522e5_txt_chunk_0_c2eb407ac5\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Keyword/ais_maritime_track_track\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Keyword/nato_7814_position\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Keyword/commercial_vessel\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Quantity/343_degrees-47efc4155c83\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ais_01429_fab522e5_txt\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01429_fab522e5_txt/Keyword/ais_maritime_track_track\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ais maritime track track\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 10,
+      "graph_triple_count": 18,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 61,
+    "total_tokens": 61,
+    "covered_characters": 180,
+    "total_characters": 180,
+    "derivation": {
+      "enabled": true,
+      "status": "NO_MATCHES",
+      "matches": 0,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 0,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KKCAJH01ZRW3M64RPGXPM/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 6,
+  "content-token-count": 55,
+  "token-count": 61,
+  "source-file-size-bytes": 184,
+  "image-extraction": {
+    "enabled": false,
+    "used": false,
+    "mode": null,
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.153,
+    "tasks": {
+      "converter": 0.002,
+      "language-detection": 0.003,
+      "resource-selection": 0.001,
+      "tokenizer": 0.003,
+      "morphosyntax": 0.008,
+      "ner": 0.043,
+      "syntax": 0.008,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.081,
+      "chunk-questions": 0.001
+    }
+  }
+}

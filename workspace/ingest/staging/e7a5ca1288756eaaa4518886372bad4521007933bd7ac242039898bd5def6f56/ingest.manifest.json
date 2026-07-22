@@ -1,0 +1,23 @@
+{
+  "schema": "tkeir.ingest.manifest.v1",
+  "ingest_id": "01KY4G35DF3SNW2K2EVDPGKFXX",
+  "correlation_id": "5d7b49315e918e833867588ce16ca02f",
+  "doc_id": "e7a5ca1288756eaaa4518886372bad4521007933bd7ac242039898bd5def6f56",
+  "source": {
+    "uri": "upload://01KY4G35DESGYMS27T2Z9D8DFS/SITREP_00104_2e25b5ee.md",
+    "filename": "SITREP_00104_2e25b5ee.md",
+    "content_type": "application/octet-stream",
+    "size_bytes": 402
+  },
+  "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+  "embedder": {
+    "model": "bge-m3",
+    "provider": "ollama",
+    "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+  },
+  "lineage": {},
+  "status": "indexed",
+  "chunk_count": 1,
+  "indexed_at": "2026-07-22T08:46:50.883Z",
+  "created_at": "2026-07-22T08:46:50.289Z"
+}

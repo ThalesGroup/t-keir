@@ -1,0 +1,197 @@
+Runtime resource annotation taxonomy and signal enrichment
+
+Summary
+
+This document defines a canonical taxonomy for resource annotations used across the serving runtime, plus the enrichment pipeline that turns raw telemetry + config into scored signals used by the scheduler, admission controller, and autoscaler. The goal is to standardize names, types, semantics, and operational practices so that components can interoperate without brittle ad-hoc mappings.
+
+Motivation
+
+- Multiple teams (scheduler, kernel mapper, autoscaler, Observability) require consistent, machine-readable metadata about model-serving resources (GPUs, shards, model variants, containers, and requests).
+- Inconsistent annotation names caused mismatches in fallback routing and incorrect prefetch decisions during Q3 incidents.
+- A small, well-documented set of canonical fields reduces cognitive load for owners and speeds rollouts of policy changes.
+
+Scope
+
+- This taxonomy applies to: GPU nodes, runtime shards, model-variant instances, session tokens (provenance), and request classes.
+- Out of scope: long-term billing tags (managed by Finance) and user-level semantic labels (managed by product teams).
+
+Core principles
+
+1) Backwards-compatible: existing annotation keys must continue to be supported; new keys should have clear deprecation paths.
+2) Idempotent enrichment: repeated enrichment runs should produce identical signals for the same inputs.
+3) Typed and validated: each key has a strict type and acceptable value range.
+4) Explainable scores: any composite score must be reproducible and accompanied by its component weights.
+
+Canonical annotation table (summary)
+
+| key | type | description | primary consumers | default/notes |
+|---|---:|---|---|---|
+| resource_type | string | one of [gpu-node, shard, model-variant, session, request-class] | all | required |
+| affinity | string | affinity class: one of [high, medium, low] used for co-location heuristics | scheduler, autoscaler | default: medium |
+| eviction_priority | integer | 0 (never) - 100 (highest) eviction ranking, lower = safer to evict | scheduler, runtime | default: 50 |
+| kvcache_hotness | float | 0.0-1.0 locality score for KV cache reuse | kernel-mapper, scheduler | computed by enrichment pipeline |
+| kernel_hint | string | preferred kernel execution path (e.g. attention-sliced-v2, fused-mlp) | kernel-mapper | optional |
+| fidelity_profile | string | fidelity target: [max_quality, balanced, cost_saver] | autoscaler, rollout | impacts quantization and fallback policies |
+| estimated_tps | float | estimated tokens-per-second capacity for this resource | admission, autoscaler | derived from microbenchmarks and telemetry |
+| thermal_headroom | float | 0.0-1.0 available thermal headroom; <0.2 triggers soft-limits | scheduler, SRE | pulled from node sensors |
+| model_variant_compat | list | list of variant ids this resource is compatible with | orchestrator | canonicalized to short ids |
+| provenance | string | origin id of last configuration change | all | helps audit and debugging |
+| isolation_class | string | [best_effort, strict, dedicated] determines multi-tenancy isolation | scheduler, infra | default: best_effort |
+| prefetch_hint | string | [none, small, aggressive] KV prefetch strategy expected | kernel-mapper | influences warmstart behavior |
+| billing_bucket | string | internal billing categorization | billing, finance | optional, tie-breaker only |
+
+Full field definitions and validation rules
+
+- resource_type (string, required): must be one of the canonical values. Reject unknown types during ingestion and route to owner for classification.
+
+- affinity (enum): used by the placement policy to express co-location sensitivity. Implementation note: treat affinity high as an additive score +30 in placement ranking.
+
+- eviction_priority (int 0-100): lower values protected; eviction_policy: pick candidate with highest eviction_priority first. For multi-tenant nodes, maintain per-tenant min_protected_threshold.
+
+- kvcache_hotness (float 0.0-1.0): computed by enrichment pipeline using a sliding-window merge of request provenance + access patterns. See Enrichment pipeline section. Values <0.15 are considered cold.
+
+- kernel_hint (string): free-form but validated against KernelHintRegistry (see Operational pointers). Unrecognized hints fall back to kernel auto-selection with telemetry annotation.
+
+- fidelity_profile (enum): toggles quality/cost tradeoffs; must be supported by model_variant. If a requested fidelity_profile is unsupported, admission rejects with a 409 and details recommended alternatives.
+
+Enrichment pipeline (architecture)
+
+The enrichment pipeline converts raw inputs into canonical annotated-resource records. Design choices: streaming-first but compact, idempotent, and vectorizable for fast scoring.
+
+Inputs
+- Telemetry: hot-prefix traces, KV access logs, per-request latency and token counts, node sensor readings (temp, power), kernel failure traces.
+- Config/state: model manifests, node labels, feature flags, recent rollout history.
+- Microbenchmarks: per-variant short-run throughput/latency profiles stored in the Benchmark Catalog.
+
+Stages (high-level)
+1) Ingest and canonicalize keys: map vendor-specific labels (e.g., nvidia.gpu.type -> resource_type/gpu_model) using Canonicalizer map.
+2) Join time windows: create sliding windows (default 5m, 1h) for hotness and latency measures.
+3) Compute primitive signals: mean_ttfb, median_tokens, kv_access_rate, error_rate, thermal_percentile.
+4) Normalize & clamp: scale signals into canonical ranges, clamp outliers (z-score guardrails).
+5) Composite scoring: calculate kvcache_hotness, estimated_tps, eviction_priority_delta using weighted sums. Weights are stored in the ScoreConfig repo and are versioned.
+6) Publish annotated record: write to Annotated Resource Store (a lightweight document store with versioned entries).
+
+Example enrichment rule (pseudocode)
+
+# kvcache_hotness calculation - pseudocode
+
+window = last_15_minutes(requests.filter(model==X))
+kv_hits = sum(window.map(r -> r.kv_hit ? 1 : 0))
+kv_accesses = sum(window.map(r -> r.kv_accesses))
+hotness = (kv_hits + 0.5 * kv_accesses) / max(1, window.request_count)
+normalized_hotness = sigmoid_scale(hotness, scale=0.8)  # clamp to 0..1
+
+Operational notes on enrichment weights
+- ScoreConfig is a Git-backed JSON with simple schema: {"kv_weight": "0.6", "latency_weight": "0.3", "thermal_penalty": "0.1"}. Changes require a review and a CI gate that replays enrichment on a representative sample.
+
+Storage and API
+
+- Annotated Resource Store: path /annotated-resources/{resource_id}, JSON document with last_enriched_at and version tag. The store supports conditional writes (ETag) to avoid stomping concurrent enrichments.
+- Read API: /api/v1/annotated-resources?filter=... supports predicates on canonical fields and returns stable snapshots.
+
+Consumers and contracts
+
+- Scheduler: consumes annotated records and uses affinity + kvcache_hotness + thermal_headroom to rank placement. Contract: annotated record must be <5s old for scheduling decisions.
+- Kernel-mapper: consumes kernel_hint + kvcache_hotness to pick kernel and prefetch budget. Contract: if kernel_hint missing, mapper must annotate chosen kernel back into resource record.
+- Autoscaler: consumes estimated_tps and error_rate; expects monotonicity of estimated_tps across enrichment runs unless a flagged recalibration event occurred.
+
+Sample annotation (JSON example)
+
+{
+  \"resource_id\": \"shard-az2-gpu-47\",
+  \"resource_type\": \"shard\",
+  \"affinity\": \"high\",
+  \"eviction_priority\": \"20\",
+  \"kvcache_hotness\": \"0.73\",
+  \"kernel_hint\": \"attention-sliced-v2\",
+  \"fidelity_profile\": \"balanced\",
+  \"estimated_tps\": \"120.5\",
+  \"thermal_headroom\": \"0.62\",
+  \"model_variant_compat\": [\"rv1-small-int8\", \"rv1-small-fp16\"],
+  \"last_enriched_at\": \"2026-11-03T14:22:11Z\"
+}
+
+(Consumers should parse the types—this example renders numbers as strings for Transport-level simplicity; the API schema documents native types.)
+
+Producer guidelines (how to add or change annotations)
+
+1) Create a proposal in the ScoreConfig repo for new fields or weights and add a small integration test that exercises enrichment.
+2) Add a validator in the Enrichment Validator module with a clear error message and remediation steps.
+3) Increment the scoreconfig version and open a changelist referencing this Confluence page.
+4) Run enrichment replay on the low-cost sample corpus (CI job) and upload diff report.
+
+Common failure modes and mitigations
+
+- Symptom: kvcache_hotness drops suddenly for a shard after rollout.
+  - Check: recent model_variant rollout, kernel_hint change, and cold-start events in warmup logs.
+  - Mitigation: increase prefetch_hint for the shard, and re-run warmup job for 1-2 minutes.
+
+- Symptom: scheduler rejects placement citing thermal_headroom < 0.2 unexpectedly.
+  - Check: node sensor telemetry, recent firmware updates, and thermal_headroom normalization params.
+  - Mitigation: temporarily lower thermal_penalty in ScoreConfig and trigger prioritized drain if needed.
+
+Versioning, deprecation, and migration
+
+- New keys must include a deprecation plan in the PR: alias mapping, 90-day dual-write window, and a one-time migration job for historical entries.
+- ScoreConfig versions are semver: enrichment-runner uses the highest-stable tag unless an override is present.
+
+Rollout checklist (for ScoreConfig or field additions)
+
+1) Draft ScoreConfig change and unit tests.
+2) Reviewer sign-off (2 reviewers including one SRE).
+3) Run enrichment replay against sample corpus.
+4) Deploy to enrichment-staging and run a 1h shadow pipeline.
+5) Monitor divergence metrics: annotated-record-delta-rate < 1% and scheduler-placement-change-rate < 0.5% for safe rollout.
+6) Promote to production with a 10-minute canary window, monitor live SLOs.
+
+Operator runbook snippets
+
+- Quick check: get last enriched record for a shard
+
+curl -sS -H \"Authorization: Bearer $TOKEN\" \
+  https://internal-api.redwood.local/api/v1/annotated-resources/shard-az2-gpu-47 | jq .
+
+- Replay enrichment for a single resource (local dev)
+
+# assumes enrichment binary in PATH and SCORECONFIG env set
+ENRICHMENT_CONFIG=s3://scoreconfig/prod.json enrichment-runner --resource-id shard-az2-gpu-47 --window 15m --dry-run
+
+Operational ownership and contacts
+
+- Owners: Serving Runtime Observability & Enrichment squad (primary)
+- Oncall escalation: runtime-oncall -> eng-sre -> platform-eng lead.
+- Suggested reviewers for changes: Diego Ramirez (Scheduler), Priya Shah (Kernel-mapper), Ellen Zhou (SRE).
+
+Open action items
+
+- [ ] Add KV access enrichment test to the standard microbenchmark corpus (assigned: Priya, due: 2026-12-01).
+- [ ] Publish a lightweight SDK for writing annotations from third-party tools (assigned: Asha, due: 2027-01-15).
+
+References and links
+
+- ScoreConfig repo: git://redwood/scoreconfig (internal)
+- Annotated Resource Store API spec: /confluence/eng-serving-runtime/runtime-architecture/annotated-resource-store-api-spec-2026 (draft)
+- Benchmark Catalog: /confluence/eng-serving-runtime/benchmarking-and-perf-suite/ (see per-variant microbenchmarks)
+
+Appendix: example ScoreConfig fragment
+
+{
+  \"version\": \"1.4.0\",
+  \"weights\": {
+    \"kv_weight\": \"0.55\",
+    \"latency_weight\": \"0.30\",
+    \"thermal_penalty\": \"0.15\"
+  },
+  \"normalization\": {
+    \"kv_scale\": \"0.8\",
+    \"tps_clamp\": \"500.0\"
+  }
+}
+
+Glossary
+
+- Annotated Resource Store: the authoritative, versioned store of enriched resource records.
+- KernelHintRegistry: authoritative list of supported kernel execution hints.
+- ScoreConfig: versioned config that defines weights and normalization for composite scoring.
+
+If you have questions or want a walkthrough, DM the owners or schedule a 30m sync using the runtime-observability calendar.

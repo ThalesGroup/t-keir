@@ -1,4 +1,12 @@
-"""Generate a document title when the converter did not provide one."""
+"""Title: Title Generator
+
+Generate a document title when the converter did not provide one.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

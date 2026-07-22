@@ -1,6 +1,11 @@
-"""Validation tests for architecture documentation under ``tkeir/docs/architecture/``.
+"""Title: Validation tests for architecture documentation under ``tkeir/docs/architecture/``.
 
 Paths are discovered at test time from ``mkdocs.yml`` (no invented module names).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

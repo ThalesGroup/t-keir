@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Parse OPA Rego article catalogues into structured Python objects."""
+"""Title: Catalogue parse
+
+Parse OPA Rego article catalogues into structured Python objects.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
+
 from __future__ import annotations
 
 import re

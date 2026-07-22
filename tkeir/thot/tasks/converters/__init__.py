@@ -1,10 +1,11 @@
-"""Package initialization
+"""Title: Package initialization
 
-Author: Eric Blaudez (Eric Blaudez)
+Document conversion into T-KEIR JSON.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
 
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import os

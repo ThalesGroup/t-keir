@@ -1,4 +1,12 @@
-"""Agent loop: budgets, kill switch, multitenancy, grounded output."""
+"""Title: Loop governance
+
+Agent loop: budgets, kill switch, multitenancy, grounded output.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,9 +1,11 @@
-"""Utilitary functions
+"""Title: Utilitary functions
 
-Author: Eric Blaudez (Eric Blaudez)
+Core T-KEIR libraries (logging, config, paths, utilities).
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import ctypes

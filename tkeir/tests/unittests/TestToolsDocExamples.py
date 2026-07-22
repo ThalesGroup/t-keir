@@ -1,4 +1,12 @@
-"""Tests that exercise documented examples in public tool APIs."""
+"""Title: Tools Doc Examples
+
+Tests that exercise documented examples in public tool APIs.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import json
 import os
@@ -151,6 +159,9 @@ class TestOntologyUtilsDocExamples:
             "entities": [],
             "keywords": [],
             "json_ld": "[]",
+            "triple_count": 0,
+            "source_count": 0,
+            "document_ids": [],
         }
 
     def test_summarize_graph_for_prompt_empty_example(self):

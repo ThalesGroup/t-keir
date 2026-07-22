@@ -1,4 +1,12 @@
-"""Induce SHACL node shapes from aligned document RDF graphs."""
+"""Title: Shacl Inductor
+
+Induce SHACL node shapes from aligned document RDF graphs.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

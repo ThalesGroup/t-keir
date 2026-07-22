@@ -1,9 +1,11 @@
-"""Morphosyntactic tagger
+"""Title: Morphosyntactic tagger
 
-Author: Eric Blaudez (Eric Blaudez)
+Morphosyntactic tagging for T-KEIR documents.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import gc

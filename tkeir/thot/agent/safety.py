@@ -1,4 +1,12 @@
-"""Prompt-injection defenses for agent tool/document content."""
+"""Title: Safety
+
+Prompt-injection defenses for agent tool/document content.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

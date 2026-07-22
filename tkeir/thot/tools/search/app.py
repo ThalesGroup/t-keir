@@ -1,4 +1,12 @@
-"""FastAPI RAG application over Vespa 2-level document/chunk retrieval."""
+"""Title: RAG FastAPI application
+
+FastAPI RAG application over Vespa 2-level document/chunk retrieval.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -27,6 +35,13 @@ from thot.core.TkeirPaths import configs_dir, rag_prompts_path
 from thot.governor.wiring import wire_governor_middleware
 from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
+from thot.tools.search.ontology_reasoner import (
+    DEFAULT_REASONER,
+    SUPPORTED_OPERATIONS,
+    SUPPORTED_REASONERS,
+    owlapy_available,
+    query_merged_ontology,
+)
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
     extract_focus_passages,
@@ -139,16 +154,6 @@ class SearchDocument(BaseModel):
     hit_count: int = 0
 
 
-class SearchResponse(BaseModel):
-    """Reranked chunks and documents for a search query."""
-
-    query: str
-    chunks: list[SearchChunk]
-    documents: list[SearchDocument]
-    vespa_hits: int
-    ranking_profile: str | None = None
-
-
 class SemanticEntity(BaseModel):
     label: str
     type: str
@@ -161,9 +166,25 @@ class SemanticKeyword(BaseModel):
 
 
 class FusedOntology(BaseModel):
+    """Merged ontology from Vespa parent ``json_ld`` fields for HMI / reasoner."""
+
     entities: list[SemanticEntity]
     keywords: list[SemanticKeyword]
     json_ld: str = ""
+    triple_count: int = 0
+    source_count: int = 0
+    document_ids: list[str] = Field(default_factory=list)
+
+
+class SearchResponse(BaseModel):
+    """Reranked chunks and documents for a search query."""
+
+    query: str
+    chunks: list[SearchChunk]
+    documents: list[SearchDocument]
+    vespa_hits: int
+    ranking_profile: str | None = None
+    ontology: FusedOntology | None = None
 
 
 class QueryResponse(BaseModel):
@@ -179,6 +200,56 @@ class QueryResponse(BaseModel):
     chunks: list[RetrievedChunk]
     ontology: FusedOntology
     vespa_hits: int
+
+
+class OntologyReasonerRequest(BaseModel):
+    """Follow-up ontology query over a fused RAG / search ontology."""
+
+    json_ld: str = Field(
+        ...,
+        min_length=1,
+        description="Fused ontology JSON-LD from a prior /search or /rag/query",
+    )
+    operation: str = Field(
+        default="sparql",
+        description=f"One of {', '.join(SUPPORTED_OPERATIONS)}",
+    )
+    class_iri: str | None = Field(
+        default=None,
+        description="Class IRI for subclasses / superclasses / instances",
+    )
+    individual_iri: str | None = Field(
+        default=None,
+        description="Individual IRI for types",
+    )
+    sparql: str | None = Field(
+        default=None,
+        description="SPARQL SELECT for operation=sparql",
+    )
+    reasoner: str = Field(
+        default=DEFAULT_REASONER,
+        description=(
+            "Reasoner engine: "
+            + ", ".join(SUPPORTED_REASONERS)
+            + " (rdflib = no Java)"
+        ),
+    )
+    direct: bool = False
+    limit: int = Field(default=50, ge=1, le=500)
+    prefer_owlapy: bool = True
+
+
+class OntologyReasonerResponse(BaseModel):
+    operation: str
+    backend: str
+    reasoner: str = DEFAULT_REASONER
+    results: list[dict[str, str]] = Field(default_factory=list)
+    count: int = 0
+    consistent: bool | None = None
+    triple_count: int = 0
+    owlapy_available: bool = False
+    note: str | None = None
+    json_ld: str | None = None
 
 
 class AppState:
@@ -895,7 +966,7 @@ async def search(
             user_space=user_space,
         )
         parsed_hits = _parse_hits(search_response)
-        retrieved_chunks, _rdf = await _enrich_hits(state, parsed_hits)
+        retrieved_chunks, rdf_payloads = await _enrich_hits(state, parsed_hits)
     except Exception as error:
         LOGGER.exception("Search failed")
         raise HTTPException(
@@ -943,12 +1014,26 @@ async def search(
     if ranking_profile is None and isinstance(query_analysis, dict):
         ranking_profile = query_analysis.get("ranking_profile")
 
+    hmi_ontology = build_hmi_ontology(
+        rdf_payloads,
+        [chunk.chunk_id for chunk in retrieved_chunks],
+        chunk_texts={
+            chunk.chunk_id: chunk.text_raw for chunk in retrieved_chunks
+        },
+        document_ids=[chunk.parent_doc_id for chunk in retrieved_chunks],
+        max_entities=state.rag_config.ontology.max_entities,
+        max_keywords=state.rag_config.ontology.max_keywords,
+        min_keyword_length=state.rag_config.ontology.min_keyword_length,
+    )
+    ontology = FusedOntology.model_validate(hmi_ontology)
+
     _log_rag_step(
         "search-total",
         request_started,
         query=repr(query_text),
         chunks=len(search_chunks),
         documents=len(aggregated),
+        ontology_triples=ontology.triple_count,
     )
     return SearchResponse(
         query=query_text,
@@ -965,6 +1050,59 @@ async def search(
         ],
         vespa_hits=len(parsed_hits),
         ranking_profile=str(ranking_profile) if ranking_profile else None,
+        ontology=ontology,
+    )
+
+
+@app.post("/rag/ontology/query", response_model=OntologyReasonerResponse)
+async def ontology_reasoner_query(
+    request: OntologyReasonerRequest,
+) -> OntologyReasonerResponse:
+    """Query the fused ontology returned by ``/search`` or ``/rag/query``.
+
+    Pass the previous response's ``ontology.json_ld`` and choose an operation
+    (SPARQL, subclasses, instances, types, consistency, …). Uses OWLAPY
+    SyncReasoner when installed (``uv sync --extra owl``); otherwise rdflib.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(ontology_reasoner_query)
+        True
+    """
+    try:
+        payload = query_merged_ontology(
+            request.json_ld,
+            operation=request.operation,
+            class_iri=request.class_iri,
+            individual_iri=request.individual_iri,
+            sparql=request.sparql,
+            reasoner=request.reasoner,
+            direct=request.direct,
+            limit=request.limit,
+            prefer_owlapy=request.prefer_owlapy,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    except Exception as error:  # noqa: BLE001
+        LOGGER.exception("Ontology reasoner query failed")
+        raise HTTPException(
+            status_code=502,
+            detail=f"Ontology reasoner query failed: {error}",
+        ) from error
+
+    return OntologyReasonerResponse(
+        operation=str(payload.get("operation") or request.operation),
+        backend=str(payload.get("backend") or "none"),
+        reasoner=str(payload.get("reasoner") or request.reasoner),
+        results=list(payload.get("results") or []),
+        count=int(payload.get("count") or len(payload.get("results") or [])),
+        consistent=payload.get("consistent"),
+        triple_count=int(payload.get("triple_count") or 0),
+        owlapy_available=bool(
+            payload.get("owlapy_available", owlapy_available())
+        ),
+        note=payload.get("note"),
+        json_ld=payload.get("json_ld"),
     )
 
 
@@ -1064,6 +1202,7 @@ def _build_rag_prompt_bundle(
         chunk_texts={
             chunk.chunk_id: chunk.text_raw for chunk in retrieved_chunks
         },
+        document_ids=[chunk.parent_doc_id for chunk in retrieved_chunks],
         max_entities=state.rag_config.ontology.max_entities,
         max_keywords=state.rag_config.ontology.max_keywords,
         min_keyword_length=state.rag_config.ontology.min_keyword_length,

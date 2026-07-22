@@ -1,0 +1,43 @@
+Customer comms during mitigation (status page + support brief)
+
+# Goal
+Ensure customer communications are timely, accurate, and consistent during incident mitigation and emergency changes.
+
+# When to post to the status page
+Post a status page update when any of the following are true:
+- The incident is Sev1 (always)
+- The incident is Sev2 and customer-visible (e.g., elevated latency, increased 5xx, streaming instability)
+- We are deploying a mitigation that changes customer experience (e.g., reduced max output tokens, temporary throttling, traffic shifting)
+
+# Required coordination
+- **Comms Lead** coordinates content with IC and Support Lead
+- Notify Support + CS in #support and #customer-success with a brief before posting
+
+# What not to say
+- Do not name specific customers
+- Do not speculate on root cause
+- Do not commit to exact recovery times
+- Do not reference internal system names that customers do not know
+
+# Status page update template
+**Title:** Degraded performance for Redwood Hosted API
+**Body (example):**
+We are investigating increased error rates and elevated latency affecting a subset of requests. We are deploying mitigations to restore normal performance. Next update in 30 minutes.
+
+# Support brief template (internal)
+Send to #support and pin in incident channel:
+- Impact: what customers see (timeouts, 5xx, slower streaming)
+- Scope: regions/routes/tiers if known
+- Mitigation: what were doing (rollback, config change, capacity shift)
+- Customer workaround: if any
+- Next update time
+
+# Direct customer communication guidance
+For enterprise/dedicated customers with active escalations:
+- CS should send a short email referencing the status page (if posted)
+- Include only what is known + next update time
+- If we apply a mitigation that changes behavior (limits): explicitly call it out
+
+# After mitigation
+- Post a Monitoring update once metrics are stable for 30 minutes
+- Post Resolved only after the IC confirms exit criteria

@@ -1,4 +1,12 @@
-"""Audit thot package for Google-style docstring examples."""
+"""Title: Doc example audit
+
+Audit thot package for Google-style docstring examples.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

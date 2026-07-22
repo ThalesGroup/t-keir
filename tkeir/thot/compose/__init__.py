@@ -1,4 +1,12 @@
-"""T-KEIR ontology-driven composition (Phase C)."""
+"""Title: compose package init
+
+T-KEIR ontology-driven composition (Phase C).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

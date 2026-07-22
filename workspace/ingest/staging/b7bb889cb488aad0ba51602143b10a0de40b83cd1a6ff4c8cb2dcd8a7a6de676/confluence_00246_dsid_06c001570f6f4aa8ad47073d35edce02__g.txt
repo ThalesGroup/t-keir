@@ -1,0 +1,184 @@
+gpu-onboarding-sla-profiling-and-accounting-playbook
+
+Summary
+------
+This playbook defines the standard process for onboarding new customer accounts and internal teams to Redwood GPU pools with explicit SLA profiling, account-scoped credit buckets, and telemetry-driven validation. It ties together Terraform modules, CI/CD gating, network constraints, and accounting reconciliation so oncall and infra engineers can reliably bring tenants into production with predictable latency and cost characteristics.
+
+Audience
+--------
+- Infra engineers provisioning GPU capacity and network plumbing
+- Platform SREs enforcing SLOs and alerts
+- Solutions engineers and CSMs validating tenant readiness
+- Billing/finance for credit bucket reconciliation
+
+Scope
+-----
+Covers: account onboarding to shared and dedicated GPU pools, Terraform variable expectations, CI/CD checks before granting production access, monitoring assertions to validate SLA adherence, incident playbook for SLA degradation, and deprovision checklist. Excludes model onboarding (see eng-serving-runtime) and customer contract negotiation.
+
+Goals and Non‑Goals
+-------------------
+- Goals:
+  - Ensure new accounts introduced to GPU pools meet placement and latency SLOs within 72 hours of provisioning.
+  - Prevent silent cost overruns by applying account-scoped credit buckets and automated throttles.
+  - Provide clear rollback and isolation steps for noisy tenants.
+- Non-goals:
+  - Replacing bespoke enterprise onboarding flows that still require legal/compliance approvals.
+
+Prerequisites
+-------------
+- Account has a valid tenant ID and billing code in our billing system (billing-service/ledger).
+- Service account with IAM role infra-gpu-onboarder created (see cloud-accounts runbook).
+- Customer or team has completed the SLA profile questionnaire in the onboarding form (link internal).
+
+SLA Profile Matrix (example)
+---------------------------
+The SLA profile selected determines pool affinity and throttles applied. Use the matrix below as guidance when mapping a tenant to a pool.
+
+| SLA Profile | Typical use case | Target P99 latency (ms) | Pool affinity | Allowed burst | Notes |
+|---|---:|---:|---|---:|---|
+| platinum | real‑time chat, low latency | 150 | dedicated-low-jitter | 10% sustained | Requires dedicated slot reservation and ingress routing in us‑west-2 |
+| gold | interactive but tolerant | 350 | shared-fast | 30% burst | Good for PLG features and internal experiments |
+| standard | batch/eval workloads | 800 | shared-batch | 100% queued | Prefers warm-pool preemption tolerant |
+| sandbox | CI/eval dev | best-effort | ephemeral | none | Auto-evicted after 24h idle |
+
+Terraform / IaC expectations
+---------------------------
+Provide the tenant onboarding variables in the tenant module. Example trimmed variables block (HCL-like, shown for clarity):
+
+module "tenant_gpu_account" {
+  source = "git::ssh://git@repo/redwood-iac//modules/tenant-gpu"
+  tenant_id = "TENANT-1234"
+  sla_profile = "gold"
+  region = "us-west-2"
+  max_monthly_credits = 250000    # token-cost units; reconciled to billing-service
+  egress_bandwidth_limit_mbps = 250
+  network_acl_tags = ["tenant:TENANT-1234"]
+}
+
+Required Terraform outputs (contract)
+- tenant_gpu_pool_id
+- tenant_ingress_sg_id
+- tenant_billing_bucket_id
+
+CI/CD gating: verification pipeline (example)
+-----------------------------------------
+We require a short verification pipeline that runs after the tenant module is applied in staging and before flipping production traffic. Example (Buildkite / CI YAML snippet):
+
+steps:
+  - label: "terraform/plan: tenant-gpu"
+    command: ./ci/terraform-plan.sh tenant-gpu TENANT-1234
+  - wait
+  - label: "terraform/apply: tenant-gpu (staging)"
+    command: ./ci/terraform-apply.sh tenant-gpu staging TENANT-1234
+  - label: "verify: latency smoke test"
+    command: ./ci/verify-tenant-sla.sh TENANT-1234 --profile gold --p99-threshold 350
+
+Verification script must run the following checks (automated):
+1) Run 5 concurrent clients for 2 minutes against the tenant endpoint and assert P50/P90/P99 within profile thresholds.
+2) Confirm KV cache warm-up traces appear for the tenant (trace tag tenant_id=TENANT-1234).
+3) Validate that account_billing_bucket exists and max_monthly_credits matches Terraform var.
+4) Validate network egress limits via synthetic traffic to allowed endpoints.
+
+Onboarding procedure (step-by-step)
+----------------------------------
+1) Intake: Confirm completed SLA questionnaire and billing_code. Record in onboarding tracker.
+2) Create service account: grant infra-gpu-onboarder role and issue temporary key (rotate after use).
+3) Create tenant IaC branch: fill tenant variables in /modules/tenant-gpu; open PR.
+4) Run CI plan and apply to staging using pipeline above.
+5) Run the verification script; attach output artifacts to the PR.
+6) If verification passes, apply to production with canary traffic at 1% for 10 minutes.
+7) Monitor telemetry: if no alerts and SLOs are satisfied, promote canary to 100% after 60 minutes.
+8) Close onboarding ticket and notify customer/owner with final SLO metrics and billing bucket ID.
+
+Validation checklist (automated + manual)
+- [ ] Terraform outputs present and match expected types
+- [ ] P99 latency within profile target during staged canary test
+- [ ] KV cache warm-warmup observed with >50% hit rate for synthetic prefix
+- [ ] No unexpected 5xx spikes (>0.5% of requests)
+- [ ] Egress billing tag propagation verified in vpc flow logs
+- [ ] Billing bucket is visible in billing-service and reconciles to initial credit allocation
+
+Monitoring and Alerting configuration
+------------------------------------
+Configure the tenant's alerting in the central alert-manager stack using the standard templates. Key alerts (severity / page):
+- SLA breach: p99_latency > profile_threshold for 5m (page oncall-infra)
+- Queue growth: queued_tokens > 1000 for 10m (page oncall-infra)
+- Cost surge: daily_token_spend > 2x baseline (notify finance & infra)
+- No telemetry: missing heartbeat for 10m (page oncall-infra)
+
+Metric names and tags (examples)
+- inference.request.latency_ms{tenant_id=TENANT-1234, region=us-west-2}
+- inference.request.kv_hit_rate{tenant_id=TENANT-1234}
+- billing.token_spend.daily{tenant_id=TENANT-1234}
+- network.egress.mbps{tenant_id=TENANT-1234}
+
+Accounting and Credit Bucket reconciliation
+-----------------------------------------
+- Initial bucket allocation is set by max_monthly_credits terraform var. Reconciliation runs nightly: billing-service computes actual token units consumed and issues adjustments if consumption > allocation.
+- Owners receive weekly reports (CSV) with usage, anomalies, and recommended throttle changes.
+- For sustained overspend (>120% of allocation for 3 consecutive days), system will automatically reduce burst allowance by 50% and notify owner.
+
+Noisy Neighbor mitigation and isolation procedure
+------------------------------------------------
+1) Identify tenant via tenant_id in telemetry and egress tags.
+2) If tenant is causing tail latency regressions across a pool, perform soft-isolation: reduce max_concurrency for tenant to 20% of previous value.
+3) If soft-isolation insufficient after 5m, move tenant to a quarantined pool (quarantine-dedicated) with capacity-limited devices and notify owner.
+4) Log action in incident ticket and initiate post-incident RCA if mitigations triggered more than twice in a 30-day window.
+
+Incident runbook: SLA degradation (quick actions)
+------------------------------------------------
+- Trigger condition: colored alert 'SLA breach' fires and p99_latency > threshold for 10m.
+- Quick steps:
+  1) Acknowledge alert and tag incident with tenant_id.
+  2) Check 'inference.request.latency_ms' and 'queue.length' graphs for correlation.
+  3) If queue backing up: temporarily raise batch_timeout to reduce per-token pressure (CLI: infractl tenant update --tenant TENANT-1234 --batch-timeout 250ms).
+  4) If KV miss rate high: trigger prefetch task (infractl tenant prefetch --prefix /common/model-v1 --tenant TENANT-1234).
+  5) If network egress saturated: apply egress-cap (infractl network set-egress --tenant TENANT-1234 --mbps 200).
+  6) If remediation fails, enact noisy neighbor isolation procedure.
+
+Rollback and deprovision checklist
+--------------------------------
+1) Scale down traffic to 0% via routing policy.
+2) Revoke service account keys and remove IAM grants.
+3) Run terraform destroy on tenant module with snapshot of billing bucket.
+4) Archive metrics and traces to long-term storage for 90 days.
+5) Close billing ticket after final reconciliation.
+
+Owner and contacts
+------------------
+- Onboarding lead: @evelyn.cho (infra-provisioning)
+- Primary SRE pager: oncall-infra@example.redwood.com
+- Billing owner: finance-billing@example.redwood.com
+
+FAQ
+---
+Q: Can a gold profile be bumped to platinum later?
+A: Yes — request a capacity reservation via capacity-requests (provide 14 days lead time). A dry-run smoke test must be scheduled.
+
+Q: What is the standard eviction policy for sandbox pools?
+A: Sandboxes are evicted after 24 hours of idle and immediately on preemption events.
+
+Change log
+----------
+- 2024-08-15: Initial draft (Evelyn Cho)
+- 2024-11-02: Added CI/CD gating example and verification script checklist (Marco Ruiz)
+- 2025-02-10: Added noisy neighbor isolation procedure and automated cost-throttle rule (Priya Nair)
+
+Appendix: verification script pseudo-output (example)
+--------------------------------------------------
+{
+  "tenant_id": "TENANT-1234",
+  "profile": "gold",
+  "p50_ms": "45",
+  "p90_ms": "110",
+  "p99_ms": "290",
+  "kv_hit_rate": "62%",
+  "billing_bucket": "BKT-9876"
+}
+
+Related references
+------------------
+- Terraform tenant module reference: /confluence/eng-infra/terraform-and-iac/tenant-gpu-quotas-and-fair-share-patterns.json
+- Billing service ledger and API: /confluence/finance-and-legal/budgeting-and-forecasting/billing-service-api.json
+
+If anything in this playbook conflicts with a customer contract, follow contractual obligations and escalate to legal + finance. For process improvements, open a PR against this page and tag the reviewers listed above.

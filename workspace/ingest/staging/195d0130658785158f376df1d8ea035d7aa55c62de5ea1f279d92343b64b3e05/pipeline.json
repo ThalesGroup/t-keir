@@ -1,0 +1,2204 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://195d0130658785158f376df1d8ea035d7aa55c62de5ea1f279d92343b64b3e05/AAR_00758_7d01b5a3.html",
+  "title": "AAR 00758 — Eastern corridor",
+  "content": [
+    "# AAR 00758 — Eastern corridor\n\n```\nAFTER ACTION REVIEW\nExercise location: Eastern corridor\nObservation: common operational picture updates were timely.\nLesson: verify data provenance before dissemination.\nAction: improve liaison reporting cadence.\n\nNote linguistique: diffusion de travail en français; situation opérationnelle stable.\n```"
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "common",
+          "operational",
+          "picture",
+          "updates"
+        ],
+        "lemma_content": [
+          "common",
+          "operational",
+          "picture",
+          "update"
+        ],
+        "pos": [
+          "ADJ",
+          "ADJ",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          19,
+          20,
+          21,
+          22
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "were"
+        ],
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "AUX"
+        ],
+        "positions": [
+          23
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "timely"
+        ],
+        "lemma_content": [
+          "timely"
+        ],
+        "pos": [
+          "ADJ"
+        ],
+        "positions": [
+          24
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Action"
+        ],
+        "lemma_content": [
+          "action"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          34
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "improve"
+        ],
+        "lemma_content": [
+          "improve"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          36
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "reporting",
+          "cadence"
+        ],
+        "lemma_content": [
+          "reporting",
+          "cadence"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          38,
+          39
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "html",
+    "source-size-bytes": 460,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:08",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:08",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:08",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:08",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:08",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:08",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:08",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:08",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:09",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:25:09",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_smx.owl"
+  ],
+  "source": "ingest://195d0130658785158f376df1d8ea035d7aa55c62de5ea1f279d92343b64b3e05/AAR_00758_7d01b5a3.html",
+  "metadata": {
+    "topic_id": "operations",
+    "corpus": "osint",
+    "doc_type": "AAR",
+    "language": "fr",
+    "title": "AAR 00758 — Eastern corridor",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "operations",
+  "doc_type": "AAR",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.571425788765142
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "#",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AAR",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "00758",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Eastern",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "corridor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "`",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AFTER",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ACTION",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "REVIEW",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Exercise",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "location",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Eastern",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "corridor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Observation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "common",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "operational",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "picture",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "updates",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "were",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "timely",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Lesson",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "verify",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "data",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "provenance",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "before",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "dissemination",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Action",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "improve",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "liaison",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "reporting",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "cadence",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Note",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "linguistique",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "diffusion",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "de",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "travail",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "en",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "français",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "situation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "opérationnelle",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "stable",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "`",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AAR",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "00758",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Eastern",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "corridor",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AAR",
+      "text": "AAR",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00758",
+      "text": "00758",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "eastern",
+      "text": "Eastern",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "corridor",
+      "text": "corridor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "#",
+      "text": "#",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AAR",
+      "text": "AAR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00758",
+      "text": "00758",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "eastern",
+      "text": "Eastern",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "corridor",
+      "text": "corridor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 6
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "ADP",
+      "lemma": "after",
+      "text": "AFTER",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ACTION",
+      "text": "ACTION",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "REVIEW",
+      "text": "REVIEW",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "exercise",
+      "text": "Exercise",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "location",
+      "text": "location",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Eastern",
+      "text": "Eastern",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "corridor",
+      "text": "corridor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Observation",
+      "text": "Observation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "common",
+      "text": "common",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "operational",
+      "text": "operational",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "picture",
+      "text": "picture",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "update",
+      "text": "updates",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "AUX",
+      "lemma": "be",
+      "text": "were",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "timely",
+      "text": "timely",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "lesson",
+      "text": "Lesson",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 26
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "VERB",
+      "lemma": "verify",
+      "text": "verify",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "datum",
+      "text": "data",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "provenance",
+      "text": "provenance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "ADP",
+      "lemma": "before",
+      "text": "before",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "dissemination",
+      "text": "dissemination",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "action",
+      "text": "Action",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 34
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "VERB",
+      "lemma": "improve",
+      "text": "improve",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "liaison",
+      "text": "liaison",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "reporting",
+      "text": "reporting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "cadence",
+      "text": "cadence",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "VERB",
+      "lemma": "note",
+      "text": "Note",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 41
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "linguistique",
+      "text": "linguistique",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "diffusion",
+      "text": "diffusion",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "ADV",
+      "lemma": "de",
+      "text": "de",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "X",
+      "lemma": "travail",
+      "text": "travail",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "X",
+      "lemma": "en",
+      "text": "en",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "X",
+      "lemma": "français",
+      "text": "français",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "situation",
+      "text": "situation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    },
+    {
+      "pos": "X",
+      "lemma": "opérationnelle",
+      "text": "opérationnelle",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "stable",
+      "text": "stable",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 53
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 54
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 55
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 56
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [],
+  "content_deps": [
+    {
+      "text": "#",
+      "lemma": "#",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AAR",
+      "lemma": "AAR",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "00758",
+      "lemma": "00758",
+      "pos": "NUM",
+      "head": 1,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 1,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Eastern",
+      "lemma": "eastern",
+      "pos": "ADJ",
+      "head": 5,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "corridor",
+      "lemma": "corridor",
+      "pos": "NOUN",
+      "head": 1,
+      "dep": "appos",
+      "lefts": [
+        4
+      ],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 23,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 23,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 23,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AFTER",
+      "lemma": "after",
+      "pos": "ADP",
+      "head": 23,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        13
+      ]
+    },
+    {
+      "text": "ACTION",
+      "lemma": "ACTION",
+      "pos": "PROPN",
+      "head": 11,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "REVIEW",
+      "lemma": "REVIEW",
+      "pos": "PROPN",
+      "head": 13,
+      "dep": "compound",
+      "lefts": [
+        10
+      ],
+      "rights": []
+    },
+    {
+      "text": "Exercise",
+      "lemma": "exercise",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "location",
+      "lemma": "location",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "pobj",
+      "lefts": [
+        11,
+        12
+      ],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 23,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Eastern",
+      "lemma": "Eastern",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "corridor",
+      "lemma": "corridor",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Observation",
+      "lemma": "Observation",
+      "pos": "PROPN",
+      "head": 23,
+      "dep": "nsubj",
+      "lefts": [
+        15,
+        16
+      ],
+      "rights": [
+        18
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 17,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "common",
+      "lemma": "common",
+      "pos": "ADJ",
+      "head": 22,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "operational",
+      "lemma": "operational",
+      "pos": "ADJ",
+      "head": 22,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "picture",
+      "lemma": "picture",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "updates",
+      "lemma": "update",
+      "pos": "NOUN",
+      "head": 23,
+      "dep": "nsubj",
+      "lefts": [
+        19,
+        20,
+        21
+      ],
+      "rights": []
+    },
+    {
+      "text": "were",
+      "lemma": "be",
+      "pos": "AUX",
+      "head": 23,
+      "dep": "ROOT",
+      "lefts": [
+        6,
+        7,
+        8,
+        9,
+        14,
+        17,
+        22
+      ],
+      "rights": [
+        24,
+        25
+      ]
+    },
+    {
+      "text": "timely",
+      "lemma": "timely",
+      "pos": "ADJ",
+      "head": 23,
+      "dep": "acomp",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 23,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Lesson",
+      "lemma": "lesson",
+      "pos": "NOUN",
+      "head": 26,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        27,
+        28,
+        33
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 26,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "verify",
+      "lemma": "verify",
+      "pos": "VERB",
+      "head": 26,
+      "dep": "acl",
+      "lefts": [],
+      "rights": [
+        30,
+        31
+      ]
+    },
+    {
+      "text": "data",
+      "lemma": "datum",
+      "pos": "NOUN",
+      "head": 30,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "provenance",
+      "lemma": "provenance",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "dobj",
+      "lefts": [
+        29
+      ],
+      "rights": []
+    },
+    {
+      "text": "before",
+      "lemma": "before",
+      "pos": "ADP",
+      "head": 28,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        32
+      ]
+    },
+    {
+      "text": "dissemination",
+      "lemma": "dissemination",
+      "pos": "NOUN",
+      "head": 31,
+      "dep": "pobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 26,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Action",
+      "lemma": "action",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": [
+        35
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 34,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "improve",
+      "lemma": "improve",
+      "pos": "VERB",
+      "head": 36,
+      "dep": "ROOT",
+      "lefts": [
+        34
+      ],
+      "rights": [
+        39,
+        40
+      ]
+    },
+    {
+      "text": "liaison",
+      "lemma": "liaison",
+      "pos": "NOUN",
+      "head": 38,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "reporting",
+      "lemma": "reporting",
+      "pos": "NOUN",
+      "head": 39,
+      "dep": "compound",
+      "lefts": [
+        37
+      ],
+      "rights": []
+    },
+    {
+      "text": "cadence",
+      "lemma": "cadence",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "dobj",
+      "lefts": [
+        38
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 36,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Note",
+      "lemma": "note",
+      "pos": "VERB",
+      "head": 41,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        42,
+        43,
+        46,
+        52,
+        53
+      ]
+    },
+    {
+      "text": "linguistique",
+      "lemma": "linguistique",
+      "pos": "ADJ",
+      "head": 41,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 41,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "diffusion",
+      "lemma": "diffusion",
+      "pos": "NOUN",
+      "head": 46,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "de",
+      "lemma": "de",
+      "pos": "ADV",
+      "head": 46,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "travail",
+      "lemma": "travail",
+      "pos": "X",
+      "head": 41,
+      "dep": "appos",
+      "lefts": [
+        44,
+        45
+      ],
+      "rights": [
+        47,
+        48,
+        49
+      ]
+    },
+    {
+      "text": "en",
+      "lemma": "en",
+      "pos": "X",
+      "head": 46,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "français",
+      "lemma": "français",
+      "pos": "X",
+      "head": 46,
+      "dep": "npadvmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 46,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "situation",
+      "lemma": "situation",
+      "pos": "PROPN",
+      "head": 51,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "opérationnelle",
+      "lemma": "opérationnelle",
+      "pos": "X",
+      "head": 52,
+      "dep": "nsubj",
+      "lefts": [
+        50
+      ],
+      "rights": []
+    },
+    {
+      "text": "stable",
+      "lemma": "stable",
+      "pos": "ADJ",
+      "head": 41,
+      "dep": "ccomp",
+      "lefts": [
+        51
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 41,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 54,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 55,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        56
+      ]
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 55,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AAR",
+      "lemma": "AAR",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "text": "00758",
+      "lemma": "00758",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Eastern",
+      "lemma": "eastern",
+      "pos": "ADJ",
+      "head": 4,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "corridor",
+      "lemma": "corridor",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 4,
+      "text": "eastern corridor",
+      "span": {
+        "start": 3,
+        "end": 5
+      }
+    },
+    {
+      "score": 16,
+      "text": "common operational picture update",
+      "span": {
+        "start": 19,
+        "end": 23
+      }
+    },
+    {
+      "score": 14,
+      "text": "action review exercise location",
+      "span": {
+        "start": 10,
+        "end": 14
+      }
+    },
+    {
+      "score": 8,
+      "text": "eastern corridor observation",
+      "span": {
+        "start": 15,
+        "end": 18
+      }
+    },
+    {
+      "score": 5,
+      "text": "eastern corridor",
+      "span": {
+        "start": 4,
+        "end": 6
+      }
+    },
+    {
+      "score": 2,
+      "text": "action",
+      "span": {
+        "start": 34,
+        "end": 35
+      }
+    },
+    {
+      "score": 1,
+      "text": "timely",
+      "span": {
+        "start": 24,
+        "end": 25
+      }
+    },
+    {
+      "score": 1,
+      "text": "lesson",
+      "span": {
+        "start": 26,
+        "end": 27
+      }
+    },
+    {
+      "score": 1,
+      "text": "dissemination",
+      "span": {
+        "start": 32,
+        "end": 33
+      }
+    },
+    {
+      "score": 1,
+      "text": "diffusion",
+      "span": {
+        "start": 44,
+        "end": 45
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://195d0130658785158f376df1d8ea035d7aa55c62de5ea1f279d92343b64b3e05/AAR_00758_7d01b5a3.html#chunk-0-409b1d9f54",
+      "parent_doc_id": "ingest://195d0130658785158f376df1d8ea035d7aa55c62de5ea1f279d92343b64b3e05/AAR_00758_7d01b5a3.html",
+      "text_raw": "# AAR 00758 — Eastern corridor ` ` ` AFTER ACTION REVIEW Exercise location : Eastern corridor Observation : common operational picture updates were timely . Lesson : verify data provenance before dissemination . Action : improve liaison reporting cadence . Note linguistique : diffusion de travail en français ; situation opérationnelle stable . ` ` `",
+      "search_vector_payload": "# AAR 00758 — Eastern corridor ` ` ` AFTER ACTION REVIEW Exercise location : Eastern corridor Observation : common operational picture updates were timely . Lesson : verify data provenance before dissemination . Action : improve liaison reporting cadence . Note linguistique : diffusion de travail en français ; situation opérationnelle stable . ` ` `",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {},
+        "svo_triplets": [
+          [
+            "common operational picture updates",
+            "were",
+            "timely"
+          ],
+          [
+            "Action",
+            "improve",
+            "reporting cadence"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 57,
+        "sentence_start": 0,
+        "sentence_end": 6
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "common operational picture updates were timely",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "# AAR 00758 — Eastern corridor ` ` ` AFTER ACTION REVIEW",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "Action improve reporting cadence",
+          "question_type": "SVO-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/eastern_corridor\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"eastern corridor\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Be/observation-d239e9cf6a51\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Be\"\n    ],\n    \"http://tkeir.local/ontology/be\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Observation\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/CommonOperationalPictureUpdates/common_operational_picture_updates-5ec11fe4e339\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/CommonOperationalPictureUpdates\"\n    ],\n    \"http://tkeir.local/ontology/were\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Timely/timely-75fcdc79c501\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"common operational picture updates\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Timely/timely-75fcdc79c501\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Timely\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"timely\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/diffusion\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"diffusion\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/action_review_exercise_location\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"action review exercise location\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/action\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"action\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/action-64cff1319d2f\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Action\"\n    ],\n    \"http://tkeir.local/ontology/improve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/reporting_cadence-6668034e59f5\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/cadence-4f6b9e1c24d9\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Action\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/lesson\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"lesson\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Be/updates-35759b3ca7da\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Be\"\n    ],\n    \"http://tkeir.local/ontology/be\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"updates\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/timely\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"timely\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/dissemination\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"dissemination\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/eastern_corridor_observation\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"eastern corridor observation\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Chunk/ingest_195d0130658785158f376df1d8ea035d7aa55c62de5ea1f279d92343b64b3e05_aar_00758_7d01b5a3_html_chunk_0_409b1d9f54\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/common_operational_picture_update\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/action_review_exercise_location\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/eastern_corridor_observation\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/eastern_corridor\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/action\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/timely\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/lesson\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/dissemination\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/diffusion\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/CommonOperationalPictureUpdates/common_operational_picture_updates-5ec11fe4e339\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/action-64cff1319d2f\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Be/observation-d239e9cf6a51\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Be/updates-35759b3ca7da\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"aar_00758_7d01b5a3_html\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/reporting_cadence-6668034e59f5\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Action\"\n    ],\n    \"http://tkeir.local/ontology/improve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/cadence-4f6b9e1c24d9\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"reporting cadence\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Keyword/common_operational_picture_update\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"common operational picture update\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/cadence-4f6b9e1c24d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Action\"\n    ],\n    \"http://tkeir.local/ontology/improve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/cadence-4f6b9e1c24d9\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"cadence\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Chunk/ingest_195d0130658785158f376df1d8ea035d7aa55c62de5ea1f279d92343b64b3e05_aar_00758_7d01b5a3_html_chunk_0_409b1d9f54\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/CommonOperationalPictureUpdates/common_operational_picture_updates-5ec11fe4e339\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/aar_00758_7d01b5a3_html/Action/action-64cff1319d2f\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://195d0130658785158f376df1d8ea035d7aa55c62de5ea1f279d92343b64b3e05/AAR_00758_7d01b5a3.html#chunk-0-409b1d9f54\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 2,
+      "unresolved": 0,
+      "auto_fixed": 2,
+      "affected_node_count": 2,
+      "graph_node_count": 25,
+      "graph_triple_count": 59,
+      "by_result_path": {
+        "improve": 2
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 62,
+    "total_tokens": 62,
+    "covered_characters": 319,
+    "total_characters": 319,
+    "derivation": {
+      "enabled": true,
+      "status": "NO_MATCHES",
+      "matches": 0,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 0,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J9A2MP5S1PD5GGT3X9V8S/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 57,
+  "token-count": 62,
+  "source-file-size-bytes": 460,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.217,
+    "tasks": {
+      "converter": 0.007,
+      "language-detection": 0.007,
+      "resource-selection": 0.001,
+      "tokenizer": 0.003,
+      "morphosyntax": 0.008,
+      "ner": 0.042,
+      "syntax": 0.008,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.139,
+      "chunk-questions": 0.001
+    }
+  }
+}

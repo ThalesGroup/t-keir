@@ -1,4 +1,12 @@
-"""In-memory RDF graph merge and HMI-oriented ontology export."""
+"""Title: Ontology utils
+
+In-memory RDF graph merge and HMI-oriented ontology export.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -859,32 +867,56 @@ def build_hmi_ontology(
     retrieved_chunk_ids: list[str],
     *,
     chunk_texts: dict[str, str] | None = None,
+    document_ids: list[str] | None = None,
     max_entities: int = 120,
     max_keywords: int = 60,
     min_keyword_length: int = 3,
 ) -> dict[str, Any]:
-    """Export chunk-linked NER entities, keywords, and JSON-LD for HMI display.
+    """Export merged Vespa parent ontologies for HMI / RAG responses.
+
+    Merges unique ``json_ld`` (or Turtle) payloads from retrieved parent
+    documents into one RDF graph, then exports NER entities and keywords
+    linked to retrieved chunk ids plus the fused JSON-LD for display and
+    follow-up ontology reasoner queries.
 
     Args:
         rdf_documents: Parent document RDF payloads from Vespa (JSON-LD or Turtle).
         retrieved_chunk_ids: Chunk ids returned by hybrid search.
         chunk_texts: Optional map of ``chunk_id`` to indexed text for keyword linking.
+        document_ids: Optional parent ``source_doc_id`` values that contributed
+            ontology payloads (surfaced as merge metadata).
         max_entities: Maximum number of entity records to return.
         max_keywords: Maximum number of keyword records to return.
         min_keyword_length: Minimum character length for exported keyword labels.
 
     Returns:
-        Dict with ``entities``, ``keywords``, and ``json_ld``; entity items contain
-        ``label``, ``chunk_ids``, and ``type``.
+        Dict with ``entities``, ``keywords``, ``json_ld``, ``triple_count``,
+        ``source_count``, and ``document_ids``.
 
     Example:
         >>> from thot.tools.search.ontology_utils import build_hmi_ontology
-        >>> build_hmi_ontology([], [])
-        {'entities': [], 'keywords': [], 'json_ld': '[]'}
+        >>> build_hmi_ontology([], [])["json_ld"]
+        '[]'
     """
-    graph = merge_rdf_graphs(_unique_rdf_documents(rdf_documents))
+    unique_docs = _unique_rdf_documents(rdf_documents)
+    graph = merge_rdf_graphs(unique_docs)
+    doc_ids = sorted(
+        {
+            str(doc_id).strip()
+            for doc_id in (document_ids or [])
+            if str(doc_id).strip()
+        }
+    )
+    empty = {
+        "entities": [],
+        "keywords": [],
+        "json_ld": "[]",
+        "triple_count": 0,
+        "source_count": 0,
+        "document_ids": doc_ids,
+    }
     if len(graph) == 0:
-        return {"entities": [], "keywords": [], "json_ld": "[]"}
+        return empty
 
     chunk_texts = chunk_texts or {}
     chunk_uri_by_id = {
@@ -934,6 +966,9 @@ def build_hmi_ontology(
         "entities": entities,
         "keywords": keywords,
         "json_ld": serialize_graph_json_ld(graph),
+        "triple_count": len(graph),
+        "source_count": len(unique_docs),
+        "document_ids": doc_ids,
     }
 
 

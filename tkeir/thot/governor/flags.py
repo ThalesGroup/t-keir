@@ -1,4 +1,12 @@
-"""Runtime kill-switch flags store."""
+"""Title: Flags
+
+Runtime kill-switch flags store.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

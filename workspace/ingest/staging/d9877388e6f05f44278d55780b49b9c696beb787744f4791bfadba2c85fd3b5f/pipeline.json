@@ -1,0 +1,2143 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://d9877388e6f05f44278d55780b49b9c696beb787744f4791bfadba2c85fd3b5f/ENTITY_00714_69c718ee.txt",
+  "title": "ENTITY 00714 — Sector Bravo",
+  "content": [
+    "ENTITY 00714 — Sector Bravo\n===========================\n\nENTITY PROFILE\nDesignation: Task Group 47\nCategory: military organization\nArea of interest: Sector Bravo\nKnown capability: command and control coordination\nSource reliability: B2.\n"
+  ],
+  "kg": [],
+  "error": false,
+  "conversion-info": {
+    "datatype": "raw",
+    "source-size-bytes": 239,
+    "image-extraction": {
+      "enabled": false,
+      "used": false,
+      "mode": null,
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:23:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_smx.owl"
+  ],
+  "source": "ingest://d9877388e6f05f44278d55780b49b9c696beb787744f4791bfadba2c85fd3b5f/ENTITY_00714_69c718ee.txt",
+  "metadata": {
+    "topic_id": "intelligence",
+    "corpus": "osint",
+    "doc_type": "ENTITY",
+    "language": "en",
+    "title": "ENTITY 00714 — Sector Bravo",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "intelligence",
+  "doc_type": "ENTITY",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.999996403735445
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "ENTITY",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "00714",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sector",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Bravo",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "=",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "ENTITY",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "PROFILE",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Designation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Task",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Group",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "47",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Category",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "military",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "organization",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Area",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "of",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "interest",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sector",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Bravo",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Known",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "capability",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "command",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "control",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "coordination",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Source",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "reliability",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "B2",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "ENTITY",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "00714",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Sector",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Bravo",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "ENTITY",
+      "text": "ENTITY",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00714",
+      "text": "00714",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sector",
+      "text": "Sector",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Bravo",
+      "text": "Bravo",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "ENTITY",
+      "text": "ENTITY",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00714",
+      "text": "00714",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sector",
+      "text": "Sector",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Bravo",
+      "text": "Bravo",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "X",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "X",
+      "lemma": "=",
+      "text": "=",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "X",
+      "lemma": "entity",
+      "text": "ENTITY",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 32
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "profile",
+      "text": "PROFILE",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "designation",
+      "text": "Designation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Task",
+      "text": "Task",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Group",
+      "text": "Group",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "NUM",
+      "lemma": "47",
+      "text": "47",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Category",
+      "text": "Category",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "military",
+      "text": "military",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "organization",
+      "text": "organization",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "ADP",
+      "lemma": "of",
+      "text": "of",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "interest",
+      "text": "interest",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sector",
+      "text": "Sector",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Bravo",
+      "text": "Bravo",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Known",
+      "text": "Known",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "capability",
+      "text": "capability",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "command",
+      "text": "command",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 53
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "control",
+      "text": "control",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 54
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "coordination",
+      "text": "coordination",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 55
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "source",
+      "text": "Source",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 56
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "reliability",
+      "text": "reliability",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 57
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 58
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "b2",
+      "text": "B2",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 59
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 60
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [
+    {
+      "start": 36,
+      "end": 38,
+      "label": "organization",
+      "text": "Task Group"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "ENTITY",
+      "lemma": "ENTITY",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2
+      ]
+    },
+    {
+      "text": "00714",
+      "lemma": "00714",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sector",
+      "lemma": "Sector",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Bravo",
+      "lemma": "Bravo",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        3
+      ],
+      "rights": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ]
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "X",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "=",
+      "lemma": "=",
+      "pos": "X",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ENTITY",
+      "lemma": "entity",
+      "pos": "X",
+      "head": 32,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        34,
+        35
+      ]
+    },
+    {
+      "text": "PROFILE",
+      "lemma": "profile",
+      "pos": "NOUN",
+      "head": 34,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Designation",
+      "lemma": "designation",
+      "pos": "NOUN",
+      "head": 32,
+      "dep": "appos",
+      "lefts": [
+        33
+      ],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 32,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Task",
+      "lemma": "Task",
+      "pos": "PROPN",
+      "head": 37,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Group",
+      "lemma": "Group",
+      "pos": "PROPN",
+      "head": 37,
+      "dep": "ROOT",
+      "lefts": [
+        36
+      ],
+      "rights": [
+        39,
+        46,
+        50,
+        57,
+        58,
+        59,
+        60
+      ]
+    },
+    {
+      "text": "47",
+      "lemma": "47",
+      "pos": "NUM",
+      "head": 39,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Category",
+      "lemma": "Category",
+      "pos": "PROPN",
+      "head": 37,
+      "dep": "appos",
+      "lefts": [
+        38
+      ],
+      "rights": [
+        40,
+        43
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 39,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "military",
+      "lemma": "military",
+      "pos": "ADJ",
+      "head": 42,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "organization",
+      "lemma": "organization",
+      "pos": "PROPN",
+      "head": 43,
+      "dep": "compound",
+      "lefts": [
+        41
+      ],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 39,
+      "dep": "appos",
+      "lefts": [
+        42
+      ],
+      "rights": [
+        44
+      ]
+    },
+    {
+      "text": "of",
+      "lemma": "of",
+      "pos": "ADP",
+      "head": 43,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        45
+      ]
+    },
+    {
+      "text": "interest",
+      "lemma": "interest",
+      "pos": "NOUN",
+      "head": 44,
+      "dep": "pobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 37,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sector",
+      "lemma": "Sector",
+      "pos": "PROPN",
+      "head": 48,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Bravo",
+      "lemma": "Bravo",
+      "pos": "PROPN",
+      "head": 49,
+      "dep": "compound",
+      "lefts": [
+        47
+      ],
+      "rights": []
+    },
+    {
+      "text": "Known",
+      "lemma": "Known",
+      "pos": "PROPN",
+      "head": 50,
+      "dep": "compound",
+      "lefts": [
+        48
+      ],
+      "rights": []
+    },
+    {
+      "text": "capability",
+      "lemma": "capability",
+      "pos": "NOUN",
+      "head": 37,
+      "dep": "appos",
+      "lefts": [
+        49
+      ],
+      "rights": [
+        51
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 50,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "command",
+      "lemma": "command",
+      "pos": "NOUN",
+      "head": 56,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": [
+        53,
+        54
+      ]
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 52,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "control",
+      "lemma": "control",
+      "pos": "NOUN",
+      "head": 52,
+      "dep": "conj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "coordination",
+      "lemma": "coordination",
+      "pos": "NOUN",
+      "head": 56,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Source",
+      "lemma": "source",
+      "pos": "NOUN",
+      "head": 57,
+      "dep": "compound",
+      "lefts": [
+        52,
+        55
+      ],
+      "rights": []
+    },
+    {
+      "text": "reliability",
+      "lemma": "reliability",
+      "pos": "NOUN",
+      "head": 37,
+      "dep": "appos",
+      "lefts": [
+        56
+      ],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 37,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "B2",
+      "lemma": "b2",
+      "pos": "NOUN",
+      "head": 37,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 37,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "ENTITY",
+      "lemma": "ENTITY",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2
+      ]
+    },
+    {
+      "text": "00714",
+      "lemma": "00714",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sector",
+      "lemma": "Sector",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Bravo",
+      "lemma": "Bravo",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 4,
+      "text": "sector bravo",
+      "span": {
+        "start": 3,
+        "end": 5
+      }
+    },
+    {
+      "score": 16,
+      "text": "sector bravo known capability",
+      "span": {
+        "start": 47,
+        "end": 51
+      }
+    },
+    {
+      "score": 16,
+      "text": "control coordination source reliability",
+      "span": {
+        "start": 54,
+        "end": 58
+      }
+    },
+    {
+      "score": 9,
+      "text": "military organization area",
+      "span": {
+        "start": 41,
+        "end": 44
+      }
+    },
+    {
+      "score": 1,
+      "text": "interest",
+      "span": {
+        "start": 45,
+        "end": 46
+      }
+    },
+    {
+      "score": 1,
+      "text": "command",
+      "span": {
+        "start": 52,
+        "end": 53
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://d9877388e6f05f44278d55780b49b9c696beb787744f4791bfadba2c85fd3b5f/ENTITY_00714_69c718ee.txt#chunk-0-1082bbc3bc",
+      "parent_doc_id": "ingest://d9877388e6f05f44278d55780b49b9c696beb787744f4791bfadba2c85fd3b5f/ENTITY_00714_69c718ee.txt",
+      "text_raw": "ENTITY 00714 — Sector Bravo = = = = = = = = = = = = = = = = = = = = = = = = = = = ENTITY PROFILE Designation : Task Group 47 Category : military organization Area of interest : Sector Bravo Known capability : command and control coordination Source reliability : B2 .",
+      "search_vector_payload": "ENTITY 00714 — Sector Bravo = = = = = = = = = = = = = = = = = = = = = = = = = = = ENTITY PROFILE Designation : Task Group 47 Category : military organization Area of interest : Sector Bravo Known capability : command and control coordination Source reliability : B2 .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "Task Group"
+          ]
+        },
+        "svo_triplets": [],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 61,
+        "sentence_start": 0,
+        "sentence_end": 2
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Task Group",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "ENTITY 00714 — Sector Bravo = = = = = = =",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "ENTITY 00714 — Sector Bravo = = = = = = = = = = = = = = = = = = = = = = = = = = = ENTITY PROFILE Designation : Task Group 47 Category : military organization Area of interest : Sec...",
+          "question_type": "Summary-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Chunk/ingest_d9877388e6f05f44278d55780b49b9c696beb787744f4791bfadba2c85fd3b5f_entity_00714_69c718ee_txt_chunk_0_1082bbc3bc\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Organization/task_group-e15f8610d92f\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://d9877388e6f05f44278d55780b49b9c696beb787744f4791bfadba2c85fd3b5f/ENTITY_00714_69c718ee.txt#chunk-0-1082bbc3bc\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Organization/task_group-e15f8610d92f\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Task Group\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Unit_ALPHA\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/command\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"command\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/interest\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"interest\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/sector_bravo\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"sector bravo\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/control_coordination_source_reliability\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"control coordination source reliability\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/sector_bravo_known_capability\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"sector bravo known capability\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Chunk/ingest_d9877388e6f05f44278d55780b49b9c696beb787744f4791bfadba2c85fd3b5f_entity_00714_69c718ee_txt_chunk_0_1082bbc3bc\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/sector_bravo\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/sector_bravo_known_capability\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/control_coordination_source_reliability\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/military_organization_area\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/interest\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/command\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Organization/task_group-e15f8610d92f\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"entity_00714_69c718ee_txt\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/entity_00714_69c718ee_txt/Keyword/military_organization_area\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"military organization area\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 14,
+      "graph_triple_count": 28,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 66,
+    "total_tokens": 66,
+    "covered_characters": 230,
+    "total_characters": 230,
+    "derivation": {
+      "enabled": true,
+      "status": "APPLIED",
+      "matches": 1,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 1,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4J6HYCCX5Y68QVQ4X98YDJ/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 61,
+  "token-count": 66,
+  "source-file-size-bytes": 239,
+  "image-extraction": {
+    "enabled": false,
+    "used": false,
+    "mode": null,
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.169,
+    "tasks": {
+      "converter": 0.002,
+      "language-detection": 0.003,
+      "resource-selection": 0.001,
+      "tokenizer": 0.003,
+      "morphosyntax": 0.01,
+      "ner": 0.044,
+      "syntax": 0.009,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.094,
+      "chunk-questions": 0.001
+    }
+  }
+}

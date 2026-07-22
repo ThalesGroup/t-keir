@@ -1,4 +1,12 @@
-"""Tests for the T-KEIR NATO + Enterprise corpus generator and ingest script."""
+"""Title: Corpus generator
+
+Tests for the T-KEIR NATO + Enterprise corpus generator and ingest script.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

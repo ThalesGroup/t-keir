@@ -1,0 +1,8 @@
+# OPORD 00134 — Sector Bravo
+
+OPERATION ORDER
+1. Situation: maintain awareness in Sector Bravo.
+2. Mission: Joint Force Command monitors assigned area.
+3. Execution: synchronize ISR and maritime reporting.
+4. Sustainment: report logistics constraints.
+5. Command and Signal: use approved NATO C2 channels.

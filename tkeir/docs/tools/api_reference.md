@@ -82,9 +82,19 @@ uv run pytest tests/unittests/TestDocExampleCoverage.py tests/unittests/TestAllD
 | Function | Purpose |
 |---|---|
 | `merge_turtle_graphs(documents)` | Merge parent RDF graphs |
-| `build_hmi_ontology(turtles, chunk_ids, chunk_texts)` | Export entities + keywords for HMI |
+| `merge_rdf_graphs(documents)` | Merge JSON-LD / Turtle parent payloads |
+| `build_hmi_ontology(...)` | Export entities + keywords + fused `json_ld` (+ merge counts) |
 | `extract_relevant_triples(graph, query)` | Filter triple lines by query terms |
 | `summarize_graph_for_prompt(graph, query)` | Bullet summary for LLM prompts |
+
+## Ontology reasoner (`thot.tools.search.ontology_reasoner`)
+
+| Helper | Role |
+|--------|------|
+| `query_merged_ontology` | SPARQL / subclasses / instances / types / consistency on fused JSON-LD |
+| `owlapy_available` | Optional `owlapy` (`uv sync --extra owl`, Python ≥ 3.11) |
+
+HTTP: `POST /rag/ontology/query` — examples in [Vespa RAG](vespa_rag.md).
 
 ## RAG app helpers (`thot.tools.search.app`)
 

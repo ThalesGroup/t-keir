@@ -1,0 +1,132 @@
+Enterprise Observability Contract Harmonization Playbook
+
+Overview
+This playbook defines a repeatable process for harmonizing observability contracts across enterprise customer telemetry sources during onboarding. Harmonization reduces integration friction, ensures consistent SLO/SLA mapping, and shortens time-to-QBR readiness. Use this guide when integrating any new Dedicated or Private customer with custom telemetry, third-party agents, or legacy instrumentation.
+
+Goals
+- Provide a minimal required signal set for Redwood feature areas (ingress, request lifecycle, model inference, billing tokens, and error taxonomy).
+- Define canonical metric/event names and recommended labels/tags.
+- Specify retention, sampling, and privacy controls for regulated customers.
+- Prescribe validation checks, ownership, and escalation points.
+
+Scope
+Applies to: Dedicated and Private customers onboarding into Redwood's monitoring and customer-facing SLO/Uptime reports. Not intended for ad-hoc product experiments.
+
+Owners and stakeholders
+- Customer Success (CS) — primary onboarding coordinator, responsible for acceptance criteria.
+- Observability (Platform) — implements collectors, forwarders, and ensures schema conformity.
+- SRE/Infra — verifies SLO mappings and alert routing.
+- Customer Engineering — integrates customer telemetry; point-of-contact for schema questions.
+
+Required signals (canonical contract)
+The table below lists the minimum signals required to support production monitoring and QBR metrics. Provide all signals as either metrics (time-series) or structured events with the specified fields. If a customer cannot emit a field, mark the exception in the onboarding ticket.
+
+| Signal | Type | Required fields / labels | Purpose | Acceptable fallback |
+|---|---|---|---|---|
+| ingress.requests_total | metric (counter) | tenant_id, route, region, ingestion_type | Throughput and quota accounting | aggregated by tenant only (if per-route not available)
+| request.latency_p50/95/99 | metric (histogram) | tenant_id, route, model_variant, sequence_length_bucket | Latency SLOs and perf trending | p95 only for initial acceptance
+| inference.tokens_generated | metric (counter) | tenant_id, model_variant, prompt_hash | Inference economics, cost attribution | per-tenant token counts
+| response.error | event | tenant_id, request_id, error_code, error_category | Error triage and classification | aggregated error rate by tenant
+| kvcache.hits / kvcache.misses | metric | tenant_id, model_variant, prefix_cache_key | Cache efficiency and cost reduction | sample logs with cache-hit boolean
+| billing.request_cost_usd | metric | tenant_id, billing_cycle, cost_type | Chargeback & QBR cost breakdown | estimated cost model from Redwood side
+| telemetry.pii_exposure_alert | event | tenant_id, request_id, detection_ruleset_id | Data privacy monitoring | periodic sampling with redaction
+
+Privacy and regulated accounts
+For customers with data residency/regulation constraints (HIPAA, GDPR, FINRA):
+- Never forward raw request/response text. Use hashed prompt IDs (prompt_hash) and token counts.
+- Provide a privacy filter sidecar pattern: upstream collector masks or removes fields labeled pii_sensitive before forwarding.
+- Retention: default 30 days for raw structured events, 365 days for aggregated metrics. For regulated customers, support options: 7/30/90-day retention tables.
+- Document the KMS/HSM key ids used for redaction and provide evidence of encryption-at-rest and in-transit.
+
+Sampling and cardinality guidance
+- Low-cardinality tags: tenant_id, region, model_variant, route. Avoid user_id or free-text prompt content.
+- For high-cardinality fields (prompt_hash) use bucketing: keep only first 8 characters of hash and limit distinct values per tenant to 10k/day.
+- Sampling strategy: 100% for p95/p99 latency and error counters; 1–5% for raw example traces (for debugging) unless customer permits more.
+
+Onboarding acceptance criteria (checklist)
+1. Schema alignment: Customer telemetry emits all required signals with matching field names or mapped via an agreed adapter.
+2. Ingestion validation: Observability platform ingests at least 7 days of representative traffic or synthetic replay.
+3. SLO mapping: Latency and availability SLOs mapped to tenant dashboards.
+4. Privacy gates: PII redaction and retention windows verified.
+5. Cost mapping: Token & inference cost metrics available and reconciled with billing estimate.
+6. Alerting: Alert rules for latent p95, elevated error_rate (>0.5% sustained 10m), and telemetry pipeline dropouts.
+7. QBR readiness: Data populated for the last 30 days for the QBR template (see QBR readiness checklist).
+
+Detailed onboarding procedure
+Step 0 — Pre-engagement\- CS collects: customer account team, legal constraints, expected qps, list of models and regions in scope.\- Create an onboarding ticket in JIRA with "observability-contract" template and assign Observability engineer.
+
+Step 1 — Schema discovery (2–3 days)\1. Run a short discovery call with Customer Engineering to list existing telemetry endpoints and formats (Prometheus, OTLP, Datadog, custom logs).\2. Ask for sample payloads (anonymized) and a list of current tag sets.\3. Produce a mapping document within 48 hours with fields either matched or flagged for adapter implementation.
+
+Step 2 — Adapter & transport (1–2 weeks)
+- If the customer uses a homegrown format, Observability team builds an adapter (Fluent Bit/Collector pipeline) to translate to canonical names. Document the adapter config as YAML in the ticket.
+- Configure TLS and API key exchange. For Private deployments, confirm VPC peering or TLS proxy endpoints.
+
+Step 3 — Validation (3–7 days)
+- Run synthetic traffic that covers: high throughput, long sequences (>1024 tokens), and failure modes (timebox exceed, model OOM).
+- Verify metrics: counters increase, histograms report expected buckets, events contain required fields.
+- Execute the validation queries below and record results in the ticket.
+
+Validation queries (examples)\- p95 latency by tenant: SELECT percentile(latency_ms, 95) FROM request_latencies WHERE tenant_id = '<TENANT>' AND time > now() - 1h\- error rate: SELECT sum(errors) / sum(requests) FROM (SELECT count_if(response.error = true) as errors, count(*) as requests FROM requests WHERE tenant_id = '<TENANT>' AND time > now() - 10m)
+
+Step 4 — SLO mapping, alerts and runbooks (2–5 days)
+- SRE maps the onboarded metrics to Redwood SLOs and creates runbook stubs. Example SLOs: request availability >= 99.95% monthly; p95 latency < 300ms for short sequence routes.
+- Create alerts: (1) p95 latency increase > 30% over baseline for 10 minutes; (2) sustained error_rate > 0.5% for 10 minutes; (3) telemetry ingestion missing for 2 minutes.
+
+Step 5 — Handback and QBR prep (1–2 days)
+- CS verifies that all QBR metrics populate correctly for the prior 30 days.
+- Produce an "Observability Acceptance" sign-off artifact with: mapping doc, adapter config, retention policy, SLOs, and runbooks.
+
+Rollback and remediation steps
+- If validation fails, revert the adapter config and pause ingestion for the tenant while preserving raw payloads for investigation (no raw text forwarded for regulated accounts).
+- Escalation: Observability -> SRE -> CS -> Legal for PII incidents. Use the major-incident template in escalation-playbook.
+
+Common integration patterns and sample configs
+1) Prometheus scrape adapter (yaml):
+- job_name: "redwood-tenant"
+  static_configs:
+    - targets: ['collector.local:9100']
+  relabel_configs:
+    - source_labels: [__meta_kubernetes_namespace]
+      target_label: tenant_id
+
+2) OTLP to Redwood-forwarder (cli example):
+- otelcol --config /etc/otel/config.yaml --exporter.redwood.endpoint=https://telemetry.redwood.ai:443 --auth.token=<REDACTED>
+
+3) Minimal JSON event example (privacy-preserving):
+{
+  "event_type": "response.error",
+  "tenant_id": "acct-2b7f",
+  "request_id": "r-9f1a",
+  "error_code": "MODEL_TIMEOUT",
+  "error_category": "timeout",
+  "timestamp": "2026-02-15T14:03:22Z"
+}
+
+QBR readiness checklist (for CS owners)
+- 30 days of latency, error, and cost metrics available
+- Dashboards pre-populated and linked in the QBR template
+- Cost attribution validated against billing estimates 
+- Two example incident summaries (if any) with remediation notes
+- Privacy and retention policy documented and agreed
+
+Templates and artifacts to attach to the onboarding ticket
+- telemetry-mapping.csv (field mappings)
+- adapter-config.yaml (collector/exporter config)
+- acceptance-signoff.md (one-pager with signatures from CS and Customer Engineering)
+- slo-definition.json (SLOs and objectives)
+
+References and related pages
+- Observability onboarding checklist (internal link)
+- QBR telemetry storyboard and action plan
+- Escalation templates for PII or SLA incidents
+
+Appendix: common troubleshooting commands
+- Check ingestion pipeline: curl -fsS https://telemetry.redwood.ai/health || echo "pipeline down"
+- Verify metric existence (example time-series store): SELECT count(*) FROM metrics WHERE name = 'ingress.requests_total' AND tenant_id = '<TENANT>' AND time > now() - 1d
+
+Revision history
+- 2026-01-15: Created by Maya Chen
+- 2026-02-20: Added privacy gating guidance and additional validation queries (reviewers: Jasper Liu, Leah Martinez, Arjun Patel)
+
+Contact
+If you have questions about implementing the contract or need an adapter review, contact the Observability on-call channel (#obs-oncall) and assign ticket to the Observability team.

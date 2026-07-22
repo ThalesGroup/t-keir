@@ -1,4 +1,12 @@
-"""ASGI middleware for governor enforcement."""
+"""Title: Middleware
+
+ASGI middleware for governor enforcement.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

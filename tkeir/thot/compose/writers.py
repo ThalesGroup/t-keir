@@ -1,7 +1,12 @@
-"""Writer / reviewer helpers for freeform grounded slots (Phase C).
+"""Title: Writer / reviewer helpers for freeform grounded slots (Phase C).
 
 Full multi-agent orchestration is Phase D. Here we use agent YAML prompts
 with a single-shot LLM call (or a deterministic filler for offline/demo).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

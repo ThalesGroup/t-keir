@@ -1,7 +1,12 @@
-"""MCP transport isolation — official SDK behind a swappable facade.
+"""Title: MCP transport isolation — official SDK behind a swappable facade.
 
 The agent loop never imports ``mcp`` directly. This module may use the
 SDK when installed; otherwise a FastAPI JSON tool API still serves tools.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

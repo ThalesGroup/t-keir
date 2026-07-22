@@ -1,4 +1,9 @@
-import type { QueryRequest, QueryResponse } from "@/lib/types";
+import type {
+  OntologyReasonerRequest,
+  OntologyReasonerResponse,
+  QueryRequest,
+  QueryResponse,
+} from "@/lib/types";
 import { enrichQueryResponse } from "@/lib/report";
 
 const API_BASE =
@@ -59,9 +64,53 @@ export async function queryRag(request: QueryRequest): Promise<RagQueryResult> {
   };
 }
 
+export async function queryOntologyReasoner(
+  request: OntologyReasonerRequest,
+): Promise<OntologyReasonerResponse> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}/rag/ontology/query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Network request failed";
+    throw new RagApiError(
+      `Cannot reach RAG ontology reasoner (${message}). Start with: make rag`,
+    );
+  }
+  if (!response.ok) {
+    let detail = `Ontology query failed (${response.status})`;
+    try {
+      const payload = (await response.json()) as { detail?: string };
+      if (payload.detail) {
+        detail = payload.detail;
+      }
+    } catch {
+      // keep default
+    }
+    throw new RagApiError(detail, response.status);
+  }
+  return (await response.json()) as OntologyReasonerResponse;
+}
+
 export async function checkHealth(): Promise<boolean> {
   try {
     const response = await fetch(`${API_BASE}/health`, {
+      cache: "no-store",
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** True when tkeir-agent is reachable via the HMI `/api/agent` proxy. */
+export async function checkAgentHealth(): Promise<boolean> {
+  try {
+    const response = await fetch("/api/agent/health", {
       cache: "no-store",
     });
     return response.ok;

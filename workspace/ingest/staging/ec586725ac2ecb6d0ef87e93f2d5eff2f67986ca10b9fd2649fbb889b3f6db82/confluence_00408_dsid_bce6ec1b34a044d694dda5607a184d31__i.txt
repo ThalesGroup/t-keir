@@ -1,0 +1,31 @@
+Incident Review Summary (H1 2025): Capacity & quota exhaustion incidents  paging and ownership gaps
+
+# Purpose
+This page summarizes all production incidents in H1 2025 where the dominant failure mode was **GPU capacity exhaustion** or **quota exhaustion** (including cases where quota prevented provisioning). The goal is to validate completeness of paging signals and ensure incidents are owned consistently.
+
+# Inclusion criteria
+- Production customer impact
+- Primary failure mode: capacity exhaustion, quota exhaustion, or provisioning blocked by quota
+- Occurred between 2025-01-01 and 2025-06-30
+
+# Incident list (canonical for H1 2025)
+| Incident ID | Date | Product surface | Failure mode | Primary owner (team) | Canonical artifact |
+|---|---|---|---|---|---|
+| INC-2025-0112 | 2025-01-12 | Hosted API (us-east) | GPU pool capacity exhaustion | Eng Infra | Confluence postmortem: INC-2025-0112 |
+| INC-2025-0217 | 2025-02-17 | Console/Rollouts | Quota prevented canary capacity add | Eng Platform | Jira INT-489 + Slack thread |
+| INC-2025-0303 | 2025-03-03 | Dedicated (eu-west) | Provisioning blocked by quota + autoscaler lag | Eng SRE | Confluence postmortem: INC-2025-0303 |
+| INC-2025-0411 | 2025-04-11 | Hosted API | Misdiagnosed as memory pressure; confirmed quota exhaustion on burst pool | Eng Serving Runtime | Jira INT-556 |
+| INC-2025-0522 | 2025-05-22 | Private (VPC) | Effective capacity drop via GPU fragmentation | Eng Infra | Confluence postmortem: INC-2025-0522 |
+
+# Observations
+- Two incidents were driven by quota ceilings preventing scale-up (INC-2025-0217, INC-2025-0303).
+- One incident (INC-2025-0411) was initially triaged as runtime memory pressure but root-caused to quota exhaustion and provisioning failures for the burst pool.
+
+# Action items
+1. Standardize a single label for capacity/quota incidents across Jira + postmortems (owner: Eng SRE)
+2. Add a preflight check in rollouts: do not start canary if regional GPU quota headroom < 10% (owner: Eng Platform)
+3. Improve runbook guidance for distinguishing memory pressure vs capacity/quota exhaustion (owner: Eng Serving Runtime)
+
+# Links
+- INT-517, INT-544, INT-556, INT-601
+- Slack: #incidents thread (INC-2025-0217)

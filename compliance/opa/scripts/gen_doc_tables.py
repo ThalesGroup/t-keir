@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Regenerate MkDocs article tables from OPA Rego catalogues."""
+"""Title: Gen doc tables
+
+Regenerate MkDocs article tables from OPA Rego catalogues.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
+
 from __future__ import annotations
 
 import re

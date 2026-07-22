@@ -1,4 +1,12 @@
-"""Regression tests for SpacyTokenizerPipe without MWE."""
+"""Title: Spacy Tokenizer Pipe
+
+Regression tests for SpacyTokenizerPipe without MWE.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from spacy.tokens import Doc
 

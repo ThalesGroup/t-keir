@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Index pipeline JSON documents into Vespa document and chunk schemas."""
+"""Title: Index documents
+
+Index pipeline JSON documents into Vespa document and chunk schemas.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -200,7 +208,14 @@ async def index_pipeline_document(
     from thot.tools.search.user_space import resolve_vespa_user_space
     from thot.tools.search.vespa_client import normalize_user_space
 
-    source_doc_id = document["source_doc_id"]
+    source_doc_id = document.get("source_doc_id") or document.get("source")
+    if not source_doc_id:
+        raise KeyError(
+            "source_doc_id (or source) is required on pipeline documents "
+            "before Vespa indexing"
+        )
+    source_doc_id = str(source_doc_id)
+    document["source_doc_id"] = source_doc_id
     space = normalize_user_space(user_space or resolve_vespa_user_space(None))
     await vespa.upsert_document(
         _document_fields(document), source_doc_id, user_space=space

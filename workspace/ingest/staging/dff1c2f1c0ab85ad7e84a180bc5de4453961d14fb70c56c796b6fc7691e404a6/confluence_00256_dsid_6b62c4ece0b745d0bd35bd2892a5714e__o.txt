@@ -1,0 +1,143 @@
+On-call capacity forecasting and escalation simulator guide
+
+Overview
+
+This guide defines a repeatable process for: 1) forecasting on-call staffing and GPU/serving capacity for expected traffic and failure modes, and 2) running an automated escalation simulator (a tabletop + synthetic incident harness) to validate escalation paths, runbooks, and SLO-restoration timelines. The playbook is intended for SREs, service owners, and on-call engineers who operate Redwood's inference platform.
+
+Goals
+- Produce a 13-week on-call staffing plan tied to service-level objectives (SLOs) and forecasted traffic.
+- Validate that escalation policies and first-response runbooks meet the expected mean-time-to-ack (MTTA) and mean-time-to-restore (MTTR) under simulated stress.
+- Provide a reproducible simulator that triggers synthetic incidents (latency spikes, cache evictions, quota storms) and exercises paging, bridge formation, and customer communication flows.
+
+Scope
+- Applied to production Redwood hosted and Dedicated control plane services and the inference routing mesh.
+- Excludes detailed per-customer remediation steps for Private deployments (use customer-specific runbooks stored under eng-private-deployments).
+
+Ownership and cadence
+- Primary owner: Eng SRE (team lead: Priya Nambiar).
+- Quarterly forecasting cadence: every quarter the SRE and capacity-planning owner run the forecasting model and publish staffing recommendations.
+- Simulation cadence: Monthly automated game-day run + ad-hoc pre-release simulations for large infra changes.
+
+Key inputs and signals
+- Historical traffic: token/sec, requests/sec per model/version (13 weeks window preferred).
+- Spike templates: 2x, 5x, 10x baseline traffic profiles per tenant class.
+- Failure modes: single-region outage, KV-cache mass-eviction, GPU pool degradation (50% capacity), routing-controller lag.
+- On-call constraints: max weekly shifts per engineer, paired rotation rules, escalation windows.
+
+Forecasting model: high-level description
+1) Baseline computation
+   - Aggregate 13-week median and 95th percentile for requests/sec and tokens/sec per service route.
+   - Compute rolling growth: week-over-week linear and exponential fits; expose high/median/low growth scenarios.
+2) Capacity unit conversions
+   - Convert requests/sec to GPU capacity units using benchmarked tokens/sec per GPU for the most common model families (gpt-*-8bit, llama2-13b-quant).
+   - Add 25% overhead for autoscaling buffer and headroom for burst scaling.
+3) Staffing need estimate
+   - Derive operational headcount requirement from capacity units: one on-call rotation pod can reliably oversee X GPUs and Y services (configurable per team).
+   - Adjust for scheduled releases, holidays, and hiring gaps.
+
+Forecasting output: example table
+|| Metric || Low scenario || Baseline (median) || High (95p) ||
+| Projected avg tokens/sec | 120k | 210k | 380k |
+| GPUs required (model-avg) | 15 | 27 | 49 |
+| On-call pods required | 2 | 4 | 7 |
+| Recommended reserve buffer | 10% | 25% | 35% |
+
+Interpreting the table
+- Use the baseline column for staffing commitments under normal conditions. High scenario informs hiring or short-term capacity leases for dedicated pools.
+
+Escalation simulator: architecture and components
+- Simulator repo: git@redwood:infra/oncall-escalation-sim.git (owner: eng-sre).
+- Components:
+  - Incident injector: creates synthetic alerts (PagerDuty events or internal alert bus messages) and synthetic SLO breaches via the observability test harness.
+  - Load generator: produces traffic profiles to the serving runtime (uses internal locust-based templates).
+  - Pager bridge: a test namespace integrated with the real PagerDuty and Slack channels in staging (isolated routing rules).
+  - Orchestration runner: a workflow that runs a scenario, waits for acknowledgements, measures times, and records artifacts (logs, traces, recordings).
+
+Simulator configuration table (common parameters)
+|| Parameter || Description || Example ||
+| scenario_name | Friendly scenario id | kv-cache-eviction-mass |
+| traffic_multiplier | How many x baseline to send | 5 |
+| failure_duration_sec | Duration of synthetic failure | 900 |
+| expected_ack_window_sec | Expected MTTA in runbook | 300 |
+| slack_channel_override | Channel to post ephemeral test notices | #ops-game-day |
+| pd_dedup_key | External dedup key used by PD for this run | sim-2025-02-10-01 |
+
+Running a monthly simulation (step-by-step)
+1) Prepare environment (runbook owner, simulation lead, observers)
+   - Assign roles: Incident lead, Bridge operator, Customer comms writer, Evidence collector.
+   - Notify affected teams: post a 48-hour pre-notice in #ops-game-day and calendar block.
+2) Start background load generator
+   - CLI example: "rdw-sim load --profile kv-eviction-5x --duration 1800s --target serving-frontend.staging.redwood.internal"
+3) Trigger incident injection
+   - CLI example: "rdw-sim inject --scenario kv-cache-eviction-mass --pd-key sim-2025-02-10-01"
+4) Measure escalation path
+   - The orchestration runner captures: alert fired timestamp, pager sent, pager acknowledged, bridge created timestamp, first remediation action, and service restore timestamp.
+5) Execute customer comms run through
+   - Use the templates below to publish staged status updates and observe approval/clearance workflow.
+6) Evidence collection and artifact upload
+   - The runner uploads logs and timelines to /evidence/simulations/<sim-id>/ and creates a confluence summary stub automatically using the post-simulation hook.
+7) Retro and action items
+   - The simulation lead runs a 60-minute retro with assigned action owners and opens follow-ups in the incident backlog.
+
+Acceptance criteria (what success looks like)
+- SLO targets hit: MTTA <= 5 minutes for Sev-1, MTTR <= 30 minutes for canonical recoverable incidents (exclusions for multi-region outage which may be longer).
+- Runbook valid: first responder follows documented sequence with no manual knowledge gaps observed.
+- Paging reliability: pager delivery rate > 99% and acknowledgement rate > 90% within expected_ack_window.
+- Customer comms: staged status update approved within 10 minutes of bridge creation.
+
+Runbook health checks and pruning policy
+- After each simulation, mark runbooks with one of: pass / needs-update / deprecated.
+- Quarterly runbook sweep: owners must re-validate and sign-off. If owner does not respond within 14 days, runbook is flagged for escalation to the service steward.
+
+Templates and CLI snippets
+- Bridge creation (manual):
+  1) Slack: /bridge create --service serving-frontend --severity Sev1 --owner @oncall-frontend
+  2) PagerDuty: create incident with tag:sim-<id>, include runbook link.
+- Sample customer status (initial):
+  Subject: Redwood inference: elevated latency for generation API in region us-west-2
+  Body: We are investigating increased latency impacting text generation calls to the public API in us-west-2. Engineers have opened an incident and are actively investigating. We will update every 15 minutes or when we have a meaningful change.
+- Sample customer status (restored):
+  Subject: Service restored: text generation latency back to expected levels in us-west-2
+  Body: The issue has been mitigated and latency has returned to normal. Root cause analysis is in progress and we will publish a post-incident summary within 72 hours if this was a Sev-1 incident.
+
+Evidence capture checklist (simulation + real incident)
+- Timestamps: alert fired, pager sent, acked, bridge created, first deploy/rollback, restore.
+- Artifacts: trace links, top N logs, autoscaler decision events, GPU utilization charts, KV-cache eviction logs, PD incident export.
+- Ownership notes: incident lead, bridge operator, comms writer, follow-up assignee.
+
+Common simulation scenarios (recommended starter set)
+1) KV-cache mass-eviction + 5x traffic burst (duration 15m)
+2) Routing-controller lag causing 30% request requeues (duration 20m)
+3) GPU pool partial failure: 50% of GPUs offline in a region during peak (duration 25m)
+4) Quota storm: single-tenant misconfiguration leading to noisy neighbor effects (duration 30m)
+
+Data and metric dashboards to review post-sim
+- SLO dashboard: MTTA/MTTR by service and by severity
+- Cost dashboard: GPU-hours consumed during simulation and autoscaler actions
+- Alert fidelity: alert volume, alert-to-incident conversion rate, false positive count
+
+Post-simulation deliverables
+- Simulation summary confluence page (auto-generated): scenario, timeline, measured metrics, artifacts links, action items with owners and due dates.
+- Action tracking: create JIRA tickets for any remediation that requires code, infra, or runbook updates.
+- Runbook update: owner must update runbook within 7 days or enter the runbook retirement process.
+
+Appendix: quick checklist for on-call managers before quarterly forecast
+- Confirm growth signals from product and usage analytics teams.
+- Re-run capacity conversion benchmarks for the most used models (if new model family onboarded, include its profile).
+- Verify hiring plan and contractor reserve for the forecast horizon.
+- Schedule calendar windows for monthly simulations and ensure PD/Slack test namespaces are configured.
+
+Contacts and escalation matrix
+- Eng SRE lead: Priya Nambiar (priya@redwood.ai)
+- Capacity planning owner: Diego Alvarez (diego@redwood.ai)
+- Ops game-day coordinator: Hannah Lee (hannah@redwood.ai)
+
+Related resources
+- /confluence/eng-sre/capacity-planning/capacity-modeling-2024
+- /confluence/oncall-and-incident-response/runbook-library-index
+- /git/infra/oncall-escalation-sim
+
+Change log
+- 2024-06-15: Created (Maya Chen).
+- 2024-10-12: Added simulation orchestration runner steps and evidence checklist (Diego Alvarez).
+- 2025-02-10: Updated acceptance criteria and added customer comms templates (Maya Chen).

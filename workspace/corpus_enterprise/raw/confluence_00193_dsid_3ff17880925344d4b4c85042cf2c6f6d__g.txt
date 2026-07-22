@@ -1,0 +1,165 @@
+gpu-pcie-error-isolation-and-hw-failover-runbook
+
+Overview
+======
+This runbook describes operational procedures for detecting, isolating, and failing over hosts that report PCIe or downstream hardware errors affecting GPU inference capacity. It is intended for SRE and infra on-call engineers, and for infra engineers executing day-2 maintenance or emergency hardware isolation.
+
+Goals
+-----
+- Detect PCIe-related degradation (corrected/uncorrected errors, link retrains, ECC counts) within 5 minutes of occurrence.
+- Safely route tenant load off impacted hosts and preserve KV cache where possible.
+- Quarantine or reprovision hardware with minimal disruption and within 60 minutes for high-severity incidents.
+- Provide reproducible diagnostics for vendor escalation and postmortem.
+
+When to use this runbook
+-----------------------
+Use this playbook when any of the following alerts fire:
+1) pcie_error_rate_high (thresholds table below)
+2) GPU ECC uncorrectable or frequent corrected ECC spikes
+3) repeated GPU resets (nvidia-smi shows repeated GPU reset events)
+4) kernel logs show PCIe AER (Advanced Error Reporting) messages or link retrain events
+
+Ownership and escalation
+------------------------
+- Primary: infra-sre-oncall (pager)
+- Secondary: gpu-fleet-team (Slack #gpu-fleet)
+- Hardware vendor escalation: hw-escalations@redwood-inference.com (cc: infra-leads)
+- Documentation owner: Aisha Patel
+
+Alert thresholds and initial triage table
+---------------------------------------
+| Alert name | Signal | Severity | Initial triage action | SLA |
+|------------|--------|----------|-----------------------|-----|
+| pcie_corrected_rate | node_exporter: node_pcie_corrected_errors[1m] > 50 | Sev3 | Check dmesg and isolate flows | Detect 5m |
+| pcie_uncorrected | node_exporter: node_pcie_uncorrected_errors > 1 | Sev1 | Immediate drain and quarantine | Remediate 60m |
+| gpu_ecc_corrected_spike | nvml: gpu_ecc_corrected_delta > 1000/min | Sev2 | Move non-critical jobs, monitor | 30m |
+| gpu_reset_count | telemetry: gpu_reset_count_in_15m > 3 | Sev2 | Reboot node if safe, otherwise drain | 30m |
+
+Initial investigation checklist (0-10 minutes)
+------------------------------------------------
+- Safety: Confirm incident scope and impact in PagerDuty and Slack. Notify customer-facing channels if tenant-affecting.
+- Gather quick signals:
+  - dmesg | tail -n 200 | grep -iA3 -E "pcie|aer|error|link retrain"
+  - sudo journalctl -k -u systemd -n 200 | grep -i pcie
+  - lspci -vvv | grep -A2 -i "VGA\|3D\|NVIDIA"
+  - sudo nvidia-smi --query-gpu=name,index,ecc.errors.uncorrected.volatile,ecc.errors.corrected.volatile --format=csv
+  - node_exporter metrics: node_pcie_* and gpu_exporter metrics for ECC/reset counts
+- Surface whether error is localized to a single GPU, host, or rack.
+- If uncorrected PCIe errors or repeated GPU resets: follow the immediate isolation path below.
+
+Immediate isolation (Sev1 path)
+-------------------------------
+1) Mark node as quarantined in inventory system (example tag via Terraform/CLI):
+   - Terraform snippet to set quarantine tag (for manual emergency use):
+     provider "aws" { }
+     resource "aws_instance" "gpu_node" {
+       # ... existing resource ...
+       tags = {
+         Name = "gpu-node-42"
+         gpu_health = "quarantine"
+       }
+     }
+   - If using our node registry API: curl -X POST -H 'Authorization: Bearer $TOKEN' https://infra-api.internal/v1/nodes/uuid/quarantine
+2) Drain workloads immediately: run the drain playbook for the cluster type (k8s, nomad):
+   - Kubernetes: kubectl cordon node/<node-name> && kubectl drain node/<node-name> --ignore-daemonsets --delete-local-data --timeout=10m
+   - Nomad: nomad node eligibility -disable <node-id> and nomad run = stop allocations gracefully
+3) Disable load balancing to node-level endpoints (envoy/service mesh) and remove from pool.
+4) If hardware reboot is safe and no attached persistent test jobs: reboot and re-check logs (see reboot validation steps). If rebooting is not safe, preserve node for vendor escalation.
+
+Diagnostics to collect for vendor escalation
+-------------------------------------------
+- dmesg output (first 5k lines) and journalctl kernel logs around the time window.
+- lspci -vvv and lspci -xxxx (hex dump) for devices involved.
+- nvml/pci dump: nvidia-smi -q -d ERRORS and nvidia-bug-report.sh (if allowed by compliance).
+- IPMI logs / BMC event logs: ipmitool sel list && ipmitool sel get <id>
+- Node telemetry snapshot (upload to secure S3 bucket):
+  - /var/log/messages, /var/log/kern.log, nvml logs, node exporter metrics, kube/nomad allocation logs.
+- Hardware identifiers: serial numbers, BIOS versions, PCIe link speed/width from lspci, driver versions.
+
+Repro workflow and safe repro tips
+--------------------------------
+- If errors are intermittent, attempt controlled synthetic load with a non-production tenant in the same rack to reproduce under observation. Use a low-priority burst job that exercises the GPU memory and PCIe link for 10 minutes. Monitor for retries, corrected error rate, and link retrains.
+- Use nvidia-smi daemon mode to increase telemetry granularity temporarily: nvidia-smi --loop-ms=1000 --query-gpu=timestamp,utilization.gpu,temperature.gpu --format=csv
+- When reproducing, ensure KV cache persistence strategy is documented so stateful workloads are not lost.
+
+Remediation matrix
+------------------
+| Symptom | Likely cause | Remediation | When to escalate |
+|---------|--------------|------------|-----------------|
+| Corrected PCIe errors only | Dirty link, marginal signaling | Reduce PCIe link speed (if platform supports), update BIOS, schedule maint window | After 3 recurring incidents in 24h |
+| Uncorrected PCIe errors | Faulty riser/slot or GPU | Replace GPU or move card to spare slot; vendor RMA | Immediately (Sev1) |
+| Frequent GPU resets | Driver/kernel mismatch or firmware bug | Rollback driver or apply hotpatch; run canary deployment of driver image | After immediate mitigation if persists |
+| ECC uncorrectable errors | Memory fault on GPU | Quarantine and replace GPU | Immediately |
+
+Driver and kernel hotpatch/rollback guidance (CI/CD)
+---------------------------------------------------
+- Buildkite job naming convention: "gpu-driver-canary/<image-tag>". Canary rollout flow: 1) push image to canary pool, 2) run smoke tests (latency and token throughput), 3) monitor for 30 minutes, 4) gradual promote.
+- Example Buildkite check list for driver canary:
+  1. Run ci-eval-synthetic on 10 canary nodes (10M tokens).
+  2. Assert gpu_reset_count_no_increase <= 0 and latency regression < 5%.
+  3. If checks fail, automatically revert image tag and open incident in PagerDuty.
+- Keep a pinned driver image in the Terraform node profile to allow fast rollback (ami: "gpu-runtime:v2025-02-10" style pin).
+
+Post-quarantine validation and return-to-service
+------------------------------------------------
+- Before returning node to production:
+  1) Run full hardware diagnostics (vendor or in-house): memtest for GPU memory, burn-in for 2 hours, PCIe stress test.
+  2) Confirm no new pcie_uncorrected alerts for 24h under monitored synthetic load.
+  3) Re-image node with golden image and reapply node tags.
+  4) Remove quarantine tag and re-enable scheduling in a staged ramp (10% capacity first).
+- Example checklist entry for re-enablement:
+  - [ ] Hardware diagnostics passed (attach logs)
+  - [ ] Firmware/BIOS updated to supported revision
+  - [ ] Driver image validated (canary stamp)
+  - [ ] No uncorrected errors on telemetry for 24h
+
+Terraform/IaC patterns for resilience
+-----------------------------------
+- Node metadata tags to use (consistent naming expected by automation):
+  - gpu_health: {ok, quarantine, suspect}
+  - pci_lane: <x16|x8|x4|internal-bus>
+  - hw_serial: <serial-number>
+- IaC example to attach node pool replacement policy:
+  - autoscaling_group.lifecycle_hook = true (drain before termination)
+- Keep a small hot spare pool (5%) per region/zone with identical driver/kernel matrix to allow fast reprovisioning.
+
+Telemetry and long-term detection improvements
+--------------------------------------------
+- Recommended derived metrics to add to Prometheus:
+  - rate(node_pcie_corrected_errors[5m]) normalized by slots per chassis
+  - gpu_reset_rate per GPU normalized to utilization
+  - pcie_link_retrain_count by slot and vendor-reported lane width changes
+- Annotate nodes with firmware and BIOS versions in node exporter to enable cross-correlation.
+- Set up a daily job that finds nodes with rising corrected error trend and pre-emptively moves non-critical workloads off them.
+
+Runbook annex: useful commands and snippets
+-----------------------------------------
+- dmesg | grep -iA5 -E "pcie|aer|error|uncorrected|corrected"
+- sudo journalctl -k --since "15 minutes ago" | grep -i pcie
+- lspci -vvv -s <bus:slot.func>
+- sudo nvidia-smi -q -d ECC,RESET,PCI
+- sudo /usr/bin/nvidia-bug-report.sh --logdir /tmp/bugreport-<node>
+- ipmitool sel list; ipmitool sel elist
+- Terraform tag update (example): terraform apply -var 'node_id=uuid' -target=module.node_registry
+
+References and related pages
+---------------------------
+- GPU thermal & power guidelines: /confluence/eng-infra/gpu-fleet-and-capacity/gpu-thermal-and-power-management-guidelines.json
+- Hotpatch safeguard and draining playbook: /confluence/eng-infra/runbooks/gpu-hotpatch-safeguard-and-rolling-drain-playbook.json
+
+Change history
+--------------
+- 2024-07-15: Initial draft (Aisha Patel)
+- 2024-10-02: Added CI/CD rollback and canary checklist (Marcus Lee)
+- 2025-02-10: Expanded telemetry metrics and vendor escalation template (Jin Park)
+
+Appendix: vendor escalation template (email)
+-----------------------------------------
+Subject: [RMA Request] GPU PCIe Uncorrected Errors - Node <node-name> - Serial <SN>
+Body:
+- Incident time window: <UTC times>
+- Symptoms observed: uncorrected PCIe AER + GPU ECC uncorrectable + node removal required
+- Diagnostics attached: dmesg, lspci -vvv, nvml error dump, IPMI event logs, node exporter snapshot
+- Requested action: investigate link hardware (riser/cable/slot) and advise on replacement or firmware fix
+
+End of document

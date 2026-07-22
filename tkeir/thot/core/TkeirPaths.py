@@ -1,4 +1,12 @@
-"""Resolve bundled T-KEIR configuration and resource paths."""
+"""Title: Tkeir Paths
+
+Resolve bundled T-KEIR configuration and resource paths.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -56,6 +64,24 @@ def resources_dir(language: str = "en") -> str:
     return os.path.join(
         package_root(), "resources", "modeling", "tokenizer", language
     )
+
+
+def ontologies_dir() -> str:
+    """Return the bundled generic ontologies directory.
+
+    Application / corpus ontologies must not live here — upload them at
+    ingest time. Only product-neutral reference graphs belong under
+    ``resources/ontologies/``.
+
+    Returns:
+        Absolute path to ``resources/ontologies``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import ontologies_dir
+        >>> ontologies_dir().endswith("resources/ontologies")
+        True
+    """
+    return os.path.join(package_root(), "resources", "ontologies")
 
 
 def repo_root() -> str:

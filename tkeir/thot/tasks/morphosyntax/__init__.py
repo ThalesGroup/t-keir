@@ -1,8 +1,11 @@
-"""Package initialization
+"""Title: Package initialization
 
-Author: Eric Blaudez (Eric Blaudez)
+Morphosyntactic tagging for T-KEIR documents.
 
-Copyright (c) 2021 by THALES
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import os

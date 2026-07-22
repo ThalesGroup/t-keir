@@ -1,4 +1,12 @@
-"""``tkeir-agent`` FastAPI service (single-agent + Phase D workflows)."""
+"""Title: Agent HTTP service
+
+``tkeir-agent`` FastAPI service (single-agent + Phase D workflows).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,0 +1,141 @@
+local-data-sovereignty-fallback-orchestration-runbook-2026
+
+Summary:
+This runbook documents the local data sovereignty and fallback orchestration pattern used for Redwood Private deployments (VPC and on-prem). It defines when and how tenant traffic should be routed to local model variants, what safeguards to use to preserve data residency guarantees, operator procedures to trigger and recover from fallbacks, and telemetry & SLO thresholds that drive automation.
+
+Goals:
+- Maintain data residency: ensure PII and regulated data never leaves customer-controlled networks during fallback.
+- Preserve availability: keep inference capacity online with best-effort local models when control-plane or cross-region links are impaired.
+- Ensure safe rollbacks: provide clear operator steps to revert automated actions with minimal config drift.
+
+Scope:
+- Applies to Private deployments that run a hybrid control plane (customer control plane + Redwood managed components) or fully air-gapped on-prem stacks.
+- Covers network partition/failure, control-plane outage, upstream model catalog unavailability, and degraded cross-region links.
+- Does NOT cover hardware-level GPU failures or kernel-level runtime bugs (see hardware failover docs).
+
+Assumptions and prerequisites:
+- Private deployment runs these services: redwood-control-agent, private-operator, edge-proxy (service-lb), rt-inference, kvcache-service.
+- Customer has configured a local model cache (min 1 warm model per critical route) and an allowlist of model IDs that are permitted to be used in-scope for local processing.
+- KMS/HSM keys for local encryption are available and reachable from the compute tier.
+
+Ownership:
+- Incident owner: oncall-private-ops (primary).
+- Fallback orchestration: infra-platform-team (automation).
+- Security & data residency validation: security-compliance (review and approval).
+
+Key SLOs and thresholds that drive fallback:
+- Control-plane API error rate > 2% sustained for 5 minutes -> begin staged local fallback (step 1).
+- Cross-region bandwidth degradation > 60% of baseline for 10 minutes -> prepare local routing but do NOT fail traffic until control-plane errors observed.
+- Local model cold-start time > 10s at 95th percentile after priming -> raise playbook alert to operator.
+- Local inference latency p99 must remain < 600ms post-fallback for critical routes; if exceeded, trigger degradation policy to reduce response size or invoke cached responses.
+
+High-level orchestration patterns:
+1) Passive priming: maintain a warm local model cache for critical tenant routes. Regularly refresh KV-caches and checkpoint files during low-traffic windows.
+2) Staged activation: fallback occurs in stages: traffic shadowing -> partial routing (10-30%) -> full cutover. Each stage waits for health gates.
+3) Policy guardrails: use the allowlist and residency rules to prevent models that require external telemetry or third-party calls from being used during offline mode.
+
+Configuration snippets (example automation policy YAML):
+
+automation_policy: |
+  name: "local-fallback-policy-tenant-critical"
+  triggers:
+    - type: control_plane_error_rate
+      threshold_percent: 2
+      window_sec: 300
+    - type: bandwidth_degradation
+      region: "primary->secondary"
+      threshold_percent: 60
+      window_sec: 600
+  stages:
+    - name: shadow
+      traffic_percent: 0
+      verify_health: true
+      wait_sec: 120
+    - name: partial
+      traffic_percent: 20
+      verify_health: true
+      wait_sec: 300
+    - name: full
+      traffic_percent: 100
+      verify_health: true
+      wait_sec: 180
+  residency_enforcement: "strict"
+  allowed_models: ["local/gptx-small-v1", "local/embedding-sparse-1"]
+
+Operator runbook: step-by-step for automated fallback:
+1) Alert triage (0-5 min): confirm control-plane error alerts (redwood-control-plane) and cross-region telemetry. Check grafana dashboard: "Private / Control Plane / Errors" and "Network / Inter-region Throughput".
+2) Verify residency policy: ensure allowed_models list is intact in /etc/redwood/private-config.yaml and that KMS is reachable.
+3) Kick off shadowing stage if automation did not start: run CLI on private-operator box:
+   - sudo /opt/redwood/bin/operator ctl begin-shadow --tenant $TENANT_ID --policy local-fallback-policy-tenant-critical
+4) Monitor shadowing: verify shadow profiles in the "shadow-traffic" table on the operator UI and confirm no data egress events in the telemetry stream.
+5) If shadowing healthy for 2 minutes (no model exceptions, p95 latency stable), progress to partial routing:
+   - sudo /opt/redwood/bin/operator ctl set-traffic-split --tenant $TENANT_ID --percent 20
+6) Health gates at each stage:
+   - error-rate (local inference) < 1%
+   - KV cache hit rate > 70%
+   - p99 latency < configured limit (default 600ms)
+7) If any gate fails, rollback one stage and re-prime model caches (see Cache re-priming below). Notify security-compliance if data residency policy was close to violation.
+8) When full routing completes, mark incident: annotate runbook in incident tracker and set recovery actions.
+
+Manual fallback: when automation is disabled or unsafe
+- If automation is off, follow the CLI steps above; for emergency full cutover run:
+  - sudo /opt/redwood/bin/operator ctl emergency-cutover --tenant $TENANT_ID --force --reason "$INCIDENT_ID"
+- Emergency cutover requires two approvers from infra-platform-team and security-compliance.
+
+Cache re-priming procedure:
+1) Stop inference endpoints for the tenant on a single node: systemctl stop redwood-rt-inference@$TENANT_ID
+2) Remove stale KV entries: /opt/redwood/bin/kvtool prune --tenant $TENANT_ID --older-than 72h
+3) Start priming job (background): /opt/redwood/bin/priming-job --tenant $TENANT_ID --model local/gptx-small-v1 --concurrency 4 --duration 10m
+4) Verify KV hit rate > 70% and memory usage within expected bounds.
+
+Rollback & upgrade coordination (day-2 guidance):
+- Rollback policy: prefer configuration rollback over model rollback. Revert operator policy first, then restore traffic split to last known good value.
+- If rollback involves a model swap (hot-swap), use staged rollbacks: partial -> shadow -> off. Do NOT revert to hosted-only mode in restricted residency customers without explicit approval.
+- Upgrade windows: schedule control-plane upgrades during low-traffic windows and ensure warm models are available in at least two zones. Communicate planned maintenance at least 72 hours in advance to the customer.
+
+Telemetry, alerts and dashboards (key metrics):
+- control_plane_api.error_rate (by tenant)
+- network.region_throughput (primary->secondary)
+- local_inference.latency.p95/p99
+- kvcache.hit_rate
+- data_egress.events (counts of external egress attempts)
+- operator.automation.stage (current fallback stage)
+Alert routing:
+- PAGER: private-ops@pagerduty (severity P1 for control_plane_api.error_rate > 5% for 2 minutes)
+- EMAIL: infra-platform-team for warnings
+
+Security and compliance considerations:
+- Enforce strict residency_enforcement during fallback: all outbound connectors disabled by policy; no telemetry with PII forwarded outside the VPC.
+- KMS rotations: local key rotations MUST be applied before any model priming job if rotation occurred in the previous 24h.
+- Audit: record the full operator CLI transcript and store in secure evidence bucket with retention 7 years for regulated customers.
+
+Testing and validation matrix (recommended):
+1) Simulation: emulate control-plane errors by returning 5xx for 6 minutes; verify runbook triggers and staged cutover completes.
+2) Network: throttle inter-region link to 40% bandwidth for 15 minutes and validate that fallback does not trigger until control-plane errors occur.
+3) Residency: run a synthetic PII query and confirm no egress logs recorded during fallback.
+4) Load: run 1k QPS synthetic load during partial routing and verify p99 latency stays within SLA.
+
+Post-incident checklist and evidence capture:
+- Timestamped incident timeline (UTC).
+- Snapshots of dashboards and operator logs (redwood-control-agent, private-operator).
+- Copy of automation policy used and final allowed_models list.
+- Post-incident review: assign owners, list root causes, and planned mitigations.
+
+Appendix A: quick CLI commands
+- Check policy status: sudo /opt/redwood/bin/operator ctl policy-status --tenant $TENANT_ID
+- Start priming job: sudo /opt/redwood/bin/priming-job --tenant $TENANT_ID --model $MODEL --duration 10m
+- Emergency rollback: sudo /opt/redwood/bin/operator ctl rollback --tenant $TENANT_ID --to-tag $TAG
+
+Appendix B: common failure modes and mitigations
+- Problem: local model OOM after cutover -> Mitigation: reduce concurrency, enable quantized model profile, evict non-critical tenants.
+- Problem: KMS unreachable during priming -> Mitigation: fall back to cached DEKs for 15 minutes and run health-checks that require KMS unavailable flag.
+
+References and links:
+- Private deployment control plane topology (reference architecture)
+- Operator CLI reference: /confluence/eng-private-deployments/deployment-guides/private-deploy-operator-cheat-sheet-for-field-installations-2027
+- Security policy: private-deploy-telemetry-data-classification-policy-2026
+
+Change log:
+- 2026-01-15: Initial draft (Ava Kim).
+- 2026-02-10: Added automation policy examples and security gating (Priya Nambiar).
+- 2026-03-02: Reviewed and published; updated SLO thresholds and CLI paths (Diego Ramos).

@@ -1,4 +1,4 @@
-"""SPIFFE identity resolution for T-KEIR agents (ADR-0008).
+"""Title: SPIFFE identity resolution for T-KEIR agents (ADR-0008).
 
 Agents must carry a workload SPIFFE ID on every ActionRecord so mastering
 (governor kill switch, budgets, approvals) attributes machine actors, not
@@ -15,6 +15,11 @@ Resolution order:
 
 When ``SPIFFE_ENFORCE=true`` (or governor ``enforce`` with agents), missing
 or disallowed IDs are denied.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

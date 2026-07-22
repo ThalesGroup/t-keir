@@ -1,0 +1,189 @@
+Deterministic Playback Manifest Format (v1)
+
+## Overview
+This page defines the **Deterministic Playback Manifest** format (v1): a lightweight, self-contained JSON document intended to capture everything needed to deterministically replay an inference session (or an ordered set of requests) across model rollouts, runtime variants, kernel changes, and quantization profiles.
+
+The primary goal is to make postmortems, regression triage, and model A/B comparisons reproducible **without requiring full environment cloning**.
+
+## Non-goals
+The manifest is intentionally not a full provenance ledger.
+
+**Out of scope for v1**
+- Capturing private customer data inline. Manifests must reference redacted payloads or point to approved secure storage locations.
+- General-purpose data lineage, training provenance, or governance/audit trails.
+
+## Design principles
+- **Minimal**: reference large artifacts instead of embedding blobs.
+- **Deterministic intent**: include all inputs that can affect output (tokenizer, seeds, runtime config, policies/hooks).
+- **Portable**: JSON, human-readable, attachable to support tickets and GitHub issues.
+- **Privacy-aware**: PII-bearing content must be referenced via controlled pointers and governed by a privacy policy token.
+
+## Applicability and versioning
+- This page defines **v1** of the format. Breaking changes require a new `manifest_version`.
+- Forward-compatible additions must be optional and ignored by older runners.
+
+## Required top-level fields (v1)
+All top-level fields are JSON keys.
+
+**Identity and metadata**
+- `manifest_version` (required): must be `"1"`
+- `manifest_id` (required): short stable id (UUID recommended)
+- `created_by` (required): name/email of authoring agent (person or system)
+- `created_at` (required): RFC3339 timestamp
+- `source_context` (required): freeform string describing scenario (UI flow, API route, ticket)
+
+**Artifacts and execution**
+- `model_artifact` (required): model id + artifact digest
+- `tokenizer` (required): tokenizer id + digest
+- `environment` (required): runtime/environment snapshot string (see "Environment fields")
+- `requests` (required): ordered list encoded as JSON array in the manifest; each element is a request descriptor (see below)
+
+**Determinism controls**
+- `runtime_flags` (required): list of `key=value` strings affecting execution (e.g., `use_kv_cache=true`)
+- `deterministic_seeds` (required): list of seed assignments (e.g., `global_seed=42`, `sampler_seed=42`)
+- `determinism_mode` (required): one of `strict | best_effort`
+
+**Observability and privacy**
+- `telemetry_refs` (optional but recommended): pointers to associated logs/traces/metrics
+- `privacy_policy` (required): one of `none | partial | strict`
+- `payload_policy` (required): one of `inline_redacted | pointer_required`
+
+**Integrity (updated in v1)**
+- `integrity` (optional): a compact string describing integrity mechanism. v1 runners support:
+  - `none`
+  - `sha256-only` (checksums required; no signature)
+  - `sigstore-oidc` (signature envelope stored separately; manifest contains reference)
+
+> Update vs. early draft: `signature` is no longer a direct embedded blob in v1. Use `integrity` plus `integrity_ref` (see below) to avoid copying large envelopes into tickets.
+
+## Optional top-level fields (v1)
+- `telemetry_bundle_ref`: URI to a packaged bundle (trace + token metrics + logs) when available.
+- `integrity_ref`: URI to signature/envelope material when `integrity` != `none`.
+- `notes`: freeform human notes.
+
+## Request descriptor (v1)
+Each `requests[]` element represents one request in a deterministic sequence.
+
+**Required request fields**
+- `request_id`: short id, unique within manifest
+- `timestamp`: RFC3339 timestamp of original request
+- `api_route`: e.g., `/v1/generate` or `/v1/chat/completions`
+- `raw_payload_ref`: pointer to stored payload (GCS/S3/secure-store) OR inline redacted JSON string when permitted by policy
+- `input_checksums`: list of checksums for payload-derived inputs
+- `sampling_config`: canonical string encoding of sampling knobs
+
+**Recommended request fields**
+- `client_sdk`: client library + version
+- `pre_hooks`: ordered list of transformations applied pre-runtime (name@version + checksum)
+- `post_hooks`: ordered list of transformations applied post-runtime
+- `expected_response_fingerprint`: fingerprint of original response for quick divergence checks
+- `fallback_policy_trace`: record of any fallbacks (model switch, retry, safety downgrade) with timestamps
+
+> Update vs. early draft: v1 standardizes on `expected_response_fingerprint` rather than "signature" wording to avoid confusion with cryptographic signatures.
+
+## Environment fields (v1)
+Environment is represented as a compact semicolon-delimited string of `key=value` pairs to keep manifests small and friendly to ticket systems.
+
+**Required environment keys**
+- `runtime_image`: container name + digest (must include digest)
+- `host_os`: e.g., `ubuntu-22.04`
+- `region`: e.g., `us-west-2`
+- `accelerator`: e.g., `a100-80gb` or `cpu`
+
+**Recommended environment keys**
+- `runtime_release`: serving runtime release tag
+- `kernel_determinism`: `on | off | mixed`
+- `concurrency_profile`: `single-req | batched`
+- `num_shards`: integer
+
+> Update vs. early draft: `runtime_image` **must include a digest** (e.g., `redwood/runtime-infer@sha256:...`) because tags are not stable enough for deterministic repro.
+
+## Checksum and fingerprint rules (v1)
+### Input checksums
+- Checksums must be `sha256`.
+- `input_checksums` entries are strings with a prefix:
+  - `raw:sha256:<hex>` for raw payload bytes (post-redaction if redacted inline)
+  - `tok:sha256:<hex>` for tokenized input ids (canonical serialization)
+
+### Response fingerprint (v1)
+The response fingerprint algorithm is fixed in v1 to avoid ambiguity:
+- Normalize model output by:
+  1) converting CRLF to LF
+  2) trimming trailing whitespace on each line
+  3) ensuring final newline is absent
+- Compute `sha256` over UTF-8 bytes of the normalized string
+- Encode as `resp:sha256:<hex>`
+
+> Update vs. early draft: v1 explicitly uses **sha256 of normalized text** (not embeddings) for `expected_response_fingerprint`. Embedding similarity is permitted in reports but not a manifest primitive.
+
+## Telemetry references (v1)
+`telemetry_refs` are URIs (or internal artifact ids) pointing to:
+- structured trace (Jaeger/Tempo trace id)
+- token-level metrics (latency per token, logprobs if enabled)
+- server logs (filtered range)
+- resource utilization snapshot
+
+When available, prefer a single `telemetry_bundle_ref` that points to a packaged artifact.
+
+## Privacy and security
+- `raw_payload_ref` must comply with `privacy_policy` and `payload_policy`.
+- For `privacy_policy=strict`, manifests **must not** include raw text content; use secure pointers only.
+- Redacted inline payloads are permitted only with `privacy_policy=partial` and `payload_policy=inline_redacted`.
+- If payload pointers are used, the pointer must reference an access-controlled store with audit logs.
+
+## JSON example (v1)
+Below is an illustrative example (fields shown as a single JSON document). Values are representative.
+
+{
+  "manifest_version": "1",
+  "manifest_id": "m-3c9f2d4b",
+  "created_by": "aisha@redwood.ai",
+  "created_at": "2026-03-10T15:04:12Z",
+  "source_context": "support-ticket #12345 - user reported hallucination on invoice extraction",
+  "model_artifact": "gptx-4-quant-v3;sha256=7b1c...",
+  "tokenizer": "tokenizer-v4;sha256=ef56...",
+  "environment": "runtime_image=redwood/runtime-infer@sha256:91aa...;host_os=ubuntu-22.04;accelerator=a100-80gb;region=us-west-2;kernel_determinism=on;concurrency_profile=single-req",
+  "determinism_mode": "strict",
+  "runtime_flags": ["use_kv_cache=true", "kv_prefetch=on"],
+  "deterministic_seeds": ["global_seed=42", "sampler_seed=42"],
+  "privacy_policy": "strict",
+  "payload_policy": "pointer_required",
+  "integrity": "sha256-only",
+  "requests": [
+    {
+      "request_id": "r1",
+      "timestamp": "2026-03-09T22:10:03Z",
+      "api_route": "/v1/chat/completions",
+      "client_sdk": "python:openai-compat@1.8.2",
+      "raw_payload_ref": "gcs://redwood-playback/12345/payload-r1.json.redacted",
+      "input_checksums": ["raw:sha256:aaa...", "tok:sha256:fff..."],
+      "sampling_config": "temp=0.0;top_p=1.0;top_k=0;seed=42",
+      "pre_hooks": ["prompt-template@2.1.0;sha256=19c..."],
+      "expected_response_fingerprint": "resp:sha256:0d4..."
+    }
+  ],
+  "telemetry_refs": ["jaeger://trace/abc123", "gcs://redwood-playback/12345/token_metrics.json"],
+  "notes": "Repro runner should fail fast if kernel_determinism is not on."
+}
+
+## Runner procedure (Serving Runtime reference)
+A compliant playback runner (e.g., `rps` in eng-serving-runtime) should:
+1. **Validate manifest**: check required fields, validate checksums are well-formed.
+2. **Resolve artifacts**: fetch model and tokenizer by digest; verify sha256.
+3. **Materialize inputs**: fetch `raw_payload_ref` under policy; apply `pre_hooks` in order.
+4. **Recompute checksums**: assert `raw:` and `tok:` checksums match.
+5. **Configure runtime**: apply `runtime_flags`, set determinism mode, seed RNGs.
+6. **Execute**: run requests in order. In `strict` mode, disable/avoid nondeterministic kernels; if not possible, fail with a clear reason.
+7. **Compare**: compute `expected_response_fingerprint` and compare; produce a delta report.
+8. **Report artifacts**: emit a bundle containing outputs, token logs, timings, and a summary (attach via `telemetry_bundle_ref` or external storage).
+
+## Compatibility notes and updates since the draft
+- `manifest_version` is now mandatory and must be `"1"`.
+- `runtime_image` must include an immutable digest.
+- `expected_response_fingerprint` algorithm is fixed (normalized-text sha256).
+- Cryptographic signing is supported via references (`integrity` + `integrity_ref`) rather than embedding a signature blob in the manifest.
+
+## Ownership and support
+- Primary owner: **Serving Runtime** (eng-serving-runtime)
+- For schema changes: file an issue under **ENGSR** and tag **repro/playback**.
+- For privacy questions: consult **Security & Compliance** and reference SEC-201.

@@ -1,4 +1,12 @@
-"""T-KEIR single-agent runtime (Phase B) — from scratch, no frameworks."""
+"""Title: agent package init
+
+T-KEIR single-agent runtime (Phase B) — from scratch, no frameworks.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

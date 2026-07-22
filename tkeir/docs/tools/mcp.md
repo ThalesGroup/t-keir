@@ -1,7 +1,30 @@
 # MCP server (tkeir-mcp)
 
 > Phase A — read-only MCP tools over the caller's Vespa streaming group.
-> **Not an agent runtime** (that is Phase B).
+> **Not an agent runtime** (that is [Agents](agents.md) / `tkeir-agent`).
+
+## Who uses it (external vs agents)
+
+**`tkeir-mcp` is the HTTP/stdio surface for external MCP clients** (Cursor,
+Claude Desktop, other MCP hosts). Start it with `make mcp` when those clients
+should call T-KEIR tools.
+
+**Agents do not call this service.** `tkeir-agent` invokes the same
+`McpHandlers` library **in-process** (Vespa + optional RAG via `MCP_RAG_URL`).
+Search / `rag_query` work with Vespa (and RAG) alone — you do not need
+`tkeir-mcp` running for agent or workflow runs.
+
+```text
+External MCP clients ──► tkeir-mcp (:8093) ──► McpHandlers ──► Vespa / RAG
+                              ▲
+                              │ same code (library)
+tkeir-agent ──────────────────┴──► McpHandlers ──► Vespa / RAG
+         (no hop through the MCP process)
+```
+
+Optional **outbound** tools (`configs/mcp-client.yaml`) are a separate path:
+agents may call *other* egress-allow-listed MCP servers; that still does not
+require the local `tkeir-mcp` process.
 
 ## What it exposes
 
@@ -53,5 +76,5 @@ tkeir/thot/mcp/
   server.py        # tkeir-mcp entrypoint
 ```
 
-See also [Vespa RAG](vespa_rag.md) and the regularity / governor docs for
-intent scopes.
+See also [Vespa RAG](vespa_rag.md), [Agents](agents.md), and the regularity /
+governor docs for intent scopes.

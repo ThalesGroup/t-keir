@@ -1,4 +1,12 @@
-"""Tests for task metadata helpers."""
+"""Title: Task Info
+
+Tests for task metadata helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from unittest.mock import patch
 

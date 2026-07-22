@@ -1,0 +1,150 @@
+CISO & Finance Brief: Inference Economics and Security Playbook
+
+Executive summary
+
+This brief is designed for CISO and Finance stakeholders evaluating Redwood Inference for production LLM deployments. It combines a concise economics model with a mapped security and controls playbook to accelerate procurement and risk sign-off. Use this as a one-page narrative for procurement committees and as the operational checklist for pilot-to-production gating.
+
+Key takeaways
+- Redwood reduces per-token inference cost through batching, KV/prefix caching, and model quantization profiles while preserving latency SLOs.
+- The platform supports hosted, dedicated (reserved GPU pools), and private (VPC/on-prem) models; security controls and evidence differ by deployment mode.
+- Finance decisions should balance committed capacity (Dedicated) vs. variable cost (Hosted) based on predictability of token volume and acceptable unit economics.
+- CISO review focuses on data flow, key management, audit evidence, and degradation/fallback policies.
+
+1) Decision framework for Finance
+
+Objective: Choose a contracting and deployment model that minimizes expected monthly cost at target latency and uptime while limiting downside risk from traffic spikes or model regressions.
+
+Required inputs (gather before a procurement meeting):
+- Monthly average and 95th percentile tokens-per-minute (TPM).
+- Required p99 latency target and latency SLO (e.g., p99 < 300 ms).
+- Uptime SLO (e.g., 99.9%) and penalty tolerance.
+- Data residency and compliance constraints (e.g., customer data must never leave VPC).
+
+Simple pricing calculator (example)
+- Hosted: unit = $0.00012 per token (baseline open model), no commit.
+- Dedicated: monthly reserved pool = $80,000 / month for 16x A100-equivalent slots -> effective unit cost depends on utilization.
+- Private on-prem: one-time license + ops (example: $250k upfront + $35k/year support).
+
+Illustrative scenario (numbers simplified):
+- Expected monthly tokens: 1.5 billion.
+- Hosted cost: 1.5B * $0.00012 = $180,000/month.
+- Dedicated: amortized reserved cost at 70% utilization -> effective unit = $0.00006 -> $90,000/month.
+- Recommendation: If expected monthly tokens > 0.8B and predictable (±10%), Dedicated becomes cost-effective; otherwise start Hosted and convert when monthly spend is stable.
+
+Note: Redwood supports step-down during pilot: start Hosted, move to burst-enabled Dedicated commit at 30-day notice. See Pilot checklist.
+
+2) Security and controls mapping for procurement
+
+This table maps common CISO questions to Redwood capabilities and evidence artifacts.
+
+| CISO question | Redwood capability | Evidence/Artifact |
+|---|---|---|
+| Where does input data transit and persist? | VPC Private deployments keep data on customer network; Hosted uses TLS in transit and ephemeral storage; KV/prefix caches are optionally encrypted. | Network diagram, data flow diagram, default retention settings, demo audit logs |
+| Who has access to keys? | Integrations with KMS/HSM (AWS KMS, GCP KMS, Azure Key Vault). Optional HSM-backed key in Private deployments. | KMS config screenshots, KMS key rotation policy, HSM attestation (if requested) |
+| How are model outputs audited for PII/regressed behavior? | Built-in audit logging, sample-store, and eval hooks that tag outputs by prompt set and model version. | Audit log export, sample redaction policy, eval runbooks |
+| How are vulnerabilities and incidents handled? | Security incident runbook with SLA for triage, ZDR/forensic artifacts, and dedicated contact for enterprise. | Incident runbook, historical postmortem templates, SOC2 Type II evidence |
+| Can we restrict outbound network connections? | Yes — Private deployment supports customer-controlled egress; Dedicated supports egress policies and service-level network rules. | Network ACL configs, egress allowlist examples |
+| How are worker/node images hardened? | Immutable images, scanned nightly with CVE tooling, and signed at build. | SBOM export, image scan reports |
+
+3) Pilot-to-Production playbook (CFO + CISO checklist)
+
+Phase A — Discovery (week 0–2)
+1. Define success metrics: cost per 1M tokens, p99 latency, and false positive/negative rates for safety filters.
+2. Provide Redwood with sample traffic profile and data residency requirements.
+3. Agree on minimal security evidence pack (SOC2 summary, encryption-at-rest/in-transit proofs).
+
+Phase B — Pilot (week 2–8)
+1. Deploy on Hosted in a dedicated tenant with telemetry export to the customer’s observability (optional).
+2. Run 2-week load test: measure p50/p95/p99 latency and token throughput.
+3. Run quality evaluation against agreed prompt-set; capture regressions.
+4. Validate audit log exports, KMS integration, and data retention settings.
+5. Finance: track actual spend vs. modeled spend and estimate break-even.
+
+Phase C — Harden and Contract (week 8–12)
+1. For Dedicated or Private: draft SOW with capacity, SLA, and support tiers.
+2. Security: deliver final evidence pack, run an architecture review with security engineering, and complete pen test timeline (if required).
+3. Execute capacity commit or license and schedule rollout.
+
+4) Competitive brief (CISO/Finance lens)
+
+High-level differentiators that matter to CISO & Finance:
+- Predictable economics: Dedicated capacity and tooling to forecast unit cost at scale.
+- Unified control plane: same operational surface across Hosted/Dedicated/Private reduces integrator burden.
+- Observability: token-level cost and latency breakdowns help finance reconcile bills to feature usage.
+- Safety hooks and evals: tighter regression detection reduces model-risk remediation costs.
+
+Competitor comparison (summary)
+- Provider A (large cloud vendor): strong networking and identity integration but higher per-token unit costs for inference optimized for general CPU/GPU services; procurement and SLA negotiation can take longer.
+- Provider B (ML endpoint specialist): lower latency at scale but limited private deployment support and weaker cost-forecasting tools.
+- Provider C (open-source runtime): lower license cost but requires substantial ops lift and lacks consolidated audit/sales evidence for enterprise buyers.
+
+How to position to Finance and CISO in a meeting:
+- To Finance: show a 12-month cost projection under 3 adoption scenarios (conservative, expected, aggressive). Highlight when Dedicated yields savings and what commit level is required.
+- To CISO: present data flow diagram, KMS plan, and how audit/export meets their SIEM ingestion requirements.
+
+5) Pricing guidance and negotiation tactics for AE/SEs
+
+Pricing levers to surface early:
+- Committed vs. burst capacity: offer a 6–12 month ramp with tiered commit discounts.
+- Multi-year contracts: reduce effective unit price and include price protection for the first 12 months.
+- Usage caps and auto-fallback: include contractual run-rate ceilings and automatic fallback to hosted to avoid downtime.
+- Observability/Retention add-ons: frequently negotiated (longer retention windows for logs/metrics have incremental cost).
+
+Concession playbook (deal engineering):
+1. Trade price for visibility: require the customer to provide monthly usage reports in exchange for a higher commit discount.
+2. Offer a pilot credit capped at 3 months usage for qualified proofs.
+3. Bundle a security review slot (1-day architecture workshop) as a professional services line item rather than discounting list price.
+
+6) Security FAQ for CISO (concise answers to accelerate RFPs)
+
+Q: Does Redwood retain customer prompts or outputs?
+A: By default Hosted keeps ephemeral logs for 30 days for debugging; retention is configurable. Dedicated and Private can be configured to zero retention or to forward logs to customer-managed storage.
+
+Q: How is encryption handled?
+A: TLS 1.2+ for in-transit, AES-256 for at-rest. For Private deployments we support HSM-backed keys and customer-managed KMS.
+
+Q: Are third-party model weights stored centrally?
+A: Models can be mirrored into private registries under the customer’s control for Private deployments. Hosted uses verified model artifacts stored in Redwood’s secure artifact store with strict access controls.
+
+Q: What compliance evidence is available?
+A: SOC2 Type II, ISO 27001 (summary), vendor risk questionnaires, and select penetration-test reports under NDA.
+
+Q: How do you handle incident notifications?
+A: Enterprise tiers get a dedicated incident contact, SLA for initial triage (1 hour for Sev 1), and post-incident artifacts.
+
+7) Appendix: SLA and example contractual language
+
+Operational SLOs (example)
+- Uptime: 99.9% monthly (Dedicated)
+- p99 latency: < 350 ms for <1k token requests (measured under agreed load profile)
+- Incident initial response: 1 hour (Sev 1)
+
+Sample contract clause (simple wording for security appendix)
+"Redwood will ensure that cryptographic keys used to protect Customer Data are managed according to the Customer's configured KMS. Where Customer elects to use Customer-Managed Keys, Redwood will not have access to plaintext data without Customer authorization. Redwood will provide audit logs and SBOMs upon reasonable request under NDA."
+
+8) Pilot checklist (one-page operational tasks)
+- [ ] Get sample traffic and prompt set from customer (anonymized if required).
+- [ ] Agree success metrics and reporting cadence.
+- [ ] Provision tenant and enable audit log export.
+- [ ] Configure KMS integration and verify key rotation.
+- [ ] Execute load test and baseline observability dashboards.
+- [ ] Run quality eval and log regressions; update prompt guardrails.
+- [ ] Reconcile pilot spend against finance model and decide commit timing.
+
+Ownership and contacts
+- Sales lead: Asha Patel (either/asha@redwood.ai)
+- Enterprise SE: Miguel Ortega (miguel@redwood.ai)
+- Security liaison: Elaine Chen (elaine@redwood.ai)
+- Legal / Procurement template: procurement-templates@redwood.ai
+
+How to use this doc
+- AEs: use the "Decision framework for Finance" section in procurement meetings.
+- SEs: attach the Security and controls mapping to RFP responses.
+- CISO/Finance: use the Pilot checklist and Appendix SLA language to accelerate sign-off.
+
+Revision history
+- 2026-02-12: Created by Asha Patel.
+- 2026-02-25: Added competitor comparison and pricing calculator (Miguel Ortega).
+- 2026-03-08: Security FAQ expanded and confidentiality set to restricted (Elaine Chen).
+
+End of brief.

@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4DEYCXFX4CHSKXPN705KNC",
+  "reason": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+  "job": {
+    "ingest_id": "01KY4DEYCXFX4CHSKXPN705KNC",
+    "correlation_id": "a1fc72858a506289480f58e691aa3a03",
+    "status": "failed",
+    "doc_id": "a1849c9a9116f223d816d7259078771c299b8d3c842405f584c631d35e43ce39",
+    "batch_id": null,
+    "manifest_path": "staging/a1849c9a9116f223d816d7259078771c299b8d3c842405f584c631d35e43ce39/ingest.manifest.json",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+    "created_at": "2026-07-22T08:00:50.589Z",
+    "updated_at": "2026-07-22T08:01:15.658Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4DEYCXFX4CHSKXPN705KNC",
+    "correlation_id": "a1fc72858a506289480f58e691aa3a03",
+    "doc_id": "a1849c9a9116f223d816d7259078771c299b8d3c842405f584c631d35e43ce39",
+    "source": {
+      "uri": "upload://01KY4DEYCXKHMCMGK8DM4YBB29/confluence_00027_dsid_2a1e3c46331c4b16ad4455d9f395636d__t.txt",
+      "filename": "confluence_00027_dsid_2a1e3c46331c4b16ad4455d9f395636d__t.txt",
+      "content_type": "application/octet-stream",
+      "size_bytes": 8536
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T08:00:50.619Z",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']"
+  },
+  "failed_at": "2026-07-22T08:01:15.658Z"
+}

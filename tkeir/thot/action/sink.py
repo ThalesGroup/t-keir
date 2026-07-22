@@ -1,9 +1,11 @@
-"""Observe-mode ActionRecord sinks (in-memory until audit store lands).
+"""Title: Sink
 
-Author: Eric Blaudez (Eric Blaudez)
+Observe-mode ActionRecord sinks (in-memory until audit store lands).
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

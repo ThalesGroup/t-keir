@@ -1,4 +1,12 @@
-"""Verify every thot function has a Google-style Example section."""
+"""Title: Doc Example Coverage
+
+Verify every thot function has a Google-style Example section.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

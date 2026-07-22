@@ -1,4 +1,12 @@
-"""Ingest service settings from environment variables."""
+"""Title: Config
+
+Ingest service settings from environment variables.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -21,6 +29,10 @@ class IngestSettings:
     index_enabled: bool
     host: str
     port: int
+    # Cap concurrent NLP pipeline+index jobs (spaCy is memory-heavy; >1 often OOMs).
+    max_concurrency: int
+    # Exit the ingest process on the first failed job (fast debug loops).
+    stop_on_failed: bool
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -45,6 +57,7 @@ def ingest_settings() -> IngestSettings:
         os.getenv("INGEST_PIPELINE_CONFIG", str(default_pipeline))
     )
     root = Path(os.getenv("INGEST_ROOT", "/var/tkeir/ingest"))
+    max_concurrency = max(1, int(os.getenv("INGEST_MAX_CONCURRENCY", "1")))
     return IngestSettings(
         root=root,
         auth_enabled=_env_bool("INGEST_AUTH_ENABLED", False),
@@ -53,4 +66,6 @@ def ingest_settings() -> IngestSettings:
         index_enabled=_env_bool("INGEST_INDEX_ENABLED", True),
         host=os.getenv("INGEST_HOST", "0.0.0.0"),
         port=int(os.getenv("INGEST_PORT", "8091")),
+        max_concurrency=max_concurrency,
+        stop_on_failed=_env_bool("INGEST_STOP_ON_FAILED", False),
     )

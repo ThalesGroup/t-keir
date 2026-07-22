@@ -1,4 +1,12 @@
-"""Tests for pipeline CLI helpers."""
+"""Title: Pipeline
+
+Tests for pipeline CLI helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import json
 import os

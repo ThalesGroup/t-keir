@@ -1,11 +1,11 @@
-"""Common configuration
+"""Title: Common configuration
 
 Common configuration function
 
-Author: Eric Blaudez (Eric Blaudez)
+Author: Eric Blaudez
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import os

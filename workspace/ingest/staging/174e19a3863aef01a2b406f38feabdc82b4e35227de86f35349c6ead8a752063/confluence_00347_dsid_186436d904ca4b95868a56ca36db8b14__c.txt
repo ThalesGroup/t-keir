@@ -1,0 +1,141 @@
+Capacity proof-of-change and shadow-testing playbook
+
+Overview
+
+Purpose: This playbook codifies how teams validate (prove) capacity, autoscaling and routing changes against real-world traffic without risking customer-facing SLOs. It standardizes a repeatable set of experiments: shadow/shim traffic, traffic replay, staged admission (canary -> ramp -> open), and a formal evidence bundle for incident review and SLO/error-budget impact analysis.
+
+Scope: Applies to model-serving and routing surfaces that materially affect latency or availability: inference-gateway, batch-router, kv-cache, routing-proxy, and hosting pools (dedicated/dyno). It covers changes to: scaling policies, pool sizes, admission controllers, routing fallbacks, batching configs, and new quantized model variants.
+
+Why this matters
+- Avoids regressions to customer-visible SLOs when changing capacity or admission policies.
+- Produces reproducible evidence for post-change incident reviews and for error-budget adjudication.
+- Reduces blast radius by providing guardrails for staged rollout and automated rollback.
+
+Owner and roles
+- Capacity Author: person who proposes the change (PR author). Responsible for experiment plan.
+- Capacity Steward: capacity-platform oncall or team member who approves and observes the proof-of-change window.
+- SRE Observer: assigned SRE engineer responsible for SLO telemetry and evidence collection.
+- Service Owner: owner of the impacted service (e.g., inference-gateway). Responsible for final go/no-go.
+- Incident Captain: default oncall if an active SLO breach occurs.
+
+Prerequisites (checklist)
+1) Baseline capture: capture 72h of production telemetry for the impacted service (p50/p90/p99 latency, error_rate, tokens_per_second, queue_depth, cpu_util, gpu_util, memory_free). Save as artifacts in the experiment run.
+2) Running synthetic canaries: at least two active synthetic canaries that exercise hot-path prompts and long-context flows for the model family.
+3) Shadow ingest point: traffic-mirroring route or replay harness available in sandbox/qa that can run parallel to prod without altering downstream state.
+4) Rollback mechanism: pre-tested rollback (route pin, admission disable, or autoscale revert) documented and executable within 5 minutes.
+5) Communication: runbook channel created (#capacity-proof-<service>) and stakeholders paged 30m before start.
+
+Experiment matrix (examples)
+- Shadow test: mirror 100% of production read-only traffic to the test pool for 30–120 minutes. Verify that metrics in shadow pool are within tolerance of baseline.
+- Replay test: replay 1h of recorded peak traffic at 0.25x, 0.5x, 1x to the test pool, observing latency and error patterns under controlled admission.
+- Staged admission: canary 1% -> 5% -> 20% -> 100% using traffic-splitter with 15–30 minute holds and automated health gates.
+- Stress ramp: add synthetic burst (2–3x baseline) for 10 minutes to validate autoscale reaction and queue behaviour.
+
+Acceptance criteria (pass/fail gates)
+- SLO gates (hard): p99_latency increase <= 20% relative to baseline AND p99_latency absolute < service SLO threshold (e.g., <250ms for generation-api) AND error_rate not exceed 0.1% absolute or 2x baseline (whichever is smaller).
+- Resource safety gates: GPU_util <= 95% sustained, CPU_util <= 85%, memory_free > 10%.
+- Behavioral gates: no new tail-failure signatures (OOM, connection reset burst, KV cache hash-mismatch) and no increase in token-drop events.
+- Observability gates: synthetic canaries successful (response correctness checks) and no missing telemetry traces for >1 minute.
+
+Experiment execution steps (runbook)
+1) Plan and record: open a capacity-proof PR with: change summary, expected impact, experiment plan (traffic types, durations, metrics to monitor), rollback plan, and runbook channel. Attach list of artifacts to collect.
+2) Kickoff: 30m notice in #capacity-proof-<service>. Confirm all roles present and telemetry dashboards are visible.
+3) Baseline snapshot: run the baseline capture script and commit artifacts to the PR.
+4) Shadow run: enable traffic mirror to test-pool; mark traffic as read-only if necessary. Run for the planned duration (30–120 minutes).
+5) Evaluate: SRE Observer compares shadow metrics to baseline. Use gating tool (see tooling section) to evaluate pass/fail. If pass, proceed; if fail, run rollback and file an incident if SLOs affected.
+6) Replay run: if applicable, run replay at incremental multipliers. Collect logs, traces, and enqueue lengths.
+7) Staged admission: use traffic-split controller to promote % traffic as per plan. Hold at each stage for the configured hold window and check gates.
+8) Ramp stress: perform synthetic bursts to exercise autoscale. Confirm autoscale completed within configured TTI (time-to-increase) and no evictions.
+9) Close: once all stages pass, update run PR with final evidence and mark experiment as completed. If any stage fails, execute rollback and open an incident label "capacity-proof-failure" with attached evidence.
+
+Rollback & emergency actions
+- Immediate rollback: set traffic-split to 0% to test pool OR disable admission controller to route to fallback model variant. Expected execution time: < 60s for control-plane change, verification window 5m.
+- Evacuation: for severe resource pressure, scale down new pool and spin up pre-warmed fallback pool.
+- Post-rollback evidence: collect a 30m timeline of key metrics and traces and attach to incident ticket.
+
+Artifact bundle (what to include in PR and incident)
+- Baseline snapshot file (JSON): 72h aggregates and 1m granularity p50/p90/p99 and error counts.
+- Shadow/replay logs: capture IDs, timestamps, sample requests/responses (anonymized), and traces.
+- Autoscale events: timestamps and decisions from cluster Autoscaler and pool-manager.
+- Telemetry checks: canary results, trace sampling coverage report, alert triggers.
+- Resource graphs: GPU/CPU/memory/utilization and queue depth plots.
+
+Telemetry specification (minimum required metrics)
+- request.p50_latency_ms, request.p90_latency_ms, request.p99_latency_ms (1m granularity)
+- request.error_rate (5m), request.success_count (1m)
+- gpu.utilization_percent (1m), cpu.utilization_percent (1m), memory.free_bytes (1m)
+- queue.depth (1m), kvcache.hit_rate (1m)
+- autoscale.desired_replicas, autoscale.actual_replicas (event stream)
+- synthetic.canary.success (boolean), synthetic.canary.latency_ms
+
+Operational tooling (automations & commands)
+- gating CLI: capacity-gate evaluate --baseline ./baseline.json --current ./snapshot.json --rules ./gates.yaml  # returns PASS/FAIL and evidence summary
+- mirror control: infra-cli mirror enable --service inference-gateway --target test-pool --mode read-only
+- replay harness: replay-run --recording-id <id> --multiplier 0.5 --target test-pool --sample-rate 0.1
+- traffic split: traffic-split set --service inference-gateway --variants prod=95,test=5
+- quick rollback: traffic-split set --service inference-gateway --variants prod=100,test=0; autoscale apply --pool <pool> --replicas <previous>
+
+Evidence format and naming convention
+- All experiment artifacts must be uploaded to the repo/run PR and follow: proof/<service>/<YYYYMMDD>-<run-id>-<artifact-type>. Example: proof/inference-gateway/20260112-0427-baseline.json
+- Traces: sampled spans must include tag capacity-proof:run-id and service: <service>
+
+SLO and error-budget considerations
+- Any proof-of-change that risks customer SLOs requires explicit SLO allowance: either a pre-approved error-budget spend from the owning team or a signed exception by SRE steward and product PM.
+- If the experiment causes SLO consumption > 10% of monthly budget, escalate to oncall lead for review and pause subsequent experiments until reconciliation.
+
+Post-change review and incident standards
+- If a degradation occurs during or within 24h after a proof run, follow the incident-review template: page with timeline, hypothesis, evidence bundle, and RCA actions.
+- Evidence must include pre/post baseline comparisons, a list of all runbook commands executed, and the exact traffic-split and autoscale decisions at failure time.
+- Run a small reproducible test in a sandbox and attach results to the postmortem.
+
+Playbook examples (short scenarios)
+1) Routine autoscale policy tweak
+- Change: lower scale-up threshold from 80% to 70% GPU_util for batch-router.
+- Plan: shadow 24h + staged admission 1%->20% over 2h.
+- Gates: p99 latency delta <= 10%, no increase in error_rate.
+- Result actions: if fail, revert threshold and file capacity-proof-failure incident.
+
+2) New quantized model variant rollout
+- Change: introduce int8 model variant for generation.
+- Plan: replay 1h peak at 0.5x, shadow real traffic, staged admission to 10% with synthetic long-context canary.
+- Gates: correctness checks on canary (token-level diff), p99 latency improvement > 10% or no regression, no increase in hallucination alerts.
+
+Governance and continuous improvement
+- Quarterly: report of all capacity proofs executed, pass/fail rates, SLO cost (error-budget consumed), and a lessons-learned digest.
+- Failure taxonomy: classify each failure as "configuration", "capacity mis-estimate", "instrumentation gap", or "unexpected workload shift". Use taxonomy to improve gates and synthetic coverage.
+
+Appendix A — gates.yaml example
+- name: p99_latency_relative
+  metric: request.p99_latency_ms
+  comparator: relative_increase
+  threshold: 0.20
+  window: 300
+- name: error_rate_absolute
+  metric: request.error_rate
+  comparator: absolute_increase
+  threshold: 0.001
+  window: 300
+
+Appendix B — sample CLI sequence (happy path)
+1) git checkout -b capacity-proof/gpu-threshold-change
+2) ./scripts/capture_baseline --service inference-gateway --out proof/inference-gateway/$(date +%Y%m%d)-baseline.json
+3) infra-cli mirror enable --service inference-gateway --target test-pool --mode read-only
+4) capacity-gate evaluate --baseline ./proof/...baseline.json --current ./proof/...shadow-snapshot.json --rules ./gates.yaml
+5) traffic-split set --service inference-gateway --variants prod=99,test=1
+6) hold 20m and evaluate; promote traffic per plan
+
+Contact and escalation points
+- Capacity Platform Slack: #capacity-platform
+- SRE Pager: oncall-sre@example.com (use only if SLO breach observed)
+- Runbook author: Leah Park (leah.park@redwood.ai)
+
+Change log
+- 2025-03-10: Initial draft and adoption by capacity-platform team.
+- 2025-07-22: Added replay multipliers and artifact naming convention.
+- 2026-01-12: Tightened SLO gates and added governance quarterly reporting requirement.
+
+Related templates (links)
+- capacity-proof PR template: /confluence/eng-sre/capacity-planning/capacity-pr-template
+- incident-review template: /confluence/eng-sre/incident-review/post-incident-template
+
+End of document

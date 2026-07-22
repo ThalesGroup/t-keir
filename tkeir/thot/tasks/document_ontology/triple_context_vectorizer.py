@@ -1,4 +1,12 @@
-"""TF-IDF clustering of subjects, objects, and predicates from SVO context."""
+"""Title: Triple context vectorizer
+
+TF-IDF clustering of subjects, objects, and predicates from SVO context.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

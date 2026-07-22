@@ -1,0 +1,5 @@
+# NATOPUB 01408 — Eastern corridor
+
+NATO PUBLICATION EXTRACT
+Subject: interoperability and C4ISR information exchange
+This reference outlines common terminology, message handling, and operational reporting responsibilities for multinational forces.

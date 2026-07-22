@@ -1,0 +1,148 @@
+GPU Oscillation Detection and Auto‑Stabilizer — Cheat Sheet
+
+Overview
+
+This cheat sheet describes a repeatable pattern for detecting GPU allocation oscillation (rapid scale up/down or frequent preemptions/evictions) and an opinionated Auto‑Stabilizer that can be deployed as a lightweight control loop in the fleet controller. It is intended for clusters running Redwood serving workloads (service names: rwd-infer-scaler, rwd-batcher, rwd-shipper).
+
+Why this matters
+
+- Oscillation symptoms: sudden spikes in allocation followed by large evictions (within 1–5 minutes), high job churn, elevated tail latency, and inefficient GPU utilization.
+- Business impact: increased cost (extra launches), latency SLO violations, and customer-facing errors during rollouts.
+
+Detection signals and concrete queries
+
+Monitor the following signals (examples use Prometheus/Thanos):
+
+1) Allocation churn rate (per pool):
+   - PromQL: increase(gpu_alloc_events_total{pool=\"$POOL\"}[5m]) / 5m
+   - Alert if > 0.8 allocations/min for > 10m and stable backlog > 20% of warm_pool_size
+
+2) Eviction spike:
+   - PromQL: increase(gpu_evictions_total{pool=\"$POOL\"}[5m])
+   - Alert if evictions > 4 in 5m or eviction_rate > 2% of running tasks in 5m
+
+3) Thundering backfill (queue growth + launch spike):
+   - Queue: rwd_job_queue_length{pool=\"$POOL\"}
+   - Launch rate: increase(gpu_launch_total{pool=\"$POOL\"}[1m])
+   - Alert when queue_length increases > 30% and launch_rate > 50 launches/min simultaneously
+
+4) 99p latency AND jitter:
+   - PromQL: histogram_quantile(0.99, sum(rate(rwd_request_duration_seconds_bucket[5m])) by (le, route))
+   - Alert when 99p increases > 2x baseline for 15m
+
+Oscillation score (heuristic)
+
+We use a lightweight score (0–100) that sums normalized signals. Tuning knobs live in config: /etc/rwd/auto_stabilizer/config.yaml
+
+- allocation_churn_score = min(40, 20 * allocation_churn_per_min)
+- eviction_score = min(30, 10 * evictions_per_5m)
+- queue_launch_mismatch_score = min(30, 15 * (queue_increase_pct + launch_spike_pct))
+- total_score = allocation_churn_score + eviction_score + queue_launch_mismatch_score
+
+Thresholds:
+- total_score < 30: healthy
+- 30 <= total_score < 60: degraded — notify oncall, no auto action by default
+- total_score >= 60: oscillating — auto stabilizer triggers mitigation
+
+Auto‑Stabilizer mitigation actions (ordered, idempotent)
+
+When total_score >= 60, Auto‑Stabilizer attempts mitigations in sequence. Each action is reversible and has a cooldown (default 10m). The controller records actions in a central audit log (service: rwd-autostab-audit).
+
+Action 1 — Soft throttle launches (duration: 10m)
+- Reduce new GPU launches by setting fleet-controller launch_rate_limit for affected pool to max(10, current_rate * 0.5).
+- Command (kubectl to controller configmap):
+  kubectl patch cm rwd-fleet-config -n rwd-system --type merge -p '{"data":{"launch_rate_limit":"{\"pool-123\":\"20\"}"}}'
+- Rationale: gives warm pool and KV caches time to settle and avoids thundering herd.
+
+Action 2 — Prefer warm nodes and backfill policies
+- Enforce placement policy: prefer nodes with last_seen_ready < 30m and last_eviction_count == 0.
+- Update placement priority via API: POST /internal/v1/pools/{pool}/placement with body {"prefer_warm":true,"min_warm_age":1800}
+
+Action 3 — Increase eviction buffer (ephemeral)
+- Temporarily increase per‑tenant eviction buffer to 10% (from default 2%) so the scheduler reduces preemptive evictions.
+- Terraform variable path: module/fleet/variables.tf var eviction_buffer_percent
+- Example terraform override: var.eviction_buffer_percent = 10
+
+Action 4 — Gradual scale policy (hard rollback prevention)
+- Switch pool from aggressive-reactive to smoothing policy (exponential backoff on scale down).
+- Config snippet (YAML):
+  scale_policy:
+    mode: smoothing
+    scale_down_cooldown_seconds: 900
+    min_stable_time_seconds: 600
+
+Action 5 — Canary route fallback
+- If oscillation coincides with a recent model rollout, temporarily route a configurable percentage (default 20%) of traffic to a pinned model variant in a different pool/region. See service: rwd-router.
+
+Operational run steps (when auto action fires)
+
+1) Oncall receives alert or sees autostab audit event.
+2) Triage: verify the total_score and examine the last 30m of metrics (allocation, evictions, queue length, 99p latency).
+3) If an action is in progress, confirm the cooldown and outcome. If not, trigger manual mitigation (repeat Auto‑Stabilizer actions as needed).
+3) If oscillation persists after Action 3 for > 30m, escalate to {owner_team: "eng-infra"} and open an incident. Include logs: rwd-autostab-audit, fleet-controller events, kube events for affected nodes.
+
+Checklist for escalation
+
+- Collect: last 60m Prometheus graphs for the four signals above.
+- Collect: controller logs (rwd-infer-scaler, rwd-fleet-controller) from the 30m window beginning at first anomaly.
+- Provide: last deployment IDs for model-serving images and any IaC changes in the last 24h (terraform plan/apply IDs).
+
+Playbook knobs (config file example)
+
+-- /etc/rwd/auto_stabilizer/config.yaml (YAML excerpt) --
+pool_configs:
+  pool-123:
+    allocation_churn_threshold: 0.8 # allocs per min
+    eviction_threshold_5m: 4
+    queue_increase_pct_threshold: 0.3
+    total_score_threshold: 60
+    cooldown_seconds: 600
+    action_sequence: [throttle_launches, prefer_warm, increase_eviction_buffer, smoothing_policy, canary_fallback]
+
+Testing and local chaos experiments
+
+Before enabling Auto‑Stabilizer in production pools, run the following:
+
+1) Canary cluster: enable autostab in a non‑critical pool with 25% of production load for 48h.
+2) Inject allocation churn using the test harness: rwd-loadgen --target-pool pool-canary --rate 200 --burst 500 --duration 20m
+3) Validate that autostab reduces launches and that throughput degradation is < 15%.
+
+QA metrics to collect:
+- median latency change, 99p latency, total GPU-hours used, number of launches, number of evictions.
+
+Operational cautions and known limitations
+
+- Auto‑Stabilizer is a mitigation — it reduces thrash but does not replace capacity planning. If a pool is saturated for sustained periods (> 24h), file a capacity growth ticket.
+- Interactions with tenant quotas: throttling launches may cause longer queues and impact customer SLAs; make conservative thresholds for production high‑priority tenants.
+- Stateful jobs: the pattern assumes ephemeral stateless GPU tasks. For stateful streaming/offline jobs coordinate with owning teams before applying action 3 (increase eviction buffer).
+
+Ownership and rollout plan
+
+- Owner: eng-infra (primary), eng-serving-runtime (secondary for scheduler integration).
+- Rolling enablement: staged by environment (dev -> staging -> prod-canary -> prod-global). Each stage requires 48h monitoring and sign‑off.
+
+SLOs and success criteria for enabling Auto‑Stabilizer in a pool
+
+- Post‑enablement targets (measured over 7 days):
+  - allocation churn rate reduced by >= 60% during incidents
+  - eviction rate reduced by >= 50%
+  - 99p latency not degraded by more than 10% compared to baseline
+
+Appendix: useful commands and artifacts
+
+- View autostab audit log: kubectl -n rwd-system logs deploy/rwd-autostab-audit --tail 200
+- Force a manual throttle: curl -X POST -H 'Authorization: Bearer $TOKEN' https://controlplane.internal/api/v1/pools/pool-123/actions -d '{"action":"throttle_launches","params":{"rate":20}}'
+- Promote smoothing policy via Terraform: cd infra/modules/fleet && terraform apply -var 'pool=pool-123' -var 'smoothing=true'
+
+Contacts
+
+- Primary owner: eng-infra oncall (pagerduty: eng-infra-pgd)
+- Secondary: serving-runtime (Slack: #serving-runtime-ops)
+
+Change log
+
+- v1.0 (2025-11-02): initial draft and canary test plan.
+- v1.1 (2025-12-15): added eviction buffer action and terraform override examples.
+- v1.2 (2026-02-15): tightened scoring thresholds, added canary fallback step and PromQL examples.
+
+Concise operational guide to detect oscillatory scheduling/scale behavior in GPU pools and a lightweight automatic stabilization pattern (Auto‑Stabilizer) that reduces thrash without compromising throughput.

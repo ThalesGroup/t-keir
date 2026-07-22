@@ -1,0 +1,157 @@
+Runtime Fidelity: Onboarding & Consumption Playbook
+
+Overview
+
+This playbook describes the recommended approach to onboard customers onto Runtime Fidelity profiles, how to measure and simulate consumption, and how to package pricing and SLAs for predictable economics. It combines a product overview, prerequisites, technical onboarding steps, pricing guidance, rollout milestones, and operational runbooks to enable cross-functional delivery (Product, Solutions, Sales, SRE, and Engineering).
+
+Motivation
+
+As customers adopt Redwood Inference across hosted, dedicated and private deployments they require: predictable latencies, clear fidelity tradeoffs, and transparent billing. Fidelity profiles (a bundle of model variant, quantization, and runtime configuration) enable customers to trade cost for output quality under well-defined SLOs. This doc standardizes onboarding and consumption simulation to reduce regressions and commercial disputes.
+
+Scope
+
+- Audience: Product managers, Solutions Engineers, Customer Success, Sales, Runtime Engineers, SRE.
+- Applies to: Hosted API, Dedicated pools, and Private VPC deployments.
+- Excludes: Marketplace third-party models (see reference design for third-party adapters).
+
+Definitions
+
+- Fidelity profile: Named configuration combining a model variant, quantization level, KV-cache behavior, batching target, and runtime kernel hints.
+- Consumption unit: Token-equivalent used for billing and simulation (see Pricing section).
+- Soft-fidelity SLO: Non-contractual quality target measured by eval prompts and acceptance thresholds.
+
+High-level product overview
+
+- Customers select a fidelity profile per route.
+- The platform enforces runtime parameters and emits telemetry that maps to cost and quality.
+- The Onboarding flow validates economics and quality via a Simulation Run, then issues entitlements (credits or SLO guarantees) as part of commercial packaging.
+
+SLOs and acceptance criteria
+
+- Latency (hosted): p95 <= 150ms for conversational short-turns (<=128 tokens).
+- Latency (dedicated): p95 <= 120ms for pinned GPU pools.
+- Availability: 99.95% monthly for Dedicated customers (see SLA appendix).
+- Quality guardrail: regression < 2% on tenant preflight eval set (measured by ROUGE-like metric provided during onboarding).
+
+Onboarding flow (recommended)
+
+1. Discovery (Sales/SE): Collect target routes, expected qps, latency sensitivity, and example prompt sets.
+2. Baseline capture (Customer+SE): Capture 24–72 hours of representative traffic samples or synthetic approximations.
+3. Simulation run (Product): Run traffic through the Fidelity Simulator with 3 candidate profiles (High, Balanced, Low cost).
+4. Acceptance test (Customer): Stakeholder reviews fidelity evals (10–50 prompts) and signs off on chosen profile.
+5. Entitlements & packaging (Finance/Product): Map selected profile to pricing tier, SLA, and crediting (if applicable).
+6. Rollout (Engineering/SRE): Canary deploy profile on 1–5% traffic, monitor signals for 72 hours, then expand.
+7. Post-rollout (CS/Product): QBR + adjustments to profile parameters as usage stabilizes.
+
+Simulation run: steps and checklist
+
+- Inputs: representative request payloads, session distribution (session length histogram), expected concurrency, and acceptance prompts.
+- Engine: Fidelity Simulator (internal tool: fidelity-sim). Use the following CLI to run a smoke simulation:
+
+$ fidelity-sim run --profile balanced-2028 --input sample-traffic.json --duration 1h --out ./sim-results.json
+
+- Required checks: token-per-response distribution, latency p95, model fallbacks triggered, cache hit rates.
+- Output artifacts: sim-results.json (telemetry snapshot), fidelity-eval-report.md, cost-estimate.csv.
+
+Packaging and pricing guidance
+
+We recommend three packaged fidelity tiers for commercial offers. Table below shows suggested mapping; adjust for enterprise negotiations.
+
+| Tier | Typical use case | Runtime config (example) | Expected relative cost | Commercial addon |
+|------|------------------|--------------------------|------------------------|------------------|
+| Fidelity:Premium | Latency-critical, high-Q | Model: variant-v3, quant: fp16, batching: low, KV-cache: full | 1.6x baseline | SLA 99.95%, priority support |
+| Fidelity:Balanced | General-purpose conversational | Model: variant-v2, quant: int8, batching: adaptive | 1.0x baseline | Standard SLA, telemetry retention 30d |
+| Fidelity:Economy | High-throughput, cost-sensitive | Model: variant-v1, quant: int8-q4, batching: aggressive | 0.55x baseline | Best-effort fallback to lower-cost models |
+
+Pricing considerations (rules of thumb)
+
+- Baseline unit: 1 consumption unit = 1k tokens equivalent for bundled pricing.
+- Convert sim-estimate tokens -> consumption units and round up to nearest bundle.
+- Offer warm capacity credits for dedicated customers to smooth bursts (recommended: 10–20% of committed qps).
+- Preemptible or spot-backed capacity should have explicit crediting rules and shorter SLA windows.
+
+Telemetry schema and signals to monitor
+
+- Required telemetry fields: profile_name, route_id, tenant_id, tokens_in, tokens_out, model_variant, quantization_tag, batch_size, processing_time_ms, cache_hit, fallback_reason (nullable).
+- Key derived metrics: cost_per_1k_tokens, p95_latency_ms, fallback_rate, quality_regression_score, kv_cache_hit_percent.
+- Alert thresholds (sample): fallback_rate > 2% over 10m => SEV3; p95_latency increase > 40% vs baseline => SEV2.
+
+Operational runbook: fidelity-related incidents
+
+1. Detect: fidelity-alerts dashboard surfaces spikes in fallback_rate or quality_regression_score.
+2. Triage: Check firmware/runtime kernel mismatch, quantization fallback logs, and capacity pressure metrics.
+3. Mitigate: Temporarily route affected tenant to an alternative fidelity profile (canary rollback) using routing policy "fidelity-fallback-route".
+4. Postmortem: Capture root cause, update profile compatibility matrix and add regression prompts to tenant's preflight set.
+
+Developer API and SDK examples
+
+- Example JSON route configuration (HTTP):
+
+POST /v1/routes HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "route_id": "support-chat-v1",
+  "default_fidelity_profile": "balanced-2028-01",
+  "max_tokens": 1024,
+  "model_hints": ["variant-v2","batching:auto"],
+  "telemetry_enabled": true
+}
+
+- Sample SDK usage (pseudo-code):
+
+client = RedwoodClient(api_key)
+response = client.chat.create(route="support-chat-v1", messages=payload, fidelity_profile="balanced-2028-01")
+
+Rollout roadmap and milestones (quarterly)
+
+- Q3 2028: Launch public playbook and fidelity-sim v1.0; pilot with three enterprise customers.
+- Q4 2028: Add automated fidelity-advisor suggestions in Console (beta).
+- Q1 2029: Offer packaged warm-capacity credits bundled in Dedicated SKUs.
+
+Governance and configuration control
+
+- Fidelity profiles are versioned (semver-like): profile-name:major.minor (e.g., balanced-2028-01). Changes that impact model outputs require an approval from Product + Applied ML and must be accompanied by a regression report.
+- All changes to commercial mappings must go through Finance & Legal review and SRE capacity signoff.
+
+Quality & regression management
+
+- Each tenant has a preflight prompt set (10–100 prompts) collected during onboarding. Every profile change runs the preflight set and reports delta metrics.
+- If regression > 2% on the preflight set, the profile change is blocked from rollout.
+
+Commercial escalation and credits policy
+
+- If a fidelity profile causes a catastrophic regression (production-quality drop > 8% on customer preflight set), issue a remediation credit equal to 5% of that month’s consumption for the affected routes.
+- Credits for degraded latency (p95 above contractual threshold for >72 hours) are tiered at 2% / 5% / 10% depending on SLA deviation.
+
+Appendix A: Compatibility matrix (excerpt)
+
+| Model Variant | Quantization | Supported runtimes | Recommended use |
+|---------------|--------------|--------------------|-----------------|
+| variant-v3 | fp16 | v3-runtime, dedicated GPUs | Premium conversational, long-context |
+| variant-v2 | int8 | v2-runtime (hosted + dedicated) | Balanced conversational |
+| variant-v1 | int8-q4 | v1-runtime (edge-friendly) | High-throughput, cost-sensitive |
+
+Appendix B: Release notes (v1.0)
+
+- Release date: 2028-07-14
+- Highlights: Public playbook publication; fidelity-sim v1 with end-to-end token-cost simulation; three packaged fidelity tiers defined; default telemetry schema standardized.
+- Known limitations: Quantization-aware evals are best-effort; hybrid private deployments may require additional network profiling during Simulation Run.
+
+Appendix C: Owners and contacts
+
+- Product owner: Priya Nambiar (product@redwood.ai)
+- Runtime lead: Ethan Morales (eng-serving-runtime)
+- Applied ML reviewer: Li Wei (applied-ml)
+- Customer success liaison: Sophia Patel
+
+Appendix D: Quick checklist for Solutions Engineers (deliverables)
+
+- [ ] Capture sample traffic (24h).
+- [ ] Run fidelity-sim and attach sim-results.json.
+- [ ] Present fidelity-eval-report to customer and capture signoff.
+- [ ] Apply profile and run 1% canary for 72h.
+- [ ] Schedule QBR at 30 days.
+
+If you have questions about mapping to contracts or need a custom fidelity profile, contact product@redwood.ai or open a ticket in #fidelity-onboarding.

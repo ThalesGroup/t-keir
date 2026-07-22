@@ -1,0 +1,172 @@
+SLO Simulation Harness and Decision Runbook
+
+Summary
+
+This document describes the SLO Simulation Harness: a reproducible test harness used by SRE to evaluate SLO changes, autoscaling policies, throttling rules, and tenant-impact tradeoffs against historical and synthetic traffic. The goal is to produce a deterministic decision artifact (simulation report + decision matrix) that feeds into rollout gates, change approvals, and incident postmortems.
+
+Goals
+
+- Validate proposed SLO or autoscaler changes against realistic traffic and failure modes before production rollout.
+- Quantify error-budget consumption, latency tail risk, and tenant impact for candidate policies.
+- Provide a clear decision output (pass/warn/fail + prescribed mitigations) for oncall and capacity owners.
+
+Scope
+
+- Applies to model-serving, general inference endpoints, and control-plane operations that affect request routing (e.g., regional failover, model-variant downgrade, capacity rebalancing).
+- Not intended for unit-level kernel optimization testing (those remain in eng-serving-runtime bench suites).
+
+Terminology
+
+- Simulation run: an execution of the harness using a specific traffic trace + policy config.
+- Reference trace: a historical capture (1–30 days) of production telemetry used as input.
+- Synthetic scenario: generated events to exercise edge cases (DDOS-like bursts, infrastructure loss, KV cache warmup).
+- Decision artifact: simulation report, risk score, and recommended gating action.
+
+Architecture overview
+
+The harness consists of three logical components:
+
+1. Ingest layer: converts telemetry (observability metrics, request traces, token distributions) into the harness native format (newline-delimited JSON events). Supported sources: Prometheus HTTPlabels+histograms export, tracing replay collector, and internal request-logger export.
+
+2. Executor: a deterministic event-driven simulator that replays requests through a model of the serving stack (queues, worker pools, batching, KV cache hit-ratio model, and failure injection points). The executor supports pluggable policy modules: throttler, autoscaler, routing policy, model-variant fallback.
+
+3. Reporter & decision engine: aggregates per-tenant SLO consumption, tail latency distributions, and resource utilization, then computes a risk score and recommended action using a configurable decision matrix. Output is a JSON report and an HTML summary for reviewers.
+
+Inputs and formats
+
+- Trace format (NDJSON): {
+  "timestamp": "ISO-8601",
+  "tenant_id": "string",
+  "route": "/v1/generate",
+  "tokens_requested": 128,
+  "observed_latency_ms": 42,
+  "status": "ok|error|timeout",
+  "cache_hit": true|false
+}
+
+- Policy config (YAML/JSON): throttling thresholds, burst windows, autoscaler min/max, model-variant fallback order, and allowed degradation tiers.
+
+- Failure scenarios: node-loss (N GPUs down in region R), high-network-ebs-latency, degraded-KV-cache (hit ratio drop to X%), cold-cache ramp-up.
+
+Running a baseline simulation
+
+Prerequisites: harness-cli v0.9+, Python 3.10, at least 16Gi local memory (simulator memory depends on trace size).
+
+Steps:
+1) Prepare trace file: exports/trace-2025-11-01.ndjson
+2) Prepare policy file: policies/candidate-autoscale-2026-01.yaml
+3) Run: harness-cli simulate --trace exports/trace-2025-11-01.ndjson --policy policies/candidate-autoscale-2026-01.yaml --scenario node-loss-1-region-eu --out reports/run-2026-02-03.json
+
+Quick example command and flags:
+
+```
+# run deterministic replay with 3x synthetic burst
+harness-cli simulate \ 
+  --trace exports/trace-2025-11-01.ndjson \ 
+  --policy policies/experimental-throttle.yaml \ 
+  --scenario synthetic-burst-3x --out reports/exp-throttle-burst3x-2026-02-03.json \ 
+  --seed 42 --concurrency 8
+```
+
+Interpreting results
+
+The reporter generates:
+- per-tenant error-budget consumption (EBC) as a percentage of monthly budget,
+- tail latency percentiles (P50/P95/P99/P999) for each route,
+- resource utilization curves (GPU occupancy, queue lengths),
+- failure counts and time-to-recovery (simulated).
+
+Decision score (0–100): composite of EBC, tail-latency-multiplier, and tenant-impact-weight. Default thresholds: 0–30 = pass, 31–60 = warn, 61+ = fail. These thresholds are configurable in decision-matrix.yaml.
+
+Decision matrix (excerpt)
+
+| Decision score | Primary action | Secondary mitigations | Approver |
+|---:|---|---|---|
+| 0–30 | Approve for canary rollout | N/A | Service owner + SRE oncall |
+| 31–60 | Approve with constraints | Limit tenant concurrency, reduce canary size to 1% | Service owner + SRE lead |
+| 61+ | Block rollout | Revert policy + introduce autoscaler guardrails | SRE manager + Product PM |
+
+Runbook: when a simulation blocks a change
+
+1. Attach the simulation report to the change request (CR).
+2. Triage with the change author and SRE oncall: identify the dominant risk factor (EBC spike, tail latency, tenant impact).
+3. If blocking due to high tenant impact: propose mitigation (rate limits, pre-warmed cache, progressive rollout).
+4. If blocking due to infrastructure loss sensitivity: add redundancy (cross-region fallback) or reduce min replica scaling window.
+5. Re-run simulation with proposed mitigations. Document acceptance criteria (decision score <= 30 or specific P99 threshold met).
+
+Incident-review integration
+
+- For incidents involving SLO regression, attach the incident trace to the harness and run an incident-shaped simulation to reproduce the regression. This produces an evidence report that becomes part of the postmortem.
+- Use the "root-cause scenario" mode to inject the same failure pattern (node loss, cache degradation) and verify whether a proposed remediation would have prevented the regression.
+
+Operationalizing the harness
+
+- Scheduled nightly: run a smoke simulation against a 24h rolling trace with current production policy; publish a short report to #sre-telemetry.
+- Pre-release: CI pipeline step that triggers the harness for PRs that modify policies under /policies/autoscale/* and blocks merges on fail decisions.
+- Runbook owners (see Ownership section) must maintain policy templates and decision thresholds.
+
+Acceptance criteria for policy changes
+
+- Candidate policy must achieve decision score <= 30 on at least two representative traces (one weekday, one weekend), OR
+- If score in 31–60, service owner provides mitigation plan with measurable constraints; SRE lead to sign off.
+
+Ownership and escalation
+
+- Harness owner: eng-sre/operational-tooling (primary: Marisol Vega).
+- Decision matrix steward: SRE manager (primary: Liam O'Connor).
+- Oncall escalation: if a pre-release simulation fails on CI, the author and SRE oncall must reconcile within 24 hours or the CR is auto-blocked per change-management policy.
+
+Templates and artifacts
+
+- report JSON: includes metadata, per-tenant EBC, p99s, resource curves, and decision score. Example keys: run_id, trace_id, policy_id, decision_score, top_risks.
+
+Example policy snippet (YAML):
+
+```
+policy_id: experimental-autoscale-2026-01
+autoscaler:
+  min_replicas: 4
+  max_replicas: 64
+  scale_window_sec: 45
+  target_p95_ms: 200
+throttler:
+  global_rps_limit: 12000
+  per_tenant_token_bucket: 5000
+fallbacks:
+  - model_variant: small-quantized
+    max_degradation: 0.25
+```
+
+Acceptance evidence to record in the CR
+
+- simulation report (JSON) zipped with reference traces used, seed value, and policy file.
+- decision matrix output and reviewer sign-offs.
+- CI run link if the harness was used in PR gating.
+
+Health metrics for the harness itself
+
+- Simulation run time (median, 95th), to ensure CI budgets are reasonable.
+- Reproducibility rate: percent of runs with identical decision_score for same seed+inputs.
+- Coverage: percent of production routes exercised by nightly smoke traces.
+
+Future enhancements backlog (short list)
+
+- Integrate tighter with rollout automation to allow automated progressive rollouts when decision score is in warn band.
+- Add GPU memory fragmentation model to better predict cold-start tail latency during heavy variant switching.
+- Support automatic mitigation generation (suggested throttle + canary size) based on risk heuristics.
+
+Appendix: Troubleshooting tips
+
+- If report shows unexpectedly high P999 but production does not: verify trace fidelity (headers, cache markers) and ensure KV-cache model parameters match current telemetry.
+- If run fails nondeterministically: increase seed logging and check for uninstrumented randomness in custom policy modules.
+
+Contact
+
+- Primary contact: Marisol Vega (marisol@redwood.ai)
+- Tooling Slack: #sre-harness
+
+Revision history
+
+- 2025-11-12 Priya Shah — initial draft
+- 2026-01-20 Marisol Vega — added decision matrix and CI gating notes
+- 2026-02-03 Liam O'Connor — formalized ownership and acceptance criteria

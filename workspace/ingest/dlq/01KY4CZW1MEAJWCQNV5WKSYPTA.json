@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4CZW1MEAJWCQNV5WKSYPTA",
+  "reason": "'source_doc_id'",
+  "job": {
+    "ingest_id": "01KY4CZW1MEAJWCQNV5WKSYPTA",
+    "correlation_id": "b046bee3ab85c4dda9545b241bf0e2af",
+    "status": "failed",
+    "doc_id": "359744b4c8e87056f9931eb78037e8b227b10ba2dd7fd5c93a31fa6cd04d0552",
+    "batch_id": null,
+    "manifest_path": "staging/359744b4c8e87056f9931eb78037e8b227b10ba2dd7fd5c93a31fa6cd04d0552/ingest.manifest.json",
+    "error": "'source_doc_id'",
+    "created_at": "2026-07-22T07:52:36.660Z",
+    "updated_at": "2026-07-22T07:52:47.785Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4CZW1MEAJWCQNV5WKSYPTA",
+    "correlation_id": "b046bee3ab85c4dda9545b241bf0e2af",
+    "doc_id": "359744b4c8e87056f9931eb78037e8b227b10ba2dd7fd5c93a31fa6cd04d0552",
+    "source": {
+      "uri": "upload://01KY4CZW1MWCFJ2319W4A8H4JM/NATOPUB_00100_524f93ff.json",
+      "filename": "NATOPUB_00100_524f93ff.json",
+      "content_type": "application/octet-stream",
+      "size_bytes": 504
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T07:52:38.542Z",
+    "error": "'source_doc_id'"
+  },
+  "failed_at": "2026-07-22T07:52:47.787Z"
+}

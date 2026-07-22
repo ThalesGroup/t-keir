@@ -1,4 +1,12 @@
-"""Tests for pipeline task dependency resolution."""
+"""Title: Pipeline Tasks
+
+Tests for pipeline task dependency resolution.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import pytest
 

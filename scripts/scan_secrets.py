@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Scan git-tracked files for accidentally committed secrets."""
+"""Title: Scan secrets
+
+Scan git-tracked files for accidentally committed secrets.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

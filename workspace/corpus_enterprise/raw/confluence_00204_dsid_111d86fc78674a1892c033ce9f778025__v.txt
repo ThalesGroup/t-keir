@@ -1,0 +1,124 @@
+Value Canvas for Platform and Security Buyers
+
+Purpose
+This page is a compact, buyer-centric evidence pack designed for technical and security stakeholders during evaluation and procurement. It bundles a one-page value canvas, competitive positioning, pricing canvases with worked examples, a short customer case pack, and a curated security FAQ and CISO script. Use this during technical discovery, CISO briefing calls, and pricing negotiations to accelerate trust and removal of procurement blockers.
+
+One-line positioning statement
+Redwood Inference: a production-first inference runtime and control plane that reduces per-token cost while keeping predictable latency and enterprise-grade controls across hosted, dedicated, and private deployments.
+
+One-page value canvas (use during buyer calls)
+- Buyer persona: Platform/Cloud Architects, Platform Engineers, Security Officers (CISO), Head of ML/AI
+- Key problems they care about:
+  - Predictable unit economics and lower per-token cost for high-volume workloads
+  - Consistent latency and SLAs across dev/prod and multi-region deployments
+  - Data residency, auditability, and isolation for regulated workloads
+  - Fast integration and rollback paths for model changes and regressions
+- Redwood levers (how we create value):
+  1) Intelligent batching + KV/prefix caching — reduces per-token CPU/GPU utilization by up to 30–60% on chat workloads
+  2) Smart routing & model fallbacks — keeps critical endpoints online by routing to lower-cost compatible variants on capacity constraints
+  3) Dedicated capacity and isolation — reserved GPU pools with predictable throughput and optional burst buckets
+  4) Private deployment (VPC/on-prem) — network isolation, customer-managed KMS, and audit log shipping
+  5) Optimize toolkit — workload-specific quantization and batching recommendations to balance quality versus cost
+
+Decision checklist for procurement/architecture
+- Required: SOC 2 Type II, contractual SLAs for Dedicated customers (99.9% uptime target), data processing addendum (DPA)
+- Recommended: Onboarding workshop with Solutions Engineering, a 2-week proof-of-value pilot with 1–2 production traffic routes, a conservative canary rollout plan (10% traffic -> 50% -> 100%)
+- Optional: Private deployment or VPC peering for regulated data; HSM integration for keys
+
+Competitive brief (how to win common objections)
+- Against large managed cloud vendors:
+  - Differentiator: inference-first runtime and tuned kernels that reduce unit cost for generation-heavy workloads. Provide comparative throughput benchmarks and real customer token costs rather than VM-hour arguments.
+  - Common objection: "We already have cloud GPU infra." Rebuttal: Show total-cost-of-serving for production traffic (token unit economics) factoring in batching, KV cache hit rates, prefix reuse, and reserved capacity amortization.
+- Against smaller self-hosted runtimes:
+  - Differentiator: unified control plane + managed upgrades, rollouts, and observability (cost by token, per-route latency histograms, model regressed-output alerts).
+  - Common objection: "We prefer owning everything." Rebuttal: Offer dedicated/private deployment options and a transition plan that lets them retain operational control with Redwood operational guidance.
+
+Deck outline (8 slides, 6–8 minutes for technical buyer)
+1) Title + TL;DR value (quantified): e.g., "30–45% reduction in per-token cost for recommendation chat workloads; p95 latency under 200ms for small gen models with Dedicated."
+2) Buyer problems and decision criteria (latency, unit cost, isolation, SLAs)
+3) How Redwood works (runtime, smart routing, caching, deployment modes) — include simplified diagram: Control plane -> Routing -> Serving runtime -> KV cache -> GPU pool
+4) Performance evidence (throughput and latency charts) — include p50/p95/p99 tables, example: p95=160ms (gpt-small), p99=420ms (long seq)
+5) Pricing canvases (worked examples) — see pricing scenarios below
+6) Security & compliance (SOC 2, KMS/HSM, audit logs, VPC)
+7) Pilot plan + success metrics (SLOs, cost targets, go/no-go criteria)
+8) Ask and next steps (technical PoV, procurement contacts, legal docs)
+
+Pricing canvases (worked examples to leave with buyer)
+- Assumptions used across scenarios:
+  - 30M tokens/day active traffic during POC; 75% generation, 25% embedding/rerank
+  - Baseline p50 latency target: 120–250 ms depending on model class
+  - Redwood hosted price (example): $0.0009 per generation token for L-1 class (illustrative)
+  - Dedicated reserved capacity: $65k/month for a 16-GPU pool (commit) with burst pricing for overflow
+  - Private deployment license: one-time platform fee + ops support retainer (example: $120k + $15k/mo)
+
+Scenario A — Startup pilot (hosted, pay-as-you-go):
+- 30M tokens/day * 30 days = 900M tokens/month
+- Expected monthly hosted cost (generation): 900M * $0.0009 = $810/month (note: illustrative numbers are for conversation — use up-to-date pricing from finance/pricing-engine)
+- Risk reduction: fast ROI, no infra commit, recommended for rapid PoV
+
+Scenario B — Mid-market transition (hybrid):
+- Baseline: 10M tokens/day served on dedicated; 20M tokens/day burst to hosted
+- Dedicated commit: $35k/month (example, smaller pool) -> amortized per-token cost significantly lower than hosted at scale after reaching commit threshold
+- Recommend: 6–12 month commit during which Redwood manages autoscaling and provides cost monitoring dashboards
+
+Scenario C — Enterprise (Dedicated + Private):
+- Dedicated pools, reserved throughput, and private control plane; estimate a blended per-token cost reduction of 30–50% vs pure hosted for sustained throughput >500M tokens/month
+- Typical procurement components: platform license, monthly capacity commitment, onboarding/engineering days, extended support (SLA uplift)
+
+How to present pricing to procurement (negotiation playbook)
+1) Start with value: show expected savings for their workload (use our cost-simulator during call)
+2) Anchor with pilot: low-friction hosted PoV to demonstrate technical fit and measured cost
+3) Move to committed pricing once throughput stabilizes; offer step-down tiered commits and exit clauses tied to performance SLOs
+4) Offer technical credits for migration and referenceable runbooks for their infra team
+
+Customer case pack (leave-behind one-paragraph summaries)
+- Acadia Health (regulated healthcare customer) — challenge: maintain PHI residency and audit for clinical note summarization. Outcome: private deployment with customer-managed KMS, audit log retention pipeline to Splunk, 99.9% uptime SLA on Dedicated. Result: 2x throughput vs prior on-prem tuned CPU fleet and 35% lower per-claim inference cost.
+- Orbit Commerce (ecommerce search and chat) — challenge: bursty seasonal traffic, unpredictable token costs. Outcome: hybrid deployment with dedicated capacity for base traffic and hosted overflow. Result: 40% lower average monthly inference cost and simplified deployment pipelines enabling 3 product launches/year.
+
+Security & CISO FAQ (ready scripts and short answers)
+- Q: How do you ensure data never leaves our VPC?
+  - A: Private deployment option runs control plane in your VPC; model weights and inference runtime remain inside customer-managed network. We provide reference Ansible/Terraform modules for deployment.
+- Q: How are keys managed?
+  - A: We support customer KMS (AWS KMS/GCP KMS/Azure Key Vault) and HSM for private deployments; hosted customers may opt for customer-managed keys via a cross-account KMS integration.
+- Q: Can you provide audit logs and SIEM integration?
+  - A: Yes. We ship structured audit logs (JSON) to your S3/Blob/GCS bucket or directly to SIEM via syslog/forwarder. We also provide request-level tracing IDs and tokenized request bodies for sampling.
+- Q: What compliance evidence do you have?
+  - A: SOC 2 Type II report, penetration test reports (summary), DPA templates, and documented retention & deletion processes. For enterprise engagements we provide onsite security workshops and architecture reviews.
+- Q: How do you protect against model hallucination or data leakage?
+  - A: We provide eval-driven quality guardrails, per-route content filters, and output monitoring with regression alerts. For sensitive workloads we recommend private deployment plus strict rollout policies and conservative model quantization/ensemble patterns.
+
+Technical onboarding checklist (two-week PoV)
+1) Pre-call: collect traffic profile, token mix (gen vs embed), sequence length distribution, and data residency requirements.
+2) Week 0–1: Environment setup — create project, API keys, optional VPC peering or private deployment kickoff, legal DPA signed.
+3) Week 1: Baseline integration — 1 route instrumented, metric collection enabled (latency histograms, token counts, KV cache hit rate).
+4) Week 1–2: Tune and measure — implement batching/prefix caching suggestions, run load profile at 25%, 50%, 100% of expected production load.
+5) Week 2: Canary rollout plan and success criteria: p95 latency target met, <5% error rates, cost per 1k tokens within target range.
+
+Ownership and contacts
+- Sales: Account Executive (AE) — primary commercial contact
+- Solutions Engineering: SE Team (owner of PoV instrumentation and sample prompts)
+- Security: Security Architect (design review and threat model)
+- Legal/Procurement: Contracts lead (legal negotiations and DPA)
+
+Attachments and artifacts to share with buyer
+- One-page value canvas (this doc)
+- Short slide deck (8 slides) and speaker notes
+- Pricing simulator link and an export of scenario workups (CSV)
+- Security evidence pack (SOC 2 summary, pen test summary, DPA template)
+- Short case study PDFs for Acadia Health and Orbit Commerce
+
+How to use this doc in the field
+- Pre-call: send the one-page value canvas and the 8-slide deck to technical buyer two days before the meeting
+- Discovery call: follow the decision checklist and capture their traffic profile into the pricing simulator live
+- CISO call: use the Security & CISO FAQ section as the script; offer an architecture review workshop as the next step
+- Negotiation: present pilot-first anchor and move to committed pricing once PoV metrics are validated
+
+Change log
+- 2029-11-03: Created initial canvas and pricing scenarios (Maya Rodriguez)
+- 2029-12-18: Added Acadia Health case notes and updated dedicated commit examples (Jordan Lee)
+- 2030-01-12: Finalized CISO scripts and added private deployment key management notes (Priya Nair)
+
+References
+- Runtime architecture overview: /confluence/eng-serving-runtime/runtime-architecture
+- Pricing engine and up-to-date host pricing: internal pricing simulator (ask pricing@redwood.com for link)
+- Security evidence index: /confluence/security-and-compliance/compliance-evidence

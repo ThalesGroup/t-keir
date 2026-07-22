@@ -1,0 +1,172 @@
+Graceful fidelity degradation PRD
+
+Title: Graceful fidelity degradation PRD
+
+Overview:
+This PRD describes the user-facing and technical requirements for a Graceful Fidelity Degradation feature: a platform-level capability that reduces model output fidelity in controlled ways when customer-configured SLOs (latency, error rate, cost budget) are at risk. The objective is to preserve availability and acceptable latency by switching to lower-fidelity model variants, structured output with summarization, or token-budgeted responses while guaranteeing predictable cost and automated rollback when pressure abates.
+
+Background and problem statement:
+- Problem: Production applications using Redwood Inference occasionally face capacity or latency pressure (regional outages, batch-surge traffic, cold-starts for private deployments). Current fallbacks are coarse (full model variant swap or throttling) and can cause large quality regressions or customer surprise.
+- Opportunity: Provide a predictable, observable, and recoverable fidelity-degradation surface that application teams can opt into per-route to maintain availability and aligned unit economics.
+
+Goals (success criteria):
+1. Preserve availability for 99.9% of routed requests under transient capacity pressure by reducing per-request compute in controlled steps.
+2. Provide measurable fidelity/quality delta metrics (ROUGE/BLEU/embedding-similarity or custom eval sets) exposed in Console for every degradation step.
+3. Ensure automated rollback to full-fidelity within 30s once SLO metrics return to normal.
+4. Surface cost delta and estimated token savings in the Console and usage APIs.
+5. Allow per-tenant and per-route policy configuration with sensible defaults.
+
+Non-Goals:
+- This feature is not a substitute for long-term capacity provisioning. It will not change billing semantics for token accounting; it surfaces estimated savings but does not change metering.
+- It does not implement model training or quality-improvement techniques beyond variant selection and structured output templates.
+
+Target personas and use-cases:
+- Product engineers building chat assistants who require high availability across regions.
+- Platform/infra teams wanting graceful SLO-preserving behavior without manual playbooks.
+- Customer success teams enabling this for enterprise customers with strict uptime SLAs.
+
+User stories:
+- As a product engineer, I want to configure a per-route fidelity policy so my chat route degrades to a summarization-only response when latency SLO is threatened.
+- As an SRE, I want automated, observable rollback so I do not need to manually re-enable full-fidelity.
+- As a product manager, I want Console charts that show quality delta for each degradation step compared to golden prompts.
+
+High-level approach and design summary:
+- Policy model: per-tenant, per-route JSON policy with prioritized ordered steps (e.g., model-variant -> quantized-variant -> structured-output -> token-cap). Each step includes trigger conditions, max duration, and permissible quality-budgets.
+- Runtime enforcement: Serving runtime will evaluate policies in a sidecar decision path before scheduling a request. Decisions are tagged in traces and logs for observability.
+- Observability: New Console widgets, structured event logs, and trace spans for decisions. Quality metrics are computed asynchronously via lightweight eval proxies and batched against stored prompt-sets.
+
+Functional requirements (must-have):
+1. Policy schema (example) - stored in Config Service and exposed in API:
+
+Example policy JSON (user-visible):
+
+{
+  "max_latency_ms": 250,
+  "steps": [
+    {"id": "variant-a-quant", "type": "model_variant", "variant": "llama-70b-q4a", "triggers": {"p95_latency_ms": 300}},
+    {"id": "summarize-only", "type": "structured_output", "template": "summarize_first_paragraph", "triggers": {"p95_latency_ms": 400}},
+    {"id": "token-cap-200", "type": "token_cap", "max_tokens": 200, "triggers": {"region_capacity_utilization": 0.85}}
+  ]
+}
+
+2. API: PATCH /v1/routes/{route_id}/fidelity-policy to create/update policies.
+3. Console: a policy editor UI with preview of expected behavior for each step and simulated quality deltas using tenant prompt-sets.
+4. Runtime tags: Every degraded request must emit a decision tag with step id and rationale.
+5. Rollback: automatic step reversal when trigger conditions clear for 3 consecutive evaluation windows (configurable, default 3 x 10s).
+6. Opt-in: Default tenant state = disabled. Admins can enable per-tenant compliance mode (required by some enterprise customers).
+7. Observability: Time-series metrics: fidelity.degradation.count, fidelity.degradation.duration, fidelity.quality.delta.mean, fidelity.rollback.count.
+8. Alerts: SLO burn alert when automated degradation triggers > 10% of requests for > 5 minutes for a tenant.
+
+Non-functional requirements (NFRs):
+- Latency overhead: decision layer must add <= 3ms p95 to overall request path when policy checks are cached.
+- Storage: Config entries per route should be < 5KB.
+- Security: Policies are tenant-scoped; only route owners or org admins can modify. Policy changes produce audit log entries.
+- Scalability: Decision service must support 10k policy evaluations/sec in hosted control-plane.
+
+Quality and evaluation metrics:
+- Primary: % availability preserved during simulated pressure (target 99.9%).
+- Secondary: mean quality delta measured by tenant eval-set (target median delta <= 12% for first fidelity step).
+- Cost: estimated per-request compute savings aggregated over a week when enabled.
+
+Policy schema and validation rules (table):
+| Field | Type | Description | Constraints | Default |
+|-------|------|-------------|-------------|---------|
+| max_latency_ms | int | Target latency SLO for route | >50 and <5000 | 250 |
+| steps | list | Ordered degradation steps | 1..5 steps | n/a |
+| step.id | string | Unique step id | Alphanumeric + dashes | required |
+| step.type | enum | model_variant, structured_output, token_cap | one of allowed types | required |
+| step.triggers | object | Trigger predicates | See triggers table | required |
+
+Triggers supported (examples):
+- p95_latency_ms > X
+- region_capacity_utilization > 0.Y
+- error_rate_5m > Z
+
+Rollout plan and milestones:
+1. Discovery & API design (4w): finalize schema, UX mockups, security review. Owner: Product.
+2. Control-plane implementation (6w, parallel): policy store, validation, audit logs. Owner: Eng - Platform.
+3. Runtime integration (8w, parallel): sidecar decision path and tagging. Owner: Eng - Serving Runtime.
+4. Telemetry & Console (6w): ingest metrics, add Console charts, preview. Owner: Eng - Platform + DX.
+5. Canary (4w): enable for 5 pilot tenants (internal and 2 customers) with manual ops rollout.
+6. GA and docs (2w): runbook, migration guide, public docs.
+
+Total expected lead time to GA: ~6 months when run in parallel across teams.
+
+Canary strategy and criteria:
+- Canary targets: internal app (redwood-console), two low-risk customers (consent obtained).
+- Success criteria: degrade invocation latency saved >=20% on average when triggered, quality delta within targets on golden prompts, rollback operates within 30s.
+
+Observability and traces:
+- Trace annotation: fidelity.step_id, fidelity.trigger_reason, fidelity.pre_estimated_cost_savings.
+- New dashboards: Per-tenant fidelity events, per-route decision timelines, quality-delta over time.
+- Light eval proxy: asynchronously scores a sample of degraded responses vs golden outputs and writes fidelity.quality.delta metrics.
+
+Console UX and admin surfaces:
+- Policy editor (advanced mode) + simple toggle view for quick enable/disable.
+- Preview pane that runs 10 selected tenant prompts through simulated steps and highlights the expected change and calculated similarity score.
+- Billing view: projected weekly savings and number of degraded requests.
+
+Pricing & packaging considerations:
+- Feature will be available to Dedicated and Hosted customers; Private customers require on-prem runtime compatibility (see Dependencies).
+- Default offering: included for paid hosted accounts.
+- Enterprise add-on: compliance-mode support (audit retention > 1 year) and SRE-assisted rollout for a fee.
+- Pricing note: this feature only provides estimated savings; it does not change per-token metering. For enterprise contracts that purchase Dedicated reserved capacity, assist with a consultancy bundle to define safe policies and guardrails.
+
+Migration guidance for existing customers:
+1. Audit existing fallback policies and route-level fallbacks.
+2. Create tenant fidelity policy in a staging environment and run Console preview.
+3. Schedule controlled canary; monitor fidelity.quality.delta metrics and SLO burn.
+4. If unacceptable quality delta, tighten triggers or reduce allowed steps.
+
+Operational runbook (short):
+1. Detect: Alert fires when fidelity.degradation.count ratio > 0.1 for 5m.
+2. Investigate: Check Console traces for step IDs and triggers.
+3. Mitigate: If quality regressions exceed thresholds, temporarily set route.policy = disabled for tenant via PATCH API.
+4. Remediate: If regional capacity is the root cause, trigger cross-region failover per existing runbook.
+5. Postmortem: Capture decision timeline and attach to incident.
+
+Security, privacy, and compliance considerations:
+- Policies are tenant-scoped with RBAC. Audit logs record author, timestamp, and diff.
+- For regulated customers, disabling automated degradation is permitted via compliance-mode.
+- The light eval proxy only uses anonymized prompt-sets unless tenant opts in to provide labeled prompts.
+
+Dependencies and risks:
+- Control-plane policy store and Config Service availability.
+- Serving runtime integration complexity (must maintain <=3ms added latency).
+- Risk of customer surprise: need strong Console previews and defaults.
+
+Open questions (to resolve in discovery):
+- Should token-cap steps be metered differently in billing reports? (Finance)
+- What are acceptable default quality deltas per model family? (Applied ML)
+- How to limit cross-tenant test data exposure for light eval proxy? (Security)
+
+Ownership and contacts:
+- Product Owner: Maya Thompson (product)
+- Eng - Platform: Owen Martinez
+- Eng - Serving Runtime: Ethan Park
+- Applied ML / Quality: Rhea Kapoor
+- Customer Success contact for pilot: Priya Desai
+
+Appendices:
+A. Example CLI to preview a route policy:
+
+$ curl -X POST https://api.redwood.ai/v1/routes/rt-123/preview-fidelity \
+  -H 'Authorization: Bearer $TOKEN' \
+  -d '{"policy": {"max_latency_ms":250, "steps": [{"id":"summ","type":"structured_output","template":"summarize_first_paragraph","triggers": {"p95_latency_ms":350}}]}}'
+
+Returns: JSON with simulated outputs, similarity scores, and estimated cost delta.
+
+B. Minimal policy validation pseudo-rules:
+1. steps.length between 1 and 5.
+2. each step.id unique.
+3. triggers reference only supported telemetry keys.
+4. total allowed token caps cannot be lower than 32 tokens.
+
+C. Glossary:
+- Fidelity step: an ordered transformation with lower compute or stricter output budget.
+- Light eval proxy: asynchronous scoring service for quality delta estimation.
+
+Document change log:
+- 2026-09-07: Draft created (Maya Thompson).
+- 2026-09-14: Added policy schema and rollout timeline (Ethan Park).
+- 2026-09-21: Updated console UX notes and canary criteria (Rhea Kapoor).

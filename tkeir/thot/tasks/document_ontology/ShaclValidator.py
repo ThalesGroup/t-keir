@@ -1,4 +1,12 @@
-"""Validate document RDF graphs with SHACL."""
+"""Title: Shacl Validator
+
+Validate document RDF graphs with SHACL.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

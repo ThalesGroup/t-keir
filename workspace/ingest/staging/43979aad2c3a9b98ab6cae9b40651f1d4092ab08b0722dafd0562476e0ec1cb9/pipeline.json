@@ -1,0 +1,2220 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://43979aad2c3a9b98ab6cae9b40651f1d4092ab08b0722dafd0562476e0ec1cb9/meeting_minutes_00252_455a14d6.docx",
+  "title": "AcmeSystems Project ORION Steering Meeting",
+  "content": [
+    "AcmeSystems Project ORION Steering Meeting\n\nMeeting minutes\n\nCompany: AcmeSystems\n\nChair: David Vincent\n\nProject: Project ORION\n\nDecisions: approve the next integration milestone for AcmeSystems Project ORION. Actions: Engineering validates interfaces; Operations prepares rollout. Risks: supplier lead time. Next review is Friday."
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "Decisions"
+        ],
+        "lemma_content": [
+          "decision"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          18
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "approve"
+        ],
+        "lemma_content": [
+          "approve"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          20
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "integration",
+          "milestone"
+        ],
+        "lemma_content": [
+          "integration",
+          "milestone"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          23,
+          24
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Engineering"
+        ],
+        "lemma_content": [
+          "engineering"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          32
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "validates"
+        ],
+        "lemma_content": [
+          "validate"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          33
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "interfaces"
+        ],
+        "lemma_content": [
+          "interface"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          34
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Operations"
+        ],
+        "lemma_content": [
+          "operation"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          36
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "prepares"
+        ],
+        "lemma_content": [
+          "prepare"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          37
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "rollout"
+        ],
+        "lemma_content": [
+          "rollout"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          38
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Next",
+          "review"
+        ],
+        "lemma_content": [
+          "next",
+          "review"
+        ],
+        "pos": [
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          46,
+          47
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "is"
+        ],
+        "lemma_content": [
+          "be"
+        ],
+        "pos": [
+          "AUX"
+        ],
+        "positions": [
+          48
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "Friday"
+        ],
+        "lemma_content": [
+          "Friday"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          49
+        ],
+        "label": "date"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "docx",
+    "source-size-bytes": 1010,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:56:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://43979aad2c3a9b98ab6cae9b40651f1d4092ab08b0722dafd0562476e0ec1cb9/meeting_minutes_00252_455a14d6.docx",
+  "metadata": {
+    "topic_id": "projects",
+    "corpus": "enterprise",
+    "doc_type": "meeting_minutes",
+    "language": "en",
+    "title": "AcmeSystems Project ORION Steering Meeting",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "projects",
+  "doc_type": "meeting_minutes",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999951654733767
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "AcmeSystems",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Project",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ORION",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Steering",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Meeting",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Company",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Chair",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "David",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Vincent",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Project",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Project",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ORION",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Meeting",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "minutes",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Decisions",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "approve",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "next",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "integration",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "milestone",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "for",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Project",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ORION",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Actions",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Engineering",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "validates",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "interfaces",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Operations",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "prepares",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "rollout",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Risks",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "supplier",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "lead",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "time",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Next",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "review",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "is",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Friday",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Project",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "ORION",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Steering",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Meeting",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ORION",
+      "text": "ORION",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Steering",
+      "text": "Steering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ORION",
+      "text": "ORION",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Steering",
+      "text": "Steering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Company",
+      "text": "Company",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 5
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Chair",
+      "text": "Chair",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 8
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "David",
+      "text": "David",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Vincent",
+      "text": "Vincent",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 12
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ORION",
+      "text": "ORION",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 16
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "minute",
+      "text": "minutes",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "decision",
+      "text": "Decisions",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 18
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "VERB",
+      "lemma": "approve",
+      "text": "approve",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "next",
+      "text": "next",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "integration",
+      "text": "integration",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "milestone",
+      "text": "milestone",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "ADP",
+      "lemma": "for",
+      "text": "for",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ORION",
+      "text": "ORION",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "action",
+      "text": "Actions",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 30
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "engineering",
+      "text": "Engineering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "VERB",
+      "lemma": "validate",
+      "text": "validates",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "interface",
+      "text": "interfaces",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "operation",
+      "text": "Operations",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "VERB",
+      "lemma": "prepare",
+      "text": "prepares",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "rollout",
+      "text": "rollout",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "risk",
+      "text": "Risks",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 40
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "supplier",
+      "text": "supplier",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "lead",
+      "text": "lead",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "time",
+      "text": "time",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "next",
+      "text": "Next",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 46
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "review",
+      "text": "review",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "AUX",
+      "lemma": "be",
+      "text": "is",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Friday",
+      "text": "Friday",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 0,
+      "end": 2,
+      "label": "organization",
+      "text": "AcmeSystems Project"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 0,
+      "end": 2,
+      "label": "organization",
+      "text": "AcmeSystems Project"
+    },
+    {
+      "start": 7,
+      "end": 8,
+      "label": "organization",
+      "text": "AcmeSystems"
+    },
+    {
+      "start": 10,
+      "end": 12,
+      "label": "person",
+      "text": "David Vincent"
+    },
+    {
+      "start": 26,
+      "end": 29,
+      "label": "organization",
+      "text": "AcmeSystems Project ORION"
+    },
+    {
+      "start": 49,
+      "end": 50,
+      "label": "date",
+      "text": "Friday"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [
+        0
+      ],
+      "rights": []
+    },
+    {
+      "text": "ORION",
+      "lemma": "ORION",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Steering",
+      "lemma": "Steering",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        1,
+        2,
+        3
+      ],
+      "rights": []
+    },
+    {
+      "text": "Company",
+      "lemma": "Company",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        6
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 5,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 7,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Chair",
+      "lemma": "Chair",
+      "pos": "PROPN",
+      "head": 8,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        9
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 8,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "David",
+      "lemma": "David",
+      "pos": "PROPN",
+      "head": 11,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Vincent",
+      "lemma": "Vincent",
+      "pos": "PROPN",
+      "head": 11,
+      "dep": "ROOT",
+      "lefts": [
+        10
+      ],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 12,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        13
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "project",
+      "pos": "NOUN",
+      "head": 15,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ORION",
+      "lemma": "ORION",
+      "pos": "PROPN",
+      "head": 15,
+      "dep": "ROOT",
+      "lefts": [
+        14
+      ],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "minutes",
+      "lemma": "minute",
+      "pos": "NOUN",
+      "head": 17,
+      "dep": "ROOT",
+      "lefts": [
+        16
+      ],
+      "rights": []
+    },
+    {
+      "text": "Decisions",
+      "lemma": "decision",
+      "pos": "NOUN",
+      "head": 20,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 20,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "approve",
+      "lemma": "approve",
+      "pos": "VERB",
+      "head": 20,
+      "dep": "ROOT",
+      "lefts": [
+        18,
+        19
+      ],
+      "rights": [
+        24,
+        29
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 24,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "next",
+      "lemma": "next",
+      "pos": "ADJ",
+      "head": 24,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "integration",
+      "lemma": "integration",
+      "pos": "NOUN",
+      "head": 24,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "milestone",
+      "lemma": "milestone",
+      "pos": "NOUN",
+      "head": 20,
+      "dep": "dobj",
+      "lefts": [
+        21,
+        22,
+        23
+      ],
+      "rights": [
+        25
+      ]
+    },
+    {
+      "text": "for",
+      "lemma": "for",
+      "pos": "ADP",
+      "head": 24,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        28
+      ]
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 27,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 28,
+      "dep": "compound",
+      "lefts": [
+        26
+      ],
+      "rights": []
+    },
+    {
+      "text": "ORION",
+      "lemma": "ORION",
+      "pos": "PROPN",
+      "head": 25,
+      "dep": "pobj",
+      "lefts": [
+        27
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 20,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Actions",
+      "lemma": "action",
+      "pos": "NOUN",
+      "head": 37,
+      "dep": "dep",
+      "lefts": [],
+      "rights": [
+        31,
+        33
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 30,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Engineering",
+      "lemma": "engineering",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "validates",
+      "lemma": "validate",
+      "pos": "VERB",
+      "head": 30,
+      "dep": "acl",
+      "lefts": [
+        32
+      ],
+      "rights": [
+        34
+      ]
+    },
+    {
+      "text": "interfaces",
+      "lemma": "interface",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 37,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Operations",
+      "lemma": "operation",
+      "pos": "NOUN",
+      "head": 37,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "prepares",
+      "lemma": "prepare",
+      "pos": "VERB",
+      "head": 37,
+      "dep": "ROOT",
+      "lefts": [
+        30,
+        35,
+        36
+      ],
+      "rights": [
+        38,
+        39
+      ]
+    },
+    {
+      "text": "rollout",
+      "lemma": "rollout",
+      "pos": "NOUN",
+      "head": 37,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 37,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Risks",
+      "lemma": "risk",
+      "pos": "NOUN",
+      "head": 40,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        41,
+        44,
+        45
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 40,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "supplier",
+      "lemma": "supplier",
+      "pos": "NOUN",
+      "head": 43,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "lead",
+      "lemma": "lead",
+      "pos": "NOUN",
+      "head": 44,
+      "dep": "compound",
+      "lefts": [
+        42
+      ],
+      "rights": []
+    },
+    {
+      "text": "time",
+      "lemma": "time",
+      "pos": "NOUN",
+      "head": 40,
+      "dep": "appos",
+      "lefts": [
+        43
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 40,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Next",
+      "lemma": "next",
+      "pos": "ADJ",
+      "head": 47,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "review",
+      "lemma": "review",
+      "pos": "NOUN",
+      "head": 48,
+      "dep": "nsubj",
+      "lefts": [
+        46
+      ],
+      "rights": []
+    },
+    {
+      "text": "is",
+      "lemma": "be",
+      "pos": "AUX",
+      "head": 48,
+      "dep": "ROOT",
+      "lefts": [
+        47
+      ],
+      "rights": [
+        49,
+        50
+      ]
+    },
+    {
+      "text": "Friday",
+      "lemma": "Friday",
+      "pos": "PROPN",
+      "head": 48,
+      "dep": "attr",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 48,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [
+        0
+      ],
+      "rights": []
+    },
+    {
+      "text": "ORION",
+      "lemma": "ORION",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [
+        1
+      ],
+      "rights": []
+    },
+    {
+      "text": "Steering",
+      "lemma": "Steering",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        2,
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 25,
+      "text": "acmesystems project orion steering meeting",
+      "span": {
+        "start": 0,
+        "end": 5
+      }
+    },
+    {
+      "score": 17,
+      "text": "acmesystems project orion steering meeting",
+      "span": {
+        "start": 0,
+        "end": 5
+      }
+    },
+    {
+      "score": 9,
+      "text": "acmesystems project orion",
+      "span": {
+        "start": 26,
+        "end": 29
+      }
+    },
+    {
+      "score": 9,
+      "text": "supplier lead time",
+      "span": {
+        "start": 42,
+        "end": 45
+      }
+    },
+    {
+      "score": 8,
+      "text": "next integration milestone",
+      "span": {
+        "start": 22,
+        "end": 25
+      }
+    },
+    {
+      "score": 6,
+      "text": "project orion",
+      "span": {
+        "start": 14,
+        "end": 16
+      }
+    },
+    {
+      "score": 5,
+      "text": "meeting minute",
+      "span": {
+        "start": 16,
+        "end": 18
+      }
+    },
+    {
+      "score": 4,
+      "text": "next review",
+      "span": {
+        "start": 46,
+        "end": 48
+      }
+    },
+    {
+      "score": 4,
+      "text": "david vincent",
+      "span": {
+        "start": 10,
+        "end": 12
+      }
+    },
+    {
+      "score": 3,
+      "text": "acmesystems",
+      "span": {
+        "start": 7,
+        "end": 8
+      }
+    },
+    {
+      "score": 2,
+      "text": "project",
+      "span": {
+        "start": 12,
+        "end": 13
+      }
+    },
+    {
+      "score": 1,
+      "text": "company",
+      "span": {
+        "start": 5,
+        "end": 6
+      }
+    },
+    {
+      "score": 1,
+      "text": "chair",
+      "span": {
+        "start": 8,
+        "end": 9
+      }
+    },
+    {
+      "score": 1,
+      "text": "decision",
+      "span": {
+        "start": 18,
+        "end": 19
+      }
+    },
+    {
+      "score": 1,
+      "text": "action",
+      "span": {
+        "start": 30,
+        "end": 31
+      }
+    },
+    {
+      "score": 1,
+      "text": "risk",
+      "span": {
+        "start": 40,
+        "end": 41
+      }
+    },
+    {
+      "score": 1,
+      "text": "friday",
+      "span": {
+        "start": 49,
+        "end": 50
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://43979aad2c3a9b98ab6cae9b40651f1d4092ab08b0722dafd0562476e0ec1cb9/meeting_minutes_00252_455a14d6.docx#chunk-0-c815223d78",
+      "parent_doc_id": "ingest://43979aad2c3a9b98ab6cae9b40651f1d4092ab08b0722dafd0562476e0ec1cb9/meeting_minutes_00252_455a14d6.docx",
+      "text_raw": "AcmeSystems Project ORION Steering Meeting Company : AcmeSystems Chair : David Vincent Project : Project ORION Meeting minutes Decisions : approve the next integration milestone for AcmeSystems Project ORION . Actions : Engineering validates interfaces ; Operations prepares rollout . Risks : supplier lead time . Next review is Friday .",
+      "search_vector_payload": "AcmeSystems Project ORION Steering Meeting Company : AcmeSystems Chair : David Vincent Project : Project ORION Meeting minutes Decisions : approve the next integration milestone for AcmeSystems Project ORION . Actions : Engineering validates interfaces ; Operations prepares rollout . Risks : supplier lead time . Next review is Friday .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "AcmeSystems Project",
+            "AcmeSystems",
+            "AcmeSystems Project ORION"
+          ],
+          "person": [
+            "David Vincent"
+          ],
+          "date": [
+            "Friday"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "Decisions",
+            "approve",
+            "integration milestone"
+          ],
+          [
+            "Engineering",
+            "validates",
+            "interfaces"
+          ],
+          [
+            "Operations",
+            "prepares",
+            "rollout"
+          ],
+          [
+            "Next review",
+            "is",
+            "Friday"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 51,
+        "sentence_start": 0,
+        "sentence_end": 9
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Decisions approve integration milestone",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Friday",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "AcmeSystems Project ORION Steering Meeting Company : AcmeSystems Chair : David Vincent",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "Engineering validates interfaces",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Operations prepares rollout",
+          "question_type": "SVO-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Operations/operations-358cc201f87d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Operations\"\n    ],\n    \"http://tkeir.local/ontology/prepare\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Rollout/rollout-a4fa034cc780\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Operations\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/next_review\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"next review\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/next_integration_milestone\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"next integration milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decision/integration_milestone-43d83ab6227f\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Decision\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decision/integration_milestone-43d83ab6227f\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"integration milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/decision\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"decision\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems-14032de724d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/risk\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"risk\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/friday\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"friday\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/NextReview/next_review-31151e9f9bd4\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/NextReview\"\n    ],\n    \"http://tkeir.local/ontology/is\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Friday/friday-e21f3f372a46\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Next review\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Date/friday-e21f3f372a46\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Date\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Friday\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/david_vincent\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"david vincent\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/acmesystems_project_orion_steering_meeting\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems project orion steering meeting\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/action\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"action\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/project_orion\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"project orion\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Friday/friday-e21f3f372a46\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Friday\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Friday\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems_project-da66751eeb55\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems Project\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Review/review-c97ace4c8fef\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Review\"\n    ],\n    \"http://tkeir.local/ontology/be\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Friday/friday-e21f3f372a46\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"review\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Chunk/ingest_43979aad2c3a9b98ab6cae9b40651f1d4092ab08b0722dafd0562476e0ec1cb9_meeting_minutes_00252_455a14d6_docx_chunk_0_c815223d78\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems_project-da66751eeb55\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems_project_orion-0b2154aa95e2\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Person/david_vincent-c9b210d6ac81\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Date/friday-e21f3f372a46\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decisions/decisions-cfa6a08af3ed\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Engineering/engineering-729bb48d0f86\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Operations/operations-358cc201f87d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/NextReview/next_review-31151e9f9bd4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://43979aad2c3a9b98ab6cae9b40651f1d4092ab08b0722dafd0562476e0ec1cb9/meeting_minutes_00252_455a14d6.docx#chunk-0-c815223d78\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Interfaces/interfaces-0274021b904c\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Interfaces\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"interfaces\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decisions/decisions-cfa6a08af3ed\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Decision\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decision/integration_milestone-43d83ab6227f\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decision/milestone-7f7f85b1e7d5\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Decisions\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Person/david_vincent-c9b210d6ac81\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Person\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"David Vincent\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decision/milestone-7f7f85b1e7d5\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Decision\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decision/integration_milestone-43d83ab6227f\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems_project_orion-0b2154aa95e2\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems Project ORION\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Engineering/engineering-729bb48d0f86\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Engineering\"\n    ],\n    \"http://tkeir.local/ontology/validate\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Interfaces/interfaces-0274021b904c\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Engineering\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/company\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"company\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/acmesystems\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/supplier_lead_time\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"supplier lead time\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/meeting_minute\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"meeting minute\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Chunk/ingest_43979aad2c3a9b98ab6cae9b40651f1d4092ab08b0722dafd0562476e0ec1cb9_meeting_minutes_00252_455a14d6_docx_chunk_0_c815223d78\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/acmesystems_project_orion_steering_meeting\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/acmesystems_project_orion\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/supplier_lead_time\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/next_integration_milestone\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/project_orion\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/meeting_minute\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/next_review\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/david_vincent\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/acmesystems\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/project\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/company\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/chair\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/decision\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/action\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/risk\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/friday\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems_project-da66751eeb55\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Person/david_vincent-c9b210d6ac81\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Organization/acmesystems_project_orion-0b2154aa95e2\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Date/friday-e21f3f372a46\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Decisions/decisions-cfa6a08af3ed\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Engineering/engineering-729bb48d0f86\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Operations/operations-358cc201f87d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/NextReview/next_review-31151e9f9bd4\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Review/review-c97ace4c8fef\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"meeting_minutes_00252_455a14d6_docx\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Rollout/rollout-a4fa034cc780\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Rollout\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"rollout\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/project\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"project\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/chair\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"chair\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00252_455a14d6_docx/Keyword/acmesystems_project_orion\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems project orion\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 2,
+      "unresolved": 0,
+      "auto_fixed": 2,
+      "affected_node_count": 2,
+      "graph_node_count": 47,
+      "graph_triple_count": 110,
+      "by_result_path": {
+        "approve": 2
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 56,
+    "total_tokens": 56,
+    "covered_characters": 325,
+    "total_characters": 325
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 51,
+  "token-count": 56,
+  "source-file-size-bytes": 1010,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.05,
+    "tasks": {
+      "converter": 0.009,
+      "language-detection": 0.002,
+      "resource-selection": 0.001,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.006,
+      "ner": 0.007,
+      "syntax": 0.007,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.014,
+      "chunk-questions": 0.001
+    }
+  }
+}

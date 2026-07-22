@@ -1,0 +1,1281 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://2456abc41faf01142d1f443f5d635a8983079db5ddfed1798cb81215a781ee88/AIS_01348_2f035a0c.docx",
+  "title": "AIS 01348 — Eastern corridor",
+  "content": [
+    "AIS 01348 — Eastern corridor\n\nAIS MARITIME TRACK\n\nTrack: NATO-4060\n\nPosition: 63N 27E\n\nCourse: 77 degrees\n\nAssessment: commercial vessel; correlation pending."
+  ],
+  "kg": [],
+  "error": false,
+  "conversion-info": {
+    "datatype": "docx",
+    "source-size-bytes": 948,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:45:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_smx.owl"
+  ],
+  "source": "ingest://2456abc41faf01142d1f443f5d635a8983079db5ddfed1798cb81215a781ee88/AIS_01348_2f035a0c.docx",
+  "metadata": {
+    "topic_id": "situational_awareness",
+    "corpus": "osint",
+    "doc_type": "AIS",
+    "language": "en",
+    "title": "AIS 01348 — Eastern corridor",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "situational_awareness",
+  "doc_type": "AIS",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999973287346069
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "AIS",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "MARITIME",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "TRACK",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Track",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "NATO-4060",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Position",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "63N",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "27E",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "AIS",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "01348",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Eastern",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "corridor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Course",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "77",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "degrees",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Assessment",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "commercial",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "vessel",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "correlation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "pending",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AIS",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "01348",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Eastern",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "corridor",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AIS",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "01348",
+      "text": "01348",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "eastern",
+      "text": "Eastern",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "corridor",
+      "text": "corridor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "ais",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "MARITIME",
+      "text": "MARITIME",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "track",
+      "text": "TRACK",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Track",
+      "text": "Track",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 3
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "NATO-4060",
+      "text": "NATO-4060",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "position",
+      "text": "Position",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 6
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "NUM",
+      "lemma": "63n",
+      "text": "63N",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "NUM",
+      "lemma": "27e",
+      "text": "27E",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AIS",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 10
+    },
+    {
+      "pos": "NUM",
+      "lemma": "01348",
+      "text": "01348",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "eastern",
+      "text": "Eastern",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "corridor",
+      "text": "corridor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "course",
+      "text": "Course",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 15
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "NUM",
+      "lemma": "77",
+      "text": "77",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "degree",
+      "text": "degrees",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "assessment",
+      "text": "Assessment",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 19
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "commercial",
+      "text": "commercial",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "vessel",
+      "text": "vessel",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "correlation",
+      "text": "correlation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "VERB",
+      "lemma": "pende",
+      "text": "pending",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [
+    {
+      "start": 17,
+      "end": 19,
+      "label": "quantity",
+      "text": "77 degrees"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "AIS",
+      "lemma": "ais",
+      "pos": "NOUN",
+      "head": 1,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "MARITIME",
+      "lemma": "MARITIME",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2
+      ]
+    },
+    {
+      "text": "TRACK",
+      "lemma": "track",
+      "pos": "NOUN",
+      "head": 1,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Track",
+      "lemma": "Track",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        4,
+        5
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 3,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "NATO-4060",
+      "lemma": "NATO-4060",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Position",
+      "lemma": "position",
+      "pos": "NOUN",
+      "head": 6,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 6,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "63N",
+      "lemma": "63n",
+      "pos": "NUM",
+      "head": 6,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "27E",
+      "lemma": "27e",
+      "pos": "NUM",
+      "head": 6,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AIS",
+      "lemma": "AIS",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        11,
+        12,
+        14
+      ]
+    },
+    {
+      "text": "01348",
+      "lemma": "01348",
+      "pos": "NUM",
+      "head": 10,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Eastern",
+      "lemma": "eastern",
+      "pos": "ADJ",
+      "head": 14,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "corridor",
+      "lemma": "corridor",
+      "pos": "NOUN",
+      "head": 10,
+      "dep": "appos",
+      "lefts": [
+        13
+      ],
+      "rights": []
+    },
+    {
+      "text": "Course",
+      "lemma": "course",
+      "pos": "NOUN",
+      "head": 15,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        16,
+        18
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 15,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "77",
+      "lemma": "77",
+      "pos": "NUM",
+      "head": 18,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "degrees",
+      "lemma": "degree",
+      "pos": "NOUN",
+      "head": 15,
+      "dep": "appos",
+      "lefts": [
+        17
+      ],
+      "rights": []
+    },
+    {
+      "text": "Assessment",
+      "lemma": "assessment",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        20,
+        22,
+        23,
+        24,
+        26
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "commercial",
+      "lemma": "commercial",
+      "pos": "ADJ",
+      "head": 22,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "vessel",
+      "lemma": "vessel",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "appos",
+      "lefts": [
+        21
+      ],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "correlation",
+      "lemma": "correlation",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "conj",
+      "lefts": [],
+      "rights": [
+        25
+      ]
+    },
+    {
+      "text": "pending",
+      "lemma": "pende",
+      "pos": "VERB",
+      "head": 24,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AIS",
+      "lemma": "AIS",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "text": "01348",
+      "lemma": "01348",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Eastern",
+      "lemma": "eastern",
+      "pos": "ADJ",
+      "head": 4,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "corridor",
+      "lemma": "corridor",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 4,
+      "text": "eastern corridor",
+      "span": {
+        "start": 3,
+        "end": 5
+      }
+    },
+    {
+      "score": 8,
+      "text": "ais maritime track",
+      "span": {
+        "start": 0,
+        "end": 3
+      }
+    },
+    {
+      "score": 4,
+      "text": "eastern corridor",
+      "span": {
+        "start": 13,
+        "end": 15
+      }
+    },
+    {
+      "score": 4,
+      "text": "commercial vessel",
+      "span": {
+        "start": 21,
+        "end": 23
+      }
+    },
+    {
+      "score": 2,
+      "text": "track",
+      "span": {
+        "start": 3,
+        "end": 4
+      }
+    },
+    {
+      "score": 1,
+      "text": "nato-4060",
+      "span": {
+        "start": 5,
+        "end": 6
+      }
+    },
+    {
+      "score": 1,
+      "text": "position",
+      "span": {
+        "start": 6,
+        "end": 7
+      }
+    },
+    {
+      "score": 1,
+      "text": "course",
+      "span": {
+        "start": 15,
+        "end": 16
+      }
+    },
+    {
+      "score": 1,
+      "text": "assessment",
+      "span": {
+        "start": 19,
+        "end": 20
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://2456abc41faf01142d1f443f5d635a8983079db5ddfed1798cb81215a781ee88/AIS_01348_2f035a0c.docx#chunk-0-9d212e1ad5",
+      "parent_doc_id": "ingest://2456abc41faf01142d1f443f5d635a8983079db5ddfed1798cb81215a781ee88/AIS_01348_2f035a0c.docx",
+      "text_raw": "AIS MARITIME TRACK Track : NATO-4060 Position : 63N 27E AIS 01348 — Eastern corridor Course : 77 degrees Assessment : commercial vessel ; correlation pending .",
+      "search_vector_payload": "AIS MARITIME TRACK Track : NATO-4060 Position : 63N 27E AIS 01348 — Eastern corridor Course : 77 degrees Assessment : commercial vessel ; correlation pending .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "quantity": [
+            "77 degrees"
+          ]
+        },
+        "svo_triplets": [],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 27,
+        "sentence_start": 0,
+        "sentence_end": 6
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "77 degrees",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "AIS MARITIME TRACK Track : NATO-4060 Position : 63N 27E AIS 01348",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "AIS MARITIME TRACK Track : NATO-4060 Position : 63N 27E AIS 01348 — Eastern corridor Course : 77 degrees Assessment : commercial vessel ; correlation pending .",
+          "question_type": "Summary-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/eastern_corridor\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"eastern corridor\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/track\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"track\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/assessment\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"assessment\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/ais_maritime_track\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ais maritime track\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/commercial_vessel\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"commercial vessel\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/position\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"position\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Chunk/ingest_2456abc41faf01142d1f443f5d635a8983079db5ddfed1798cb81215a781ee88_ais_01348_2f035a0c_docx_chunk_0_9d212e1ad5\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Quantity/77_degrees-eb0eb8b40004\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://2456abc41faf01142d1f443f5d635a8983079db5ddfed1798cb81215a781ee88/AIS_01348_2f035a0c.docx#chunk-0-9d212e1ad5\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/nato_4060\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"nato-4060\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Quantity/77_degrees-eb0eb8b40004\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Quantity\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"77 degrees\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/course\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"course\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Chunk/ingest_2456abc41faf01142d1f443f5d635a8983079db5ddfed1798cb81215a781ee88_ais_01348_2f035a0c_docx_chunk_0_9d212e1ad5\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/ais_maritime_track\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/eastern_corridor\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/commercial_vessel\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/track\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/nato_4060\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/position\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/course\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Keyword/assessment\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_01348_2f035a0c_docx/Quantity/77_degrees-eb0eb8b40004\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ais_01348_2f035a0c_docx\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 15,
+      "graph_triple_count": 33,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 32,
+    "total_tokens": 32,
+    "covered_characters": 157,
+    "total_characters": 157,
+    "derivation": {
+      "enabled": true,
+      "status": "NO_MATCHES",
+      "matches": 0,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 0,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KE9RY83MPGPXJEEA9PR9W/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 27,
+  "token-count": 32,
+  "source-file-size-bytes": 948,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.168,
+    "tasks": {
+      "converter": 0.008,
+      "language-detection": 0.004,
+      "resource-selection": 0.001,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.006,
+      "ner": 0.041,
+      "syntax": 0.005,
+      "keywords": 0.0,
+      "chunking": 0.0,
+      "ontology": 0.098,
+      "chunk-questions": 0.001
+    }
+  }
+}

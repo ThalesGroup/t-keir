@@ -1,0 +1,227 @@
+Route Experiments (A/B testing) – SDK integration notes (stickiness keys, headers, docs plan)
+
+## Purpose
+These notes describe how Redwood SDKs and examples should integrate with **Route Experiments** (route-level A/B/n testing in Console Rollouts), with specific focus on:
+- How customers provide **deterministic stickiness keys** (so a user consistently receives the same variant)
+- How SDKs should expose and document **experiment/variant response headers**
+- A documentation + examples plan for beta → GA
+
+This page is DX-facing (SDKs, docs, examples). It is not the source of truth for routing semantics; see ADR-047 / ADR-048.
+
+---
+
+## Customer-facing mental model (what we want users to understand)
+1. An experiment is attached to a **route** (endpoint / routing policy).
+2. Each request is assigned to a **variant** based on a stable **stickiness key**.
+3. Redwood returns optional **debug headers** so customers can tell which variant they hit.
+4. Console shows per-variant metrics (latency/cost/error/quality) using experiment attribution emitted by the platform.
+
+In docs and SDKs, we should present experiments as “**routing-layer experiments**” (not application-layer experiments). Customers do not need to run their own bucketing logic.
+
+---
+
+## Stickiness keys (SDK guidance)
+### Why stickiness keys matter
+Deterministic assignment requires a key with adequate entropy and stability. If customers omit a stable key, they can observe:
+- Variant skew (one variant accidentally getting most traffic)
+- Assignment churn (same end-user bouncing between variants)
+- Harder-to-interpret metrics and regressions
+
+### Recommended key choices (in priority order)
+SDK docs should recommend one of the following, in this order:
+1. **A customer-defined stable end-user identifier** (e.g., internal user UUID)
+2. **Account/tenant identifier** (B2B SaaS) if experiments are intended to be “per-tenant”
+3. **Session identifier** (only if the experiment is short-lived and per-session consistency is acceptable)
+
+Avoid:
+- Random UUID generated per request
+- Raw IP address as the only identifier (low quality, NAT/shared IP issues, privacy concerns)
+- Email address in plaintext (PII). If email is the only available stable identifier, recommend hashing on the client side before sending.
+
+### SDK parameter and header names
+We should support a first-class, consistently named option in SDKs.
+
+**Canonical name (docs):** `experiment_sticky_key`
+
+Transport:
+- If the API supports explicit fields on the request body, pass it as a request field.
+- Otherwise (or additionally), pass as a header.
+
+**Request header:** `x-redwood-experiment-sticky-key`
+
+Notes:
+- The stickiness key is used only for experiment bucketing. It is not a security boundary.
+- SDKs should treat the stickiness key as **potentially sensitive**, and should not log it at INFO by default.
+
+### Precedence rules (what SDKs should document)
+Platform-side precedence (high level, aligned with ADR-047):
+1. `x-redwood-experiment-sticky-key` (explicit)
+2. Authenticated `customer_id` / `tenant_id` if available
+3. End-user identifier passed via customer application (if explicitly mapped by the customer)
+4. Fallback: request-derived identifiers (discouraged; may be disabled or changed)
+
+Docs should emphasize: **If you care about determinism, set the explicit sticky key.**
+
+---
+
+## Response headers (how customers interpret variant assignment)
+### Required-to-document headers
+When a request is eligible for a route experiment, the gateway/router may attach:
+- `x-redwood-experiment-id`: Stable experiment identifier
+- `x-redwood-variant-id`: Assigned variant identifier (e.g., `control`, `v1-quantized`, `new-model`)
+
+Recommended additional headers (where available):
+- `x-redwood-experiment-config-version`: Helps support debug config propagation issues
+- `x-redwood-route-id`: Normalized route identifier (template form; may differ from raw URL path)
+
+When no experiment applies, headers may be omitted. SDKs should expose a convenient way to read these headers without forcing customers to parse low-level HTTP objects.
+
+### SDK ergonomics goal
+For each SDK, support:
+- Access to raw headers (existing behavior)
+- A small helper to parse experiment info into a typed structure
+
+Example structure to document:
+- `experimentId: string | null`
+- `variantId: string | null`
+- `configVersion: string | null`
+
+### Troubleshooting guidance to include in docs
+If a customer reports “my experiment isn’t splitting traffic” or “variant is always control”, ask them to capture:
+- Their configured `experiment_sticky_key` logic (is it stable? is it always present?)
+- One request/response showing returned `x-redwood-experiment-id` and `x-redwood-variant-id`
+- Region and route name
+- Whether they are using streaming + retries (older SDKs may drop headers if they only surface the streaming iterator)
+
+---
+
+## SDK implementation notes
+### TypeScript SDK (redwood-sdk-typescript)
+**Add to request options:**
+- `experimentStickyKey?: string`
+
+**Behavior:**
+- If set, add header `x-redwood-experiment-sticky-key: <value>`
+- Parse response headers and expose them on the response object (non-breaking):
+  - `response.experiment = { experimentId, variantId, configVersion }`
+
+**Example (TypeScript):**
+```ts
+import { Redwood } from "@redwood-inference/sdk";
+
+const client = new Redwood({ apiKey: process.env.REDWOOD_API_KEY! });
+
+const userId = "user_2f3a9c1b"; // must be stable
+
+const resp = await client.chat.completions.create({
+  model: "redwood/llama-3.1-70b-instruct",
+  messages: [{ role: "user", content: "Summarize this article..." }],
+  // New SDK option
+  experimentStickyKey: userId,
+});
+
+console.log(resp.experiment?.experimentId, resp.experiment?.variantId);
+```
+
+**Streaming note:** ensure the first response chunk (or stream wrapper) includes the parsed experiment headers; do not drop them when returning an async iterator.
+
+### Python SDK (redwood-sdk-python)
+**Add to request options:**
+- `experiment_sticky_key: Optional[str] = None`
+
+**Behavior:**
+- If set, add header `x-redwood-experiment-sticky-key`
+- Expose parsed headers:
+  - `response.experiment_id`
+  - `response.variant_id`
+  - (optional) `response.experiment_config_version`
+
+**Example (Python):**
+```py
+from redwood import Redwood
+
+client = Redwood(api_key=os.environ["REDWOOD_API_KEY"])
+
+user_id = "user_2f3a9c1b"  # must be stable
+
+resp = client.chat.completions.create(
+    model="redwood/llama-3.1-70b-instruct",
+    messages=[{"role": "user", "content": "Summarize this article..."}],
+    experiment_sticky_key=user_id,
+)
+
+print(resp.experiment_id, resp.variant_id)
+```
+
+### Backwards compatibility
+- Adding the request option is backward compatible.
+- Adding response fields is backward compatible if we avoid breaking existing response types and keep raw header access unchanged.
+
+### Logging defaults (privacy + support)
+SDK defaults:
+- Do not log the sticky key at INFO.
+- If customers enable debug logging, redact or hash the sticky key in logs.
+- It is OK to log `experiment_id` and `variant_id` (not typically PII), but treat them as customer-sensitive in shared logs.
+
+---
+
+## Documentation plan (beta → GA)
+### Docs artifacts to ship
+1. **Customer Guide:** “Route experiments (A/B testing) in Console”
+   - What it is, when to use it
+   - Creating an experiment (Console workflow)
+   - Choosing stickiness keys (with examples)
+   - Reading variant headers / debugging
+   - Guardrails + stopping semantics (soft-stop vs optional hard-stop)
+
+2. **SDK reference additions:**
+   - `experiment_sticky_key` / `experimentStickyKey` option in the API reference
+   - Response header fields / helper structure
+
+3. **Example app updates (redwood-examples):**
+   - A minimal route experiments demo showing:
+     - Passing a stable stickiness key
+     - Printing assigned variant
+     - A note on stable routing keys in multi-tenant apps
+
+4. **Troubleshooting page / section:**
+   - “Variant skew / always control”
+   - “Headers missing”
+   - “Streaming retries missing attribution”
+   - “Results in Console not updating (propagation lag / aggregation delay)”
+
+### Beta documentation constraints
+- Avoid promising advanced statistics/significance analysis in GA (out of scope).
+- Be explicit that metrics may take time to appear due to aggregation windows.
+
+### GA readiness checklist (DX-owned)
+- SDKs released with stickiness key option in TS + Python
+- Example app merged and referenced from docs
+- Customer guide includes a “How to pick a stickiness key” section with at least 3 concrete patterns
+- Docs reviewed by:
+  - Policy Engine (assignment semantics)
+  - Telemetry (header naming + attribution correctness)
+  - Security (PII guidance / redaction)
+
+---
+
+## FAQ (for SDK/docs authors)
+### Do customers need to implement their own bucketing?
+No. Bucketing is performed by Redwood’s routing layer.
+
+### What if the customer cannot provide a stable user identifier?
+Recommend tenant-level stickiness or session-level stickiness depending on product needs. Explicitly warn about churn/skew if they cannot provide any stable key.
+
+### Are headers always present?
+Only when a request is eligible for an experiment and the request path surfaces headers. Some intermediaries can drop headers; if customers are behind proxies, advise them to allowlist the Redwood headers.
+
+### Can customers force a variant?
+Not in GA docs. Any internal override mechanism should be treated as restricted/internal-only and gated by RBAC/feature flags.
+
+---
+
+## Open items / follow-ups
+- Confirm final header names with Observability + Policy Engine owners (align with OTel tag naming conventions).
+- Finalize copy for Console tooltips explaining headers and stickiness.
+- Add a short section in docs on hashing PII identifiers before using them as sticky keys.
+- Ensure streaming clients surface response headers consistently (prior issues observed with retries).

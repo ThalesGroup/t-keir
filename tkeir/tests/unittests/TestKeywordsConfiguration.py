@@ -1,4 +1,12 @@
-"""Test keywords configuration."""
+"""Title: Keywords Configuration
+
+Test keywords configuration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import json
 import os

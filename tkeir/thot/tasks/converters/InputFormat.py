@@ -1,4 +1,12 @@
-"""Detect and verify converter input formats before conversion."""
+"""Title: Input Format
+
+Detect and verify converter input formats before conversion.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

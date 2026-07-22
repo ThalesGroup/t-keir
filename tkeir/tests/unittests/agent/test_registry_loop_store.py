@@ -1,4 +1,12 @@
-"""Unit tests for agent registry, parse, safety, and run store."""
+"""Title: Registry loop store
+
+Unit tests for agent registry, parse, safety, and run store.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

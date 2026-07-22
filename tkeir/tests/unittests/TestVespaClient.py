@@ -1,4 +1,12 @@
-"""Tests for Vespa feed helpers."""
+"""Title: Vespa Client
+
+Tests for Vespa feed helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tools.search.vespa_client import (
     build_chunk_tensor,

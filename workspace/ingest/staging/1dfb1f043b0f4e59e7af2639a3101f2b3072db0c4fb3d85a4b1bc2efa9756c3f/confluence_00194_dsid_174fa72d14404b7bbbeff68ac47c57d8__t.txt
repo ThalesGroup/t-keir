@@ -1,0 +1,139 @@
+typed-error-model-and-client-contract-recommendations-2026
+
+Summary
+-------
+This document defines the canonical, typed error model and client contract recommendations for Redwood public and internal inference APIs. It standardizes machine-friendly error schema, HTTP status mappings, retry semantics, SDK behavior, observability signals, and a migration/playbook for rolling these changes out with minimal customer impact. The recommendations apply to text generation, chat, embeddings, and management endpoints.
+
+Goals
+-----
+- Provide a single parsable error schema usable by SDKs and monitoring systems.
+- Make retry logic deterministic (retryable vs non-retryable).
+- Ensure backward-compatible enrichment path: servers may add fields but not change semantics.
+- Tie error types to SLO and alerting rules so failures surface consistently.
+- Document deprecation/compatibility rules for future error code changes.
+
+Error model overview
+--------------------
+All endpoints MUST return an error payload with HTTP status and the following JSON envelope when an application-level error occurs (200 responses for success remain unchanged):
+
+Example error envelope (minimally required fields):
+
+{
+  "error": {
+    "code": "MODEL_UNAVAILABLE",
+    "message": "Requested model 'redwood-large-v1' is not available in region us-east-1",
+    "status": 503,
+    "retryable": true,
+    "request_id": "req_0123456789"
+  }
+}
+
+Field definitions (required):
+- error.code (string): machine-readable, UPPER_SNAKE_CASE token. See taxonomy below.
+- error.message (string): human-readable description for logs and developer UX. Should not be relied on for parsing.
+- error.status (integer): canonical HTTP status matching the envelope. MUST match the HTTP status header.
+- error.retryable (boolean): explicit recommendation whether client should attempt an automated retry.
+- error.request_id (string): unique request id for support and tracing.
+
+Optional fields (allowed but not required):
+- error.meta (object encoded as string if SDKs can't handle raw objects): free-form key/value pairs for debugging (model_id, node_pool, shard).
+- error.hint (string): short remediation hint for users.
+- error.documentation_url (string): link to an internal/external page with more context.
+
+Error taxonomy and HTTP mapping
+------------------------------
+We mandate a bounded set of canonical error codes. Each code maps to HTTP status and expected retry behavior. SDKs MUST map HTTP and transport-level failures into these codes where possible.
+
+Table: canonical codes
+- INVALID_INPUT => 400, retryable: false. Use when request payload fails schema/validation. Include field-level errors in error.meta.validation.
+- AUTHENTICATION_FAILED => 401, retryable: false. Token invalid/expired.
+- PERMISSION_DENIED => 403, retryable: false. RBAC/ACL error.
+- NOT_FOUND => 404, retryable: false. Unknown model/resource.
+- RATE_LIMIT_EXCEEDED => 429, retryable: true (with backoff). Provide error.meta.retry_after_seconds when available.
+- QUOTA_EXCEEDED => 402 or 429 (team may choose), retryable: false. Indicates customer's billing/commit limits.
+- MODEL_UNAVAILABLE => 503, retryable: true. Model runtime not available in chosen tier/region. Suggest fallback model in error.meta.fallback_model when present.
+- INTERNAL_ERROR => 500, retryable: true (with capped attempts). Use for transient infra problems.
+- TIMEOUT => 504, retryable: true. Long-running inference timeout.
+- PARTIAL_RESPONSE => 206, retryable: false. Generation produced partial output; include meta.partial=true and best-effort continuing instructions.
+- DATA_POLICY_VIOLATION => 403, retryable: false. Request triggers policy blocking; include documentation_url and policy_id.
+- DEPRECATED => 299 (or 200 with warning header), retryable: false. Use to indicate deprecated parameter/route was used; include error.meta.migration_guide.
+
+Retry semantics and idempotency
+------------------------------
+- Use explicit retryable boolean rather than inferring from status alone. This prevents ambiguous behavior in SDKs.
+- Clients SHOULD implement exponential backoff with jitter for retryable errors. Default: initial backoff 200ms, multiplier 2, max attempts 5 for typical hosted endpoints.
+- For non-idempotent operations (e.g., model fine-tuning jobs), servers MUST require an idempotency key; if provided, server must make retries safe. Document idempotency in individual route specs.
+
+SDK requirements and behavior
+---------------------------
+- Language SDKs MUST expose: parsed error.code, message, status, retryable, request_id, and any meta fields.
+- SDKs SHOULD surface a typed exception hierarchy (e.g., RedwoodApiError -> RateLimitError/AuthenticationError).
+- SDKs MUST not make automatic retries for errors with retryable=false. For retryable=true, retries must be configurable and disabled by default in critical interactive paths.
+- SDKs SHOULD provide helpers: isRetryable(err), getRetryAfter(err), getRequestId(err).
+
+Observability and alerting
+-------------------------
+- All error responses MUST be instrumented with the following tags/labels: endpoint, model, deployment_tier (hosted/dedicated/private), region, customer_id (if applicable), error.code.
+- Metric: inference.errors.count{code,endpoint,model} incremented for every non-2xx/non-206 response.
+- SLI: 99.9% success rate (2xx) over 5m sliding window for hosted API endpoints (see performance-standards for per-route SLOs).
+- Pager thresholds: sustained error rate > 0.1% for control plane endpoints or >1.0% for tenant-level endpoints over 5m should create an alert. High-severity alerts should use request samples with request_id for postmortem.
+
+Logging and support data
+-----------------------
+- Error logs MUST include request_id, error.code, upstream node id (if applicable), and logged stacktrace only for internal errors. Do not log sensitive customer payloads; apply redaction rules in data-management policies.
+
+Compatibility and evolution rules
+--------------------------------
+- Servers may add new fields to the error envelope at any time.
+- Servers MUST NOT change meaning of existing error.code tokens. To change semantics, create a new error code and deprecate the old one via public deprecation schedule (see deprecation policy).
+- New error codes MUST be introduced behind feature flags for 4 weeks with monitoring of client failures and SDK adoption.
+
+Migration and rollout playbook
+-----------------------------
+1) Implement server-side error envelope in a layered rollout: production -> canary -> beta tenants. 2) Monitor client parsing failures via a synthetic test suite that validates each SDK correctly interprets the envelope. 3) Gradually enable additional metadata fields (meta, hint, documentation_url) ensuring SDKs tolerate unknown fields. 4) Announce breaking changes (if unavoidable) with 90 days notice and provide a compatibility shim for the prior behavior.
+
+Example: client handling pseudocode
+----------------------------------
+try {
+  const resp = await client.generate(...);
+} catch (err) {
+  if (sdk.isRetryable(err) && attempts < cfg.maxAttempts) {
+    await backoff.wait(attempts);
+    retry();
+  } else if (err.code === 'DEPRECATED') {
+    console.warn('Deprecated param used', err.meta.migration_guide);
+    // still return the response if present, or surface as warning
+  } else {
+    throw err; // propagate to caller
+  }
+}
+Appendix: JSON Schema (human-readable)
+-------------------------------------
+- error: object (required)
+  - code: string (required)
+  - message: string (required)
+  - status: integer (required)
+  - retryable: boolean (required)
+  - request_id: string (required)
+  - meta: object (optional)
+  - documentation_url: string (optional)
+
+Decision links and references
+-----------------------------
+- See ADRs on API evolution and fallback policies for related decisions.
+- Aligns with observability SLI guidance for error tagging and tracing.
+
+Ownership and next steps
+------------------------
+- Owner: API Platform (engineering).
+- Action items: SDK maintainers to add typed exceptions (deadline 2025-05-15), infra team to emit new error envelope (canary by 2025-04-01), product to publish migration docs and examples.
+
+Notes and rationale
+-------------------
+Typed error envelopes reduce fragmentation in client logic, make retry behavior explicit, and improve signal quality for SLOs and incident response. They intentionally separate human-facing messages from machine tokens to prevent brittle parsing.
+
+Document history
+----------------
+- 2024-10-12: initial draft by Aisha Kapoor.
+- 2024-12-03: added PARTIAL_RESPONSE handling and observability tags (reviewers: Michael Chen).
+- 2025-03-05: published after cross-SDK compatibility validation.

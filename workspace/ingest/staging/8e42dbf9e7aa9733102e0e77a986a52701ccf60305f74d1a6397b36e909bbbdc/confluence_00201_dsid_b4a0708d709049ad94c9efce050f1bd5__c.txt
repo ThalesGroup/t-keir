@@ -1,0 +1,127 @@
+Cold-start Quality Degradation Detection and Recovery Runbook
+
+Summary:
+This runbook describes how to detect, triage, and recover from quality degradations that are correlated with cold-start events in the runtime (examples: increased hallucination rate, lower QA pass rate, deterministic prompt-prefix regressions after model swap, or output truncation tied to KV cache misses). It is focused on production incidents where client-facing correctness metrics drop following service restarts, model swaps, autoscaler-driven scale-ups, or routing to undersized warm pools.
+
+Scope and intent:
+- Scope: hosted/Dedicated/Private deployments running the Redwood serving runtime. Applicable to model swaps, node restarts, autoscaling events, or any scenario where a high proportion of requests experience cold execution (empty KV/embedding caches, unprimed kernels).
+- Intent: detect regressions quickly, preserve customer-facing SLOs, and restore previous-quality behavior with minimal disruption. This runbook prioritizes safe, reversible actions and clarifies ownership.
+
+Who owns this runbook:
+- First responder: serving-runtime oncall (eng-serving-runtime team)
+- Escalation: runtime-sre lead, model-onboarding owner, customer-success for impacted customers
+
+Key signals to monitor (detection):
+1) Behavioral quality metrics (primary):
+   - QA pass rate on synthetic prompt-sets (rolling 5m and 1h buckets). Alert if 1h pass rate drops >20% relative to 6h baseline.
+   - Hallucination indicator: fraction of responses matching negative heuristics (nonsense score, repeated tokens). Alert if >5% of responses exceed hallucination threshold and correlated with cold-start tags.
+2) Telemetry and execution signals (correlated with cold-start):
+   - KV cache miss rate: per-shard and per-model KV miss rate spike (Prometheus: runtime_kvcache_miss_rate). Alert if >= 80% of requests for a cohort are cold for >10min.
+   - Prefix latency spike: token-latency for first N tokens (token_index <= 32) up by >2x baseline.
+   - Model swap events: recent model variant switch or kernel rollouts (eventlog entries).
+3) Sampling-based checks (low-volume but high fidelity):
+   - Shadow evaluation: sample requests shadowed to previous model/variant; if shadowed outputs differ on correctness checks by >15% relative to live, flag as regression.
+
+Detection playbook (automated alerts and triage):
+- Automated alerts to page oncall when any primary signal triggers. Alerts should include:
+  - affected model(s)/variant(s) and cohort IDs
+  - recent autoscaler/node events in last 10 min
+  - KV cache miss heatmap and per-shard error rate
+  - attached sample of 10 failed responses (anonymized)
+
+Initial triage (oncall checklist):
+1) Validate alert: confirm metric anomalies using PromQL and sampling endpoints. Quick PromQL queries: 
+   - QA pass rate: sum(rate(eval_qa_pass_total[5m])) / sum(rate(eval_requests_total[5m]))
+   - KV cold fraction: increase(runtime_kvcache_miss_rate[10m]) > 0.2
+2) Correlate with infra events: check cluster events, node restarts, pod reschedules, and model rollout timestamps (kubectl get events, /ops/eventlog).
+3) Isolate scope: check whether issue affects single model variant, model family, single region, or all customers. Use per-route and per-token tagging.
+4) Collect traces & dumps: capture 30s full trace for a failing request pattern (trace-id), and export kernel telemetry and KV warmup state for the affected shard(s). CLI snippets below.
+
+Immediate mitigations (order of preference — safer first):
+1) Route traffic to warm pool or previously healthy variant:
+   - Use routing policy to send impacted percentage to warm pool while keeping the rest on primary for canary validation.
+   - Command (control plane): redwood route update --model <model> --variant prev-stable --percent 30 --reason "cold-start-quality-rollback"
+2) Force KV prefill for high-impact cohorts: schedule an immediate prefill job for affected keys (see prefill command below). Prefill avoids cold KV misses that often trigger hallucination in long-context models.
+   - Prefill CLI: redwood runtime prefill-kv --shard <shard-id> --keys-file /tmp/prefill-keys.json --priority high
+3) Temporarily widen quality SLO to reduce batching/fusion: reduce concurrency and batching for the affected variant to reduce kernel cold micro-behavior that affects output shape.
+   - config patch (example YAML snippet):
+     batcher:
+       max_batch_tokens: 4096
+       target_latency_ms: 50
+       enable_prefill: false
+4) Rollback model variant if the degradation coincides with a recent variant rollout and automated canary validation fails. Rollback is disruptive; prefer routing to warm pool when customer impact is partial.
+
+Commands & data-collection recipes:
+- Capture a full trace (oncall machine with access):
+  curl -sS "https://obs-api.redwood.internal/trace/collect?model=<model>&window=30s&sample=1" -H "Authorization: Bearer $OBS_KEY" > /tmp/trace.json
+- Export KV state for shard:
+  redwood infra kvcache dump --shard <shard-id> --output /tmp/kvcache-shard-123.dump
+- Run batch of synthetic QA prompts against previous-stable variant:
+  redwood eval run --model <model>:prev-stable --prompt-file qa-failure-sample.json --concurrency 5 --out /tmp/eval-prev.json
+
+Operational controls (threshold table — editable):
+- This table lists the default thresholds used by the detection engine. Operate conservatively and update only after post-incident review.
+
+| signal | alert threshold | severity | default action |
+|---|---:|---|---|
+| 1h QA pass drop vs baseline | >20% absolute drop | Sev2 | page oncall; run shadow eval |
+| KV cold fraction (cohort) | >80% cold requests for 10m | Sev1 | route to warm pool; prefill KV |
+| Prefix token latency change | >2x for token_idx < 32 | Sev2 | decrease batch size; reduce concurrency |
+| Shadow-vs-live correctness delta | >15% | Sev1 | immediate rollback or route to prev-variant |
+
+Note: The table above should be managed in the runtime-config repo (config/runtime/coldstart-detection.yaml). Sample YAML fields: 
+
+signal_thresholds:
+  qa_pass_drop_pct: 20
+  kvcold_fraction_threshold: 0.8
+  prefix_latency_multiplier: 2.0
+  shadow_delta_pct: 15
+
+Recovery playbook (step-by-step):
+1) If KV cold fraction is main driver: run prefill job, validate reduced KV miss rate, then gradually increase traffic to variant.
+2) If model swap is root cause and prior variant performs better on shadow eval: route 100% to previous variant and open a rollback change in the deployment tracker.
+3) If the issue is due to kernel rollout or scheduling change: pause the kernel rollout, set scheduler to conservative profile, and engage kernel owner to examine kernel changes.
+4) If widespread and unknown: enable temporary degradation mode that firms up safety heuristics (shorten response length, add conservative decoding params like top_p=0.8) while engineers investigate.
+
+Post-incident actions (postmortem checklist):
+- Create a postmortem within 72 hours with: timeline, contributing causes, sampling artifacts, KV dump, traces, rollout IDs, and remediation owner.
+- Update the thresholds table if alert was noisy or too lax.
+- Add targeted integration tests to the benchmark suite: shadow-evaluation scenarios that mimic the failed cohort shape.
+- Schedule a follow-up: kernel scheduling replay across recorded traces to reproduce the behavior in the lab.
+
+Runbook escalation matrix and SLA:
+- Sev1 (customer-impacting correctness): page oncall immediately, 15 min ack, 1 hour mitigation or rollback.
+- Sev2 (degraded QA but limited subset): page oncall, 30 min ack, mitigation within 4 hours.
+
+Known gotchas and heuristics:
+- Small cohorts (low traffic) produce noisy QA signals; require a minimum sampling floor of 200 requests/hour before auto-alerting.
+- Not every KV miss spike implies hallucination — cross-check with decoding entropy and repeated token heuristics.
+- Prefill can be expensive. Use prioritized prefill for high-value cohorts only.
+
+Examples and case studies (short):
+- Case: Model-variant X rollout (2025-08-13) produced a 35% QA pass drop for long-context summarization requests. Root cause: optimistic kernel fusion that skipped boundary prefetch for windowed attention. Recovery: immediate rollback to prev-stable, patch to prefetch check in kernel 2.1. Patch released with canary and shadow checks.
+
+References and links:
+- Prefill job operator docs: /confluence/eng-serving-runtime/runbooks/prefill-job-operator-manual
+- Cold-start warmup patterns: /confluence/eng-serving-runtime/runbooks/cold-start-warmup-strategies-and-entropy-reduction-2025
+- Observability data model: /confluence/eng-serving-runtime/team-wiki/runtime-observability-data-model-and-tracebook-2026
+
+Appendix: quick checklist card (for oncall)
+1) Verify alert artifacts and sample 10 failing traces.
+2) Check KV cold fraction and prefill if >80%
+3) Shadow-eval prev-stable variant (5m)
+4) Route traffic to warm pool or prev-stable variant (30% -> 100% if good)
+5) If kernel rollout correlated, pause rollout and contact kernel owner
+6) Open postmortem and attach kvcache dump + traces
+
+Contact list:
+- serving-runtime oncall: #oncall-serving-runtime (Slack)
+- runtime-sre lead: diego.alvarez@redwood.ai
+- kernel owners: kernel-team@redwood.ai
+- model-onboarding: models@redwood.ai
+
+Document maintenance:
+- Owner: eng-serving-runtime runbooks guild (rotate quarterly)
+- Review cadence: quarterly or after any Sev1 incident tied to cold-start quality
+
+End of document.

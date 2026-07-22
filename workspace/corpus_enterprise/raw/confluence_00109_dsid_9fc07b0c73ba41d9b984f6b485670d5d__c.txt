@@ -1,0 +1,105 @@
+Cross-functional Activation & Access Provisioning: New-hire Handoff and Role Readiness
+
+Overview
+
+Purpose: This page documents a standardized, cross-functional process for activating new hires, provisioning the accounts and tooling they need on Day 0/Day 1, validating role readiness, and handing off ownership between People Ops, IT/Cloud, Security, and the hiring manager. The goal is to reduce time-to-productivity, eliminate repeated requests for access, and ensure compliance with least-privilege principles.
+
+Scope
+- Applies to all full-time employees, long-term contractors (>90 days), and principal external contributors.
+- Excludes short-term contractors (<90 days) who follow the contractor onboarding checklist.
+- Covers identity, cloud and infra accounts, developer tooling, Slack/Zoom, internal dashboards, and hardware provisioning.
+
+Key Principles
+- Least privilege: provide only what is necessary for the role/team and escalate access via documented approvals.
+- Single source of truth: People Ops must open a single activation ticket that drives downstream provisioning workflows.
+- Role readiness gate: hiring manager signs off on access and tooling after a checklist validation.
+- Auditability: every activation has an audit trail (Okta request ID, ticket ID, approvers).
+
+Roles and Responsibilities
+- People Ops (Owner): collects hire data, opens activation ticket, schedules orientation, confirms equipment shipping.
+- Hiring Manager (Owner): completes role readiness checklist, approves elevated access, assigns buddy.
+- IT/Cloud (Executor): provisions hardware, cloud accounts (GCP/AWS), repository access, VPN.
+- Security (Reviewer): reviews and approves IAM roles above baseline (see Access Baseline table).
+- Employee/Buddy (Assignee): completes verification tasks and confirms access.
+
+Activation Workflow (High level)
+1. Offer accepted -> People Ops creates Activation Ticket in ServiceDesk with tag activation-step-1 and populates the Activation Form (fields below).
+2. People Ops triggers automated provisioning via Okta SCIM and the infra provisioning automation (CI job: infra-provision/new-hire).
+3. IT/Cloud provisions hardware and cloud accounts; Security reviews any non-standard role requests.
+4. Hiring Manager completes Role Readiness Checklist and signs off within 72 hours.
+5. People Ops closes activation ticket after Manager signoff and employee confirmation.
+
+Activation Form (minimum fields to include in ticket)
+- candidate_name
+- start_date
+- office_or_remote
+- role_title
+- manager_name
+- team_name
+- required_tools (comma-separated list e.g. repo,db,analytics)
+- access_exceptions (yes/no; if yes, justification)
+- equipment_needed (laptop, dock, monitors)
+
+Day 0/Day 1 Access Matrix (table)
+| Category | Baseline access (Day 0) | Role-elevated (Manager request) | Provisioning owner | SLA |
+| --- | --- | --- | --- | --- |
+| Corporate identity | Okta account, SSO to Google Workspace | N/A | People Ops (Okta) | 4 hours before start |
+| Communication | Slack, Miro, Zoom | Admin channels by request | People Ops | 24 hours |
+| Code repos | Read access to team GitHub org | Write on repo or team-admin | IT/DevPlatform | 24-48 hours |
+| Cloud console | Billing console view (read) via group | Project-editor or custom role (approved) | IT/Cloud + Security | 48 hours (security approval adds 24h) |
+| Internal dashboards | Read access to dashboards.team | Product/admin as needed | Data Platform | 48 hours |
+| CI/CD | No access until training | Pipeline trigger rights after training | DevOps | 72 hours |
+
+Role Readiness & Signoff Checklist (hiring manager to complete)
+1. Verified identity and Okta login (employee)
+2. Slack and Zoom access confirmed
+3. Development environment booted and repo cloned
+4. Test commit pushed to non-prod branch (if dev role)
+5. Access to relevant dashboards and tickets granted
+6. Hardware receipt confirmed and VPN tested (if remote)
+7. Buddy assigned and first-week plan scheduled
+
+Manager signs: [Manager name] [Date]
+
+Non-standard Access Requests (escalation steps)
+- If manager requests access beyond baseline, they must include: justification, duration (if temporary), and list of resources.
+- Security will triage within 24 hours and either approve, request mitigating controls, or deny.
+- Approved temporary elevated roles must include an expiration date and owner for removal.
+
+Automation and Templates
+- Okta activation: SCIM provisioning template located at /infra/okta/scim-new-hire.yaml (automation ID: okta-scim-newhire).
+- infra-provision/new-hire CI job accepts a JSON payload with fields: candidate_name, team_slug, start_date, role_template. Example: 
+
+curl -X POST https://ci.redwood.internal/jobs/infra-provision/new-hire -H 'Content-Type: application/json' -d '{"candidate_name":"Alex Kim","team_slug":"infra","start_date":"2028-10-01","role_template":"engineer-senior"}'
+
+Security Baseline (examples)
+- Baseline groups: SRE-Baseline, Eng-Baseline, Analytics-Baseline. Membership handled via Okta group sync.
+- Privileged approvals required for any IAM role that includes: compute.admin, sts:AssumeRole with external_id, or cloudbilling.*.
+
+Troubleshooting Playbook (common issues)
+1. Employee cannot sign in to Okta: verify email provisioning and SCIM sync (Okta Admin Console -> Provisioning -> Review recent sync logs).
+2. GitHub access missing: ensure user is in the correct GitHub team and check SCIM mappings.
+3. VPN failing for remote hire: confirm device certs and split-tunnel config; escalate to IT with packet capture.
+
+Validation & Quarterly Audit
+- People Ops runs a quarterly audit of hires and access for the last 90 days to ensure: activation tickets closed, manager signoff present, no lingering temporary elevated roles beyond expiration.
+- Findings are published to the Security team and Hiring Managers; remediations tracked in the Security risk board.
+
+Appendix: Templates and Examples
+- Example Okta approval note: 
+  "Request: Add user to Eng-Baseline; Reason: onboarding for eng infra team; Expiry: 2029-01-05; Approved by: Manager Name"
+- Example Slack message for first day: 
+  "Please welcome Alex Kim (joined today) — team: Platform; Buddy: Maria S.; Onboarding plan: orientation 10am, infra walkthrough 2pm."
+
+Related links
+- Onboarding Playbook (high-level): /confluence/people-ops/hire-onboard-accelerate-playbook-2025
+- Identity & Access standards: /confluence/security-and-compliance/rbac-and-auth/identity-standards
+
+Revision history
+- 2028-09-05: created by Anika Patel
+- 2028-10-11: updated automation curl example, clarified SLA windows, added quarterly audit note
+
+Contact
+- For process questions: people-ops@redwood.com
+- For access failures: it-support@redwood.com
+- Security exceptions: security-exceptions@redwood.com

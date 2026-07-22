@@ -1,0 +1,198 @@
+Operator runtime seeding and traffic mirroring playbook
+
+Summary
+
+This playbook describes a validated, operator-driven process for seeding runtime state and performing live traffic mirroring in on-prem / VPC private deployments. The goal is to enable low-risk model and config rollouts, reduce cold-start impact, and give operators a deterministic path for verification and rollback without impacting production tenants.
+
+Scope and audience
+
+- Audience: Field operators, deployment engineers, SREs responsible for customer private deployments.
+- Scope: Seeding model artifacts, KV cache warmup, prefix-caching strategies, routing-level traffic mirroring (1:1 and 1:n), observability thresholds, and safe rollback steps. This playbook applies to both single-tenant and multi-tenant private control planes where an operator has access to the runtime operator API.
+
+When to use this playbook
+
+1. Initial customer activation where model artifacts must be preloaded to avoid cold token latencies.
+2. Model swap or quantized artifact rollout where output quality and latency must be validated with mirrored live traffic.
+3. Capacity-driven cutovers (moving tenant traffic between proxy fabrics or during hardware migration).
+
+Prerequisites
+
+- Operator CLI/console access to the private control plane and runtime operator endpoints.
+- Signed model artifact available in the artifact repository and accessible to the runtime image signer.
+- A canary tenant or test tenant that mirrors production traffic (recommended).
+- Observability hooks enabled: per-route latency p50/p95/p99, token throughput, KV cache hit ratio, error rates, and regression hooks for quality check (BLEU/embedding drift or custom eval).
+- Out-of-band communication channel with customer NOC and an agreed maintenance window (if required).
+
+Topology and patterns
+
+We support two common mirroring topologies:
+
+- Sidecar mirror: Proxy duplicates incoming request headers/payloads to a mirrored runtime instance in parallel. Useful for per-tenant verification without changing routing.
+- Egress-shim mirror: Upstream router sends a sampled fraction of traffic to the mirror cluster using routing weights. Useful when sidecar injection is expensive.
+
+Example diagram (text):
+
+Client -> Ingress Proxy -> (primary runtime) -> responses
+                      """"""""""""""
+                      -> Mirrored runtime (read-only, seeded artifacts) -> logging/metrics
+
+Operational principles
+
+- Mirrored runtime must be read-only and never acknowledged as authoritative for production traffic.
+- Seeded KV/cache state should be treated as advisory; operators must track cache TTLs and seeding age.
+- Traffic mirroring must be limited to a safe sampling fraction when doing first-time validation: 0.1% -> 1% -> 10% -> 100% progression model.
+
+Step-by-step: Runtime seeding
+
+1. Verify artifact integrity
+   - Confirm artifact signature and checksum (sha256) against the artifact manifest.
+   - CLI: runtime-operator artifact verify --artifact-id <ARTID> --sha256 <SUM>
+
+2. Stage artifact to runtime image
+   - Upload artifact to local artifact cache and mark as staged for tenant/cluster: runtime-operator stage --artifact <ARTID> --tenant <TENANT_ID>
+
+3. Warm model weights and KV cache
+   - Strategy A: Prefetch model weights into local GPU memory using runtime preloader: runtime-preload --artifact <ARTID> --nodes all --batch-size 1
+   - Strategy B: Replay representative prompt corpus (10k prompts representative of production traffic) against mirrored runtime in isolated mode to populate KV cache. Use replay tool with throttling to avoid CPU/GPU contention: replay-tool --corpus /data/rep-corpus --rate 50/s --target <MIRROR_ENDPOINT>
+
+4. Verify memory and readiness
+   - Check readiness endpoint and GPU memory occupancy: curl -sS http://<node>/runtime/health | jq .gpu_memory_mb
+   - Expected: model resident and readiness==true.
+
+Step-by-step: Traffic mirroring (safe progression)
+
+1. Create mirror policy (dry-run)
+   - Define an objective: quality-signal threshold (e.g., embedding drift < 0.05, top-1 rerank alignment > 98%) and latency budget (p95 < baseline + 50ms).
+   - Create mirror policy in operator: runtime-operator mirror create --from-cluster <INGRESS> --to <MIRROR_CLUSTER> --sample-rate 0.001 --mode read-only --filter "route:/api/v1/chat/*"
+
+2. Observe for 1–2 maintenance cycles (30–60 minutes)
+   - Collect metrics: mirrored latency p50/p95/p99, cache hit ratio, model output divergence (see Quality checks). Do not escalate traffic.
+
+3. Increase mirror rate stepwise: 0.01 -> 0.1 -> 1 -> 10 -> 100
+   - At each step run the quality regression checks and ensure observability gates are satisfied before moving to the next step.
+
+Quality checks and gating
+
+- Metrics to compute every 15 minutes:
+  - Latency delta: p95_mirror - p95_primary <= 50ms
+  - Cache warmness: KV cache hit ratio > 60% after seed phase
+  - Output divergence: embedding cosine distance median <= 0.04 vs baseline, or task-specific metric (F1/BLEU) regression <= 1.5%
+  - Error rate: 5xx rate mirror <= 0.5% absolute increase over primary
+
+- Automated gate example (pseudo-rule):
+  - IF latency_delta_p95 > 100ms OR error_increase > 1% OR output_divergence > threshold -> AUTO-PAUSE mirror and notify operator channel
+
+Observability and logs
+
+- Required dashboards: Mirror-Latency, Mirror-Quality-Drift, KV-Cache-Occupancy, Mirror-Errors. Dashboards should include per-tenant and per-route breakdowns.
+- Trace tags: add tag mirror=1 and seed_age=<minutes> to all mirrored requests for trace correlation.
+- Logging: mirror runtime must emit request-id, model-artifact-id, seed-checksum, and decision flags.
+
+Rollback and fail-open behavior
+
+- Mirror-only operations are safe by default (read-only). However, if the mirror runtime exhibits consistent regressions, follow the rollback checklist:
+  1. Set mirror sample-rate=0 and mark mirror policy paused: runtime-operator mirror pause --policy <POLICY_ID>
+  2. If the problem is a bad artifact, mark artifact revoked and trigger failover to previous artifact: runtime-operator artifact revoke --artifact <ARTID>; runtime-operator rollback --artifact <ARTID_PRIO> --tenant <TENANT_ID>
+  3. If operator cannot revoke artifact immediately, isolate mirror cluster at network level and drain mirrored pods.
+
+Escalation path and ownership
+
+- Primary owner: PrivateDeployments Engineering (oncall: private-deployments-sre rotation)
+- Escalation: contact Platform Reliability -> Product -> Customer Success (template message included below).
+
+Operational checklist (table)
+
+- Pre-seed checklist:
+  - Artifact signature verified
+  - Observability hooks enabled and dashboards accessible
+  - Canary/test tenant configured
+  - Maintenance window agreed (if >10% traffic)
+
+- Seeding checklist:
+  - Model weights resident on GPU across nodes
+  - KV cache hit ratio observed improving > 40% within 1 hour of replay
+  - Readiness endpoints green on all seed targets
+
+- Mirroring progression checklist:
+  - Stepwise sample rate documented and approved
+  - Quality gates green for 30 minutes at each step
+  - Rollback plan validated and contact list confirmed
+
+Example configs
+
+Mirror policy (YAML example):
+
+---
+apiVersion: redwood/v1
+kind: MirrorPolicy
+metadata:
+  name: tenant-123-mirror-1
+spec:
+  source: ingress-proxy
+  destination: cluster-mirror-ten-123
+  sampleRate: 0.01
+  mode: read-only
+  filters:
+    - pathPrefix: /api/v1/chat
+  annotations:
+    owner: private-deployments
+    ticket: PD-2345
+---
+
+Seed replay config (example JSON lines):
+{
+  "corpus": "/data/customer/tenant-123/rep-corpus.jsonl",
+  "target": "https://mirror.tenant-123.internal:8443/v1/stream",
+  "rate": 25,
+  "duration_minutes": 120
+}
+
+Operator CLI snippets
+
+- Stage artifact: runtime-operator stage --artifact art-2026-06-03 --tenant TEN-123
+- Start seeded replay: replay-tool start --config seed-replay.json
+- Create mirror policy: runtime-operator mirror create --from ingress --to mirror-ten-123 --rate 0.01 --filter "/api/v1/chat"
+- Pause mirror: runtime-operator mirror pause --policy mirror-abc123
+
+Troubleshooting cookbook (common failures)
+
+1. Slow p95 on mirror after seed:
+   - Symptom: p95_mirror >> p95_primary even after seed phase
+   - Actions: verify GPU memory residency, reduce batch-size, validate kernel/quantization mismatch between clusters. If mismatch, revert to previous artifact.
+
+2. High output divergence:
+   - Symptom: embedding drift > threshold
+   - Actions: run off-line evals on seeded mirror with the same prompts used in production sampling, compare top-k outputs. If drift persists, revoke artifact.
+
+3. KV cache not warming:
+   - Symptom: cache hit ratio remains <20% after replay
+   - Actions: ensure replay corpus covers prefixes and conversational back-and-forth; increase replay diversity and duration; confirm that caching keys and prefix hashing match between primary and mirror runtimes.
+
+Templates and communication
+
+- Customer notification template (short):
+  Subject: Planned runtime seeding and verification for <customer-name> (window: <start> - <end>)
+  Body: We will perform routine runtime seeding and staged traffic mirroring to validate a model refresh. Production write path will not be impacted. If you observe regression, contact NOC at <contact>.
+
+- Incident template (if rollback):
+  - Summary, start time, affected tenants, action taken (mirror paused, artifact revoked, rollback initiated), next steps, owner contact.
+
+Post-mortem data to collect
+
+- Replay corpus used, sample rates and step timings, metric deltas (latency, error, divergence), kubernetes pod events, GPU memory profiles, and request traces with mirror=1 tag. Preserve artifacts and checksums.
+
+Ownership and contact list
+
+- Private Deployments Engineering (oncall): private-deployments-sre@redwood.internal
+- Runtime artifact team: artifacts@redwood.internal
+- Observability: telemetry@redwood.internal
+
+Appendix: Quick reference commands
+
+- Check mirror metrics: telemetry-cli query --dashboard Mirror-Latency --tenant TEN-123 --range 60m
+- Verify artifact checksum: runtime-operator artifact verify --artifact art-2026-06-03
+- Pause mirror quickly: runtime-operator mirror pause --policy mirror-abc123
+
+Notes and rationale
+
+This playbook codifies a minimal-risk pattern that balances operator autonomy with automated gates. Seeding avoids the large latencies common on first cold-infer request; mirroring gives a realistic signal for quality without impacting production. The safe progression and gate rules are conservative by design and should be tuned with specific customer SLAs and workload profiles.

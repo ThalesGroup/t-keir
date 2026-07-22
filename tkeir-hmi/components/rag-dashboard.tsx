@@ -11,7 +11,7 @@ import {
 import { AuthButton } from "@/components/auth-button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { checkHealth, queryRag, RagApiError } from "@/lib/api";
+import { checkAgentHealth, checkHealth, queryRag, RagApiError } from "@/lib/api";
 import type { QueryResponse, SemanticEntity, SemanticKeyword } from "@/lib/types";
 
 export function RagDashboard() {
@@ -21,6 +21,7 @@ export function RagDashboard() {
   const [response, setResponse] = useState<QueryResponse | null>(null);
   const [correlationId, setCorrelationId] = useState<string | null>(null);
   const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
+  const [agentAvailable, setAgentAvailable] = useState(false);
   const [activeChunkIds, setActiveChunkIds] = useState<Set<string> | null>(
     null,
   );
@@ -29,6 +30,7 @@ export function RagDashboard() {
 
   useEffect(() => {
     void checkHealth().then(setApiHealthy);
+    void checkAgentHealth().then(setAgentAvailable);
   }, []);
 
   useEffect(() => {
@@ -179,6 +181,7 @@ export function RagDashboard() {
           response={response}
           correlationId={correlationId}
           loading={loading}
+          agentAvailable={agentAvailable}
           activeChunkIds={activeChunkIds}
           activeLabel={activeLabel}
           onSelectEntity={handleSelectEntity}

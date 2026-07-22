@@ -1,4 +1,12 @@
-"""Tests for shared keyword label validation."""
+"""Title: Keyword Rules
+
+Tests for shared keyword label validation.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.core.KeywordRules import (
     DEFAULT_MIN_KEYWORD_LENGTH,

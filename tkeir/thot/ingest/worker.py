@@ -1,14 +1,24 @@
-"""Run pipeline + optional Vespa indexing for ingest jobs."""
+"""Title: Worker
+
+Run pipeline + optional Vespa indexing for ingest jobs.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
 import asyncio
 import base64
+import inspect
 import json
 import logging
 import os
 import tempfile
 from collections.abc import Awaitable, Callable
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -46,11 +56,45 @@ from thot.tools.search.vespa_client import VespaClient
 
 LOGGER = logging.getLogger(__name__)
 
-PipelineFn = Callable[
-    [PipelineRunner, bytes, str, str],
-    dict[str, Any],
-]
+PipelineFn = Callable[..., dict[str, Any]]
 IndexFn = Callable[[dict[str, Any]], Awaitable[int]]
+
+
+def document_extras_from_metadata(
+    metadata: dict[str, Any] | None,
+    *,
+    ontologies: list[str] | None = None,
+) -> dict[str, Any] | None:
+    """Build pipeline document extras from ingest multipart/JSON fields.
+
+    ``ontologies`` must already be **server-local staged paths** produced from
+    client-uploaded bytes (never client filesystem paths). Legacy path keys in
+    metadata are ignored for derive-from.
+    """
+    from thot.tasks.document_ontology.OntologyLexicon import (
+        normalize_ontology_path_list,
+        stamp_document_ontologies,
+    )
+
+    extras: dict[str, Any] = {}
+    if metadata:
+        extras["metadata"] = dict(metadata)
+        for key in (
+            "corpus",
+            "topic_id",
+            "doc_type",
+            "title",
+            "user_space",
+            "language",
+        ):
+            if key in metadata and metadata[key] is not None:
+                extras[key] = metadata[key]
+
+    collected = normalize_ontology_path_list(ontologies)
+    if collected:
+        stamp_document_ontologies(extras, collected)
+
+    return extras or None
 
 
 def _default_pipeline_config_path(settings: IngestSettings) -> Path:
@@ -66,17 +110,61 @@ def _load_runner(config_path: Path) -> PipelineRunner:
     return PipelineRunner(config)
 
 
+@lru_cache(maxsize=4)
+def _cached_runner(config_path: str) -> PipelineRunner:
+    """Reuse one PipelineRunner (and spaCy models) per config path."""
+    return _load_runner(Path(config_path))
+
+
+def ensure_source_doc_id(
+    document: dict[str, Any],
+    *,
+    filename: str | None = None,
+    content_digest: str | None = None,
+) -> dict[str, Any]:
+    """Guarantee ``source_doc_id`` for Vespa indexing.
+
+    Pre-converted corpus JSON (title/content only) skips the converter, which
+    normally stamps ``source_doc_id``. Fall back to ``source``, then a stable
+    ingest URI from the content digest / filename.
+    """
+    existing = document.get("source_doc_id")
+    if isinstance(existing, str) and existing.strip():
+        return document
+    source = document.get("source")
+    if isinstance(source, str) and source.strip():
+        document["source_doc_id"] = source.strip()
+        return document
+    name = filename or "upload.bin"
+    if content_digest:
+        document["source_doc_id"] = f"ingest://{content_digest}/{name}"
+    else:
+        document["source_doc_id"] = f"ingest://{name}"
+    if not document.get("source"):
+        document["source"] = document["source_doc_id"]
+    return document
+
+
 def run_pipeline_on_bytes(
     runner: PipelineRunner,
     content: bytes,
     filename: str,
     correlation_id: str,
+    *,
+    document_extras: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Execute the NLP pipeline on raw document bytes."""
+    """Execute the NLP pipeline on raw document bytes.
+
+    ``document_extras`` (e.g. per-request ``ontologies`` paths) are
+    merged into the pipeline input and preserved across the converter step.
+    """
+    from thot.ingest.fetch import doc_id_from_content
+
     suffix = Path(filename).suffix or ".bin"
     call_context = LogUserContext(correlation_id)
     call_context["input-file"] = filename
     call_context["source-file-size-bytes"] = len(content)
+    content_digest = doc_id_from_content(content)
 
     with tempfile.TemporaryDirectory(prefix="tkeir-ingest-") as temp_dir:
         input_path = Path(temp_dir) / f"source{suffix}"
@@ -87,9 +175,26 @@ def run_pipeline_on_bytes(
             if isinstance(payload, dict) and (
                 "content" in payload or "content_tokens" in payload
             ):
-                return runner.run_converted(
+                if document_extras:
+                    payload = {**payload, **document_extras}
+                # Corpus JSON often has title/content only — stamp id before
+                # run_converted (converter is skipped).
+                ensure_source_doc_id(
+                    payload,
+                    filename=filename,
+                    content_digest=content_digest,
+                )
+                # content may be a plain string in demo corpora.
+                if isinstance(payload.get("content"), str):
+                    payload["content"] = [payload["content"]]
+                result = runner.run_converted(
                     payload,
                     call_context=call_context,
+                )
+                return ensure_source_doc_id(
+                    result,
+                    filename=filename,
+                    content_digest=content_digest,
                 )
         resolved_type = detect_input_format(
             str(input_path),
@@ -97,12 +202,26 @@ def run_pipeline_on_bytes(
             AUTO_DATATYPE,
         )
         encoded = base64.b64encode(content).decode()
-        payload = {
+        payload: dict[str, Any] = {
             "datatype": resolved_type,
             "data": encoded,
-            "source": f"ingest://{filename}",
+            "source": f"ingest://{content_digest}/{filename}",
+            "source_doc_id": f"ingest://{content_digest}/{filename}",
         }
-        return runner.run(payload, call_context=call_context)
+        if document_extras:
+            payload.update(document_extras)
+            # Keep a stable id even if extras omit it.
+            ensure_source_doc_id(
+                payload,
+                filename=filename,
+                content_digest=content_digest,
+            )
+        result = runner.run(payload, call_context=call_context)
+        return ensure_source_doc_id(
+            result,
+            filename=filename,
+            content_digest=content_digest,
+        )
 
 
 async def _default_index(
@@ -133,12 +252,47 @@ class IngestWorker:
         self.settings = settings or ingest_settings()
         self._pipeline_fn = pipeline_fn
         self._index_fn = index_fn
+        # Serialize heavy NLP+index work — parallel spaCy runs OOM host ingest (SIGKILL 137).
+        self._pipeline_sem = asyncio.Semaphore(self.settings.max_concurrency)
 
     def _embedder_info(self) -> EmbedderInfo:
         provider = os.getenv("PROVIDER", "ollama")
         model = os.getenv("EMBEDDING_MODEL", "bge-m3")
         digest = embedder_fingerprint(provider=provider, model=model)
         return EmbedderInfo(model=model, provider=provider, sha256=digest)
+
+    def _runner(self, config_path: Path) -> PipelineRunner:
+        if self._pipeline_fn is not None:
+            return _load_runner(config_path)
+        return _cached_runner(str(config_path.resolve()))
+
+    def _invoke_pipeline_fn(
+        self,
+        runner: PipelineRunner,
+        content: bytes,
+        filename: str,
+        correlation_id: str,
+        document_extras: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        """Call injected pipeline_fn; pass extras when the callable accepts them."""
+        assert self._pipeline_fn is not None
+        fn = self._pipeline_fn
+        try:
+            params = inspect.signature(fn).parameters
+        except (TypeError, ValueError):
+            params = {}
+        accepts_extras = "document_extras" in params or any(
+            p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()
+        )
+        if accepts_extras:
+            return fn(
+                runner,
+                content,
+                filename,
+                correlation_id,
+                document_extras=document_extras,
+            )
+        return fn(runner, content, filename, correlation_id)
 
     async def process_source(
         self,
@@ -151,6 +305,7 @@ class IngestWorker:
         content_type: str | None = None,
         batch_id: str | None = None,
         user_space: str | None = None,
+        document_extras: dict[str, Any] | None = None,
     ) -> IngestJob:
         """Fetch (when needed), stage, pipeline, and optionally index."""
         from thot.tools.search.user_space import resolve_vespa_user_space
@@ -161,6 +316,7 @@ class IngestWorker:
             fallback=user_space
             or (existing_job.user_space if existing_job else None),
         )
+        extras = document_extras
         try:
             GovernorClient().assert_scope_active("ingest")
         except RuntimeError as exc:
@@ -271,37 +427,40 @@ class IngestWorker:
         self.store.write_manifest(manifest)
 
         try:
-            if self._pipeline_fn is not None:
-                runner = _load_runner(config_path)
-                document = self._pipeline_fn(
-                    runner,
-                    content,
-                    filename,
-                    correlation_id,
-                )
-            else:
-                runner = _load_runner(config_path)
-                document = await asyncio.to_thread(
-                    run_pipeline_on_bytes,
-                    runner,
-                    content,
-                    filename,
-                    correlation_id,
-                )
-            pipeline_path = self.store.staging_path(doc_id) / "pipeline.json"
-            pipeline_path.write_text(
-                json.dumps(document, indent=2, ensure_ascii=False) + "\n",
-                encoding="utf-8",
-            )
-
-            chunk_count = 0
-            if self.settings.index_enabled:
-                if self._index_fn is not None:
-                    chunk_count = await self._index_fn(document)
-                else:
-                    chunk_count = await _default_index(
-                        document, user_space=space
+            async with self._pipeline_sem:
+                if self._pipeline_fn is not None:
+                    runner = self._runner(config_path)
+                    document = self._invoke_pipeline_fn(
+                        runner,
+                        content,
+                        filename,
+                        correlation_id,
+                        extras,
                     )
+                else:
+                    runner = self._runner(config_path)
+                    document = await asyncio.to_thread(
+                        run_pipeline_on_bytes,
+                        runner,
+                        content,
+                        filename,
+                        correlation_id,
+                        document_extras=extras,
+                    )
+                pipeline_path = self.store.staging_path(doc_id) / "pipeline.json"
+                pipeline_path.write_text(
+                    json.dumps(document, indent=2, ensure_ascii=False) + "\n",
+                    encoding="utf-8",
+                )
+
+                chunk_count = 0
+                if self.settings.index_enabled:
+                    if self._index_fn is not None:
+                        chunk_count = await self._index_fn(document)
+                    else:
+                        chunk_count = await _default_index(
+                            document, user_space=space
+                        )
 
             manifest.status = "indexed"
             manifest.chunk_count = chunk_count
@@ -337,6 +496,12 @@ class IngestWorker:
                 manifest=manifest,
                 reason=str(exc),
             )
+            if self.settings.stop_on_failed:
+                from thot.ingest.shutdown import request_ingest_shutdown
+
+                request_ingest_shutdown(
+                    f"stop-on-failed: ingest_id={ingest_id} error={exc}"
+                )
             return job
 
     async def retry_from_dlq(self, ingest_id: str) -> IngestJob:

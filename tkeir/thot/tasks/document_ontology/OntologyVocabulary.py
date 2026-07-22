@@ -1,4 +1,12 @@
-"""Per-document ontology vocabulary derived from clustering and auto-labeling."""
+"""Title: Ontology Vocabulary
+
+Per-document ontology vocabulary derived from clustering and auto-labeling.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

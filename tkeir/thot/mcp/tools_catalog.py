@@ -1,9 +1,14 @@
-"""Declarative MCP tool catalogue for T-KEIR read-only tools.
+"""Title: Declarative MCP tool catalogue for T-KEIR read-only tools.
 
 Example:
     >>> from thot.mcp.tools_catalog import list_tool_names
     >>> "search" in list_tool_names()
     True
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

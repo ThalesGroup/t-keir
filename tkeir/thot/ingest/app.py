@@ -1,10 +1,20 @@
-"""FastAPI ingest service (``tkeir-ingest``)."""
+"""Title: Ingest FastAPI application
+
+FastAPI ingest service (``tkeir-ingest``).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any, cast
 
 from fastapi import (
@@ -98,6 +108,97 @@ def _correlation_id() -> str:
     return current_correlation_id() or new_action_id()
 
 
+def _parse_json_object_field(raw: Any, *, field_name: str) -> dict[str, Any] | None:
+    """Parse an optional multipart JSON object field."""
+    if raw is None or hasattr(raw, "read"):
+        return None
+    text = str(raw).strip()
+    if not text:
+        return None
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid {field_name} JSON: {exc}",
+        ) from exc
+    if not isinstance(parsed, dict):
+        raise HTTPException(
+            status_code=400,
+            detail=f"{field_name} must be a JSON object",
+        )
+    return parsed
+
+
+def _parse_ontology_paths_field(raw: Any) -> None:
+    """Reject path-only ``ontologies`` form fields (content must be uploaded)."""
+    if raw is None or hasattr(raw, "read"):
+        return
+    text = str(raw).strip()
+    if not text:
+        return
+    raise HTTPException(
+        status_code=400,
+        detail=(
+            "Form field 'ontologies' as paths is not accepted: the ingest "
+            "server cannot read client files. Upload each ontology with "
+            "multipart field 'ontology_file' (repeatable) containing the "
+            "file bytes, or use JSON ontologies[].content_base64."
+        ),
+    )
+
+
+async def _stage_uploaded_ontologies(
+    form: Any,
+    staging_dir: Path,
+) -> list[str]:
+    """Persist multipart ontology file uploads and return staged absolute paths."""
+    from thot.ingest.ontology_upload import stage_ontology_bytes
+
+    items: list[tuple[str, bytes]] = []
+    getters: list[Any] = []
+    if hasattr(form, "getlist"):
+        for key in ("ontology_file", "ontology_files"):
+            getters.extend(list(form.getlist(key)))
+    for key in ("ontology_file", "ontology_files"):
+        item = form.get(key)
+        if item is not None and item not in getters:
+            getters.append(item)
+    for upload in getters:
+        if not hasattr(upload, "read"):
+            continue
+        upload_obj = cast(Any, upload)
+        content = await upload_obj.read()
+        if not content:
+            continue
+        name = getattr(upload_obj, "filename", None) or "ontology.ttl"
+        items.append((str(name), content))
+    return stage_ontology_bytes(staging_dir, items)
+
+
+async def _document_extras_from_multipart(
+    form: Any,
+    *,
+    ingest_id: str,
+) -> dict[str, Any] | None:
+    """Build pipeline extras from multipart metadata + uploaded ontology bytes."""
+    from thot.ingest.ontology_upload import strip_client_ontology_paths
+    from thot.ingest.worker import document_extras_from_metadata
+
+    # Reject path-only ontology lists (client/server separation).
+    _parse_ontology_paths_field(form.get("ontologies"))
+
+    metadata = _parse_json_object_field(form.get("metadata"), field_name="metadata")
+    metadata = strip_client_ontology_paths(metadata)
+    state: AppState = app.state.ingest
+    upload_dir = Path(state.settings.root) / "uploaded_ontologies" / ingest_id
+    uploaded = await _stage_uploaded_ontologies(form, upload_dir)
+    return document_extras_from_metadata(
+        metadata,
+        ontologies=uploaded or None,
+    )
+
+
 def _queue_job(
     *,
     source_uri: str,
@@ -107,6 +208,7 @@ def _queue_job(
     batch_id: str | None,
     background: BackgroundTasks,
     user_space: str,
+    document_extras: dict[str, Any] | None = None,
 ) -> IngestAcceptedResponse:
     state: AppState = app.state.ingest
     ingest_id = new_action_id()
@@ -133,6 +235,7 @@ def _queue_job(
             content_type=content_type,
             batch_id=batch_id,
             user_space=user_space,
+            document_extras=document_extras,
         )
 
     background.add_task(_run)
@@ -145,10 +248,7 @@ def _queue_job(
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    """Liveness probe."""
-    state: AppState = app.state.ingest
-    if state.vespa is None or not await state.vespa.health():
-        raise HTTPException(status_code=503, detail="Vespa is unavailable")
+    """Liveness probe (process up). Use ``/ready`` for Vespa + deps."""
     return {"status": "ok"}
 
 
@@ -190,7 +290,17 @@ async def ingest_document(
     background: BackgroundTasks,
     actor: str = Depends(require_ingest_auth),
 ) -> IngestAcceptedResponse:
-    """Ingest one document from multipart upload or JSON URL."""
+    """Ingest one document from multipart upload or JSON URL.
+
+    Per-document external ontologies must be **uploaded as content** (the
+    server has no access to client filesystem paths):
+
+    - multipart: repeatable ``ontology_file`` parts (OWL/TTL/RDF bytes), and/or
+    - JSON body: ``ontologies: [{filename, content_base64}, ...]``.
+
+    Staged paths under ``INGEST_ROOT`` are passed to NER, syntax, and
+    document-ontology for that document only.
+    """
     content_type = request.headers.get("content-type", "")
     if content_type.startswith("multipart/"):
         form = await request.form()
@@ -206,6 +316,9 @@ async def ingest_document(
         filename = getattr(upload_obj, "filename", None) or "upload.bin"
         doc_id_hint = new_action_id()
         source_uri = f"upload://{doc_id_hint}/{filename}"
+        extras = await _document_extras_from_multipart(
+            form, ingest_id=doc_id_hint
+        )
         return _queue_job(
             source_uri=source_uri,
             content=content,
@@ -214,11 +327,39 @@ async def ingest_document(
             batch_id=None,
             background=background,
             user_space=actor,
+            document_extras=extras,
         )
     try:
         body = DocumentIngestRequest.model_validate(await request.json())
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    from thot.ingest.ontology_upload import (
+        decode_ontology_uploads,
+        stage_ontology_bytes,
+        strip_client_ontology_paths,
+    )
+    from thot.ingest.worker import document_extras_from_metadata
+
+    state: AppState = app.state.ingest
+    staging_id = new_action_id()
+    try:
+        uploads = decode_ontology_uploads(
+            [item.model_dump() for item in (body.ontologies or [])]
+            if body.ontologies
+            else None
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    staged: list[str] = []
+    if uploads:
+        staged = stage_ontology_bytes(
+            Path(state.settings.root) / "uploaded_ontologies" / staging_id,
+            uploads,
+        )
+    extras = document_extras_from_metadata(
+        strip_client_ontology_paths(body.metadata),
+        ontologies=staged or None,
+    )
     return _queue_job(
         source_uri=str(body.url),
         content=None,
@@ -227,6 +368,7 @@ async def ingest_document(
         batch_id=None,
         background=background,
         user_space=actor,
+        document_extras=extras,
     )
 
 
@@ -240,11 +382,38 @@ async def ingest_batch(
     background: BackgroundTasks,
     actor: str = Depends(require_ingest_auth),
 ) -> BatchAcceptedResponse:
-    """Queue a batch of URL-based ingest jobs."""
+    """Queue a batch of URL-based ingest jobs (each item may carry ontologies)."""
+    from thot.ingest.ontology_upload import (
+        decode_ontology_uploads,
+        stage_ontology_bytes,
+        strip_client_ontology_paths,
+    )
+    from thot.ingest.worker import document_extras_from_metadata
+
+    state: AppState = app.state.ingest
     batch_id = new_action_id()
     correlation_id = _correlation_id()
     jobs: list[IngestAcceptedResponse] = []
     for item in request.items:
+        staging_id = new_action_id()
+        try:
+            uploads = decode_ontology_uploads(
+                [o.model_dump() for o in (item.ontologies or [])]
+                if item.ontologies
+                else None
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        staged: list[str] = []
+        if uploads:
+            staged = stage_ontology_bytes(
+                Path(state.settings.root) / "uploaded_ontologies" / staging_id,
+                uploads,
+            )
+        extras = document_extras_from_metadata(
+            strip_client_ontology_paths(item.metadata),
+            ontologies=staged or None,
+        )
         accepted = _queue_job(
             source_uri=str(item.url),
             content=None,
@@ -253,6 +422,7 @@ async def ingest_batch(
             batch_id=batch_id,
             background=background,
             user_space=actor,
+            document_extras=extras,
         )
         jobs.append(accepted)
     return BatchAcceptedResponse(
@@ -286,6 +456,32 @@ async def ingest_status(
         noop=job.noop,
         manifest=manifest,
     )
+
+
+@app.post("/ingest/stop")
+async def ingest_stop(
+    request: Request,
+    _actor: str = Depends(require_ingest_auth),
+) -> dict[str, str]:
+    """Stop the ingest server process (used by client ``--stop-on-failed``)."""
+    import threading
+
+    from thot.ingest.shutdown import request_ingest_shutdown
+
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    reason = "client requested /ingest/stop"
+    if isinstance(body, dict) and body.get("reason"):
+        reason = str(body["reason"])
+
+    def _stop() -> None:
+        request_ingest_shutdown(reason)
+
+    # Delay so the HTTP 200 reaches the client before SIGTERM.
+    threading.Timer(0.2, _stop).start()
+    return {"status": "stopping", "reason": reason}
 
 
 def main() -> None:

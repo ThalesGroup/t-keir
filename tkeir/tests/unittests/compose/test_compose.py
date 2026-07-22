@@ -1,4 +1,12 @@
-"""Unit tests for ontology-driven composition (Phase C)."""
+"""Title: Compose
+
+Unit tests for ontology-driven composition (Phase C).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

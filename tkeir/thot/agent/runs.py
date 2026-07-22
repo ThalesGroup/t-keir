@@ -1,4 +1,12 @@
-"""Filesystem run store mirroring ingest jobs layout."""
+"""Title: Runs
+
+Filesystem run store mirroring ingest jobs layout.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

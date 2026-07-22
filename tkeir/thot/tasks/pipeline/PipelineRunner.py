@@ -1,4 +1,12 @@
-"""Run the full T-KEIR NLP pipeline in process."""
+"""Title: Pipeline Runner
+
+Run the full T-KEIR NLP pipeline in process.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import copy
 import time
@@ -27,6 +35,42 @@ from thot.tasks.pipeline.PipelineTasks import (
 from thot.tasks.pipeline.ResourceSelector import ResourceSelector
 from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
 from thot.tasks.tokenizer.Tokenizer import Tokenizer
+
+# Fields carried on the ingest/pipeline input that the converter replaces but
+# which later tasks (esp. document-ontology derive-from) still need.
+_PIPELINE_PRESERVE_KEYS = (
+    "ontologies",
+    "derive_from_ontologies",
+    "ontology_sources",
+    "source_doc_id",
+    "source",
+    "metadata",
+    "corpus",
+    "topic_id",
+    "doc_type",
+    "title",
+    "user_space",
+)
+
+
+def _preserve_pipeline_extras(source: dict, target: dict) -> dict:
+    """Copy ingest/corpus extras onto the converter (or task) output document."""
+    for key in _PIPELINE_PRESERVE_KEYS:
+        if key not in source:
+            continue
+        value = source[key]
+        if key == "metadata" and isinstance(value, dict):
+            existing = target.get("metadata")
+            if isinstance(existing, dict):
+                merged = dict(existing)
+                merged.update(value)
+                target["metadata"] = merged
+            elif "metadata" not in target:
+                target["metadata"] = dict(value)
+            continue
+        if key not in target or target.get(key) in (None, "", [], {}):
+            target[key] = copy.deepcopy(value)
+    return target
 
 
 class PipelineRunner:
@@ -495,6 +539,7 @@ class PipelineRunner:
             result = self._run_timed_step(
                 "converter", input_file, call_context, _convert, step_timings
             )
+            result = _preserve_pipeline_extras(document, result)
 
         result = self._apply_language_setup(
             result, tasks_to_run, input_file, call_context, step_timings

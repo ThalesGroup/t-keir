@@ -1,4 +1,12 @@
-"""Publish agent-generated content (approval-gated re-ingest staging)."""
+"""Title: Publish
+
+Publish agent-generated content (approval-gated re-ingest staging).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

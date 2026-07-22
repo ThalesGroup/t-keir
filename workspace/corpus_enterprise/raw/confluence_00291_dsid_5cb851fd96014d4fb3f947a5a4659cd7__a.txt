@@ -1,0 +1,133 @@
+Anticipatory SLO Drift and Capacity Playbook
+
+Overview:
+This playbook defines a structured, anticipatory approach to detecting SLO drift early, preserving error budgets, and synthesizing short-term capacity hedges for Redwood Inference multi-tenant inference services. It combines telemetry-based detection, automated mitigation policies, manual runbook steps, and post-action verification to keep customer-facing SLOs within tolerance while minimizing cost and operational blast radius.
+
+Scope:
+- Services covered: inference-api, batch-embeddings, realtime-chat, routing-proxy.
+- Applies to: latency and availability SLOs, burst headroom planning, tenant isolation/priority actions.
+- Not covered: long-term capacity procurement, contract-level SLA negotiations (see finance/legal).
+
+Objectives:
+1) Detect SLO drift (trend-based and distributional) before error budget depletion.
+2) Provide an ordered set of automated and manual mitigations to preserve error budgets with minimal customer-visible degradation.
+3) Create capacity hedges (short duration) using elastic pools, pre-warmed models, and tenant prioritization.
+4) Ensure clear ownership, observable outcomes, and fast rollback.
+
+Key definitions:
+- SLO drift: a sustained shift in SLO metrics (p90/p99 latency, availability) relative to baseline trend over the last 24–72 hours.
+- Anticipatory action: mitigation taken while error budget remains > 0 but trending to depletion within horizon T (default T = 6 hours).
+- Hedged capacity: short-lived capacity reserved from burst pool or spare GPU fleet to reduce tail pressure.
+
+Ownership and on-call responsibilities:
+- Primary owner: service steward (service manifest: owners field). For inference-api this is @steward-inference.
+- SRE on-call: triage alerts, execute automated policy escalations, coordinate with service owner.
+- Platform/Capacity team: approve and enact reserved-capacity allocations (>2h).
+- Product/customer-success: communicate customer-impacting actions when degradation expected >15 minutes.
+
+Detection: telemetry signals and queries
+- Inputs (minimum telemetry): request latency histogram (per-route), success/error rate, queue length, GPU utilization, model-kv-cache-hit, request-sizes, tenant-priority label.
+- Detection rules (examples):
+  * Trend rule: if p99 latency has increased by >25% vs rolling-7d baseline for 2 consecutive 15m buckets and error budget burn rate > 2x expected, generate SLO-drift alert with severity MEDIUM.
+  * Distributional rule: if p95–p99 spread widens by >2x and tail instance count > 0.5% of traffic, alert TAIL-EXPANSION.
+  * Burn-rate horizon rule: compute time_to_depletion = current_error_budget / recent_burn_rate; if time_to_depletion < T (default 6h) fire PRE-EMPTIVE mitigation trigger.
+
+PromQL (examples):
+- p99 latency trend: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service="inference-api"}[5m])) by (le))
+- burn rate (windowed): (increase(error_budget_consumed_total[10m]) / 600) / error_budget_size
+
+Alerting classification and channels
+- Severity: P2 (anticipatory) | P1 (imminent depletion or customer-affecting).
+- Notifications: PagerDuty for P1, Slack #sre-triage for P2 with clear runbook links. Include time_to_depletion, top affected tenants, and recommended mitigations in alert payload.
+
+Triage and decision matrix (high-level)
+1) Confirm: validate telemetry (duplicate queries, check for ingestion gaps).
+2) Scope: identify affected routes, models, tenants, and geographic regions.
+3) Classify: drift type = capacity-constrained | model-regression | traffic-shift | infra-degradation.
+4) Select mitigation tier using the matrix below.
+
+Mitigation tiers (ordered by preferability):
+- Tier 0: Non-disruptive (automated, low-cost)
+  * Enable prefix/KV cache warmers for top models for 10–30 minutes.
+  * Increase batching size cap (if latency SLO allows) by +1 for configurable endpoints.
+  * Apply adaptive sampling (reduce low-priority tenant sampling) to throttle non-critical requests.
+- Tier 1: Short-lived hedges (elastic, pre-authorized)
+  * Provision hedged GPUs from burst pool (max 1h by default) using rwt capacity.alloc --pool burst --count N --expiry 1h
+  * Activate pre-warmed model replicas (scale up replica count for affected model variants).
+- Tier 2: Priority actions and graceful degradation
+  * Apply tenant-priority routing: shift best-effort tenants to degraded model variant (quantized or smaller model).
+  * Route critical routes to dedicated capacity lanes (reserved instances) via routing policy update.
+- Tier 3: Emergency containment (requires manager approval if >30m)
+  * Service-level admission control: reject or queue requests above per-tenant thresholds.
+  * Canary rollback of recent model/version changes.
+  * Cross-region failover if local region capacity exhausted.
+
+Automated policies and guardrails
+- Burn-rate autopilot: when time_to_depletion < 6h, automatically perform Tier 0 actions and notify on-call. Escalate to Tier 1 if post-action burn rate reduction < 30% within 10 minutes.
+- Auto-hedge budget: platform maintains a configurable burst budget per org; automatic hedges must not exceed 20% of monthly burst budget without manual approval.
+- Safety checks before automated scaling:
+  * validate binary instrument signals (no ingestion gaps),
+  * ensure model-variant compatibility for fallback routing,
+  * allocate GPUs in same region unless cross-region failover configured.
+
+Runbook: ordered steps for SRE on-call (quick checklist)
+1) Acknowledge alert. Pin the SLO drift alert channel and open service dashboard.
+2) Run validation queries (copy/paste):
+   - Check p99 trend: (PromQL provided above).
+   - Top-ten tenants by error-budget-burn: topk(10, sum(increase(error_budget_consumed_total[10m])) by (tenant_id))
+3) If automated Tier 0 actions not applied, trigger them via: rwt actions run --playbook anticipatory-cache-warm --service inference-api
+4) If time_to_depletion < 6h and Tier 0 ineffective, request hedged capacity: rwt capacity.request --pool burst --region {region} --count X --duration 1h --reason "SLO drift hedge"
+5) If Tier 2 required, coordinate with product/customer-success before tenant-impacting routing changes. Use Slack bridge and update status page if customer-visible.
+6) Record all actions taken in incident channel and in the event timeline (timestamps, commands, owner).
+
+Decision matrix (simple table):
+| Symptom | First action | Escalate to | Typical rollback |
+|---|---|---|---|
+| p99 up 25% but error budget healthy | Tier 0 cache/batching | SRE lead | revert batching to previous cap |
+| Burn-rate horizon < 6h | Auto-tier0 then request hedge | Platform Capacity | deallocate burst pool GPUs |
+| p99 up after model rollout | Canary rollback | Model owner + SRE | rollback to previous model tag |
+
+Post-action verification checklist
+- Verify burn-rate decreased by >= 30% within 10 minutes of action.
+- Validate tail latency percentiles (p95/p99) returned to baseline within 30 minutes.
+- Confirm no telemetry ingestion gaps and no secondary regressions (errors, queue growth).
+- If hedged GPUs allocated, ensure utilization >30% within 10 minutes, otherwise deallocate to avoid waste.
+
+Communication and coordination
+- If action is non-customer-visible (Tier 0/1), update Slack SRE channel and append a short note in #service-status.
+- If impact > 5% of tenants or > 15 minutes, trigger customer-success and prepare a proactive message (template in customer-success/integration-guides).
+- For cross-team actions (model rollback, routing changes) include owners in the alert thread and record approvals.
+
+Post-incident and follow-up tasks
+- Create a short incident RFC if error budget consumption > 25% of monthly: include hypothesis, actions taken, and timelines.
+- Run an SLO drift root-cause analysis (RCA) within 3 business days: was drift caused by traffic shift, model change, resource contention, or telemetry corruption?
+- If root cause tied to capacity sizing, add demand profile adjustments to next quarter capacity plan.
+
+Appendix A — Example commands and snippets
+- Request hedged capacity (example):
+  rwt capacity.request --pool burst --region us-west-2 --count 4 --duration 1h --tags "slo_hedge,inference-api" --reason "Anticipatory hedge for p99 surge"
+- Pre-warm cache job example (K8s job yaml snippet described):
+  kubectl apply -f prewarm-job-inference-api.yaml --namespace inference-warmers
+- Quick Prometheus sanity check: curl -sS "http://prometheus/api/v1/query?query=up" | jq .
+
+Appendix B — Tunable parameters (default values)
+| Parameter | Default | Notes |
+|---|---|---|
+| anticipatory_horizon_hours | "6" | Time horizon to compute time_to_depletion |
+| auto_hedge_max_duration_minutes | "60" | Max automatic burst pool allocation without manual approval |
+| burn_rate_reduction_threshold_pct | "30" | Required reduction to consider action effective |
+| hedged_gpu_util_threshold_pct | "30" | Minimum utilization to keep hedged capacity allocated |
+
+Related pages and references:
+- See capacity-procurement and burst-pool-runbook for long-lived allocations.
+- See model-onboarding standards for pre-warming and cache compatibility.
+
+Document change log:
+- 2025-11-12 created by Jordan Li (initial draft).
+- 2025-12-08 updated: added PromQL examples and automated policy thresholds (reviewers: Asha Patel).
+- 2026-02-14 updated: refined decision matrix, added hedged GPU utilization rules (reviewers: Luis Moreno, Priya Singh).
+
+Contact and escalation list:
+- SRE on-call rotation: #sre-oncall (PagerDuty).
+- Platform capacity: platform-capacity@redwood.com.
+- Service steward: see service manifest in repo infra/service-manifests/inference-api.yaml.

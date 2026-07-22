@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4CTBJYD5M7HJ86X31XAMSD",
+  "reason": "Language is not managed",
+  "job": {
+    "ingest_id": "01KY4CTBJYD5M7HJ86X31XAMSD",
+    "correlation_id": "eef42e4201e21bbf5e79765be5878d37",
+    "status": "failed",
+    "doc_id": "e6720885924f41042bbd9e1dcf67de16018882a274b4dce1f6a248cf4c109689",
+    "batch_id": null,
+    "manifest_path": "staging/e6720885924f41042bbd9e1dcf67de16018882a274b4dce1f6a248cf4c109689/ingest.manifest.json",
+    "error": "Language is not managed",
+    "created_at": "2026-07-22T07:49:35.966Z",
+    "updated_at": "2026-07-22T07:49:37.432Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4CTBJYD5M7HJ86X31XAMSD",
+    "correlation_id": "eef42e4201e21bbf5e79765be5878d37",
+    "doc_id": "e6720885924f41042bbd9e1dcf67de16018882a274b4dce1f6a248cf4c109689",
+    "source": {
+      "uri": "upload://01KY4CTBJY0363TRG1RMBKF159/INTSUM_00005_d58842de.md",
+      "filename": "INTSUM_00005_d58842de.md",
+      "content_type": "application/octet-stream",
+      "size_bytes": 277
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T07:49:35.995Z",
+    "error": "Language is not managed"
+  },
+  "failed_at": "2026-07-22T07:49:37.477Z"
+}

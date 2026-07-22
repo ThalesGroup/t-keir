@@ -1,9 +1,11 @@
-"""Action identity package — correlation, ActionRecord, observe middleware.
+"""Title: action package init
 
-Author: Eric Blaudez (Eric Blaudez)
+Action identity package — correlation, ActionRecord, observe middleware.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.action.correlation import (

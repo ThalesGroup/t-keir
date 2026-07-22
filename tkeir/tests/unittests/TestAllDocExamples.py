@@ -1,4 +1,12 @@
-"""Run doctest examples embedded in thot package docstrings."""
+"""Title: All Doc Examples
+
+Run doctest examples embedded in thot package docstrings.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

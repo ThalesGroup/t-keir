@@ -1,4 +1,12 @@
-"""Tests for resource selection."""
+"""Title: Resource Selector
+
+Tests for resource selection.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.core.TkeirPaths import resources_dir
 from thot.tasks.pipeline.ResourceSelector import ResourceSelector

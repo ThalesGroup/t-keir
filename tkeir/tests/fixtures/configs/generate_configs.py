@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Generate functional test service configs without Jinja placeholders."""
+"""Title: Generate configs
+
+Generate functional test service configs without Jinja placeholders.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 

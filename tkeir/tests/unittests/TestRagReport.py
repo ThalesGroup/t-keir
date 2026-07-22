@@ -1,4 +1,12 @@
-"""Tests for RAG report assembly helpers."""
+"""Title: Rag Report
+
+Tests for RAG report assembly helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tools.search.app import RetrievedChunk
 from thot.tools.search.rag_report import (
@@ -56,7 +64,7 @@ def test_format_input_prompt_combines_system_and_user():
     assert "Who is Alice?" in prompt
 
 
-def test_assemble_report_markdown_includes_input_prompt():
+def test_assemble_report_markdown_excludes_input_prompt():
     report = assemble_report_markdown(
         query="Who is Alice?",
         language="en",
@@ -67,12 +75,14 @@ def test_assemble_report_markdown_includes_input_prompt():
         vespa_hits=0,
         input_prompt="[SYSTEM]\nBe concise.\n\n[USER]\nWho is Alice?",
     )
-    assert "## LLM Input Prompt" in report
-    assert "[SYSTEM]" in report
+    assert "## LLM Input Prompt" not in report
+    assert "[SYSTEM]" not in report
+    assert "Be concise." not in report
+    assert "## Question" in report
     assert "Who is Alice?" in report
 
 
-def test_assemble_report_markdown_includes_vespa_query():
+def test_assemble_report_markdown_excludes_vespa_query():
     report = assemble_report_markdown(
         query="Abbey Road",
         language="en",
@@ -83,9 +93,10 @@ def test_assemble_report_markdown_includes_vespa_query():
         vespa_hits=3,
         vespa_query='{"yql": "select * from chunk where true", "hits": 3}',
     )
-    assert "## Vespa Search Query" in report
-    assert "```json" in report
-    assert "select * from chunk where true" in report
+    assert "## Vespa Search Query" not in report
+    assert "select * from chunk where true" not in report
+    assert "## Question" in report
+    assert "Abbey Road" in report
 
 
 def test_assemble_report_markdown_includes_sources_and_entities():

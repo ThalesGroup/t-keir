@@ -1,4 +1,12 @@
-"""Tests for TF-IDF lemma vectorization used in ontology clustering."""
+"""Title: Label Vectorizer
+
+Tests for TF-IDF lemma vectorization used in ontology clustering.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import numpy as np
 

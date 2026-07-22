@@ -1,0 +1,54 @@
+Incident Commander checklist: platform-wide degradation (Hosted API)
+
+h1. Goal
+Provide a fast, repeatable checklist for Incident Commanders responding to platform-wide degradation of the Hosted API.
+
+h1. Declare + organize (first 5 minutes)
+1) Create incident channel and set severity (P0/P1).
+2) Assign roles:
+- IC
+- Ops lead (SRE)
+- Comms lead
+- Liaison to Support
+3) Start a shared timeline doc (link in channel).
+4) Confirm paging of required oncalls:
+- SRE
+- Infra
+- Gateway
+- Serving runtime
+- (If auth suspected) Security
+
+h1. Triage + stabilize (minutes 5-20)
+1) Confirm user impact:
+- 5xx rate
+- latency
+- streaming disconnects
+2) Determine blast radius:
+- single region vs global
+- one route vs multiple
+- specific model vs all models
+3) Apply quick mitigations (if available):
+- tighten rate limits
+- disable recent feature flags
+- pause deploys
+- re-route only a subset of traffic
+
+h1. Decision: do we initiate regional failover?
+You should ask three questions:
+1) Is this clearly regional? (e.g., only us-east-1 is failing)
+2) Is the secondary region healthy and has headroom?
+3) Is recovery in the primary likely within 30 minutes?
+
+If (1) and (2) are YES and (3) is NO/unknown, instruct Ops lead to initiate failover per the failover runbook.
+
+*Documentation requirement:* If we are cutting over global traffic, this is an Emergency Change. Capture second-person sign-off in the channel per policy.
+
+h1. Comms
+- Update status page at incident start, at major state changes (failover started, failover complete), and at resolution.
+- For enterprise customers, coordinate with Support on direct outreach.
+
+h1. Resolution + wrap-up
+1) Confirm stability for at least 30 minutes.
+2) Announce "resolved" and note whether we remain failed over.
+3) Assign postmortem owner and due date.
+4) Ensure the exact traffic routing commands used are in the timeline.

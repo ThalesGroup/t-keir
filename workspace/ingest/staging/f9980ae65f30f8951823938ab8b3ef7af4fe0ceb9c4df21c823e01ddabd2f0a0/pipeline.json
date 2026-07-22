@@ -1,0 +1,2142 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://f9980ae65f30f8951823938ab8b3ef7af4fe0ceb9c4df21c823e01ddabd2f0a0/technical_spec_00057_1c0a8411.csv",
+  "title": "AcmeSystems SOC2 Audit 2024 Technical Specification",
+  "content": [
+    "title,content,topic\r\nAcmeSystems SOC2 Audit 2024 Technical Specification,\"Technical specification — AcmeSystems SOC2 Audit 2024  Purpose: define a secure service interface. Requirements: TLS transport, audit events, role-based authorization, and 99.9% availability. Acceptance: integration tests pass in staging.\",engineering\r\n"
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "Purpose"
+        ],
+        "lemma_content": [
+          "purpose"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          19
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "define"
+        ],
+        "lemma_content": [
+          "define"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          21
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "service",
+          "interface"
+        ],
+        "lemma_content": [
+          "service",
+          "interface"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          24,
+          25
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "integration",
+          "tests"
+        ],
+        "lemma_content": [
+          "integration",
+          "test"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          45,
+          46
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "pass",
+          "in"
+        ],
+        "lemma_content": [
+          "pass",
+          "in"
+        ],
+        "pos": [
+          "VERB",
+          "ADP"
+        ],
+        "positions": [
+          47,
+          48
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "staging"
+        ],
+        "lemma_content": [
+          "staging"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          49
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "raw",
+    "source-size-bytes": 329,
+    "image-extraction": {
+      "enabled": false,
+      "used": false,
+      "mode": null,
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:52:15",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://f9980ae65f30f8951823938ab8b3ef7af4fe0ceb9c4df21c823e01ddabd2f0a0/technical_spec_00057_1c0a8411.csv",
+  "metadata": {
+    "topic_id": "engineering",
+    "corpus": "enterprise",
+    "doc_type": "technical_spec",
+    "language": "en",
+    "title": "AcmeSystems SOC2 Audit 2024 Technical Specification",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "engineering",
+  "doc_type": "technical_spec",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999954741096758
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "title",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "content",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "topic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "SOC2",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Audit",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "2024",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Technical",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Specification",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "\"Technical",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "specification",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "SOC2",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Audit",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "2024",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Purpose",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "define",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "a",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "secure",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "service",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "interface",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Requirements",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "TLS",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "transport",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "audit",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "events",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "role-based",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "authorization",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "99.9",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "%",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "availability",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Acceptance",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "integration",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "tests",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "pass",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "in",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "staging",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "\"",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "engineering",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "SOC2",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Audit",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "2024",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Technical",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Specification",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "SOC2",
+      "text": "SOC2",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Audit",
+      "text": "Audit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "NUM",
+      "lemma": "2024",
+      "text": "2024",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Technical",
+      "text": "Technical",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Specification",
+      "text": "Specification",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "title",
+      "text": "title",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "content",
+      "text": "content",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "topic",
+      "text": "topic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "SOC2",
+      "text": "SOC2",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Audit",
+      "text": "Audit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "NUM",
+      "lemma": "2024",
+      "text": "2024",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Technical",
+      "text": "Technical",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Specification",
+      "text": "Specification",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "\"technical",
+      "text": "\"Technical",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "specification",
+      "text": "specification",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "SOC2",
+      "text": "SOC2",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Audit",
+      "text": "Audit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "NUM",
+      "lemma": "2024",
+      "text": "2024",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "purpose",
+      "text": "Purpose",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "VERB",
+      "lemma": "define",
+      "text": "define",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "DET",
+      "lemma": "a",
+      "text": "a",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "secure",
+      "text": "secure",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "service",
+      "text": "service",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "interface",
+      "text": "interface",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "requirement",
+      "text": "Requirements",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "TLS",
+      "text": "TLS",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "transport",
+      "text": "transport",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "audit",
+      "text": "audit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "event",
+      "text": "events",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "role-based",
+      "text": "role-based",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "authorization",
+      "text": "authorization",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "NUM",
+      "lemma": "99.9",
+      "text": "99.9",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "%",
+      "text": "%",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "availability",
+      "text": "availability",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "acceptance",
+      "text": "Acceptance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "integration",
+      "text": "integration",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "test",
+      "text": "tests",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "VERB",
+      "lemma": "pass",
+      "text": "pass",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "ADP",
+      "lemma": "in",
+      "text": "in",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "staging",
+      "text": "staging",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "\"",
+      "text": "\"",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    },
+    {
+      "pos": "VERB",
+      "lemma": "engineer",
+      "text": "engineering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 53
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 0,
+      "end": 1,
+      "label": "organization",
+      "text": "AcmeSystems"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 5,
+      "end": 6,
+      "label": "organization",
+      "text": "AcmeSystems"
+    },
+    {
+      "start": 9,
+      "end": 11,
+      "label": "organization",
+      "text": "Technical Specification"
+    },
+    {
+      "start": 15,
+      "end": 16,
+      "label": "organization",
+      "text": "AcmeSystems"
+    },
+    {
+      "start": 17,
+      "end": 19,
+      "label": "date",
+      "text": "Audit 2024"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "title",
+      "lemma": "title",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        7
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "content",
+      "lemma": "content",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "conj",
+      "lefts": [],
+      "rights": [
+        3,
+        4
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 2,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "topic",
+      "lemma": "topic",
+      "pos": "NOUN",
+      "head": 2,
+      "dep": "conj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 7,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SOC2",
+      "lemma": "SOC2",
+      "pos": "PROPN",
+      "head": 7,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Audit",
+      "lemma": "Audit",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        5,
+        6
+      ],
+      "rights": [
+        8
+      ]
+    },
+    {
+      "text": "2024",
+      "lemma": "2024",
+      "pos": "NUM",
+      "head": 7,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Technical",
+      "lemma": "Technical",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Specification",
+      "lemma": "Specification",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "ROOT",
+      "lefts": [
+        9
+      ],
+      "rights": [
+        11,
+        13
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "\"Technical",
+      "lemma": "\"technical",
+      "pos": "ADJ",
+      "head": 13,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "specification",
+      "lemma": "specification",
+      "pos": "NOUN",
+      "head": 10,
+      "dep": "appos",
+      "lefts": [
+        12
+      ],
+      "rights": [
+        14
+      ]
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 13,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SOC2",
+      "lemma": "SOC2",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Audit",
+      "lemma": "Audit",
+      "pos": "PROPN",
+      "head": 19,
+      "dep": "nmod",
+      "lefts": [
+        15,
+        16
+      ],
+      "rights": []
+    },
+    {
+      "text": "2024",
+      "lemma": "2024",
+      "pos": "NUM",
+      "head": 19,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Purpose",
+      "lemma": "purpose",
+      "pos": "NOUN",
+      "head": 21,
+      "dep": "nsubj",
+      "lefts": [
+        17,
+        18
+      ],
+      "rights": [
+        20
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "define",
+      "lemma": "define",
+      "pos": "VERB",
+      "head": 21,
+      "dep": "ROOT",
+      "lefts": [
+        19
+      ],
+      "rights": [
+        25,
+        26
+      ]
+    },
+    {
+      "text": "a",
+      "lemma": "a",
+      "pos": "DET",
+      "head": 25,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "secure",
+      "lemma": "secure",
+      "pos": "ADJ",
+      "head": 25,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "service",
+      "lemma": "service",
+      "pos": "NOUN",
+      "head": 25,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "interface",
+      "lemma": "interface",
+      "pos": "NOUN",
+      "head": 21,
+      "dep": "dobj",
+      "lefts": [
+        22,
+        23,
+        24
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 21,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Requirements",
+      "lemma": "requirement",
+      "pos": "NOUN",
+      "head": 27,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        28,
+        30,
+        42
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 27,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "TLS",
+      "lemma": "TLS",
+      "pos": "PROPN",
+      "head": 30,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "transport",
+      "lemma": "transport",
+      "pos": "NOUN",
+      "head": 27,
+      "dep": "appos",
+      "lefts": [
+        29
+      ],
+      "rights": [
+        31,
+        33
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 30,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "audit",
+      "lemma": "audit",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "events",
+      "lemma": "event",
+      "pos": "NOUN",
+      "head": 30,
+      "dep": "conj",
+      "lefts": [
+        32
+      ],
+      "rights": [
+        34,
+        36
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "role-based",
+      "lemma": "role-based",
+      "pos": "ADJ",
+      "head": 36,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "authorization",
+      "lemma": "authorization",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "conj",
+      "lefts": [
+        35
+      ],
+      "rights": [
+        37,
+        38,
+        41
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 36,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 36,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "99.9",
+      "lemma": "99.9",
+      "pos": "NUM",
+      "head": 40,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "%",
+      "lemma": "%",
+      "pos": "NOUN",
+      "head": 41,
+      "dep": "compound",
+      "lefts": [
+        39
+      ],
+      "rights": []
+    },
+    {
+      "text": "availability",
+      "lemma": "availability",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "conj",
+      "lefts": [
+        40
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 27,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Acceptance",
+      "lemma": "acceptance",
+      "pos": "NOUN",
+      "head": 47,
+      "dep": "dep",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 47,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "integration",
+      "lemma": "integration",
+      "pos": "NOUN",
+      "head": 46,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "tests",
+      "lemma": "test",
+      "pos": "NOUN",
+      "head": 47,
+      "dep": "nsubj",
+      "lefts": [
+        45
+      ],
+      "rights": []
+    },
+    {
+      "text": "pass",
+      "lemma": "pass",
+      "pos": "VERB",
+      "head": 47,
+      "dep": "ROOT",
+      "lefts": [
+        43,
+        44,
+        46
+      ],
+      "rights": [
+        48,
+        50,
+        51
+      ]
+    },
+    {
+      "text": "in",
+      "lemma": "in",
+      "pos": "ADP",
+      "head": 47,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        49
+      ]
+    },
+    {
+      "text": "staging",
+      "lemma": "staging",
+      "pos": "NOUN",
+      "head": 48,
+      "dep": "pobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 47,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "\"",
+      "lemma": "\"",
+      "pos": "PUNCT",
+      "head": 47,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 53,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "engineering",
+      "lemma": "engineer",
+      "pos": "VERB",
+      "head": 53,
+      "dep": "ROOT",
+      "lefts": [
+        52
+      ],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SOC2",
+      "lemma": "SOC2",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Audit",
+      "lemma": "Audit",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "ROOT",
+      "lefts": [
+        0,
+        1
+      ],
+      "rights": [
+        5
+      ]
+    },
+    {
+      "text": "2024",
+      "lemma": "2024",
+      "pos": "NUM",
+      "head": 5,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Technical",
+      "lemma": "Technical",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Specification",
+      "lemma": "Specification",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "appos",
+      "lefts": [
+        3,
+        4
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 9,
+      "text": "secure service interface",
+      "span": {
+        "start": 23,
+        "end": 26
+      }
+    },
+    {
+      "score": 4,
+      "text": "\"technical specification",
+      "span": {
+        "start": 12,
+        "end": 14
+      }
+    },
+    {
+      "score": 4,
+      "text": "tls transport",
+      "span": {
+        "start": 29,
+        "end": 31
+      }
+    },
+    {
+      "score": 4,
+      "text": "audit event",
+      "span": {
+        "start": 32,
+        "end": 34
+      }
+    },
+    {
+      "score": 4,
+      "text": "role-based authorization",
+      "span": {
+        "start": 35,
+        "end": 37
+      }
+    },
+    {
+      "score": 1,
+      "text": "title",
+      "span": {
+        "start": 0,
+        "end": 1
+      }
+    },
+    {
+      "score": 1,
+      "text": "content",
+      "span": {
+        "start": 2,
+        "end": 3
+      }
+    },
+    {
+      "score": 1,
+      "text": "requirement",
+      "span": {
+        "start": 27,
+        "end": 28
+      }
+    },
+    {
+      "score": 1,
+      "text": "acceptance",
+      "span": {
+        "start": 43,
+        "end": 44
+      }
+    },
+    {
+      "score": 1,
+      "text": "staging",
+      "span": {
+        "start": 49,
+        "end": 50
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://f9980ae65f30f8951823938ab8b3ef7af4fe0ceb9c4df21c823e01ddabd2f0a0/technical_spec_00057_1c0a8411.csv#chunk-0-e7ee2db8bb",
+      "parent_doc_id": "ingest://f9980ae65f30f8951823938ab8b3ef7af4fe0ceb9c4df21c823e01ddabd2f0a0/technical_spec_00057_1c0a8411.csv",
+      "text_raw": "title , content , topic AcmeSystems SOC2 Audit 2024 Technical Specification , \"Technical specification — AcmeSystems SOC2 Audit 2024 Purpose : define a secure service interface . Requirements : TLS transport , audit events , role-based authorization , and 99.9 % availability . Acceptance : integration tests pass in staging . \" , engineering",
+      "search_vector_payload": "title , content , topic AcmeSystems SOC2 Audit 2024 Technical Specification , \"Technical specification — AcmeSystems SOC2 Audit 2024 Purpose : define a secure service interface . Requirements : TLS transport , audit events , role-based authorization , and 99.9 % availability . Acceptance : integration tests pass in staging . \" , engineering",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "AcmeSystems",
+            "Technical Specification"
+          ],
+          "date": [
+            "Audit 2024"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "Purpose",
+            "define",
+            "service interface"
+          ],
+          [
+            "integration tests",
+            "pass in",
+            "staging"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 54,
+        "sentence_start": 0,
+        "sentence_end": 1
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Purpose define service interface",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Audit 2024",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "title , content , topic AcmeSystems SOC2 Audit 2024 Technical Specification ,",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "integration tests pass in staging",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "AcmeSystems",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Organization/technical_specification-bd1c68bf3148\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Technical Specification\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Chunk/ingest_f9980ae65f30f8951823938ab8b3ef7af4fe0ceb9c4df21c823e01ddabd2f0a0_technical_spec_00057_1c0a8411_csv_chunk_0_e7ee2db8bb\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/secure_service_interface\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/technical_specification\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/tls_transport\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/audit_event\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/role_based_authorization\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/title\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/content\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/requirement\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/acceptance\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/staging\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Organization/technical_specification-bd1c68bf3148\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Date/audit_2024-792dd6f5edc0\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/purpose-d4e8830a71c7\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/IntegrationTests/integration_tests-e347d082b797\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Tests/tests-59830ebc3a41\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"technical_spec_00057_1c0a8411_csv\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/tls_transport\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"tls transport\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/technical_specification\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"\\\"technical specification\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/content\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"content\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/interface-c796d37c6d49\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Purpose\"\n    ],\n    \"http://tkeir.local/ontology/define\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/service_interface-6ef0471d37ce\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"interface\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Tests/tests-59830ebc3a41\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Tests\"\n    ],\n    \"http://tkeir.local/ontology/pass\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"tests\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/title\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"title\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Date/audit_2024-792dd6f5edc0\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Date\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Audit 2024\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/role_based_authorization\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"role-based authorization\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/secure_service_interface\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"secure service interface\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Chunk/ingest_f9980ae65f30f8951823938ab8b3ef7af4fe0ceb9c4df21c823e01ddabd2f0a0_technical_spec_00057_1c0a8411_csv_chunk_0_e7ee2db8bb\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Organization/technical_specification-bd1c68bf3148\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Date/audit_2024-792dd6f5edc0\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/purpose-d4e8830a71c7\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/IntegrationTests/integration_tests-e347d082b797\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://f9980ae65f30f8951823938ab8b3ef7af4fe0ceb9c4df21c823e01ddabd2f0a0/technical_spec_00057_1c0a8411.csv#chunk-0-e7ee2db8bb\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/purpose-d4e8830a71c7\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Purpose\"\n    ],\n    \"http://tkeir.local/ontology/define\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/service_interface-6ef0471d37ce\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/interface-c796d37c6d49\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Purpose\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/staging\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"staging\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Organization/acmesystems-14032de724d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/audit_event\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"audit event\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Staging/staging-e919a7536439\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Staging\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"staging\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/requirement\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"requirement\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/service_interface-6ef0471d37ce\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Purpose\"\n    ],\n    \"http://tkeir.local/ontology/define\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Purpose/service_interface-6ef0471d37ce\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"service interface\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Keyword/acceptance\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acceptance\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/IntegrationTests/integration_tests-e347d082b797\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/IntegrationTests\"\n    ],\n    \"http://tkeir.local/ontology/passIn\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00057_1c0a8411_csv/Staging/staging-e919a7536439\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"integration tests\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 2,
+      "unresolved": 0,
+      "auto_fixed": 2,
+      "affected_node_count": 2,
+      "graph_node_count": 30,
+      "graph_triple_count": 70,
+      "by_result_path": {
+        "define": 2
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 60,
+    "total_tokens": 60,
+    "covered_characters": 335,
+    "total_characters": 335
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 6,
+  "content-token-count": 54,
+  "token-count": 60,
+  "source-file-size-bytes": 329,
+  "image-extraction": {
+    "enabled": false,
+    "used": false,
+    "mode": null,
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.048,
+    "tasks": {
+      "converter": 0.001,
+      "language-detection": 0.004,
+      "resource-selection": 0.001,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.008,
+      "ner": 0.008,
+      "syntax": 0.009,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.012,
+      "chunk-questions": 0.001
+    }
+  }
+}

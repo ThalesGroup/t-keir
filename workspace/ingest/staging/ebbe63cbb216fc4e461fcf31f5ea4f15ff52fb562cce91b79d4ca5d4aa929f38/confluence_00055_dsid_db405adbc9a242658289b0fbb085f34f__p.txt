@@ -1,0 +1,145 @@
+Postmortem Writeup Style Guide and Executive Summary Templates
+
+Purpose
+This document defines the standard structure, language guidance, and templates for producing postmortem writeups and short executive summaries at Redwood Inference. Our goal is faster, higher-quality postmortems that surface actionable remediation, respect blameless culture, and provide concise executive-ready summaries suitable for customers and leadership.
+
+Scope
+- All incidents that meet the postmortem threshold (see "Incident Triage and Postmortem Thresholds" below)
+- Game-day exercises where a formal writeup is required
+- Customer-impacting outages and incidents requiring external communication or regulatory evidence
+
+Quick reference: When to write a postmortem
+1) Severity P1 or P2 incident that impacts >1% of customers or violates an SLO for >10 minutes.
+2) Any incident with regulatory evidence requirements (enterprise customers, data residency, security incidents).
+3) Any game day or chaos experiment that requires lessons learned.
+
+1. Required structure of a postmortem page (order matters)
+- Title: short, specific, include incident date and primary symptom (e.g., "2026-02-18 — Multi-region KV-cache Eviction Causing 5xx Spike")
+- Severity and duration: single line (Severity: P1, Start: YYYY-MM-DD HH:MM UTC, End: YYYY-MM-DD HH:MM UTC, Duration: 00h00m)
+- Executive summary (one paragraph + 3 bullets) — see template below
+- Impact summary: number of customers, affected routes, estimated error budget/percentage, and key metrics (e.g., 95th latency, error rate)
+- Timeline: ordered, timestamped events (ISO 8601) and short descriptions; include detection, mitigation, and closure events
+- Root cause analysis: concise causal chain (not a laundry list) with evidence links (logs, dashboards, traces)
+- Mitigations applied during the incident (with timestamps and owners)
+- Long-term corrective actions: 90-day plan with owner and target completion date (format: ACTION — OWNER — ETA)
+- Verification plan: how we will validate the fix (synthetic tests, load tests, monitoring checks)
+- Lessons learned / Preventative measures: short list, prioritized
+- Postmortem checklist and artifacts: list of evidence files retained and retention policy
+- Distribution list and stakeholder notifications: who was informed and when
+- Closure criteria and sign-off: product, SRE, and legal (if required) approval
+
+2. Executive summary template (target length: 3–6 sentences + up to 3 bullets)
+- One-line incident description: what happened and when.
+- Top-level impact: number of customers or percentage affected, and key metric delta (e.g., "peak error rate 18% (baseline 0.3%)").
+- Root cause (one sentence): the proximate failure in plain language.
+- Short statement of immediate mitigation and current state.
+- Bulleted quick actions: 2–3 highest-priority next steps with owners.
+
+Example executive summary (copyable)
+"On 2026-02-18 at 14:02 UTC a multi-region KV-cache eviction path was triggered during a rolling kernel update, causing sustained 5xx errors on text-generation routes for ~72 minutes. Approximately 12% of production requests experienced errors at peak; SLOs for 99th percentile latency and error budget were violated. The proximate cause was a race condition in the cache eviction handler under parallel evacuation; a mis-sized eviction window was exposed by the higher-than-expected GC pressure. Immediate mitigation reverted the kernel update and scaled replicas to drain hot partitions; customer-facing traffic is back to nominal. Short-term actions: 1) Fix eviction race (owner: Sasha) — ETA 2026-03-15; 2) Add synthetic canary for kernel-update path (owner: Infra Team) — ETA 2026-02-28."
+
+3. Blameless language checklist (must be enforced)
+- Use facts, not attributions. Replace: "Engineer X deployed a bad patch" with "A patch containing an eviction-window change was deployed during maintenance".
+- Avoid "caused by" that implies intent. Use "contributed to" or "exposed".
+- Attribute systemic factors (process, tests, monitoring, documentation), not people.
+- Include timeline evidence that supports statements.
+
+4. Incident triage and postmortem thresholds (short table in text)
+- P1 (complete service outage or major data loss): postmortem required and must be published within 5 business days.
+- P2 (partial degradation impacting many customers): postmortem required within 10 business days.
+- P3 & below: postmortem encouraged where cross-team learning is likely; product or incident owner can opt-in.
+
+5. Evidence and artifact retention (minimums)
+- Full APM trace export for the incident window (retain 90 days)
+- Raw logs for implicated services (retain 30 days unless regulatory hold)
+- Correlated metrics, synthetic test outputs, and timeline screenshots (retain 180 days)
+- Incident bridge recording and decision artifacts (retain 365 days)
+- For enterprise customers or regulatory incidents, follow the Incident Evidence Chain runbook for extended retention and legal hold.
+
+6. Timeline guidance (best practice)
+- Use ISO 8601 timestamps (UTC).
+- Each event row: TIMESTAMP — ROLE — ACTION/OBSERVATION — LINK TO EVIDENCE.
+- Distinguish detection vs mitigation events.
+- Annotate who made the decision and why (brief rationale).
+
+Sample timeline fragment (text table)
+2026-02-18T14:02:12Z — Monitoring — Spike detected: 5xx rate > 10% on /v1/generate — link: grafana/dashboard/err-rate
+2026-02-18T14:05:30Z — Oncall — Opened incident bridge (bridge-id) and paged Platform team
+2026-02-18T14:12:10Z — Platform — Scoped to kv-eviction logs; identified eviction storms — link: logs/query?id=evict
+2026-02-18T14:25:00Z — SRE — Rolled back kernel update in eu-west-1; began draining replicas — link: deploy/rollback/1234
+
+7. Action item format and tracking (required fields)
+- Each action must be entered into the action tracker (JIRA) and referenced in the postmortem using JIRA-ID. Required fields in the tracker: Summary, Owner, Risk/Impact, ETA, Acceptance Criteria, Verification Plan.
+
+8. Customer and status-page messaging templates (short, adjustable by severity)
+A) P1 public status-page (initial notice)
+- Title: "Service disruption affecting text-generation routes — investigating"
+- Body: "We are investigating elevated error rates for text-generation routes (v1). Affected customers may experience 5xx errors. Our engineers have opened a bridge and are actively investigating. We will provide an update by [time]."
+- Follow-up updates: factual, timestamped, short; avoid technical blame in public messages.
+
+B) P2 customer email (post-incident summary)
+- Subject: "Incident summary: Partial degradation impacting inference latency (YYYY-MM-DD)"
+- Body: Short executive summary + impact bullets + what we did to resolve + link to full postmortem page + next steps and contact for support.
+
+C) Enterprise sensitive notice (when legal or customer data exposure is suspected)
+- Contact: CSM and Legal must be looped immediately using the enterprise incident escalation matrix. Do not send external text until Legal approves.
+
+9. Postmortem workflow and SLAs
+- Owner assignment: The incident commander (IC) assigns the postmortem author within 24 hours of incident closure.
+- Draft: Author produces a complete draft within the SLA window (5 or 10 business days depending on severity).
+- Peer review: Two reviewers (one SRE, one Product) must provide comments within 48 hours.
+- Publication: Postmortem page is published and linked from the incident tracker; exec summary is emailed to leadership and attached to the incident.
+- Closure: Postmortem is closed only after all action items have owners and an initial verification test is scheduled.
+
+10. Examples: poor vs. improved phrasing
+- Poor: "Alice's deploy broke the cache and caused the outage."
+- Improved: "A deploy that modified the cache eviction parameters coincided with increased GC pressure; the change was a proximate factor in exposing an eviction race."
+
+11. Game day specific guidance
+- If a game day triggers a postmortem requirement, label the page with the game-day tag and include: exercise hypothesis, injected fault, expected outcome, observed outcome, and recommended changes to the runbook.
+- Always include a dedicated section "What behaved as expected" to keep the learning balanced.
+
+12. Publishing checklist (confluence-specific quick steps)
+1) Create page under /oncall-and-incident-response/YYYY/MM/ with title format above.
+2) Paste executive summary at the top and pin the page to the incident tracker.
+3) Add labels: postmortem, incident, severity-P1/P2, owner-[team].
+4) Attach artifacts (screenshots, recordings) and add evidence links (do not paste large logs inline).
+5) Assign reviewers and request comment turn-around of 48 hours.
+6) After reviewers sign off, set status to "published" and notify distribution list.
+
+13. Metrics and dashboards to include in every postmortem (minimum)
+- Request volume (qps) and error rate time series for implicated endpoints
+- 50/95/99/99.9 latency percentiles for inference routes
+- Pod/node-level resource utilization (GPU/CPU/memory) for implicated clusters
+- Cache hit ratio and eviction counts (if applicable)
+- Autoscaler events and queue length
+
+14. Ownership and escalation for postmortem defects
+- If a defect spans multiple teams, the service owner nominates the primary assignee; SRE co-owns verification.
+- For regressions that impact customers repeatedly, the head of SRE sponsors an incident review (30-day retro) and may escalate to leadership for additional resourcing.
+
+15. Frequently asked questions (short)
+Q: Who writes the postmortem?
+A: The IC assigns the primary author; typically an oncall SRE or the service owner.
+Q: Can we redact internal names before publishing externally?
+A: Yes — redact PII and internal-only notes. Use the public executive summary for customers.
+Q: How do I request extended evidence retention?
+A: Follow the Incident Evidence Chain runbook and open a legal hold ticket via the runbook link.
+
+Appendix: Quick CLI snippets and pointers
+- Export traces for incident window (example: jaeger)
+$ jaeger-export --start 2026-02-18T14:00:00Z --end 2026-02-18T15:30:00Z --service inference --output ./traces.json
+- Query logs (example using our internal logs service):
+$ logs query "service:inference AND status:5xx" --start 2026-02-18T14:00:00Z --end 2026-02-18T15:30:00Z --save evict-logs.ndjson
+- Snapshot dashboards: open Grafana panel and click "share -> snapshot"; attach link to postmortem.
+
+Contact and governance
+- Postmortem process owner: Marcus Chen (SRE) — process@redwood.com
+- Escalation: see /confluence/oncall-and-incident-response/escalation-lattice-restoration-blueprint-2026 for the escalation matrix and legal contacts.
+
+Revision history
+- 2026-01-12: Created (Marcus Chen)
+- 2026-02-10: Clarified retention and added game-day guidance (Anika Patel)
+- 2026-03-02: Updated review SLAs and added sample CLI snippets (Rohit Singh)
+
+End of document

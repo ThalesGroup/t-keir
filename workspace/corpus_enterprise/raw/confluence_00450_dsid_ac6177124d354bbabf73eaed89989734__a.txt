@@ -1,0 +1,273 @@
+Runbook: Audit Log Coverage Regression (Missing Sensitive-Action Events)
+
+## Purpose
+This runbook describes how to respond when Redwood’s audit logging coverage regresses (e.g., a newly added/changed admin endpoint or workflow no longer emits a required audit event, or emits an event that fails schema/taxonomy requirements).
+
+Coverage regressions are treated as security-impacting quality issues because they can break customer detection/investigation workflows and SOC2/ISO-aligned evidence expectations.
+
+## When to use this runbook
+Use this runbook when any of the following occurs:
+- The Audit Coverage dashboard shows a drop in observed coverage for one or more `event_type`s.
+- An alert fires for missing expected event types for a sensitive action.
+- Support/Solutions reports a customer issue: “action happened, but we don’t see a corresponding audit event” (common in Private and Console workflows).
+- CI begins failing due to new/changed code paths missing required audit fields or using an unregistered `event_type`.
+
+If the issue is that events are being emitted but not delivered/exported (ingestion backlog, exporter failure, high drop rate), use the **Audit Log Pipeline Incident Runbook** instead.
+
+---
+
+## Definitions (quick)
+- **Sensitive action:** An action listed in the sensitive actions taxonomy that requires an audit event (RBAC, credential lifecycle, policy/routing changes, retention/residency changes, audit export config, Private install/upgrade/rollback/config apply, etc.).
+- **Coverage regression:** A sensitive action occurs (or is exercised by tests/synthetic) but the expected audit event is not observed OR is observed but invalid (wrong `event_type`, missing required fields, schema validation failure).
+- **Producer:** The service/tool that emits the audit event (API Gateway, Control Plane, Console backend, Private installer, policy engine, exporter normalization layer).
+
+---
+
+## Severity and handling guidelines
+### Default severity
+- **SEV2 (security-impacting)** if:
+  - A required sensitive-action audit event is missing in any production tier (Hosted/Dedicated/Private) for GA surfaces, OR
+  - The regression affects multiple tenants/projects, OR
+  - A customer SIEM export pipeline is known to be affected.
+
+- **SEV3** if:
+  - The missing event is in a gated/feature-flagged preview surface, OR
+  - Impact is limited to internal environments / pre-production.
+
+### Escalation triggers (page/incident)
+Escalate to on-call / incident process when:
+- Coverage gap coincides with pipeline symptoms (ingestion latency spike, drop-rate alerts).
+- The missing event is for high-risk actions (RBAC changes, API key create/rotate/revoke, audit export destination changes, retention/residency changes).
+- A regulated enterprise customer is blocked (Support ticket tagged: “security review”, “SOC2 evidence”, “Private”).
+
+Primary escalation channel: `#eng-security` and `#eng-platform`. For incident coordination: `#incidents`.
+
+---
+
+## Required access
+- Observability dashboards (audit coverage + event validation failures).
+- Ability to query audit events (by `event_type`, `service_name`, `deployment_mode`, `tenant_id`, `request_id`).
+- Read access to service repos / CI logs (for lint failures and test output).
+- Linear/Jira access for creating/triaging work items.
+
+Owners to contact if access is blocked:
+- Dashboard access / telemetry: Logan Wright, Nadia Rahman
+- SRE / alerts: Sean Gallagher, Rafael Mendes
+- CI enforcement tooling: Sahana Iyer
+
+---
+
+## Quick decision tree
+1) Are audit events being emitted but not delivered/exported?
+- Yes → Use **Audit Log Pipeline Incident Runbook** (delivery issue).
+- No / unknown → Continue.
+
+2) Is coverage drop limited to a single `deployment_mode` (e.g., Private only)?
+- Yes → Likely producer parity gap (Console/Private installer/control plane differences).
+- No → Likely shared library/schema/taxonomy change or a producer regression across modes.
+
+3) Does CI/lint fail for audit logging in the relevant repo?
+- Yes → Likely missing required fields or unregistered `event_type`. Fix in code + add test.
+- No → Likely code path exists but event emission not called or behind an unexpected branch/permission check.
+
+---
+
+## Triage checklist (do these in order)
+### Step 1 — Identify exactly what is missing
+Capture the following (paste into the ticket/incident):
+- Expected `event_type` (from taxonomy)
+- Action/workflow that should generate it (endpoint + UI path + installer command)
+- Affected deployment mode(s): Hosted / Dedicated / Private
+- First observed time (approx) and whether it correlates with a deploy
+- Example tenant/project (if safe) and the actor type (user, service account, system)
+
+Common signals:
+- Coverage dashboard tile: “Expected vs Observed by event_type (24h)”
+- Alert name: `audit_coverage_gap_detected` or `missing_sensitive_action_events`
+- CI failure name: `audit-event-required-fields` or `event-type-registry-check`
+
+### Step 2 — Confirm it’s a coverage regression (not an ingestion delay)
+Run these sanity checks:
+- Check audit ingestion latency for the same window.
+- Check drop-rate metrics and exporter error rate.
+- Check whether other unrelated event types are flowing normally.
+
+Rule of thumb:
+- If **many event types** drop simultaneously and ingestion latency spikes → delivery issue.
+- If **one/few event types** drop while overall volume is steady → coverage regression.
+
+### Step 3 — Reproduce (preferred) or isolate via traces
+Pick the lowest-risk environment where you can reproduce:
+1. Staging or dogfood tenant
+2. A private test fixture environment (if Private-only)
+
+Reproduce the sensitive action and capture:
+- `request_id`
+- `trace_id`
+- `admin_action_id` (if present)
+- HTTP route + method
+- Actor identity context (user_id / service_account_id / impersonation)
+
+Then search audit events by correlation id (example query patterns):
+- `request_id:<id> AND event_type:*`
+- `admin_action_id:<id> AND schema_version:v1*`
+- `trace_id:<id> AND service_name:<service>`
+
+Expected outcomes:
+- No audit event at all → missing emission.
+- Audit event exists but invalid → schema/taxonomy mismatch.
+- Audit event exists but wrong actor/target semantics → producer bug (still considered a coverage failure for acceptance).
+
+### Step 4 — Identify the producer and route to the right owner
+Use the workflow to map to a producing system:
+- Control Plane (tenant config, RBAC, API keys, policy/rollouts): **Ethan Park** (lead), Benji Okafor
+- API Gateway (admin endpoints, quota overrides, auth policy enforcement knobs): **Amara Diallo**
+- Console backend (admin workflows, export config UI/BE): **Dylan Brooks / Chloe Martin**
+- Policy engine (routing/policy changes): **Jordan Lee**
+- Private installer/upgrade tooling: **Vivek Kulkarni** (PM), engineering owner via `redwood-private-installer` rotation; ping `#eng` with “private-installer” tag
+- Exporter normalization/schema tagging: **Kevin Osei**
+- Telemetry coverage dashboard/alerts: **Logan Wright**
+- CI enforcement/lints: **Sahana Iyer**
+
+Routing instructions:
+- Create a Linear ticket under **Engineering / Security & Platform**.
+- Add label: `audit-logging` + the relevant subsystem label (`control-plane`, `console`, `gateway`, `private-installer`, `exporter`, `policy-engine`).
+- Assign directly if clear; otherwise post in `#eng-platform` with the captured repro + correlation IDs and request an owner within 4 business hours.
+
+### Step 5 — Correlate with a change
+If possible, tie the regression to:
+- A specific deploy (service release timestamp)
+- A PR merged recently touching:
+  - auth middleware
+  - routing changes
+  - RBAC checks
+  - new endpoints
+  - refactors around request context propagation
+
+If you find the likely PR, link it in the ticket and tag the author + service owner.
+
+---
+
+## Mitigation options
+Choose based on impact and feasibility.
+
+### Option A — Hotfix to emit the event (preferred)
+- Add the missing audit event emission on the sensitive code path.
+- Validate against schema v1 using the shared schema validator.
+- Ensure the `event_type` is registered in the central registry.
+- Add unit/integration tests (see “Adding enforcement tests”).
+
+### Option B — Emergency rollback
+If a deploy is clearly responsible and impact is high:
+- Roll back the offending service release.
+- Confirm coverage returns to baseline.
+- Open follow-up ticket for forward fix (do not rely on rollback long-term).
+
+### Option C — Temporary exception (last resort)
+If immediate fix is not possible and risk is understood:
+- File an exception request per the audit logging exception process.
+- Include explicit expiration (default max: 14 days) and mitigation (manual review, added monitoring).
+- Note: Exceptions are not acceptable for the highest-risk actions without Marcus Lin + Naomi Feldman approval.
+
+---
+
+## Verification (what “fixed” means)
+A fix is complete when ALL are true:
+- The sensitive action reliably emits the expected `event_type` in the relevant deployment mode(s).
+- The event validates against schema v1 (no required-field omissions).
+- Actor attribution is correct (including impersonation context where applicable).
+- Correlation fields are present (`request_id` + `trace_id`, and `admin_action_id` when produced by Console/admin workflows).
+- Coverage dashboard shows the event type returning to baseline and no “expected vs observed” gaps for at least one full deploy cycle.
+- Regression prevention test(s) are merged and passing in CI.
+
+For customer-reported issues:
+- Provide Support with:
+  - the `event_type`
+  - the fixed version/build
+  - a short confirmation statement that duplicates are possible due to at-least-once delivery and should be deduped by `event_id` (if relevant)
+
+---
+
+## Adding enforcement tests (how to prevent recurrence)
+### 1) Register or confirm `event_type` in the central registry
+- If a new sensitive action was introduced, add its `event_type` to the registry.
+- Ensure required fields match taxonomy requirements (e.g., actor + target + diff summary for config changes).
+
+### 2) Add unit tests at the producer
+Minimum:
+- Test that the code path calls audit emitter with:
+  - correct `event_type`
+  - non-empty `event_id`
+  - `schema_version` set to `v1` or `v1.x`
+  - required fields present (actor, target/resource, timestamp, service_name, deployment_mode, tenancy fields)
+
+### 3) Add integration/E2E tests for the sensitive action
+Use the standard harness (see Linear ENG-4834) to:
+- Execute the sensitive action via API or UI-backend call.
+- Poll the audit sink/test collector.
+- Assert an event exists with the expected `event_type` and validated schema.
+
+Recommended assertions (keep stable to avoid flakes):
+- Must match: `event_type`, `service_name`, `deployment_mode`, `actor.type`, presence of `request_id`.
+- Avoid brittle assertions on dynamic text. Prefer structured diff summaries when available.
+
+### 4) Ensure CI coverage gates are updated
+If the regression came from a new endpoint/workflow:
+- Add the endpoint/action to the “sensitive actions coverage list” used by CI gates (where applicable).
+- Confirm the audit lints are triggered on the owning repo (ENG-4831 patterns).
+
+### 5) Update coverage expectations (telemetry)
+If dashboards track “expected vs observed” from a static list:
+- Add the new expected `event_type` so a future missing event pages early.
+- Owner: Logan Wright / Nadia Rahman.
+
+---
+
+## Common root causes and fixes
+- **New admin endpoint added without instrumentation** → add audit emitter call + test.
+- **Refactor bypassed middleware that injects actor/source_ip/correlation** → restore context propagation; add regression test for actor + `request_id`.
+- **Console workflow calls a backend mutation that isn’t classified as sensitive** → update taxonomy and ensure backend emits the event (do not rely on frontend-only logging).
+- **Private installer parity gap** (hosted emits, private doesn’t) → instrument installer command execution and capture operator identity where available; ensure schema alignment.
+- **Event emitted but dropped by validator** (missing required field) → fix producer payload; ensure redaction rules don’t blank required fields.
+
+---
+
+## Communication templates
+### Slack (internal)
+Post in `#eng-security` and `#eng-platform`:
+- “Coverage regression detected: missing `event_type=<...>` for action <...> in <deployment_mode>. First seen <time>. Repro request_id=<...> trace_id=<...>. Suspected producer=<service>. Linear=<link>.”
+
+### Support handoff
+- “Identified missing audit event for <action>. Fix merged in <service>/<version>. Expected `event_type=<...>` will be present with `schema_version=v1`. If customers see duplicates during retries, dedupe by `event_id`.”
+
+---
+
+## Owner checklist (post-incident / post-fix)
+- [ ] Add/confirm E2E coverage test for the workflow.
+- [ ] Ensure event type is in registry + taxonomy.
+- [ ] Confirm dashboards/alerts include the new event type if applicable.
+- [ ] If customer-impacting: add a brief entry to the internal release notes and link the Support ticket.
+
+---
+
+## Appendix: What to include in the Linear ticket
+Title:
+- “Audit coverage regression: missing `<event_type>` for `<workflow>` in `<mode>`”
+
+Description:
+- Expected event_type + taxonomy link
+- Steps to reproduce
+- Correlation IDs (`request_id`, `trace_id`, `admin_action_id`)
+- Observed behavior (no event / invalid event)
+- Scope (which tenants/modes) and severity
+- Suspected owning service and recent changes
+
+Attachments:
+- Redacted sample audit events around the repro window (do not include secrets; follow redaction rules)
+
+---
+
+## Changelog
+- 2026-02-24: Added enforcement test section and clarified routing table for Private installer and exporter normalization.
+- 2026-02-10: Updated severity guidance and correlation ID capture requirements.
+- 2026-01-31: Initial published runbook.

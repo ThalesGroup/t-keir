@@ -1,0 +1,164 @@
+Execution Profile Registry and Live Reconfiguration Playbook
+
+Summary
+
+This page describes the Execution Profile Registry (EPR) — a central runtime component that captures workload execution profiles, exposes them to scheduling and kernel-selection layers, and enables safe live reconfiguration of scheduling, batching, and kernel parameters based on telemetry signals. The document is a combined design + operational playbook: architecture, data model, decision logic, safety gates, rollout checklist, and incident runbook.
+
+Why this exists
+
+- Serving workloads show high variability (sequence length, user-level burstiness, cache hit-rate). Static scheduler configs produce avoidable cost and tail latency.
+- EPR lets runtime components subscribe to a canonical, versioned set of execution profiles derived from production telemetry and experiment signals.
+- Operators can use EPR to perform targeted live reconfiguration (e.g., batch-slice size, kernel variant selection, kvcache-prefetch policy) while maintaining SLOs and safe rollback.
+
+Goals and non-goals
+
+Goals
+1. Provide a single source-of-truth for workload execution characteristics and policy hints.
+2. Enable deterministic, auditable live reconfiguration with automated safety checks.
+3. Allow fast, low-risk rollout of kernel/scheduler parameter changes and targeted rollbacks.
+
+Non-goals
+- Not a full replacement for the offline autotune pipeline used for model-quantization recommendations.
+- Not intended to perform global topology changes (e.g., replacing a GPU class); EPR operates at request-routing & scheduler/kernal level.
+
+High-level architecture
+
+Components
+- Telemetry Ingestors: Stream samplers that emit signals into Trace + Metric pipelines (per-request timing, kernel durations, kvcache hit/miss, batch sizes).
+- Profile Builder Service: Periodically aggregates telemetry into candidate Execution Profiles (EPs). Runs feature extraction: seq_len distribution, token-per-request histogram, typical KV cache reuse entropy, tail-latency percentiles, priority-mix.
+- Execution Profile Registry (EPR): Versioned store of profiles and policy hints (JSON documents). Supports read-by-name, read-by-tag, and snapshot-by-commit. Exposes an HTTP API and a lightweight gRPC endpoint for fast reads.
+- Reconfig Controller: Evaluates EPs against SLO rules and rollout policies; issues configuration update bundles to the Scheduler Agent and Kernel Agent.
+- Safety Evaluator: Canary/Shadow judge service that tests a candidate bundle against traffic samples in a controlled environment and reports regressions.
+
+Data flow (described)
+1. Ingestors collect sampled traces and metrics (default sampling 0.1% for full traces; 5% lightweight metrics).
+2. Profile Builder produces candidate EPs on a configurable cadence (default: every 4 hours).
+3. Operator or automated policy promotes a candidate EP to "active" version in EPR.
+4. Reconfig Controller creates a rollout plan (canary percentage, duration, rollback triggers) and pushes bundles to a target cell's Scheduler Agent.
+5. Safety Evaluator monitors canary traffic; if triggers are observed, the Reconfig Controller halts rollout and initiates rollback.
+
+Execution Profile model (canonical JSON fields)
+
+- profile_id: string (versionable)
+- tags: [string] (e.g., "interactive", "long-seq", "high-cache-reuse")
+- seq_len_pct: stringified histogram reference id
+- median_tokens: string (number)
+- p95_latency_ms: string (number)
+- kvcache_reuse_rate: string (0.0-1.0)
+- typical_batch_shape: string (e.g., "[1,2,1,4]")
+- kernel_hints: [string] (ordered list of preferred kernel variant ids)
+- scheduler_hints: [string] (e.g., "prefer-small-batches", "aggressive-concurrency")
+- safe_rollback_signature: string (hash of pre-change probe results)
+
+Note: the EPR JSON schema is intentionally flat so runtime agents can do cheap JSON parsing. Each field above is represented as strings or arrays of strings to simplify cross-language clients.
+
+Mapping profiles to runtime decisions
+
+- Kernel Selection: Kernel Agent queries EPR with current route+profile tag. EPR returns kernel_hints starting from low-precision fast variants if kvcache_reuse_rate > 0.7 and median_tokens < 64.
+- Batching Policy: Scheduler Agent picks batch_slice targets from typical_batch_shape and scheduler_hints. For "long-seq" tag, recommended max_batch_tokens=1024 and slice_size=1.
+- Prefetching & KV Warmup: If kvcache_reuse_rate > 0.5 and p95_latency_ms < 80, enable async prefetch with conservative concurrency 2.
+
+Safety and SLO gates
+
+Every live reconfiguration requires satisfaction of the following gates before production push: 
+- Canary Regression < 2% in p95 latency and < 0.5% error-rate increase (configurable per-route).
+- Cost delta check: expected token-cost delta should be within operator-set budget (e.g., < 10% increase).
+- Resource headroom: free GPU slots > 10% to accommodate transient spike.
+- Observability hooks: tracing and metric sampling level bumped to capture an additional 0.5% trace samples for rollout duration.
+
+Safety Evaluator experiments
+
+Use two experiment modes:
+- Shadow-run (no impact): Run candidate kernel on shadowed replicas for sampled requests and compare outputs/latency.
+- Canary-run: Route X% of real traffic to canary fleet with full observability.
+
+Manual and automated rollouts
+
+Rollout policy example (Reconfig Controller YAML):
+
+```yaml
+profile_id: epr-2026-11
+canary:
+  steps:
+    - percent: 1
+      duration: 10m
+    - percent: 5
+      duration: 30m
+    - percent: 20
+      duration: 60m
+    - percent: 100
+      duration: 10m
+rollback_triggers:
+  p95_latency_increase_pct: 2
+  error_rate_increase_abs: 0.005
+  gpu_memory_pressure_pct: 85
+monitoring:
+  extra_trace_sampling: 0.5%
+  dashboard: /dashboards/epr-rollout
+```
+
+Operational runbook: quick steps to apply a profile
+
+1. Validate candidate EP in the staging Profile Builder UI (check histograms and kernel hints).
+2. Run Safety Evaluator in shadow mode for 2,000 sampled requests.
+3. Create rollout plan in Reconfig Controller and set canary steps.
+4. Kick off canary. Monitor p50/p95/p99 latency, error-rate, GPU utilization, and cost-estimated token-per-second.
+5. If any rollback trigger fires, invoke Reconfig Controller -> automated rollback. If not, proceed to next step until 100%.
+6. After full rollout, schedule a stabilization window (default 24 hours) before allowing further EPR changes for the same route.
+
+Troubleshooting and triage matrix
+
+Symptom: p95 increases by > 3% during canary
+- Immediate action: rollback to previous EPR version.
+- Investigation: compare kernel duration traces, look for shifts in batch sizes, check kvcache reuse telemetry.
+- Postmortem items: add a synthetic replay benchmark using sample traces to see divergence.
+
+Symptom: Increased model output divergence (functional change) in shadow-run
+- Immediate action: mark kernel variant as unsafe and blacklist variant id in EPR.
+- Investigation: re-run safety-evaluator with higher fidelity (1% sampling + deterministic seed).
+
+Operational checklist before making EPR changes
+
+- Ownership: assign an owner and at least one reviewer.
+- Backwards-compat: ensure new profile includes safe_rollback_signature.
+- Observability: enable additional trace sampling and annotated dashboard.
+- Communication: note change in #runtime-prod channel and add rollout to weekly change log.
+
+Example CLI snippets
+
+Registering a profile (curl):
+
+curl -X POST https://epr.internal.redwood/api/v1/profiles -H 'Authorization: Bearer $EPR_TOKEN' -H 'Content-Type: application/json' -d '{"profile_id":"epr-2026-11","tags":["interactive"],"median_tokens":"34","p95_latency_ms":"62","kvcache_reuse_rate":"0.72","kernel_hints":["kfast-q4","kstd-q8"],"scheduler_hints":["prefer-small-batches"]}'
+
+Querying EPR from a runtime agent (gRPC example description)
+- Agents should prefer the gRPC endpoint: /epr.Lookup(route="/v1/generate", tags=["interactive"]) 
+- Fallback to HTTP read if gRPC fails; cache the response for 30s.
+
+Audit, observability and change history
+
+- Every promotion of a profile writes an audit event to AuditDB (fields: actor, profile_id, previous_version, diff-summary, rollback_signature).
+- Rollouts create a rollout record with timestamps, canary steps, and metrics snapshot for automated postmortem.
+- Dashboards: prebuilt panels for rollout health (p50/p95/p99, error-rate, kernel-duration distribution, cache-reuse).
+
+Ownership and SLAs
+
+- EPR service owner: eng-serving-runtime team (oncall: runtime-sre rotation).
+- SLA for EPR reads: 99.99% in-region with median latency < 10ms.
+- Promotion/Write window: recommend performing writes during low-traffic windows unless urgent.
+
+Longer term extensions (notes)
+
+- Integrate model-behavior regression signals (e.g., semantic evals) as additional safety gates.
+- Add ML-based rollout optimizers that predict optimal canary durations per-route.
+
+Appendix: minimal profile example (single-line JSON escaped for Confluence)
+
+{"profile_id":"epr-2026-11","tags":["interactive"],"median_tokens":"34","p95_latency_ms":"62","kvcache_reuse_rate":"0.72","kernel_hints":["kfast-q4","kstd-q8"],"scheduler_hints":["prefer-small-batches"]}
+
+Appendix: Contacts and escalation
+
+- Primary owner: Priya Shah (@priya)
+- Runtime SRE oncall: #runtime-oncall
+- Product reviewer: Marco Alvarez
+
+End of document.

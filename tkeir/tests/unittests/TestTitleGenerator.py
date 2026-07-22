@@ -1,4 +1,12 @@
-"""Tests for automatic title generation."""
+"""Title: Title Generator
+
+Tests for automatic title generation.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tasks.keywords.TitleGenerator import generate_missing_title
 

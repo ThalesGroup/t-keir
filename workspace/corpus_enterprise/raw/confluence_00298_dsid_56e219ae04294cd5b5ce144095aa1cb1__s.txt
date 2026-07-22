@@ -1,0 +1,144 @@
+SDK Integration Resiliency: Canonical Fixes, Telemetry Alignment, and Publishing Checklist
+
+Summary
+
+Purpose: This playbook consolidates pragmatic, field-proven fixes and a prescriptive checklist for SDK integrations that cause the majority of support cases. It is intended for SDK maintainers, integration engineers, and support engineers who triage canonical failure modes.
+
+Scope: Covers HTTP/streaming generation clients, embeddings/encode flows, adapter-layer failures, client-side batching/backoff, telemetry alignment (schema + cardinality), and the docs-site publishing steps for canonical fixkits. Does not replace product-level release notes or security incident response procedures.
+
+Owner and contact
+- Owner: SDK Platform (eng-devx)
+- Primary contact: maya.patel@redwood.com
+- Pager (support triage escalation): #sdk-support (Slack)
+
+Quick reference: 3-minute triage
+1) Identify symptom signature (error strings, status codes, stream abort reason).
+2) Check last-deployed SDK version and release notes (git tag).
+3) Query telemetry for corresponding trace_id / request_id to validate upstream timing and retries.
+4) Apply canonical fix from table below; if no match, escalate to L2.
+
+Canonical failure matrix (symptom -> root cause -> recommended fix)
+| Symptom | Probable root cause | Recommended quick fix | Owner | Rollout urgency |
+|---|---|---:|---|---:|
+| Repeated 502s during burst test | Upstream gateway timeout + synchronous client retries | Switch client to non-blocking streaming path; enable jittered exponential backoff and reduce retry count to 2 | SDK Platform | high |
+| Partial streaming output then stream stops with ECONNRESET | Incompatible keepalive/TCP idle settings on customer infra | Add client-side resume token support + instruct ops to increase TCP keepalive to 30s | Integrations | medium |
+| High token cost from duplicated generation calls | Misconfigured callback / webhook causing duplicate call path | Add idempotency-key header and dedupe in server-side middleware; add test in sample-app | SDK Samples | high |
+| Telemetry missing request_id or has multiple request_ids per operation | SDK emits telemetry before request-id binding or uses transient IDs | Align SDK telemetry schema to include request_id and parent_id; add schema validation in CI | Observability | high |
+| Latency spikes for batched requests | Batch sizing mismatch and variable model seq length | Enable adaptive batch sizing and configure max_batch_tokens=4096; add per-tenant batch metrics | Serving Runtime | medium |
+
+Detailed triage playbook (step-by-step)
+1) Collect artefacts
+   - Logs: full client log, server trace id, timestamp, and network layer logs.
+   - Telemetry: trace_id, span ids, sampling rate, batch size metric.
+   - Repro harness snippet: minimal request that reproduces the error.
+
+2) Reproduce in isolation
+   - Use the local-sdks-sandbox to replay the exact request with captured headers.
+   - If streaming: run --stream-debug to emit low-level frames. Example:
+
+   ```bash
+   ./sdk-replay --source capture.json --stream-debug --region=us-west1
+   ```
+
+3) Apply targeted fixes (examples)
+   - Retry/backoff tuning (recommended default):
+
+     ```json
+     {"retry": {"max_attempts": 2, "backoff_base_ms": 200, "backoff_multiplier": 2.2, "jitter": "full"}}
+     ```
+
+   - Idempotency headers (HTTP sample):
+
+     curl -X POST https://api.redwood.example/v1/generate \\
+       -H "Authorization: Bearer $TOKEN" \\
+       -H "Idempotency-Key: $(uuidgen)" \\
+       -d '{"prompt":"hi"}'
+
+   - Streaming resume token pattern (pseudo):
+
+     ```js
+     // client keeps last-good-offset and sends on reconnect
+     const resume = { resume_token: lastGoodOffset }
+     ws.send(JSON.stringify({ op: 'resume', metadata: resume }))
+     ```
+
+4) Validate metrics post-fix
+   - Check 5xx rate, mean latency (p50/p95), and token-per-request for the affected route.
+   - Use redwood-console query: route="/v1/generate" and tag customer_id=<id> for 72h window.
+
+Telemetry alignment checklist (why this matters)
+- Goal: ensure every user-visible operation is correlated with a single request_id and a trace that spans SDK -> Gateway -> Serving runtime.
+- Minimum viable telemetry fields (schema):
+  - request_id (string)
+  - client_sdk.name (string)
+  - client_sdk.version (string)
+  - route (string)
+  - model (string)
+  - tokens_requested (int)
+  - tokens_returned (int)
+  - error.code (string)
+  - upstream_latency_ms (int)
+
+Telemetry enforcement steps
+1) SDK CI should validate that emitted telemetry contains the minimum fields. Add a Pytest assertion that loads a local telemetry sample.
+2) Docs-site: publish the telemetry contract page and version it at v1.2.
+3) Sampling: ensure span sampling for retries is sampled at 100% for first 30s after a release that touches SDKs.
+
+SDK-specific defensive patterns (templates)
+- Connection handling
+  - Exponential backoff with bounded maximum delay (no more than 10s).
+  - Active ping/keepalive with configurable interval (default 20s).
+- Batching
+  - Expose max_batch_tokens and per-request token ceiling.
+  - Provide a `batch_estimator` hook for clients to provide sequence-length distributions.
+- Streaming
+  - Provide resume tokens and ack windows.
+  - Avoid re-emitting events on reconnect without dedupe tokens.
+
+Canonical fixes and test cases (developer checklist)
+1) Add a unit test that simulates gateway 502 and asserts the client backoff reduces retries and surfaces a clear error to the caller.
+2) Add an integration test for the streaming resume flow that replays a disconnect in the middle of a response and validates the resume token path.
+3) Add a golden telemetry sample to the repo under `tests/telemetry/golden` and fail CI on schema drift.
+
+Publishing a canonical-fix kit to docs-site (ops steps)
+1) Draft the docs page under docs-site/content/sdk-canonical-fixes/<issue-shortname>.md using the canonical template.
+2) Attach minimal repro code and a mini-release patch (cherry-pick) to the SDK repo.
+3) Run the docs-site preflight: `make docs-lint && make snippet-check`
+4) Open PR against docs-site with the label `doc:fixkit` and request reviewers: @dx-docs, @sdk-owner.
+5) After merge, trigger docs-site canary publish and smoke test the example.
+6) Communicate on #sdk-releases and include a short blurb for release notes.
+
+Ops runbook for high-severity customer cases (SLA influence)
+1) Immediate steps (0-30m): gather trace IDs, reproduce, and apply a temporary client-side mitigation (reduce concurrency or force single-threaded path).
+2) Short-term (30m-4h): ship a hotfix to SDK branch with a flag-based mitigation and provide a patched wheel/npm tarball to customer.
+3) Medium-term (4h-72h): complete the full fix, add tests, merge release, and update release notes and docs.
+4) Postmortem: publish a blameless incident review within 7 days, include root cause, telemetry gaps, and corrective actions.
+
+Example incident timeline (realistic)
+- 09:03: spike observed in 5xx. Automatic alert created.
+- 09:09: triage: found matching telemetry; cause: a new gateway deployment changed header forwarding.
+- 09:18: mitigation: released SDK v2.14.1 with header-stable fallback and published docs-site fixkit.
+- 14:00: incident declared resolved. Postmortem drafted.
+
+Appendix: common error patterns and fix snippets
+- Error: "stream aborted: 1006" -> fix: enable resume tokens and increase ws keepalive; add server-side graceful-shutdown hook.
+- Error: "duplicate webhook delivery" -> fix: require X-Redwood-Delivery-Id and dedupe in the webhook handler.
+- Error: "missing request_id" -> fix: inject request_id at SDK boundary before any telemetry emission.
+
+Maintenance and cadence
+- Quarterly review of canonical-fixes matrix by SDK Platform and Observability teams.
+- Telemetry contract bump policy: minor bumps for additional optional fields; major bump requires SDK client upgrades (announce 8 weeks in advance).
+
+Feedback and improvement
+- To propose additions, open an issue in the eng-developer-experience repo with label `canonical-fix-request`.
+- For urgent gaps, ping @maya.patel or file a support ticket with priority P0.
+
+Related resources
+- SDK CI telemetry validator: /internal/repos/sdk-ci/actions/telemetry-validate
+- Repro harness: /internal/tools/sdk-replay
+- Docs-site canonical templates: /confluence/eng-developer-experience/docs-site/canonical-templates
+
+Document history
+- 2026-11-15: Created by Maya Patel.
+- 2026-12-03: Added streaming resume template and retry defaults (Liam Chen).
+- 2027-01-18: Expanded telemetry contract and publishing workflow (Sofia Alvarez).

@@ -1,4 +1,12 @@
-"""Lightweight governor client for workers and services."""
+"""Title: Client
+
+Lightweight governor client for workers and services.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,0 +1,133 @@
+Fidelity migration impact matrix and pricing heuristics
+
+Playbook and decision matrix to guide product and commercial teams when migrating customers between fidelity tiers (e.g., high, standard, low). Includes impact matrix, quantitative heuristics used for pricing adjustments, rollout steps, telemetry requirements, and risk mitigations.
+Overview:
+
+Purpose
+This document provides a repeatable playbook for assessing the customer and system impact when migrating a tenant’s inference consumption between fidelity tiers. It combines an operational impact matrix (technical and customer-facing effects) with concrete pricing heuristics and a phased migration plan. The goal is to enable predictable economics while limiting customer disruption and preserving SLOs.
+
+Scope
+- Applies to migrations across fidelity bands within Redwood’s consumption model (e.g., High-Fidelity -> Standard, Standard -> Low-Fidelity).
+- Relevant to hosted, dedicated, and private deployments; where private deployments have separate contractual constraints, use the appendix guidance.
+- Intended audience: product managers, solutions engineering, account teams, billing, and SRE.
+
+Definitions
+- Fidelity tier: Operational profile that trades response quality characteristics (sampling, decoding, quantization, KV cache aggressiveness) for cost/latency. Typical tiers: High, Standard, Low.
+- Migration: A change to the effective fidelity tier for a tenant (per-route or global).
+- Fidelity delta: Observable changes in output quality metrics (BLEU/ROUGE proxy, hallucination rate, perplexity drift, or domain-specific accuracy).
+
+Impact Matrix (technical / customer / commercial)
+Format: rows = Migration type, columns = Expected system CPU/GPU impact, Latency, Token cost delta, User-facing quality risk, Customer billing change, Recommended guardrail.
+
+| Migration | GPU utilization | 95p latency | Cost per 1k tokens | Output quality risk | Billing delta | Guardrail |
+|---|---:|---:|---:|---:|---:|---|
+| High -> Standard | -20% to -35% | -10% to -25% | -28% | Small drop; risk on long-context summarization | -25% | Canary 1% traffic, track domain prompts |
+| Standard -> Low | -30% to -50% | -15% to -40% | -40% to -55% | Medium; increased token repetition, factuality regressions | -45% | Run A/B on synthetic prompts, revert on >5% metric degradation |
+| High -> Low (fast path) | -45% to -70% | -25% to -60% | -60%+ | High; possible unacceptable regressions for sensitive workflows | -60%+ | Only for non-transactional routes or explicit customer opt-in |
+| Low -> Standard | +15% to +30% | +8% to +20% | +30% | Quality improvement measurable; risk of increased cost | +28% | Phased uplift with cost alerts and budget caps |
+
+Note: values above are workload-sensitive. Always run synthetic replay (see telemetry section) before schedule.
+
+Quantitative Pricing Heuristics
+We use a set of heuristics to translate expected runtime delta into an adjustment to per-token pricing or to recommended credits/discounts for migration windows. Heuristics are intentionally conservative to avoid revenue loss from quality-related churn.
+
+1) Baseline compute cost mapping
+- Measure steady-state per-token GPU seconds over representative 24h window.
+- Map GPU seconds to unit cost using committed pricing for the deployment (hosted vs dedicated).
+
+2) Apply fidelity multiplier (example):
+- High: 1.00 (reference)
+- Standard: 0.72 (+/- 0.06)
+- Low: 0.42 (+/- 0.08)
+These multipliers are validated monthly against production telemetry; treat as soft knobs.
+
+3) Convert to billable price adjustment
+- If migration reduces compute by X%, then per-token price is reduced by max(X - 5%, floor 10%), where 5% accounts for overheads not realized as direct savings.
+- For increases in fidelity, recommend a surcharge calculated as ceil((observed cost increase + 3% ops premium) * 100)/100 to nearest cent per 1k tokens for advertised pricing.
+
+4) Migration crediting
+- For customer-facing migrations (where perceived drop might reduce retention), offer a one-time credit sized at 10% of the first-month expected spend differential for migrations that exceed a projected 20% quality regression risk.
+
+Decision rules (binary)
+- If projected output-quality delta (measured by the evaluation harness) > 7% on critical prompt set => require explicit customer approval and Solutions Eng sign-off.
+- If projected cost savings < 8% => do not auto-migrate; consider opt-in only.
+
+Telemetry & Evaluation Requirements
+Before approving a migration produce:
+- Synthetic replay of at least 50k representative requests or 72 hours of sampled production traffic (whichever is larger).
+- Evals: domain prompt set (owner-provided) + Redwood baseline prompt set. Key metrics: fidelity_score, hallucination_rate, latency_p95, token_cost_estimate.
+- Dashboard: per-route change visualization, diff histograms for token counts and latency, sliding 24/168h windows.
+
+Migration Playbook (operational steps)
+1) Prepare:
+  - Owner: Product / Solutions Eng
+  - Collate domain prompt set (min 100 canonical prompts) and representative traffic sample (see telemetry).
+  - Estimate cost delta via offline simulator (use cost-sim SDK v2).
+2) Synthetic run (preflight):
+  - Run A/B: 10% traffic routed to candidate tier for 48 hours. Capture fidelity metrics and customer-facing regressions.
+  - Monitor: fidelity_score drop, error rates, latency p95, requests with >3 repeated tokens.
+3) Canary expansion:
+  - If preflight passes thresholds (fidelity_score drop <= 4% and no customer errors) expand to 33% for 72 hours.
+4) Billing and pricing action:
+  - Apply temporary dual-billing window: customer billed at midpoint price for 2 billing cycles while retention and usage observed; credit if churn signals triggered.
+5) Full rollout:
+  - Increase to 100% in 24-48 hours with automated rollback triggers.
+  - Post-rollout: 14-day monitoring window with weekly review.
+
+Rollback triggers (automated):
+- fidelity_score drop > 7% sustained for 6 hours
+- new error.rate increase > 2x baseline
+- customer-initiated escalation recorded
+
+Customer communication templates
+- Pre-migration (email/in-console): clear summary of expected changes, scheduled window, cost impact (estimated), opt-out instructions, contact for support.
+- Post-migration: operational summary with before/after metrics and applied credits if any.
+
+Pricing examples (scenarios)
+- Scenario A: Customer A (Standard -> Low): baseline monthly spend $50k. Projected token cost reduction 45%. Heuristics: reduce per-token price by 40% (since >8% and accounting for overheads). Offer 10% one-time credit ($5k) if fidelity delta on domain set >10%.
+- Scenario B: Customer B (High -> Standard, non-critical): baseline $12k. Projected compute saving 30%. Per-token price reduced by 25% and no credit; add a 2-month observation billing band and telemetry reports.
+
+Risk & Mitigations
+- Regressions for long-context chains: use targeted fallback policy for routes with long sequences (route-level 'high-fidelity' pin).
+- Unexpected billing disputes: require ledger export and spend-simulator runbooks to be part of migration packet.
+- Model drift: include monthly re-eval cadence for migrated tenants for first 6 months.
+
+KPIs to evaluate migration program
+- Migration success rate: % migrations completed without rollback within 14 days (target >= 90%).
+- Net dollar retention impact for migrated customers at 90 days (target >= -2%).
+- Average cost savings realized vs simulated (target within +/- 8%).
+- Time to rollback when automated trigger fires (target < 10 minutes).
+
+Operational ownership and contacts
+- Product (Fidelity Programs): Maya Chen (owner) — maya@redwood.example.com
+- Solutions Engineering: Liam Patel — liam@redwood.example.com
+- Billing & Revenue Ops: Sofia Martinez — sofia@redwood.example.com
+- SRE escalation: Ethan Brooks — ethan@redwood.example.com
+
+Appendix A — Private deployments and contractual constraints
+- Private deployments may require contract amendment for any fidelity-based pricing changes. Work with Legal and Commercial to produce one-off amendments. For on-prem, the migration must be scheduled with a 4-week lead time and a signed change order.
+
+Appendix B — Example cost-sim snippet (pseudo-JSON)
+{
+  "route": "chat-v1/assistant",
+  "baseline_seconds_per_token": "0.0032",
+  "candidate_multiplier": "0.72",
+  "estimated_monthly_tokens": "1_200_000_000",
+  "projected_monthly_cost": "$X"
+}
+
+Appendix C — Fast checklist (one-pager)
+- [ ] Domain prompts collected and validated
+- [ ] Synthetic replay configured (>=50k requests)
+- [ ] Preflight A/B run (10% traffic) complete and passing
+- [ ] Canary (33%) complete and passing
+- [ ] Billing plan updated and communications drafted
+- [ ] Rollback configured with automated alerts
+
+Notes and change log
+- 2027-08-09: Initial draft and internal review.
+- 2027-10-01: Added explicit billing band and credit heuristics after pilot with three customers.
+- 2028-01-15: Clarified rollback thresholds and added private-deploy constraints.
+
+Related artifacts
+- Cost-sim SDK v2 runbook (internal link)

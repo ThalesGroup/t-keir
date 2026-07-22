@@ -1,0 +1,1908 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://0509760340db50cff8199adb43f8eadcd26298cf251b8b30f283ffa26a7dd8d7/SALUTE_00501_4c485cfc.md",
+  "title": "SALUTE 00501 — Eastern corridor",
+  "content": [
+    "# SALUTE 00501 — Eastern corridor\n\nSALUTE REPORT\nSize: 3 personnel\nActivity: convoy staging\nLocation: Eastern corridor\nUnit/Uniform: unidentified support element\nTime: 2026-07-22T21:56Z\nEquipment: tactical radios and light vehicles.\n\nNote linguistique: diffusion de travail en français; situation opérationnelle stable.\n"
+  ],
+  "kg": [],
+  "error": false,
+  "conversion-info": {
+    "datatype": "raw",
+    "source-size-bytes": 324,
+    "image-extraction": {
+      "enabled": false,
+      "used": false,
+      "mode": null,
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:16:21",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_smx.owl"
+  ],
+  "source": "ingest://0509760340db50cff8199adb43f8eadcd26298cf251b8b30f283ffa26a7dd8d7/SALUTE_00501_4c485cfc.md",
+  "metadata": {
+    "topic_id": "situational_awareness",
+    "corpus": "osint",
+    "doc_type": "SALUTE",
+    "language": "fr",
+    "title": "SALUTE 00501 — Eastern corridor",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "situational_awareness",
+  "doc_type": "SALUTE",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "fr",
+    "confidence": 0.5714263834482955
+  },
+  "resource-selection": {
+    "detected-language": "fr",
+    "processing-language": "fr",
+    "spacy-language": "fr",
+    "resources-base-path": null,
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "#",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "SALUTE",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "00501",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Eastern",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "corridor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "SALUTE",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "REPORT",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Size",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "3",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "personnel",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Activity",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "convoy",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "staging",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Location",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Eastern",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "corridor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Unit",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "/",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Uniform",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "unidentified",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "support",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "element",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Time",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "2026-07-22T21:56Z",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Equipment",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "tactical",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "radios",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "light",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "vehicles",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Note",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "linguistique",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "diffusion",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "de",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "travail",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "en",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "français",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "situation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "opérationnelle",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "stable",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "SALUTE",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "00501",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Eastern",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "corridor",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "salute",
+      "text": "SALUTE",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00501",
+      "text": "00501",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "X",
+      "lemma": "Eastern",
+      "text": "Eastern",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "corridor",
+      "text": "corridor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "ADP",
+      "lemma": "#",
+      "text": "#",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "salute",
+      "text": "SALUTE",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00501",
+      "text": "00501",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "X",
+      "lemma": "Eastern",
+      "text": "Eastern",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "corridor",
+      "text": "corridor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "SALUTE",
+      "text": "SALUTE",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "REPORT",
+      "text": "REPORT",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "size",
+      "text": "Size",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "NUM",
+      "lemma": "3",
+      "text": "3",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "personnel",
+      "text": "personnel",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "activity",
+      "text": "Activity",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "convoy",
+      "text": "convoy",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "X",
+      "lemma": "staging",
+      "text": "staging",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "location",
+      "text": "Location",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "X",
+      "lemma": "Eastern",
+      "text": "Eastern",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "corridor",
+      "text": "corridor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Unit",
+      "text": "Unit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "/",
+      "text": "/",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "uniform",
+      "text": "Uniform",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "unidentified",
+      "text": "unidentified",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "support",
+      "text": "support",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "element",
+      "text": "element",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Time",
+      "text": "Time",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "VERB",
+      "lemma": "2026-07-22t21:56z",
+      "text": "2026-07-22T21:56Z",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "equipment",
+      "text": "Equipment",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "tactical",
+      "text": "tactical",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "X",
+      "lemma": "radio",
+      "text": "radios",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "X",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "X",
+      "lemma": "light",
+      "text": "light",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "vehicle",
+      "text": "vehicles",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "note",
+      "text": "Note",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 38
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "linguistique",
+      "text": "linguistique",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "diffusion",
+      "text": "diffusion",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "ADP",
+      "lemma": "de",
+      "text": "de",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "travail",
+      "text": "travail",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "ADP",
+      "lemma": "en",
+      "text": "en",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "français",
+      "text": "français",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "situation",
+      "text": "situation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "opérationnel",
+      "text": "opérationnelle",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "stable",
+      "text": "stable",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [
+    {
+      "start": 6,
+      "end": 9,
+      "label": "organization",
+      "text": "SALUTE REPORT Size"
+    },
+    {
+      "start": 12,
+      "end": 21,
+      "label": "misc",
+      "text": "Activity : convoy staging Location : Eastern corridor Unit"
+    },
+    {
+      "start": 27,
+      "end": 28,
+      "label": "organization",
+      "text": "Time"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "#",
+      "lemma": "#",
+      "pos": "ADP",
+      "head": 1,
+      "dep": "case",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SALUTE",
+      "lemma": "salute",
+      "pos": "NOUN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2
+      ]
+    },
+    {
+      "text": "00501",
+      "lemma": "00501",
+      "pos": "NUM",
+      "head": 1,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 5,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Eastern",
+      "lemma": "Eastern",
+      "pos": "X",
+      "head": 5,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "corridor",
+      "lemma": "corridor",
+      "pos": "NOUN",
+      "head": 5,
+      "dep": "ROOT",
+      "lefts": [
+        3,
+        4
+      ],
+      "rights": []
+    },
+    {
+      "text": "SALUTE",
+      "lemma": "SALUTE",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "REPORT",
+      "lemma": "REPORT",
+      "pos": "PROPN",
+      "head": 7,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Size",
+      "lemma": "size",
+      "pos": "NOUN",
+      "head": 8,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        9
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 8,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "3",
+      "lemma": "3",
+      "pos": "NUM",
+      "head": 10,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        11
+      ]
+    },
+    {
+      "text": "personnel",
+      "lemma": "personnel",
+      "pos": "ADJ",
+      "head": 10,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Activity",
+      "lemma": "activity",
+      "pos": "NOUN",
+      "head": 12,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        13,
+        14
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "convoy",
+      "lemma": "convoy",
+      "pos": "NOUN",
+      "head": 12,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": [
+        15
+      ]
+    },
+    {
+      "text": "staging",
+      "lemma": "staging",
+      "pos": "X",
+      "head": 14,
+      "dep": "flat:foreign",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Location",
+      "lemma": "location",
+      "pos": "NOUN",
+      "head": 16,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        17
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 16,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Eastern",
+      "lemma": "Eastern",
+      "pos": "X",
+      "head": 18,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        19,
+        20
+      ]
+    },
+    {
+      "text": "corridor",
+      "lemma": "corridor",
+      "pos": "NOUN",
+      "head": 18,
+      "dep": "flat:foreign",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Unit",
+      "lemma": "Unit",
+      "pos": "PROPN",
+      "head": 18,
+      "dep": "flat:foreign",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "/",
+      "lemma": "/",
+      "pos": "PUNCT",
+      "head": 22,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Uniform",
+      "lemma": "uniform",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "ROOT",
+      "lefts": [
+        21
+      ],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 23,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "unidentified",
+      "lemma": "unidentified",
+      "pos": "NOUN",
+      "head": 24,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "support",
+      "lemma": "support",
+      "pos": "NOUN",
+      "head": 25,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        26
+      ]
+    },
+    {
+      "text": "element",
+      "lemma": "element",
+      "pos": "NOUN",
+      "head": 25,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Time",
+      "lemma": "Time",
+      "pos": "PROPN",
+      "head": 27,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        28,
+        29
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 27,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "2026-07-22T21:56Z",
+      "lemma": "2026-07-22t21:56z",
+      "pos": "VERB",
+      "head": 27,
+      "dep": "parataxis",
+      "lefts": [],
+      "rights": [
+        30
+      ]
+    },
+    {
+      "text": "Equipment",
+      "lemma": "equipment",
+      "pos": "NOUN",
+      "head": 29,
+      "dep": "obj",
+      "lefts": [],
+      "rights": [
+        31
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 30,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "tactical",
+      "lemma": "tactical",
+      "pos": "NOUN",
+      "head": 32,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        33,
+        34,
+        35
+      ]
+    },
+    {
+      "text": "radios",
+      "lemma": "radio",
+      "pos": "X",
+      "head": 32,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "X",
+      "head": 32,
+      "dep": "dep",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "light",
+      "lemma": "light",
+      "pos": "X",
+      "head": 32,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "vehicles",
+      "lemma": "vehicle",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        37
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 36,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Note",
+      "lemma": "note",
+      "pos": "NOUN",
+      "head": 38,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        39,
+        40,
+        41,
+        46
+      ]
+    },
+    {
+      "text": "linguistique",
+      "lemma": "linguistique",
+      "pos": "ADJ",
+      "head": 38,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 38,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "diffusion",
+      "lemma": "diffusion",
+      "pos": "NOUN",
+      "head": 38,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": [
+        43,
+        45
+      ]
+    },
+    {
+      "text": "de",
+      "lemma": "de",
+      "pos": "ADP",
+      "head": 43,
+      "dep": "case",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "travail",
+      "lemma": "travail",
+      "pos": "NOUN",
+      "head": 41,
+      "dep": "nmod",
+      "lefts": [
+        42
+      ],
+      "rights": []
+    },
+    {
+      "text": "en",
+      "lemma": "en",
+      "pos": "ADP",
+      "head": 45,
+      "dep": "case",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "français",
+      "lemma": "français",
+      "pos": "NOUN",
+      "head": 41,
+      "dep": "nmod",
+      "lefts": [
+        44
+      ],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 38,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "situation",
+      "lemma": "situation",
+      "pos": "NOUN",
+      "head": 47,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        48,
+        49,
+        50
+      ]
+    },
+    {
+      "text": "opérationnelle",
+      "lemma": "opérationnel",
+      "pos": "ADJ",
+      "head": 47,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "stable",
+      "lemma": "stable",
+      "pos": "ADJ",
+      "head": 47,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 47,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "SALUTE",
+      "lemma": "salute",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1
+      ]
+    },
+    {
+      "text": "00501",
+      "lemma": "00501",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Eastern",
+      "lemma": "Eastern",
+      "pos": "X",
+      "head": 4,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "corridor",
+      "lemma": "corridor",
+      "pos": "NOUN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        2,
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 16,
+      "text": "unidentified support element time",
+      "span": {
+        "start": 24,
+        "end": 28
+      }
+    },
+    {
+      "score": 9,
+      "text": "salute report size",
+      "span": {
+        "start": 6,
+        "end": 9
+      }
+    },
+    {
+      "score": 9,
+      "text": "situation opérationnel stable",
+      "span": {
+        "start": 47,
+        "end": 50
+      }
+    },
+    {
+      "score": 4,
+      "text": "note linguistique",
+      "span": {
+        "start": 38,
+        "end": 40
+      }
+    },
+    {
+      "score": 1,
+      "text": "uniform",
+      "span": {
+        "start": 22,
+        "end": 23
+      }
+    },
+    {
+      "score": 1,
+      "text": "diffusion",
+      "span": {
+        "start": 41,
+        "end": 42
+      }
+    },
+    {
+      "score": 1,
+      "text": "travail",
+      "span": {
+        "start": 43,
+        "end": 44
+      }
+    },
+    {
+      "score": 1,
+      "text": "français",
+      "span": {
+        "start": 45,
+        "end": 46
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://0509760340db50cff8199adb43f8eadcd26298cf251b8b30f283ffa26a7dd8d7/SALUTE_00501_4c485cfc.md#chunk-0-a0695dabc0",
+      "parent_doc_id": "ingest://0509760340db50cff8199adb43f8eadcd26298cf251b8b30f283ffa26a7dd8d7/SALUTE_00501_4c485cfc.md",
+      "text_raw": "# SALUTE 00501 — Eastern corridor SALUTE REPORT Size : 3 personnel Activity : convoy staging Location : Eastern corridor Unit / Uniform : unidentified support element Time : 2026-07-22T21:56Z Equipment : tactical radios and light vehicles . Note linguistique : diffusion de travail en français ; situation opérationnelle stable .",
+      "search_vector_payload": "# SALUTE 00501 — Eastern corridor SALUTE REPORT Size : 3 personnel Activity : convoy staging Location : Eastern corridor Unit / Uniform : unidentified support element Time : 2026-07-22T21:56Z Equipment : tactical radios and light vehicles . Note linguistique : diffusion de travail en français ; situation opérationnelle stable .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "SALUTE REPORT Size",
+            "Time"
+          ],
+          "misc": [
+            "Activity : convoy staging Location : Eastern corridor Unit"
+          ]
+        },
+        "svo_triplets": [],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 51,
+        "sentence_start": 0,
+        "sentence_end": 3
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Activity : convoy staging Location : Eastern corridor Unit",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "# SALUTE 00501 — Eastern corridor SALUTE REPORT Size : 3 personnel",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "SALUTE REPORT Size",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "Time",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/salute_report_size\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"salute report size\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Misc/activity_convoy_staging_location_eastern_corridor_unit-4b5367dab5e8\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Misc\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Activity : convoy staging Location : Eastern corridor Unit\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Organization/salute_report_size-81553bd742f6\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"SALUTE REPORT Size\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/fran_ais\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"français\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Chunk/ingest_0509760340db50cff8199adb43f8eadcd26298cf251b8b30f283ffa26a7dd8d7_salute_00501_4c485cfc_md_chunk_0_a0695dabc0\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/unidentified_support_element_time\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/salute_report_size\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/note_linguistique\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/uniform\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/diffusion\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/travail\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/fran_ais\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Organization/salute_report_size-81553bd742f6\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Misc/activity_convoy_staging_location_eastern_corridor_unit-4b5367dab5e8\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Organization/time-33b93476cf59\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"salute_00501_4c485cfc_md\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/note_linguistique\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"note linguistique\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/unidentified_support_element_time\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"unidentified support element time\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/diffusion\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"diffusion\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Organization/time-33b93476cf59\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Time\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/uniform\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"uniform\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Chunk/ingest_0509760340db50cff8199adb43f8eadcd26298cf251b8b30f283ffa26a7dd8d7_salute_00501_4c485cfc_md_chunk_0_a0695dabc0\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Organization/salute_report_size-81553bd742f6\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Organization/time-33b93476cf59\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Misc/activity_convoy_staging_location_eastern_corridor_unit-4b5367dab5e8\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://0509760340db50cff8199adb43f8eadcd26298cf251b8b30f283ffa26a7dd8d7/SALUTE_00501_4c485cfc.md#chunk-0-a0695dabc0\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00501_4c485cfc_md/Keyword/travail\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"travail\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 17,
+      "graph_triple_count": 38,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 56,
+    "total_tokens": 56,
+    "covered_characters": 306,
+    "total_characters": 306,
+    "derivation": {
+      "enabled": true,
+      "status": "NO_MATCHES",
+      "matches": 0,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 0,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HS78J0JXJ9SSTN3B3S772/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 51,
+  "token-count": 56,
+  "source-file-size-bytes": 324,
+  "image-extraction": {
+    "enabled": false,
+    "used": false,
+    "mode": null,
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.192,
+    "tasks": {
+      "converter": 0.002,
+      "language-detection": 0.006,
+      "resource-selection": 0.001,
+      "tokenizer": 0.016,
+      "morphosyntax": 0.006,
+      "ner": 0.043,
+      "syntax": 0.007,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.109,
+      "chunk-questions": 0.001
+    }
+  }
+}

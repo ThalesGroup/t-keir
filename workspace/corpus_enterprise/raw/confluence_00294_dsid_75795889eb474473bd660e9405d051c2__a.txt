@@ -1,0 +1,157 @@
+Authorization Board: Evidence Synthesis and Retention Catalog
+
+Purpose:
+This page codifies the Authorization Board's approach to assembling, validating, and retaining evidence for authorization-related decisions across RBAC, audit logging, data residency, SDLC gates, incident response, and risk exceptions. It is intended for Board members, InfoSec, Engineering leads, and Compliance owners.
+
+Scope:
+- All production-facing access changes that affect model serving, customer data access, or tenant isolation.
+- SDLC release gates that touch entitlement, cryptographic key handling, or logging schemas.
+- Incident evidence for authorization-related incidents (unauthorized access, privilege escalation, service-account compromise).
+
+Summary / Executive guidance:
+The Authorization Board must be able to answer three questions for every decision or exception:
+1) Who made the change? (provenance)
+2) What did they change and why? (scope and rationale)
+3) How long will we retain evidence and where? (retention and locality)
+
+Primary Roles & Responsibilities:
+- Authorization Board (chair: Security PM): final sign-off for cross-domain exceptions and high-impact entitlement changes.
+- InfoSec (owner): maintains evidence schemas, runbooks, and audit-query templates.
+- Engineering (service owners): produce change artifacts, rollout notes, authorizing PR IDs, and test evidence.
+- SRE / Observability: ensure streaming audit logs, retention, and immutable store integrations.
+- Legal / Compliance: set regulatory locality & retention requirements for specific customers or tenants.
+
+Principles:
+- Minimal Blast Radius: prefer timebound, scoped entitlements with automated deprovisioning.
+- Immutable Evidence: critical authorization events must be persisted to an append-only store (see Audit Schema).
+- Contextual Packaging: combine logs + PR metadata + deployment artifact + incident timeline into a single evidence bundle for audits.
+- Defense in Depth: combine RBAC, attribute filters, and runtime policy checks; evidence must reflect all relevant layers.
+
+RBAC Patterns and Required Artifacts:
+- Pattern: Role-Based + Attribute Filtered (recommended for customer-facing endpoints).
+  Required artifacts per change: role-definition YAML, PR link, authorizing ticket, canary/rollback plan, access-review snapshot (pre-change), sampling of affected identities (<= 20 ids for review).
+- Pattern: Timebound Elevation (JIT): must include justification, duration, automatic expiry timestamp, and post-expiry verification job.
+- Pattern: Service Identity Change (keys/roles): key rotation proof, new key fingerprint, previous key revocation proof, CI build artifact IDs.
+
+Audit Logging Requirements (minimum contract):
+- Every authorization decision must emit a structured event with the following fields (pipe table):
+
+| field | type | description | retention-tier |
+|-------|------|-------------|----------------|
+| event_id | uuid | unique event identifier | hot:30d / cold:3y |
+| timestamp | ISO8601 | event time | hot:30d / cold:3y |
+| actor_id | string | user or service principal | hot:30d / cold:3y |
+| actor_type | enum | human | service | system | hot |
+| action | string | e.g., grant_role, revoke, evaluate_acl | hot:30d / cold:3y |
+| target_resource | string | resource identifier (model, dataset, route) | hot:30d / cold:3y |
+| outcome | enum | allowed | denied | error | hot:30d / cold:3y |
+| evidence_refs | list | links to PRs / tickets / deployment IDs | cold:3y |
+| locality_tag | string | region/residency label | cold:3y |
+
+Notes: the "evidence_refs" field must contain internal links or object ids; logs without evidence_refs trigger a pre-review alert.
+
+Data Residency & Retention Mapping (catalog):
+- Table (pipe):
+| artifact | default-retention | storage-class | residency constraint | owner |
+|---------|------------------|---------------|----------------------|-------|
+| auth-audit-hot | 30 days | hot-ssd (central observability) | none (index only) | observability-team |
+| auth-audit-cold | 3 years | object-store-immutable | region-tagged per-tenant | observability-team |
+| evidence-bundles | 7 years | immutable-archive | per-customer residency if requested | security |
+| sdlc-gate-artifacts | 5 years | object-store | global | eng-platform |
+| exception-approvals | 10 years | secure-vault | restricted (legal sensitive) | security/legal |
+
+SDLC Gate Checklist (authorization-impacting changes):
+Pre-merge (owner):
+1) Attach role-definition and sample policy to PR.
+2) Add "authorization-impact" label and link to ticket.
+3) Run unit tests including attribute-filtered access tests.
+4) Provide mock audit events showing expected log output.
+
+Pre-release (release manager):
+1) Confirm evidence_refs are populated with PR and ticket IDs.
+2) Confirm canary target and rollback policy.
+3) Confirm retention-class of produced logs conforms to tenant residency.
+
+Emergency patch flow (2-step signoff):
+1) Quick-approve by on-call engineer + on-call security; create post-facto authorization ticket within 4 hours.
+2) Evidence bundle must be assembled and presented to Authorization Board within 48 hours.
+
+Incident Response: Evidence Collection Steps (authorization incidents):
+1) Triage: tag incident as AUTHZ and attach incident-id to all artifacts.
+2) Preserve hot logs (copy snapshot) and mark snapshots immutable.
+3) Export evidence bundle:
+   - PRs, merge commits, CI logs (build ids)
+   - Deployment manifests and rollout timestamps
+   - Audit events (filter: event_type in [grant_role, revoke_role, evaluate_acl])
+   - Key material rotation proofs and KMS audit events
+   - Access reviews and approval tickets
+4) For tenant-impact incidents, consult Legal on cross-border copies before exporting.
+5) Hand off to Forensics: provide query templates and a preferred time window.
+
+Compliance Evidence Workflow (packaging & submission):
+1) Create evidence-bundle object in Evidence Service (artifact id).
+2) Populate metadata: incident_id/exception_id, owner_team, retention_class, residency_tag.
+3) Attach artifacts (log snapshots, PRs, tickets, screenshots) and a short executive summary (<=300 words).
+4) Board Review: Authorization Board evaluates bundle within 15 business days for high-risk items.
+5) Archive: on approval, evidence-bundle is sealed to immutable-archive and retention starts.
+
+Decision & Exception Handling (Authorization Board procedure):
+1) Submission: engineering or security submits an Exception Request with the minimal required artifacts.
+2) Triage: Board Secretary assesses completeness within 3 business days.
+3) Review: Board meets (synchronous or async) and votes; required vote thresholds: security + one engineering + one compliance/legal.
+4) Conditions: Board may add conditional mitigations (e.g., additional logging, scoped timebound limits).
+5) Approval: Board records decision and shipping ticket; evidence-bundle is created at approval time.
+6) Expiry & Re-evaluation: all approvals default to 90 days unless a longer term is justified and documented.
+
+Retention schedule (quick reference):
+- Hot auth audit: 30 days
+- Cold auth audit (immutable): 3 years (default), extended per regulation to 7+ years
+- Evidence bundles for incidents: 7 years (default) or longer if legal requirement
+- Exception approvals and change logs: 10 years
+
+Query templates (examples):
+- Find all grant_role events by actor:
+  SELECT * FROM auth_audit_cold WHERE actor_id = 'svc-deploy-123' AND action = 'grant_role' AND timestamp >= '2026-01-01T00:00:00Z';
+- Evidence bundle retrieval:
+  curl -H "Authorization: Bearer $TOKEN" 
+       https://evidence.internal/api/v1/bundles/{bundle_id} | jq '.'
+
+Sample event JSON (simple contract example):
+{
+  "event_id": "uuid-1234",
+  "timestamp": "2026-02-18T14:12:03Z",
+  "actor_id": "alice@redwood",
+  "actor_type": "human",
+  "action": "revoke_role",
+  "target_resource": "model:recommendation:v2",
+  "outcome": "allowed",
+  "evidence_refs": ["PR-1423", "TICKET-5819"],
+  "locality_tag": "eu-west-1"
+}
+
+Operational Alerts & Automation:
+- Missing evidence_refs: alert to submitter and Board secretary after 24 hours.
+- Timebound approval expiry: automated reminder 7 days before expiry.
+- Post-approval verification: scheduled job at expiry to confirm deprovisioning ran.
+
+Acceptance criteria for auditability (must be met before approval):
+- Events are searchable by event_id and actor_id for the required retention period.
+- Evidence-bundles include at least one immutable artifact (log snapshot) plus change metadata.
+- Residency requirements validated by Legal/Compliance for affected tenants.
+
+Appendix A — Board templates and checklists (links):
+- Exception request template: /templates/authz-exception-request
+- Evidence bundle checklist: /templates/evidence-bundle-checklist
+- Audit event schema docs: /confluence/security-and-compliance/audit-logging/event-schema-contract-and-retention-runbook-2025.json
+
+Appendix B — Contact matrix:
+- Authorization Board Secretary: security-board@redwood.internal
+- Observability Slack: #observability
+- Incident Pager: PagerDuty rotation: sec-oncall
+
+Revision history:
+- 2025-11-05: Created by Marisol Rivera
+- 2026-01-12: Added SDLC gate checklist and emergency patch flow (Elena Gomez review)
+- 2026-02-18: Tuned retention mapping and added automated alert rules (Jonah Patel review)
+
+End of document.

@@ -1,4 +1,12 @@
-"""Fetch document bytes from URLs or local paths."""
+"""Title: Fetch
+
+Fetch document bytes from URLs or local paths.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

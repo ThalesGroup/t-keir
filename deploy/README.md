@@ -6,7 +6,8 @@ Platform packaging for T-KEIR installation profiles P1–P4.
 |------|---------|
 | `versions.lock.yaml` | Third-party image/chart pins (digest + update command) |
 | `compose/` | Docker Compose stack (Workstream A) |
-| `images/` | Dockerfiles + `docker-bake.hcl` — `make images` / `image-*` / `images-push` / `images-sign` |
+| `images/` | Dockerfiles + `docker-bake.hcl` — shared `tkeir-lib`, then thin services (`make images`) |
+
 | `charts/` | Helm umbrella + sub-charts — `make helm-lint` / `cluster-install PROFILE=k8s-dev` |
 | `keycloak/` | Realm `tkeir` export + config-cli (Workstream K) |
 | `k3s/` | Hardened K3s + Lima macOS path (Workstream F) |
@@ -15,4 +16,9 @@ Platform packaging for T-KEIR installation profiles P1–P4.
 | `spire/` | SPIRE server/agent configs for agent SPIFFE (ADR-0008) |
 
 Canonical docs: [tkeir/docs/deployment/](../tkeir/docs/deployment/index.md).
-Image registry: `ghcr.io/thalesgroup/t-keir`.
+
+Image registry:
+
+- **Local / Compose default:** `local` (`make images` → `local/tkeir-*:…`)
+- **Publish / CI:** `ghcr.io/thalesgroup/t-keir`
+  (`make images-push IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir`)

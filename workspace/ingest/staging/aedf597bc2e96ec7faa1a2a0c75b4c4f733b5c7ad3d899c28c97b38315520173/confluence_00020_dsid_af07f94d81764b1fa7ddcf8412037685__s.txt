@@ -1,0 +1,161 @@
+serving-consumption-experiments-framework-prd-and-co-packaging-playbook-2029-11-20
+
+Title: Serving Consumption Experiments Framework — PRD and Co-Packaging Playbook
+
+Summary:
+This document defines a repeatable experimentation framework and associated commercial packaging guidance to evaluate and commercialize consumption-side interventions on Redwood’s inference platform. It covers goals, core experiments, instrumentation requirements, acceptance criteria, rollout safety checks, and recommended pricing/packaging patterns for successful experiments that bridge product, commercial, and engineering stakeholders.
+
+Problem statement:
+- Teams need a standardized way to run controlled consumption experiments (e.g., batching defaults, cache-enabled tiers, adaptive SLOs) that: (1) surface measurable cost and latency impact, (2) preserve customer experience, and (3) produce artifacts that map directly to pricing & packaging options.
+- Ad-hoc experiments produce inconsistent metrics, avoidable regression risk, and unclear commercial signal.
+
+Goals (what success looks like):
+- Reproducible experiments with end-to-end instrumentation across hosted, dedicated, and private deployments.
+- Clear mapping from experiment outcome to at least three commercialization levers: credits/discounts, fidelity tiers, and SLO-backed bundles.
+- Safety-first rollout with automated rollback triggers and guardrails to prevent customer impact.
+- Baseline experiment-to-packaging lead time <= 8 weeks (from hypothesis to commercial pilot).
+
+Non-goals:
+- This is not a customer-facing SLA document.
+- It does not prescribe model-level optimizations (quantization kernels live in eng-serving-runtime docs).
+
+Scope:
+- Applicable surfaces: Hosted API (primary), Redwood Dedicated (secondary), Redwood Private (limited: requires opt-in telemetry).
+- Workstreams covered: experiment infra, metrics schema, agent orchestration, product UX for opt-ins, pricing templates, and sales enablement collateral.
+
+Key definitions:
+1) Consumption experiment — a controlled change in the serving stack or defaults intended to influence unit economics (examples: prefetching, adaptive batching, cached prefixes, quantization-policy assignment).
+2) Fidelity mapping — classification of output fidelity policies (high / medium / economize) and their observable quality metrics.
+3) Commercial packaging — charging construct offered to customers (token-based credits, fidelity add-ons, SLO bundles).
+
+Success metrics (for an experiment run):
+- Primary: delta tokens/second cost (% reduction) and 95p latency change (ms).
+- Quality guard: no more than 1.0% increase in top-line regression for evaluated prompt set (measured by automated evals).
+- Adoption metric: 3% of eligible customers opt-in during pilot or assigned in commercial trial.
+- Risk control: automated rollback executed < 2% of runs due to regression signals.
+
+Experiment framework requirements (high level):
+- Instrumentation and telemetry:
+  - Emit experiment_id and treatment tag for every request.
+  - Token-level cost attribution (per-request token_count, compute_ms, cached_hit boolean).
+  - Quality capture: 1:1 eval harness capture for a configurable prompt set (up to 5k prompts/day for pilot).
+- Experiment orchestration:
+  - Support traffic split (0-100%) by percent and by customer cohort (tenant-aware).
+  - Built-in ramp schedule (stages: canary 0.5% -> ramp 5% -> broad 25% -> commercial).
+  - Fallback policy: automatic model variant fallback and cross-region failover when SLO violation threshold exceeded.
+- Data storage and retention:
+  - Experiment metadata retained for minimum 180 days.
+  - Aggregated experiment summaries available in Console and API for 365 days.
+- Access controls and confidentiality:
+  - Experiment results classified internal; customer-specific metrics may be flagged restricted and require legal sign-off to share.
+
+Functional requirements (numbered):
+1) FR-001: Experiment API — A REST endpoint to create/update/terminate experiments with fields: name, hypothesis, treatment_config, allocation_rules, safety_config, observability_config.
+2) FR-002: Console UI — Visual experiment builder with pre-filled templates for common experiments (batching, caching, quantization policy).
+3) FR-003: Metrics export — Per-experiment export to S3/BigQuery with schema versioning.
+4) FR-004: Prompt-set manager — Attachable prompt sets for quality validation; support fingerprinting and diff reports.
+5) FR-005: Auto-rollback engine — Rule-based engine with threshold config (e.g., quality_regression > 0.5% AND latency_increase > 15% -> rollback).
+
+Non-functional requirements (NFR):
+- NFR-001: Observability latency — experiment tagging and metric emission must add < 0.5ms p95 overhead to request path.
+- NFR-002: Scalability — support concurrent experiments across 10k tenants without > 2% throughput degradation.
+- NFR-003: Privacy — for Private deployments, telemetry is optional; experiments requiring telemetry must have an opt-in SDK.
+
+Design considerations and trade-offs:
+- Per-tenant vs global experiments: per-tenant yields cleaner commercial signal but increases complexity for capacity planning; global experiments are cheaper to run but noisier for billing signals. Recommendation: start with per-cohort experiments mapped to buying personas.
+- Instrumentation cost: token-level tracking increases storage cost. Use sampled token traces for long tail while keeping full traces during canary windows.
+
+Experiment templates (examples):
+- Template A: Adaptive batching default change
+  - Hypothesis: Increasing default batch_size from 8 -> 12 for short-context requests reduces per-token cost by >= 12% with < 5% 95p latency increase.
+  - Metrics: cost_per_1k_tokens, 95p latency, cache_hit_rate.
+  - Ramp: 0.5% -> 5% -> 20%.
+- Template B: Prefix KV caching for conversational flows
+  - Hypothesis: Keeping KV cache warm for recurrent session IDs reduces compute_ms by >= 20% for returning sessions.
+  - Metrics: compute_ms, kv_cache_hit_ratio, quality eval delta.
+- Template C: Mix of quantization profiles by tenant size
+  - Hypothesis: Small tenants can use quantized variants (4-bit) without measurable quality loss on curated prompts.
+  - Metrics: eval score delta, error_rate, latency p50/p95.
+
+Safety and rollback playbook (procedural):
+1) Define safety thresholds in the experiment creation flow.
+2) Run canary at 0.5% for minimum 24 hours with full trace capture.
+3) Evaluate automated quality reports and run manual spot checks.
+4) If rollback triggers fire, auto-rollback and notify triage channel (eng, product, support).
+5) Post-mortem required for any rollback that hit > 1% of traffic.
+
+Rollout plan (phases):
+- Pilot (internal + 2–5 trusted customers): 4 weeks. Goal: validate metrics and guardrails.
+- Commercial beta (opt-in by customers + sales-assisted): 8 weeks. Goal: 2–3 pilots converted to paid offering.
+- GA packaging: ship as add-on or default change accompanied by migration credits.
+
+Commercial packaging recommendations (patterns):
+1) Experiment-to-Addon path: successful experiments become optional add-ons that customers can enable; price as % discount on per-token price while ensuring margin floor.
+2) Fidelity bundling: map experiment outcomes to fidelity-graded SKUs (e.g., Economy, Balanced, Premium) with explicit SLO descriptions.
+3) Trial credits and pilot discounts: provide 6–8 weeks of offset credits to early adopters; capture conversion rate as commercial KPI.
+
+Pricing guardrails and cost modelling:
+- Minimum margin floor: expected unit-cost reduction from experiment must sustain a 15% gross margin before packaging as discount.
+- Price/discount table example:
+  | SKU | Unit price delta vs base | Packaging notes |
+  | Economy-Cache | -20% | Requires opt-in caching; not available for customers with restricted data policies |
+  | Balanced-Batch | -12% | Default for small tenants; includes canary monitoring |
+
+Console & sales enablement deliverables:
+- Console: experiment history, outcome dashboard, commercial suggestion card (maps results to recommended SKU).
+- Sales: pitch templates, ROI calculator (spreadsheet), customer migration checklist.
+
+Release notes template (for GA of an experiment-based feature):
+- Feature: name, short description, availability (regions, tiers), experiment-to-SKU mapping, migration steps, known limitations, contact for support.
+- Migration guidance: timeframe for auto-migration (if any), customer opt-out instructions, credits/grace period.
+
+Operational runbook highlights for SRE & Support:
+- Alerting: define experiment-specific alerts (quality_regression_pct, latency_p95_delta_ms, error_rate_increase).
+- Escalation path: on critical alarm, page SRE -> product -> assigned account owner.
+- Post-release validation: run curated prompt-set eval daily for 14 days post rollout.
+
+Ownership and governance:
+- Product (owner): experiment catalog, hypothesis approval, commercial mapping.
+- Engineering: experiment infra, auto-rollback engine, telemetry.
+- Applied ML / Evals: prompt-set curation and quality gates.
+- Sales / RevOps: packaging, pricing, pilot conversion tracking.
+
+Next steps & timeline (quarterly milestones):
+1) Q4 2029: Build Experiment API and Console MVP; create 3 template experiments.
+2) Q1 2030: Run internal pilots and instrument conversion metrics.
+3) Q2 2030: Commercial beta and packaging pilots with 5 customers.
+
+Appendix A — Example Experiment API payload (YAML):
+---
+name: "adaptive-batching-default-12"
+hypothesis: "Increase batching for short-ctx reduces unit cost >=12%"
+treatment_config:
+  batching_default: 12
+  kv_cache: false
+allocation_rules:
+  percent: 5
+  cohort: "small-tenant-cohort"
+safety_config:
+  quality_regression_pct: 0.5
+  latency_p95_delta_ms: 50
+observability_config:
+  prompt_set_id: "pilot-2029-batching"
+  trace_sample_rate: 1.0
+---
+
+Appendix B — Minimum data schema (CSV export):
+- experiment_id, treatment_tag, tenant_id, request_id, timestamp_utc, tokens_in, tokens_out, compute_ms, kv_hit, latency_ms, eval_score_delta
+
+Appendix C — FAQ (short):
+Q: Will Private deployments be forced to participate?
+A: No. Private deployments require explicit opt-in for telemetry and experiments.
+
+Q: How do we prevent cross-tenant billing confusion?
+A: All experimental metrics are per-tenant and exported to RevOps; commercial mapping requires a signed pilot agreement before offering discounts.
+
+Approvals: product and engineering leadership sign-off required before GA.
+
+Document history:
+- Created: 2029-10-15 by Aisha Patel
+- Reviewed: 2029-11-05 by Marco Li, Sofia Nguyen
+- Updated: 2029-11-20 — added pricing guardrails and rollout timeline.

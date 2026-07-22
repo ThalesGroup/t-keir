@@ -1,4 +1,12 @@
-"""TF-IDF vectorization of ontology labels using token lemmas."""
+"""Title: Label vectorizer
+
+TF-IDF vectorization of ontology labels using token lemmas.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

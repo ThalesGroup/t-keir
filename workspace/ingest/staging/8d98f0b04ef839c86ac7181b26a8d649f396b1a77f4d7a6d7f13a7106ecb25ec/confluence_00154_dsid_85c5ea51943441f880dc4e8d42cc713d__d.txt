@@ -1,0 +1,273 @@
+Data warehouse cost allocation sources (inventory + owners)
+
+## Purpose
+This page inventories the upstream data sources used to allocate infrastructure cost into Redwood’s data warehouse for unit economics reporting (e.g., blended $/1M output tokens). It is intended to answer:
+- Where each cost input comes from
+- Which table/view is the source-of-truth in the warehouse
+- Update cadence and backfill expectations
+- The owning team/person for correctness and change management
+
+Scope includes GPU fleet spend inputs, region normalization/mapping tables, and tagging/attribution inputs for Hosted vs Dedicated vs Private.
+
+## Warehouse conventions (quick reference)
+- Warehouse: **Snowflake**
+- Databases/schemas used by cost allocation jobs:
+  - `RAW_COST.*` — provider exports (immutable, append-only)
+  - `FINANCE.*` — Finance-managed assumptions and rate cards (versioned)
+  - `INFRA.*` — fleet inventory, cluster metadata, capacity reservations
+  - `MAPPING.*` — normalization tables (region, customer tier, service tagging)
+  - `TELEMETRY.*` — metering aggregates (tokens/requests)
+  - `UNIT_ECON.*` — curated outputs of the allocation + aggregation pipeline
+
+Naming notes:
+- All time series tables should be partitioned by `dt` (date) and, if hourly, include `hour_ts` (UTC).
+- Allocation jobs assume **UTC** timestamps end-to-end. Finance reporting views may apply a reporting timezone at query time.
+
+## Primary sources (authoritative inputs)
+### 1) Provider cost exports (actual spend)
+These are the “actuals” inputs. They are not perfectly attributable to a single model/customer without additional mapping.
+
+A) AWS (CUR)
+- What: AWS Cost and Usage Report (CUR), including amortized/reservation fields.
+- Warehouse objects:
+  - `RAW_COST.AWS_CUR_LINE_ITEMS` (line-level)
+  - `RAW_COST.AWS_CUR_RESOURCE_TAGS` (flattened tags)
+- Update cadence: daily ingest; late-arriving adjustments up to ~72 hours.
+- Owner: Eng Infra Data (primary: **Mei Lin**)
+- Notes:
+  - Use amortized cost fields for reserved instances/commitments per Finance methodology.
+  - GPU instances are identified via `instanceType`, `productFamily`, and tag-based project mapping.
+
+B) GCP billing export
+- What: GCP billing export to BigQuery, ingested to Snowflake.
+- Warehouse objects:
+  - `RAW_COST.GCP_BILLING_LINE_ITEMS`
+- Update cadence: daily ingest; adjustments up to ~48 hours.
+- Owner: Eng Infra Data (primary: **Mei Lin**)
+- Notes:
+  - Region is derived from SKU/usage location and normalized via `MAPPING.REGION_NORMALIZATION`.
+
+C) Azure cost export
+- What: Azure cost management export.
+- Warehouse objects:
+  - `RAW_COST.AZURE_COST_LINE_ITEMS`
+- Update cadence: daily ingest.
+- Owner: Eng Infra Data (primary: **Mei Lin**)
+
+D) Colocation / on-prem invoices (if applicable)
+- What: Colocation power + rack + networking invoices; sometimes represented as a monthly journal entry.
+- Warehouse objects:
+  - `FINANCE.COLO_COST_JOURNALS`
+- Update cadence: monthly close (M+7 to M+12 days depending on vendor)
+- Owner: Finance (methodology owner: **Rishi Malhotra**)
+- Notes:
+  - These are allocated via the ADR-defined basis (typically GPU-hours or equivalent utilization).
+
+
+### 2) GPU cost rate card (assumptions for blended views)
+Used for:
+- Forecasting, planning, and certain “blended” views that prefer stable rates over noisy daily actuals
+- Normalizing heterogeneous billing structures (spot/on-demand/reserved) into a consistent $/GPU-hour model
+
+- What: Finance-authored GPU hourly costs by provider + region + GPU class + capacity type.
+- Warehouse objects:
+  - `FINANCE.GPU_COST_RATE_CARD` (current)
+  - `FINANCE.GPU_COST_RATE_CARD_VERSIONS` (history; effective dating)
+- Update cadence: quarterly (or ad-hoc for major pricing changes)
+- Owner: Finance (primary: **Rishi Malhotra**); Eng Infra integration: **Cole Summers**
+- Required columns (conceptual):
+  - `effective_start_dt`, `effective_end_dt`
+  - `provider` (aws|gcp|azure|colo)
+  - `canonical_region`
+  - `gpu_type` (e.g., h100_80gb, a100_80gb, l40s)
+  - `capacity_type` (on_demand|reserved|spot|dedicated_reserved)
+  - `usd_per_gpu_hour`
+  - `source_doc` (Drive link / approval reference)
+
+
+### 3) Fleet inventory + utilization (GPU-hours denominator)
+These sources establish how many GPUs exist, where they are, and how to apportion idle/overhead.
+
+A) Fleet inventory hourly
+- What: hourly snapshot of schedulable GPU inventory by cluster and pool.
+- Warehouse objects:
+  - `INFRA.FLEET_INVENTORY_HOURLY`
+- Update cadence: hourly (SLO target: < 90 minutes lag)
+- Owner: SRE/Infra (primary: **Sean Gallagher**)
+- Notes:
+  - Must include capacity pool identifiers that map to Hosted/Dedicated/Private.
+
+B) GPU allocation / utilization metrics
+- What: aggregated GPU utilization signals (e.g., GPU duty cycle, allocated GPU-seconds, queue wait).
+- Warehouse objects:
+  - `INFRA.GPU_UTILIZATION_HOURLY`
+- Update cadence: hourly
+- Owner: SRE/Infra Observability (primary: **Allison Grant**)
+- Notes:
+  - Used to support idle-capacity treatment per ADR (do not unilaterally change definitions).
+
+
+## Attribution & mapping sources (dimensions)
+These tables are used to convert “infrastructure reality” into the reporting dimensions required for unit economics: model, region, customer tier, and deployment mode.
+
+### 4) Region normalization (canonical_region)
+- What: mapping of provider regions + internal colo labels to a canonical region used across telemetry and cost.
+- Warehouse objects:
+  - `MAPPING.REGION_NORMALIZATION`
+- Update cadence: as-needed; changes must be backward compatible or versioned
+- Owner: Eng Platform (primary: **Mei Lin**; reviewer: **Sean Gallagher**)
+- Key fields (conceptual):
+  - `source_system` (aws_cur|gcp_billing|azure_cost|gateway|runtime|colo)
+  - `source_region` (e.g., us-east-1, europe-west4, iad-colo)
+  - `canonical_region` (e.g., us-east, eu-west)
+  - `active_from_dt`
+  - `notes`
+- Change policy:
+  - Additive changes are preferred.
+  - If merging/splitting canonical regions, coordinate with Finance + Unit Econ owners and provide a migration plan.
+
+
+### 5) Service/project tagging (what spend belongs to “inference”)
+Provider exports often include non-inference costs. We allocate costs into the inference cost model using project/account/service mappings.
+
+- What: mapping from cloud account/project + tags to Redwood internal services (serving runtime, gateway, telemetry, etc.).
+- Warehouse objects:
+  - `MAPPING.CLOUD_PROJECT_TO_SERVICE`
+  - `MAPPING.COST_CATEGORY_RULES`
+- Update cadence: as-needed; review monthly
+- Owner: Eng Infra (primary: **Cole Summers**)
+- Notes:
+  - Any rule change can shift spend between categories; treat as a controlled change with change log.
+  - Common categories include: `inference_gpu`, `inference_cpu`, `network_egress`, `storage`, `observability`, `shared_platform`.
+
+
+### 6) Hosted vs Dedicated vs Private tagging (deployment mode)
+This is the critical input for tiered reporting and reconciling contract economics.
+
+A) Capacity pool → deployment mode mapping
+- What: mapping from cluster/pool identifiers to deployment mode.
+- Warehouse objects:
+  - `MAPPING.CAPACITY_POOL_DEPLOYMENT_MODE`
+- Update cadence: as-needed (on new pools)
+- Owner: Eng Infra + SRE (primary: **Sean Gallagher**; secondary: **Cole Summers**)
+- Values:
+  - `hosted` (shared multi-tenant)
+  - `dedicated` (reserved customer-specific capacity)
+  - `private` (VPC / customer-managed networking; may still run on Redwood-managed infra)
+
+B) Dedicated customer assignments
+- What: mapping from dedicated pool to customer account (internal ID) and contract dates.
+- Warehouse objects:
+  - `MAPPING.DEDICATED_POOL_CUSTOMER_ASSIGNMENTS`
+- Update cadence: daily sync from billing/contract source (or as-of contract changes)
+- Owner: Platform Engineering (primary: **Kaitlyn Nguyen**; reviewer: **Marcus Lin** for access control)
+- Notes:
+  - This table is **restricted**; do not expose raw customer IDs in dashboard drilldowns.
+
+
+### 7) Customer tier mapping (self-serve / dedicated / private / enterprise)
+Tier is not always equivalent to deployment mode (e.g., enterprise customers can use hosted; pilots/credits exist).
+
+- What: authoritative tier dimension derived from billing plan + contract flags + routing signals.
+- Warehouse objects:
+  - `MAPPING.CUSTOMER_TIER_DIM`
+- Update cadence: daily
+- Owner: Platform Engineering (primary: **Kaitlyn Nguyen**) with Finance review (**Rishi Malhotra**)
+- Edge cases to handle:
+  - Resellers / channel customers
+  - Pilot credits (treated as enterprise for reporting, unless Finance specifies otherwise)
+  - Customers migrating from hosted → dedicated mid-period
+
+
+### 8) Model + version + quantization profile metadata
+Used to map telemetry identifiers into stable reporting groupings.
+
+- What: canonical model registry including version aliases and allowed quantization profile IDs.
+- Warehouse objects:
+  - `MAPPING.MODEL_REGISTRY`
+  - `MAPPING.QUANTIZATION_PROFILE_ALLOWLIST`
+- Update cadence: as-needed (new models/profiles), reviewed weekly
+- Owner: Applied ML / Model Metadata (primary: **Quentin Harris**)
+- Notes:
+  - Any alias/grouping change should preserve historical comparability; prefer adding new aliases over renaming.
+
+
+## Telemetry inputs used by allocation
+Cost allocation ultimately computes $/token by joining cost (numerator) to metered output tokens (denominator) across shared dimensions.
+
+### 9) Token metering (hourly aggregates)
+- What: hourly aggregation of output tokens (and key driver signals) with controlled tag cardinality.
+- Warehouse objects:
+  - `TELEMETRY.OUTPUT_TOKENS_HOURLY` (authoritative for output)
+  - `TELEMETRY.REQUESTS_HOURLY` (request counts, streaming flag)
+  - `TELEMETRY.CACHE_BATCHING_SIGNALS_HOURLY` (cache hit rate, batching efficiency, prefill/decode)
+- Update cadence: hourly (SLO target: < 120 minutes lag)
+- Owner: Telemetry/Analytics (primary: **Nadia Rahman**, **Logan Wright**)
+- Required dimensions (must align with observability standards):
+  - `canonical_region`, `model_id`, `model_version`, `quantization_profile`, `customer_tier`, `deployment_mode`, `streaming` (true/false)
+
+
+## Operational responsibilities and change management
+### Ownership summary (who to page)
+- Provider export ingestion (`RAW_COST.*`): **Mei Lin** (Eng Infra Data)
+- Rate card (`FINANCE.GPU_COST_RATE_CARD*`): **Rishi Malhotra** (Finance) for values; **Cole Summers** for ingestion integration
+- Fleet inventory/utilization (`INFRA.*`): **Sean Gallagher** (SRE/Infra)
+- Region normalization (`MAPPING.REGION_NORMALIZATION`): **Mei Lin** (owner), **Sean Gallagher** (review)
+- Capacity/tier mappings (`MAPPING.*` for tier and dedicated assignments): **Kaitlyn Nguyen** (Platform Eng), **Marcus Lin** (security review)
+- Model registry / quant allowlist (`MAPPING.MODEL_REGISTRY`, `MAPPING.QUANTIZATION_PROFILE_ALLOWLIST`): **Quentin Harris**
+- Token metering (`TELEMETRY.*`): **Nadia Rahman** / **Logan Wright**
+
+### Update cadence expectations (for unit economics reporting)
+- Hourly: fleet inventory, utilization, telemetry aggregates
+- Daily: provider cost exports, tier/customer mappings
+- Quarterly: GPU rate card versions (with explicit effective dates)
+- Monthly: colo journals / invoice-based overhead entries
+
+### Required controls
+- All mapping tables must have:
+  - a defined owner
+  - a change log (commit/PR reference or audit table)
+  - backfill guidance if changes affect history
+- Restricted tables:
+  - `MAPPING.DEDICATED_POOL_CUSTOMER_ASSIGNMENTS`
+  - any table containing customer identifiers or contract metadata
+  Access is limited to approved roles; downstream dashboard views must be aggregated/redacted.
+
+
+## Common failure modes (and where to look)
+1) Spend looks flat / missing for a region
+- Check `RAW_COST.*` ingest freshness and `MAPPING.REGION_NORMALIZATION` coverage.
+
+2) Dedicated tier costs appear under Hosted
+- Check `MAPPING.CAPACITY_POOL_DEPLOYMENT_MODE` and dedicated pool assignment table.
+
+3) Output tokens drop (especially streaming)
+- Check `TELEMETRY.OUTPUT_TOKENS_HOURLY` completeness and streaming parity validation; coordinate with Telemetry.
+
+4) Blended cost changes sharply after a rate card update
+- Confirm `FINANCE.GPU_COST_RATE_CARD_VERSIONS` effective date boundaries and Finance sign-off.
+
+
+## Appendix: Data source inventory (compact)
+Format: Source → Warehouse object(s) → Cadence → Owner
+- AWS CUR → `RAW_COST.AWS_CUR_LINE_ITEMS`, `RAW_COST.AWS_CUR_RESOURCE_TAGS` → Daily → Mei Lin
+- GCP billing export → `RAW_COST.GCP_BILLING_LINE_ITEMS` → Daily → Mei Lin
+- Azure cost export → `RAW_COST.AZURE_COST_LINE_ITEMS` → Daily → Mei Lin
+- Colo invoices/journals → `FINANCE.COLO_COST_JOURNALS` → Monthly → Rishi Malhotra
+- GPU rate card → `FINANCE.GPU_COST_RATE_CARD`, `FINANCE.GPU_COST_RATE_CARD_VERSIONS` → Quarterly → Rishi Malhotra / Cole Summers
+- Fleet inventory → `INFRA.FLEET_INVENTORY_HOURLY` → Hourly → Sean Gallagher
+- GPU utilization → `INFRA.GPU_UTILIZATION_HOURLY` → Hourly → Allison Grant
+- Region normalization → `MAPPING.REGION_NORMALIZATION` → As-needed → Mei Lin
+- Project/service mapping → `MAPPING.CLOUD_PROJECT_TO_SERVICE`, `MAPPING.COST_CATEGORY_RULES` → As-needed → Cole Summers
+- Capacity pool deployment mode → `MAPPING.CAPACITY_POOL_DEPLOYMENT_MODE` → As-needed → Sean Gallagher / Cole Summers
+- Dedicated pool assignments → `MAPPING.DEDICATED_POOL_CUSTOMER_ASSIGNMENTS` → Daily → Kaitlyn Nguyen
+- Customer tier dimension → `MAPPING.CUSTOMER_TIER_DIM` → Daily → Kaitlyn Nguyen / Rishi Malhotra
+- Model registry + quant allowlist → `MAPPING.MODEL_REGISTRY`, `MAPPING.QUANTIZATION_PROFILE_ALLOWLIST` → As-needed → Quentin Harris
+- Output token metering + signals → `TELEMETRY.OUTPUT_TOKENS_HOURLY`, `TELEMETRY.CACHE_BATCHING_SIGNALS_HOURLY` → Hourly → Nadia Rahman / Logan Wright
+
+## Requests / changes
+To add a new cost source, mapping, or tag:
+1) Open a Platform Eng/Infra ticket with the proposed schema + backfill plan.
+2) Identify the owner and on-call routing.
+3) Add to this inventory and link the change record (PR/ADR if methodology changes).
+4) If the change affects Finance reporting, obtain sign-off from FP&A (Rishi Malhotra) before enabling in production views.

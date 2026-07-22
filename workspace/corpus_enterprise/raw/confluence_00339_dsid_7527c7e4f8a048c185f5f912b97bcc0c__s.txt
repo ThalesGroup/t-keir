@@ -1,0 +1,146 @@
+SLO Evolution & Capacity Simulation Runbook
+
+Overview
+
+Purpose: centralize the SLO lifecycle decisions and the set of reproducible capacity simulations, so SRE and platform teams can evolve SLOs safely, validate autoscaling and fallback policies, and link simulation results to incident reviews and error-budget actions. This runbook prescribes the policy, tooling, and a repeatable test matrix for Redwood inference services (hosted-api, routing-proxy, model-worker pools).
+
+Scope: hosted inference and dedicated pools. Excludes on-prem Private packaging tests (see eng-private-deployments/runbooks).
+
+Key definitions
+- SLO: Service level objective measured as error budget and latency percentiles over a rolling 30d window unless noted.
+- Error budget: 1 - SLO (percentage of allowed user-visible failures). Consumed by user-visible errors and latency misses.
+- Simulation: controlled load or chaos test intended to exercise autoscaling, fallback routing, cache eviction, and degraded-model behaviors.
+
+Executive summary
+- Target primary SLOs: availability (successful requests rate) and latency (p95 for short responses, p99 for long streaming). Example baseline SLOs we validate with these simulations:
+  - hosted-api availability: 99.95% monthly (error budget 0.05%)
+  - p95 latency (completion<512 tokens, small model): <= 250ms
+  - p99 latency (completion>1024 tokens, large model): <= 2000ms
+- We run full simulation campaigns quarterly and after any major change (runtime, kernel updates, quantization changes, major capacity changes).
+- Simulation results must be attached to incident reviews when relevant and drive either SLO revision, operational tuning, or rollout rollback.
+
+Ownership and escalation
+- Runbook owner: SRE - Capacity & Resilience team (primary contact: nadia.chen@redwood.ai).
+- Secondary owners: infra-platform (autoscaler), runtime-performance (kernel), product-ops (customer-facing SLA decisions).
+- Escalation path: on-call -> L2 capacity engineer -> Runtime lead -> Head of SRE. Use Slack channel #sre-capacity for live coordination.
+
+SLO lifecycle and change policy
+1. Propose change: product or platform teams propose SLO evolution with rationale (tradeoffs, observability evidence). Attach before/after expected user impact matrix.
+2. Simulation gating: major SLO relaxations or tightenings require an approved simulation campaign (see 'Simulation templates' below).
+3. Rollout plan: staged rollout with canary (5% traffic), A/B (50/50 for 24h), and full (100%) with automated rollback if error budget burn rate > 3x in 1h or latency p99 exceeds threshold for 10 minutes.
+4. Post-rollout review: collect metrics and attach to incident review if thresholds tripped.
+
+Error budget policy and automated responses
+- Consumption accounting: counts both 5xx responses and latency misses defined per SLO rule. Latency miss example PromQL for p95 miss over 30d window:
+  - promql: 'sum_over_time((increase(requests_total{job="hosted-api",status!~"2.."}[30d])))/sum_over_time(increase(requests_total{job="hosted-api"}[30d]))'
+- Automated responses by burn rate:
+  - Burn rate < 1.0: normal operations.
+  - Burn rate 1.0-3.0 sustained for 1h: SRE notified, reduce non-critical deploy velocity, enable extra monitoring retention for affected routes.
+  - Burn rate >= 3.0 for 30m: trigger immediate mitigation playbook (see 'Mitigation steps' below) and schedule incident review.
+
+Mitigation steps (fast path)
+1. Route traffic to fallback models with documented performance profile (call: routectl promote-fallback --service hosted-api --percent 50).
+2. Throttle non-essential APIs (admin/debug endpoints) via ingress rule: `kubectl patch configmap ingress-rules -p '{"data":{"throttle": "true"}}'`
+3. Increase dedicated pool shards (if capacity available): `infractl scale pool model-worker --shards +2 --priority emergency`
+4. If GPU memory pressure high, enable low-memory quantized variant: `runtimectl set-variant --model-id open-llama-7b --variant q4_0 --apply`
+5. Notify customers on SLA-sensitive contracts and open incident bridge.
+
+Simulation templates and tooling
+- Tools we standardize on: k6 (functional load), vegeta (microburst), chaos-mesh (network latency/partition), and our in-house replay tool 'traceloader' for synthetic prompt mixes.
+- Baseline dataset: use anonymized 30-day request corpus from hosted-prod (redwood-internal S3 path: s3://redwood-simulations/baselines/last-30d) with parameterized token distributions.
+
+Test matrix (example)
+| Scenario | Traffic multiplier | Model size | Batch size | Target QPS | Duration | Acceptance 
+|---|---:|---:|---:|---:|---:|---:|
+| Steady ramp | 1.0 -> 3.0 | small (2B) | 8 | 1k -> 3k | 2h | p95 <= 250ms, error rate < 0.1%
+| Microburst | 5x spike (10s) | small | 1 | 5k peak | 1h (repeats) | autoscaler < 60s to add nodes, error rate < 0.5%
+| Worker crash | steady 2x | large (20B) | 4 | 800 | 30m | fallback routing <= 30% traffic, customer impact <= 1%
+| Cache eviction | steady 1.5x + cold cache | mixed | 8 | 1.2k | 90m | cache-miss latency added < 300ms
+
+Operational steps to run a simulation (playbook)
+1. Pre-checks (run 24h prior)
+  - Ensure on-call rota assigned and incident bridge reserved.
+  - Snapshot current infra: `infractl snapshot --env prod --name sim-<date>`
+  - Notify customer-ops about scheduled campaign (48h notice for Dedicated customers).
+2. Staging run (quick smoke)
+  - Replay 1 hour of baseline traffic at 0.5x using traceloader. Confirm dashboards green.
+3. Execute ramped tests
+  - Launch k6 script: `k6 run --vus 100 --duration 2h scripts/steady-ramp.js --out influxdb=http://monitoring:8086`
+  - For microbursts use vegeta: `echo 'GET http://hosted-api/v1/generate' | vegeta attack -rate=5000 -duration=10s | vegeta report`
+4. Chaos injections (optional)
+  - Network latency: `chaosctl create latency --target routing-proxy --latency 150ms --duration 600s`
+  - Pod kill: `kubectl -n runtime delete pod model-worker-abc-123`
+5. Triage and mitigation (if thresholds tripped)
+  - Follow Mitigation steps and stop tests: `k6 stop <run-id>`
+  - Record metrics snapshot `promql: topk(20, avg_over_time(rate(request_duration_seconds_bucket[5m])[15m:]))`
+6. Postmortem and artifacts
+  - Upload logs and dashboards to simulation run ticket and link to incident review if applicable.
+
+Prometheus alerts and example queries
+- Alert: SLO_Latency_P95_Exceeded
+  - expr: 'histogram_quantile(0.95, sum(rate(request_duration_seconds_bucket{job="hosted-api"}[5m])) by (le)) > 0.25'
+  - for: 10m
+  - severity: page
+- Alert: Error_Budget_Burn_Rate_High
+  - expr: 'increase(errors_total[1h]) / increase(requests_total[1h]) / (0.0005) > 3' (where 0.0005 is baseline error budget for 99.95%)
+  - for: 30m
+
+Linking simulations to incident reviews
+- Any simulation that trips a page is captured as an incident in the same format as production incidents. Attach: simulation plan, scripts, recorded k6/vegeta outputs, chaos definitions, and dashboard snapshots.
+- Use `incctl create --type simulation --title "Sim: <name> <date>" --artifacts s3://redwood-simulations/runs/<id>` to create the review.
+
+Operational tooling and dashboards
+- Dashboards to review during simulation:
+  - SLO summary (30d window): availability, latency percentiles, error budget burn rate
+  - Autoscaler metrics: desired vs actual replicas, scale decision latency, GPU utilization per shard
+  - Cache layer: hit ratio, byte throughput, eviction rate
+- Runbooks and scripts are kept in git repo: git@github.com:redwood-infra/sim-playbooks. Tag simulation commits with `sim/<yyyymmdd>-<service>`.
+
+Incidents and post-simulation review standard
+- If simulation results indicate fragile behavior (e.g., sustained error budget burn), a post-simulation incident review is required within 3 business days. The review should include:
+  - Timeline of events (minute-granular), owners, actions taken
+  - Root cause hypotheses and evidence (heap profiles, kernel changes, autoscaler logs)
+  - Corrective actions and owners with dates
+  - If applicable, SLO revision proposal with customer impact analysis
+
+Frequency and gating
+- Quarterly full campaigns for each critical service.
+- Ad-hoc campaigns gated by major runtime or workload changes (kernel upgrades, quantization profile changes, new autoscaler strategy).
+
+Appendix A — Example configuration snippets
+- Autoscaler policy example (YAML):
+  apiVersion: autoscaler.redwood/v1
+  kind: PoolAutoscaler
+  metadata:
+    name: model-worker-default
+  spec:
+    minReplicas: 4
+    maxReplicas: 64
+    targetGPUUtilization: 0.65
+    scaleUpCooldown: 45s
+    scaleDownCooldown: 300s
+
+- k6 steady-ramp snippet (JS):
+  import http from 'k6/http';
+  import { sleep } from 'k6';
+  export let options = { stages: [ { duration: '20m', target: 100 }, { duration: '70m', target: 300 } ] }
+  export default function () { http.post('https://hosted-api/v1/generate', JSON.stringify({prompt: 'sim-test'}), { headers: {'Content-Type': 'application/json'} }); sleep(1); }
+
+Appendix B — Acceptance checklist before marking a simulation as successful
+- [ ] All alerts cleared or root cause documented
+- [ ] No unintended customer-visible errors above acceptance threshold
+- [ ] Autoscaler actions observed and within expected latency
+- [ ] Artifacts uploaded to simulation ticket
+- [ ] Post-simulation notes added to SLO change proposal if applicable
+
+Related pages and references
+- Service capacity governance handbook (link in metadata)
+- SLO escalation guidance (link in metadata)
+- Runtime kernel upgrade ADRs
+
+Document change log
+- 2024-11-12: Initial published by Nadia Chen.
+- 2025-02-28: Added automated rollback criteria and microburst scenario details (reviewers: Liam Patel, Aisha Rahman).
+
+Contact and feedback
+- For questions or to propose a simulation: open a ticket in SRE board and tag @sre-capacity.

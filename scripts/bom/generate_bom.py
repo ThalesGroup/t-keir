@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Generate a unified CycloneDX BOM (SBOM + AIBOM) for T-Keir."""
+"""Title: Generate bom
+
+Generate a unified CycloneDX BOM (SBOM + AIBOM) for T-Keir.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

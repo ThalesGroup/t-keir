@@ -1,0 +1,13 @@
+{
+  "ingest_id": "01KY4DEDJ03ZV0R4YTRTQGHGN1",
+  "correlation_id": "0751b0989425eb6cfd26b1ddf7013db8",
+  "status": "failed",
+  "doc_id": "c5ea69b4572e56a8ab0b950313af3394f983b193d78bea72d58a77a7ce82e972",
+  "batch_id": null,
+  "manifest_path": "staging/c5ea69b4572e56a8ab0b950313af3394f983b193d78bea72d58a77a7ce82e972/ingest.manifest.json",
+  "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+  "created_at": "2026-07-22T08:00:33.344Z",
+  "updated_at": "2026-07-22T08:00:53.586Z",
+  "noop": false,
+  "user_space": "dev@tkeir"
+}

@@ -1,4 +1,12 @@
-"""Tests for language detection."""
+"""Title: Language Detector
+
+Tests for language detection.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from unittest.mock import patch
 

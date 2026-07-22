@@ -1,0 +1,233 @@
+Rights and Procurement Operations Handbook
+
+Summary
+
+This handbook consolidates company-wide operational policies for access & permissions, change management that impacts authorization, data classification and handling, procurement and expense approval, vendor lifecycle management, and travel rules. It is intended for managers, finance, security, procurement partners, and people ops staff who execute or approve operational requests.
+
+Scope
+
+Applies to all Redwood Inference employees, contractors, and third-party vendors interacting with company systems, purchasing on behalf of the company, or handling company data. Exceptions must be documented and approved by Finance + Security.
+
+Definitions
+
+- PO: Purchase Order
+- IAM: Identity and Access Management
+- SSO: Single Sign-On
+- KMS: Key Management Service
+- PII: Personally Identifiable Information
+
+Ownership and escalation
+
+- Policy owner: Finance-Legal (owner_team)
+- Operational steward: Procurement Guild (finance operations)
+- Security author for access rules: Security Engineering
+- Travel coordinator: People Ops travel team
+- Dispute/exception escalation: Head of Finance -> General Counsel
+
+1) Access & Permissions
+
+Goal: Provide least-privilege access with auditable requests, approvals, and automated deprovisioning.
+
+Access request flow (standard):
+1. Requestor creates an access request in the Access Portal (Confluence link: /access-portal).
+2. Request includes justification, duration (if temporary), and list of systems or roles.
+3. Manager approval (must be the requestor's direct manager).
+4. Owner approval for the target resource (service owner or team oncall).
+5. Security reviews if request includes elevated privileges (admin/root, production data access).
+6. Provisioning executed via IAM automation within 2 business days.
+
+Emergency access (break-glass):
+1. Submit an urgent request via the PagerDuty channel and file a standard Access Portal entry within 24 hours.
+2. Emergency access is time-limited to 8 hours by default and requires retrospective review.
+
+Approval matrix (example):
+| Role/request type | Manager approval | Resource owner | Security review | Notes |
+|-------------------|------------------|----------------|-----------------|-------|
+| Non-prod read-only | Required | Auto-approve for team-owned resources | No | Self-serve for common tools |
+| Prod read-only | Required | Required | Optional | Logged for 90 days |
+| Prod write/admin | Required | Required | Required | 2FA + justification |
+| PII access | Required | Required | Required | Data handling training required |
+
+Deprovisioning
+
+- Access automatically removed 7 days after termination events in HR feed.
+- Managers must review active accesses quarterly; security will flag stale roles older than 90 days.
+
+2) Change Management (authorization-impacting changes)
+
+Purpose: Ensure changes that affect permissions, network access, or data flows are evaluated for security and cost impact.
+
+Change classification:
+- Standard change: routine, pre-approved changes (e.g., scheduled key rotation)
+- Major change: architecture work that modifies routing, IAM roles, or storage boundaries
+- Emergency change: production-fix required to restore service
+
+Procedure for major changes:
+1. Submit a Change Request in the Change Registry with owner, roll-back plan, and test validation steps.
+2. Security and Finance review risk and cost implication within 3 business days.
+3. Schedule a change window; communicate to stakeholders 48 hours prior.
+4. Post-change validation: run smoke tests, IAM audit, and cost delta report.
+
+Rollback and canary policy:
+- All major changes must include a rollback plan and at least 1-hour canary with health checks.
+- If error budget impact exceeds 5% or cost delta >10% of baseline, rollback immediately.
+
+Emergency changes:
+- Follow the emergency change runbook: notify SRE, Security, and Finance within 1 hour of deployment.
+- Complete a retrospective and RCA within 7 days.
+
+3) Data Management
+
+Classification levels:
+- PUBLIC: information freely shareable (e.g., blog posts)
+- INTERNAL: internal business info without PII or trade secrets
+- CONFIDENTIAL: contains business-sensitive info, low-risk PII, internal roadmaps
+- RESTRICTED: high-sensitivity PII, customer data, keys, source code
+
+Handling rules (selected):
+- RESTRICTED data must be stored in approved buckets with encryption-at-rest (KMS) and limited to roles granted via IAM groups.
+- CONFIDENTIAL data may be exported only with Manager + Security approval.
+- All PII access requires completion of Data Safety training in LMS every 12 months.
+
+Retention and deletion
+
+- Default retention: 2 years for INTERNAL; 5 years for CONFIDENTIAL; RESTRICTED retention per contract.
+- Data deletion requests (e.g., GDPR/CCPA) are processed by Privacy Ops and must be completed within 30 days.
+
+Audit and monitoring
+
+- Logs: Access to RESTRICTED data requires detailed audit logs retained for 1 year.
+- Weekly automated audits: Security runs a stale-permissions scan and reports to the owner.
+
+4) Procurement and Expense Approvals
+
+Principles: Centralize vendor spend visibility, enforce PO discipline, reduce invoice leakage.
+
+Approval thresholds (effective policy):
+- Expenses (employee spend):
+  - <$250: auto-approved by manager via expense tool
+  - $250 - $2,500: manager approval required; finance lead review for vendor-related costs
+  - >$2,500 up to $25,000: Manager + Finance Director approval
+  - >$25,000: Manager + Finance Director + CFO approval (PO required)
+- Purchasing (vendor contracts):
+  - <$5,000: Standard procurement form + approver (manager)
+  - $5,000 - $50,000: PO required; Procurement review and Finance approval
+  - >$50,000: Procurement + Legal + Finance Director + CFO sign-off; SLA review mandatory
+
+Standard procurement workflow:
+1. Requestor completes the Procurement Request form (link) and attaches Scope of Work and estimated budget.
+2. Procurement team validates vendor, pricing, and conflict-of-interest disclosures.
+3. Finance issues PO or routes to Legal for contract review if T&Cs deviate from template.
+4. Procurement issues PO and confirms delivery milestones.
+
+Invoice handling and 3-way match
+
+- Preferred process: 3-way match (PO, invoice, receipt). If no PO, invoices must be tagged with an approved procurement request. Payment net-30 unless contract specifies otherwise.
+
+Expense reimbursements (travel & misc):
+- Receipts required for all expenses > $25.
+- Per diem: $75 domestic, $150 international (overnight).
+- Personal expenses are not reimbursable. Examples and edge cases are listed in the travel section.
+
+5) Vendor Management and Onboarding
+
+Goals: Protect company data, ensure performance and contractual clarity.
+
+Vendor lifecycle: Evaluate -> Contract -> Onboard -> Monitor -> Renew/Offboard
+
+Minimal vendor vetting checklist (must be completed before onboarding):
+- Business verification: company legal name, tax ID, contact points
+- Security questionnaire: complete the standard vendor security assessment (link)
+- Compliance evidence: SOC2 / ISO27001 where applicable or compensating controls documented
+- Contract terms: Data processing addendum (DPA), liability caps, termination rights
+- SLA: measurable uptime, incident response time, and escalation path
+
+Onboarding steps:
+1. Procurement creates vendor record and issues onboarding packet.
+2. Security verifies network/data flows; if vendor requires network access, put in a separate VPC with least-privilege routes.
+3. Access credentials for vendor agents must be time-bound and tied to vendor employee lists.
+
+Monitoring and renewal:
+- Quarterly vendor performance reviews for vendors with >$10k/month spend or who handle RESTRICTED data.
+- Offboarding checklist: revoke credentials, archive vendor data, confirm deletion per DPA or contract terms.
+
+6) Travel Policy (selected highlights)
+
+Booking and approvals:
+- All international travel requires manager approval and Finance pre-clearance for trips >5 days.
+- Use corporate travel provider for bookings where available. Exceptions require manager note.
+
+Allowed classes and per-diem:
+- Domestic coach for flights <5 hours; premium economy for flights >5 hours with manager approval.
+- Hotel: standard room; upgrades require manager approval and justification.
+- Meals: per diem applies. Meals included in conferences must be deducted.
+
+Safety and exceptions:
+- Emergency contact list is maintained by People Ops and must be reviewed annually.
+- For high-risk destinations, Travel Safety Assessment must be completed by People Ops + Security before booking.
+
+7) Templates and Checklists (quick index)
+
+Available templates (links to Confluence pages / document store):
+- Procurement Request Form: /templates/procurement-request
+- Vendor Security Questionnaire (VSAQ): /templates/vendor-security-questionnaire
+- Standard Purchase Order (PO) template: /templates/po-template
+- Travel Request & Approval form: /templates/travel-request
+- Data Processing Addendum (DPA) template: /templates/dpa
+
+Example: Procurement Request YAML (for automation)
+
+---
+requestor: "firstname.lastname@redwood.com"
+project: "Feature X model hosting"
+estimated_cost: "12000"
+vendor: "Acme Inference Ltd"
+justification: "Dedicated capacity for model benchmarking"
+required_by: "2024-05-15"
+items:
+  - sku: "gpu-reservation-monthly"
+    qty: 1
+    unit_cost: 12000
+---
+
+8) Compliance and Evidence
+
+- Finance maintains procurement trail for audit (POs, invoices, approvals) for minimum 7 years.
+- Security maintains evidence for vendor assessments and IAM audits for 3 years (or as contract requires).
+
+9) Exceptions and Amendments
+
+- Exceptions: Documented exception requests are reviewed monthly by a cross-functional panel (Finance, Security, People Ops). Exceptions expire after 90 days unless renewed.
+- Policy changes: Major amendments require Finance + Security + Legal sign-off and all-staff notification.
+
+Contacts and escalation table
+
+- Procurement team: procurement@redwood.com
+- Finance approvals: approvals@redwood.com
+- Security: security-ops@redwood.com
+- People Ops (travel): travel@redwood.com
+- Legal: legal@redwood.com
+
+Appendix A: Quick runbooks and commands
+
+- List active IAM roles for a user (example CLI):
+  aws iam list-attached-user-policies --user-name alice@example.com
+
+- Revoke temporary credentials (example):
+  ./access-portal revoke --user alice@example.com --reason "termination"
+
+Appendix B: Quarterly review checklist
+
+1. Procurement: review top 20 vendors by spend and confirm SLAs.
+2. Security: run stale-privileges audit and confirm remedial actions.
+3. Finance: reconcile POs vs invoices and identify exceptions.
+4. People Ops: validate travel policy adherence and approve any rate changes.
+
+Document history and approvals
+
+- Drafted by: Maya Thompson (Finance-Legal) 2024-03-15
+- Reviewed by: Liam O'Connor (Security), Priya Desai (Procurement), Jordan Alvarez (People Ops) 2024-04-02
+- Published: 2024-05-01
+- Last reviewed and amended for thresholds and retention updates: 2025-11-02
+
+End of handbook.

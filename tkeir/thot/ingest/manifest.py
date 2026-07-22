@@ -1,4 +1,12 @@
-"""Manifest builders and idempotency key helpers."""
+"""Title: Manifest
+
+Manifest builders and idempotency key helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

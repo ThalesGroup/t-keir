@@ -1,0 +1,1288 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://7db98d36ab0de11c3023f947e002772437a5070e135480fbfd7af9e48f32c97d/AIS_00487_9f8c2c51.md",
+  "title": "AIS 00487 — Baltic Sea",
+  "content": [
+    "# AIS 00487 — Baltic Sea\n\nAIS MARITIME TRACK\nTrack: NATO-9157\nPosition: 60N 21E\nCourse: 134 degrees\nAssessment: commercial vessel; correlation pending.\n"
+  ],
+  "kg": [],
+  "error": false,
+  "conversion-info": {
+    "datatype": "raw",
+    "source-size-bytes": 154,
+    "image-extraction": {
+      "enabled": false,
+      "used": false,
+      "mode": null,
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:52",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:52",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:52",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:52",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:52",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:53",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:53",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:53",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:53",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:15:53",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_smx.owl"
+  ],
+  "source": "ingest://7db98d36ab0de11c3023f947e002772437a5070e135480fbfd7af9e48f32c97d/AIS_00487_9f8c2c51.md",
+  "metadata": {
+    "topic_id": "situational_awareness",
+    "corpus": "osint",
+    "doc_type": "AIS",
+    "language": "en",
+    "title": "AIS 00487 — Baltic Sea",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "situational_awareness",
+  "doc_type": "AIS",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999950448467195
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "#",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AIS",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "00487",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Baltic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sea",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "AIS",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "MARITIME",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "TRACK",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Track",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "NATO-9157",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Position",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "60N",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "21E",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Course",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "134",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "degrees",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Assessment",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "commercial",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "vessel",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "correlation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "pending",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AIS",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "00487",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Baltic",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Sea",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AIS",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00487",
+      "text": "00487",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "#",
+      "text": "#",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AIS",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00487",
+      "text": "00487",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AIS",
+      "text": "AIS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 6
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "maritime",
+      "text": "MARITIME",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "track",
+      "text": "TRACK",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Track",
+      "text": "Track",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "NATO-9157",
+      "text": "NATO-9157",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Position",
+      "text": "Position",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NUM",
+      "lemma": "60n",
+      "text": "60N",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "21E",
+      "text": "21E",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "course",
+      "text": "Course",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "NUM",
+      "lemma": "134",
+      "text": "134",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "degree",
+      "text": "degrees",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "assessment",
+      "text": "Assessment",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "commercial",
+      "text": "commercial",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "vessel",
+      "text": "vessel",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "correlation",
+      "text": "correlation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "VERB",
+      "lemma": "pende",
+      "text": "pending",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 3,
+      "end": 5,
+      "label": "location",
+      "text": "Baltic Sea"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 4,
+      "end": 6,
+      "label": "location",
+      "text": "Baltic Sea"
+    },
+    {
+      "start": 18,
+      "end": 20,
+      "label": "quantity",
+      "text": "134 degrees"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "#",
+      "lemma": "#",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AIS",
+      "lemma": "AIS",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "00487",
+      "lemma": "00487",
+      "pos": "NUM",
+      "head": 1,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 1,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "appos",
+      "lefts": [
+        4
+      ],
+      "rights": []
+    },
+    {
+      "text": "AIS",
+      "lemma": "AIS",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "MARITIME",
+      "lemma": "maritime",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "TRACK",
+      "lemma": "track",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Track",
+      "lemma": "Track",
+      "pos": "PROPN",
+      "head": 9,
+      "dep": "ROOT",
+      "lefts": [
+        7,
+        8
+      ],
+      "rights": [
+        10,
+        12,
+        25,
+        27
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "NATO-9157",
+      "lemma": "NATO-9157",
+      "pos": "PROPN",
+      "head": 12,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Position",
+      "lemma": "Position",
+      "pos": "PROPN",
+      "head": 9,
+      "dep": "appos",
+      "lefts": [
+        11
+      ],
+      "rights": [
+        13,
+        16
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "60N",
+      "lemma": "60n",
+      "pos": "NUM",
+      "head": 16,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "21E",
+      "lemma": "21E",
+      "pos": "PROPN",
+      "head": 16,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Course",
+      "lemma": "course",
+      "pos": "NOUN",
+      "head": 12,
+      "dep": "appos",
+      "lefts": [
+        14,
+        15
+      ],
+      "rights": [
+        17,
+        19,
+        24
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 16,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "134",
+      "lemma": "134",
+      "pos": "NUM",
+      "head": 19,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "degrees",
+      "lemma": "degree",
+      "pos": "NOUN",
+      "head": 16,
+      "dep": "appos",
+      "lefts": [
+        18
+      ],
+      "rights": [
+        20,
+        21,
+        23
+      ]
+    },
+    {
+      "text": "Assessment",
+      "lemma": "assessment",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "commercial",
+      "lemma": "commercial",
+      "pos": "ADJ",
+      "head": 23,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "vessel",
+      "lemma": "vessel",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "appos",
+      "lefts": [
+        22
+      ],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 16,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "correlation",
+      "lemma": "correlation",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "appos",
+      "lefts": [],
+      "rights": [
+        26
+      ]
+    },
+    {
+      "text": "pending",
+      "lemma": "pende",
+      "pos": "VERB",
+      "head": 25,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AIS",
+      "lemma": "AIS",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "text": "00487",
+      "lemma": "00487",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 4,
+      "text": "baltic sea",
+      "span": {
+        "start": 3,
+        "end": 5
+      }
+    },
+    {
+      "score": 16,
+      "text": "ais maritime track track",
+      "span": {
+        "start": 6,
+        "end": 10
+      }
+    },
+    {
+      "score": 4,
+      "text": "baltic sea",
+      "span": {
+        "start": 4,
+        "end": 6
+      }
+    },
+    {
+      "score": 4,
+      "text": "nato-9157 position",
+      "span": {
+        "start": 11,
+        "end": 13
+      }
+    },
+    {
+      "score": 4,
+      "text": "commercial vessel",
+      "span": {
+        "start": 22,
+        "end": 24
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://7db98d36ab0de11c3023f947e002772437a5070e135480fbfd7af9e48f32c97d/AIS_00487_9f8c2c51.md#chunk-0-31805d3e16",
+      "parent_doc_id": "ingest://7db98d36ab0de11c3023f947e002772437a5070e135480fbfd7af9e48f32c97d/AIS_00487_9f8c2c51.md",
+      "text_raw": "# AIS 00487 — Baltic Sea AIS MARITIME TRACK Track : NATO-9157 Position : 60N 21E Course : 134 degrees Assessment : commercial vessel ; correlation pending .",
+      "search_vector_payload": "# AIS 00487 — Baltic Sea AIS MARITIME TRACK Track : NATO-9157 Position : 60N 21E Course : 134 degrees Assessment : commercial vessel ; correlation pending .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "location": [
+            "Baltic Sea"
+          ],
+          "quantity": [
+            "134 degrees"
+          ]
+        },
+        "svo_triplets": [],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 28,
+        "sentence_start": 0,
+        "sentence_end": 2
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Baltic Sea",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "# AIS 00487 — Baltic Sea AIS MARITIME TRACK Track : NATO-9157",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "134 degrees",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Keyword/ais_maritime_track_track\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ais maritime track track\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Keyword/nato_9157_position\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"nato-9157 position\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Quantity/134_degrees-1a807e0856a5\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Quantity\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"134 degrees\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Keyword/commercial_vessel\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"commercial vessel\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Keyword/baltic_sea\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"baltic sea\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Chunk/ingest_7db98d36ab0de11c3023f947e002772437a5070e135480fbfd7af9e48f32c97d_ais_00487_9f8c2c51_md_chunk_0_31805d3e16\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Location/baltic_sea-467833b59030\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Quantity/134_degrees-1a807e0856a5\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://7db98d36ab0de11c3023f947e002772437a5070e135480fbfd7af9e48f32c97d/AIS_00487_9f8c2c51.md#chunk-0-31805d3e16\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Chunk/ingest_7db98d36ab0de11c3023f947e002772437a5070e135480fbfd7af9e48f32c97d_ais_00487_9f8c2c51_md_chunk_0_31805d3e16\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Keyword/ais_maritime_track_track\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Keyword/baltic_sea\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Keyword/nato_9157_position\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Keyword/commercial_vessel\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Location/baltic_sea-467833b59030\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Quantity/134_degrees-1a807e0856a5\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ais_00487_9f8c2c51_md\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/ais_00487_9f8c2c51_md/Location/baltic_sea-467833b59030\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Location\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Baltic Sea\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 13,
+      "graph_triple_count": 25,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 33,
+    "total_tokens": 33,
+    "covered_characters": 147,
+    "total_characters": 147,
+    "derivation": {
+      "enabled": true,
+      "status": "NO_MATCHES",
+      "matches": 0,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 0,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HRB7FE7DG9YRDW7N86NWA/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 28,
+  "token-count": 33,
+  "source-file-size-bytes": 154,
+  "image-extraction": {
+    "enabled": false,
+    "used": false,
+    "mode": null,
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.155,
+    "tasks": {
+      "converter": 0.002,
+      "language-detection": 0.004,
+      "resource-selection": 0.001,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.007,
+      "ner": 0.039,
+      "syntax": 0.005,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.094,
+      "chunk-questions": 0.001
+    }
+  }
+}

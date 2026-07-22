@@ -1,4 +1,12 @@
-"""Tests for PDF image OCR enrichment."""
+"""Title: Pdf Image Ocr
+
+Tests for PDF image OCR enrichment.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 import sys

@@ -1,7 +1,11 @@
-"""Test Annotation Configuration
-Author: Eric Blaudez (Eric Blaudez)
+"""Title: Test Annotation Configuration
 
-Copyright (c) 2020 by THALES
+Automated tests for T-KEIR (unit / functional).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import json

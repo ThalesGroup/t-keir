@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4DE40ZJP855GNDSPK3HVHE",
+  "reason": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'morphologizer', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+  "job": {
+    "ingest_id": "01KY4DE40ZJP855GNDSPK3HVHE",
+    "correlation_id": "98ca2e14c7074b18d286704dc0cf240d",
+    "status": "failed",
+    "doc_id": "05db49a101b0144e10699e84b6b34d668823ce787427308541b9a2acb428561d",
+    "batch_id": null,
+    "manifest_path": "staging/05db49a101b0144e10699e84b6b34d668823ce787427308541b9a2acb428561d/ingest.manifest.json",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'morphologizer', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+    "created_at": "2026-07-22T08:00:23.583Z",
+    "updated_at": "2026-07-22T08:00:43.450Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4DE40ZJP855GNDSPK3HVHE",
+    "correlation_id": "98ca2e14c7074b18d286704dc0cf240d",
+    "doc_id": "05db49a101b0144e10699e84b6b34d668823ce787427308541b9a2acb428561d",
+    "source": {
+      "uri": "upload://01KY4DE40ZYDPMPEVF12DC0KY9/LOGSIT_01187_966db02f.txt",
+      "filename": "LOGSIT_01187_966db02f.txt",
+      "content_type": "application/octet-stream",
+      "size_bytes": 327
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T08:00:23.585Z",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'morphologizer', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']"
+  },
+  "failed_at": "2026-07-22T08:00:43.450Z"
+}

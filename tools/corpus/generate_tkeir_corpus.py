@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
-"""Create a small, reproducible, offline-friendly T-KEIR demonstration corpus."""
+"""Title: Generate tkeir corpus
+
+Create a small, reproducible, offline-friendly T-KEIR demonstration corpus.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -73,9 +82,17 @@ ENTERPRISE_TYPES = [
     "project_report", "email_thread", "invoice_summary", "kb_article",
 ]
 ENTERPRISE_SOURCE_TOPIC = {
-    "confluence": "projects", "gdoc": "projects", "jira": "projects",
-    "email": "hr", "slack": "hr", "crm": "finance", "transcript": "projects",
+    "confluence": "projects",
+    "gdoc": "projects",
+    "google_drive": "projects",
+    "jira": "projects",
+    "email": "hr",
+    "gmail": "hr",
+    "slack": "hr",
+    "crm": "finance",
+    "transcript": "projects",
 }
+
 OSINT_FORMATS = [("txt", 28), ("md", 20), ("html", 14), ("json", 12), ("pdf", 10), ("docx", 9), ("csv", 7)]
 ENTERPRISE_FORMATS = [("pdf", 25), ("docx", 24), ("html", 20), ("md", 12), ("txt", 8), ("json", 7), ("csv", 4)]
 FORMAT_DIRS = {"txt": "raw", "md": "markdown", "html": "html", "json": "json", "pdf": "pdf", "docx": "docx", "csv": "csv"}
@@ -426,86 +443,184 @@ def download_official_artifacts(output_dir: Path | str, timeout: int = 30) -> di
         LOG.warning("corpus-download skipping %s: %s", src, exc)
 
     # SOURCE 2 — C2SIM XSD schemas
+    xsd_label = "OpenC2SIM/C2SIM XSD"
     xsd_urls = [
         "https://raw.githubusercontent.com/OpenC2SIM/OpenC2SIM.github.io/master/C2SIM_SMX_LOX_V1.0.1.xsd",
         "https://raw.githubusercontent.com/OpenC2SIM/OpenC2SIM.github.io/master/C2SIM_SMX_LOX_CWIX2023v1.0.2.xsd",
     ]
+    result["sources_tried"].append(xsd_label)
+    xsd_ok = False
     for url in xsd_urls:
-        result["sources_tried"].append(url)
         try:
             data = _fetch(url, timeout)
             target = nato / "xml" / Path(url).name
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)
             result["xsd_schemas"] += 1
-            result["sources_ok"].append(url)
+            xsd_ok = True
             break
         except Exception as exc:
             LOG.warning("corpus-download skipping %s: %s", url, exc)
+    if xsd_ok:
+        result["sources_ok"].append(xsd_label)
 
-    # SOURCE 3 — EnterpriseRAG-Bench slices
-    enterprise_urls = [
-        ("confluence", "https://huggingface.co/datasets/onyx-dot-app/EnterpriseRAG-Bench/resolve/main/confluence_slice_1.zip"),
-        ("gdoc", "https://huggingface.co/datasets/onyx-dot-app/EnterpriseRAG-Bench/resolve/main/gdoc_slice_1.zip"),
-        ("email", "https://huggingface.co/datasets/onyx-dot-app/EnterpriseRAG-Bench/resolve/main/email_slice_1.zip"),
-        ("confluence", "https://github.com/onyx-dot-app/EnterpriseRAG-Bench/releases/latest/download/confluence_slice_1.zip"),
-    ]
+    # SOURCE 3 — EnterpriseRAG-Bench slices (GitHub release assets; HF has no zip files)
+    # Artifact names are like confluence_slice_0001.zip (not confluence_slice_1.zip).
+    erb_label = "onyx-dot-app/EnterpriseRAG-Bench"
+    preferred_slices = (
+        "confluence_slice_0001.zip",
+        "google_drive_slice_0001.zip",
+        "gmail_slice_0001.zip",
+    )
+    source_from_name = {
+        "confluence": "confluence",
+        "google_drive": "google_drive",
+        "gmail": "gmail",
+        "gdoc": "google_drive",
+        "email": "gmail",
+    }
     max_docs = 500
-    for source_type, url in enterprise_urls:
-        if result["enterprise_docs"] >= max_docs:
-            break
-        result["sources_tried"].append(url)
-        try:
-            blob = _fetch(url, timeout)
-            with zipfile.ZipFile(io.BytesIO(blob)) as archive:
-                for name in archive.namelist():
-                    if result["enterprise_docs"] >= max_docs:
-                        break
-                    if name.endswith("/") or ".." in Path(name).parts:
-                        continue
-                    suffix = Path(name).suffix.lower().lstrip(".")
-                    if suffix not in {"txt", "html", "json", "md", "csv"}:
-                        continue
-                    fmt = "html" if suffix == "html" else ("json" if suffix == "json" else ("md" if suffix == "md" else ("csv" if suffix == "csv" else "txt")))
-                    data = archive.read(name)
-                    ident = f"{source_type}_{result['enterprise_docs']:05d}_{Path(name).stem[:40]}"
-                    rel = Path(FORMAT_DIRS.get(fmt, "raw")) / f"{ident}.{fmt if fmt != 'txt' else 'txt'}"
-                    if fmt == "txt":
-                        rel = Path("raw") / f"{ident}.txt"
-                    target = enterprise / rel
-                    target.parent.mkdir(parents=True, exist_ok=True)
-                    target.write_bytes(data)
-                    topic = ENTERPRISE_SOURCE_TOPIC.get(source_type, "projects")
-                    result["documents"].append(
-                        {
-                            "id": ident,
-                            "doc_type": source_type,
-                            "format": fmt,
-                            "title": Path(name).name,
-                            "lang": "en",
-                            "path": str(rel),
-                            "user_space": "demo-admin",
-                            "topic_id": topic,
-                            "corpus": "enterprise",
-                            "origin": "downloaded",
-                            "metadata": {"source_url": url, "source_type": source_type},
-                        }
+    result["sources_tried"].append(erb_label)
+    try:
+        release = json.loads(
+            _fetch(
+                "https://api.github.com/repos/onyx-dot-app/EnterpriseRAG-Bench/"
+                "releases/latest",
+                timeout,
+            )
+        )
+        assets = {
+            str(asset.get("name", "")): str(asset.get("browser_download_url", ""))
+            for asset in release.get("assets", [])
+            if asset.get("name") and asset.get("browser_download_url")
+        }
+        # Prefer small first-slice archives; fall back to any matching *_slice_0001.zip.
+        selected: list[tuple[str, str]] = []
+        for name in preferred_slices:
+            if name in assets:
+                prefix = name.rsplit("_slice_", 1)[0]
+                selected.append(
+                    (source_from_name.get(prefix, prefix), assets[name])
+                )
+        if not selected:
+            for name, url in sorted(assets.items()):
+                if name.endswith("_slice_0001.zip"):
+                    prefix = name.rsplit("_slice_", 1)[0]
+                    selected.append(
+                        (source_from_name.get(prefix, prefix), url)
                     )
-                    result["enterprise_docs"] += 1
-            result["sources_ok"].append(url)
-            break
-        except Exception as exc:
-            LOG.warning("corpus-download skipping %s: %s", url, exc)
+                if len(selected) >= 3:
+                    break
+        enterprise_ok = False
+        for source_type, url in selected:
+            if result["enterprise_docs"] >= max_docs:
+                break
+            try:
+                # Release zips are ~20MB+; allow a longer timeout than ontology assets.
+                blob = _fetch(url, max(timeout, 120))
+                with zipfile.ZipFile(io.BytesIO(blob)) as archive:
+                    for name in archive.namelist():
+                        if result["enterprise_docs"] >= max_docs:
+                            break
+                        if name.endswith("/") or ".." in Path(name).parts:
+                            continue
+                        suffix = Path(name).suffix.lower().lstrip(".")
+                        if suffix not in {"txt", "html", "json", "md", "csv"}:
+                            continue
+                        fmt = {
+                            "html": "html",
+                            "json": "json",
+                            "md": "md",
+                            "csv": "csv",
+                        }.get(suffix, "txt")
+                        data = archive.read(name)
+                        ident = (
+                            f"{source_type}_{result['enterprise_docs']:05d}_"
+                            f"{Path(name).stem[:40]}"
+                        )
+                        rel = (
+                            Path("raw") / f"{ident}.txt"
+                            if fmt == "txt"
+                            else Path(FORMAT_DIRS.get(fmt, "raw"))
+                            / f"{ident}.{fmt}"
+                        )
+                        target = enterprise / rel
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        target.write_bytes(data)
+                        topic = ENTERPRISE_SOURCE_TOPIC.get(
+                            source_type, "projects"
+                        )
+                        result["documents"].append(
+                            {
+                                "id": ident,
+                                "doc_type": source_type,
+                                "format": fmt,
+                                "title": Path(name).name,
+                                "lang": "en",
+                                "path": str(rel),
+                                "user_space": "demo-admin",
+                                "topic_id": topic,
+                                "corpus": "enterprise",
+                                "origin": "downloaded",
+                                "metadata": {
+                                    "source_url": url,
+                                    "source_type": source_type,
+                                },
+                            }
+                        )
+                        result["enterprise_docs"] += 1
+                enterprise_ok = True
+            except Exception as exc:
+                LOG.warning("corpus-download skipping %s: %s", url, exc)
+        if enterprise_ok:
+            result["sources_ok"].append(erb_label)
+        elif not selected:
+            LOG.warning(
+                "corpus-download: no EnterpriseRAG-Bench slice assets found "
+                "in latest GitHub release"
+            )
+    except Exception as exc:
+        LOG.warning("corpus-download skipping %s: %s", erb_label, exc)
 
     result["downloaded"] = bool(result["sources_ok"])
     result["reason"] = "completed" if result["downloaded"] else "no source available"
     return result
 
 
+def _load_manifest_documents(root: Path, corpus: str) -> list[dict[str, Any]]:
+    base = root / ("corpus_nato" if corpus == "osint" else "corpus_enterprise")
+    path = base / "manifest.json"
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    docs = data.get("documents")
+    return list(docs) if isinstance(docs, list) else []
+
+
 def write_manifest(root: Path, corpus: str, seed: int, entries: list[dict[str, Any]]) -> None:
     base = root / ("corpus_nato" if corpus == "osint" else "corpus_enterprise")
     base.mkdir(parents=True, exist_ok=True)
-    (base / "manifest.json").write_text(json.dumps({"corpus": corpus, "count_generated": sum(e["origin"] == "generated" for e in entries), "seed": seed, "documents": entries}, indent=2) + "\n", encoding="utf-8")
+    (base / "manifest.json").write_text(
+        json.dumps(
+            {
+                "corpus": corpus,
+                "count_generated": sum(
+                    e.get("origin") == "generated" for e in entries
+                ),
+                "count_downloaded": sum(
+                    e.get("origin") == "downloaded" for e in entries
+                ),
+                "seed": seed,
+                "documents": entries,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -530,21 +645,75 @@ def main(argv: list[str] | None = None) -> int:
     if args.corpus in ("osint", "all"): generate_ontologies(root)
     entries: dict[str, list[dict[str, Any]]] = {"osint": [], "enterprise": []}
     rng = random.Random(args.seed)
+    download_only = (
+        args.download
+        and not args.only_ontologies
+        and args.count_osint == 0
+        and args.count_enterprise == 0
+    )
     if not args.only_ontologies:
-        if args.corpus in ("osint", "all"): entries["osint"] = generate_documents(root, "osint", args.count_osint, rng)
-        if args.corpus in ("enterprise", "all"): entries["enterprise"] = generate_documents(root, "enterprise", args.count_enterprise, rng)
+        if args.corpus in ("osint", "all") and args.count_osint:
+            entries["osint"] = generate_documents(
+                root, "osint", args.count_osint, rng
+            )
+        if args.corpus in ("enterprise", "all") and args.count_enterprise:
+            entries["enterprise"] = generate_documents(
+                root, "enterprise", args.count_enterprise, rng
+            )
     downloaded: dict[str, Any] | None = None
-    if args.download: downloaded = download_official_artifacts(root)
-    if downloaded and args.corpus in ("enterprise", "all"): entries["enterprise"].extend(downloaded["documents"])
+    if args.download:
+        downloaded = download_official_artifacts(root)
+    if downloaded and args.corpus in ("enterprise", "all"):
+        if download_only:
+            # Preserve previously generated enterprise docs; append downloads.
+            existing = _load_manifest_documents(root, "enterprise")
+            kept = [e for e in existing if e.get("origin") != "downloaded"]
+            entries["enterprise"] = kept + list(downloaded["documents"])
+        else:
+            entries["enterprise"].extend(downloaded["documents"])
     if not args.only_ontologies:
         for corpus in ("osint", "enterprise"):
-            if args.corpus in (corpus, "all"): write_manifest(root, corpus, args.seed, entries[corpus])
+            if args.corpus not in (corpus, "all"):
+                continue
+            if download_only and corpus == "osint":
+                # Do not wipe an existing OSINT corpus on download-only runs.
+                continue
+            if download_only and corpus == "enterprise" and not entries["enterprise"]:
+                continue
+            write_manifest(root, corpus, args.seed, entries[corpus])
     if not args.quiet:
         print(f"Generated corpus in {root}")
+        osint_n = len(entries["osint"]) or (
+            len(_load_manifest_documents(root, "osint")) if download_only else 0
+        )
+        ent = entries["enterprise"] or (
+            _load_manifest_documents(root, "enterprise") if download_only else []
+        )
+        ent_gen = sum(1 for e in ent if e.get("origin") == "generated")
+        ent_dl = sum(1 for e in ent if e.get("origin") == "downloaded")
+        print(
+            "  corpus totals: "
+            f"OSINT={osint_n} (generated offline; not a download source), "
+            f"Enterprise={len(ent)} "
+            f"(generated={ent_gen}, downloaded={ent_dl})"
+        )
         if downloaded:
             ok = len(downloaded.get("sources_ok") or [])
             tried = len(downloaded.get("sources_tried") or [])
             print(f"Download: {downloaded['reason']} ({ok}/{tried} sources)")
+            print(
+                "  details: "
+                f"SISO ontologies={downloaded.get('siso_ontologies', 0)}, "
+                f"C2SIM XSD={downloaded.get('xsd_schemas', 0)}, "
+                f"EnterpriseRAG docs={downloaded.get('enterprise_docs', 0)}"
+            )
+            missing = [
+                src
+                for src in (downloaded.get("sources_tried") or [])
+                if src not in (downloaded.get("sources_ok") or [])
+            ]
+            if missing:
+                print("  skipped: " + "; ".join(missing))
     return 0
 
 

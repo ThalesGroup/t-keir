@@ -1,8 +1,13 @@
-"""Kubeflow Pipelines — ingest → pipeline → index skeleton (P4).
+"""Title: Kubeflow Pipelines — ingest → pipeline → index skeleton (P4).
 
 This module is intentionally lightweight: it defines the pipeline graph as
 Python that can be compiled with the KFP SDK when Kubeflow is installed.
 Without KFP, `make kubeflow-run-ingest` prints the planned steps.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

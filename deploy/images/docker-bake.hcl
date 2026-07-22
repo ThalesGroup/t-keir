@@ -1,14 +1,18 @@
-# docker buildx bake — images for ghcr.io/thalesgroup/t-keir
+# docker buildx bake — local tags by default (`local/tkeir-*`)
+#
+# Shared Python runtime is built once as `tkeir-lib`; api/ingest/mcp/agent/
+# governor/audit are thin layers on that context (not a re-run of uv sync).
+# HMI stays on NODE_BASE; indexer keeps its own Dockerfile (spaCy models + OCR).
 #
 # Local (native platform):
 #   make images
-# Single target:
+# Single target (pulls in tkeir-lib when needed):
 #   make image-api
-# Multi-arch push:
-#   make images-push PLATFORMS=linux/amd64,linux/arm64
+# Multi-arch push (set publish registry):
+#   make images-push IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir PLATFORMS=linux/amd64,linux/arm64
 
 variable "REGISTRY" {
-  default = "ghcr.io/thalesgroup/t-keir"
+  default = "local"
 }
 
 variable "TAG" {
@@ -46,7 +50,18 @@ variable "MODEL_MODE" {
 }
 
 group "default" {
-  targets = ["tkeir-api", "tkeir-indexer", "tkeir-indexer-slim", "tkeir-hmi", "tkeir-ingest", "tkeir-audit", "tkeir-governor", "tkeir-mcp", "tkeir-agent"]
+  targets = [
+    "tkeir-lib",
+    "tkeir-api",
+    "tkeir-indexer",
+    "tkeir-indexer-slim",
+    "tkeir-hmi",
+    "tkeir-ingest",
+    "tkeir-audit",
+    "tkeir-governor",
+    "tkeir-mcp",
+    "tkeir-agent",
+  ]
 }
 
 target "_common" {
@@ -58,12 +73,31 @@ target "_common" {
   }
 }
 
-target "tkeir-api" {
+# Shared Python venv — built once; consumed via named context `tkeir-lib`.
+target "tkeir-lib" {
   inherits   = ["_common"]
-  dockerfile = "deploy/images/Dockerfile.tkeir-api"
+  dockerfile = "deploy/images/Dockerfile.tkeir-lib"
   args = {
     PYTHON_BASE = PYTHON_BASE
-    MODEL_MODE  = MODEL_MODE
+  }
+  tags = [
+    "${REGISTRY}/tkeir-lib:${TAG}",
+    "${REGISTRY}/tkeir-lib:${VERSION}",
+  ]
+}
+
+target "_from-lib" {
+  inherits = ["_common"]
+  contexts = {
+    tkeir-lib = "target:tkeir-lib"
+  }
+}
+
+target "tkeir-api" {
+  inherits   = ["_from-lib"]
+  dockerfile = "deploy/images/Dockerfile.tkeir-api"
+  args = {
+    MODEL_MODE = MODEL_MODE
   }
   tags = [
     "${REGISTRY}/tkeir-api:${TAG}",
@@ -112,11 +146,8 @@ target "tkeir-hmi" {
 }
 
 target "tkeir-ingest" {
-  inherits   = ["_common"]
+  inherits   = ["_from-lib"]
   dockerfile = "deploy/images/Dockerfile.tkeir-ingest"
-  args = {
-    PYTHON_BASE = PYTHON_BASE
-  }
   tags = [
     "${REGISTRY}/tkeir-ingest:${TAG}",
     "${REGISTRY}/tkeir-ingest:${VERSION}",
@@ -124,11 +155,8 @@ target "tkeir-ingest" {
 }
 
 target "tkeir-audit" {
-  inherits   = ["_common"]
+  inherits   = ["_from-lib"]
   dockerfile = "deploy/images/Dockerfile.tkeir-audit"
-  args = {
-    PYTHON_BASE = PYTHON_BASE
-  }
   tags = [
     "${REGISTRY}/tkeir-audit:${TAG}",
     "${REGISTRY}/tkeir-audit:${VERSION}",
@@ -136,11 +164,8 @@ target "tkeir-audit" {
 }
 
 target "tkeir-governor" {
-  inherits   = ["_common"]
+  inherits   = ["_from-lib"]
   dockerfile = "deploy/images/Dockerfile.tkeir-governor"
-  args = {
-    PYTHON_BASE = PYTHON_BASE
-  }
   tags = [
     "${REGISTRY}/tkeir-governor:${TAG}",
     "${REGISTRY}/tkeir-governor:${VERSION}",
@@ -148,11 +173,8 @@ target "tkeir-governor" {
 }
 
 target "tkeir-mcp" {
-  inherits   = ["_common"]
+  inherits   = ["_from-lib"]
   dockerfile = "deploy/images/Dockerfile.tkeir-mcp"
-  args = {
-    PYTHON_BASE = PYTHON_BASE
-  }
   tags = [
     "${REGISTRY}/tkeir-mcp:${TAG}",
     "${REGISTRY}/tkeir-mcp:${VERSION}",
@@ -160,11 +182,8 @@ target "tkeir-mcp" {
 }
 
 target "tkeir-agent" {
-  inherits   = ["_common"]
+  inherits   = ["_from-lib"]
   dockerfile = "deploy/images/Dockerfile.tkeir-agent"
-  args = {
-    PYTHON_BASE = PYTHON_BASE
-  }
   tags = [
     "${REGISTRY}/tkeir-agent:${TAG}",
     "${REGISTRY}/tkeir-agent:${VERSION}",

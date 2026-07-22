@@ -1,7 +1,12 @@
-"""Outbound MCP client with egress allow-list (Phase D).
+"""Title: Outbound MCP client with egress allow-list (Phase D).
 
 Protocol plumbing only — agent logic stays in ``thot.agent``. External tool
 outputs always pass through :func:`thot.agent.safety.wrap_untrusted`.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

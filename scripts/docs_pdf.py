@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build T-KEIR MkDocs documentation as a single PDF.
+"""Title: Build T-KEIR MkDocs documentation as a single PDF.
 
 Reads ``tkeir/mkdocs.yml`` navigation order, converts Markdown pages to HTML,
 then renders a PDF with PyMuPDF (already a project dependency).
@@ -14,6 +14,11 @@ Environment:
     DOCS_PDF_OUTPUT  Output path (default: output/docs/tkeir-docs.pdf)
     DOCS_DIR         MkDocs docs_dir (default: tkeir/docs)
     MKDOCS_YML       MkDocs config (default: tkeir/mkdocs.yml)
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

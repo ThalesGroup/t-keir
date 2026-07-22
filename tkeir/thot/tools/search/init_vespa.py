@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Initialize Vespa Docker container and deploy 2-level schemas."""
+"""Title: Init vespa
+
+Initialize Vespa Docker container and deploy 2-level schemas.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

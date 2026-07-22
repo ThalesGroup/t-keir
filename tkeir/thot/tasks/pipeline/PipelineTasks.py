@@ -1,4 +1,12 @@
-"""Pipeline task ordering and dependency resolution."""
+"""Title: Pipeline Tasks
+
+Pipeline task ordering and dependency resolution.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

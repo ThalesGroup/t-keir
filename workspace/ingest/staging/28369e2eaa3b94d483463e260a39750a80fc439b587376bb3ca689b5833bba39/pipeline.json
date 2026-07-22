@@ -1,0 +1,1513 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://28369e2eaa3b94d483463e260a39750a80fc439b587376bb3ca689b5833bba39/ADSB_01405_b2f3bc00.md",
+  "title": "ADSB 01405 — North Atlantic",
+  "content": [
+    "# ADSB 01405 — North Atlantic\n\nADS-B AIR TRACK\nCallsign: NAF551\nAltitude: 14591 ft\nArea: North Atlantic\nTime: 2026-07-19T23:24Z\nC2ISR correlation: friendly flight plan matched.\n"
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "North",
+          "Atlantic"
+        ],
+        "lemma_content": [
+          "North",
+          "Atlantic"
+        ],
+        "pos": [
+          "PROPN",
+          "PROPN"
+        ],
+        "positions": [
+          4,
+          5
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "ADS-B"
+        ],
+        "lemma_content": [
+          "ADS-B"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          6
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "AIR",
+          "TRACK",
+          "Callsign"
+        ],
+        "lemma_content": [
+          "AIR",
+          "track",
+          "Callsign"
+        ],
+        "pos": [
+          "PROPN",
+          "NOUN",
+          "PROPN"
+        ],
+        "positions": [
+          7,
+          8,
+          9
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "North",
+          "Atlantic"
+        ],
+        "lemma_content": [
+          "North",
+          "Atlantic"
+        ],
+        "pos": [
+          "PROPN",
+          "PROPN"
+        ],
+        "positions": [
+          4,
+          5
+        ],
+        "label": "location"
+      },
+      "property": {
+        "content": [
+          "ADS-B"
+        ],
+        "lemma_content": [
+          "ADS-B"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          6
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "AIR",
+          "TRACK",
+          "Callsign"
+        ],
+        "lemma_content": [
+          "AIR",
+          "track",
+          "Callsign"
+        ],
+        "pos": [
+          "PROPN",
+          "NOUN",
+          "PROPN"
+        ],
+        "positions": [
+          7,
+          8,
+          9
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "raw",
+    "source-size-bytes": 179,
+    "image-extraction": {
+      "enabled": false,
+      "used": false,
+      "mode": null,
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:47:18",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_smx.owl"
+  ],
+  "source": "ingest://28369e2eaa3b94d483463e260a39750a80fc439b587376bb3ca689b5833bba39/ADSB_01405_b2f3bc00.md",
+  "metadata": {
+    "topic_id": "situational_awareness",
+    "corpus": "osint",
+    "doc_type": "ADSB",
+    "language": "en",
+    "title": "ADSB 01405 — North Atlantic",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "situational_awareness",
+  "doc_type": "ADSB",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999957489270752
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "#",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ADSB",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "01405",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "North",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Atlantic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "ADS-B",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AIR",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "TRACK",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Callsign",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "NAF551",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Altitude",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "14591",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ft",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Area",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "North",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Atlantic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Time",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "2026-07-19T23:24Z",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "C2ISR",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "correlation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "friendly",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "flight",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "plan",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "matched",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "ADSB",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "01405",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "North",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Atlantic",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "ADSB",
+      "text": "ADSB",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "01405",
+      "text": "01405",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "North",
+      "text": "North",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Atlantic",
+      "text": "Atlantic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "X",
+      "lemma": "#",
+      "text": "#",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ADSB",
+      "text": "ADSB",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NUM",
+      "lemma": "01405",
+      "text": "01405",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "North",
+      "text": "North",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Atlantic",
+      "text": "Atlantic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "VERB",
+      "lemma": "ADS-B",
+      "text": "ADS-B",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AIR",
+      "text": "AIR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "track",
+      "text": "TRACK",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Callsign",
+      "text": "Callsign",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "NAF551",
+      "text": "NAF551",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "altitude",
+      "text": "Altitude",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NUM",
+      "lemma": "14591",
+      "text": "14591",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ft",
+      "text": "ft",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "North",
+      "text": "North",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Atlantic",
+      "text": "Atlantic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Time",
+      "text": "Time",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NUM",
+      "lemma": "2026-07-19t23:24z",
+      "text": "2026-07-19T23:24Z",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "c2isr",
+      "text": "C2ISR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "correlation",
+      "text": "correlation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "friendly",
+      "text": "friendly",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "flight",
+      "text": "flight",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "plan",
+      "text": "plan",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "VERB",
+      "lemma": "match",
+      "text": "matched",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 3,
+      "end": 5,
+      "label": "location",
+      "text": "North Atlantic"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 4,
+      "end": 6,
+      "label": "location",
+      "text": "North Atlantic"
+    },
+    {
+      "start": 14,
+      "end": 16,
+      "label": "quantity",
+      "text": "14591 ft"
+    },
+    {
+      "start": 18,
+      "end": 21,
+      "label": "location",
+      "text": "North Atlantic Time"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "#",
+      "lemma": "#",
+      "pos": "X",
+      "head": 1,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ADSB",
+      "lemma": "ADSB",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "text": "01405",
+      "lemma": "01405",
+      "pos": "NUM",
+      "head": 1,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 1,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "North",
+      "lemma": "North",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Atlantic",
+      "lemma": "Atlantic",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "appos",
+      "lefts": [
+        4
+      ],
+      "rights": []
+    },
+    {
+      "text": "ADS-B",
+      "lemma": "ADS-B",
+      "pos": "VERB",
+      "head": 6,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AIR",
+      "lemma": "AIR",
+      "pos": "PROPN",
+      "head": 9,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "TRACK",
+      "lemma": "track",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Callsign",
+      "lemma": "Callsign",
+      "pos": "PROPN",
+      "head": 9,
+      "dep": "ROOT",
+      "lefts": [
+        7,
+        8
+      ],
+      "rights": [
+        10,
+        12,
+        24,
+        30
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "NAF551",
+      "lemma": "NAF551",
+      "pos": "PROPN",
+      "head": 12,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Altitude",
+      "lemma": "altitude",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "appos",
+      "lefts": [
+        11
+      ],
+      "rights": [
+        13,
+        16
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "14591",
+      "lemma": "14591",
+      "pos": "NUM",
+      "head": 16,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ft",
+      "lemma": "ft",
+      "pos": "PROPN",
+      "head": 16,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 12,
+      "dep": "appos",
+      "lefts": [
+        14,
+        15
+      ],
+      "rights": [
+        17,
+        20
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 16,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "North",
+      "lemma": "North",
+      "pos": "PROPN",
+      "head": 20,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Atlantic",
+      "lemma": "Atlantic",
+      "pos": "PROPN",
+      "head": 20,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Time",
+      "lemma": "Time",
+      "pos": "PROPN",
+      "head": 16,
+      "dep": "appos",
+      "lefts": [
+        18,
+        19
+      ],
+      "rights": [
+        21
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 20,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "2026-07-19T23:24Z",
+      "lemma": "2026-07-19t23:24z",
+      "pos": "NUM",
+      "head": 24,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "C2ISR",
+      "lemma": "c2isr",
+      "pos": "ADJ",
+      "head": 24,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "correlation",
+      "lemma": "correlation",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "appos",
+      "lefts": [
+        22,
+        23
+      ],
+      "rights": [
+        25,
+        29
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 24,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "friendly",
+      "lemma": "friendly",
+      "pos": "ADJ",
+      "head": 28,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "flight",
+      "lemma": "flight",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "plan",
+      "lemma": "plan",
+      "pos": "NOUN",
+      "head": 29,
+      "dep": "nsubj",
+      "lefts": [
+        26,
+        27
+      ],
+      "rights": []
+    },
+    {
+      "text": "matched",
+      "lemma": "match",
+      "pos": "VERB",
+      "head": 24,
+      "dep": "acl",
+      "lefts": [
+        28
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "ADSB",
+      "lemma": "ADSB",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "text": "01405",
+      "lemma": "01405",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "North",
+      "lemma": "North",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Atlantic",
+      "lemma": "Atlantic",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 4,
+      "text": "north atlantic",
+      "span": {
+        "start": 3,
+        "end": 5
+      }
+    },
+    {
+      "score": 8,
+      "text": "north atlantic time",
+      "span": {
+        "start": 18,
+        "end": 21
+      }
+    },
+    {
+      "score": 5,
+      "text": "north atlantic",
+      "span": {
+        "start": 4,
+        "end": 6
+      }
+    },
+    {
+      "score": 4,
+      "text": "naf551 altitude",
+      "span": {
+        "start": 11,
+        "end": 13
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://28369e2eaa3b94d483463e260a39750a80fc439b587376bb3ca689b5833bba39/ADSB_01405_b2f3bc00.md#chunk-0-9e6be098ac",
+      "parent_doc_id": "ingest://28369e2eaa3b94d483463e260a39750a80fc439b587376bb3ca689b5833bba39/ADSB_01405_b2f3bc00.md",
+      "text_raw": "# ADSB 01405 — North Atlantic ADS-B AIR TRACK Callsign : NAF551 Altitude : 14591 ft Area : North Atlantic Time : 2026-07-19T23:24Z C2ISR correlation : friendly flight plan matched .",
+      "search_vector_payload": "# ADSB 01405 — North Atlantic ADS-B AIR TRACK Callsign : NAF551 Altitude : 14591 ft Area : North Atlantic Time : 2026-07-19T23:24Z C2ISR correlation : friendly flight plan matched .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "location": [
+            "North Atlantic",
+            "North Atlantic Time"
+          ],
+          "quantity": [
+            "14591 ft"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "North Atlantic",
+            "ADS-B",
+            "AIR TRACK Callsign"
+          ],
+          [
+            "North Atlantic",
+            "ADS-B",
+            "AIR TRACK Callsign"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 31,
+        "sentence_start": 0,
+        "sentence_end": 2
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "North Atlantic ADS-B AIR TRACK Callsign",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "North Atlantic",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "# ADSB 01405 — North Atlantic ADS-B AIR TRACK Callsign : NAF551",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "North Atlantic Time",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "14591 ft",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Keyword/naf551_altitude\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"naf551 altitude\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Chunk/ingest_28369e2eaa3b94d483463e260a39750a80fc439b587376bb3ca689b5833bba39_adsb_01405_b2f3bc00_md_chunk_0_9e6be098ac\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/NorthAtlantic/north_atlantic-7e6ef3c18a80\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Location/north_atlantic_time-11d6e0066d8d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Quantity/14591_ft-236535d4c38a\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/NorthAtlantic/north_atlantic-7e6ef3c18a80\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://28369e2eaa3b94d483463e260a39750a80fc439b587376bb3ca689b5833bba39/ADSB_01405_b2f3bc00.md#chunk-0-9e6be098ac\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/NorthAtlantic/north_atlantic-7e6ef3c18a80\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/NorthAtlantic\"\n    ],\n    \"http://tkeir.local/ontology/adsB\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/AirTrackCallsign/air_track_callsign-19073c6e04f5\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"North Atlantic\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Location/north_atlantic_time-11d6e0066d8d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Location\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"North Atlantic Time\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Quantity/14591_ft-236535d4c38a\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Quantity\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"14591 ft\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Plan/plan-64879f7d6b96\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Plan\"\n    ],\n    \"http://tkeir.local/ontology/match\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"plan\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/AirTrackCallsign/air_track_callsign-19073c6e04f5\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/AirTrackCallsign\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AIR TRACK Callsign\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Keyword/north_atlantic_time\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"north atlantic time\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Chunk/ingest_28369e2eaa3b94d483463e260a39750a80fc439b587376bb3ca689b5833bba39_adsb_01405_b2f3bc00_md_chunk_0_9e6be098ac\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Keyword/north_atlantic_time\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Keyword/north_atlantic\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Keyword/naf551_altitude\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/NorthAtlantic/north_atlantic-7e6ef3c18a80\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Quantity/14591_ft-236535d4c38a\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Location/north_atlantic_time-11d6e0066d8d\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/NorthAtlantic/north_atlantic-7e6ef3c18a80\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Plan/plan-64879f7d6b96\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"adsb_01405_b2f3bc00_md\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/adsb_01405_b2f3bc00_md/Keyword/north_atlantic\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"north atlantic\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 18,
+      "graph_triple_count": 35,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 36,
+    "total_tokens": 36,
+    "covered_characters": 174,
+    "total_characters": 174,
+    "derivation": {
+      "enabled": true,
+      "status": "NO_MATCHES",
+      "matches": 0,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 0,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KHW6G6RD4WX50B6JB7BJK/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 31,
+  "token-count": 36,
+  "source-file-size-bytes": 179,
+  "image-extraction": {
+    "enabled": false,
+    "used": false,
+    "mode": null,
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.223,
+    "tasks": {
+      "converter": 0.002,
+      "language-detection": 0.003,
+      "resource-selection": 0.001,
+      "tokenizer": 0.003,
+      "morphosyntax": 0.006,
+      "ner": 0.043,
+      "syntax": 0.006,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.159,
+      "chunk-questions": 0.001
+    }
+  }
+}

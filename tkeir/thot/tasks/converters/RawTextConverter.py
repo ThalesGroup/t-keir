@@ -1,4 +1,12 @@
-"""Convert plain text documents to tkeir format."""
+"""Title: Raw Text Converter
+
+Convert plain text documents to tkeir format.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from bs4 import BeautifulSoup
 

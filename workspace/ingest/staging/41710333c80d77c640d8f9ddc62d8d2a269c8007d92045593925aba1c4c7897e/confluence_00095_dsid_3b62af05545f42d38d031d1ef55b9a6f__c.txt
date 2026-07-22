@@ -1,0 +1,131 @@
+Compact Priming Fallback Orchestrator and Regression Fastpath
+
+Summary
+
+This playbook describes the Compact Priming Fallback Orchestrator (CPFO): an end-to-end pattern for generating and serving highly compressed prompt priming for edge clients while preserving evaluation fidelity, integrating quantization-aware fallbacks, and providing a rapid regression fastpath for operational incidents. The target audience is model-onboarding engineers, eval harness owners, runtime operators, and SREs who manage mixed-precision/edge-serving fleets.
+
+Goals
+
+- Reduce average token cost for long-primed edge requests by >= 35% without exceeding fidelity delta budgets.
+- Maintain 99th percentile generation latency SLOs for edge-tail workloads (see Metrics).
+- Provide a deterministic, low-latency rollback and regression triage path when fidelity or hallucination error increases.
+
+When to use
+
+Use CPFO when:
+- Clients attach long priming contexts (>= 512 tokens) frequently and budget/cost is material.
+- Deployments use mixed-precision quantized model variants (int8/4bit) where prompt sensitivity may vary.
+- You need to shadow edge traffic in private or dedicated deployments for continuous fidelity monitoring.
+
+Architecture (text diagram)
+
+Edge Client -> Compact-Priming Service -> Shadow-Orchestrator -> Runtime Router -> {Quantized Variant, Full FP Variant} -> Eval-Mesh (telemetry sink)
+
+Components and responsibilities
+
+- Compact-Priming Service: token-aware compressor that produces a compact priming representation and a reconstruction hint. Outputs: compressed_prompt, reconstruction_meta. Owned by: eng-developer-experience.
+- Shadow-Orchestrator: fabric that duplicates requests into shadow lanes with configurable ratio and fidelity anchors. Owned by: eval-harness team.
+- Runtime Router: policy engine (latency-first, cost-first, hybrid) that selects model variant. Owned by: serving-runtime.
+- Eval-Mesh: long-term storage and continuous evaluators that compute fidelity deltas, embedding drift, and hallucination scores. Owned by: applied-ml-and-evals.
+
+Design details
+
+1) Prompt compression algorithm (overview)
+- Input: priming text, tokenized.
+- Steps:
+  1. Identify high-entropy windows via n-gram frequency sketch (k=5).
+  2. Preserve named entities and functioncall signatures (heuristics + regex whitelist).
+  3. Replace low-impact adjectives and boilerplate with canonical placeholders.
+  4. Serialize compressed representation as a small delta patch: {anchors, tokens, compress-hints}.
+- Output constraints: final compressed token footprint <= 0.45 * original for target slices.
+
+2) Quantization-aware priming profiles
+- Profiles: conservative (use int8 fallback only), aggressive (allow int4/packed quant), reconstruction-first (prioritizes fidelity).
+- Each profile includes: acceptable fidelity delta (ROUGE/embedding distance), recommended shadow rate, and quant hedge policy.
+
+Configuration table (example)
+
+| profile | fidelity_budget | recommended_shadow_rate | runtime_policy | quant_hedge_threshold |
+|---------|-----------------|-------------------------|----------------|-----------------------|
+| conservative | <= 0.02 embedding-dist | 10% | prefer fp32 -> int8 fallback | 1.5x fidelity-cost |
+| aggressive   | <= 0.05 embedding-dist | 2%  | cost-first, allow int4 | 2.0x fidelity-cost |
+| reconstruction-first | <= 0.01 embedding-dist | 20% | preserve anchors -> fp32 | 1.2x fidelity-cost |
+
+Shadow orchestration flow (operational steps)
+
+1. Enable CPFO for a tenant: set profile, shadow_rate, and priming_max_tokens in tenant config.
+2. For each incoming edge request: generate compressed_prompt; send live request to runtime per policy.
+3. Fork a shadow request to eval-mesh with full uncompressed priming and to a quant-shadow pool.
+4. Compare live response vs shadow baseline asynchronously; compute fidelity metrics and publish to topic eval.metrics.cpfo.{tenant}.
+5. If fidelity deltas exceed profile thresholds for N=5 consecutive probes, trigger regression fastpath.
+
+Regression fastpath (triage playbook)
+
+Immediate detection triggers: fidelity delta high, hallucination score > threshold, functioncall mismatch.
+
+Fastpath steps (numbered):
+1. Auto-quarantine: temporarily disable compression for affected tenant-route (API flag). Timebox: 30m.
+2. Promote FP baseline: route traffic to non-quantized variant and set shadow_rate=100% for 10 minutes.
+3. Capture artifacts: request/response pairs, tokenization diffs, compressed->reconstructed text, model logits (if available).
+4. Oncall steps (SLO 15 minutes to initial triage):
+   a. Run automatic delta classifier (script: tools/cpfo/delta_check.py --tenant $ID).
+   b. If classifier maps to 'compression-failure', create a triage ticket in the regression board and tag as cpfo-compression.
+   c. If classifier maps to 'quant-degradation', escalate to runtime/quantops.
+5. Rollback path: if an immediate rollback is required, flip runtime_policy to 'prefer fp32' and reduce shadowing for cost.
+
+Metrics and SLOs (text table)
+
+- SLOs:
+  - Latency: p95 end-to-end generation < 420ms for edge small prompts, p99 < 900ms for cold starts.
+  - Fidelity: average embedding-distance increase <= profile budget (see config).
+  - Cost: tokenized priming cost reduction target >= 35% within 30 days of rollout.
+- Signals to monitor:
+  - eval.metrics.cpfo.{tenant}.embedding_delta (gauge)
+  - eval.metrics.cpfo.{tenant}.hallucination_score (gauge)
+  - runtime.latency.tail (histogram)
+  - quantops.fallback_rate (counter)
+
+Rollout checklist
+
+1. Lab validation: run 1k synthetic probes with both compressed and full priming; assert fidelity budgets.
+2. Shadow stage: enable profile at 5% shadow rate for 48 hours; monitor metrics.
+3. Canary stage: 1% live traffic (compressed) with 100% shadowing for 24 hours.
+4. Gradual increase: double live traffic every 24 hours until 25% or target cost.
+5. Full rollout: set runtime_policy and monitor for 14 days.
+
+Ownership and runbooks
+
+- Compact-Priming Service: eng-developer-experience; Pager: compact-priming-pager; Runbook: sources/confluence/eng-developer-experience/support-top-issues/compact-priming-runbook (link).
+- Shadow-Orchestrator: eval-harness; Pager: eval-shadow-pager; Runbook: sources/confluence/applied-ml-and-evals/eval-harness/shadow-orchestrator-runbook (link).
+- Runtime Router & Quantops: eng-serving-runtime; Pager: runtime-quantops.
+
+CLI & config examples
+
+Example tenant config (JSON):
+{\n  "tenant_id": "tenant-acme",\n  "profile": "conservative",\n  "priming_max_tokens": 768,\n  "shadow_rate": 0.10,\n  "runtime_policy": "latency-first"\n}
+
+Quick triage command (for oncall):
+$ ./tools/cpfo/triage.sh --tenant tenant-acme --since 15m
+
+Postmortem guidance
+
+- Every regression fastpath incident must include: cause hypothesis, artifacts collected, mitigation applied, and a reproduction notebook.
+- If root cause is compression logic, open an onboarding ticket to dev-ex with a failing seed set and mark affected probes as "do-not-compress" until fix.
+
+Security and privacy notes
+
+- Compressed artifacts retain anchors only; do not store full sensitive content in the compressed cache. For regulated tenants enable dp-redaction prior to compression.
+- Shadow traffic must be stored to the tenant's private bucket when using Redwood Private.
+
+Related resources
+
+- See: quant-shadow-cohort-strategy-and-rollback-playbook (recommended reading)
+- Eval harness shadow consistency checker (for seed determinism checks)
+
+Appendix: heuristics checklist for compression
+
+- Preserve functioncall identifiers and argument shapes.
+- Never compress numeric sequences that look like hashes/IDs.
+- Favor preserving sentence-level anchors for step-by-step instructions.
+
+This document is maintained by the applied-ml-and-evals and eng-developer-experience cross-functional guild. For questions, tag #cpfo in internal Slack and ping the document reviewers.

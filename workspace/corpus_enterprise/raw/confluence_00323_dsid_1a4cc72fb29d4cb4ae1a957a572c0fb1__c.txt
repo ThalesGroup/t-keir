@@ -1,0 +1,42 @@
+Company Process Orchestrator Handbook
+
+Overview
+--------
+This handbook consolidates company-wide processes and standard operating procedures for access and permissions, change management, data management, procurement & expenses, vendor management, travel, and internal templates. Its purpose is to provide a single reference for employees and team owners so processes are consistent, auditable, and aligned with Redwood Inference’s reliability, security, and cost objectives.
+
+Scope
+-----
+Applies to all Redwood staff, contractors, and third-party partners who interact with company systems, purchase goods or services, handle production or customer data, or travel on behalf of Redwood. Exceptions require documented approval from the owning team and People Ops.
+
+Principles
+----------
+- Least privilege: grant only the minimum access required.
+- Clear ownership: every process step must list an owner and an escalation contact.
+- Auditability: all requests, approvals, and changes must be recorded in company systems.
+- Risk-based controls: higher-risk activities require stronger approvals and more frequent review.
+- Simplicity and self-service: common, low-risk tasks should be automated where possible.
+
+1) Access & Permissions
+------------------------
+Summary: Centralized access requests and periodic access reviews reduce blast radius and help meet compliance requirements.
+
+Roles and owners:
+- Access Requester: employee requesting access.
+- Approver: team owner or manager (usually the resource owner for the target service).
+- Access Admin: identity team / IAM administrators who provision accounts.
+- Owner: service or data owner listed in the internal service registry.
+
+Standard process (request -> approval -> provisioning):
+1. Submit an Access Request via the Access Portal (link: /confluence/eng-platform/how-tos/access-portal). Include justification, duration, and required privileges.
+2. Manager or Owner approves within 3 business days. Approval must reference least-privilege justification.
+3. Access Admin provisions within 24 business hours after approval (SLA).
+4. Provisioning event logs create an audit record in the IAM log stream.
+
+Periodic reviews:
+- Quarterly access review for production systems. Team owners receive a checklist and must certify current access or submit change requests.
+- Emergency access (break-glass) must be time-limited to a maximum of 8 hours and recorded with an incident tag.
+
+Sample access request payload (to be pasted into the Access Portal form):
+
+REQUEST SUMMARY:
+{

@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Build HTML + JSON EU compliance audit reports from OPA evaluation outputs."""
+"""Title: Report generator
+
+Build HTML + JSON EU compliance audit reports from OPA evaluation outputs.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

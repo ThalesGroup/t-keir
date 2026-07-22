@@ -1,9 +1,11 @@
-"""Runtime governor — enforce mode, budgets, kill switch, approvals.
+"""Title: governor package init
 
-Author: Eric Blaudez (Eric Blaudez)
+Runtime governor — enforce mode, budgets, kill switch, approvals.
 
-Copyright (c) 2026 by THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.governor.client import GovernorClient

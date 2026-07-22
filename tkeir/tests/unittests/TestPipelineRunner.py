@@ -1,4 +1,12 @@
-"""Tests for pipeline runner orchestration."""
+"""Title: Pipeline Runner
+
+Tests for pipeline runner orchestration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import base64
 import os

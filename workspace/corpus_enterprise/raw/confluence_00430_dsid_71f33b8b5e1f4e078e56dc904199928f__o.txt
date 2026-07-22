@@ -1,0 +1,161 @@
+Orchestrated control-plane swap and fallback playbook
+
+Purpose and scope
+
+This playbook defines a repeatable, low-risk process to orchestrate a control-plane swap between Redwood's hosted control plane and a customer-private control plane (or between two private control-plane versions) with explicit fallback and rollback steps. It covers: pre-swap readiness checks, phased swap orchestration, KV cache handover, traffic steering, verification gates, automated rollback triggers, and post-swap evidence collection. This document is intended for operators, field engineers, and SREs responsible for private deployments.
+
+When to use this playbook
+
+- Planned upgrades to control-plane software where a full in-place upgrade is impractical (major version or architecture change).
+- Emergency diversion from hosted control plane to private control plane (or vice-versa) for customer isolation or regulatory requirements.
+- Migration between control-plane clusters for scale, geo-failover, or tenancy rebalancing.
+
+Key services referenced
+
+- control-plane-api: the HTTP/GRPC endpoint handling tenant and model routing policy decisions.
+- runtime-proxy: the data-plane proxy used at customer VPC edge to route inference traffic.
+- operator-agent: the field operator service that performs image swap, config apply, and evidence bundle collection.
+- kv-store (redis-ephemeral / s3-backed snapshot): stores runtime ephemeral state and prefix/KV caches.
+- telemetry-gateway: aggregates traces, metrics, and log events for SLO validation.
+
+SLOs and safety thresholds (gates)
+
+- Successful RPC error-rate during canary window must remain < 0.5% (control-plane-api).
+- 99th percentile control-plane latency must not increase by > 40% compared to pre-swap baseline.
+- KV cache warmup hit-rate target >= 65% after model handover within 15 minutes.
+- No more than 2% of tenants may exhibit critical inference latency regressions (>500ms increase) during the swap.
+
+Pre-swap checklist (operator must verify)
+
+1. Backups & evidence
+   - Take a snapshot of control-plane database and model-variant manifest: operator-agent cli: run "operator-agent snapshot --target control-plane-db --tag pre-swap-<date>".
+   - Export KV cache manifest and last-consistent cursor for each tenant: "kvctl export --out pre-swap-kv-manifest.json".
+2. Capacity & compatibility
+   - Confirm target control-plane nodes meet runtime compatibility matrix (see table below).
+   - Reserve burst capacity of at least 20% in the serving cluster to avoid overload during cache miss storms.
+3. Observability & test harness
+   - Ensure telemetry-gateway retention window covers pre-swap baseline metrics.
+   - Provision a synthetic workload (see Quick test harness) with representative sequence lengths and request mix.
+4. Communication
+   - Notify customer NOC and internal stakeholders; create incident runbook with oncall escalation list.
+
+Compatibility matrix (example)
+
+| Component | Minimum supported version | Recommended version | Notes |
+|---|---:|---:|---|
+| control-plane-api | v2.8.0 | v3.0.x | v3.0 adds policy caching improvements; requires runtime-proxy >= v1.4 |
+| runtime-proxy | v1.3.2 | v1.5.x | v1.5 contains KV handoff endpoint and improved timeout handling |
+| operator-agent | v0.9.0 | v1.1.x | operator-agent v1.x supports evidence bundle compression |
+| kv-store | redis 6.2+ or s3 snapshot | redis 7.x | When using redis, enable AOF snapshots for quick restore |
+
+Phased orchestration (high-level)
+
+1) Canary phase (single-tenant/small slice)
+   - Select canary tenant(s) using: high-traffic + tolerant=FALSE labels. Canary traffic should represent 1-3% of typical load.
+   - Steps:
+     a) Deploy control-plane software to new cluster (or enable secondary control plane) in standby mode.
+     b) Configure routing policy rule: traffic for canary tenant -> new-control-plane endpoint. Use routing policy key: "swap-canary-<id>".
+     c) Start synthetic workload and watch SLOs for 10 minutes.
+     d) Validate KV cache warmup and inference tail latency.
+
+2) Incremental rollout (progressive tenant fanout)
+   - Expand to 10% of tenants over next 30 minutes if metrics remain green. Each expansion step: 10 -> 25 -> 50 -> 100% using predefined tenant cohorts.
+   - At each step, validate: error-rate < 0.5%, p99 latency delta < 40%, KV warmup >= 65%.
+
+3) Full swap and quarantine windows
+   - Once at 100% and stable for 60 minutes, mark new control plane as primary and trigger a final state sync.
+   - Hold a 2-hour quarantine window during which a coordinated rollback is still considered low-impact.
+
+Automatic rollback triggers
+
+If any of the following occur within the defined observation window, execute an immediate rollback to the previous control plane and follow the rollback evidence checklist:
+
+- Total error-rate exceeds 1.5% for the canary group for > 3 minutes.
+- p99 latency increases by > 100% for more than 5 minutes.
+- KV warmup hit-rate below 40% after 15 minutes for more than 5 tenants.
+- More than 5 tenants report inference failures measured by application-level 5xx rates.
+
+Rollback sequence (fast path)
+
+1. Freeze routing changes: set routing policy to failover -> previous-control-plane. Command: 
+   - curl -X POST https://control-plane-admin.internal/apply-routing -H 'Authorization: Bearer <operator-token>' -d '{"mode":"failover","target":"previous-control-plane"}'
+2. Scale down new control-plane traffic adapter to drain connections: "kubectl scale deployment cp-adapter-new --replicas=0 -n redwood-control"
+3. Restore KV snapshot if necessary: "kvctl import --from pre-swap-kv-manifest.json --apply"
+4. Rehydrate evidence bundle: operator-agent collect --tag pre-swap-<date> --include logs,metrics,traces
+5. Notify stakeholders: runbook-trigger email templates located at /templates/rollback-notify.md
+
+Post-rollback diagnostics
+
+- Collect control-plane-api logs (last 2 hours) and grep for errors with code >= 500.
+- Correlate telemetry-gateway traces to identify tail latency causation.
+- Run model-sanity test suite against both control-plane versions to detect behavioral differences.
+
+Operator CLI quick commands (examples)
+
+- Start a canary swap:
+  operator-agent start-swap --target new-control-plane --tenants canary-list.json --dry-run=false --evidence-tag pre-swap-<date>
+- Monitor swap progress:
+  operator-agent status --swap-id <id> --format table
+- Force immediate rollback:
+  operator-agent rollback --swap-id <id> --reason "metric-trigger" --collect-evidence
+
+KV cache handover considerations
+
+- Strategy A: live stream bulk prefetch
+  - Pre-compute top-K prefixes per-tenant and seed target runtime-proxy via kvctl seed --manifest pre-swap-kv-manifest.json.
+  - Advantages: faster warmup. Disadvantages: bandwidth and storage transient spike.
+
+- Strategy B: on-demand lazy warming with throttled misses
+  - Allow misses to fall back to model origin with a throttled concurrent limit to protect model backend.
+  - Advantages: minimal up-front cost. Disadvantages: higher initial latency for some tenants.
+
+Decision guidance: use Strategy A for latency-sensitive workloads with predictable prefix distributions (chatbots, search reranking). Use Strategy B when bandwidth or storage for full prefetch is constrained.
+
+Observability checklist (what to watch)
+
+- control-plane-api: RPC error-rate, p50/p95/p99 latencies, GC pause spikes.
+- runtime-proxy: connection churn, per-tenant KV hit-rate, serialization errors.
+- telemetry-gateway: missing spans, ingestion lag > 30s triggers alert.
+- infra: CPU steal, node OOMs, disk IO saturation.
+
+Synthetic test harness (quick)
+
+1. Use the canonical synthetic client: redwood-test-client v1.2.
+2. Load pattern: 60% short requests (<64 tokens), 30% medium (64-512 tokens), 10% long (>512 tokens).
+3. Run in three phases: baseline (15m), canary (10m), expanded (continuous during rollout).
+
+Evidence and audit bundle (required)
+
+- Must include: control-plane-db snapshot id, kv manifest, operator-agent action log, telemetry slice (baseline and during swap), pod-level logs for cp-adapter and runtime-proxy, incident timeline.
+- Bundle format: tar.gz with JSON manifest describing included files and checksums. Command to collect: "operator-agent collect-evidence --swap-id <id> --out /tmp/swap-evidence-<id>.tar.gz"
+
+Troubleshooting playbook (short)
+
+- Symptom: KV warmup low despite prefetch
+  - Check redis AOF/memory pressure; ensure eviction policy is not aggressive. Run: "redis-cli INFO MEMORY" and "kvctl show-evictions --tenant <id>".
+- Symptom: sudden p99 tail spike
+  - Check for long GC pauses in control-plane API pods (describe pod, jstack if possible), and review recent kernel updates or node-level maintenance.
+- Symptom: gradual increase in error-rate after 30m
+  - Inspect model-variant manifest divergence and verify model artifact checksums across clusters (sha256).
+
+Roll-forward (if canary passed and gradual rollout completed)
+
+- Finalize primary assignment in the global routing table and mark old control plane as read-only for 24 hours.
+- Schedule decommission window for the old control plane only after 7 days of stable telemetry and no rollback incidents.
+
+Ownership and contacts
+
+- Primary owner: eng-private-deployments (oncall: private-deployments-sre@redwood.internal).
+- Secondary owner: eng-serving-runtime (runtime-lead@redwood.internal).
+- Escalation: Platform Pager (pager redwood-platform) -> Site Reliability Lead.
+
+Related artifacts and references
+
+- Upgrade decision record: /confluence/eng-private-deployments/upgrade-and-rollback/incremental-stateful-upgrade-strategy-2027
+- KV migration playbook: /confluence/eng-private-deployments/day-2-ops/kv-cache-migrations-and-runtime-state-migration-playbook-2025
+- Operator CLI reference: /confluence/eng-private-deployments/deployment-guides/private-deploy-operator-cheat-sheet-for-field-installations-2027
+
+Revision history
+
+- 2027-11-02: Drafted by Maya Chen.
+- 2028-03-12: Reviewed and published; added automated rollback triggers and more detailed KV handover guidance.

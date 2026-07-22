@@ -1,4 +1,12 @@
-"""Unit tests for governor flags, policy, API, and enforcement."""
+"""Title: Governor
+
+Unit tests for governor flags, policy, API, and enforcement.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

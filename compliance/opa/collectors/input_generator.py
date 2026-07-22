@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Scan the T-KEIR repository and emit OPA input JSON for EU compliance audit."""
+"""Title: Input generator
+
+Scan the T-KEIR repository and emit OPA input JSON for EU compliance audit.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

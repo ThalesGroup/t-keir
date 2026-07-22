@@ -1,4 +1,12 @@
-"""Shared keyword label validation rules for extraction and RAG export."""
+"""Title: Keyword Rules
+
+Shared keyword label validation rules for extraction and RAG export.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

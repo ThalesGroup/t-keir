@@ -1,4 +1,12 @@
-"""Refine RAG search queries with the T-KEIR NLP pipeline."""
+"""Title: Query refiner
+
+Refine RAG search queries with the T-KEIR NLP pipeline.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

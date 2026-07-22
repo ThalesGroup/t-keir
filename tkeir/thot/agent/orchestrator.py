@@ -1,8 +1,13 @@
-"""Multi-agent orchestrator from scratch (Phase D) — sequential only.
+"""Title: Multi-agent orchestrator from scratch (Phase D) — sequential only.
 
 Supervisor plan comes from ``WorkflowSpec`` YAML. Each agent phase runs the
 existing :class:`AgentLoop`; compose phases use ``thot.compose``. Explicit
 :class:`Handoff` records and an append-only blackboard carry provenance.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

@@ -1,0 +1,1838 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://c8388ac71cf83fc6b57ca06b6ff39bd4d5c12fd128ef19fc39e69efc53353dcb/email_thread_00136_87b53b85.pdf",
+  "title": "Email: AcmeSystems Integration Decision",
+  "content": [
+    "Email: AcmeSystems Integration Decision\nFrom: David Martin@acmesystems.example\nTo: Pierre Richard@acmesystems.example\nSubject: AcmeSystems integration decision\n\nPlease confirm the API version before Thursday.\n\nReply: Version 2 is approved; Security will review the deployment plan."
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "Security"
+        ],
+        "lemma_content": [
+          "Security"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          33
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "will",
+          "review"
+        ],
+        "lemma_content": [
+          "will",
+          "review"
+        ],
+        "pos": [
+          "AUX",
+          "VERB"
+        ],
+        "positions": [
+          34,
+          35
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "the",
+          "deployment",
+          "plan"
+        ],
+        "lemma_content": [
+          "the",
+          "deployment",
+          "plan"
+        ],
+        "pos": [
+          "DET",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          36,
+          37,
+          38
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Security"
+        ],
+        "lemma_content": [
+          "Security"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          33
+        ],
+        "label": "organization"
+      },
+      "property": {
+        "content": [
+          "will",
+          "review"
+        ],
+        "lemma_content": [
+          "will",
+          "review"
+        ],
+        "pos": [
+          "AUX",
+          "VERB"
+        ],
+        "positions": [
+          34,
+          35
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "the",
+          "deployment",
+          "plan"
+        ],
+        "lemma_content": [
+          "the",
+          "deployment",
+          "plan"
+        ],
+        "pos": [
+          "DET",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          36,
+          37,
+          38
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Security"
+        ],
+        "lemma_content": [
+          "Security"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          33
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "will",
+          "review"
+        ],
+        "lemma_content": [
+          "will",
+          "review"
+        ],
+        "pos": [
+          "AUX",
+          "VERB"
+        ],
+        "positions": [
+          34,
+          35
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "deployment",
+          "plan"
+        ],
+        "lemma_content": [
+          "deployment",
+          "plan"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          37,
+          38
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "pdf",
+    "source-size-bytes": 970,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:20",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://c8388ac71cf83fc6b57ca06b6ff39bd4d5c12fd128ef19fc39e69efc53353dcb/email_thread_00136_87b53b85.pdf",
+  "metadata": {
+    "topic_id": "hr",
+    "corpus": "enterprise",
+    "doc_type": "email_thread",
+    "language": "en",
+    "title": "Email: AcmeSystems Integration Decision",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "hr",
+  "doc_type": "email_thread",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999963360405348
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "Email",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Integration",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Decision",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "From",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "David",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Martin@acmesystems.example",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "To",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Pierre",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Richard@acmesystems.example",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Subject",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "integration",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "decision",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Please",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "confirm",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "API",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "version",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "before",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Thursday",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Reply",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Version",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "2",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "is",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "approved",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Security",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "will",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "review",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "deployment",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "plan",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "Email",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": ":",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "AcmeSystems",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Integration",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Decision",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "email",
+      "text": "Email",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Integration",
+      "text": "Integration",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Decision",
+      "text": "Decision",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "email",
+      "text": "Email",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Integration",
+      "text": "Integration",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Decision",
+      "text": "Decision",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "ADP",
+      "lemma": "from",
+      "text": "From",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "David",
+      "text": "David",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Martin@acmesystems.example",
+      "text": "Martin@acmesystems.example",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PART",
+      "lemma": "to",
+      "text": "To",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Pierre",
+      "text": "Pierre",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "Richard@acmesystems.example",
+      "text": "Richard@acmesystems.example",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "subject",
+      "text": "Subject",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "integration",
+      "text": "integration",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "decision",
+      "text": "decision",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "INTJ",
+      "lemma": "please",
+      "text": "Please",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 18
+    },
+    {
+      "pos": "VERB",
+      "lemma": "confirm",
+      "text": "confirm",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "api",
+      "text": "API",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "version",
+      "text": "version",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "ADP",
+      "lemma": "before",
+      "text": "before",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Thursday",
+      "text": "Thursday",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "reply",
+      "text": "Reply",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 26
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "version",
+      "text": "Version",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NUM",
+      "lemma": "2",
+      "text": "2",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "AUX",
+      "lemma": "be",
+      "text": "is",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "VERB",
+      "lemma": "approve",
+      "text": "approved",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Security",
+      "text": "Security",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "AUX",
+      "lemma": "will",
+      "text": "will",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "VERB",
+      "lemma": "review",
+      "text": "review",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "deployment",
+      "text": "deployment",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "plan",
+      "text": "plan",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [
+    {
+      "start": 7,
+      "end": 9,
+      "label": "person",
+      "text": "David Martin@acmesystems.example"
+    },
+    {
+      "start": 15,
+      "end": 16,
+      "label": "organization",
+      "text": "AcmeSystems"
+    },
+    {
+      "start": 24,
+      "end": 25,
+      "label": "date",
+      "text": "Thursday"
+    },
+    {
+      "start": 33,
+      "end": 34,
+      "label": "organization",
+      "text": "Security"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "Email",
+      "lemma": "email",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        4,
+        7,
+        8
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Integration",
+      "lemma": "Integration",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Decision",
+      "lemma": "Decision",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        2,
+        3
+      ],
+      "rights": [
+        5
+      ]
+    },
+    {
+      "text": "From",
+      "lemma": "from",
+      "pos": "ADP",
+      "head": 4,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        6
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 5,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "David",
+      "lemma": "David",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Martin@acmesystems.example",
+      "lemma": "Martin@acmesystems.example",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "To",
+      "lemma": "to",
+      "pos": "PART",
+      "head": 9,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        10,
+        12
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Pierre",
+      "lemma": "Pierre",
+      "pos": "PROPN",
+      "head": 12,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Richard@acmesystems.example",
+      "lemma": "Richard@acmesystems.example",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [
+        11
+      ],
+      "rights": []
+    },
+    {
+      "text": "Subject",
+      "lemma": "subject",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        14,
+        17
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 13,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "integration",
+      "lemma": "integration",
+      "pos": "NOUN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "decision",
+      "lemma": "decision",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "appos",
+      "lefts": [
+        15,
+        16
+      ],
+      "rights": []
+    },
+    {
+      "text": "Please",
+      "lemma": "please",
+      "pos": "INTJ",
+      "head": 19,
+      "dep": "intj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "confirm",
+      "lemma": "confirm",
+      "pos": "VERB",
+      "head": 19,
+      "dep": "ROOT",
+      "lefts": [
+        18
+      ],
+      "rights": [
+        22,
+        23,
+        25
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 22,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "API",
+      "lemma": "api",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "version",
+      "lemma": "version",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "dobj",
+      "lefts": [
+        20,
+        21
+      ],
+      "rights": []
+    },
+    {
+      "text": "before",
+      "lemma": "before",
+      "pos": "ADP",
+      "head": 19,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        24
+      ]
+    },
+    {
+      "text": "Thursday",
+      "lemma": "Thursday",
+      "pos": "PROPN",
+      "head": 23,
+      "dep": "pobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Reply",
+      "lemma": "reply",
+      "pos": "NOUN",
+      "head": 35,
+      "dep": "dep",
+      "lefts": [],
+      "rights": [
+        31
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 31,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Version",
+      "lemma": "version",
+      "pos": "NOUN",
+      "head": 31,
+      "dep": "nsubjpass",
+      "lefts": [],
+      "rights": [
+        29
+      ]
+    },
+    {
+      "text": "2",
+      "lemma": "2",
+      "pos": "NUM",
+      "head": 28,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "is",
+      "lemma": "be",
+      "pos": "AUX",
+      "head": 31,
+      "dep": "auxpass",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "approved",
+      "lemma": "approve",
+      "pos": "VERB",
+      "head": 26,
+      "dep": "acl",
+      "lefts": [
+        27,
+        28,
+        30
+      ],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 35,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Security",
+      "lemma": "Security",
+      "pos": "PROPN",
+      "head": 35,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "will",
+      "lemma": "will",
+      "pos": "AUX",
+      "head": 35,
+      "dep": "aux",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "review",
+      "lemma": "review",
+      "pos": "VERB",
+      "head": 35,
+      "dep": "ROOT",
+      "lefts": [
+        26,
+        32,
+        33,
+        34
+      ],
+      "rights": [
+        38,
+        39
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 38,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "deployment",
+      "lemma": "deployment",
+      "pos": "NOUN",
+      "head": 38,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "plan",
+      "lemma": "plan",
+      "pos": "NOUN",
+      "head": 35,
+      "dep": "dobj",
+      "lefts": [
+        36,
+        37
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 35,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "Email",
+      "lemma": "email",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        4
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Integration",
+      "lemma": "Integration",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Decision",
+      "lemma": "Decision",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        2,
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 9,
+      "text": "acmesystems integration decision",
+      "span": {
+        "start": 2,
+        "end": 5
+      }
+    },
+    {
+      "score": 1,
+      "text": "email",
+      "span": {
+        "start": 0,
+        "end": 1
+      }
+    },
+    {
+      "score": 9,
+      "text": "acmesystems integration decision",
+      "span": {
+        "start": 15,
+        "end": 18
+      }
+    },
+    {
+      "score": 9,
+      "text": "david martin@acmesystems.example to",
+      "span": {
+        "start": 7,
+        "end": 10
+      }
+    },
+    {
+      "score": 4,
+      "text": "api version",
+      "span": {
+        "start": 21,
+        "end": 23
+      }
+    },
+    {
+      "score": 4,
+      "text": "deployment plan",
+      "span": {
+        "start": 37,
+        "end": 39
+      }
+    },
+    {
+      "score": 1,
+      "text": "email",
+      "span": {
+        "start": 0,
+        "end": 1
+      }
+    },
+    {
+      "score": 1,
+      "text": "pierre",
+      "span": {
+        "start": 11,
+        "end": 12
+      }
+    },
+    {
+      "score": 1,
+      "text": "subject",
+      "span": {
+        "start": 13,
+        "end": 14
+      }
+    },
+    {
+      "score": 1,
+      "text": "thursday",
+      "span": {
+        "start": 24,
+        "end": 25
+      }
+    },
+    {
+      "score": 1,
+      "text": "reply",
+      "span": {
+        "start": 26,
+        "end": 27
+      }
+    },
+    {
+      "score": 1,
+      "text": "security",
+      "span": {
+        "start": 33,
+        "end": 34
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://c8388ac71cf83fc6b57ca06b6ff39bd4d5c12fd128ef19fc39e69efc53353dcb/email_thread_00136_87b53b85.pdf#chunk-0-0843e5ddc2",
+      "parent_doc_id": "ingest://c8388ac71cf83fc6b57ca06b6ff39bd4d5c12fd128ef19fc39e69efc53353dcb/email_thread_00136_87b53b85.pdf",
+      "text_raw": "Email : AcmeSystems Integration Decision From : David Martin@acmesystems.example To : Pierre Richard@acmesystems.example Subject : AcmeSystems integration decision Please confirm the API version before Thursday . Reply : Version 2 is approved ; Security will review the deployment plan .",
+      "search_vector_payload": "Email : AcmeSystems Integration Decision From : David Martin@acmesystems.example To : Pierre Richard@acmesystems.example Subject : AcmeSystems integration decision Please confirm the API version before Thursday . Reply : Version 2 is approved ; Security will review the deployment plan .",
+      "metadata": {
+        "implicit_subjects": [
+          "the API -> Security",
+          "the deployment -> Security"
+        ],
+        "primary_entities": {
+          "person": [
+            "David Martin@acmesystems.example"
+          ],
+          "organization": [
+            "AcmeSystems",
+            "Security"
+          ],
+          "date": [
+            "Thursday"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "Security",
+            "will review",
+            "the deployment plan"
+          ],
+          [
+            "Security",
+            "will review",
+            "the deployment plan"
+          ],
+          [
+            "Security",
+            "will review",
+            "deployment plan"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 40,
+        "sentence_start": 0,
+        "sentence_end": 3
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Security will review the deployment plan",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Thursday",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "Email : AcmeSystems Integration Decision From : David Martin@acmesystems.example To : Pierre",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "Security will review deployment plan",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "AcmeSystems",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/acmesystems_integration_decision\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems integration decision\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Date/thursday-fc2662062ffd\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Date\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Thursday\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Person/david_martin_acmesystems_example-c869c0b1dc98\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Person\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"David Martin@acmesystems.example\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/pierre\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"pierre\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Chunk/ingest_c8388ac71cf83fc6b57ca06b6ff39bd4d5c12fd128ef19fc39e69efc53353dcb_email_thread_00136_87b53b85_pdf_chunk_0_0843e5ddc2\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/acmesystems_integration_decision\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/email\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/david_martin_acmesystems_example_to\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/api_version\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/deployment_plan\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/pierre\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/subject\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/thursday\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/reply\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/security\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Person/david_martin_acmesystems_example-c869c0b1dc98\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Date/thursday-fc2662062ffd\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/security-8f6fb4eb7f42\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/security-8f6fb4eb7f42\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"email_thread_00136_87b53b85_pdf\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/deployment_plan\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"deployment plan\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Organization/acmesystems-14032de724d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/deployment_plan-12894c93fec4\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Security\"\n    ],\n    \"http://tkeir.local/ontology/review\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Plan/plan-64879f7d6b96\"\n      }\n    ],\n    \"http://tkeir.local/ontology/willReview\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/deployment_plan-12894c93fec4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"deployment plan\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/email\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"email\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/the_deployment_plan-ea5d139159ef\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Security\"\n    ],\n    \"http://tkeir.local/ontology/review\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Plan/plan-64879f7d6b96\"\n      }\n    ],\n    \"http://tkeir.local/ontology/willReview\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/deployment_plan-12894c93fec4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"the deployment plan\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Chunk/ingest_c8388ac71cf83fc6b57ca06b6ff39bd4d5c12fd128ef19fc39e69efc53353dcb_email_thread_00136_87b53b85_pdf_chunk_0_0843e5ddc2\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Person/david_martin_acmesystems_example-c869c0b1dc98\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/security-8f6fb4eb7f42\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Date/thursday-fc2662062ffd\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/security-8f6fb4eb7f42\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://c8388ac71cf83fc6b57ca06b6ff39bd4d5c12fd128ef19fc39e69efc53353dcb/email_thread_00136_87b53b85.pdf#chunk-0-0843e5ddc2\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/reply\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"reply\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/david_martin_acmesystems_example_to\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"david martin@acmesystems.example to\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/security-8f6fb4eb7f42\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Security\"\n    ],\n    \"http://tkeir.local/ontology/review\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Plan/plan-64879f7d6b96\"\n      }\n    ],\n    \"http://tkeir.local/ontology/willReview\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/the_deployment_plan-ea5d139159ef\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Security/deployment_plan-12894c93fec4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Security\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/thursday\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"thursday\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Plan/plan-64879f7d6b96\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Plan\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"plan\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/subject\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"subject\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/api_version\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"api version\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/email_thread_00136_87b53b85_pdf/Keyword/security\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"security\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 4,
+      "unresolved": 0,
+      "auto_fixed": 4,
+      "affected_node_count": 2,
+      "graph_node_count": 27,
+      "graph_triple_count": 66,
+      "by_result_path": {
+        "review": 2,
+        "willReview": 2
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 45,
+    "total_tokens": 45,
+    "covered_characters": 284,
+    "total_characters": 284
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 40,
+  "token-count": 45,
+  "source-file-size-bytes": 970,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.046,
+    "tasks": {
+      "converter": 0.007,
+      "language-detection": 0.003,
+      "resource-selection": 0.001,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.006,
+      "ner": 0.007,
+      "syntax": 0.007,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.011,
+      "chunk-questions": 0.0
+    }
+  }
+}

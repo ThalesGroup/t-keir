@@ -1,0 +1,168 @@
+Responder wellbeing and orchestration guide
+
+Overview
+
+Purpose: This guide unifies three practical priorities for Redwood responders: (1) a compact incident lifecycle focused on fast containment and humane workload, (2) repeatable runbook patterns and postmortem scaffolding, and (3) on-call rotation and game-day design that preserves responder wellbeing while meeting SLO obligations.
+
+Scope: applies to all teams that operate inference services (api-frontend, inference-router, kv-cache, model-host). This is an operational reference — for team-specific runbooks link to the service page.
+
+Owner and escalation
+
+- Primary owner: Eng SRE (pager rotation managed in OnCall roster).
+- Secondary owner: team that owns the impacted service (see escalation matrix below).
+- Pager escalation: primary -> secondary -> SRE lead -> CTO on extended incidents (>4 hours).
+
+Escalation matrix (quick view)
+
+| Symptom | Primary | Secondary | Escalate after |
+|---|---:|---|---:|
+| Elevated error rate (>2x baseline) | api-frontend | inference-router | 30m |
+| P95 latency > 500ms for 15m | inference-router | kv-cache | 20m |
+| Model mis-scores / quality regression | model-host | Applied ML | 60m |
+| Large-scale capacity shortage | SRE capacity | Eng infra | 15m |
+
+Incident lifecycle (recommended lightweight flow)
+
+1) Detect & acknowledge (0-5 min)
+   - Pager owner: acknowledge within 5 minutes in PagerDuty.
+   - Create incident channel in Slack: #inc-<service>-<shortid>.
+2) Triage & classify (5-20 min)
+   - Identify customer impact (partial outage / degraded performance / no impact).
+   - Record evidence: metric snapshots, logs, recent deploys, config changes.
+3) Contain & mitigate (20-90 min)
+   - Apply a targeted mitigation (traffic routing, scale-up, circuit-breaker, rollback).
+   - Activate fallback model variant if model-host latency or quality is impacted.
+4) Restore & verify (90-240 min)
+   - Confirm SLO recovery and run smoke tests (see verification checklist).
+   - If incident exceeds 4 hours, notify executives and prepare a customer-facing message.
+5) Close & learn (post-incident)
+   - Run postmortem within 72 hours; include action items with owners and target dates.
+
+Runbook templates (copy and adapt per service)
+
+High latency (p95 > 500ms) runbook
+
+- Preconditions: p95 latency alert triggered; 3x baseline CPU or queue growth observed.
+- Immediate checks (do not skip):
+  1. Confirm alert: metrics.redwood.com > inference-router > p95 (last 15m).
+  2. Check pods: `kubectl -n inference get pods -l app=inference-router`
+  3. Inspect node metrics: `gcloud compute instances list --filter="labels:redwood-gpu"` or cloud equivalent.
+- Triage steps:
+  - Is KV cache miss-rate elevated? `promql: sum(increase(kv_cache_miss_total[15m]))`
+  - Any recent deploys? `git log --oneline --decorate -n 5` in the service repo.
+- Mitigation options (ordered):
+  a) Increase inference-router replicas (temporary): `kubectl scale deployment inference-router --replicas=6`.
+  b) Promote cached model shard to hot-cache (see kv-cache ops doc).
+  c) Route a subset of traffic to a cheaper, lower-latency model variant via routing policy: set route "latency-fallback" to true in Routing Console.
+- Verification:
+  - p95 below 300ms sustained for 10 minutes.
+  - Synthetic smoke test: `curl -sS https://smoke-redwood.local/health?service=inference-router` returns 200.
+- Post-incident note: add observation to the incident timeline and assign postmortem owner.
+
+Postmortem template (required fields)
+
+- Title: concise description + date.
+- Severity: Sev2 / Sev3 / Informational.
+- Incident lead: name and rotation week.
+- Timeline: bullet list of timestamps and key actions (short, 1–2 sentences each).
+- Root cause analysis: brief summary and evidence.
+- Contributing factors: list of 2–5 items.
+- Customer impact: who/what SLA/regions affected; approximate % of requests.
+- Action items: table with owner, action, ETA, verification plan.
+- Follow-ups: link to monitoring/dashboard changes or new runbook attachments.
+
+On-call rotations and humane shift design
+
+Goals: reduce burnout, make handoffs frictionless, and keep coverage predictable. Recommended model for Redwood (evidence-based):
+
+- Primary weekday rotation: 09:00–17:00 local (8-hour shifts) for teams with high daytime traffic.
+- Night/weekend coverage: two-week night-sprint model — one engineer on a 24/7 follow-the-sun primary for 2 weeks, then 4 weeks off from night duty.
+- Max continuous pager span: 2 hours per duty window; allow one 30-minute deep-focus block per 8-hour shift.
+- Maximum consecutive weeks on-call (night): 2 weeks.
+
+Handoff checklist (required at end of shift)
+
+1. Confirm there are no active incidents assigned.
+2. Post a short handoff note in #oncall-handoffs including:
+   - Summary of ongoing issues and mitigation state.
+   - Any temporary config toggles and how to revert.
+   - Expected QPS / capacity considerations.
+3. Tag the next responder and wait for verbal acknowledgement.
+4. Mark the shift as completed in OnCall roster tool and update the oncall-diary slack thread.
+
+Game day design and objectives
+
+Purpose: verify runbooks, validate routing fallbacks, and rehearse communication cadence. Run once per quarter per team.
+
+Example 3-hour game day agenda:
+- 00:00–00:20: kickoff, roles (Incident Lead, Bridge, Communications, SRE buddy, Observability).
+- 00:20–00:60: simulated degraded latency event — follow runbook, test routing fallback.
+- 00:60–01:20: simulated model quality regression — promote fallback model and run quality smoke tests.
+- 01:20–02:00: mass-failure simulation (50% of nodes in us-west) — execute capacity failover and customer rate-limits.
+- 02:00–02:30: status page exercise — compose and publish messages (see templates below).
+- 02:30–03:00: retro and action capture.
+
+Scoring (simple): containment time (goal < 30m), correctness of messaging, and checklist completion. Include at least one cross-team observer to evaluate comms.
+
+Status page & customer comm templates
+
+Principles for public comms: be accurate, empathetic, and set expectations for remediation and follow-up. Use short subject lines and a visible update cadence (every 30–60 minutes for active incidents).
+
+Template: "Degraded performance affecting inference API (partial outage)"
+
+Headline: "We are experiencing degraded performance for the Redwood inference API in us-west."
+Impact: "Customers may see increased latency or timeouts for text generation requests. This affects ~12% of requests routed to us-west."
+What we are doing: "Our engineering teams have identified a routing pressure point and are performing a staged traffic reroute to healthy regions. We will provide updates every 30 minutes." 
+
+Template: "Partial service interruption — model quality regression"
+
+Headline: "We have detected a quality regression in the default embeddings model for some queries."
+Impact: "A subset of embeddings produced for short-form inputs may be lower quality; downstream reranking may be affected for some customers."
+What we are doing: "We have rolled traffic to the previous model version and are running regression checks. If you rely on embeddings quality, you can pin to model 'embed-v2' in the API until we finish verification."
+
+Internal quick message (Slack) when escalating to execs:
+
+"Inc <ID>: severity Sev2, service inference-router, impact: partial outage affecting 12% of requests. Mitigation: traffic reroute in progress. Current ETA to restore: 45m. Owner: Ava Chen (SRE). Next update: +30m."
+
+Verification and evidence collection checklist
+
+- Save metric snapshots (p95, p99, error-rate) for 1 hour before and during incident.
+- Export logs for impacted pods (last 60 minutes).
+- Record all runbook commands used and config changes.
+- Capture status page messages and timestamps.
+
+Responder wellbeing guidance (practical rules)
+
+- Use the 2+2 rule for paging intensity: if an engineer receives >2 pages in 2 hours, discuss on duty to reduce load (scale, automation, or temporary handoff).
+- Mandatory cool-down: after an incident rated Sev1 or extended >4 hours the responder gets 12 hours protected time (no noncritical meetings).
+- Post-incident check-in: incident lead schedules a 30-minute wellness check with the responder within 48 hours for any Sev1/Sev2 incidents. This is not a performance review.
+
+Appendix: sample commands and snippets
+
+- List inference router pods: `kubectl -n inference get pods -l app=inference-router -o wide`
+- Restart a misbehaving pod safely: `kubectl -n inference rollout restart deployment/inference-router --timeout=2m`
+- Promote fallback model via API (example):
+```
+POST https://routing.redwood.internal/v1/route
+Body: { "service": "inference", "policy": "latency-fallback", "enabled": true }
+```
+- Quick smoke test (synthetic): `python tools/smoke_test.py --service inference-router --assert-p95 300`
+
+Appendix: retention & follow-up norms
+
+- Postmortem actions: tracked as issues in the team backlog; owners must set an ETA and verification PR.
+- Runbook pruning cadence: every 6 months runbook owners must re-validate steps in game day or during a change window.
+- Incident metrics retention: timeline and evidence for Sev2+ retained 2 years.
+
+Contact list (short):
+- SRE lead: Ravi Patel (ravi@redwood.com)
+- Observability: Lena Morris (lena@redwood.com)
+- Applied ML on-call: Priya Singh (priya@redwood.com)
+
+References and links
+
+- SLO decomposition: /confluence/eng-sre/capacity-planning/slo-decomposition-2025
+- Runbook library: /confluence/oncall-and-incident-response/runbook-retention-and-responder-onboarding-handbook-2026
+- Routing console (internal): https://routing-console.internal.redwood/
+
+This guide is intentionally concise. Teams should copy relevant sections into their service-specific runbooks and adopt the wellbeing rules as a minimum standard.

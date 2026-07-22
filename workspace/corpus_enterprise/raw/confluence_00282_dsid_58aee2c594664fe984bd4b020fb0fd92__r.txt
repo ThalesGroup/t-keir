@@ -1,0 +1,364 @@
+RBAC v2 Design Overview (Hosted, Dedicated, Private)
+
+## Summary
+RBAC v2 is Redwood Inference’s fine-grained authorization model designed to support regulated enterprise workloads across Hosted API, Dedicated capacity, and Private (VPC/on-prem) deployments. This document describes RBAC v2 goals, primitives, evaluation flow, storage model, caching strategy, and rollout plan.
+
+RBAC v2 is the authorization layer. Authentication (API keys, SSO/SAML/OIDC, service identities) remains unchanged, but all security-relevant actions must map to an explicit permission and be deny-by-default.
+
+## Goals
+1. Least-privilege authorization with a canonical permission catalog covering the Redwood product surface area (API Gateway, Console, Control Plane services, Dedicated/Private admin operations).
+2. Consistent enforcement and error semantics across:
+   - API Gateway (edge enforcement)
+   - Control Plane services (authoritative enforcement)
+   - Console/admin tooling (UX alignment with API semantics)
+3. Deny-by-default with explicit permission annotations/registrations and CI guardrails to prevent unprotected sensitive endpoints from shipping.
+4. Enterprise-grade auditability:
+   - Log authorization decisions (subject/action/resource/scope/policy version/decision/denial reason)
+   - Support export to SIEM with evidence-friendly fields
+5. Multi-scope semantics that work across deployment modes:
+   - Org, Project, Environment, Cluster
+   - Consistent mapping for Hosted, Dedicated, Private
+6. Migration safety:
+   - Backwards compatible transition from RBAC v1/coarse roles
+   - Dual-read/feature flags and default mappings
+7. Performance and reliability:
+   - Low-latency deterministic checks
+   - Safe caching (scope-aware, version-aware)
+   - Defined behavior for partial outages (fail-closed for sensitive actions)
+
+## Non-goals (RBAC v2)
+- Customer-defined ABAC/policy language or rule scripting.
+- Full re-architecture of identity providers, SSO, or API key issuance.
+- Replacing product-level business rules (e.g., “cannot delete default project”) with RBAC; RBAC only controls whether the caller is authorized to attempt the action.
+- Cross-tenant delegation features (e.g., “grant another org access to my project”).
+
+## Definitions and primitives
+### Core concepts
+RBAC v2 evaluates whether a subject (actor) is allowed to perform an action (permission) on a resource within a scope.
+
+- **Subject**: A principal derived from authentication.
+  - Human user (SSO or local)
+  - API key principal (service-style identity, bound to an org/project)
+  - Internal service identity (mTLS/JWT workload identity)
+
+- **Permission (action)**: Canonical string identifying an operation. See ADR-014 for naming/versioning.
+  - Format: `redwood.<domain>.<resource>.<verb>`
+  - Example: `redwood.controlplane.api_keys.rotate`
+
+- **Role**: Named bundle of permissions.
+  - Built-in roles shipped by Redwood (templates)
+  - Custom roles (customer-created, subject to constraints)
+
+- **Role binding**: Assignment of a role to a subject at a particular scope.
+
+- **Scope**: Hierarchical context limiting where permissions apply.
+  - Org -> Project -> Environment -> Cluster (for Dedicated/Private)
+
+- **Resource**: Object type and optional identifier used for audit clarity and (optionally) finer checks.
+  - Resource types are enumerated (e.g., `org`, `project`, `environment`, `deployment`, `api_key`, `audit_log_export`).
+  - RBAC v2 is primarily scope-based (not per-object ACL), but we still pass resource metadata to support auditing and future tightening.
+
+### Scope model
+Scopes are represented as typed identifiers. A binding always attaches to exactly one scope.
+
+Supported scope types:
+- **org:<org_id>**
+- **project:<project_id>** (must belong to an org)
+- **environment:<env_id>** (must belong to a project)
+- **cluster:<cluster_id>** (Dedicated/Private operational scope; cluster belongs to an environment)
+
+Scope inheritance:
+- A role binding at org scope applies to all descendant projects/environments/clusters within the org.
+- A binding at project scope applies to environments/clusters in that project.
+- A binding at environment scope applies to clusters within that environment.
+- Cluster scope is leaf.
+
+Constraints:
+- No cross-org inheritance.
+- “Global” scope is not exposed to customers. Internal-only global operations use internal service identity + internal-only permissions.
+
+### Permissions catalog and versioning
+RBAC v2 requires a canonical permission catalog (registry). Each sensitive action maps to exactly one permission.
+
+Rules:
+- Permissions are stable identifiers; do not reuse names.
+- Deprecation uses explicit suffix or versioning rules per ADR-014.
+- Permissions must be registered in the permission registry with:
+  - human-readable description
+  - domain owner
+  - sensitivity tier
+  - applicable deployment modes (Hosted/Dedicated/Private)
+
+Sensitivity tiers (used for review rigor and fail-closed policy):
+- **Tier 0 (Critical):** actions that can exfiltrate data, compromise keys, disable logging, or change security posture.
+- **Tier 1 (High):** actions that change routing/model pinning, modify deployment config, manage users/roles, export audit logs.
+- **Tier 2 (Medium):** read access to sensitive metadata, operational actions with limited blast radius.
+- **Tier 3 (Low):** non-sensitive reads.
+
+Example permission entries:
+| Permission | Tier | Description |
+|---|---:|---|
+| redwood.controlplane.orgs.manage_roles | 0 | Create/update/delete roles and role bindings within an org scope. |
+| redwood.controlplane.api_keys.rotate | 0 | Rotate an API key secret / issue a new secret material. |
+| redwood.controlplane.audit_logs.export | 1 | Export audit logs to external destination or download bulk archive. |
+| redwood.controlplane.routing_policies.update | 1 | Update routing policy affecting model selection/fallback. |
+
+## Architecture and evaluation flow
+### High-level enforcement principles
+- **Deny-by-default**: If an endpoint/action has no permission annotation or cannot be evaluated, the request is denied (with narrowly defined break-glass exceptions).
+- **Defense in depth**:
+  - API Gateway enforces permissions for external requests.
+  - Control Plane services enforce permissions again for all sensitive operations.
+- **Consistent semantics**:
+  - Authorization errors are 403 (not 404) unless the endpoint standard explicitly requires resource-hiding semantics.
+  - Errors include a stable denial reason code. Admin/debug mode may include a correlation/debug header.
+
+### Request flow (external)
+1. Request enters API Gateway.
+2. Gateway resolves principal (user/api key), org/project context, and intended permission for the route (via route annotation).
+3. Gateway calls the policy evaluator (embedded client) to evaluate:
+   - subject
+   - permission
+   - scope
+   - resource metadata (type/id where available)
+   - policy bundle version hint
+4. Gateway enforces decision:
+   - Allow: request forwarded to upstream service
+   - Deny: return standardized 403 response
+5. Upstream service performs its own authorization check (authoritative), using the same evaluation library.
+6. Both gateway and service emit audit events (see “Audit logging”).
+
+### Request flow (internal service-to-service)
+- Internal service identities use internal-only permissions.
+- Calls still pass scope/resource metadata for auditing.
+- Services must not rely solely on gateway enforcement for internal calls.
+
+### Policy evaluation location (embedded vs centralized)
+RBAC v2 uses **embedded evaluation via a shared library client** with a local decision cache, consistent with ADR-015.
+
+Rationale (summary):
+- Centralized evaluation can become a latency and availability bottleneck.
+- Embedded evaluation improves locality and resilience but requires strict versioning, cache safety, and consistent library rollout.
+
+The evaluator library supports:
+- Fetching/refreshing policy bundles and role bindings from the Control Plane authz store
+- Verifying signatures / integrity of policy artifacts (Private mode compatible)
+- Deterministic evaluation
+- Metrics (latency, cache hit rate, denial reasons)
+
+## Data model and storage
+RBAC v2 data is stored in the Control Plane (authoritative). Services consume via the evaluator client.
+
+### Entities
+1. **permissions** (registry)
+   - Source of truth: code registry + policy-bundle repo
+   - Distributed as a versioned artifact
+
+2. **roles**
+   - `role_id` (UUID)
+   - `org_id` (NULL for built-in roles, set for org-custom roles)
+   - `name`, `description`
+   - `permissions[]` (list of permission strings)
+   - `is_builtin` boolean
+   - `version` (increment on change)
+
+3. **role_bindings**
+   - `binding_id` (UUID)
+   - `subject_type` (user/api_key/service)
+   - `subject_id`
+   - `role_id`
+   - `scope_type` (org/project/environment/cluster)
+   - `scope_id`
+   - `created_by`, `created_at`
+   - `deleted_at` (soft delete)
+
+4. **subjects** (identity references)
+   - Not owned by RBAC; RBAC stores references to the identity subsystem.
+
+### Policy bundle
+A **policy bundle** is a versioned artifact containing:
+- Built-in role templates
+- Permission metadata (descriptions, tiers, owners)
+- Default mappings for migration (v1 -> v2)
+
+Bundle properties:
+- Immutable, content-addressed (hash)
+- Has a semantic version (e.g., `rbac-bundle-2025.03.2`)
+- Signed by Redwood (and optionally re-signed in Private build pipelines)
+
+Services include `policy_bundle_version` in evaluation context and in audit logs.
+
+## Caching and performance strategy
+### Goals
+- Keep P50 authz evaluation under 2 ms in-process (excluding any initial bundle fetch).
+- Ensure cache correctness when roles/bindings change.
+- Avoid “sticky allow” after revocation.
+
+### Cache layers
+1. **Policy bundle cache**
+   - Bundles are immutable; safe to cache indefinitely with periodic refresh checks.
+   - Refresh cadence: check for new bundle version every 5 minutes (configurable).
+
+2. **Role bindings cache (authoritative data)**
+   - Cache key: `(subject_id)` plus “scope graph” for the org.
+   - TTL: 30 seconds default (configurable by deployment mode).
+   - Invalidation triggers:
+     - Any role binding mutation emits an event and increments `authz_subject_version` for the subject.
+     - Evaluator compares cached version to latest known version; if stale, bypass cache.
+
+3. **Decision cache (computed allow/deny)**
+   - Cache key: `(subject_id, permission, scope_type, scope_id)`
+   - Optional inclusion: `resource_type` when a permission’s semantics require it.
+   - TTL policy:
+     - Allow: 15 seconds
+     - Deny: 5 seconds (shorter to reduce “false deny” persistence during propagation)
+   - Hard bounds:
+     - Max entries per process (default 50k) with LRU eviction
+     - Per-subject cap to prevent unbounded growth
+
+### Fail-closed behavior
+- For Tier 0 and Tier 1 permissions: if evaluation cannot be completed due to missing policy/bindings data, the system fails closed (deny) and emits a high-severity metric/event.
+- For Tier 2/3 reads: services may be configured to fail closed by default; any fail-open exception requires Security approval and must be documented with explicit risk acceptance.
+
+### Dedicated/Private considerations
+- Private deployments may have higher latency to the Control Plane DB; caches become more important.
+- Private installs must support “cold start” where policy bundle is present locally (installer seeds bundle) and bindings are fetched from local control plane.
+
+### Observability
+Required metrics (emitted by evaluator library):
+- `authz_eval_latency_ms` (histogram)
+- `authz_cache_hit_total` (by cache type)
+- `authz_decision_total{decision, permission, scope_type}`
+- `authz_denial_reason_total{code}`
+- `authz_policy_bundle_version` (gauge label)
+
+Alerting recommendations (initial):
+- Deny rate spike > 3x baseline for a permission family in 10 minutes (per environment)
+- Evaluation latency P95 > 10 ms for 15 minutes
+- Policy bundle version mismatch across fleet beyond acceptable rollout window
+
+## Endpoint integration requirements
+### Annotation/registration
+All sensitive routes/endpoints must declare:
+- Required permission
+- Scope derivation rule (how scope_id is computed)
+- Resource metadata mapping
+
+Gateway routes must be deny-by-default when permission annotation is missing.
+
+Control Plane endpoints must include unit tests that:
+- Assert permission annotation exists
+- Assert the handler calls the authorization interceptor
+
+### Standardized authorization error shape
+- HTTP: 403
+- Body includes:
+  - `error`: `permission_denied`
+  - `permission`: required permission
+  - `scope`: scope type/id
+  - `reason_code`: stable internal code
+  - `request_id`: correlation id
+
+Optional (admin/debug only):
+- Response header `X-Redwood-Authz-Debug: <opaque>` containing evaluator trace id
+
+Reason code examples:
+- `AUTHZ_NO_BINDING`
+- `AUTHZ_SCOPE_MISMATCH`
+- `AUTHZ_PERMISSION_NOT_IN_ROLE`
+- `AUTHZ_POLICY_UNAVAILABLE`
+- `AUTHZ_PERMISSION_UNREGISTERED` (treated as misconfiguration; should be blocked in CI)
+
+## Audit logging (authorization decisions)
+RBAC v2 extends audit logs to record authorization decisions for sensitive actions.
+
+For every evaluated sensitive action (at least Tier 0 and Tier 1):
+- subject: type/id, org_id (if known), authn method (api_key/sso/service)
+- action: permission string
+- scope: type/id
+- resource: type/id (when available)
+- decision: allow/deny
+- denial reason code (if denied)
+- policy bundle version
+- evaluator version
+- request id / trace id
+
+Notes:
+- We log both gateway decision and service decision for defense-in-depth traceability.
+- For privacy, we do not include secret material; resource ids are allowed, request payloads are not.
+
+## Rollout and migration plan
+### Phased rollout
+1. **Inventory & catalog (complete for MVP)**
+   - Enumerate endpoints/jobs and map to permissions.
+   - Classify permissions by sensitivity tier.
+
+2. **Library + registry adoption**
+   - Land permission registry and linting.
+   - Add evaluator library to gateway and control plane.
+
+3. **Dual-read mode (RBAC v1 + v2)**
+   - Evaluate both systems and compare decisions (shadow mode).
+   - Emit divergence metrics; do not block traffic based on v2 yet.
+
+4. **Feature-flagged enforcement**
+   - Start with internal dogfood orgs.
+   - Enable on select pilot customers (Dedicated + Private).
+   - Gradually expand by permission tiers and service domains.
+
+5. **Deprecation of v1**
+   - Publish timelines and customer comms.
+   - Remove v1 checks after stability and evidence criteria are met.
+
+### Backwards compatibility notes
+- Existing API keys and existing coarse roles must continue to function during migration.
+- Default mappings:
+  - v1 Org Admin -> v2 Org Admin template
+  - v1 Read-only -> v2 Read-only Auditor template
+  - Dedicated/Private operator roles are mapped per deployment scope rules
+- During dual-write, mutations to roles/bindings update both v1 and v2 representations to avoid drift.
+- Any endpoint returning 403 due to v2 enforcement must include a supportable reason code.
+
+### Break-glass
+- Break-glass is supported as a time-bound elevated role binding with strict monitoring.
+- Break-glass bindings:
+  - Must require approval workflow (per Break-glass access and controls)
+  - Must have explicit expiration (max 2 hours by default)
+  - Must trigger alerts to SecOps and create an auditable ticket trail
+
+## Security considerations
+- Deny-by-default and CI gating are mandatory to prevent “forgotten” endpoints.
+- Permission registry changes require Security review for Tier 0/1 permissions.
+- Private deployments:
+  - Policy bundle signing and provenance must be preserved.
+  - Customers must be able to map IdP groups to role bindings without granting global admin by default.
+
+## Testing and validation
+Minimum requirements before broad enablement:
+- Unit tests for permission annotations on Tier 0/1 endpoints.
+- Integration tests for critical workflows:
+  - API key rotation
+  - Role/binding changes
+  - Routing policy edits
+  - Audit log export
+- Regression test for streaming endpoints to ensure checks occur before streaming begins.
+
+## Open questions / follow-ups
+1. Resource-level granularity: which permissions require resource_id in cache keys to avoid incorrect reuse?
+2. Resource-hiding semantics: do we ever return 404 to reduce information leakage, or keep consistent 403 for debuggability?
+3. Cache invalidation mechanism in Private when eventing is constrained (fallback to version polling intervals).
+4. Console UX: final design for “why denied?” messaging and admin debug toggles.
+
+## Appendix: Example evaluation
+Example: user attempts to update a routing policy in project scope.
+- Subject: `user:usr_8F2...`
+- Permission: `redwood.controlplane.routing_policies.update`
+- Scope: `project:proj_91C...`
+- Resource: `routing_policy:rpol_77A...`
+
+Evaluation:
+1. Collect bindings for subject (org + project).
+2. Expand role permissions.
+3. Check whether any binding scope matches or is an ancestor of project scope.
+4. Allow if permission is present in any applicable binding.
+5. Emit audit decision with `policy_bundle_version` and denial reason if denied.

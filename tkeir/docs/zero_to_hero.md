@@ -9,10 +9,10 @@ you know you succeeded before moving on.
 | [1](#1-what-you-will-build) | — | Map the journey | 2 min |
 | [2](#2-prerequisites) | — | Tools on the host | 10–20 min |
 | [3](#3-p0-dev-local--first-pipeline) | **P0** | Pipeline on fixtures | 15–40 min |
-| [4](#4-p0-vespa-rag--hmi) | **P0** | Search + web UI | 20–45 min |
-| [5](#5-p1-docker-compose-full-demo) | **P1** | Auth + audit + observability | 20–40 min |
+| [4](#4-p0-vespa-rag--hmi--agents) | **P0** | Search + HMI + **agents** on demo corpora | 25–55 min |
+| [5](#5-p1-docker-compose-full-demo) | **P1** | Auth + audit + observability + per-user agents | 25–50 min |
 | [6](#6-p2-kubernetes-dev-k3d) | **P2** | Helm umbrella on k3d | 30–60 min |
-| [7](#7-p3-secure-cluster) | **P3** | Enforce + hardened path | 45–90 min |
+| [7](#7-p3-secure-cluster) | **P3** | Enforce + hardened path + SPIFFE agents | 45–90 min |
 | [8](#8-p4-platform--evidence) | **P4** | Kubeflow + compliance packs | optional |
 | [9](#9-day-2-operations) | — | Kill switch, DSR, evidence | ongoing |
 
@@ -42,11 +42,16 @@ templates, and an MCP server — see [Agents](tools/agents.md), [MCP](tools/mcp.
 
 **Progressive maturity**
 
-- **P0** — you develop and demo NLP + RAG on your machine. Vespa uses streaming
-  mode with the shared local group **`dev@tkeir`** (no Keycloak required).
-- **P1** — you demo the full stack in Compose (Keycloak, ingest, audit, Grafana).
-  Each Keycloak user gets an isolated Vespa corpus (`preferred_username` / email).
-- **P2** — you install the same stack with Helm on a local Kubernetes (k3d).
+- **P0** — you develop and demo NLP + RAG + **agents** on your machine. Vespa
+  is the only container; T-KEIR tools (`pipeline`, `ingest`, `rag`, `agent`,
+  HMI) run on the host. Streaming group **`dev@tkeir`** (no Keycloak
+  required) — both OSINT and enterprise demo docs share that space.
+- **P1** — you demo the full stack in Compose (local image registry `local/…`,
+  Keycloak, ingest, audit, Grafana, optional `mcp` / `agents`). Each Keycloak
+  user gets an isolated Vespa corpus; agents search only that user’s space
+  (OSINT → `demo-user`, enterprise → `demo-admin`).
+- **P2** — you install the same stack with Helm on a local Kubernetes (k3d),
+  including optional agent / MCP charts when enabled in values.
 - **P3** — you harden (auth on, governor enforce, network policies). Agent
   workloads use SPIFFE ([ADR-0008](adr/0008-spire-agent-identity.md)); enable
   Compose profile `spire` with `agents`.
@@ -142,34 +147,34 @@ NER fields.
 ### 3.4 Generate the demo corpora (recommended)
 
 The fixture files cover only a minimal smoke test. For a realistic demo across
-two independent themes, seven formats, and two languages, run the corpus generator:
+two independent themes, seven formats, and two languages, run:
 
 ```bash
 make corpus
 ```
 
-This generates two offline corpora under `workspace/`:
+This generates two corpora under `workspace/` and, when online, best-effort
+fetches official SISO C2SIM artifacts plus an EnterpriseRAG-Bench slice:
 
 | Corpus | Theme | Default user | Documents | Formats |
 |--------|-------|-------------|-----------|---------|
-| `corpus_nato/` | NATO C4ISR OSINT (SITREP, INTSUM, OPORD…) | `demo-user` | 1 500 | txt md html json csv pdf docx |
-| `corpus_enterprise/` | AcmeSystems internal docs (specs, HR, finance…) | `demo-admin` | 500 | txt md html pdf docx json csv |
+| `corpus_nato/` | NATO C4ISR OSINT (SITREP, INTSUM, OPORD…) | `demo-user` | 1 500 generated | txt md html json csv pdf docx |
+| `corpus_enterprise/` | AcmeSystems internal docs + optional EnterpriseRAG | `demo-admin` | 500 generated (+ up to 500 downloaded) | txt md html pdf docx json csv |
 
 Each document carries a `user_space` and a `topic_id` (sub-folder within the
 corpus). Six NATO C2SIM/C4ISR ontologies are written to
-`workspace/corpus_nato/ontologies/` and are ready for the ontology-driven
-template phase ([Templates](tools/templates.md)).
+`workspace/corpus_nato/ontologies/`. Pass them at ingest time with
+`--ontology-dir` / `CORPUS_ONTOLOGY_DIR` (the ingest API itself stays
+corpus-agnostic).
 
-Online? Fetch the official SISO C2SIM ontology artifacts
-(OpenC2SIM/C2SIMArtifacts on GitHub) and a slice of the EnterpriseRAG-Bench
-dataset (onyx-dot-app/EnterpriseRAG-Bench on HuggingFace, MIT license):
+Fully offline (skip network fetches):
 
 ```bash
-make corpus-download
+make corpus CORPUS_DOWNLOAD=0
 ```
 
-The build remains fully functional offline: embedded generators produce all
-1 500 + 500 documents without any network access.
+Embedded generators still produce all 1 500 + 500 documents without any
+network access; only SISO / EnterpriseRAG extras are skipped.
 
 **Checkpoint:** `ls workspace/corpus_nato/manifest.json
 workspace/corpus_enterprise/manifest.json
@@ -177,31 +182,90 @@ workspace/corpus_nato/ontologies/*.owl` all exist.
 `python3 -c "import json; m=json.load(open('workspace/corpus_nato/manifest.json'));
 print(m['count_generated'])"` prints `1500`.
 
-### 3.5 Ingest the corpora (P0 — offline)
+### 3.5 Ingest the corpora (P0 — host tools)
 
-Without Keycloak, both corpora land in the shared `dev@tkeir` space. The
-`--fallback-index` flag automatically uses `make index` when `tkeir-ingest`
-is not running:
+P0 has **no containerization of T-KEIR tools**. Only Vespa runs in Docker;
+pipeline, ingest, RAG, agent, and the HMI run on the host via `uv` / `npm`.
+
+Without Keycloak, both corpora land in the shared `dev@tkeir` space.
+`make corpus-ingest` runs **two passes**: OSINT with client-side
+`--ontology-dir workspace/corpus_nato/ontologies` (the **client** reads those
+files and uploads their **bytes** as `ontology_file` parts — the server never
+opens the client path), then enterprise **without** ontologies.
+
+Copy/paste (two terminals):
 
 ```bash
+# Terminal A — Vespa + host ingest API (:8091)
+make bootstrap
+make ingest          # serializes NLP (INGEST_MAX_CONCURRENCY=1); avoid OOM
+
+# Terminal B — push both corpora into dev@tkeir (1 worker by default)
+make corpus-ingest
+
+# Spot-check the reports
+python3 -c "import json; r=json.load(open('workspace/ingest_osint.json')); print('osint sent', r['sent'], 'failed', r['failed'])"
+python3 -c "import json; r=json.load(open('workspace/ingest_enterprise.json')); print('ent sent', r['sent'], 'failed', r['failed'])"
+```
+
+#### Stop on first failure (fast debug)
+
+When a document fails, stop **both** the ingest server and the corpus client
+so you can fix the error immediately instead of waiting for thousands of
+jobs:
+
+```bash
+# Terminal A
+make ingest STOP_ON_FAILED=1
+
+# Terminal B
+make corpus-ingest STOP_ON_FAILED=1
+```
+
+| Flag | Effect |
+|------|--------|
+| `STOP_ON_FAILED=1` on `make ingest` | Sets `INGEST_STOP_ON_FAILED=1` — server exits (SIGTERM) after the first failed job |
+| `STOP_ON_FAILED=1` on `make corpus-ingest` | Passes `--stop-on-failed` — client cancels remaining uploads and calls `POST /ingest/stop` |
+
+Same flag works for `make corpus-ingest-user` / `make corpus-ingest-admin`.
+You can also pass `INGEST_FLAGS='--stop-on-failed'`.
+
+One-shot after corpora exist (ingest must already be listening on `:8091`):
+
+```bash
+make corpus-demo   # generate (if needed) + ingest
+```
+
+If `:8091` is down, `make corpus-ingest` **fails fast**. Start `make ingest`
+(P0) or, from **P1** onward, Compose after building local images:
+
+```bash
+make images
+make compose-up PROFILES=core,ingest
 make corpus-ingest
 ```
 
-Or generate and ingest in one command:
+Host pipeline fallback (no ingest process) is only for small slices — the full
+~2 500-document corpus can take hours:
 
 ```bash
-make corpus-demo
+make corpus-ingest INGEST_FLAGS='--topics situational_awareness --formats txt --force-fallback'
 ```
 
-**Checkpoint:** `workspace/ingest_report.json` exists and shows `"failed": 0`.
+**Checkpoint:** `workspace/ingest_osint.json` and
+`workspace/ingest_enterprise.json` exist with `"failed": 0`.
+After [§4.2](#42-start-the-rag-api):
 `make rag-query RAG_QUERY="SITREP Objective ALPHA"` returns chunk hits.
 
 ---
 
-## 4. P0 — Vespa RAG + HMI
+## 4. P0 — Vespa RAG + HMI + agents
 
-Vespa runs in **streaming mode**: documents live in a *user space* (Vespa
-group). Without Keycloak, everything uses the fixed principal **`dev@tkeir`**.
+Still **host-native** for T-KEIR: `make rag`, `make agent`, and `cd tkeir-hmi
+&& npm run dev`. Vespa runs in Docker (`make bootstrap`). Streaming mode:
+documents live in a *user space* (Vespa group). Without Keycloak, everything
+uses the fixed principal **`dev@tkeir`** — so OSINT and enterprise demo data
+are both visible to RAG and agents in P0.
 
 | Mode | Vespa `user_space` / `streaming.groupname` |
 |------|--------------------------------------------|
@@ -236,10 +300,16 @@ make rag-query RAG_QUERY="What is T-KEIR?"
 API listens on **:8090**. Queries without a Bearer token search **`dev@tkeir`**.
 Each answer carries `X-Correlation-Id` for audit later.
 
-For the richer demo corpus (§3.4), substitute the fixture index:
+For the richer demo corpus ([§3.4](#34-generate-the-demo-corpora) /
+[§3.5](#35-ingest-the-corpora-p0--host-tools)), keep ingest and RAG on the
+**host** (no tkeir containers):
 
 ```bash
-make corpus-demo                                     # generate + ingest (P0)
+make bootstrap
+make ingest                                      # terminal A — :8091
+# other terminal:
+make corpus-demo                                 # generate + ingest (P0)
+make rag                                         # :8090
 make rag-query RAG_QUERY="SITREP Objective ALPHA"   # OSINT hits
 make rag-query RAG_QUERY="AcmeSystems Project ATLAS" # Enterprise hits (same space in P0)
 ```
@@ -259,20 +329,106 @@ Browse **http://localhost:3000**. For local P0 without login, keep
 
 **Checkpoint:** A query in the HMI returns an answer and shows a correlation id.
 
+### 4.4 Agents on OSINT and enterprise demo data (P0)
+
+After [§3.5](#35-ingest-the-corpora-p0--host-tools) and [§4.2](#42-start-the-rag-api),
+run grounded agents against the shared `dev@tkeir` index. Agents call
+`search` / `rag_query` / `ontology_query` / `document_get` (and optional
+workflows) over that space — claims must cite chunk or document ids.
+
+**Prerequisites**
+
+| Need | Why |
+|------|-----|
+| Corpora ingested | OSINT + enterprise under `dev@tkeir` |
+| `make rag` on **:8090** | Agent tools talk to the RAG API |
+| Local LLM (e.g. Ollama) | `UnifiedLLMWrapper` drives the agent loop |
+| `make agent` on **:8092** | `tkeir-agent` HTTP service |
+
+```bash
+# Ensure Ollama (or another PROVIDER) is reachable — see §2
+# export PROVIDER=ollama LLM_MODEL=mistral-nemo
+
+# Terminal A — RAG (if not already up)
+make rag
+
+# Terminal B — agent service
+make agent
+```
+
+**OSINT (NATO C4ISR corpus)** — researcher single-shot and multi-agent brief:
+
+```bash
+make agent-run \
+  GOAL="Summarize SITREP findings about Objective ALPHA from the indexed corpus" \
+  AGENT=researcher
+
+make workflow-run \
+  GOAL="Produce an OSINT content brief on Objective ALPHA and related units" \
+  WORKFLOW=content_brief \
+  TOPIC="Objective ALPHA"
+```
+
+Polling waits up to ~6 minutes for workflows (`WORKFLOW_POLL_ATTEMPTS=180` ×
+`AGENT_POLL_SECONDS=2`). If Make times out, the run may still finish — check
+`curl -s http://localhost:8092/agent/runs/<run_id> | jq '{status:.run.status,compose_result}'`.
+
+Ontology-aware tools benefit from the C2SIM/C4ISR ontologies uploaded with
+OSINT ingest (`CORPUS_ONTOLOGY_DIR` / `ontology_file` parts).
+
+**Enterprise (AcmeSystems corpus)** — same host, same `dev@tkeir` space:
+
+```bash
+make agent-run \
+  GOAL="What is the status of AcmeSystems Project ATLAS in the indexed docs?" \
+  AGENT=researcher
+
+make workflow-run \
+  GOAL="Profile Project ATLAS for leadership: risks, owners, and open actions" \
+  WORKFLOW=content_brief \
+  TOPIC="Project ATLAS"
+```
+
+**HMI monitor**
+
+```bash
+export AGENT_URL=http://localhost:8092
+# with tkeir-hmi already running (§4.3)
+open http://localhost:3000/agents   # or browse manually
+```
+
+Start `content_brief` from the UI, poll handoffs / compose preview, and (when
+governor allows) publish. Details: [Agents](tools/agents.md).
+
+**Checkpoint:** `make agent-run` for an OSINT goal and an enterprise goal both
+reach `status=succeeded` (or show grounded `findings` with `chunk_ids`).
+Workflow runs return `handoffs` + `compose_result`. In P0 both themes hit the
+same streaming group; isolation comes in [§5.5](#55-per-user-and-per-topic-corpus-segregation-p1) /
+[§5.6](#56-agents-on-osint-vs-enterprise-p1).
+
 ---
 
 ## 5. P1 Docker Compose — full demo
 
-Compose packages the same services with optional Keycloak, ingest, audit,
-governor, Grafana, and MinIO. With **`auth`**, each Keycloak user owns a
-separate Vespa streaming group (HMI forwards the access token; API/ingest
-resolve `user_space` from the JWT).
+Compose packages the same services as containers. Images default to the
+**local** registry (`IMAGE_REGISTRY=local` → `local/tkeir-api:…`). Build
+before the first `compose-up` (Compose will not pull from GHCR unless you set
+`IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir`).
+
+```bash
+cp deploy/compose/.env.example deploy/compose/.env   # IMAGE_REGISTRY=local
+make images
+```
+
+With **`auth`**, each Keycloak user owns a separate Vespa streaming group
+(HMI forwards the access token; API/ingest resolve `user_space` from the JWT).
 
 ### 5.1 Env file
 
 ```bash
 cp deploy/compose/.env.example deploy/compose/.env
-# VESPA_USER_SPACE=dev@tkeir  # CLI / auth-off fallback only
+# IMAGE_REGISTRY=local          # default — local Docker daemon tags
+# VESPA_USER_SPACE=dev@tkeir    # CLI / auth-off fallback only
 # edit secrets if you expose the stack beyond localhost
 ```
 
@@ -290,6 +446,12 @@ Industrial demo (recommended once P0 works):
 make compose-up PROFILES=core,auth,ingest,audit,governor,observability,objectstore
 ```
 
+Full demo **with agents + MCP** (after images are built):
+
+```bash
+make compose-up PROFILES=core,auth,ingest,audit,governor,observability,objectstore,mcp,agents
+```
+
 | Profile | What you get | Ports |
 |---------|--------------|-------|
 | `core` | Vespa, API, indexer, HMI | 3000, 8080, 8090 |
@@ -299,6 +461,8 @@ make compose-up PROFILES=core,auth,ingest,audit,governor,observability,objectsto
 | `governor` | Kill / budgets / tokens | 8094 |
 | `observability` | Grafana, Prom, Loki, Tempo, OTel | Grafana **3001** |
 | `objectstore` | MinIO (WORM buckets) | 9000 / 9001 |
+| `mcp` | MCP tool server | (compose network / published port) |
+| `agents` | `tkeir-agent` | **8092** |
 
 Guide: [Compose (P1)](deployment/compose.md).
 
@@ -341,17 +505,25 @@ results when they hold different corpora.
 
 ### 5.5 Per-user and per-topic corpus segregation (P1)
 
-With Keycloak running (`make compose-up PROFILES=core,auth,ingest`), each
-Keycloak user owns a completely isolated Vespa streaming group. The corpus
-generator assigns each document to a target user; the ingest script routes
-it there automatically.
-
-**Ingest the OSINT corpus as demo-user:**
+Copy/paste — bring up auth + ingest, then load each corpus into its owner’s
+Vespa group:
 
 ```bash
+make compose-up PROFILES=core,auth,ingest
+make compose-smoke
+
+# OSINT → demo-user streaming group
 make corpus-ingest-user
 
-# or with a specific topic only:
+# Enterprise → demo-admin streaming group
+make corpus-ingest-admin
+```
+
+Prerequisite: `make images` so Compose finds `local/tkeir-*:…` (see §5 intro).
+
+Topic-filtered OSINT (optional):
+
+```bash
 python3 tools/corpus/ingest_corpus.py \
   --corpus-dir workspace \
   --corpus osint --topics intelligence \
@@ -359,14 +531,7 @@ python3 tools/corpus/ingest_corpus.py \
   --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token
 ```
 
-**Ingest the Enterprise corpus as demo-admin:**
-
-```bash
-make corpus-ingest-admin
-```
-
-**Prefer the web interface?** Get the full step-by-step guide (HMI
-drag-and-drop and curl variants with real filenames):
+**Prefer the web interface?** HMI drag-and-drop and curl with real filenames:
 
 ```bash
 make corpus-ingest-web
@@ -392,6 +557,80 @@ curl -s -H "Authorization: Bearer $TOKEN_U" \
 
 **Checkpoint:** `workspace/ingest_user.json` and `workspace/ingest_admin.json` both
 show `"failed": 0`; cross-user isolation queries return 0 hits.
+
+### 5.6 Agents on OSINT vs enterprise (P1)
+
+With [§5.5](#55-per-user-and-per-topic-corpus-segregation-p1) loaded and the
+`agents` Compose profile up, agents inherit **`user_space` from the Bearer
+token** (tool args cannot override it). Run OSINT goals as `demo-user` and
+enterprise goals as `demo-admin`.
+
+```bash
+# Ensure agents (+ RAG) are in the stack
+make compose-up PROFILES=core,auth,ingest,mcp,agents
+# corpora already in demo-user / demo-admin (§5.5)
+
+TOKEN_U=$(python3 tools/corpus/ingest_corpus.py --print-token \
+  --username demo-user --password demo-user \
+  --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token)
+TOKEN_A=$(python3 tools/corpus/ingest_corpus.py --print-token \
+  --username demo-admin --password demo-admin \
+  --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token)
+```
+
+**OSINT agent** (`demo-user` → NATO corpus only):
+
+```bash
+curl -fsS http://localhost:8092/agent/runs \
+  -H "Authorization: Bearer $TOKEN_U" \
+  -H "Content-Type: application/json" \
+  -H "X-Correlation-Id: $(python3 -c 'import secrets; print(secrets.token_hex(16))')" \
+  -d '{"agent":"researcher","goal":"Summarize SITREP findings about Objective ALPHA"}' \
+  | jq .
+# poll: GET /agent/runs/{run_id} with the same Bearer
+```
+
+**Enterprise agent** (`demo-admin` → AcmeSystems corpus only):
+
+```bash
+curl -fsS http://localhost:8092/agent/runs \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -H "X-Correlation-Id: $(python3 -c 'import secrets; print(secrets.token_hex(16))')" \
+  -d '{"agent":"researcher","goal":"What is the status of AcmeSystems Project ATLAS?"}' \
+  | jq .
+```
+
+**Multi-agent briefs** (same isolation):
+
+```bash
+# OSINT brief as demo-user
+curl -fsS http://localhost:8092/agent/runs \
+  -H "Authorization: Bearer $TOKEN_U" \
+  -H "Content-Type: application/json" \
+  -d '{"workflow":"content_brief","goal":"OSINT brief on Objective ALPHA","params":{"topic":"Objective ALPHA"}}' \
+  | jq .
+
+# Enterprise brief as demo-admin
+curl -fsS http://localhost:8092/agent/runs \
+  -H "Authorization: Bearer $TOKEN_A" \
+  -H "Content-Type: application/json" \
+  -d '{"workflow":"content_brief","goal":"Leadership brief on Project ATLAS","params":{"topic":"Project ATLAS"}}' \
+  | jq .
+```
+
+**Cross-tenant check:** as `demo-user`, an enterprise-only goal should finish
+with empty / weak grounded findings (no ATLAS chunks), not with admin docs.
+Sign in at **http://localhost:3000/agents** as each user to confirm the UI
+run monitor respects the session token.
+
+Host shortcuts `make agent-run` / `make workflow-run` omit Keycloak and use
+`VESPA_USER_SPACE` / auth-off defaults — prefer the Bearer curls above for the
+P1 isolation demo.
+
+**Checkpoint:** OSINT run as `demo-user` cites SITREP / Objective ALPHA chunks;
+enterprise run as `demo-admin` cites Project ATLAS; the swapped goals do not
+surface the other corpus.
 
 ---
 
@@ -429,8 +668,18 @@ With Keycloak enabled, HMI/API behave like Compose P1: JWT → Vespa
 
 Token exchange notes: [Token exchange](deployment/token-exchange.md).
 
+### 6.4 Agents on demo corpora (P2)
+
+Same agent goals as [§4.4](#44-agents-on-osint-and-enterprise-demo-data-p0) /
+[§5.6](#56-agents-on-osint-vs-enterprise-p1), pointed at the cluster RAG and
+agent Services (port-forward or ingress). With Keycloak on cluster, reuse the
+`demo-user` / `demo-admin` Bearer pattern so OSINT and enterprise stay isolated.
+Without Keycloak, agents use `VESPA_USER_SPACE=dev@tkeir` from
+`values-dev.yaml` (both corpora share one space, like P0).
+
 **Checkpoint:** `kubectl -n tkeir get pods` shows Running; `helm test` / chart
-smoke succeeds when configured.
+smoke succeeds when configured. Optional: one OSINT and one enterprise agent
+run against the in-cluster `tkeir-agent` Service succeed.
 
 ---
 
@@ -458,10 +707,26 @@ make lima-k3s-up
 make cluster-install PROFILE=k8s-secure
 ```
 
-Guides: [Secure cluster](deployment/k8s-secure.md), [macOS](deployment/macos.md).
+Guides: [Secure cluster](deployment/k8s-secure.md), [macOS](deployment/macos.md),
+[SPIRE / SPIFFE](deployment/spire.md).
+
+### 7.1 Agents under enforce (P3)
+
+Repeat the [§5.6](#56-agents-on-osint-vs-enterprise-p1) OSINT / enterprise
+runs with governor **`enforce`** and SPIFFE on the agent workload:
+
+- Budgets (`llm_tokens`, `tool_calls`, `wall_seconds`) throttle / block runs.
+- Kill scope: `make governor-kill SCOPE=agents ACTIVE=true`.
+- Publish from the HMI requires ApprovalQueue approval (`/admin`).
+- ActionRecords carry `actor.type=agent` and `actor.spiffe_id`.
+
+Demo goals stay the same (Objective ALPHA as `demo-user`, Project ATLAS as
+`demo-admin`); only governance and identity are stricter.
 
 **Checkpoint:** Governor mode is `enforce`; unauthenticated privileged calls
-fail; kill switch works (`make governor-kill` / runbook).
+fail; kill switch works (`make governor-kill` / runbook); an agent run under
+`demo-user` / `demo-admin` still grounds on the correct corpus or is blocked
+cleanly by budget / kill / approval.
 
 ---
 

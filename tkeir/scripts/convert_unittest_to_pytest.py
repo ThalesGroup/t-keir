@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Convert unittest-style tests to pytest-style tests."""
+"""Title: Convert unittest to pytest
+
+Convert unittest-style tests to pytest-style tests.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

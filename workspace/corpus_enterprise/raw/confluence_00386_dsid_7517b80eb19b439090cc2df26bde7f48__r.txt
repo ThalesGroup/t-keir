@@ -1,0 +1,353 @@
+Runbook: perf-canary performance regression alert (p95 latency / tokens/sec)
+
+## Purpose
+This runbook describes how to triage, validate, and mitigate alerts emitted by **perf-canary** for per-model performance regressions:
+- **p95 latency** increase (end-to-end and/or runtime-only)
+- **tokens/sec** decrease
+
+The goal is to:
+1) quickly verify the alert is real (not noise/cardinality/baseline drift),
+2) localize the regression (model vs region vs hardware vs tier),
+3) attribute likely cause (kernel vs scheduler vs model config vs infra/fleet),
+4) take the lowest-risk mitigation (pause rollout, rollback, drain nodes, disable a kernel, etc.),
+5) route escalation to the right team with the right artifacts.
+
+perf-canary uses **synthetic prompt shapes** (no customer prompts) and should remain under the **GPU overhead budget**. Do not attempt to “increase canary load” during incident response without SRE/runtime approval.
+
+---
+
+## When this runbook applies
+You are in the right place if you received one of the following:
+- Slack/incident-bot message: `perf-canary WARNING` or `perf-canary PAGE`
+- Pager event: `PerfCanaryRegression` / `PerfCanaryTopModelRegression`
+
+Common alert names (Grafana/Prometheus):
+- `perf_canary_p95_latency_regression_warn`
+- `perf_canary_p95_latency_regression_page`
+- `perf_canary_tokens_per_sec_regression_warn`
+- `perf_canary_tokens_per_sec_regression_page`
+
+Not in scope:
+- Customer-reported latency issues without a canary signal (start with customer-impact triage + runtime dashboards)
+- Quality regressions (see Applied ML eval harness)
+
+---
+
+## Inputs you should have from the alert payload
+Incident-bot should include (if anything is missing, request it in-thread and note for follow-up):
+- **model**: canonical model identifier (e.g., `llama-3.1-70b-instruct`) and **model_version**
+- **region**: e.g., `us-east`, `eu-west`
+- **tier/pool**: `hosted`, `dedicated`, `private` (where applicable)
+- **hardware_sku**: e.g., `h100-sxm`, `a100-80g`
+- **runtime_build_id** and **runtime_version**
+- **kernel_tag / kernel_selection_id** (if present)
+- **metric** + **observed** vs **baseline** and **% change**
+- **sample size** (requests) and **window**
+- **confidence / anti-flap state** (e.g., “3/3 evaluations fired”, “sustained 15m”)
+- Links:
+  - Perf Canary dashboard (model pre-filtered)
+  - Runtime service dashboard (scheduler/queue)
+  - Recent runtime release (if the alert correlates)
+  - Runbook (this page)
+
+If the alert payload does not include runtime/kernels tags, check runtime telemetry tags in the dashboards and capture them manually (screenshots or links). Missing tags are actionable follow-up.
+
+---
+
+## Severity and immediate expectations
+### WARNING
+- Investigate within business hours or as on-call load permits.
+- Goal: confirm whether the signal is real and whether it correlates with an active rollout.
+- If the regression impacts a **top model** or spans multiple regions/hardware, treat as “page-like” and escalate sooner.
+
+### PAGE
+- Treat as potential Sev2 until proven otherwise.
+- Goal: validate quickly (≤10 minutes), and if real, mitigate (pause/rollback) quickly (≤30 minutes) to prevent customer impact.
+
+---
+
+## Step 0 — Safety checks (do first)
+1) **Do not modify perf-canary QPS/config** during triage.
+2) Verify no customer data is involved:
+   - perf-canary logs/metrics should contain only synthetic prompt shape identifiers (bucket IDs), not raw text.
+   - If you see raw prompts or identifiers, stop and page Security & Compliance (and Runtime TL).
+
+---
+
+## Step 1 — Confirm the alert is “valid” (anti-noise checklist)
+Open the **Perf Canary dashboard** from the alert.
+
+Confirm all of the following:
+1) **Minimum samples met**
+   - The alert should include `min_samples` gating (e.g., ≥200 requests in window; per-model values vary).
+   - If sample count is below threshold, mark as likely false positive and monitor (do not page Runtime).
+
+2) **Sustained signal**
+   - Check if regression persisted across at least the dampening window (typically 10–15 minutes for paging).
+   - If it spikes for 1–2 evaluations then recovers, treat as transient; watch for recurrence.
+
+3) **Single-dimension artifact check** (common false positive pattern)
+   - If regression appears only when filtering on an overly-specific label (unexpected `model_alias`, `pod`, `node`, `request_shape_id`), it may be a cardinality/config bug.
+   - Remove filters and re-check the aggregated panels.
+
+4) **Telemetry ingestion delay**
+   - If dashboard “now” shows missing or delayed datapoints, check the telemetry pipeline health panel (ingestion lag).
+   - If ingestion lag is high, the alert may be late/incorrect; coordinate with Telemetry Platform.
+
+If the alert fails validity checks, do:
+- Comment in incident thread: “Likely invalid due to <reason>; monitoring for 30m; no mitigation taken.”
+- Create a follow-up issue to fix gating/cardinality/ingestion lag.
+
+---
+
+## Step 2 — Localize the regression (model vs region vs hardware)
+Answer these questions from the dashboards:
+1) **Is the regression isolated to one region?**
+   - Compare `us-east` vs `eu-west` for the same model+version.
+
+2) **Is it isolated to one hardware SKU?**
+   - Compare `h100-sxm` vs `a100-80g` (if both run the model).
+
+3) **Is it isolated to a tier/pool?**
+   - Hosted vs Dedicated pools can diverge due to fleet differences.
+
+4) **Is it only one model, or multiple models at once?**
+   - Multiple models regressing simultaneously often indicates infra/fleet or scheduler-level changes.
+   - A single model regressing suggests model config change or kernel selection change specific to that model.
+
+Record in the incident thread:
+- A short statement like: “Regression is us-east + h100 only, affects 3 models, runtime build 2026.02.11-rc3.”
+
+---
+
+## Step 3 — Attribute likely cause using metric breakdowns
+Use the Perf Canary dashboard panels that break down latency:
+- **End-to-end latency**
+- **Runtime-only latency**
+- **Queueing time**
+- **Prefill latency**
+- **Decode latency**
+- **Batch size distribution**
+- **(Optional) KV cache hit rate**
+
+### A. Queueing time increased (scheduler / capacity / fleet)
+Signals:
+- p95 end-to-end ↑, runtime-only flat or mild ↑
+- queueing_time_p95 ↑ materially
+- batch sizes may increase (oversubscription) or decrease (underutilization)
+
+Likely causes:
+- capacity shortfall / fleet disruption in region
+- scheduler heuristic change (batching/priority)
+- noisy neighbor or node-level degradation
+
+Actions:
+1) Check recent changes:
+   - runtime release notes / rollout status in the region
+   - fleet changes (GPU maintenance, driver roll, node pool change)
+2) Validate with runtime scheduler dashboard:
+   - queue depth, admission rate, throttle events
+3) Mitigate (least to most disruptive):
+   - **Pause rollout** of runtime in the affected region (Release Engineering)
+   - **Shift traffic** / adjust routing policy to healthy region/tier (SRE + Runtime)
+   - **Scale dedicated pool** or increase reserved capacity temporarily (SRE/Infra)
+   - **Drain suspect nodes** if correlated to a node pool (Infra)
+
+Escalate to:
+- Scheduling lead: **Sofia Ivanova**
+- Infra/fleet: **Vanessa Ortiz**
+- On-call SRE sponsor: **Sean Gallagher**
+
+
+### B. Runtime-only latency increased (kernel / runtime / model config)
+Signals:
+- runtime-only p95 ↑ materially
+- queueing time flat
+- tokens/sec ↓ often accompanies runtime-only ↑
+
+Next split:
+1) **Prefill-only regression**
+   - prefill_latency_p95 ↑; decode relatively stable
+   - often tied to attention kernel changes for long prompts or prompt-length bucket mix sensitivity
+
+2) **Decode-only regression**
+   - decode_latency_p95 ↑; prefill stable
+   - often tied to KV cache management, kernel selection for decode, or scheduler micro-batching
+
+Likely causes:
+- runtime release with new kernel selection/compilation
+- kernel tag change for the model (new fused kernel, quant path, etc.)
+- model config update (rope scaling, max seq len, quantization profile)
+
+Actions:
+1) Check kernel/runtime tags:
+   - Compare `kernel_selection_id` and `runtime_build_id` vs baseline period.
+   - If tags changed at the same time as regression, treat as prime suspect.
+2) Compare against prior runtime build:
+   - Use the dashboard “compare to previous release” view (if available) or manually set time ranges.
+3) Mitigate:
+   - **Pause runtime rollout** immediately if ongoing.
+   - If regression is tied to a kernel flag/selection ID:
+     - Request Kernel lead to flip selection back / disable the new kernel for that model.
+   - If regression aligns with a runtime build:
+     - **Rollback runtime** in the affected region to the previous stable build.
+   - If regression aligns with a model config change:
+     - Roll back model config/version pin for the canary target (and if already in prod, consider customer routing).
+
+Escalate to:
+- Runtime TL: **Noah Patel**
+- Kernel lead: **Hiro Tanaka**
+- Instrumentation: **Omar El-Sayed** (if metrics look inconsistent)
+
+
+### C. Tokens/sec dropped but latency unchanged
+Signals:
+- tokens/sec ↓, latency panels not clearly regressed
+
+Likely causes:
+- measurement mismatch (aggregation bug, units)
+- batch size distribution change (smaller batches, less continuous batching)
+- GPU clock throttling / power management
+
+Actions:
+1) Check batch size histogram shift.
+2) Check GPU/node health panels (throttle, ECC, utilization).
+3) Verify tokens/sec computation version (dashboard panel notes).
+4) If multiple models affected on same hardware/region, prioritize infra investigation.
+
+Escalate to:
+- Telemetry: **Logan Wright** / **Caleb Johnson** (if suspect metric bug)
+- Infra/fleet: **Vanessa Ortiz**
+
+---
+
+## Step 4 — Compare observed values to baseline (sanity)
+Baseline context:
+- Baselines are defined per **model + model_version + runtime_version + hardware_sku** (and sometimes region).
+- Alert thresholds are percentage deltas with minimum sample size.
+
+Checklist:
+1) Verify the baseline is the correct key:
+   - model and version match
+   - hardware SKU matches (no fallback to “unknown”)
+   - runtime version/build is expected (baseline might be tied to last stable)
+
+2) Look at variance:
+   - If the baseline distribution is wide (high p95 variance), small regressions may be noise.
+
+3) Confirm prompt-shape bucket mix matches:
+   - Canary uses a predefined distribution; if it changed recently, baseline comparisons may be invalid.
+
+If you suspect baseline mismatch/drift:
+- Downgrade urgency unless customer impact is suspected.
+- Escalate to Baselines owner: **Nadia Rahman**.
+
+---
+
+## Step 5 — Decide mitigation path
+Use the following decision logic:
+
+### If there is an active rollout (runtime, kernel, or model config)
+1) **Pause the rollout** first.
+2) If the signal is still present after pause and impacts a top model:
+   - **Rollback** the changed component (runtime build, kernel flag, or model config) in the affected region.
+3) Confirm recovery in perf-canary within 10–30 minutes (depending on evaluation window).
+
+### If there is no active rollout
+1) Check infra/fleet changes in the region (maintenance, driver, node pool).
+2) If regression isolated to one SKU:
+   - drain / quarantine suspect node pool (Infra)
+3) If regression widespread across models and regions:
+   - treat as telemetry or baseline issue until proven otherwise, but validate with spot manual perf test if available.
+
+### Emergency stop (rare)
+If perf-canary itself is suspected to be causing load or instability (e.g., QPS cap misconfigured):
+- Follow **perf-canary safe-disable procedure** in the deploy/rollback runbook.
+- Notify Runtime + SRE sponsor immediately.
+
+---
+
+## Step 6 — Evidence to capture (for fast RCA)
+Paste into the incident thread:
+- Dashboard links with filters applied (model, region, sku, tier)
+- Before/after time ranges (baseline vs observed)
+- runtime_build_id and kernel_selection_id
+- Which component changed most (queueing vs runtime-only vs prefill vs decode)
+- If rollback/pause performed: exact time and scope (region/tier)
+
+If you can’t capture links, capture screenshots of:
+- p95 latency panel
+- queueing time panel
+- tokens/sec panel
+- kernel/runtime tags panel
+
+---
+
+## Escalation paths and ownership
+Primary Slack channels:
+- `#eng-oncall` (coordination)
+- `#eng-sre` (SRE support)
+- `#eng-runtime` (runtime/kernels/scheduler)
+- `#eng-platform` (telemetry/observability)
+- `#eng-releases` (rollout pause/rollback execution)
+
+Who to page/escalate:
+- Sustained regression on top model (paging alert):
+  - SRE on-call + Runtime on-call (via incident-bot routing)
+- Queueing/capacity/fleet indicators:
+  - Infra/fleet escalation (Vanessa Ortiz) + Scheduling lead (Sofia Ivanova)
+- Kernel tag change / runtime-only regression:
+  - Kernel lead (Hiro Tanaka) + Runtime TL (Noah Patel)
+- Baseline mismatch / drift / metric inconsistencies:
+  - Nadia Rahman (baselines) + Logan Wright (telemetry) + Caleb Johnson (ingestion)
+
+If unclear after 15 minutes on a PAGE:
+- Escalate to **Sean Gallagher** (SRE sponsor) and **Mateo Alvarez** (runtime exec sponsor) with a short summary and what is blocking.
+
+---
+
+## Communication guidelines
+- Keep incident thread updated every 10–15 minutes on paging incidents.
+- Use a single owner (“incident driver”) and explicitly assign:
+  - driver
+  - rollback executor
+  - dashboard/telemetry checker
+  - runtime/kernels contact
+
+Customer communication:
+- Do not proactively message customers based solely on canary signals.
+- If customer impact is confirmed via customer-facing metrics, follow the standard incident comms process.
+
+---
+
+## Resolution criteria
+An incident can be resolved when:
+- perf-canary regression clears (back within threshold) for at least one full evaluation window, and
+- the suspected causal change is paused/rolled back OR the infra issue is mitigated/quarantined, and
+- monitoring confirms no recurrence.
+
+---
+
+## Post-incident follow-ups (required)
+Within 1 business day for PAGE incidents:
+1) File a short RCA note (even if preliminary): what changed, what signal, what fix.
+2) If rollback occurred, link the rollback artifact and open a ticket to re-introduce safely.
+3) If false positive:
+   - file an issue against baseline drift, label cardinality, or anti-flap tuning.
+4) Update this runbook if any step was ambiguous or links were missing.
+
+---
+
+## Appendix: Common failure modes and what they look like
+1) **Baseline drift / seasonality**
+   - slow creeping alerts, multiple warnings, especially after fleet mix changes
+2) **Cardinality explosion**
+   - dashboards slow; alerts fire only for specific label values; sample counts look wrong
+3) **Telemetry ingestion lag**
+   - alert arrives late; dashboard panels have gaps; baseline comparisons inconsistent
+4) **Kernel selection flip**
+   - sudden step function in runtime-only latency; kernel_selection_id changes at the same timestamp
+5) **Capacity event**
+   - queueing time spikes; multiple models at once; region-specific
+
+If you see a new pattern, add it here with screenshots/links and a short “how to detect” section.

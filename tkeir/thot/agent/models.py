@@ -1,7 +1,12 @@
-"""Agent runtime models (Phase B) — specs, runs, steps, grounded output.
+"""Title: Agent runtime models (Phase B) — specs, runs, steps, grounded output.
 
 No orchestration frameworks: these pydantic models are the source of truth
 for YAML agents and filesystem run stores.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

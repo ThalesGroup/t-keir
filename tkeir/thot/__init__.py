@@ -1,8 +1,11 @@
-"""THOT suite tools — T-KEIR core package.
+"""Title: thot package init
 
-Author: Eric Blaudez (Eric Blaudez)
+THOT suite tools — T-KEIR core package.
 
-Copyright (c) 2026 by THALES
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import os

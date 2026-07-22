@@ -1,4 +1,12 @@
-"""Self-healing SHACL validation loop for document ontologies."""
+"""Title: Self Healing Loop
+
+Self-healing SHACL validation loop for document ontologies.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

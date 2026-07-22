@@ -1,8 +1,11 @@
-"""Syntax tagger
-Author : Eric Blaudez (Eric Blaudez)
+"""Title: Syntax tagger
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Syntactic tagging and SVO triple extraction.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import collections
@@ -656,6 +659,21 @@ class SyntacticTagger:
                 )
             )
 
+    @staticmethod
+    def _ner_spans_overlap(a: dict, b: dict) -> bool:
+        return not (a["end"] <= b["start"] or b["end"] <= a["start"])
+
+    def _merge_ontology_ner(
+        self, existing: list[dict], ontology_spans: list[dict]
+    ) -> list[dict]:
+        """Merge ontology concept spans into NER without overlapping existing."""
+        merged = list(existing)
+        for span in ontology_spans:
+            if any(self._ner_spans_overlap(span, other) for other in merged):
+                continue
+            merged.append(span)
+        return merged
+
     def _dep_svo_spans(self, doc, dep_svo):
         d_subject = [
             Span(
@@ -724,6 +742,28 @@ class SyntacticTagger:
         """
         self._cache_svos = set()
         self._validate_tag_input(tkeir_doc)
+        # Reinforce NER spans from per-document external ontologies so SVO /
+        # dependency linking stays coherent with reference vocabularies.
+        from thot.tasks.document_ontology.OntologyLexicon import (
+            ontology_ner_spans_for_document,
+            ontology_paths_from_document,
+        )
+
+        if ontology_paths_from_document(tkeir_doc):
+            onto_title, onto_content = ontology_ner_spans_for_document(
+                tkeir_doc
+            )
+            if onto_title:
+                existing = list(tkeir_doc.get("title_ner") or [])
+                tkeir_doc["title_ner"] = self._merge_ontology_ner(
+                    existing, onto_title
+                )
+            if onto_content:
+                existing = list(tkeir_doc.get("content_ner") or [])
+                tkeir_doc["content_ner"] = self._merge_ontology_ner(
+                    existing, onto_content
+                )
+
         doc_title = None
         doc_content = None
         if "title_tokens" in tkeir_doc:

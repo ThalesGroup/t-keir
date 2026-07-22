@@ -8,13 +8,15 @@
 #   docker pull <image:tag>
 #   docker inspect --format='{{index .RepoDigests 0}}' <image:tag>
 #
-# Image registry for our own builds: ghcr.io/thalesgroup/t-keir
-#   IMAGE_REGISTRY ?= ghcr.io/thalesgroup/t-keir
+# Image registry for our own builds:
+#   Local / Compose default: IMAGE_REGISTRY ?= local
+#   Publish / CI:            IMAGE_REGISTRY ?= ghcr.io/thalesgroup/t-keir
 
 schema_version: 1
 updated: "2026-07-17"
 registry:
-  our_images: ghcr.io/thalesgroup/t-keir
+  our_images_local: local
+  our_images_publish: ghcr.io/thalesgroup/t-keir
 
 # ---------------------------------------------------------------------------
 # Already used by the P0 Vespa scripts (vespa/start_vespa.sh). Digest TBD when

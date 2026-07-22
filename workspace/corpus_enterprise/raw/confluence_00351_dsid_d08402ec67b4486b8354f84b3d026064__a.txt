@@ -1,0 +1,128 @@
+Adaptive Cost SLOs PRD: dynamic cost-aware routing and autoscaling
+
+Summary:
+
+This Product Requirements Document (PRD) describes the Adaptive Cost SLOs feature: a unified mechanism that allows customers and platform operators to express and enforce cost targets (per-token cost, $/inference, monthly spend cap) alongside traditional latency and availability SLOs. The feature coordinates model routing, quantization profile selection, batching policies, and autoscaling gestures to meet cost objectives while preserving correctness and reliability.
+
+Goals:
+- Provide a first-class declarative API and Console UX for defining cost SLOs at the token, route, and customer namespace levels.
+- Implement runtime enforcement that adjusts routing (model variant selection), batching, KV/prefix cache policies, and instance sizing to meet cost targets without violating hard latency SLOs.
+- Surface per-request and aggregated cost explainability (why a request incurred a cost outcome).
+- Enable safe rollouts with canary experiments and guardrails to prevent quality regressions.
+
+Non-goals:
+- This PRD does not change basic pricing tiers or the billing engine; it provides cost-target-driven routing and controls only.
+- It will not replace manual reserved capacity contracts; Dedicated will still allow explicit capacity pinning.
+
+Background and motivation:
+- Customers increasingly want predictable inference economics. Many ask for a way to cap or target unit costs for high-volume features (e.g., embeddings at scale, token-heavy summarization).
+- Current levers (quantization profiles, manual model selection, batching knobs) are powerful but disconnected and require deep runtime knowledge.
+- Adaptive Cost SLOs aggregates those levers with a policy layer and closed-loop control to meet cost targets at scale.
+
+User personas & primary use cases:
+- Product engineers: set per-route cost budget to keep feature unit economics stable during peak load.
+- Platform/FinOps: enforce company-wide monthly spend caps or set conservative SLOs for dev/staging vs. prod.
+- SRE: ensure that cost-induced runtime changes do not violate latency or error SLOs.
+
+High-level design overview:
+- Policy API: A new CostSLO object, configurable via Redwood API and Console. Fields include: scope (route|model|namespace), target_type (per_token|per_inference|monthly_cap), value (numeric), latency_guard_ms (hard latency bound), priority (enum: latency_first|cost_first|balanced), fallback_policy (list of fallback actions).
+- Controller: A control-plane loop that computes recommended runtime configurations every 30s per SLO. Recommendations include model_variant, max_batch_size, KV_cache_policy (aggressiveness), allocation_hint (vCPU/GPU type).
+- Enforcement: The serving runtime consumes recommendations and attempts adjustment via safe actions: prefer cheaper model variant, increase batching within latency bounds, enable higher quantization, or route to Dedicated reserved pool.
+- Explainability: Each request's metadata will include the active CostSLO id and a short rationale: e.g., "selected-variant:llama-13b-q4_0- for 22% lower token cost; batch-size increased 2x; latency impact estimated +12ms (within guard)".
+
+Functional requirements (FRs):
+FR-1: API - Create/Read/Update/Delete CostSLOs. Example API payload:
+- POST /v1/cost_slos
+  {
+    "scope": "route:/v1/embeddings",
+    "target_type": "per_inference",
+    "value": "0.0035",
+    "latency_guard_ms": 150,
+    "priority": "cost_first"
+  }
+FR-2: Console - Cost SLO editor with live simulation of historical traffic showing projected compliance, and an impact preview (estimated latency/cost tradeoffs).
+FR-3: Enforcement - The controller must emit a plan change at most once per 30s per SLO and annotate the plan with expected cost delta and estimated error/regression risk.
+FR-4: Fallbacks - If enforcement would violate latency_guard_ms for >1% of requests in a 5m window, revert to previous plan and raise an alert.
+FR-5: Reporting - Per-route daily compliance report (compliant/violations, 95th percentile cost, root-cause tags).
+FR-6: Audit - All plan changes must be stored in a time-series config log for 90 days.
+
+Non-functional requirements (NFRs):
+NFR-1: Controller decision latency must be <1s for computing a plan per SLO.
+NFR-2: Introduced runtime overhead must add <1% p99 tail latency at steady state.
+NFR-3: Config data and logs must be encrypted at rest and accessible via existing audit log APIs.
+
+SLO/threshold definitions (example):
+- Cost compliance SLO: Monthly target satisfied if 95% of per-inference costs are <= target_value across the billing window.
+- Hard latency guard: No more than 1% of requests exceed latency_guard_ms after enforcement; immediate rollback if >5% in a 5m window.
+
+API surface and examples:
+- CostSLO object (fields): scope, target_type, value, latency_guard_ms, priority, fallback_policy[], enabled, tags[].
+- Example CLI: redwood cost-slo create --scope route:/v1/chat --target_type per_token --value 0.00025 --latency_guard 120 --priority balanced
+
+Console UX & workflows:
+1) Create Cost SLO: Guided wizard with traffic sampling slider and recommendation engine that suggests an initial policy (e.g., prefer quantized small casting).
+2) Simulate: Run a historical simulation for the last 7/30/90 days. UI shows projected violations and an impact heatmap (latency vs. cost).
+3) Deploy: Stage to canary (1% traffic) for 24h with automatic rollback conditions.
+4) Promote: If canary passes (no regressions, cost delta within expected range), promote to full rollout and schedule a post-rollout review.
+
+Rollout & release plan (milestones):
+- M0 (2025-12-15): API schema and Console mockups complete.
+- M1 (2026-02-01): Controller prototype + simulation pipeline. Limited internal testing with two pilot customers.
+- M2 (2026-03-15): Runtime enforcement in staging; canary tooling and rollback hooks implemented.
+- M3 (2026-04-20): Public beta for Hosted API customers (opt-in).
+- M4 (2026-06-01): GA for Hosted and Dedicated with docs and sample policies.
+
+Safety and quality guardrails:
+- All plan changes must pass an automated risk check that estimates quality regression probability using recent evals and prompt sets tied to the route.
+- Canary window defaults: 1% traffic for 24h. Hard rollback triggers: >0.5% user-visible error regression (measured via user-level error rate differential) or latency guard violations as defined above.
+
+Monitoring, metrics and alerts:
+- New metrics: cost_slo.compliance_ratio, cost_slo.action_count, cost_slo.rollback_count, cost_slo.estimated_savings, cost_slo.latency_impact_ms.
+- Alerts: SLO enforcement failures, rollback events, simulation vs actual divergence >10% for one SLO over 24h.
+
+Acceptance criteria (must be met before public beta):
+- API CRUD operations implemented and integration tested with Console.
+- Controller meets NFRs under synthetic load tests (replay 10M req/day).
+- Built-in canary flow performs rollback under injected latency regressions in 100% of tests.
+- Pilot customers (2) report cost compliance metrics within 10% of simulation predictions.
+
+Ownership and stakeholders:
+- Product owner: Maya Thompson (product).
+- Tech lead: Arjun Rao (eng-serving-runtime).
+- Runtime integration: Kernel/Scheduling team (owner: Connor Blake).
+- Console: DevX team (owner: Leila Martinez).
+- Pilot customers & success: Customer Success (owner: Priya Shah).
+
+Open questions and trade-offs:
+- Q1: How aggressive should cross-model routing be for models with subtle correctness differences? Trade-off between cost and semantic fidelity. Proposed approach: require model-compatibility tags and quality budgets per route.
+- Q2: Billing alignment: when routing shifts to a cheaper variant, how to surface and attribute cost to existing billing/pricing contracts? Engineering and Finance need a mapping table.
+
+Appendix: example config snippets and simulation output format:
+- Example CostSLO JSON:
+  {
+    "id": "slo-202601-embeds-small",
+    "scope": "route:/v1/embeddings",
+    "target_type": "per_inference",
+    "value": "0.0020",
+    "latency_guard_ms": 200,
+    "priority": "balanced",
+    "fallback_policy": ["prefer_model_variant:embedding-sm-quant", "increase_batch:2"]
+  }
+- Simulation output (CSV columns): slo_id, window_start, window_end, projected_compliance_pct, projected_avg_cost, projected_p95_latency, recommended_actions
+
+Docs and runbooks to be created:
+- Design spec for controller heuristics and ML-based predictors (owner: Runtime).
+- Console guide: creating simulations and interpreting results (owner: DevX).
+- Oncall runbook: handling rollbacks and investigating regressions (owner: SRE).
+
+Notes and next steps:
+- Begin defining model compatibility taxonomy (tagging models that are functionally interchangeable for a set of routes).
+- Schedule kickoff with Finance to align cost attribution mapping.
+- Start pilot outreach: identify two customers (one embeddings-heavy, one chat-heavy) for Feb 2026 pilot.
+
+Document history:
+- 2025-11-12: Draft created by Maya Thompson.
+- 2026-01-18: Added canary definition and safety thresholds (review by Arjun Rao).
+- 2026-02-10: Updated rollout timeline and pilot plan (review by Leila Martinez).
+
+End of document.

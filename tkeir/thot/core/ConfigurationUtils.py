@@ -1,4 +1,12 @@
-"""Shared helpers for loading service configuration files."""
+"""Title: Configuration Utils
+
+Shared helpers for loading service configuration files.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

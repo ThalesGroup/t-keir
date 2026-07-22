@@ -1,4 +1,12 @@
-"""AI Act OPA policy tests."""
+"""Title: Ai act policy
+
+AI Act OPA policy tests.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

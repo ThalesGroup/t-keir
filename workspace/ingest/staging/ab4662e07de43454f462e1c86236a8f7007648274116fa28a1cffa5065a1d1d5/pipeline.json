@@ -1,0 +1,2926 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://ab4662e07de43454f462e1c86236a8f7007648274116fa28a1cffa5065a1d1d5/OPORD_01473_893bfecf.pdf",
+  "title": "OPORD 01473 — North Atlantic",
+  "content": [
+    "OPORD 01473 â North Atlantic\nOPERATION ORDER\n1. Situation: maintain awareness in North Atlantic.\n2. Mission: Maritime Component monitors assigned area.\n3. Execution: synchronize ISR and maritime reporting.\n4. Sustainment: report logistics constraints.\n5. Command and Signal: use approved NATO C2 channels.\n\nNote linguistique: diffusion de travail en franˆ§ais; situation opˆ'rationnelle stable."
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "Situation"
+        ],
+        "lemma_content": [
+          "situation"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          9
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "maintain"
+        ],
+        "lemma_content": [
+          "maintain"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          11
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "awareness"
+        ],
+        "lemma_content": [
+          "awareness"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          12
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Maritime",
+          "Component",
+          "monitors"
+        ],
+        "lemma_content": [
+          "Maritime",
+          "Component",
+          "monitor"
+        ],
+        "pos": [
+          "PROPN",
+          "PROPN",
+          "NOUN"
+        ],
+        "positions": [
+          21,
+          22,
+          23
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "assigned"
+        ],
+        "lemma_content": [
+          "assign"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          24
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "area"
+        ],
+        "lemma_content": [
+          "area"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          25
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Component",
+          "monitors"
+        ],
+        "lemma_content": [
+          "Component",
+          "monitor"
+        ],
+        "pos": [
+          "PROPN",
+          "NOUN"
+        ],
+        "positions": [
+          22,
+          23
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "assigned"
+        ],
+        "lemma_content": [
+          "assign"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          24
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "area"
+        ],
+        "lemma_content": [
+          "area"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          25
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Execution"
+        ],
+        "lemma_content": [
+          "execution"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          29
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "synchronize"
+        ],
+        "lemma_content": [
+          "synchronize"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          31
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "ISR",
+          "and",
+          "maritime",
+          "reporting"
+        ],
+        "lemma_content": [
+          "ISR",
+          "and",
+          "maritime",
+          "reporting"
+        ],
+        "pos": [
+          "PROPN",
+          "CCONJ",
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          32,
+          33,
+          34,
+          35
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Sustainment"
+        ],
+        "lemma_content": [
+          "sustainment"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          39
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "report"
+        ],
+        "lemma_content": [
+          "report"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          41
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "logistics",
+          "constraints"
+        ],
+        "lemma_content": [
+          "logistic",
+          "constraint"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          42,
+          43
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Command",
+          "and",
+          "Signal"
+        ],
+        "lemma_content": [
+          "Command",
+          "and",
+          "Signal"
+        ],
+        "pos": [
+          "PROPN",
+          "CCONJ",
+          "PROPN"
+        ],
+        "positions": [
+          47,
+          48,
+          49
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "approved"
+        ],
+        "lemma_content": [
+          "approve"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          52
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "NATO",
+          "C2",
+          "channels"
+        ],
+        "lemma_content": [
+          "NATO",
+          "C2",
+          "channel"
+        ],
+        "pos": [
+          "PROPN",
+          "PROPN",
+          "NOUN"
+        ],
+        "positions": [
+          53,
+          54,
+          55
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "use"
+        ],
+        "lemma_content": [
+          "use"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          51
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "approved"
+        ],
+        "lemma_content": [
+          "approve"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          52
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "NATO"
+        ],
+        "lemma_content": [
+          "NATO"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          53
+        ],
+        "label": "organization"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "pdf",
+    "source-size-bytes": 1099,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:37",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:37",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:37",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:37",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:37",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:49:38",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_smx.owl"
+  ],
+  "source": "ingest://ab4662e07de43454f462e1c86236a8f7007648274116fa28a1cffa5065a1d1d5/OPORD_01473_893bfecf.pdf",
+  "metadata": {
+    "topic_id": "operations",
+    "corpus": "osint",
+    "doc_type": "OPORD",
+    "language": "fr",
+    "title": "OPORD 01473 — North Atlantic",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "operations",
+  "doc_type": "OPORD",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999938201647343
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "OPORD",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "01473",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "â",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "North",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Atlantic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "OPERATION",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ORDER",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "1",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Situation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "maintain",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "awareness",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "in",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "North",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Atlantic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "2",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Mission",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Maritime",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Component",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "monitors",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "assigned",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "area",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "3",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Execution",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "synchronize",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ISR",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "maritime",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "reporting",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "4",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sustainment",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "report",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "logistics",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "constraints",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "5",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Command",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Signal",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "use",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "approved",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "NATO",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "C2",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "channels",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Note",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "linguistique",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "diffusion",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "de",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "travail",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "en",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "franˆ§ais",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "situation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "opˆ'rationnelle",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "stable",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "OPORD",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "01473",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "North",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Atlantic",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "opord",
+      "text": "OPORD",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "01473",
+      "text": "01473",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "North",
+      "text": "North",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Atlantic",
+      "text": "Atlantic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "opord",
+      "text": "OPORD",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "01473",
+      "text": "01473",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "â",
+      "text": "â",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "North",
+      "text": "North",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Atlantic",
+      "text": "Atlantic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "operation",
+      "text": "OPERATION",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "order",
+      "text": "ORDER",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "NUM",
+      "lemma": "1",
+      "text": "1",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 7
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "situation",
+      "text": "Situation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "VERB",
+      "lemma": "maintain",
+      "text": "maintain",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "awareness",
+      "text": "awareness",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "ADP",
+      "lemma": "in",
+      "text": "in",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "North",
+      "text": "North",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Atlantic",
+      "text": "Atlantic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "X",
+      "lemma": "2",
+      "text": "2",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 17
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "mission",
+      "text": "Mission",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Maritime",
+      "text": "Maritime",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Component",
+      "text": "Component",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "monitor",
+      "text": "monitors",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "VERB",
+      "lemma": "assign",
+      "text": "assigned",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "area",
+      "text": "area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "X",
+      "lemma": "3",
+      "text": "3",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 27
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "execution",
+      "text": "Execution",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "VERB",
+      "lemma": "synchronize",
+      "text": "synchronize",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ISR",
+      "text": "ISR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "maritime",
+      "text": "maritime",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "reporting",
+      "text": "reporting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "X",
+      "lemma": "4",
+      "text": "4",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 37
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "sustainment",
+      "text": "Sustainment",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "VERB",
+      "lemma": "report",
+      "text": "report",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "logistic",
+      "text": "logistics",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "constraint",
+      "text": "constraints",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "X",
+      "lemma": "5",
+      "text": "5",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 45
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Command",
+      "text": "Command",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Signal",
+      "text": "Signal",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "use",
+      "text": "use",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "VERB",
+      "lemma": "approve",
+      "text": "approved",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "NATO",
+      "text": "NATO",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 53
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "C2",
+      "text": "C2",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 54
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "channel",
+      "text": "channels",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 55
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 56
+    },
+    {
+      "pos": "VERB",
+      "lemma": "note",
+      "text": "Note",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 57
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "linguistique",
+      "text": "linguistique",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 58
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 59
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "diffusion",
+      "text": "diffusion",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 60
+    },
+    {
+      "pos": "ADP",
+      "lemma": "de",
+      "text": "de",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 61
+    },
+    {
+      "pos": "X",
+      "lemma": "travail",
+      "text": "travail",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 62
+    },
+    {
+      "pos": "X",
+      "lemma": "en",
+      "text": "en",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 63
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "franˆ§ais",
+      "text": "franˆ§ais",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 64
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 65
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "situation",
+      "text": "situation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 66
+    },
+    {
+      "pos": "ADV",
+      "lemma": "opˆ'rationnelle",
+      "text": "opˆ'rationnelle",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 67
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "stable",
+      "text": "stable",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 68
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 69
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 3,
+      "end": 5,
+      "label": "location",
+      "text": "North Atlantic"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 14,
+      "end": 16,
+      "label": "location",
+      "text": "North Atlantic"
+    },
+    {
+      "start": 32,
+      "end": 33,
+      "label": "organization",
+      "text": "ISR"
+    },
+    {
+      "start": 49,
+      "end": 50,
+      "label": "organization",
+      "text": "Signal"
+    },
+    {
+      "start": 53,
+      "end": 54,
+      "label": "organization",
+      "text": "NATO"
+    },
+    {
+      "start": 54,
+      "end": 55,
+      "label": "product",
+      "text": "C2"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "OPORD",
+      "lemma": "opord",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2
+      ]
+    },
+    {
+      "text": "01473",
+      "lemma": "01473",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "â",
+      "lemma": "â",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "North",
+      "lemma": "North",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Atlantic",
+      "lemma": "Atlantic",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    },
+    {
+      "text": "OPERATION",
+      "lemma": "operation",
+      "pos": "NOUN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ORDER",
+      "lemma": "order",
+      "pos": "NOUN",
+      "head": 6,
+      "dep": "ROOT",
+      "lefts": [
+        4,
+        5
+      ],
+      "rights": []
+    },
+    {
+      "text": "1",
+      "lemma": "1",
+      "pos": "NUM",
+      "head": 7,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        8
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 7,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Situation",
+      "lemma": "situation",
+      "pos": "NOUN",
+      "head": 11,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": [
+        10
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "maintain",
+      "lemma": "maintain",
+      "pos": "VERB",
+      "head": 11,
+      "dep": "ROOT",
+      "lefts": [
+        9
+      ],
+      "rights": [
+        12,
+        13,
+        16
+      ]
+    },
+    {
+      "text": "awareness",
+      "lemma": "awareness",
+      "pos": "NOUN",
+      "head": 11,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "in",
+      "lemma": "in",
+      "pos": "ADP",
+      "head": 11,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        15
+      ]
+    },
+    {
+      "text": "North",
+      "lemma": "North",
+      "pos": "PROPN",
+      "head": 15,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Atlantic",
+      "lemma": "Atlantic",
+      "pos": "PROPN",
+      "head": 13,
+      "dep": "pobj",
+      "lefts": [
+        14
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 11,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "2",
+      "lemma": "2",
+      "pos": "X",
+      "head": 19,
+      "dep": "meta",
+      "lefts": [],
+      "rights": [
+        18
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 17,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Mission",
+      "lemma": "mission",
+      "pos": "NOUN",
+      "head": 24,
+      "dep": "npadvmod",
+      "lefts": [
+        17
+      ],
+      "rights": [
+        20
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Maritime",
+      "lemma": "Maritime",
+      "pos": "PROPN",
+      "head": 22,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Component",
+      "lemma": "Component",
+      "pos": "PROPN",
+      "head": 23,
+      "dep": "compound",
+      "lefts": [
+        21
+      ],
+      "rights": []
+    },
+    {
+      "text": "monitors",
+      "lemma": "monitor",
+      "pos": "NOUN",
+      "head": 24,
+      "dep": "nsubj",
+      "lefts": [
+        22
+      ],
+      "rights": []
+    },
+    {
+      "text": "assigned",
+      "lemma": "assign",
+      "pos": "VERB",
+      "head": 24,
+      "dep": "ROOT",
+      "lefts": [
+        19,
+        23
+      ],
+      "rights": [
+        25,
+        26
+      ]
+    },
+    {
+      "text": "area",
+      "lemma": "area",
+      "pos": "NOUN",
+      "head": 24,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 24,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "3",
+      "lemma": "3",
+      "pos": "X",
+      "head": 27,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        28
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 27,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Execution",
+      "lemma": "execution",
+      "pos": "NOUN",
+      "head": 31,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": [
+        30
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 29,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "synchronize",
+      "lemma": "synchronize",
+      "pos": "VERB",
+      "head": 31,
+      "dep": "ROOT",
+      "lefts": [
+        29
+      ],
+      "rights": [
+        32,
+        36
+      ]
+    },
+    {
+      "text": "ISR",
+      "lemma": "ISR",
+      "pos": "PROPN",
+      "head": 31,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": [
+        33,
+        35
+      ]
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 32,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "maritime",
+      "lemma": "maritime",
+      "pos": "ADJ",
+      "head": 35,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "reporting",
+      "lemma": "reporting",
+      "pos": "NOUN",
+      "head": 32,
+      "dep": "conj",
+      "lefts": [
+        34
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 31,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "4",
+      "lemma": "4",
+      "pos": "X",
+      "head": 37,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        38
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 37,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sustainment",
+      "lemma": "sustainment",
+      "pos": "NOUN",
+      "head": 41,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": [
+        40
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 39,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "report",
+      "lemma": "report",
+      "pos": "VERB",
+      "head": 41,
+      "dep": "ROOT",
+      "lefts": [
+        39
+      ],
+      "rights": [
+        43,
+        44
+      ]
+    },
+    {
+      "text": "logistics",
+      "lemma": "logistic",
+      "pos": "NOUN",
+      "head": 43,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "constraints",
+      "lemma": "constraint",
+      "pos": "NOUN",
+      "head": 41,
+      "dep": "dobj",
+      "lefts": [
+        42
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 41,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "5",
+      "lemma": "5",
+      "pos": "X",
+      "head": 47,
+      "dep": "meta",
+      "lefts": [],
+      "rights": [
+        46
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 45,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Command",
+      "lemma": "Command",
+      "pos": "PROPN",
+      "head": 52,
+      "dep": "nsubj",
+      "lefts": [
+        45
+      ],
+      "rights": [
+        48,
+        49,
+        50,
+        51
+      ]
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 47,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Signal",
+      "lemma": "Signal",
+      "pos": "PROPN",
+      "head": 47,
+      "dep": "conj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 47,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "use",
+      "lemma": "use",
+      "pos": "NOUN",
+      "head": 47,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "approved",
+      "lemma": "approve",
+      "pos": "VERB",
+      "head": 52,
+      "dep": "ROOT",
+      "lefts": [
+        47
+      ],
+      "rights": [
+        55,
+        56
+      ]
+    },
+    {
+      "text": "NATO",
+      "lemma": "NATO",
+      "pos": "PROPN",
+      "head": 55,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "C2",
+      "lemma": "C2",
+      "pos": "PROPN",
+      "head": 55,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "channels",
+      "lemma": "channel",
+      "pos": "NOUN",
+      "head": 52,
+      "dep": "dobj",
+      "lefts": [
+        53,
+        54
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 52,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Note",
+      "lemma": "note",
+      "pos": "VERB",
+      "head": 57,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        58,
+        59,
+        62,
+        66,
+        69
+      ]
+    },
+    {
+      "text": "linguistique",
+      "lemma": "linguistique",
+      "pos": "ADJ",
+      "head": 57,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 57,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "diffusion",
+      "lemma": "diffusion",
+      "pos": "NOUN",
+      "head": 62,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "de",
+      "lemma": "de",
+      "pos": "ADP",
+      "head": 62,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "travail",
+      "lemma": "travail",
+      "pos": "X",
+      "head": 57,
+      "dep": "appos",
+      "lefts": [
+        60,
+        61
+      ],
+      "rights": [
+        63,
+        65
+      ]
+    },
+    {
+      "text": "en",
+      "lemma": "en",
+      "pos": "X",
+      "head": 62,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        64
+      ]
+    },
+    {
+      "text": "franˆ§ais",
+      "lemma": "franˆ§ais",
+      "pos": "PROPN",
+      "head": 63,
+      "dep": "pobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 62,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "situation",
+      "lemma": "situation",
+      "pos": "NOUN",
+      "head": 57,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": [
+        67,
+        68
+      ]
+    },
+    {
+      "text": "opˆ'rationnelle",
+      "lemma": "opˆ'rationnelle",
+      "pos": "ADV",
+      "head": 66,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "stable",
+      "lemma": "stable",
+      "pos": "ADJ",
+      "head": 66,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 57,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "OPORD",
+      "lemma": "opord",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "text": "01473",
+      "lemma": "01473",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "North",
+      "lemma": "North",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Atlantic",
+      "lemma": "Atlantic",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "npadvmod",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 4,
+      "text": "north atlantic",
+      "span": {
+        "start": 3,
+        "end": 5
+      }
+    },
+    {
+      "score": 4,
+      "text": "north atlantic",
+      "span": {
+        "start": 14,
+        "end": 16
+      }
+    },
+    {
+      "score": 4,
+      "text": "maritime reporting",
+      "span": {
+        "start": 34,
+        "end": 36
+      }
+    },
+    {
+      "score": 1,
+      "text": "situation",
+      "span": {
+        "start": 66,
+        "end": 67
+      }
+    },
+    {
+      "score": 1,
+      "text": "mission",
+      "span": {
+        "start": 19,
+        "end": 20
+      }
+    },
+    {
+      "score": 1,
+      "text": "execution",
+      "span": {
+        "start": 29,
+        "end": 30
+      }
+    },
+    {
+      "score": 1,
+      "text": "sustainment",
+      "span": {
+        "start": 39,
+        "end": 40
+      }
+    },
+    {
+      "score": 1,
+      "text": "command",
+      "span": {
+        "start": 47,
+        "end": 48
+      }
+    },
+    {
+      "score": 1,
+      "text": "signal",
+      "span": {
+        "start": 49,
+        "end": 50
+      }
+    },
+    {
+      "score": 1,
+      "text": "diffusion",
+      "span": {
+        "start": 60,
+        "end": 61
+      }
+    },
+    {
+      "score": 1,
+      "text": "stable",
+      "span": {
+        "start": 68,
+        "end": 69
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://ab4662e07de43454f462e1c86236a8f7007648274116fa28a1cffa5065a1d1d5/OPORD_01473_893bfecf.pdf#chunk-0-3d5c295681",
+      "parent_doc_id": "ingest://ab4662e07de43454f462e1c86236a8f7007648274116fa28a1cffa5065a1d1d5/OPORD_01473_893bfecf.pdf",
+      "text_raw": "OPORD 01473 â North Atlantic OPERATION ORDER 1 . Situation : maintain awareness in North Atlantic . 2 . Mission : Maritime Component monitors assigned area . 3 . Execution : synchronize ISR and maritime reporting . 4 . Sustainment : report logistics constraints . 5 . Command and Signal : use approved NATO C2 channels . Note linguistique : diffusion de travail en franˆ§ais ; situation opˆ'rationnelle stable .",
+      "search_vector_payload": "OPORD 01473 â North Atlantic OPERATION ORDER 1 . Situation : maintain awareness in North Atlantic . 2 . Mission : Maritime Component monitors assigned area . 3 . Execution : synchronize ISR and maritime reporting . 4 . Sustainment : report logistics constraints . 5 . Command and Signal : use approved NATO C2 channels . Note linguistique : diffusion de travail en franˆ§ais ; situation opˆ'rationnelle stable .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "location": [
+            "North Atlantic"
+          ],
+          "organization": [
+            "ISR",
+            "Signal",
+            "NATO"
+          ],
+          "product": [
+            "C2"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "Situation",
+            "maintain",
+            "awareness"
+          ],
+          [
+            "Maritime Component monitors",
+            "assigned",
+            "area"
+          ],
+          [
+            "Component monitors",
+            "assigned",
+            "area"
+          ],
+          [
+            "Execution",
+            "synchronize",
+            "ISR and maritime reporting"
+          ],
+          [
+            "Sustainment",
+            "report",
+            "logistics constraints"
+          ],
+          [
+            "Command and Signal",
+            "approved",
+            "NATO C2 channels"
+          ],
+          [
+            "use",
+            "approved",
+            "NATO"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 70,
+        "sentence_start": 0,
+        "sentence_end": 7
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Situation maintain awareness",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "North Atlantic",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "OPORD 01473 â North Atlantic OPERATION ORDER 1 . Situation : maintain",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "Maritime Component monitors assigned area",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Component monitors assigned area",
+          "question_type": "SVO-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Monitors/monitors-e5c19e68e5a3\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Monitors\"\n    ],\n    \"http://tkeir.local/ontology/assign\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Area/area-4a91ee5f0106\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"monitors\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/maritime_reporting\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"maritime reporting\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/situation\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"situation\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/ontology/Nato\",\n    \"http://www.w3.org/2000/01/rdf-schema#subClassOf\": [\n      {\n        \"@id\": \"http://www.nato.int/ontologies/c4isr#Class0\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Assigned/component_monitors-4b1bb9612096\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Assigned\"\n    ],\n    \"http://tkeir.local/ontology/assigned\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Area/area-4a91ee5f0106\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Component monitors\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/stable\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"stable\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/diffusion\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"diffusion\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Use/use-a3b142af6e97\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Use\"\n    ],\n    \"http://tkeir.local/ontology/approved\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Nato/nato-ace0fc1bd762\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"use\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/execution\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"execution\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Product/c2-9685eb765661\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Product\",\n      \"http://www.sisostds.org/ontologies/C2SIM/cwix2023#Class0\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"C2\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM/cwix2023#\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Nato/nato-ace0fc1bd762\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Nato\",\n      \"http://www.nato.int/ontologies/c4isr#Class0\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"NATO\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.nato.int/ontologies/c4isr#\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/north_atlantic\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"north atlantic\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Awareness/awareness-5674991da3fa\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Awareness\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"awareness\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Assigned/maritime_component_monitors-27f6e0463964\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Assigned\"\n    ],\n    \"http://tkeir.local/ontology/assigned\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Area/area-4a91ee5f0106\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Maritime Component monitors\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/isr_and_maritime_reporting-1f4deec9ed9f\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ISR and maritime reporting\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Execution/execution-a45cd4bd0998\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Execution\"\n    ],\n    \"http://tkeir.local/ontology/synchronize\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/isr_and_maritime_reporting-1f4deec9ed9f\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/isr-99fb5e7c8b05\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Execution\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/NatoC2Channels/nato_c2_channels-2b8822ede550\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/NatoC2Channels\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"NATO C2 channels\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/nato-ace0fc1bd762\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\",\n      \"http://www.nato.int/ontologies/c4isr#Class0\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"NATO\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.nato.int/ontologies/c4isr#\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Situation/situation-b3aeeb32a0c7\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Situation\"\n    ],\n    \"http://tkeir.local/ontology/maintain\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Awareness/awareness-5674991da3fa\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Situation\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/isr-99fb5e7c8b05\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\",\n      \"http://www.nato.int/ontologies/c4isr#Class0\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ISR\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.nato.int/ontologies/c4isr#\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/command\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"command\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/signal-1e9806e4227b\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Signal\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Chunk/ingest_ab4662e07de43454f462e1c86236a8f7007648274116fa28a1cffa5065a1d1d5_opord_01473_893bfecf_pdf_chunk_0_3d5c295681\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/north_atlantic\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/maritime_reporting\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/situation\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/mission\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/execution\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/sustainment\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/command\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/signal\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/diffusion\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/stable\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Location/north_atlantic-7e6ef3c18a80\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/isr-99fb5e7c8b05\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/signal-1e9806e4227b\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/nato-ace0fc1bd762\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Product/c2-9685eb765661\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Situation/situation-b3aeeb32a0c7\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Assigned/maritime_component_monitors-27f6e0463964\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Assigned/component_monitors-4b1bb9612096\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Execution/execution-a45cd4bd0998\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/sustainment-0bf9fd8692be\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/CommandAndSignal/command_and_signal-d4a9e0258d4d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Use/use-a3b142af6e97\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Monitors/monitors-e5c19e68e5a3\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Command/command-713166971d73\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"opord_01473_893bfecf_pdf\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Channels/channels-61ffa9c8c703\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Channels\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"channels\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/logistics_constraints-e0af007046ae\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Sustainment\"\n    ],\n    \"http://tkeir.local/ontology/report\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/logistics_constraints-e0af007046ae\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"logistics constraints\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/sustainment\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"sustainment\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/constraints-e225063b944e\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Sustainment\"\n    ],\n    \"http://tkeir.local/ontology/report\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/logistics_constraints-e0af007046ae\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"constraints\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/CommandAndSignal/command_and_signal-d4a9e0258d4d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Commandandsignal\"\n    ],\n    \"http://tkeir.local/ontology/approved\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/NatoC2Channels/nato_c2_channels-2b8822ede550\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Command and Signal\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Location/north_atlantic-7e6ef3c18a80\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Location\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"North Atlantic\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/mission\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"mission\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Chunk/ingest_ab4662e07de43454f462e1c86236a8f7007648274116fa28a1cffa5065a1d1d5_opord_01473_893bfecf_pdf_chunk_0_3d5c295681\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Location/north_atlantic-7e6ef3c18a80\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/isr-99fb5e7c8b05\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/signal-1e9806e4227b\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Organization/nato-ace0fc1bd762\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Product/c2-9685eb765661\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Situation/situation-b3aeeb32a0c7\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Assigned/maritime_component_monitors-27f6e0463964\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Assigned/component_monitors-4b1bb9612096\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Execution/execution-a45cd4bd0998\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/sustainment-0bf9fd8692be\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/CommandAndSignal/command_and_signal-d4a9e0258d4d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Use/use-a3b142af6e97\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://ab4662e07de43454f462e1c86236a8f7007648274116fa28a1cffa5065a1d1d5/OPORD_01473_893bfecf.pdf#chunk-0-3d5c295681\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Command/command-713166971d73\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Command\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Channels/channels-61ffa9c8c703\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Command\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Keyword/signal\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"signal\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Area/area-4a91ee5f0106\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Area\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"area\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/sustainment-0bf9fd8692be\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Sustainment\"\n    ],\n    \"http://tkeir.local/ontology/report\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/logistics_constraints-e0af007046ae\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/opord_01473_893bfecf_pdf/Sustainment/constraints-e225063b944e\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Sustainment\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 2,
+      "unresolved": 0,
+      "auto_fixed": 2,
+      "affected_node_count": 2,
+      "graph_node_count": 57,
+      "graph_triple_count": 127,
+      "by_result_path": {
+        "report": 2
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 75,
+    "total_tokens": 75,
+    "covered_characters": 368,
+    "total_characters": 368,
+    "derivation": {
+      "enabled": true,
+      "status": "APPLIED",
+      "matches": 9,
+      "subclass_links": 1,
+      "type_links": 4,
+      "same_as_links": 4,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4KP4JDFKNNEJPSGTREWQM1/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 70,
+  "token-count": 75,
+  "source-file-size-bytes": 1099,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.495,
+    "tasks": {
+      "converter": 0.007,
+      "language-detection": 0.003,
+      "resource-selection": 0.001,
+      "tokenizer": 0.004,
+      "morphosyntax": 0.009,
+      "ner": 0.248,
+      "syntax": 0.008,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.213,
+      "chunk-questions": 0.001
+    }
+  }
+}

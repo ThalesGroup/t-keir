@@ -1,9 +1,11 @@
-"""Structured JSON logging helpers for platform services.
+"""Title: Structured Logging
 
-Author: Eric Blaudez (Eric Blaudez)
+Structured JSON logging helpers for platform services.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

@@ -1,4 +1,12 @@
-"""Build semantic golden chunks from analyzed T-KEIR documents."""
+"""Title: Chunk Builder
+
+Build semantic golden chunks from analyzed T-KEIR documents.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

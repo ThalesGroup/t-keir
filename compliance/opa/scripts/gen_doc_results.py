@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish the latest EU compliance audit report into MkDocs docs.
+"""Title: Publish the latest EU compliance audit report into MkDocs docs.
 
 Reads ``reports/compliance/eu-audit/<version>/report.json`` (or ``--report``)
 and writes Markdown under ``tkeir/docs/compliance/generated/`` so ``make docs``
@@ -7,7 +7,13 @@ and writes Markdown under ``tkeir/docs/compliance/generated/`` so ``make docs``
 
 Also builds GDPR/CRA **reviewer checklists**: auto-satisfied controls are
 pre-checked; legal/human-only items stay unchecked with a how-to process.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
+
 from __future__ import annotations
 
 import argparse

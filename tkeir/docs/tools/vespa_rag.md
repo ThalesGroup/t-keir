@@ -3,7 +3,8 @@
 T-KEIR uses a two-level Vespa stack for hybrid retrieval in **streaming mode**
 (per-user / tenant document spaces):
 
-- **Parent `tkeir_document`** — BM25 on title and content, stores ontology Turtle
+- **Parent `tkeir_document`** — BM25 on title and content, stores document
+  ontology as **`json_ld`** (plus `shacl_status`)
 - **Child `chunk`** — exact nearest-neighbor on chunk / question tensors + BM25
 
 Streaming mode co-locates each user's documents via the Vespa **group** in the
@@ -91,10 +92,29 @@ Response fields:
 |---|---|
 | `chunks` | Reranked chunks with `chunk_id`, `text_raw`, `parent_doc_id`, `score`, `title` |
 | `documents` | Documents aggregated from those chunks (`document_id`, `score`, `chunk_ids`, `title`, `hit_count`) |
+| `ontology` | **Merged** parent ontologies from Vespa (see below) |
 | `vespa_hits` | Raw Vespa hit count before enrichment |
 | `ranking_profile` | Vespa ranking profile used when known |
 
 Document score: `max(chunk_score) + 0.05 * log1p(hit_count)`.
+
+### Merged ontology (search + RAG)
+
+After hybrid search, the API fetches each hit’s parent document and unions the
+`json_ld` fields into one RDF graph (`merge_rdf_graphs` /
+`build_hmi_ontology`):
+
+| Field | Description |
+|---|---|
+| `entities` | NER-style labels with linked `chunk_ids` |
+| `keywords` | Keyword labels with linked `chunk_ids` |
+| `json_ld` | Fused graph (JSON-LD) for HMI display and reasoner follow-ups |
+| `triple_count` | Number of RDF triples in the merge |
+| `source_count` | Unique parent ontology payloads merged |
+| `document_ids` | Parent `source_doc_id` values that contributed |
+
+The HMI **Ontology Navigator** shows entities, keywords, JSON-LD, and a
+**Reason** tab that posts the fused `json_ld` to `/rag/ontology/query`.
 
 ### `POST /rag/query` (retrieval + generation)
 
@@ -115,10 +135,86 @@ Response fields:
 | `highlight_entities` | Top entity labels to highlight in the UI |
 | `highlight_keywords` | Top keyword labels to highlight in the UI |
 | `chunks` | Retrieved chunks with `chunk_id`, `text_raw`, `parent_doc_id`, `relevance` |
-| `ontology` | Merged semantic view: `entities` (NER) and `keywords`, each with `chunk_ids` |
+| `ontology` | Same merged ontology shape as `/search` (entities, keywords, `json_ld`, counts) |
 | `vespa_hits` | Raw Vespa hit count |
 
 Prompt templates: `tkeir/configs/rag-prompts.yaml` (`unavailable_answer` per language).
+
+### `POST /rag/ontology/query` (reasoner / SPARQL on fused ontology)
+
+Interact with the **merged ontology returned by the initial search/RAG call**
+(pass `ontology.json_ld` from that response). Optional **OWLAPY** SyncReasoner
+(HermiT, Pellet, ELK, …) when installed; otherwise rdflib SPARQL / RDFS walks.
+
+```bash
+# Optional Java reasoners (JPype / OWLAPI)
+cd tkeir && uv sync --extra owl
+```
+
+**Example — after a RAG answer, list subclasses:**
+
+```bash
+# 1) Initial RAG query (stores fused ontology in the response)
+curl -s http://localhost:8090/rag/query \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"SITREP Objective ALPHA","language":"en","hits":10}' \
+  > /tmp/rag.json
+
+# 2) Extract fused JSON-LD and ask for subclasses of a class IRI
+JSON_LD=$(python3 -c 'import json; print(json.load(open("/tmp/rag.json"))["ontology"]["json_ld"])')
+curl -s http://localhost:8090/rag/ontology/query \
+  -H 'Content-Type: application/json' \
+  -d "$(jq -nc --arg j "$JSON_LD" \
+    '{json_ld:$j, operation:"subclasses",
+      class_iri:"http://tkeir.local/ontology/Organization",
+      reasoner:"HermiT", limit:50}')" | jq .
+```
+
+**Example — SPARQL over the merge (always available via rdflib):**
+
+```bash
+curl -s http://localhost:8090/rag/ontology/query \
+  -H 'Content-Type: application/json' \
+  -d "$(jq -nc --arg j "$JSON_LD" \
+    --arg q 'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?label WHERE { ?s rdfs:label ?label } LIMIT 20' \
+    '{json_ld:$j, operation:"sparql", sparql:$q}')" | jq .
+```
+
+**Example — instances of a class / types of an individual:**
+
+```bash
+# Individuals typed as a class
+curl -s http://localhost:8090/rag/ontology/query \
+  -H 'Content-Type: application/json' \
+  -d "$(jq -nc --arg j "$JSON_LD" \
+    '{json_ld:$j, operation:"instances",
+      class_iri:"http://tkeir.local/ontology/Organization"}')" | jq .
+
+# Named types of one individual
+curl -s http://localhost:8090/rag/ontology/query \
+  -H 'Content-Type: application/json' \
+  -d "$(jq -nc --arg j "$JSON_LD" \
+    '{json_ld:$j, operation:"types",
+      individual_iri:"http://tkeir.local/doc/e1"}')" | jq .
+```
+
+| `operation` | Needs | Backend |
+|-------------|-------|---------|
+| `sparql` | `sparql` SELECT | rdflib |
+| `subclasses` / `superclasses` | `class_iri` | OWLAPY if installed, else RDFS walk |
+| `instances` | `class_iri` | OWLAPY / rdflib |
+| `types` | `individual_iri` | OWLAPY / rdflib |
+| `consistency` | — | OWLAPY HermiT (preferred) |
+| `infer` | — | OWLAPY (`InferredClassAssertionAxiomGenerator`) |
+
+Response: `{ operation, backend, reasoner, results[], count, triple_count, owlapy_available, json_ld, note? }`.
+
+The HMI **Reason** tab lets you pick the reasoner (`rdflib`, HermiT, Pellet, …),
+runs the query, and shows the answer as a **graph** (from `json_ld`) or raw
+JSON-LD.
+
+Implementation: `thot.tools.search.ontology_reasoner.query_merged_ontology`.
 
 ## Configuration (`tkeir/configs/rag.yaml`)
 

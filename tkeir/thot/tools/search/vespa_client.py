@@ -1,4 +1,12 @@
-"""Vespa HTTP client for 2-level document/chunk indexing and search."""
+"""Title: Vespa client
+
+Vespa HTTP client for 2-level document/chunk indexing and search.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

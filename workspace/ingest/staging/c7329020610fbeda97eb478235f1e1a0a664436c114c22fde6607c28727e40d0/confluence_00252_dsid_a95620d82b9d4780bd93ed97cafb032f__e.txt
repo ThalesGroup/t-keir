@@ -1,0 +1,136 @@
+Evaluation Budgeting and Cross-Stage Probe Reuse for Multilingual Long-Tail Workloads
+
+Overview
+========
+
+This document defines a practical framework for allocating evaluation budget and reusing probe assets across evaluation stages for multilingual, long-tail workloads. It is targeted at applied ML engineers, evaluators, and program managers responsible for maintaining model quality while controlling eval cost. The guidance complements the Eval Harness and Probe Fabrication playbooks and is optimized for environments that include quantized models and heterogeneous serving configurations.
+
+Scope
+-----
+- Multilingual prompt families (10+ languages), heavy long-tail slice coverage (rare intents, regional colloquialisms).
+- Cross-stage evaluation stages: smoke -> slice-level -> federated shadow -> production cohort monitors.
+- Workloads that span hosted, dedicated, and private deployment modes.
+- Integration with probe reuse, budget ledger, and evaluator scheduling.
+
+Goals and constraints
+---------------------
+- Maximize defect detection (regressions, calibration drift, quantization sensitivity) under a fixed monthly evaluation budget.
+- Prefer reuse of probes between stages to reduce annotation and probe generation cost while preserving statistical power for key slices.
+- Maintain traceability: every probe must be traceable to its stage, language, and slice tags.
+- Ensure compatibility with privacy constraints (PII redaction, locale-specific restrictions).
+
+Key definitions
+---------------
+- Probe: a single input (prompt + optional context + expected outputs/annotations) used in an eval.
+- Probe family: group of probes generated from the same seed or template across locales/variants.
+- Reuse lift: the measured statistical power preserved when a probe is reused across stages (expressed as a fraction between 0.0 and 1.0).
+- Budget unit: smallest billing unit in the eval ledger (e.g., per-token eval cost multiplied by probe length).
+
+Principles
+----------
+1. Prioritize coverage by slice importance, not raw frequency. Use business impact weighting (e.g., payment flows > chat greetings).
+2. Reuse aggressively in early stages (smoke, broad regression scans), but require fresh probes for canary/final acceptance in high-risk slices.
+3. Track per-probe metadata (language, generation-method, seed, sensitivity-tags, quant-run-id) and store in the Eval Ledger.
+4. Apply quant-awareness: tag probes likely to trigger quant-failure modes (long context, functioncall-heavy) and budget for targeted re-evals after quant rollouts.
+
+Strategy overview
+-----------------
+- Stage 1 (Smoke): small, high-signal set of reused probes across all languages. Budget share: 5%
+- Stage 2 (Slice Scans): stratified sampling with reuse ratio computed per slice (see Reuse Matrix). Budget share: 40%
+- Stage 3 (Shadow Federated): mirrored tenant workloads (synthetic forks) with minimal reuse for localization-sensitive probes. Budget share: 30%
+- Stage 4 (Pre-Prod Canary): fresh probes for all priority slices and languages; no reuse for top-25% impact slices. Budget share: 20%
+- Reserve: 5% contingency for ad-hoc investigations or regression triage.
+
+Reuse decision matrix (example)
+-------------------------------
+| Slice importance | Expected variance | Historical reuse lift | Allow reuse? | Notes |
+|------------------|-------------------|----------------------:|--------------|-------|
+| Critical payment flow | low | 0.30 | No (fresh probes required for canary) | Fresh every canary/major release |
+| High-frequency FAQ | medium | 0.85 | Yes (reuse across smoke+slice) | Reevaluate post-quant rollout |
+| Regional slang (lang=pt-BR) | high variance | 0.60 | Conditional | Use fresh probes for shadow; reuse for smoke |
+| Low-frequency niche intent | very high variance | 0.95 | Yes | Use reuse to boost sample count cheaply |
+
+How to compute reuse ratios
+---------------------------
+1. Compute historical lift: run a retrospective A/B where reused probes are contrasted with fresh probes across N releases. Lift = 1 - (delta_detection_power / baseline_power).
+2. For each slice, target effective sample size ES_target based on desired confidence (e.g., detect a 5% absolute deterioration with 90% power).
+3. Required fresh probes = max(0, ES_target - reuse_lift * N_reused_probes).
+4. Cap reused probes per slice to avoid stale-priming (default cap = 60% of ES_target).
+
+Procedure: monthly budget planner (step-by-step)
+------------------------------------------------
+1. Input: monthly_active_budget_units (from Eval Ledger), priority slice list with impact weight, languages enabled, pending rollouts (quant/architecture).
+2. Allocate base shares: assign Smoke/Slice/Shadow/Canary per Strategy overview.
+3. For each slice: compute ES_target using slice weight and statistical table (Appendix A).
+4. Fetch historical reuse_lift and past N_reused_probes from the probe metadata DB.
+5. Calculate fresh probe requirement and mark which probes can be scheduled for reuse.
+6. Commit allocation to the Eval Ledger and schedule evaluator runs via the Eval Harness API.
+7. Daily monitor: if consumption > 80% of budget with high-risk rollouts pending, trigger emergency reassignment (move share from slice scans to canary).
+
+Pseudocode: prioritized probe sampler
+------------------------------------
+```python
+# Simplified sampler: ranks slice-locale pairs and emits probes respecting reuse caps
+def prioritized_sampler(slice_locale_list, budget_units):
+    ranked = sorted(slice_locale_list, key=lambda s: s.weight * s.risk, reverse=True)
+    plan = []
+    units_remaining = budget_units
+    for s in ranked:
+        es = compute_es_target(s)
+        reuse_available = min(s.reuse_cap * es, s.available_reused)
+        fresh_needed = max(0, es - reuse_available)
+        cost = estimate_cost(fresh_needed, s.avg_tokens)
+        if cost <= units_remaining:
+            plan.append({"slice": s.name, "fresh": fresh_needed, "reused": reuse_available})
+            units_remaining -= cost
+    return plan
+```
+
+Quality gates and alert thresholds
+----------------------------------
+- Slice-level acceptance gate (pre-prod): weighted F1 >= baseline - 2% AND delta_coherence <= 1.5 points.
+- Shadow to Prod release gate: no critical regressions in top 20 slices for 72h.
+- Quant-fallback sentinel: if quantized artifact increases failure rate by > 3% on quant-tagged probes, automatic fallback to float-run for 24h.
+- Budget alarm: Pager if monthly consumption exceeds 95% and any canary is active.
+
+Integration with onboarding and quantization profiles
+-----------------------------------------------------
+- Model onboarding checklist must include the eval-budget plan for first 3 months post-promotion. Attach plan to the model promotion PR.
+- Each quant profile must publish a list of probe families tagged as 'quant-sensitive' so the budgeting planner adds a 2x freshness multiplier for those slices in the first two rollouts.
+- Use the Eval Harness API tag filter when scheduling quant validation runs: ?tags=quant-sensitive,lang:es
+
+Runbook: regression triage fast-path (abridged)
+-----------------------------------------------
+1. Alert fires: budget alarm or slice regression.
+2. Triage lead gathers: slice_id, last_promotion_sha, quant-run-id, probe-family-ids.
+3. If triage suggests quant-induced signal, run targeted backfill of fresh probes for the slice with quant disabled.
+4. If regression confirmed: initiate remediation (rollback/patch) and mark affected probes as 'stale' to prevent reuse until revalidation.
+
+Ownership and responsibilities
+------------------------------
+- Applied ML (oncall): owning probe reuse telemetry and runbook execution.
+- Evaluations Platform: scheduling, ledger accounting, and tagging APIs.
+- Product Safety / Compliance: approve any cross-border probe reuse that touches regulated content.
+
+Appendix A: quick statistical reference (for ES_target)
+------------------------------------------------------
+- Detect 5% absolute drop, 90% power, alpha=0.05 -> ES_target ≈ 120 probes per slice (simple binary outcome approximation).
+- For high-variance slices (sigma multiplier > 1.5) scale ES_target by 1.5x.
+
+Appendix B: example CSV schema for probe metadata
+--------------------------------------------------
+probe_id,probe_family,created_at,language,stage_tags,is_quant_sensitive,seed_source,annotation_cost_unit,probe_tokens
+1234,faq_family_202410,2024-10-03,es,smoke|slice,True,templated,0.8,82
+
+References and related policies
+-------------------------------
+- Eval Ledger and Cost Attribution (see related page)
+- Probe Fabrication and Privacy Redaction Guide
+- Quantization Profile Playbook
+
+Notes and future work
+---------------------
+- Add automated reuse lift estimation into the Eval Harness (Q2 2025).
+- Explore active learning to generate high-information fresh probes that minimize fresh count.
+
+If you have questions about applying this framework to a specific model or rollout, ping the Applied ML team in #applied-ml-probes or open an evaluation planning issue in the Eval Planner board.

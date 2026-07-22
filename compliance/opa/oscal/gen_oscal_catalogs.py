@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Generate OSCAL 1.1.2 catalogs from OPA Rego article catalogues."""
+"""Title: Gen oscal catalogs
+
+Generate OSCAL 1.1.2 catalogs from OPA Rego article catalogues.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""Bridge: OPA JSON results → OSCAL Assessment Results + POA&M (OSCAL 1.1.2).
+"""Title: Bridge: OPA JSON results → OSCAL Assessment Results + POA&M (OSCAL 1.1.2).
 
 UUIDs are deterministic (UUID v5) so diffs between runs show genuine changes only.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

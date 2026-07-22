@@ -1,0 +1,164 @@
+Onboarding, Career Safety Net, and Internal Tools Compact
+
+Overview:
+
+This compact playbook bundles three closely related employee experiences: the first 90 days of onboarding, the 'career safety net' used to manage role transitions and expectations, and a concise internal-tools quickstart required to be productive at Redwood. It is intended for hiring managers, new hires, people-ops partners, and managers handling role transitions.
+
+Goals:
+- Reduce time-to-impact for new hires to 30 days for basic production contributors, 60 days for engineers contributing to core runtime, and 90 days for cross-functional ownership of projects.
+- Provide a visible, humane set of expectations (the Career Safety Net) for employees facing role changes, performance improvement, or return-from-leave transitions.
+- Standardize onboarding tool access so engineering and non-engineering teams can complete the technical checklist in the first week.
+
+Quick links (operational):
+- New hire onboarding checklist (People Ops): rbw://onboard/checklist
+- Internal tooling access request: https://id.redwood.example/access-requests
+- Role ladder reference: /confluence/company-handbook/02_roles-and-career/competency-maps-and-rotation-paths-2027
+
+1) First-90 Onboarding framework
+
+Intro: The First-90 is split into three clearly defined phases with owner responsibilities and measurable outcomes. Managers must publish a simple 90-day plan for each hire in the onboarding doc within 48 hours of start date.
+
+Phases and outcomes:
+- Day 0–7: Orientation + Access
+  - Outcomes: account creation, README for team, local dev + CI run, one small doc or PR merged.
+  - Owner: Hiring manager + buddy.
+  - Must-complete checklist items:
+    1. HR paperwork completed (People Ops)
+    2. Okta + SSO validated and 2FA registered
+    3. Internal mailbox and Slack channels joined
+    4. Dev environment: run unit tests locally and submit a tiny fix/typo PR
+
+- Day 8–30: Contribution + Feedback
+  - Outcomes: shipping a first scoped task (bug fix, evaluation harness test, doc change), first check-in with manager, initial career conversation.
+  - Owner: Manager (weekly 1:1)
+  - Success metrics: PR landed, code review feedback implemented, buddy signoff on operational readiness.
+
+- Day 31–90: Ownership + Integration
+  - Outcomes: ownership of a small feature, runbook or eval suite component; documented handoff for cross-team dependencies.
+  - Owner: Manager (biweekly 1:1)
+  - Success metrics: service/deck ownership identified, promotion of knowledge via a 30-min team demo, and an updated career plan in Lattice/Growth platform.
+
+2) Career Safety Net (CSN) — humane role transitions and support
+
+Purpose: The CSN is a people-first protocol to support employees who are reassigned, returning from extended leave, or subject to a performance conversation. It codifies expectations, resources, and timelines so transitions are explicit and fair.
+
+Principles:
+- Transparency: clear goals, measurable checkpoints, and written agreements (no surprise change of expectations).
+- Time-bounded: typical CSN plans last 6–12 weeks depending on context.
+- Support-first: training, mentorship, and reasonable load reduction when appropriate.
+- Escalation clarity: defined steps if objectives are not met.
+
+CSN template (manager-owned):
+- Context and objective (one paragraph)
+- Timeline and checkpoints (weeks 1, 3, 6, 9)
+- Specific success criteria (3–5 measurable outcomes)
+- Adjustments to workload and support (mentor hours, training modules, paired work)
+- People Ops and HR touchpoints (names and frequency)
+- Review date and next steps (promote, extend, role change)
+
+Example success criteria (engineer):
+- Ship three completed bugfixes affecting latency >20% within 6 weeks
+- Document two runbook pages and own one weekly on-call rotation by week 9
+
+Escalation steps if CSN objectives are not met:
+1. Manager and People Ops meet to reassess and document next 4-week plan.
+2. If no sustained improvement: formal HR performance process, with People Ops and legal review as needed.
+
+3) Benefits, Perks, and Accessibility highlights
+
+This section captures the practical touchpoints new hires need to use benefits and ensure accessibility needs are handled early. It is a companion to the full Benefits Catalog.
+
+Key actions for new hires:
+- Enroll in benefits within 30 days (People Ops sends enrollment link automatically).
+- Request ergonomic equipment via https://it-requests.redwood.example/ergonomics (allow 10 business days).
+- Submit accommodation requests to accommodations@redwood.example — People Ops will triage within 3 business days.
+
+Minimum accommodation SLA (internal):
+- Acknowledgement: 3 business days
+- Initial plan/short-term accommodations: 10 business days
+- Long-term solution or procurement (e.g., specialized hardware): 30 business days
+
+Mental health and caregiver support:
+- Confidential counseling sessions (up to 8 sessions per calendar year) with provider details in the Benefits Catalog.
+- Parent transition checklists for flexible return-to-work and phased schedules.
+
+4) Internal tools quickstart (minimal commands and access flow)
+
+Objective: get a new hire capable of completing the Dev + Prod checklist within the first week. This section lists the most common commands, access flows, and troubleshooting tips.
+
+Authentication and identity
+- Okta SSO: Ensure you can log into Okta and enroll 2FA (device or passkey).
+- Service account requests: rbw-admin request --type service --team <team-name> (people-ops approves within 1 business day for standard needs)
+
+Code and CI
+- Clone the monorepo: git clone git@repo.redwood.example:infra/monorepo.git- Create a branch: git checkout -b feat/onboard-<initials>- Run tests: ./dev/run_tests.sh --fast- Submit PR: hub pull-request -b main -m "Onboard: fix typo"
+
+Observability and runbooks
+- Dashboard access: observability.redwood.example -> login via Okta- On-call handover doc: /confluence/eng-sre/runbooks/oncall-handover-template
+
+Common troubleshooting steps (order matters)
+1. Check Okta status (https://status.okta.com)
+2. Validate network and VPN (rbw vpn status)
+3. Revoke and reissue token: rbw-auth refresh --force
+4. If still blocked, open IT ticket and tag Manager + People Ops (required for expedited access)
+
+5) Manager checklist: before day 0 and week 1
+
+Before day 0:
+- Create 90-day plan and share in onboarding doc- Add new hire to team calendar and public Slack channels- Provision required repos and cloud project roles (least privilege)
+
+Week 1 tasks:
+- Intro meetings (team, cross-functional leads, People Ops)
+- Confirm dev environment and run sample test together with buddy- First 1:1 scheduled and goal setting completed.
+
+6) Role ladders, promotion signals, and coaching cadence
+
+Role ladder reference: managers must map hires to a role ladder within 30 days and document the expected milestones for promotion. This section summarizes signals we value across functions:
+- Engineering: scope of ownership, architectural impact, mentoring, and reliability outcomes (SLOs improved or maintained).
+- Product: shipped outcomes with measurable metrics, cross-functional leadership, and customer impact.
+- Design & DX: end-to-end UX improvements, measurable engagement improvements, and design systems contributions.
+
+Promotion cadence and signals:
+- Typical review windows: quarterly calibration cycles.
+- Expectation: a minimum of 6–12 months in-role for a typical promotion, unless extraordinary impact is documented.
+
+Coaching cadence:
+- Monthly growth 1:1s focused on skills and career plan (documented in Lattice/Growth).
+- Quarterly calibration: manager and people-ops review progress and adjust plan.
+
+Appendices and templates
+
+A) 90-day plan template (paste into onboarding doc):
+- Objective (one sentence)
+- Week-by-week milestones (week 1, 2–4, 5–8, 9–12)
+- Acceptance criteria (3–5 checks)
+- Dependencies and stakeholders
+- Training modules (links)
+
+B) Quick CSN template (copy to manager docs):
+| Field | Example |
+| Context | Role shift from infra to product-facing role |
+| Timeline | 9 weeks (checkpoints at wk 3, 6, 9) |
+| Outcomes | Ship dashboard integration; pass two on-call rotations |
+| Support | Mentor 4 hours/week; reduced release cadence |
+
+C) Internal tool contacts
+- People Ops: people-ops@redwood.example
+- IT & provisioning: it-support@redwood.example
+- Security & access exceptions: security-ops@redwood.example
+
+Governance and ownership
+- People Ops owns the CSN templates and benefits enrollment process.
+- Hiring managers are accountable for the 90-day plan and career mapping.
+- IT owns first-line access provisioning and hardware procurement.
+
+Feedback loop and continuous improvement
+- New hires are asked to complete a 30-day, 60-day, and 90-day pulse survey. Results are triaged monthly by People Ops and aggregated into a quarterly onboarding health report.
+- Managers must act on escalations within 3 business days. Persistent blockers are escalated to the Head of People Ops for resolution.
+
+Document history and changelog:
+- 2028-02-15: Drafted by Jordan Lee (People Ops).
+- 2028-02-22: Added Career Safety Net examples after review with Aisha Kumar.
+- 2028-03-02: Published after legal and IT review (minor edits to SLAs).
+
+End of document.

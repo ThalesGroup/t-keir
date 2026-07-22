@@ -1,0 +1,169 @@
+Service surface minimization and compatibility playbook
+
+Overview
+
+Purpose:
+This playbook captures Redwood's recommended patterns for minimizing API/service surface area and evolving request/response schemas with minimal consumer disruption. It consolidates practical rules, examples, testing strategies, and rollout procedures so teams can safely ship changes that maintain production stability and predictable client cost/latency profiles.
+
+Scope:
+Applies to all externally-facing Redwood APIs (hosted and private control plane) and internal service-to-service contracts that impact inference, telemetry, billing, or routing decisions. It complements the API compatibility & deprecation policy but focuses on design patterns and operational controls.
+
+Definitions:
+- Service surface: set of public endpoints, RPC methods, query parameters, header hooks, and documented request/response fields a consumer depends on.
+- Contract: the machine- and human-readable schema, including metadata, error models, and behavior guarantees (idempotency, ordering, streaming semantics).
+- Consumer-driven contract (CDC): tests or assertions derived from actual client usage to validate compatibility.
+
+Principles (high level):
+1. Minimize: Only expose fields and endpoints that deliver measurable consumer value. Prefer extensible generic fields over many specialized endpoints.
+2. Versionless-first: Default to non-major breaking changes. Reserve explicit versioning for architectural shifts.
+3. Strict rollout controls: All changes that touch contracts require canarying, CDCs, automated regression checks, and a documented fallback.
+4. Observable compatibility: Surface compatibility impact in dashboards (consumer break rate, schema-change alerting).
+5. Fail-open consumer safety: Keep benign defaults; prefer ignoring unknown optional fields over rejecting requests.
+
+Standards and patterns
+
+A. Service-surface minimization checklist (apply during design)
+- Does the change add a new endpoint or can we extend an existing one? If possible, prefer extension.
+- Can we reuse existing metadata headers instead of adding new header keys?
+- Is the new field optional with a safe default? If yes, make it optional.
+- Will the change increase cardinality of route variations (query params + headers)? Aim to keep cardinality low.
+- Is there a measurable feature flag or telemetry guard to limit rollout?
+
+B. Field and schema rules
+1. Additive-only policy for minor releases:
+   - Adding new optional fields to response/request is allowed. New fields MUST be optional and documented.
+   - Removing fields or changing types is a breaking change and requires ADR + major-versioning or migration plan.
+2. Stringly-typed extensibility pattern:
+   - For rapidly-evolving bits, prefer a single extensible map field ("attributes" or "metadata") with limited keyset enforcement server-side.
+3. Enumerations and feature flags:
+   - New enum variants are allowed if consumers ignore unknown enum values gracefully. Document opt-in rollout for client-side consumers.
+4. Error model stability:
+   - Error codes must be stable strings (e.g., RESOURCE_NOT_FOUND). Avoid encoding semantics in error text.
+
+C. Endpoint minimization patterns
+- Composite endpoints: Where multiple small endpoints exist (e.g., /model/summary, /model/metrics), provide a single /model?fields=summary,metrics style endpoint to reduce route surface.
+- Projection query param: Support ?fields= and ?exclude= to return minimal payloads; default should be compact (no heavy embeddings or long metadata).
+- Streaming separation: Separate streaming and non-streaming paths (e.g., /generate vs /generate/stream) to avoid extra complexity in the base contract.
+
+D. Compatibility opt-in controls
+- Feature gates at the user-token level for new schema fields.
+- Compatibility headers: X-Redwood-Client-Capabilities (comma-separated tokens) to allow servers to detect client features without expanding route variants.
+
+Examples
+
+1) Safe additive response (recommended)
+Request:
+```http
+GET /v1/models/coffee-shop HTTP/1.1
+Host: api.redwood.ai
+Authorization: Bearer <token>
+```
+Response (existing):
+```json
+{
+  "id": "coffee-shop",
+  "name": "Coffee Shop Model",
+  "description": "small text model for conversational tasks"
+}
+```
+Add new optional field (safe):
+```json
+{
+  "id": "coffee-shop",
+  "name": "Coffee Shop Model",
+  "description": "small text model for conversational tasks",
+  "serving_profiles": ["low-latency", "balanced"] // optional array, safe to ignore
+}
+```
+
+2) Avoid changing semantics of existing fields (anti-pattern)
+- Do NOT change numeric field units (tokens -> characters) or flip boolean polarity ("enabled" -> meaning reversed). Such changes require explicit migration.
+
+Schema-evolution workflows
+
+1. Proposal and schema PR:
+- Create an API design doc describing intent, consumer impact, and telemetry. Attach example requests/responses.
+- Add schema diff in the PR and a migration plan if the change is non-additive.
+
+2. Automated compatibility checks (required):
+- Run CDC test suite (see Testing section) and contract linter. Changes that fail must be gated.
+- Run production traffic replay against canary to check deserialization errors and parity metrics.
+
+3. Canary rollout (required for any schema touch)
+- Canary on 0.5–2% of traffic for 48 hours. Monitor: deserialization errors, 4xx spike, consumer error rate, latency P95.
+- If any of these breach configured thresholds (see Monitoring section), auto-rollback.
+
+4. Gradual ramp and deprecation
+- If removal is required, mark field deprecated in docs, run consumer impact analysis, and keep deprecated field for at least two major release cycles (target 90 days minimum).
+
+Testing and automation
+
+Required tests before merge:
+- Unit schema validation (JSON Schema / Protobuf linter).
+- Consumer-Driven Contract tests: Each consumer team must maintain a minimal CDC verifying their expected contract slices.
+- Mutation testing: Validate server tolerates unknown optional fields and clients tolerate unknown response fields.
+- Integration replay: Use a recorded traffic snippet to exercise new code-paths.
+
+CI automation checklist (example):
+1. schema-lint (fail on breaking diffs unless ADR referenced)
+2. cdc-run (execute CDC tests against a mock server)
+3. replay-smoke (run traffic replay job)
+4. canary-deploy job (automatically wires canary config)
+
+Monitoring and thresholds
+
+Create a per-change dashboard with the following tiles:
+- Deserialization error rate (target < 0.01% increase)
+- Client 4xx rate delta (target < +0.2% absolute)
+- Client error spike count (>= 5 spike events in 15m triggers pager)
+- Latency P95/P99 delta (target < +10% relative)
+- Consumer failure-rate by client-id (ranked)
+
+Automated rollback triggers (examples):
+- Deserialization error rate > 0.05% sustained for 5 minutes
+- Any single client ID sees >1% absolute increase in 5xx or deserialization errors
+- Latency P99 increases by >25% with sustained SLA breach
+
+Rollout and rollback playbook
+
+1. Pre-rollout
+- Ensure automated CDCs pass.
+- Prepare rollback plan: Kubernetes manifest or feature flag reversal command and owner.
+- Schedule a 2-hour watch window after canary start.
+
+2. Canary
+- Deploy to canary pool. Start collecting metrics.
+- After 2 hours with no threshold breaches, increment traffic to 10% for 24 hours.
+
+3. Ramp to GA
+- Ramp in exponential steps (10% -> 30% -> 60% -> 100%) with at least 24 hours at each step for non-trivial schema changes.
+
+4. Rollback
+- If trigger fires, invoke rollback runbook: revert canary, disable feature flag, notify owners, open a postmortem within 72 hours.
+
+Ownership and governance
+
+- API owner: the owning service team must maintain schema docs, CDCs, and rollout artifact.
+- Platform guardrail: Platform team provides schema-lint, CDC harness, replay tooling, and the canary deployment pipeline.
+- Change advisory: For changes affecting payment, routing, or privacy-sensitive fields, involve product and security reviewers.
+
+Appendix: quick reference
+
+Table: Allowed vs. Breaking changes
+| Change type | Allowed in patch/minor | Requires ADR/major | Notes |
+|------------|-----------------------:|------------------:|-------|
+| Add optional response field | Yes | No | Preferred pattern |
+| Add required request field | No | Yes | Use feature gate first |
+| Change field type or unit | No | Yes | Migration required |
+| Remove field | No | Yes | Deprecate first |
+| Add endpoint | Generally yes | No | Prefer extension instead |
+
+Contacts and references:
+- Platform: eng-platform@redwood.ai (canary pipeline, schema-lint)
+- Contract testing docs: sources/confluence/eng-developer-experience/api-examples/contract-testing-harness-2025.json
+- Deprecation policy: sources/confluence/architecture-and-standards/api-standards/api-compatibility-and-deprecation-policy-2026.json
+
+Change log:
+- 2025-11-03: Initial draft by Aisha K. Patel.
+- 2025-12-10: Added CDC requirements and canary thresholds (reviewed by Daniel M. Cho).
+- 2026-02-12: Clarified monitoring thresholds and rollback triggers (MaraDa Gf3nzalez reviewed).

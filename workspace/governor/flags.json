@@ -1,0 +1,42 @@
+{
+  "schema": "tkeir.governor.flags.v1",
+  "updated_at": "2026-07-22T07:48:48.616Z",
+  "scopes": {
+    "all": {
+      "active": false,
+      "reason": "",
+      "activated_at": "",
+      "activated_by": ""
+    },
+    "ingest": {
+      "active": false,
+      "reason": "",
+      "activated_at": "",
+      "activated_by": ""
+    },
+    "index": {
+      "active": false,
+      "reason": "",
+      "activated_at": "",
+      "activated_by": ""
+    },
+    "inference": {
+      "active": false,
+      "reason": "",
+      "activated_at": "",
+      "activated_by": ""
+    },
+    "hmi-write": {
+      "active": false,
+      "reason": "",
+      "activated_at": "",
+      "activated_by": ""
+    },
+    "agents": {
+      "active": false,
+      "reason": "",
+      "activated_at": "",
+      "activated_by": ""
+    }
+  }
+}

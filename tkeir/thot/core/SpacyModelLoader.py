@@ -1,9 +1,20 @@
-"""Load spaCy models by language with multilingual fallback."""
+"""Title: Spacy Model Loader
+
+Load spaCy models by language with multilingual fallback and a process-wide
+cache so tokenizer / morphosyntax / NER / syntax do not each keep a full copy
+of ``en_core_web_md`` in RAM (a common cause of ingest OOM / exit 137).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
 import subprocess
 import sys
+import threading
 import time
 
 import spacy
@@ -17,6 +28,12 @@ MULTILINGUAL_MODEL = "xx_ent_wiki_sm"
 # English uses core_web; most other spaCy models use core_news.
 ENGLISH_MODEL_FAMILY = "core_web"
 DEFAULT_MODEL_FAMILY = "core_news"
+
+# Process-wide cache: model_name → Language.
+# Callers may mutate tokenizer / pipes; re-entrant inits must remove/replace
+# pipes (see Tokenizer / NERTagger) rather than assuming a pristine nlp.
+_MODEL_CACHE: dict[str, Language] = {}
+_MODEL_CACHE_LOCK = threading.Lock()
 
 
 def model_name_candidates(language: str | None, size: str = "sm") -> list[str]:
@@ -93,27 +110,43 @@ def _load_model(
     call_context=None,
     task_name: str | None = None,
 ) -> Language:
-    """Load one spaCy model and log how long it took.
+    """Load one spaCy model (or reuse the process cache) and log timing.
 
     Example:
         >>> from thot.core.SpacyModelLoader import _load_model
         >>> _load_model("en_core_web_sm")  # doctest: +SKIP
     """
     prefix = (task_name + ": ") if task_name else ""
-    ThotLogger.info(
-        prefix + "Loading spaCy model " + model_name + " ...",
-        context=call_context,
-    )
-    started = time.perf_counter()
-    nlp = spacy.load(model_name)
-    ThotLogger.info(
-        prefix
-        + "Loaded spaCy model "
-        + model_name
-        + f" in {time.perf_counter() - started:.1f}s",
-        context=call_context,
-    )
-    return nlp
+    with _MODEL_CACHE_LOCK:
+        cached = _MODEL_CACHE.get(model_name)
+        if cached is not None:
+            ThotLogger.debug(
+                prefix + "Reusing cached spaCy model " + model_name,
+                context=call_context,
+            )
+            return cached
+
+        ThotLogger.info(
+            prefix + "Loading spaCy model " + model_name + " ...",
+            context=call_context,
+        )
+        started = time.perf_counter()
+        nlp = spacy.load(model_name)
+        _MODEL_CACHE[model_name] = nlp
+        ThotLogger.info(
+            prefix
+            + "Loaded spaCy model "
+            + model_name
+            + f" in {time.perf_counter() - started:.1f}s",
+            context=call_context,
+        )
+        return nlp
+
+
+def clear_spacy_model_cache() -> None:
+    """Drop cached spaCy models (tests / memory reclaim)."""
+    with _MODEL_CACHE_LOCK:
+        _MODEL_CACHE.clear()
 
 
 def load_spacy_model(

@@ -1,0 +1,1761 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://071810e8c8f2008baa64e41db9fc15bb617a38a057933322792dfde67da5e7d7/project_report_00104_261e5c4d.html",
+  "title": "AcmeSystems API Gateway Refactor Status",
+  "content": [
+    "# AcmeSystems API Gateway Refactor Status\n\n```\nProject report — AcmeSystems API Gateway Refactor\nStatus: amber\nCompleted: architecture review and prototype.\nNext: user acceptance testing.\nBudget variance: 8 percent. Owner: Nadia Dubois.\n```"
+  ],
+  "kg": [],
+  "error": false,
+  "conversion-info": {
+    "datatype": "html",
+    "source-size-bytes": 368,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:30",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://071810e8c8f2008baa64e41db9fc15bb617a38a057933322792dfde67da5e7d7/project_report_00104_261e5c4d.html",
+  "metadata": {
+    "topic_id": "projects",
+    "corpus": "enterprise",
+    "doc_type": "project_report",
+    "language": "en",
+    "title": "AcmeSystems API Gateway Refactor Status",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "projects",
+  "doc_type": "project_report",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999957689106717
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "#",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "API",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Gateway",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Refactor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Status",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "`",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Project",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "report",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "API",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Gateway",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Refactor",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Status",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "amber",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Completed",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "architecture",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "review",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "prototype",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Next",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "user",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "acceptance",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "testing",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Budget",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "variance",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "8",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "percent",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Owner",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Nadia",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Dubois",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "`",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "API",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Gateway",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Refactor",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Status",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "api",
+      "text": "API",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Gateway",
+      "text": "Gateway",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Refactor",
+      "text": "Refactor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Status",
+      "text": "Status",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "#",
+      "text": "#",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "api",
+      "text": "API",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Gateway",
+      "text": "Gateway",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Refactor",
+      "text": "Refactor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Status",
+      "text": "Status",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 6
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "report",
+      "text": "report",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "api",
+      "text": "API",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Gateway",
+      "text": "Gateway",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Refactor",
+      "text": "Refactor",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Status",
+      "text": "Status",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "amber",
+      "text": "amber",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Completed",
+      "text": "Completed",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "architecture",
+      "text": "architecture",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "review",
+      "text": "review",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "prototype",
+      "text": "prototype",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "ADV",
+      "lemma": "next",
+      "text": "Next",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 26
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "user",
+      "text": "user",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "acceptance",
+      "text": "acceptance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "testing",
+      "text": "testing",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "budget",
+      "text": "Budget",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 32
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "variance",
+      "text": "variance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "NUM",
+      "lemma": "8",
+      "text": "8",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "percent",
+      "text": "percent",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "owner",
+      "text": "Owner",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 38
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Nadia",
+      "text": "Nadia",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Dubois",
+      "text": "Dubois",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 43
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 0,
+      "end": 5,
+      "label": "organization",
+      "text": "AcmeSystems API Gateway Refactor Status"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 40,
+      "end": 42,
+      "label": "person",
+      "text": "Nadia Dubois"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "#",
+      "lemma": "#",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "API",
+      "lemma": "api",
+      "pos": "NOUN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Gateway",
+      "lemma": "Gateway",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [
+        2
+      ],
+      "rights": []
+    },
+    {
+      "text": "Refactor",
+      "lemma": "Refactor",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    },
+    {
+      "text": "Status",
+      "lemma": "Status",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "ROOT",
+      "lefts": [
+        0,
+        1,
+        4
+      ],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "project",
+      "pos": "NOUN",
+      "head": 10,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "report",
+      "lemma": "report",
+      "pos": "NOUN",
+      "head": 10,
+      "dep": "ROOT",
+      "lefts": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "rights": [
+        11,
+        16,
+        19,
+        25
+      ]
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 16,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "API",
+      "lemma": "api",
+      "pos": "NOUN",
+      "head": 14,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Gateway",
+      "lemma": "Gateway",
+      "pos": "PROPN",
+      "head": 15,
+      "dep": "compound",
+      "lefts": [
+        13
+      ],
+      "rights": []
+    },
+    {
+      "text": "Refactor",
+      "lemma": "Refactor",
+      "pos": "PROPN",
+      "head": 16,
+      "dep": "compound",
+      "lefts": [
+        14
+      ],
+      "rights": []
+    },
+    {
+      "text": "Status",
+      "lemma": "Status",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "appos",
+      "lefts": [
+        12,
+        15
+      ],
+      "rights": [
+        17
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 16,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "amber",
+      "lemma": "amber",
+      "pos": "PROPN",
+      "head": 19,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Completed",
+      "lemma": "Completed",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "appos",
+      "lefts": [
+        18
+      ],
+      "rights": [
+        20,
+        22
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "architecture",
+      "lemma": "architecture",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "review",
+      "lemma": "review",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "appos",
+      "lefts": [
+        21
+      ],
+      "rights": [
+        23,
+        24
+      ]
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 22,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "prototype",
+      "lemma": "prototype",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "conj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Next",
+      "lemma": "next",
+      "pos": "ADV",
+      "head": 30,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 30,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "user",
+      "lemma": "user",
+      "pos": "NOUN",
+      "head": 29,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "acceptance",
+      "lemma": "acceptance",
+      "pos": "NOUN",
+      "head": 30,
+      "dep": "compound",
+      "lefts": [
+        28
+      ],
+      "rights": []
+    },
+    {
+      "text": "testing",
+      "lemma": "testing",
+      "pos": "NOUN",
+      "head": 30,
+      "dep": "ROOT",
+      "lefts": [
+        26,
+        27,
+        29
+      ],
+      "rights": [
+        31
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 30,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Budget",
+      "lemma": "budget",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "variance",
+      "lemma": "variance",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "ROOT",
+      "lefts": [
+        32
+      ],
+      "rights": [
+        34,
+        36,
+        37
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "8",
+      "lemma": "8",
+      "pos": "NUM",
+      "head": 36,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "percent",
+      "lemma": "percent",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "appos",
+      "lefts": [
+        35
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Owner",
+      "lemma": "owner",
+      "pos": "NOUN",
+      "head": 38,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        39,
+        41,
+        42
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 38,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Nadia",
+      "lemma": "Nadia",
+      "pos": "PROPN",
+      "head": 41,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Dubois",
+      "lemma": "Dubois",
+      "pos": "PROPN",
+      "head": 38,
+      "dep": "appos",
+      "lefts": [
+        40
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 38,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 43,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 44,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        45
+      ]
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 44,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "API",
+      "lemma": "api",
+      "pos": "NOUN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Gateway",
+      "lemma": "Gateway",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [
+        0,
+        1
+      ],
+      "rights": []
+    },
+    {
+      "text": "Refactor",
+      "lemma": "Refactor",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [
+        2
+      ],
+      "rights": []
+    },
+    {
+      "text": "Status",
+      "lemma": "Status",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 25,
+      "text": "acmesystems api gateway refactor status",
+      "span": {
+        "start": 0,
+        "end": 5
+      }
+    },
+    {
+      "score": 33,
+      "text": "# acmesystems api gateway refactor status",
+      "span": {
+        "start": 0,
+        "end": 6
+      }
+    },
+    {
+      "score": 27,
+      "text": "acmesystems api gateway refactor status",
+      "span": {
+        "start": 12,
+        "end": 17
+      }
+    },
+    {
+      "score": 9,
+      "text": "user acceptance testing",
+      "span": {
+        "start": 28,
+        "end": 31
+      }
+    },
+    {
+      "score": 4,
+      "text": "project report",
+      "span": {
+        "start": 9,
+        "end": 11
+      }
+    },
+    {
+      "score": 4,
+      "text": "amber completed",
+      "span": {
+        "start": 18,
+        "end": 20
+      }
+    },
+    {
+      "score": 4,
+      "text": "architecture review",
+      "span": {
+        "start": 21,
+        "end": 23
+      }
+    },
+    {
+      "score": 4,
+      "text": "budget variance",
+      "span": {
+        "start": 32,
+        "end": 34
+      }
+    },
+    {
+      "score": 4,
+      "text": "nadia dubois",
+      "span": {
+        "start": 40,
+        "end": 42
+      }
+    },
+    {
+      "score": 1,
+      "text": "prototype",
+      "span": {
+        "start": 24,
+        "end": 25
+      }
+    },
+    {
+      "score": 1,
+      "text": "owner",
+      "span": {
+        "start": 38,
+        "end": 39
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://071810e8c8f2008baa64e41db9fc15bb617a38a057933322792dfde67da5e7d7/project_report_00104_261e5c4d.html#chunk-0-f946b2bf78",
+      "parent_doc_id": "ingest://071810e8c8f2008baa64e41db9fc15bb617a38a057933322792dfde67da5e7d7/project_report_00104_261e5c4d.html",
+      "text_raw": "# AcmeSystems API Gateway Refactor Status ` ` ` Project report — AcmeSystems API Gateway Refactor Status : amber Completed : architecture review and prototype . Next : user acceptance testing . Budget variance : 8 percent . Owner : Nadia Dubois . ` ` `",
+      "search_vector_payload": "# AcmeSystems API Gateway Refactor Status ` ` ` Project report — AcmeSystems API Gateway Refactor Status : amber Completed : architecture review and prototype . Next : user acceptance testing . Budget variance : 8 percent . Owner : Nadia Dubois . ` ` `",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "person": [
+            "Nadia Dubois"
+          ]
+        },
+        "svo_triplets": [],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 46,
+        "sentence_start": 0,
+        "sentence_end": 6
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Nadia Dubois",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "# AcmeSystems API Gateway Refactor Status ` ` ` Project report —",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "# AcmeSystems API Gateway Refactor Status ` ` ` Project report — AcmeSystems API Gateway Refactor Status : amber Completed : architecture review and prototype . Next : user accepta...",
+          "question_type": "Summary-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/acmesystems_api_gateway_refactor_status\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"# acmesystems api gateway refactor status\"\n      },\n      {\n        \"@value\": \"acmesystems api gateway refactor status\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/user_acceptance_testing\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"user acceptance testing\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Chunk/ingest_071810e8c8f2008baa64e41db9fc15bb617a38a057933322792dfde67da5e7d7_project_report_00104_261e5c4d_html_chunk_0_f946b2bf78\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/acmesystems_api_gateway_refactor_status\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/user_acceptance_testing\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/project_report\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/amber_completed\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/architecture_review\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/budget_variance\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/nadia_dubois\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/prototype\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/owner\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Person/nadia_dubois-93a0ee021cdf\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Organization/acmesystems_api_gateway_refactor_status-ebc3b8e5e081\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"project_report_00104_261e5c4d_html\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/owner\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"owner\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/amber_completed\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"amber completed\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/budget_variance\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"budget variance\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Organization/acmesystems_api_gateway_refactor_status-ebc3b8e5e081\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems API Gateway Refactor Status\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Chunk/ingest_071810e8c8f2008baa64e41db9fc15bb617a38a057933322792dfde67da5e7d7_project_report_00104_261e5c4d_html_chunk_0_f946b2bf78\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Person/nadia_dubois-93a0ee021cdf\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://071810e8c8f2008baa64e41db9fc15bb617a38a057933322792dfde67da5e7d7/project_report_00104_261e5c4d.html#chunk-0-f946b2bf78\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/project_report\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"project report\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/nadia_dubois\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"nadia dubois\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Person/nadia_dubois-93a0ee021cdf\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Person\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Nadia Dubois\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/prototype\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"prototype\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/project_report_00104_261e5c4d_html/Keyword/architecture_review\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"architecture review\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 18,
+      "graph_triple_count": 40,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 51,
+    "total_tokens": 51,
+    "covered_characters": 242,
+    "total_characters": 242
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 46,
+  "token-count": 51,
+  "source-file-size-bytes": 368,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.049,
+    "tasks": {
+      "converter": 0.008,
+      "language-detection": 0.004,
+      "resource-selection": 0.001,
+      "tokenizer": 0.003,
+      "morphosyntax": 0.009,
+      "ner": 0.007,
+      "syntax": 0.009,
+      "keywords": 0.0,
+      "chunking": 0.002,
+      "ontology": 0.006,
+      "chunk-questions": 0.001
+    }
+  }
+}

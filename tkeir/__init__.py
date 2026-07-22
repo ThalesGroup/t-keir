@@ -1,9 +1,11 @@
-"""T-KEIR top-level package.
+"""Title: tkeir package init
 
-Author: Eric Blaudez (Eric Blaudez)
+T-KEIR top-level package.
 
-Copyright (c) 2026 by THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 __version__ = "2.0.0"

@@ -1,0 +1,23 @@
+{
+  "started_at": "2026-07-22T09:02:27Z",
+  "ended_at": "2026-07-22T09:50:35Z",
+  "api_url": "http://localhost:8091",
+  "fallback_mode": null,
+  "total": 1500,
+  "sent": 1500,
+  "noop": 96,
+  "failed": 0,
+  "by_user_space": {
+    "dev@tkeir": 1500
+  },
+  "by_corpus": {
+    "osint": 1500
+  },
+  "by_topic": {
+    "situational_awareness": 606,
+    "intelligence": 261,
+    "publications": 143,
+    "operations": 490
+  },
+  "errors": []
+}

@@ -1,4 +1,12 @@
-"""Load and validate agent YAML specs from ``tkeir/configs/agents/``."""
+"""Title: Registry
+
+Load and validate agent YAML specs from ``tkeir/configs/agents/``.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

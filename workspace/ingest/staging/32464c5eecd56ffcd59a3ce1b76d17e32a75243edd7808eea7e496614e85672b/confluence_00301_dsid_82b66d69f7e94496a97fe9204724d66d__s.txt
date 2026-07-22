@@ -1,0 +1,194 @@
+SRE On-Call Guidelines and Game-Day Curriculum
+
+## Purpose
+This document codifies Redwood's SRE on-call expectations, a standard incident lifecycle, runbook patterns, rotation guidance, and a reproducible game-day curriculum for operational readiness. It also includes customer-facing and status-page templates for consistent communications.
+
+Scope: eng-facing operational guidance for production incidents impacting hosted and dedicated inference services (redwood-api, inference-router, kv-cache, batch-scheduler). Not a replacement for service-specific runbooks, which should be linked below.
+
+---
+
+## Quick reference: severity definitions and thresholds
+- Sev 1 (P0): Customer-facing outage impacting >= 10% of requests or regional full-service outage. Response target: page within 5 minutes; reduce blast radius within 30 minutes.
+- Sev 2 (P1): Partial degradation (latency/throughput degradation or errors affecting a subset of customers). Response target: acknowledge within 15 minutes; mitigation in 2 hours.
+- Sev 3 (P2): Minor functional impact, non-urgent bug, or scheduled maintenance. Response target: triage within 24 hours.
+
+Alert thresholds (examples):
+- redwood-api: error-rate > 1.5% sustained for 1 minute -> Sev2; > 5% for 1 minute -> Sev1.
+- inference-router p95 latency: > 750ms for 2 minutes -> Sev2; > 1500ms for 1 minute -> Sev1.
+- kv-cache miss ratio: > 40% for 5 minutes when baseline < 10% -> Sev2.
+- batch-scheduler backlog: queue length > 3x provisioned capacity for 10 minutes -> Sev2.
+
+SLOs and error budgets are authoritative for routing incident prioritization; always consult the SLO dashboard before declaring a Sev.
+
+---
+
+## Incident lifecycle (standard procedure)
+1. Detect/Alert: Monitoring or external report triggers an alert.
+2. Triage & Severity: On-call accepts page, performs fast triage, and sets severity.
+3. Mobilize Incident Commander (IC) and communicate initial status.
+4. Contain & Mitigate: Apply short-term mitigation (traffic-shift, scale-up, fallback model variant).
+5. Investigate Root Cause: parallel workstreams for mitigation and RCA.
+6. Restore: Return system to normal service (SLOs met).
+7. Postmortem: Blameless write-up within 72 hours of restore with action items.
+8. Close: Verify actions and track to completion; update runbooks.
+
+Responsibilities during an incident:
+- Primary on-call: acknowledge, initial triage, own first-15-minute message.
+- Incident Commander (IC): owns coordination, updates, and run of the incident; rotates every 60–90 minutes.
+- Secondary on-call: backs up primary, owned service SME.
+- Communications lead: posts to status page and customer comms when required.
+- Engineers in the hot seat: follow IC direction and update the shared incident channel.
+
+---
+
+## Escalation matrix (reference)
+Service owners maintain a local phone/cell list; below is the canonical escalation ladder for on-call responders:
+
+| Level | Role | How to engage | SLA to respond |
+|---|---|---:|---:|
+| 1 | Primary on-call | Pager -> Slack DM -> phone | 5 minutes |
+| 2 | Secondary / Team lead | Escalate via Slack @team-oncall -> phone | 10 minutes |
+| 3 | SRE Manager / Service Owner | Phone -> pager | 20 minutes |
+| 4 | Engineering Director / Incident Executive | Phone + email | 30 minutes |
+
+Note: when a customer contractual SLA is implicated, escalate directly to Director and Customer Success.
+
+---
+
+## Runbook pattern (template and example)
+Use this as the base structure for all service-level runbooks:
+- Title & scope
+- Owner & rotation contact
+- Symptoms that should trigger the runbook
+- Quick checks (0–5 minutes)
+- Containment steps (5–30 minutes)
+- Recovery & verification (30–120 minutes)
+- Deep diagnostics (RCA) commands and logs
+- Post-incident steps and follow-ups
+
+Example: inference-router-p95-surge-runbook (abbreviated)
+Quick checks:
+1) Check routing health: curl -s https://internal-monitoring/api/v1/services/inference-router/health | jq .status
+2) Check pods: kubectl -n inference get pods -l app=inference-router -o wide
+3) Check queue/backpressure: curl http://metrics:9090/api/v1/query?query=queue_length_inference_router
+
+Containment steps:
+1) Scale replica sets: kubectl -n inference scale deploy/inference-router --replicas=6
+2) Traffic shift: runbook-scripts/shift-traffic --from=inference-router --to=inference-router-hotfix 
+3) Apply temporary rate-limiter/short-circuit for heavy clients: rlimitctl set --service inference-router --max-rps 10000
+
+Recovery & verification:
+- Monitor p95 and error rate for 15-minute rolling window.
+- Run synthetic request checks: for endpoint X -> curl -sS https://redwood-api.internal/v1/health-check | grep OK
+
+Diagnostics (RCA) commands:
+- kubectl logs -n inference -l app=inference-router --tail=1000 | grep -i error
+- strace/heap profile collection: collect-profiles.sh --service inference-router --duration 60s
+
+---
+
+## Postmortem expectations and template
+- Timeline: publish a draft within 72 hours of service restore.
+- Required sections: summary, impact (customers/regions/tokens), timeline, root cause analysis, contributing factors, corrective actions (owner + ETA), detection & alert improvements, follow-up verification plan.
+- Severity adjustments: postmortem author proposes final Sev and provides SLO impact calculation.
+
+Postmortem checklist:
+1) Link to incident channel and runbook versions used.
+2) Attach logs and key metrics snapshots.
+3) Create Jira tasks for corrective actions with owners and dates.
+4) Schedule a 30–60 minute blameless review within one week.
+
+---
+
+## On-call rotations: recommended patterns and handoffs
+- Primary rotations: 1-week primary on-call per engineer (typical for platform teams).
+- Secondary rotations: 4-week secondary cycle (senior engineers).
+- On-call shift handoff template (to use in Slack):
+  - Current status: services passing/known issues
+  - Active incidents: link + brief status
+  - Nighttime guardrails: escalation contacts if auto-alerts trigger
+  - Local maintenance windows scheduled
+
+Handoff acceptance requires explicit acknowledgement ("I accept" in channel). If no acknowledgement in 10 minutes, escalate to Secondary.
+
+Compensation & fatigue management:
+- Time-off: individuals with >3 on-call weeks in a 12-week window should rotate off for a recovery week.
+- Pager load balancing: use schedule rules to avoid >2 consecutive critical incidents for same engineer when possible.
+
+---
+
+## Game-day curriculum (quarterly runbook)
+Purpose: validate runbooks, handoffs, communication templates, and escalation under realistic stress with a mix of planned failures.
+
+Quarterly schedule (example):
+- Week -2: Planning — scenario owners, objectives, and success criteria defined.
+- Week -1: Participant notification and pre-reads distributed.
+- Day 0 (game day): 4-hour exercise
+  - 00:00–00:15: Inject incident, page primary.
+  - 00:15–00:45: Triage & IC selection.
+  - 00:45–01:30: Containment actions and communication to status page.
+  - 01:30–02:30: Root cause investigation and mitigation.
+  - 02:30–03:00: Restore and service verification.
+  - 03:00–04:00: Hot debrief and action item capture.
+- Week +1: Postmortem draft and follow-ups.
+
+Common injection scenarios:
+- Regional network partition affecting managed storage.
+- Model-serving memory leak leading to OOMs under steady load.
+- Credential rotation failure for a downstream dependency.
+
+Success criteria:
+- IC assigned within 10 minutes.
+- Status page updated within 30 minutes of injection.
+- Containment achieved within 90 minutes for Sev-equivalent scenarios.
+
+---
+
+## Status page & customer communication templates
+Status page brief (one-line):
+- "Partial service degradation in us-east affecting model inference latency. Investigating (last updated: {time})."
+
+Status page detailed update (example):
+- Impact: "Customers in us-east may experience elevated latency for inference requests. Error rates are not elevated across all customers."
+- Scope: "Approx. 14% of requests routed through inference-router-us-east are impacted; other regions nominal."
+- Mitigation: "We have shifted 30% of traffic away from affected hosts and are scaling warm pools. No data loss observed."
+- ETA/Next update: "Targeting mitigation within 60 minutes; next update at {time}."
+
+Customer email template (short):
+Subject: "Redwood: Partial inference latency degradation in us-east — update"
+Body: "Hi {CustomerName},
+We are investigating an issue causing increased inference latency for a subset of requests in the us-east region. Our SRE team is actively mitigating and has shifted traffic to healthy hosts. We do not believe there is any data loss. We will follow up with another update within 60 minutes or when the issue is resolved.
+Regards,
+Redwood SRE"
+
+Communication ownership: the IC assigns a communications lead within the first 15 minutes who is responsible for public-facing and customer comms. All outgoing messages must be approved by IC.
+
+---
+
+## Post-incident actions & tracking
+- Create Jira tasks for immediate fixes (priority P1), medium-term improvements (P2), and long-term projects (P3).
+- Ensure at least one automation item (alert, runbook step, or monitoring dashboard) is created per incident to reduce recurrence.
+- Validate corrective actions within 30 days and mark completion in the postmortem.
+
+---
+
+## Ownership and contacts
+- On-call schedule manager: SRE tooling team (sre-schedules@redwood.internal).
+- Incident commander escalation: SRE Manager (pager: +1-555-0199).
+- Status page publishing: comms-bot account (automated) and Communications lead for manual updates.
+
+---
+
+## Related resources
+- Service runbooks: link from team wikis (each service must link back to this standard).
+- SLO & Error Budgets dashboard: /confluence/eng-sre/slo-and-error-budgets-2025.
+- Incident channel naming convention: #inc-<YYYYMMDD>-<service>-<sevtier>
+
+---
+
+## Revision history
+- 2024-11-15: Created by Maya Patel.
+- 2025-06-03: Added game-day curriculum and updated alert thresholds (reviewed by Ava Ramirez).
+- 2026-02-10: Clarified rotation handoff rules and added compensation guidance (reviewed by Noah Kim).
+
+For immediate feedback or required amendments, ping the SRE team in #sre-process or contact the author.

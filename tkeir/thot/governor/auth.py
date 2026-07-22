@@ -1,4 +1,12 @@
-"""Authorization for governor admin APIs."""
+"""Title: Auth
+
+Authorization for governor admin APIs.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

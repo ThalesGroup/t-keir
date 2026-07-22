@@ -1,0 +1,1638 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://b15fd7c2574265d68bba8557a9308618f0c7b71aabc11a08e59f0e34a578d241/SALUTE_00932_b79ee140.pdf",
+  "title": "SALUTE 00932 — Training Area 7",
+  "content": [
+    "SALUTE 00932 â Training Area 7\nSALUTE REPORT\nSize: 4 personnel\nActivity: convoy staging\nLocation: Training Area 7\nUnit/Uniform: unidentified support element\nTime: 2026-07-08T07:16Z\nEquipment: tactical radios and light vehicles."
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "convoy"
+        ],
+        "lemma_content": [
+          "convoy"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          14
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "staging"
+        ],
+        "lemma_content": [
+          "stage"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          15
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "Location"
+        ],
+        "lemma_content": [
+          "location"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          16
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "pdf",
+    "source-size-bytes": 918,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:05",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:05",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:05",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:05",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:05",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:05",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:05",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:05",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:06",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:31:06",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_smx.owl"
+  ],
+  "source": "ingest://b15fd7c2574265d68bba8557a9308618f0c7b71aabc11a08e59f0e34a578d241/SALUTE_00932_b79ee140.pdf",
+  "metadata": {
+    "topic_id": "situational_awareness",
+    "corpus": "osint",
+    "doc_type": "SALUTE",
+    "language": "en",
+    "title": "SALUTE 00932 — Training Area 7",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "situational_awareness",
+  "doc_type": "SALUTE",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999939739013244
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "SALUTE",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "00932",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "â",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Training",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Area",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "7",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "SALUTE",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "REPORT",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Size",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "4",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "personnel",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Activity",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "convoy",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "staging",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Location",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Training",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Area",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "7",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Unit",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "/",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Uniform",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "unidentified",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "support",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "element",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Time",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "2026-07-08T07:16Z",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Equipment",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "tactical",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "radios",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "light",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "vehicles",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "SALUTE",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "00932",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Training",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Area",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "7",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "salute",
+      "text": "SALUTE",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00932",
+      "text": "00932",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Training",
+      "text": "Training",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NUM",
+      "lemma": "7",
+      "text": "7",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "SALUTE",
+      "text": "SALUTE",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00932",
+      "text": "00932",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "â",
+      "text": "â",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Training",
+      "text": "Training",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NUM",
+      "lemma": "7",
+      "text": "7",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "salute",
+      "text": "SALUTE",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "report",
+      "text": "REPORT",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Size",
+      "text": "Size",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "NUM",
+      "lemma": "4",
+      "text": "4",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "personnel",
+      "text": "personnel",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "activity",
+      "text": "Activity",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "convoy",
+      "text": "convoy",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "VERB",
+      "lemma": "stage",
+      "text": "staging",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "location",
+      "text": "Location",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "training",
+      "text": "Training",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "NUM",
+      "lemma": "7",
+      "text": "7",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Unit",
+      "text": "Unit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "/",
+      "text": "/",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Uniform",
+      "text": "Uniform",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "unidentified",
+      "text": "unidentified",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "support",
+      "text": "support",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "element",
+      "text": "element",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "time",
+      "text": "Time",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "2026-07-08T07:16Z",
+      "text": "2026-07-08T07:16Z",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Equipment",
+      "text": "Equipment",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "tactical",
+      "text": "tactical",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "radio",
+      "text": "radios",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "light",
+      "text": "light",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "vehicle",
+      "text": "vehicles",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [],
+  "content_deps": [
+    {
+      "text": "SALUTE",
+      "lemma": "SALUTE",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        8
+      ]
+    },
+    {
+      "text": "00932",
+      "lemma": "00932",
+      "pos": "NUM",
+      "head": 4,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "â",
+      "lemma": "â",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Training",
+      "lemma": "Training",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [
+        2
+      ],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "nmod",
+      "lefts": [
+        1,
+        3
+      ],
+      "rights": []
+    },
+    {
+      "text": "7",
+      "lemma": "7",
+      "pos": "NUM",
+      "head": 6,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SALUTE",
+      "lemma": "salute",
+      "pos": "NOUN",
+      "head": 8,
+      "dep": "compound",
+      "lefts": [
+        4,
+        5
+      ],
+      "rights": []
+    },
+    {
+      "text": "REPORT",
+      "lemma": "report",
+      "pos": "ADJ",
+      "head": 8,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Size",
+      "lemma": "Size",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "dobj",
+      "lefts": [
+        6,
+        7
+      ],
+      "rights": [
+        9,
+        12
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 8,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "4",
+      "lemma": "4",
+      "pos": "NUM",
+      "head": 12,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "personnel",
+      "lemma": "personnel",
+      "pos": "NOUN",
+      "head": 12,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Activity",
+      "lemma": "activity",
+      "pos": "NOUN",
+      "head": 8,
+      "dep": "appos",
+      "lefts": [
+        10,
+        11
+      ],
+      "rights": [
+        13
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "convoy",
+      "lemma": "convoy",
+      "pos": "NOUN",
+      "head": 14,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        15,
+        24,
+        27,
+        28,
+        29,
+        31,
+        38
+      ]
+    },
+    {
+      "text": "staging",
+      "lemma": "stage",
+      "pos": "VERB",
+      "head": 14,
+      "dep": "acl",
+      "lefts": [],
+      "rights": [
+        16
+      ]
+    },
+    {
+      "text": "Location",
+      "lemma": "location",
+      "pos": "NOUN",
+      "head": 15,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": [
+        17,
+        23
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 16,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Training",
+      "lemma": "training",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 21,
+      "dep": "nmod",
+      "lefts": [
+        18
+      ],
+      "rights": []
+    },
+    {
+      "text": "7",
+      "lemma": "7",
+      "pos": "NUM",
+      "head": 21,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Unit",
+      "lemma": "Unit",
+      "pos": "PROPN",
+      "head": 23,
+      "dep": "nmod",
+      "lefts": [
+        19,
+        20
+      ],
+      "rights": []
+    },
+    {
+      "text": "/",
+      "lemma": "/",
+      "pos": "PUNCT",
+      "head": 23,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Uniform",
+      "lemma": "Uniform",
+      "pos": "PROPN",
+      "head": 16,
+      "dep": "appos",
+      "lefts": [
+        21,
+        22
+      ],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 14,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "unidentified",
+      "lemma": "unidentified",
+      "pos": "ADJ",
+      "head": 27,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "support",
+      "lemma": "support",
+      "pos": "NOUN",
+      "head": 27,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "element",
+      "lemma": "element",
+      "pos": "NOUN",
+      "head": 14,
+      "dep": "appos",
+      "lefts": [
+        25,
+        26
+      ],
+      "rights": []
+    },
+    {
+      "text": "Time",
+      "lemma": "time",
+      "pos": "NOUN",
+      "head": 14,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 14,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "2026-07-08T07:16Z",
+      "lemma": "2026-07-08T07:16Z",
+      "pos": "PROPN",
+      "head": 31,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Equipment",
+      "lemma": "Equipment",
+      "pos": "PROPN",
+      "head": 14,
+      "dep": "appos",
+      "lefts": [
+        30
+      ],
+      "rights": [
+        32,
+        34
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 31,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "tactical",
+      "lemma": "tactical",
+      "pos": "ADJ",
+      "head": 34,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "radios",
+      "lemma": "radio",
+      "pos": "NOUN",
+      "head": 31,
+      "dep": "appos",
+      "lefts": [
+        33
+      ],
+      "rights": [
+        35,
+        37
+      ]
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 34,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "light",
+      "lemma": "light",
+      "pos": "ADJ",
+      "head": 37,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "vehicles",
+      "lemma": "vehicle",
+      "pos": "NOUN",
+      "head": 34,
+      "dep": "conj",
+      "lefts": [
+        36
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 14,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "SALUTE",
+      "lemma": "salute",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        4
+      ]
+    },
+    {
+      "text": "00932",
+      "lemma": "00932",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 4,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Training",
+      "lemma": "Training",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [
+        2,
+        3
+      ],
+      "rights": [
+        5
+      ]
+    },
+    {
+      "text": "7",
+      "lemma": "7",
+      "pos": "NUM",
+      "head": 4,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 16,
+      "text": "unidentified support element time",
+      "span": {
+        "start": 25,
+        "end": 29
+      }
+    },
+    {
+      "score": 4,
+      "text": "2026-07-08t07:16z equipment",
+      "span": {
+        "start": 30,
+        "end": 32
+      }
+    },
+    {
+      "score": 4,
+      "text": "tactical radio",
+      "span": {
+        "start": 33,
+        "end": 35
+      }
+    },
+    {
+      "score": 4,
+      "text": "light vehicle",
+      "span": {
+        "start": 36,
+        "end": 38
+      }
+    },
+    {
+      "score": 1,
+      "text": "uniform",
+      "span": {
+        "start": 23,
+        "end": 24
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://b15fd7c2574265d68bba8557a9308618f0c7b71aabc11a08e59f0e34a578d241/SALUTE_00932_b79ee140.pdf#chunk-0-17fc00fc84",
+      "parent_doc_id": "ingest://b15fd7c2574265d68bba8557a9308618f0c7b71aabc11a08e59f0e34a578d241/SALUTE_00932_b79ee140.pdf",
+      "text_raw": "SALUTE 00932 â Training Area 7 SALUTE REPORT Size : 4 personnel Activity : convoy staging Location : Training Area 7 Unit / Uniform : unidentified support element Time : 2026-07-08T07:16Z Equipment : tactical radios and light vehicles .",
+      "search_vector_payload": "SALUTE 00932 â Training Area 7 SALUTE REPORT Size : 4 personnel Activity : convoy staging Location : Training Area 7 Unit / Uniform : unidentified support element Time : 2026-07-08T07:16Z Equipment : tactical radios and light vehicles .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {},
+        "svo_triplets": [
+          [
+            "convoy",
+            "staging",
+            "Location"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 39,
+        "sentence_start": 0,
+        "sentence_end": 1
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "convoy staging Location",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "SALUTE 00932 â Training Area 7 SALUTE REPORT Size : 4 personnel",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "SALUTE 00932 â Training Area 7 SALUTE REPORT Size : 4 personnel Activity : convoy staging Location : Training Area 7 Unit / Uniform : unidentified support element Time : 2026-07-...",
+          "question_type": "Summary-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Chunk/ingest_b15fd7c2574265d68bba8557a9308618f0c7b71aabc11a08e59f0e34a578d241_salute_00932_b79ee140_pdf_chunk_0_17fc00fc84\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/unidentified_support_element_time\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/2026_07_08t07_16z_equipment\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/tactical_radio\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/light_vehicle\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/uniform\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Convoy/convoy-56dc1a011eb4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"salute_00932_b79ee140_pdf\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/2026_07_08t07_16z_equipment\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"2026-07-08t07:16z equipment\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/light_vehicle\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"light vehicle\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Location/location-15b61974b270\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Location\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Location\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/tactical_radio\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"tactical radio\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/uniform\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"uniform\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Convoy/convoy-56dc1a011eb4\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Convoy\"\n    ],\n    \"http://tkeir.local/ontology/staging\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Location/location-15b61974b270\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"convoy\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Keyword/unidentified_support_element_time\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"unidentified support element time\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Chunk/ingest_b15fd7c2574265d68bba8557a9308618f0c7b71aabc11a08e59f0e34a578d241_salute_00932_b79ee140_pdf_chunk_0_17fc00fc84\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/salute_00932_b79ee140_pdf/Convoy/convoy-56dc1a011eb4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://b15fd7c2574265d68bba8557a9308618f0c7b71aabc11a08e59f0e34a578d241/SALUTE_00932_b79ee140.pdf#chunk-0-17fc00fc84\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 14,
+      "graph_triple_count": 27,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 45,
+    "total_tokens": 45,
+    "covered_characters": 225,
+    "total_characters": 225,
+    "derivation": {
+      "enabled": true,
+      "status": "NO_MATCHES",
+      "matches": 0,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 0,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JM6QHHS2TEKYYQPGF3SWZ/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 6,
+  "content-token-count": 39,
+  "token-count": 45,
+  "source-file-size-bytes": 918,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.209,
+    "tasks": {
+      "converter": 0.007,
+      "language-detection": 0.005,
+      "resource-selection": 0.001,
+      "tokenizer": 0.05,
+      "morphosyntax": 0.005,
+      "ner": 0.038,
+      "syntax": 0.007,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.094,
+      "chunk-questions": 0.001
+    }
+  }
+}

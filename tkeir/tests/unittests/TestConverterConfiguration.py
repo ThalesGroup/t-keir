@@ -1,4 +1,12 @@
-"""Test converter configuration."""
+"""Title: Converter Configuration
+
+Test converter configuration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import json
 import os

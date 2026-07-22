@@ -1,4 +1,12 @@
-"""Test NER tagger configuration."""
+"""Title: NERTagger Configuration
+
+Test NER tagger configuration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import json
 import os

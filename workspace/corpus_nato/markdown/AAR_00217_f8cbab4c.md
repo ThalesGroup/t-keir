@@ -1,0 +1,7 @@
+# AAR 00217 — North Atlantic
+
+AFTER ACTION REVIEW
+Exercise location: North Atlantic
+Observation: common operational picture updates were timely.
+Lesson: verify data provenance before dissemination.
+Action: improve liaison reporting cadence.

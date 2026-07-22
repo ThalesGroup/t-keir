@@ -1,4 +1,12 @@
-"""Helpers for EU compliance OPA policy unit tests."""
+"""Title: Opa helpers
+
+Helpers for EU compliance OPA policy unit tests.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

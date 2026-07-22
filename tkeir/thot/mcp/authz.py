@@ -1,7 +1,12 @@
-"""MCP authorization: Bearer → user_space + intent/scope + OPA-style gate.
+"""Title: MCP authorization: Bearer → user_space + intent/scope + OPA-style gate.
 
 Phase A maps every read tool to ``intent:search``. ``user_space`` is never
 taken from tool arguments — only from the authenticated principal.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

@@ -1,8 +1,11 @@
-"""NER Tagger configuration
-Author : Eric Blaudez (Eric Blaudez)
+"""Title: NER Tagger configuration
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Named-entity recognition for the T-KEIR NLP pipeline.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.core.ConfigurationUtils import load_configuration

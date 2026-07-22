@@ -1,0 +1,184 @@
+Cache Warmup, Degradation Handling, and Heterogeneous-Fallback Playbook
+
+Summary
+
+This playbook describes operator procedures and automated policies for warm‑starting model caches, graceful degraded‑model fallbacks across heterogeneous GPU fleets, and safe tenant eviction when warmup cannot complete within SLOs. It covers: preflight checks, deterministic warmup sequences, progressive degradation thresholds, telemetry signals to monitor, and rollback/forensic steps. The patterns apply to VPC and on‑prem private deployments where model artifacts and KV/prefix caches are local and tenant isolation is required.
+
+Goals and SLOs
+
+- Warmup SLO: 90% of tenant model instances reach operational KV cache priming within 6 minutes of deployment or scale‑up for 95th percentile request types.
+- Degraded‑model latency SLO: tail latency (p95) should not exceed baseline latency by >2x when fallback is active.
+- Safe eviction window: tenant eviction (if required) completes with state snapshot and crypto key rotation within 10 minutes of initiation.
+- Observability: warmup progress ETA and fallback events must be emitted as structured telemetry events with tenant_id and model_version.
+
+Ownership and Contacts
+
+- Primary owners: runtime-team (redwood-runtime), infra-sre (capacity and networking), field-ops (operator procedures).
+- Escalation path: operator -> runtime oncall -> infra-sre -> eng leads.
+- Pager: #runtime-oncall (PagerDuty) | Primary: runtime-oncall@redwood.example.com
+
+When to use this playbook
+
+Use this playbook for:
+- New private deployment commissioning (VPC + on‑prem) when model bundles are staged locally.
+- Model swap or quantized model rollouts where cache priming is required.
+- Unexpected surge after tenant migration that causes cold caches to impair latency.
+- Hardware heterogeneity events (mixed A100/RTX/Infer accelerators) requiring fallback to smaller or quantized variants.
+
+Preflight checklist (operator)
+
+1. Verify model artifact presence and signature:
+   - Check model artifact checksum and attestation: sha256 and provenance meta in /opt/redwood/models/<model_version>/manifest.json
+   - Example: shasum -a 256 /opt/redwood/models/gptx-compact-1/weights.bin
+2. Confirm KV/prefix cache mount and sizing:
+   - df -h /var/lib/redwood/kv-cache
+   - Ensure configured cache size >= requested cache_quota (see config table below)
+3. Validate runtime health: curl -sS http://localhost:8080/health | jq .
+4. Confirm GPU topology discovery: redwood-runtime topo inspect --json > /tmp/topo.json
+5. Ensure telemetry gateway reachable: curl -fS http://telemetry-gateway.internal:9200/health
+
+Warmup strategy and sequence
+
+A deterministic warmup reduces probabilistic cold latency. We use a three‑phase warmup: seed, incremental, and steady‑state.
+
+- Seed phase (parallel, short requests):
+  - Purpose: populate prefix cache/KV with hot tokens for common prompts.
+  - Trigger: after model artifact load completes.
+  - Action: run seed harness using representative prompt set (seed-prompts.json) at low concurrency (c=4).
+  - CLI example: redwood-runtime warmup run --model gptx-compact-1 --seed-file /opt/redwood/seed-prompts.json --concurrency 4 --rate-limit 25/s
+
+- Incremental phase (throttled traffic shadowing):
+  - Purpose: gradually increase context lengths and batch sizes to fill attention and KV patterns.
+  - Action: start shadow traffic generator that replays sampled customer prompts with tenant headers in shadow mode. Shadow policy: 10% of production QPS for first 5 minutes, 25% for next 10 minutes.
+
+- Steady-state phase (validation and handover):
+  - Purpose: validate that p50/p95 latencies meet target and caches are sufficiently populated.
+  - Action: run validation evals against evaluation prompt set and promote model to serving label.
+
+Warmup telemetry signals (required)
+
+Emit the following structured events at INFO level:
+- warmup.started {tenant_id, model_version, instance_id, topology_snapshot} 
+- warmup.seed_progress {percent, seeded_keys, estimated_time_remaining} 
+- warmup.kv_fill {kv_size_bytes, kv_hit_rate} 
+- warmup.completed {duration_ms, final_kv_hit_rate} 
+- fallback.activated {reason_code, from_model, to_model, suppress_until}
+
+Progressive degradation policy (automated)
+
+When capacity or warmup fails, the fallback orchestrator should perform a graded degradation to preserve availability: 
+
+1) Prefetch fallback candidates: model variants must be registered in the model registry with compatibility metadata (architecture, quantization, tokenizer hash).
+2) Soft fallback: route a configurable percentage (default 10%) of requests to a smaller or quantized variant to validate output quality and latency. Monitor quality metrics for 10 minutes.
+3) Hard fallback: if error rate or latency exceed thresholds (see thresholds table), route 100% of traffic to fallback variant and mark primary model unhealthy.
+4) Eviction: if no fallback variant is compatible and latency is unacceptable for >15 minutes, initiate tenant eviction procedures (see Eviction section).
+
+Thresholds and safe guards
+
+| Metric | Soft threshold | Hard threshold | Action |
+|---|---:|---:|---|
+| p95 latency increase over baseline | 1.5x | 2.0x | soft/hard fallback |
+| 5xx error rate (1m) | 0.5% | 2.0% | soft/hard fallback |
+| kv cache hitrate (moving 5m) | 60% | 30% | alert + fallback |
+| memory pressure (% of alloc) | 70% | 90% | throttle + evict |
+
+Configuration reference (example)
+
+- redwood-runtime.conf (YAML snippet):
+
+runtime:
+  model_version: "gptx-compact-1"
+  cache_quota_bytes: 2147483648 # 2GiB per tenant instance
+  warmup:
+    seed_file: "/opt/redwood/seed-prompts.json"
+    seed_concurrency: 4
+    shadow_policy: 
+      initial_rate_pct: 10
+      step_rate_pct: 25
+      step_duration_minutes: 10
+  fallback:
+    enable_soft_fallback: true
+    soft_sample_pct: 10
+    hard_thresholds: 
+      p95_multiplier: 2.0
+      error_rate_pct: 2.0
+
+Operational procedures
+
+1) Manual warmup (operator-run)
+   - When: commissioning or manual model swap.
+   - Steps:
+     a) Run preflight checklist.
+     b) Execute seed phase: redwood-runtime warmup run --model <model> --seed-file <seed> --concurrency 4
+     c) Start shadow replay: redwood-runtime shadow start --tenant <tid> --pct 10 --duration 5m
+     d) Monitor telemetry: tail telemetry events and check warmup.kv_fill and warmup.completed.
+     e) Promote: redwood-registry promote --model <model> --label serving --tenant <tid>
+
+2) Automated fallback activation (runtime)
+   - Trigger: crossing soft or hard thresholds.
+   - Runtime actions:
+     a) Emit fallback.activated event with reason_code.
+     b) Start soft fallback gating (sample traffic).
+     c) Run quality regression check (BLEU/ROUGE/embedding-distance) on sampled responses.
+     d) If quality acceptable, ramp to hard fallback.
+
+3) Tenant eviction procedure (operator-assisted, last resort)
+   - Preconditions: no compatible fallback, warmup failing >15m, business impact high.
+   - Steps:
+     1) Announce: notify customer success and send templated message via provider channels.
+     2) Snapshot state:
+        - redwood-operator snapshot --tenant <tid> --destination /evidence/<tid>/snapshot-<ts>.tar.gz
+        - Verify signature and upload to controlled S3 bucket with restricted ACLs.
+     3) Rotate ephemeral tenant keys: operator-key-rotate --tenant <tid> --force
+     4) Drain traffic: route addition of 503 circuit with friendly message.
+     5) Evict and sanitize: redwood-operator tenant-evict --tenant <tid> --purge-ephemeral true --preserve-evidence /evidence/<tid>/
+     6) Postmortem: create incident with links to snapshot and warmup telemetry within 24 hours.
+
+Forensic evidence and compliance notes
+
+- Always preserve warmup telemetry events and the last 72 hours of runtime traces for regulated tenants. Evidence must be stored with retention tags and a chain-of-custody manifest.
+- Use the evidence bundle template: 
+  - /evidence/<tenant>/snapshot-<ts>.tar.gz
+  - /evidence/<tenant>/telemetry-warmup-<ts>.log.gz
+  - /evidence/<tenant>/artifact-manifest.json
+
+Quality guardrails for fallback variants
+
+Before a fallback variant is allowed to automatically receive >20% traffic it must pass a short quality gate:
+- Embedding distance check against reference responses < 0.12 (cosine distance).
+- Finite set response safety checks (no hallucinations for fixed prompt tests).
+- Latency verification: p95 < baseline*1.5.
+
+Common failure modes and remediation (FAQ)
+
+- Scenario: KV cache mount shows low free space
+  - Remediation: reduce cache_quota for low-priority tenants, run gc: redwood-runtime cache gc --tenant <tid> --policy lru
+- Scenario: Fallback variant fails quality gate
+  - Remediation: rollback routing to primary, annotate model registry with failure reason, schedule regression test and dev ticket.
+- Scenario: Shadow traffic overloads host
+  - Remediation: immediately throttle shadow_policy to 1% and scale out instances.
+
+Runbook snippets and CLI examples
+
+- Inspect warmup events stream (jq example):
+  curl -sS http://telemetry-gateway.internal/search?q=warmup.started | jq '.hits[] | {tenant_id: ._source.tenant_id, model: ._source.model_version, ts: ._source.ts}'
+
+- Force soft fallback for testing:
+  redwood-runtime fallback force --tenant <tid> --from model:gptx-1 --to model:gptx-quant-1 --sample-pct 20 --reason TEST_FALLBACK
+
+Postmortem and continuous improvement
+
+- Create an incident within 24 hours for any warmup failures leading to eviction. Include: timeline of warmup events, topology snapshot, fallback.activated events, and full evidence bundle.
+- SRE and runtime teams will maintain a quarterly warmup test in staging that simulates heterogeneous GPU environments with a mixed prompt workload. Results published to the runtime team dashboard.
+
+Appendix: artifacts and references
+
+- seed-prompts.json (kept in /opt/redwood/config/seed-sets/) — representative short prompts and long context prompts.
+- Model registry fields required for fallback compatibility: model_id, architecture, quantized_hash, tokenizer_v2_hash, compat_models (list).
+- Related pages: tenant-eviction-and-safe-state-sanitization-playbook, model-hot-swap-and-quantization-fallbacks-playbook.
+
+Revision history
+
+- 2026-01-12 — created by Aisha Patel
+- 2026-04-02 — updated thresholds and added evidence bundle template (reviewer Marcus Li)
+- 2026-07-09 — clarified shadow policy steps and added CLI examples (reviewer Elena García)

@@ -1,4 +1,12 @@
-"""Tests for QueryAnalyzerTask and Vespa payload generation."""
+"""Title: Query Analyzer
+
+Tests for QueryAnalyzerTask and Vespa payload generation.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

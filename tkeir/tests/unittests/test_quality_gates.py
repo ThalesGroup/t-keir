@@ -1,6 +1,11 @@
-"""Quality gate tests: cyclomatic complexity and licence inventory.
+"""Title: Quality gate tests: cyclomatic complexity and licence inventory.
 
 Thresholds mirror the Makefile ``complexity`` / ``pip-licenses`` targets.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

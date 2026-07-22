@@ -1,4 +1,12 @@
-"""Detect document language from plain text."""
+"""Title: Language Detector
+
+Detect document language from plain text.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from dataclasses import dataclass
 

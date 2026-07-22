@@ -1,0 +1,217 @@
+ADR: Shadow Traffic Routing Architecture (Inline Mirroring, Bucketing, Fail-Open)
+
+## Status
+Published (approved for Phase 1 MVP). Any material changes to timeouts, bucketing inputs, or request capture fields require a follow-up ADR.
+
+## Summary of decision
+We will implement shadow traffic by **inline mirroring** a sampled subset of production requests in the **data plane routing path**, sending a best-effort duplicate request to one or more shadow targets while returning the **control** response to the user.
+
+Key properties:
+- **Fail-open**: shadowing must never block or degrade the user path. Shadow execution is best-effort with strict timeouts and circuit breaking.
+- **Deterministic bucketing**: a stable request fingerprint drives sampling and variant assignment for consistent comparisons.
+- **Minimal capture**: shadow request/response artifacts are redacted and retained briefly; scoring happens asynchronously.
+
+## Context
+Redwood’s Rollouts framework supports canaries and A/B testing for latency/cost, but customers and internal teams need a safe way to measure **quality regressions** (format adherence, refusal/safety, instruction following, etc.) for model/version/quantization/prompt changes without impacting user-visible responses.
+
+Shadow traffic duplicates a subset of real production requests to candidate variants and scores outputs asynchronously. This ADR focuses on **where** shadow duplication happens (data plane vs offline replay), **how** requests are sampled/assigned, and **what** fail-open means operationally.
+
+## Problem statement
+We need a routing architecture that:
+1) Produces comparable control vs shadow outputs using real production prompts/contexts.
+2) Keeps user-path latency and reliability unchanged (or within a tightly bounded overhead budget).
+3) Works across Hosted, Dedicated, and Private deployments with consistent semantics.
+4) Minimizes data retention and reduces exposure of sensitive prompt/response data.
+5) Integrates cleanly with existing routing and rollouts primitives (variants, policies, guardrails).
+
+## Considered options
+### Option A — Inline mirroring in the data plane (chosen)
+**Description:** After request admission and route selection, the router mirrors the request to shadow target(s) asynchronously, while processing the control request normally.
+
+**Pros**
+- Highest fidelity: shadow sees the same request payload, same headers/metadata policy, and same timing window.
+- Enables deterministic bucketing keyed on request fingerprint at the moment of routing.
+- Works for “online-only” traffic (no dependence on log availability).
+- Natural integration point with routing policies and rollouts objects.
+
+**Cons / risks**
+- Any synchronous work on the user path risks tail latency impact if not carefully bounded.
+- Requires robust guardrails (timeouts, backpressure, circuit breakers) to avoid resource contention.
+- Streaming requests need special semantics to avoid mirroring an unbounded stream.
+
+### Option B — Async replay from captured traffic/logs
+**Description:** Capture production requests into a log/queue and replay them later to candidate variants.
+
+**Pros**
+- No data plane mirroring overhead if capture is lightweight.
+- Replays can be scheduled/regulated to fit scoring capacity.
+- Easier to “pause and resume” experiments without touching the router.
+
+**Cons / risks**
+- Lower fidelity for requests with ephemeral context (tool results, auth-derived features, time-sensitive prompts, retried requests with altered metadata).
+- Adds pressure to retention/storage; higher compliance complexity (more prompt storage by default).
+- Harder to guarantee that replay payload matches what the model actually saw (normalization/versioning drift).
+- Delayed feedback; less usable for real-time canary decisions.
+
+### Option C — Hybrid: inline capture + later replay
+**Description:** Capture a canonical, normalized request envelope inline, then replay later.
+
+**Pros**
+- Can reduce immediate shadow target load.
+- Preserves a “canonical input” concept.
+
+**Cons / risks**
+- Combines the main risks of A (data plane work) and B (retention/compliance).
+- Still requires careful decisions on what to capture; mismatches remain likely.
+
+## Decision
+Adopt **Option A: Inline mirroring in the data plane** with the following constraints:
+- Mirroring is **asynchronous** relative to the user-path response.
+- The router enforces **strict resource isolation** for shadow (separate connection pools/queues; bounded concurrency).
+- Shadowing is **fail-open** with circuit breaking and backpressure.
+- Sampling and assignment use a **deterministic request fingerprint** and consistent bucketing.
+- For streaming requests, mirror only a bounded, well-defined portion (see “Streaming semantics”).
+
+## Architecture overview
+### Data plane flow (conceptual)
+1) Request arrives at Router.
+2) Admission checks (auth, quotas, basic validation).
+3) Determine control target using existing routing policy.
+4) Compute request fingerprint and evaluate shadow policy:
+   - sampling decision
+   - shadow target set (one or more variants)
+   - metadata/header handling rules
+5) Execute control request normally.
+6) If sampled, enqueue shadow work item (non-blocking):
+   - fire-and-forget dispatch to shadow target(s)
+   - record telemetry links between control and shadow
+7) Return control response to user.
+
+### Shadow path isolation
+- Shadow dispatch uses a dedicated internal “shadow egress” queue and concurrency limiter.
+- Shadow requests are executed with:
+  - lower priority
+  - strict timeouts
+  - capped retries (default: none; see below)
+- Shadow failures are logged as telemetry but never surface to the user.
+
+## Deterministic bucketing strategy
+### Requirements
+- Stable assignment for a given “logical request” to reduce variance when comparing control vs shadow.
+- Privacy-preserving: avoid storing raw prompt text or high-risk identifiers in telemetry.
+- Works across regions and deployment modes.
+- Avoids high-cardinality explosion.
+
+### Fingerprint inputs (v1)
+We define a **normalized fingerprint input string** composed of:
+- `tenant_id` (internal UUID)
+- `route_id` (stable route identifier)
+- `request_type` (chat.completions | responses | embeddings | rerank)
+- `canonical_messages_hash` OR `canonical_input_hash` (see below)
+- `tooling_mode` (none | tool_calling_enabled) when applicable
+
+Canonicalization rules:
+- Chat/messages: normalize to a stable JSON representation (ordering, whitespace) before hashing.
+- Remove/zero fields known to be unstable across retries (timestamps, request_id, tracing ids).
+- Truncate inputs before hashing at a configured limit (default 8KB of canonicalized text) to bound CPU.
+
+### Hash function
+- Compute `fingerprint = HMAC-SHA256(tenant_fingerprint_key, normalized_input)`.
+- Use the first 64 bits as `fingerprint64` for bucketing.
+
+Rationale:
+- HMAC prevents cross-tenant correlation and reduces risk if fingerprints leak.
+- Per-tenant key rotation is supported (see consequences).
+
+### Sampling and assignment
+- Use consistent bucketing over `[0, 9,999]`:
+  - `bucket = fingerprint64 mod 10,000`
+  - sampled if `bucket < (sampling_rate_bps)` where bps is basis points (0–10,000).
+- For multi-shadow-target experiments, assign targets deterministically:
+  - `target_index = (fingerprint64 / 10,000) mod N`
+  - For “mirror to all” experiments, dispatch to all targets but still use a single sampling gate.
+
+Notes:
+- This is not a user-level sticky assignment; it is request-level stability. If customers want session-level stickiness, they should pass a stable user/session key (future enhancement, explicitly not required for v1).
+
+### Collision handling
+- Collisions are expected to be extremely rare and acceptable at our sampling rates.
+- No special collision detection in v1; metrics are computed in aggregate.
+
+## Fail-open behavior (hard requirements)
+Shadow traffic must be invisible to end users and must not affect control-path SLOs.
+
+### What “fail-open” means
+- If shadow dispatch fails (queue full, timeout, shadow target errors), the control request proceeds normally.
+- The router must never wait on shadow completion to respond to the user.
+- Shadowing must not consume unbounded resources (CPU, memory, connections).
+
+### Timeouts
+Defaults (v1; may be tuned under SRE guardrails):
+- Shadow dispatch enqueue: **<= 1ms** budget on the user path.
+- Shadow target request timeout: **2s** absolute (configurable per request type).
+- Shadow overall work item TTL: **10m** (after which it is dropped and recorded as expired).
+
+### Retries
+- Shadow path retries are **disabled by default** to prevent amplification.
+- Exception: idempotent request types may allow **1 retry** behind a feature flag, only when SRE confirms no correlated incident risk.
+
+### Backpressure and circuit breakers
+- If shadow queue utilization exceeds threshold (e.g., 80% for 5 minutes) OR scoring/telemetry lag exceeds SLO, automatically:
+  - reduce effective sampling (e.g., clamp to 10% of configured rate)
+  - then disable shadowing for the route if the condition persists
+- If shadow target error rate exceeds threshold (e.g., >5% 5xx over 5 minutes), open circuit for that target.
+
+Operational note: exact thresholds are specified in the SLO/guardrails doc; this ADR establishes the principle and required mechanisms.
+
+## Streaming semantics
+Streaming requests require bounded behavior to avoid mirroring indefinite token streams and to control egress cost.
+
+Decision (v1):
+- Mirror the **initial request** payload (messages/instructions/tools) and request parameters.
+- Shadow requests may be executed in non-streaming mode, capturing only the **final completion** (or up to a configured max tokens) for scoring.
+- If the control request is cancelled by the client, shadow continues best-effort up to a cap, then is cancelled.
+
+Rationale:
+- Quality metrics generally evaluate final output structure/content; streaming chunk-by-chunk parity is not required for v1.
+- Non-streaming shadow reduces complexity and cardinality of partial-chunk telemetry.
+
+## Security and privacy considerations
+- Fingerprints are HMAC’d and non-reversible without tenant keys.
+- Telemetry must not include raw prompts by default. Shadow artifacts are referenced via redacted storage pointers with strict retention.
+- Header/metadata mirroring is policy-controlled (default denylist for sensitive headers).
+
+## Consequences
+### Positive
+- High-fidelity comparisons: control and shadow are derived from the same live request.
+- Fast feedback: supports near-real-time monitoring during canaries.
+- Clean integration with routing policies and rollouts (single place to enforce sampling, guardrails, and audit logs).
+
+### Negative / trade-offs
+- Router complexity increases (must maintain shadow queue, isolation, and circuit breakers).
+- Adds bounded CPU overhead (fingerprinting + enqueue) on the user path.
+- Requires careful tuning to avoid egress pressure and connection pool contention.
+- Per-tenant HMAC key rotation can shift sampling assignments over time; comparisons across rotation windows must be treated carefully.
+
+### Non-obvious implications
+- Deterministic sampling can under-sample rare but critical request classes. This is mitigated via segmentation and manual overrides (future: stratified sampling; not in v1).
+- If the request includes tool calling with non-deterministic tool outputs, shadow results may diverge due to tool side effects. For v1, shadowing should disable external side-effecting tools or mirror in “read-only” tool mode where supported.
+
+## Rollout plan (routing component)
+1) Internal-only feature flag: `shadow_traffic_enabled` (off by default).
+2) Enable for a single internal tenant + single route at <=0.1% sampling.
+3) Verify:
+   - p99 control latency delta within budget
+   - shadow queue health, circuit breakers, and telemetry correctness
+4) Expand to limited beta (Dedicated) behind allowlist.
+
+## Open questions (tracked outside ADR)
+- Stratified sampling support (by route segment, request type, or customer-provided key).
+- Session-level deterministic assignment (customer-provided stable key) vs request-level only.
+- Shadowing for multi-modal inputs (images/audio) and canonicalization rules.
+
+## References
+- SLOs/Guardrails: shadow traffic SLOs and guardrails
+- Data model/cardinality ADR: telemetry schema constraints and required dimensions
+- Data retention/redaction policy: prompt/response handling rules
+- Control plane policy service: shadow policy schema and validation rules

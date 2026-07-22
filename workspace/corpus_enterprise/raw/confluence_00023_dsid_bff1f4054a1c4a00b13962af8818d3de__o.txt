@@ -1,0 +1,170 @@
+Operator Training: Synthetic Experiment Catalog & Metrics Contract
+
+Summary
+
+This catalog documents a curated set of synthetic experiments and operator exercises aimed at validating platform fallback behavior, SLI sensitivity, and operator handoff procedures for LLM inference services. It is intended for platform operators, SREs, and platform engineering leads responsible for regional resilience and tenant isolation.
+
+Background
+
+We run synthetic experiments regularly to: 
+- Ensure safe fallbacks between model variants and regions.
+- Validate automated prefetch/prefix-cache heuristics.
+- Measure SLI sensitivity to token-burst and cold-cache scenarios.
+- Train operators on triage flows and decision heuristics.
+
+This document combines: an experiment catalog, expected metrics/dashboards, runbook snippets for operator drills, an exercise planner template, and retrospective questions used after each lab.
+
+Experiment Catalog (top-level)
+
+1) Cold-cache token-burst (Tiered degradation)
+- Objective: Validate warmup paths and synthetic warm-start improvement when a cold prefix cache receives a 10k-request burst.
+- Preconditions: deploy synthetic workload generator in us-west-2, target model: "redwood-open-7b-v2" (can be swapped to quantized variant).
+- Injection steps:
+  1. Create cohort of 500 synthetic tenants with cold KV prefixes.
+  2. Ramp to 10k QPS over 60s, sustain 120s, then ramp down.
+  3. Enable predictive prefetch hints for 20% of tenants mid-burst.
+- Success criteria:
+  - 95th percentile frontend latency does not exceed 1.8x normal baseline for more than 3 minutes.
+  - KV-prefetch hit rate increases by >= 30% for hinted cohorts.
+  - No sustained SLO burn (error budget < 1% consumed per 10-minute window).
+
+2) Model-variant fallback misfire
+- Objective: Confirm that an automated model-variant fallback triggers and that synthetic QA prompts show no catastrophic regression in semantic quality beyond alert thresholds.
+- Preconditions: Canary the lower-cost variant "rw-open-7b-q4" in regional fallback policy.
+- Injection steps:
+  1. Force model variant exhaustion on primary pool via quota exhaustion script.
+  2. Observe routing to fallback variant and record outputs for a fixed prompt suite (see prompt-set ID: PS-regen-2026-14).
+- Success criteria:
+  - Fallback occurs within configured 2s routing window.
+  - BLEU-like regression metric (internal eval) <= 10% drop vs primary model baseline.
+  - Alerts: quality-regression SLI triggers if >20% of prompts exceed threshold.
+
+3) Regional-degradation graceful routing
+- Objective: Validate that soft-failover to secondary region preserves 99% of throughput for Tier-1 tenants and that billing attribution and backfill queues behave correctly.
+- Preconditions: Synthetic cross-region latency emulator engaged.
+- Injection steps:
+  1. Introduce 250ms additional egress delay on primary region for 5 minutes.
+  2. Shift routing weight by policy to secondary region using canary stage.
+- Success criteria:
+  - Throughput for tier-1 tenants maintained at >= 99% of baseline within 120s of cutover.
+  - Cost-accounting tags preserved for billing reconciliation.
+
+Metrics and Dashboards (contract)
+
+All experiments must populate or validate the following dashboards and queries. Dashboard names assume the prefix "Platform Lab/". Operators should add experiment tag "lab:<experiment-id>" to all synthetic traffic for traceability.
+
+Key metrics (names used in telemetry):
+- platform.request.latency_ms (histogram)
+- platform.request.errors (counter, labeled by error_type)
+- platform.kv_cache.hit_rate (gauge, per-promoted-prefix)
+- platform.routing.fallback_rate (counter, per-tenant)
+- platform.model.quality_regressions (counter, per-prompt-suite)
+- platform.billing.metered_tokens (counter, per-tenant)
+
+Required dashboard panels (minimum):
+- Latency heatmap (p50/p90/p95/p99), split by region and tenant tier.
+- KV-prefetch hit-rate trend and per-prefix breakdown.
+- Fallbacks: rate and latency delta for requests that fallback.
+- Quality regression panel showing prompt-suite pass/fail and semantic-diff histogram.
+- Billing spike detector showing token volume by tenant and lab tag.
+
+Alerting rules to validate (example PromQL / alert text):
+1) Latency surge (informational):
+Expression: increase(platform_request_latency_ms_bucket{le=\"500\"}[5m]) / increase(platform_request_latency_ms_count[5m]) > 0.2
+Alert: "Lab: High fraction of requests <500ms dropping — investigate cold-starts and prefetch"
+
+2) Fallback rate spike (actionable):
+Expression: increase(platform_routing_fallback_rate[2m]) > 50
+Alert: "Fallback surge — routing policy in effect, confirm model pool health and canary config"
+
+3) Quality regression (critical):
+Expression: increase(platform_model_quality_regressions{lab=~\"lab-.*\"}[10m]) > 5
+Alert: "Quality regressions detected in synthetic prompt-suite; abort rollout and notify ML oncall"
+
+Runbook snippets (operator play flows)
+
+A) Cold-cache token-burst quick triage
+1) Confirm lab tag on incoming traces and isolate synthetic tenant IDs.
+2) Inspect platform.kv_cache.hit_rate for the prefix cohort. If hit_rate < 15% and latency delta > baseline: run warming job:
+
+Command (example):
+
+curl -X POST https://ops-api.internal/v1/prefetch?action=warm&prefix_id=prefix-2026-09 -H 'Authorization: Bearer $OPERATOR_TOKEN'
+
+3) If warming job fails or queue length grows > 2000, escalate to runtime-owner and open an Incident with severity: P2.
+
+B) Model-variant fallback misfire triage
+1) Validate routing policy: /ops/routing/policies/<policy-id> shows fallback windows configured (expected 2s).
+2) Pull prompt-suite results and run quick diff:
+
+python tools/quality_diff.py --baseline baseline.json --sample lab-output.json --threshold 0.10
+
+3) If regression > 10% and >20% of prompts fail, trigger rollback of auto-fallback (set fallback_weight=0) and notify ML and Product for evaluation.
+
+Exercise Planner (template)
+
+Use this template to schedule and score operator drills. Fill fields and attach experiment run logs to the lab ticket.
+
+- Experiment ID: lab-2027-05
+- Owner: @platform-ops (team alias)
+- Duration: 90 minutes
+- Pre-reads: link to model baseline, prompt-set PS-regen-2026-14, and dashboard links.
+- Tasks (timed):
+  1. 0–10m: Preflight checks and tagging.
+  2. 10–30m: Run injection step.
+  3. 30–60m: Triage and mitigation.
+  4. 60–80m: Postmortem writeup draft.
+  5. 80–90m: Scorecard and lessons.
+- Scoring rubric (operator-focused):
+  - Detection (0-3): Did operator detect the injected failure via dashboard/alert?
+  - Isolation (0-3): How quickly did operator narrow to cause (region, model, prefix)?
+  - Mitigation (0-4): Quality of mitigation decision (prefetch, rollback, routing adjust).
+  - Communication (0-2): Did operator update incident channel and paging appropriately?
+
+Retrospective checklist (post-exercise)
+
+- What worked well?
+- What were signal blind spots? (missing metrics, noisy alerts)
+- Were playbook steps clear and executable?
+- Actions (owner + due date) — add to backlog with priority tag lab:action.
+- If regression observed, create quality-guardrail ticket with prompt-suite and sample outputs attached.
+
+Appendix: Example PromQL and SQL queries
+
+PromQL: 5m prefetched hit rate by prefix
+
+sum by(prefix_id)(increase(platform_kv_cache_hit{lab="lab-2027-05"}[5m])) / sum by(prefix_id)(increase(platform_kv_cache_lookup_total{lab="lab-2027-05"}[5m]))
+
+SQL: retrieve lab-tagged billing for reconciliation
+
+SELECT tenant_id, sum(tokens) as tokens, lab_tag
+FROM billing.events
+WHERE lab_tag LIKE 'lab-%' AND ts >= '2027-02-01T00:00:00Z'
+GROUP BY tenant_id, lab_tag
+ORDER BY tokens DESC
+
+Ownership and scheduling
+
+- Platform Ops (oncall alias: "platform-ops") - experiment owner and scheduler.
+- Runtime Team - responsible for kernel/quantization rollbacks and prefetch API.
+- Observability - dashboard and alerting steward.
+- Applied ML - quality metrics, prompt-sets, and regression thresholds.
+
+Schedule recurring exercises quarterly and after any significant runtime change (kernel swap, quantization rollout, routing policy update). For high-risk rollouts, run a focused experiment 48–72 hours prior to customer-impacting deploy.
+
+Glossary and resources
+
+- lab:<id> — tag applied to synthetic traffic to trace experiments.
+- prefix — KV cache prefix used for warmup.
+- prompt-set PS-regen-2026-14 — canonical prompt suite for regeneration quality checks.
+
+Useful links:
+- Dashboard: Platform Lab / Synthetic Experiment Overview -> https://grafana.internal/d/PLAB/synthetic-overview
+- Prefetch API docs: https://docs.internal/prefetch-api
+- Playbook generator: /eng-platform/runbooks/playbook-generator
+
+Revision history
+
+- 2026-11-15 (Maya Chen) — created initial catalog and contract.
+- 2026-12-20 (Arjun Patel) — added exercise planner and PromQL examples.
+- 2027-02-10 (Maya Chen) — updated success criteria for regional failover and added billing reconciliation query.

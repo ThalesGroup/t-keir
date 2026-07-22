@@ -1,4 +1,12 @@
-"""Convert documents to tkeir format using Microsoft MarkItDown."""
+"""Title: Mark It Down Converter
+
+Convert documents to tkeir format using Microsoft MarkItDown.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 import traceback

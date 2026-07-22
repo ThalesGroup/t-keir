@@ -24,7 +24,7 @@ endif
 	bom sbom aibom trivy owasp-dependency-check security-report \
 	docs docs-build docs-pdf pipeline quickstart install-workspace ci-deps ci pre-commit clean devcontainer \
 	sync pull-models start init bootstrap vespa-check test-vespa test-vespa-py \
-	index index-fixtures rag rag-query search-query mcp mcp-tools agent agent-run smoke-test beir-eval clean-db vespa-clean logs \
+	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test beir-eval clean-db vespa-clean logs \
 	images images-push images-sign \
 	compose-up compose-down compose-logs compose-smoke audit-report audit-verify audit-archive \
 	governor-flags governor-kill rollback-index check-secrets-staged \
@@ -108,8 +108,8 @@ SMOKE_TIMEOUT    ?= 10
 
 DEPS_BRANCH ?= deps/auto-update-$(shell date +%Y%m%d)
 
-# Container images (Workstream A) — registry ghcr.io/thalesgroup/t-keir
-IMAGE_REGISTRY ?= ghcr.io/thalesgroup/t-keir
+# Container images — local daemon by default; publish with IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir
+IMAGE_REGISTRY ?= local
 IMAGE_TAG ?= $(VERSION)
 # Empty = native platform (fast local). CI/push: linux/amd64,linux/arm64
 PLATFORMS ?=
@@ -656,7 +656,7 @@ clean: ## Remove build artifacts, caches, and reports
 # Container images (buildx bake → ghcr.io/thalesgroup/t-keir)
 # ---------------------------------------------------------------------------
 
-images: check-docker ## Build all images (api, indexer, indexer-slim, hmi, ingest); also: make image-api|…
+images: check-docker ## Build all images (lib once, then api/ingest/…); also: make image-api|…
 	$(Q)docker buildx version >/dev/null
 	REGISTRY="$(IMAGE_REGISTRY)" TAG="$(IMAGE_TAG)" \
 		VERSION="$(VERSION)" GIT_COMMIT="$(GIT_COMMIT)" BUILD_DATE="$(BUILD_DATE)" \
@@ -665,9 +665,9 @@ images: check-docker ## Build all images (api, indexer, indexer-slim, hmi, inges
 		docker buildx bake -f "$(BAKE_FILE)" \
 			$(if $(PLATFORMS),--set "*.platform=$(PLATFORMS)",) \
 			--progress=plain default
-	$(Q)echo "Built images under $(IMAGE_REGISTRY)/*:$(IMAGE_TAG)"
+	$(Q)echo "Built images under $(IMAGE_REGISTRY)/*:$(IMAGE_TAG) (shared base: tkeir-lib)"
 
-image-%: check-docker ## Build one image target (api|indexer|indexer-slim|hmi|ingest)
+image-%: check-docker ## Build one image target (lib|api|indexer|indexer-slim|hmi|ingest|…)
 	$(Q)docker buildx version >/dev/null
 	REGISTRY="$(IMAGE_REGISTRY)" TAG="$(IMAGE_TAG)" \
 		VERSION="$(VERSION)" GIT_COMMIT="$(GIT_COMMIT)" BUILD_DATE="$(BUILD_DATE)" \
@@ -694,23 +694,24 @@ images-sign: ## Cosign keyless sign images (requires cosign + OIDC identity)
 		echo "cosign is required: https://docs.sigstore.dev/cosign/system_config/installation/"; \
 		exit 1; \
 	}
-	$(Q)for name in tkeir-api tkeir-indexer tkeir-indexer-slim tkeir-hmi tkeir-ingest tkeir-audit tkeir-governor; do \
+	$(Q)for name in tkeir-lib tkeir-api tkeir-indexer tkeir-indexer-slim tkeir-hmi tkeir-ingest tkeir-audit tkeir-governor; do \
 		echo "Signing $(IMAGE_REGISTRY)/$${name}:$(IMAGE_TAG)"; \
 		cosign sign --yes "$(IMAGE_REGISTRY)/$${name}:$(IMAGE_TAG)"; \
 	done
 
 # ---------------------------------------------------------------------------
-# Docker Compose (P1) — profiles core,auth
+# Docker Compose (P1+) — tkeir images from IMAGE_REGISTRY (default: local)
 # ---------------------------------------------------------------------------
 
-compose-up: check-docker ## Start Compose profiles (PROFILES=core,auth)
+compose-up: check-docker ## Start Compose profiles (PROFILES=core,auth); build local images first if needed
 	$(Q)test -f "$(COMPOSE_DIR)/.env" || cp "$(COMPOSE_DIR)/.env.example" "$(COMPOSE_DIR)/.env"
 	$(Q)PROFILE_ARGS=$$(printf -- '--profile %s ' $$(echo "$(COMPOSE_PROFILES)" | tr ',' ' ')); \
 		IMAGE_REGISTRY="$(IMAGE_REGISTRY)" IMAGE_TAG="$(IMAGE_TAG)" \
 		VERSION="$(VERSION)" GIT_COMMIT="$(GIT_COMMIT)" BUILD_DATE="$(BUILD_DATE)" \
 		$(COMPOSE) -f "$(COMPOSE_FILE)" --env-file "$(COMPOSE_DIR)/.env" \
 			$$PROFILE_ARGS up -d --remove-orphans
-	$(Q)echo "Compose up (PROFILES=$(COMPOSE_PROFILES)). HMI http://localhost:3000 Keycloak http://localhost:8082"
+	$(Q)echo "Compose up (PROFILES=$(COMPOSE_PROFILES) IMAGE_REGISTRY=$(IMAGE_REGISTRY)). HMI http://localhost:3000"
+	$(Q)echo "Local images: make images   |   Publish: make images-push IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir"
 
 compose-down: check-docker ## Stop Compose stack (VOLUMES=1 also removes volumes)
 	$(Q)ENV_FILE="$(COMPOSE_DIR)/.env"; \
@@ -937,10 +938,27 @@ index: install init ## Embed + index pipeline JSON into Vespa
 
 GOVERNOR_STATE_ROOT ?= $(WORKSPACE)/governor
 
-rag: install install-spacy-models ## Start FastAPI RAG API (:8090)
+rag: install install-spacy-models ## Start FastAPI RAG API on the host (:8090) — P0, no container
 	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)"
 	cd $(TKEIR_DIR) && GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
 		$(UV) run --python $(PYTHON) python -m thot.tools.search.app
+
+INGEST_ROOT_HOST ?= $(WORKSPACE)/ingest
+# STOP_ON_FAILED=1 → ingest server exits on first failed job; corpus client
+# also aborts and calls POST /ingest/stop (fast debug loop).
+STOP_ON_FAILED ?= 0
+
+ingest: install install-spacy-models ## Start tkeir-ingest on the host (:8091) — P0, no container
+	$(Q)mkdir -p "$(INGEST_ROOT_HOST)" "$(GOVERNOR_STATE_ROOT)"
+	cd $(TKEIR_DIR) && \
+		INGEST_ROOT="$(INGEST_ROOT_HOST)" \
+		INGEST_MAX_CONCURRENCY="$(or $(INGEST_MAX_CONCURRENCY),1)" \
+		INGEST_STOP_ON_FAILED="$(STOP_ON_FAILED)" \
+		GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		VESPA_USER_SPACE="$(or $(VESPA_USER_SPACE),dev@tkeir)" \
+		TKEIR_WORKSPACE="$(WORKSPACE)" \
+		TKEIR_REPO_ROOT="$(ROOT)" \
+		$(UV) run --python $(PYTHON) tkeir-ingest
 
 rag-query: check-curl check-jq ## Sample curl against RAG API (/rag/query)
 	curl -fsS "$(RAG_URL)/rag/query" \
@@ -974,6 +992,10 @@ mcp-tools: check-curl check-jq ## List MCP tools then call search (MCP_URL, MCP_
 
 AGENT_URL ?= http://localhost:8092
 GOAL ?= What does the corpus say about T-KEIR?
+# Agent / workflow LLM runs often exceed 20s (compose + tools). Override if needed.
+AGENT_POLL_SECONDS ?= 2
+AGENT_POLL_ATTEMPTS ?= 90
+WORKFLOW_POLL_ATTEMPTS ?= 180
 
 agent: ## Start tkeir-agent HTTP service (:8092)
 	cd $(TKEIR_DIR) && AGENT_ROOT="$(CURDIR)/.tkeir-agent" \
@@ -986,15 +1008,21 @@ agent-run: check-curl check-jq ## Create agent run and poll (GOAL=… AGENT=rese
 		-d "$$(jq -nc --arg goal "$(GOAL)" --arg agent "$(or $(AGENT),researcher)" '{agent:$$agent,goal:$$goal}')"); \
 		echo "$$resp" | jq .; \
 		rid=$$(echo "$$resp" | jq -r .run_id); \
-		for i in 1 2 3 4 5 6 7 8 9 10; do \
-			sleep 1; \
-			st=$$(curl -fsS "$(AGENT_URL)/agent/runs/$$rid" | jq -r .run.status); \
-			echo "status=$$st"; \
+		i=0; \
+		while [ $$i -lt $(AGENT_POLL_ATTEMPTS) ]; do \
+			i=$$((i + 1)); \
+			sleep $(AGENT_POLL_SECONDS); \
+			payload=$$(curl -fsS "$(AGENT_URL)/agent/runs/$$rid"); \
+			st=$$(echo "$$payload" | jq -r .run.status); \
+			echo "status=$$st ($$i/$(AGENT_POLL_ATTEMPTS))"; \
 			case "$$st" in succeeded|failed|blocked|killed|cancelled) \
-				curl -fsS "$(AGENT_URL)/agent/runs/$$rid" | jq .; exit 0 ;; \
+				echo "$$payload" | jq .; exit 0 ;; \
 			esac; \
 		done; \
-		echo "timeout waiting for run $$rid"; exit 1
+		echo "timeout waiting for run $$rid — last snapshot:"; \
+		curl -fsS "$(AGENT_URL)/agent/runs/$$rid" | jq '{status:.run.status,error:.run.error,usage:.run.usage}' || true; \
+		echo "Re-check later: curl -s $(AGENT_URL)/agent/runs/$$rid | jq ."; \
+		exit 1
 
 WORKFLOW ?= content_brief
 
@@ -1005,15 +1033,21 @@ workflow-run: check-curl check-jq ## Create workflow run and poll (GOAL=… WORK
 		-d "$$(jq -nc --arg goal "$(GOAL)" --arg wf "$(WORKFLOW)" --arg topic "$(or $(TOPIC),Acme)" '{workflow:$$wf,goal:$$goal,params:{topic:$$topic}}')"); \
 		echo "$$resp" | jq .; \
 		rid=$$(echo "$$resp" | jq -r .run_id); \
-		for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do \
-			sleep 1; \
-			st=$$(curl -fsS "$(AGENT_URL)/agent/runs/$$rid" | jq -r .run.status); \
-			echo "status=$$st"; \
+		i=0; \
+		while [ $$i -lt $(WORKFLOW_POLL_ATTEMPTS) ]; do \
+			i=$$((i + 1)); \
+			sleep $(AGENT_POLL_SECONDS); \
+			payload=$$(curl -fsS "$(AGENT_URL)/agent/runs/$$rid"); \
+			st=$$(echo "$$payload" | jq -r .run.status); \
+			echo "status=$$st ($$i/$(WORKFLOW_POLL_ATTEMPTS))"; \
 			case "$$st" in succeeded|failed|blocked|killed|cancelled) \
-				curl -fsS "$(AGENT_URL)/agent/runs/$$rid" | jq '{run,handoffs,compose_result}'; exit 0 ;; \
+				echo "$$payload" | jq '{run,handoffs,compose_result}'; exit 0 ;; \
 			esac; \
 		done; \
-		echo "timeout waiting for workflow $$rid"; exit 1
+		echo "timeout waiting for workflow $$rid — last snapshot:"; \
+		curl -fsS "$(AGENT_URL)/agent/runs/$$rid" | jq '{status:.run.status,error:.run.error,handoffs:(.handoffs|length),compose:(.compose_result!=null)}' || true; \
+		echo "Re-check later: curl -s $(AGENT_URL)/agent/runs/$$rid | jq '{run,handoffs,compose_result}'"; \
+		exit 1
 
 TEMPLATE ?= synthesis_note
 TOPIC ?= Acme
@@ -1037,44 +1071,96 @@ CORPUS_OUT           ?= $(WORKSPACE)
 CORPUS_SEED          ?= 42
 CORPUS_COUNT_OSINT   ?= 1500
 CORPUS_COUNT_ENT     ?= 500
+# Set CORPUS_DOWNLOAD=0 for a fully offline generate (skip SISO / EnterpriseRAG fetch).
+CORPUS_DOWNLOAD      ?= 1
 CORPUS_FLAGS         ?=
 INGEST_API_URL       ?= http://localhost:8091
 INGEST_TOKEN_URL     ?= http://localhost:8082/realms/tkeir/protocol/openid-connect/token
-INGEST_WORKERS       ?= 4
+INGEST_WORKERS       ?= 1
 INGEST_FLAGS         ?=
+# Appended when STOP_ON_FAILED=1 (see ingest target too).
+_STOP_ON_FAILED_FLAG = $(if $(filter 1 true TRUE yes YES,$(STOP_ON_FAILED)),--stop-on-failed,)
 
 _CORPUS_PY  := $(ROOT)/tools/corpus/generate_tkeir_corpus.py
 _INGEST_PY  := $(ROOT)/tools/corpus/ingest_corpus.py
 _CORPUS_RUN := cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python
 
-corpus: ## [corpus] Generate OSINT (1 500 docs) + Enterprise (500 docs) corpora offline
+corpus: ## [corpus] Generate OSINT+Enterprise and best-effort download official artifacts
 	$(_CORPUS_RUN) $(_CORPUS_PY) \
 	  --output $(CORPUS_OUT) \
 	  --count-osint $(CORPUS_COUNT_OSINT) \
 	  --count-enterprise $(CORPUS_COUNT_ENT) \
 	  --seed $(CORPUS_SEED) \
+	  $(if $(filter 1,$(CORPUS_DOWNLOAD)),--download,) \
 	  $(CORPUS_FLAGS)
-	@echo "Next: make corpus-ingest (P0) | make corpus-ingest-user + corpus-ingest-admin (P1)"
+	@echo "Next (P0 host): make bootstrap && make ingest   # other terminal: make corpus-ingest"
+	@echo "Next (P1):      make compose-up PROFILES=core,auth,ingest && make corpus-ingest-user"
+	@echo "Offline-only: make corpus CORPUS_DOWNLOAD=0"
 
 corpus-ontologies: ## [corpus] Generate C2SIM/C4ISR ontologies only
 	$(_CORPUS_RUN) $(_CORPUS_PY) \
 	  --output $(CORPUS_OUT) --only-ontologies $(CORPUS_FLAGS)
 
-corpus-download: ## [corpus] Best-effort: fetch official SISO C2SIM artifacts + EnterpriseRAG-Bench slice
-	$(_CORPUS_RUN) $(_CORPUS_PY) \
-	  --output $(CORPUS_OUT) --download $(CORPUS_FLAGS)
+# Kept as an alias so older docs/scripts keep working.
+corpus-download: corpus ## [corpus] Alias for 'make corpus' (generate + download)
 
-corpus-ingest: ## [corpus] Ingest both corpora (CLI, P0-safe with --fallback-index)
+# Process-time ontologies for OSINT ingest (ingest API stays corpus-agnostic).
+# Override with CORPUS_ONTOLOGIES=a.ttl,b.owl or CORPUS_ONTOLOGY_DIR=/other/dir
+# Clear with CORPUS_ONTOLOGY_DIR= only if you intentionally skip ontologies.
+CORPUS_ONTOLOGY_DIR ?= $(CORPUS_OUT)/corpus_nato/ontologies
+CORPUS_ONTOLOGIES ?=
+_INGEST_ONTOLOGY_ARGS = $(if $(CORPUS_ONTOLOGIES),--ontologies $(CORPUS_ONTOLOGIES),$(if $(CORPUS_ONTOLOGY_DIR),--ontology-dir $(CORPUS_ONTOLOGY_DIR),))
+
+# Fail if OSINT ingest would run without any ontology files.
+define _require_corpus_ontologies
+	@if [ -n "$(CORPUS_ONTOLOGIES)" ]; then \
+	  echo "Using ontologies: $(CORPUS_ONTOLOGIES)"; \
+	elif [ -z "$(CORPUS_ONTOLOGY_DIR)" ]; then \
+	  echo "ERROR: corpus-ingest requires ontologies — set CORPUS_ONTOLOGY_DIR or CORPUS_ONTOLOGIES"; \
+	  exit 1; \
+	elif [ ! -d "$(CORPUS_ONTOLOGY_DIR)" ]; then \
+	  echo "ERROR: ontology dir missing: $(CORPUS_ONTOLOGY_DIR)"; \
+	  echo "  Run: make corpus   (or make corpus-ontologies)"; \
+	  exit 1; \
+	elif [ -z "$$(find "$(CORPUS_ONTOLOGY_DIR)" -maxdepth 1 \( -name '*.ttl' -o -name '*.owl' -o -name '*.rdf' -o -name '*.xml' \) -print -quit)" ]; then \
+	  echo "ERROR: no OWL/TTL/RDF files in $(CORPUS_ONTOLOGY_DIR)"; \
+	  echo "  Run: make corpus   (or make corpus-ontologies)"; \
+	  exit 1; \
+	else \
+	  echo "Using ontologies from $(CORPUS_ONTOLOGY_DIR)"; \
+	fi
+endef
+
+corpus-ingest: ## [corpus] Ingest both corpora via :8091 (OSINT with ontologies; enterprise without)
+	$(call _require_corpus_ontologies)
 	$(_CORPUS_RUN) $(_INGEST_PY) \
 	  --corpus-dir $(CORPUS_OUT) \
 	  --api-url $(INGEST_API_URL) \
+	  --corpus osint \
 	  --user-space dev@tkeir \
 	  --workers $(INGEST_WORKERS) \
 	  --fallback-index \
-	  --output-report $(CORPUS_OUT)/ingest_report.json \
+	  --output-report $(CORPUS_OUT)/ingest_osint.json \
+	  $(_INGEST_ONTOLOGY_ARGS) \
+	  $(_STOP_ON_FAILED_FLAG) \
 	  $(INGEST_FLAGS)
+	$(_CORPUS_RUN) $(_INGEST_PY) \
+	  --corpus-dir $(CORPUS_OUT) \
+	  --api-url $(INGEST_API_URL) \
+	  --corpus enterprise \
+	  --user-space dev@tkeir \
+	  --workers $(INGEST_WORKERS) \
+	  --fallback-index \
+	  --output-report $(CORPUS_OUT)/ingest_enterprise.json \
+	  $(_STOP_ON_FAILED_FLAG) \
+	  $(INGEST_FLAGS)
+	@echo "If API was down (P0): make bootstrap && make ingest   # then re-run make corpus-ingest"
+	@echo "If API was down (P1): make images && make compose-up PROFILES=core,ingest"
+	@echo "OSINT ingested with ontologies; enterprise ingested without"
+	@echo "Debug tip: make ingest STOP_ON_FAILED=1  &&  make corpus-ingest STOP_ON_FAILED=1"
 
 corpus-ingest-user: ## [corpus] Ingest OSINT corpus as demo-user (P1, Keycloak required)
+	$(call _require_corpus_ontologies)
 	$(_CORPUS_RUN) $(_INGEST_PY) \
 	  --corpus-dir $(CORPUS_OUT) \
 	  --api-url $(INGEST_API_URL) \
@@ -1084,6 +1170,8 @@ corpus-ingest-user: ## [corpus] Ingest OSINT corpus as demo-user (P1, Keycloak r
 	  --workers $(INGEST_WORKERS) \
 	  --status-poll \
 	  --output-report $(CORPUS_OUT)/ingest_user.json \
+	  $(_INGEST_ONTOLOGY_ARGS) \
+	  $(_STOP_ON_FAILED_FLAG) \
 	  $(INGEST_FLAGS)
 
 corpus-ingest-admin: ## [corpus] Ingest Enterprise corpus as demo-admin (P1, Keycloak required)
@@ -1096,6 +1184,7 @@ corpus-ingest-admin: ## [corpus] Ingest Enterprise corpus as demo-admin (P1, Key
 	  --workers $(INGEST_WORKERS) \
 	  --status-poll \
 	  --output-report $(CORPUS_OUT)/ingest_admin.json \
+	  $(_STOP_ON_FAILED_FLAG) \
 	  $(INGEST_FLAGS)
 
 corpus-ingest-web: ## [corpus] Print HMI drag-and-drop + curl guide for web ingestion
@@ -1105,12 +1194,13 @@ corpus-ingest-web: ## [corpus] Print HMI drag-and-drop + curl guide for web inge
 	  --token-url $(INGEST_TOKEN_URL) \
 	  --print-web-guide
 
-corpus-demo: corpus corpus-ingest ## [corpus] One-shot: generate → ingest (P0, dev@tkeir)
+corpus-demo: corpus corpus-ingest ## [corpus] One-shot: generate → ingest (P0 host ingest must be up)
 	@echo "=== Corpus demo ready (P0 / dev@tkeir) ==="
-	@echo "  RAG: make rag-query RAG_QUERY=\"SITREP Objective ALPHA\""
-	@echo "  HMI: http://localhost:3000"
-	@echo "  For P1 isolation: make compose-up PROFILES=core,auth,ingest"
-	@echo "                    make corpus-ingest-user && make corpus-ingest-admin"
+	@echo "  Prerequisite: make bootstrap && make ingest (host; no tkeir containers)"
+	@echo "  RAG: make rag && make rag-query RAG_QUERY=\"SITREP Objective ALPHA\""
+	@echo "  HMI: cd tkeir-hmi && npm run dev → http://localhost:3000"
+	@echo "  P1 isolation: make images && make compose-up PROFILES=core,auth,ingest"
+	@echo "                make corpus-ingest-user && make corpus-ingest-admin"
 
 corpus-clean: ## [corpus] Remove generated corpora under workspace/
 	rm -rf $(CORPUS_OUT)/corpus_nato $(CORPUS_OUT)/corpus_enterprise

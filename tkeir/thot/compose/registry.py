@@ -1,4 +1,12 @@
-"""Load versioned templates from ``tkeir/configs/templates/``."""
+"""Title: Registry
+
+Load versioned templates from ``tkeir/configs/templates/``.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

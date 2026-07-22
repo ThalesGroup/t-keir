@@ -1,0 +1,138 @@
+Granular metrics taxonomy and dimension catalog
+
+Overview
+
+This document defines a company-wide metrics taxonomy and a canonical dimension catalog for Redwood Inference telemetry. The goal is to ensure consistent metric names, dimension sets, cardinality limits, aggregation windows, and SLI mappings so dashboards, alerts, and cost reports are reliable and easy to compose. This is a prescriptive standard for all services that emit metrics into the central metrics pipeline (m-metrics/redwood-metrics).
+
+Scope
+
+- Applies to: all backend services (hosted API, serving runtime, routers, autoscalers), edge proxies, and control-plane components that publish metrics to the central ingestion cluster.
+- Excludes: ephemeral developer-local metrics unless explicitly onboarded for integration tests.
+
+Metric naming convention
+
+Follow a dot-separated, snake_case metric name pattern: <product>.<service>.<entity>.<measurement>.<statistic>
+
+- product: one of hosted, dedicated, private, console, optimize, infra
+- service: short service identifier (router, runtime, scheduler, cache, api, billing)
+- entity: optional object (route, model, shard)
+- measurement: user-visible concept (latency, tokens, requests, errors, utilization, memory)
+- statistic: count | p50 | p95 | sum | gauge | max
+
+Examples:
+- hosted.router.requests.count
+- runtime.shard.kv_cache.hit_ratio.gauge
+- infra.gpu.node_utilization.p95
+
+Dimension catalog (recommended canonical dimensions)
+
+Each metric should include only the relevant dimensions from this catalog. Services must document the dimensions they emit in their service README. Do not invent new top-level dimensions without an ADR and at least two reviewers.
+
+1) routing and request dimensions (high-cardinality caution)
+- tenant_id (string) — Customer identifier used for billing and rate-limiting. Cardinality: medium (prefer hashed tenant_id or tenant_tier where possible).
+- route (string) — Logical route name (e.g., /v1/generate). Cardinality: low.
+- model_family (string) — Canonical model family (gpt-4o, redwood-alpha, llama-2). Cardinality: low.
+- model_variant (string) — Variant + quantization (e.g., gpt4o-v2-q4_0). Cardinality: medium.
+- request_priority (string) — high|normal|best_effort. Cardinality: small.
+
+2) runtime and infra dimensions
+- shard_id (string) — runtime shard identifier. Cardinality: medium.
+- gpu_type (string) — e.g., a100-80gb, h100-80gb. Cardinality: low.
+- region (string) — compute region (us-west1, eu-west1). Cardinality: low.
+- instance_pool (string) — pool name for Dedicated. Cardinality: low.
+
+3) deployment and release dimensions
+- service_version (string) — semver-like tag, e.g., 3.7.1. Cardinality: medium (cap to last 10 active versions in dashboards).
+- rollout_stage (string) — canary|canary-1|stable|rollback. Cardinality: small.
+
+Cardinality guidelines and enforcement
+
+- Cardinality buckets: low (<=100 values), medium (<=10k values), high (>10k values). High-cardinality dimensions are allowed only on debug/trace metrics or aggregated as hashed buckets.
+- Per-metric tag limit: default 6 dimensions. Exceptions require approvals by observability team.
+- Metric label cardinality cap: ingest pipeline enforces a 20k-series-per-metric sliding window; services that exceed will receive warnings and eventual ingestion throttling.
+
+Aggregation windows and retention
+
+- Default base resolution: 1s for latency histograms and counters in the serving runtime for high-fidelity SLOs.
+- Aggregated rollups: 1m, 5m, 1h produced by the metrics rollup job.
+- Retention: raw 1s series retained for 30 days for production namespaces; rollups retained for 13 months.
+
+SLO and SLI mapping guidance
+
+- Canonical latency metric for API surface: hosted.router.latency_ms.{p50,p95,p99}. Use p95 for customer-facing latency SLOs unless otherwise specified.
+- Error budget metric: hosted.router.requests.errors.count and hosted.router.requests.count used to derive error rate.
+- Example SLI definition (pseudocode):
+  - SLI name: api_success_rate
+  - Query: (sum(hosted.router.requests.count) - sum(hosted.router.requests.errors.count)) / sum(hosted.router.requests.count) over 5m
+
+Metric type and semantic hints
+
+- Counters: append-only counters for events (requests.count, tokens.generated.count).
+- Gauges: point-in-time values (cache_fill_ratio.gauge, shard_free_memory.gauge).
+- Histograms: use for latency and size distributions. Publish explicit pX aggregates as separate metrics when necessary.
+
+Metric ingestion schema example (YAML)
+
+service: runtime
+metric_prefix: runtime.shard
+metrics:
+  - name: runtime.shard.kv_cache.hit_ratio.gauge
+    type: gauge
+    dimensions: [shard_id, model_family, region]
+    description: "Ratio of kv cache hits over last 60s"
+    cardinality_estimate: "medium"
+
+Enforcement, onboarding, and change process
+
+1) New metric onboarding:
+  a. Create a short PR in the service repo adding metric name(s) + dimensions in the service README (metrics.md).
+  b. Add an example Grafana panel JSON reference and the intended SLO mapping (if any).
+  c. Observability team will auto-review via the metrics-lint bot and run cardinality checks.
+  d. After 2 approvers and successful CI checks, metric is allowed for production ingress.
+
+2) Metric deprecation:
+  - Mark metric in README with deprecated: true and add replacement metric.
+  - Maintain emitted metric for 90 days with rollup-to-new-metric mapping.
+
+Dashboards and alerting conventions
+
+- Dashboard panels should use standardized template variables: environment, region, model_family, route.
+- Alerting thresholds: use aggregated 5m windows for alert firing; 1h windows for alert auto-resolve thresholds where applicable.
+- High-cardinality dimension slicing: do not create per-tenant alerts without centralized signup; tenant-scoped alerts require security and billing team approval.
+
+Ownership and contact
+
+- Observability team (observability@redwood.ai) owns the taxonomy and enforcement tooling.
+- Each service must list a metrics owner in its README. The owner is responsible for instrumentation correctness and for responding to cardinality warnings.
+
+Appendix A — Examples and queries
+
+1) SLO example (PromQL-like pseudocode):
+  - api_success_rate_5m = sum_over_time(hosted_router_requests_count[5m]) - sum_over_time(hosted_router_requests_errors_count[5m])
+  - api_success_rate = api_success_rate_5m / sum_over_time(hosted_router_requests_count[5m])
+
+2) Dimension reduction example (SQL):
+  SELECT
+    model_family,
+    quantized_bucket,
+    count(*) AS series_count
+  FROM metric_series_catalog
+  WHERE metric_name = 'runtime.shard.kv_cache.hit_ratio.gauge'
+  GROUP BY 1,2
+  ORDER BY series_count DESC
+  LIMIT 100
+
+Change log and historical notes
+
+- 2025-11-12: Initial draft and first pass by engineering instrumentation group.
+- 2025-12-08: Cardinality caps added after SLO tooling review.
+- 2026-02-20: Publication after stakeholder reviews and metrics-lint integration.
+
+Related reading
+
+- Telemetry ingestion and retention guidelines (see related pages).
+- End-to-end SLI composition and correlation playbook.
+
+Questions or exceptions
+
+Submit exceptions via the observability exceptions board (internal RFC) or contact the Observability team. Urgent exceptions for customer incidents can be requested via oncall and must be retroactively documented.

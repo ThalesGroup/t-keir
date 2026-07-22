@@ -1,0 +1,6 @@
+# AcmeSystems KB: Reset Service Credential
+
+Knowledge base article — AcmeSystems
+Use the identity portal to rotate a service credential. Update the vault entry, redeploy the dependent workload, and verify audit logs. Never send credentials through email.
+
+Note: document interne AcmeSystems (version française de travail).

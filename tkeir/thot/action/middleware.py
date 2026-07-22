@@ -1,9 +1,11 @@
-"""FastAPI/Starlette middleware for correlation IDs and ActionRecords.
+"""Title: Middleware
 
-Author: Eric Blaudez (Eric Blaudez)
+FastAPI/Starlette middleware for correlation IDs and ActionRecords.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

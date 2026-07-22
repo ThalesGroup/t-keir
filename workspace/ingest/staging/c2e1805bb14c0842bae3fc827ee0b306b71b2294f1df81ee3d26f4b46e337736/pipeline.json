@@ -1,0 +1,1580 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://c2e1805bb14c0842bae3fc827ee0b306b71b2294f1df81ee3d26f4b46e337736/meeting_minutes_00154_5d2db4f9.pdf",
+  "title": "AcmeSystems GDPR Compliance Sprint Steering Meeting",
+  "content": [
+    "AcmeSystems GDPR Compliance Sprint Steering Meeting\nMeeting minutes\nCompany: AcmeSystems\nChair: Ibrahim Richard\nProject: GDPR Compliance Sprint\n\nDecisions: approve the next integration milestone for AcmeSystems GDPR Compliance Sprint. Actions: E"
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "Decisions"
+        ],
+        "lemma_content": [
+          "Decisions"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          20
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "approve"
+        ],
+        "lemma_content": [
+          "approve"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          22
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "integration",
+          "milestone"
+        ],
+        "lemma_content": [
+          "integration",
+          "milestone"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          25,
+          26
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "pdf",
+    "source-size-bytes": 920,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:46",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://c2e1805bb14c0842bae3fc827ee0b306b71b2294f1df81ee3d26f4b46e337736/meeting_minutes_00154_5d2db4f9.pdf",
+  "metadata": {
+    "topic_id": "projects",
+    "corpus": "enterprise",
+    "doc_type": "meeting_minutes",
+    "language": "en",
+    "title": "AcmeSystems GDPR Compliance Sprint Steering Meeting",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "projects",
+  "doc_type": "meeting_minutes",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999966326924797
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "AcmeSystems",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "GDPR",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Compliance",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sprint",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Steering",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Meeting",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Meeting",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "minutes",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Company",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Chair",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Ibrahim",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Richard",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Project",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "GDPR",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Compliance",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sprint",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Decisions",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "approve",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "next",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "integration",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "milestone",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "for",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "GDPR",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Compliance",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sprint",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Actions",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "E",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "GDPR",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Compliance",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Sprint",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Steering",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Meeting",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "GDPR",
+      "text": "GDPR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Compliance",
+      "text": "Compliance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sprint",
+      "text": "Sprint",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Steering",
+      "text": "Steering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "GDPR",
+      "text": "GDPR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Compliance",
+      "text": "Compliance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sprint",
+      "text": "Sprint",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Steering",
+      "text": "Steering",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Meeting",
+      "text": "Meeting",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "minute",
+      "text": "minutes",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Company",
+      "text": "Company",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Chair",
+      "text": "Chair",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Ibrahim",
+      "text": "Ibrahim",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Richard",
+      "text": "Richard",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "GDPR",
+      "text": "GDPR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Compliance",
+      "text": "Compliance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sprint",
+      "text": "Sprint",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Decisions",
+      "text": "Decisions",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 20
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "VERB",
+      "lemma": "approve",
+      "text": "approve",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "next",
+      "text": "next",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "integration",
+      "text": "integration",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "milestone",
+      "text": "milestone",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "ADP",
+      "lemma": "for",
+      "text": "for",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "GDPR",
+      "text": "GDPR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Compliance",
+      "text": "Compliance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sprint",
+      "text": "Sprint",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "action",
+      "text": "Actions",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 33
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "e",
+      "text": "E",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [
+    {
+      "start": 10,
+      "end": 11,
+      "label": "organization",
+      "text": "AcmeSystems"
+    },
+    {
+      "start": 13,
+      "end": 16,
+      "label": "person",
+      "text": "Ibrahim Richard Project"
+    },
+    {
+      "start": 28,
+      "end": 32,
+      "label": "organization",
+      "text": "AcmeSystems GDPR Compliance Sprint"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "GDPR",
+      "lemma": "GDPR",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Compliance",
+      "lemma": "Compliance",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sprint",
+      "lemma": "Sprint",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Steering",
+      "lemma": "Steering",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 7,
+      "dep": "compound",
+      "lefts": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "rights": []
+    },
+    {
+      "text": "minutes",
+      "lemma": "minute",
+      "pos": "NOUN",
+      "head": 8,
+      "dep": "compound",
+      "lefts": [
+        6
+      ],
+      "rights": []
+    },
+    {
+      "text": "Company",
+      "lemma": "Company",
+      "pos": "PROPN",
+      "head": 8,
+      "dep": "ROOT",
+      "lefts": [
+        7
+      ],
+      "rights": [
+        9,
+        11
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 8,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 11,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Chair",
+      "lemma": "Chair",
+      "pos": "PROPN",
+      "head": 8,
+      "dep": "appos",
+      "lefts": [
+        10
+      ],
+      "rights": [
+        12,
+        15,
+        16
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 11,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Ibrahim",
+      "lemma": "Ibrahim",
+      "pos": "PROPN",
+      "head": 15,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Richard",
+      "lemma": "Richard",
+      "pos": "PROPN",
+      "head": 15,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 11,
+      "dep": "appos",
+      "lefts": [
+        13,
+        14
+      ],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 11,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "GDPR",
+      "lemma": "GDPR",
+      "pos": "PROPN",
+      "head": 19,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Compliance",
+      "lemma": "Compliance",
+      "pos": "PROPN",
+      "head": 19,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sprint",
+      "lemma": "Sprint",
+      "pos": "PROPN",
+      "head": 19,
+      "dep": "ROOT",
+      "lefts": [
+        17,
+        18
+      ],
+      "rights": []
+    },
+    {
+      "text": "Decisions",
+      "lemma": "Decisions",
+      "pos": "PROPN",
+      "head": 22,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 22,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "approve",
+      "lemma": "approve",
+      "pos": "VERB",
+      "head": 22,
+      "dep": "ROOT",
+      "lefts": [
+        20,
+        21
+      ],
+      "rights": [
+        26,
+        32
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 26,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "next",
+      "lemma": "next",
+      "pos": "ADJ",
+      "head": 26,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "integration",
+      "lemma": "integration",
+      "pos": "NOUN",
+      "head": 26,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "milestone",
+      "lemma": "milestone",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "dobj",
+      "lefts": [
+        23,
+        24,
+        25
+      ],
+      "rights": [
+        27
+      ]
+    },
+    {
+      "text": "for",
+      "lemma": "for",
+      "pos": "ADP",
+      "head": 26,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        31
+      ]
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 31,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "GDPR",
+      "lemma": "GDPR",
+      "pos": "PROPN",
+      "head": 31,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Compliance",
+      "lemma": "Compliance",
+      "pos": "PROPN",
+      "head": 31,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sprint",
+      "lemma": "Sprint",
+      "pos": "PROPN",
+      "head": 27,
+      "dep": "pobj",
+      "lefts": [
+        28,
+        29,
+        30
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 22,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Actions",
+      "lemma": "action",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        34,
+        35
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "E",
+      "lemma": "e",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "GDPR",
+      "lemma": "GDPR",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Compliance",
+      "lemma": "Compliance",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sprint",
+      "lemma": "Sprint",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Steering",
+      "lemma": "Steering",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Meeting",
+      "lemma": "Meeting",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "ROOT",
+      "lefts": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 36,
+      "text": "acmesystems gdpr compliance sprint steering meeting",
+      "span": {
+        "start": 0,
+        "end": 6
+      }
+    },
+    {
+      "score": 66,
+      "text": "acmesystems gdpr compliance sprint steering meeting meeting minute company",
+      "span": {
+        "start": 0,
+        "end": 9
+      }
+    },
+    {
+      "score": 20,
+      "text": "acmesystems gdpr compliance sprint",
+      "span": {
+        "start": 28,
+        "end": 32
+      }
+    },
+    {
+      "score": 16,
+      "text": "gdpr compliance sprint",
+      "span": {
+        "start": 17,
+        "end": 20
+      }
+    },
+    {
+      "score": 9,
+      "text": "ibrahim richard project",
+      "span": {
+        "start": 13,
+        "end": 16
+      }
+    },
+    {
+      "score": 9,
+      "text": "next integration milestone",
+      "span": {
+        "start": 24,
+        "end": 27
+      }
+    },
+    {
+      "score": 7,
+      "text": "acmesystems chair",
+      "span": {
+        "start": 10,
+        "end": 12
+      }
+    },
+    {
+      "score": 1,
+      "text": "decisions",
+      "span": {
+        "start": 20,
+        "end": 21
+      }
+    },
+    {
+      "score": 1,
+      "text": "action",
+      "span": {
+        "start": 33,
+        "end": 34
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://c2e1805bb14c0842bae3fc827ee0b306b71b2294f1df81ee3d26f4b46e337736/meeting_minutes_00154_5d2db4f9.pdf#chunk-0-7f1466c481",
+      "parent_doc_id": "ingest://c2e1805bb14c0842bae3fc827ee0b306b71b2294f1df81ee3d26f4b46e337736/meeting_minutes_00154_5d2db4f9.pdf",
+      "text_raw": "AcmeSystems GDPR Compliance Sprint Steering Meeting Meeting minutes Company : AcmeSystems Chair : Ibrahim Richard Project : GDPR Compliance Sprint Decisions : approve the next integration milestone for AcmeSystems GDPR Compliance Sprint . Actions : E",
+      "search_vector_payload": "AcmeSystems GDPR Compliance Sprint Steering Meeting Meeting minutes Company : AcmeSystems Chair : Ibrahim Richard Project : GDPR Compliance Sprint Decisions : approve the next integration milestone for AcmeSystems GDPR Compliance Sprint . Actions : E",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "AcmeSystems",
+            "AcmeSystems GDPR Compliance Sprint"
+          ],
+          "person": [
+            "Ibrahim Richard Project"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "Decisions",
+            "approve",
+            "integration milestone"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 36,
+        "sentence_start": 0,
+        "sentence_end": 3
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Decisions approve integration milestone",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "AcmeSystems",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "AcmeSystems GDPR Compliance Sprint Steering Meeting Meeting minutes Company : AcmeSystems Chair",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "AcmeSystems GDPR Compliance Sprint",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "Ibrahim Richard Project",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decisions/decisions-cfa6a08af3ed\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Decision\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decision/integration_milestone-43d83ab6227f\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decision/milestone-7f7f85b1e7d5\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Decisions\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/decisions\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"decisions\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Person/ibrahim_richard_project-2bfeea5d9658\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Person\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Ibrahim Richard Project\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Organization/acmesystems_gdpr_compliance_sprint-b16f62d236a9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems GDPR Compliance Sprint\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/acmesystems_gdpr_compliance_sprint\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems gdpr compliance sprint\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Chunk/ingest_c2e1805bb14c0842bae3fc827ee0b306b71b2294f1df81ee3d26f4b46e337736_meeting_minutes_00154_5d2db4f9_pdf_chunk_0_7f1466c481\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/acmesystems_gdpr_compliance_sprint_steering_meeting\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/acmesystems_gdpr_compliance_sprint\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/gdpr_compliance_sprint\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/ibrahim_richard_project\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/next_integration_milestone\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/acmesystems_chair\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/decisions\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/action\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Person/ibrahim_richard_project-2bfeea5d9658\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Organization/acmesystems_gdpr_compliance_sprint-b16f62d236a9\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decisions/decisions-cfa6a08af3ed\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"meeting_minutes_00154_5d2db4f9_pdf\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decision/integration_milestone-43d83ab6227f\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Decision\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decision/milestone-7f7f85b1e7d5\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"integration milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/acmesystems_chair\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems chair\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Chunk/ingest_c2e1805bb14c0842bae3fc827ee0b306b71b2294f1df81ee3d26f4b46e337736_meeting_minutes_00154_5d2db4f9_pdf_chunk_0_7f1466c481\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Organization/acmesystems_gdpr_compliance_sprint-b16f62d236a9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Person/ibrahim_richard_project-2bfeea5d9658\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decisions/decisions-cfa6a08af3ed\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://c2e1805bb14c0842bae3fc827ee0b306b71b2294f1df81ee3d26f4b46e337736/meeting_minutes_00154_5d2db4f9.pdf#chunk-0-7f1466c481\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/action\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"action\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decision/milestone-7f7f85b1e7d5\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Decision\"\n    ],\n    \"http://tkeir.local/ontology/approve\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Decision/milestone-7f7f85b1e7d5\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/ibrahim_richard_project\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ibrahim richard project\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/gdpr_compliance_sprint\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"gdpr compliance sprint\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/next_integration_milestone\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"next integration milestone\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Keyword/acmesystems_gdpr_compliance_sprint_steering_meeting\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems gdpr compliance sprint steering meeting\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/meeting_minutes_00154_5d2db4f9_pdf/Organization/acmesystems-14032de724d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 2,
+      "unresolved": 0,
+      "auto_fixed": 2,
+      "affected_node_count": 2,
+      "graph_node_count": 22,
+      "graph_triple_count": 53,
+      "by_result_path": {
+        "approve": 2
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 42,
+    "total_tokens": 42,
+    "covered_characters": 261,
+    "total_characters": 261
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 6,
+  "content-token-count": 36,
+  "token-count": 42,
+  "source-file-size-bytes": 920,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.046,
+    "tasks": {
+      "converter": 0.006,
+      "language-detection": 0.003,
+      "resource-selection": 0.001,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.007,
+      "ner": 0.007,
+      "syntax": 0.008,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.009,
+      "chunk-questions": 0.001
+    }
+  }
+}

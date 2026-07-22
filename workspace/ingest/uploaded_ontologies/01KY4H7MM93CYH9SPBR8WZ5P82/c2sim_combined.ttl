@@ -1,0 +1,103 @@
+@prefix cwix: <http://www.sisostds.org/ontologies/C2SIM/cwix2023#> .
+@prefix ex: <http://example.org/cwix#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix c2sim: <http://www.sisostds.org/ontologies/C2SIM#> .
+@prefix lox: <http://www.sisostds.org/ontologies/lox#> .
+@prefix cwix: <http://www.sisostds.org/ontologies/C2SIM/cwix2023#> .
+@prefix tkeir: <http://tkeir.local/ontology/> .
+@prefix tkeirdoc: <http://tkeir.local/doc/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+<http://www.sisostds.org/ontologies/C2SIM/cwix2023#> a owl:Ontology ; rdfs:label "C2SIM Combined CWIX"@en .
+cwix:Class0 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 0"@en .
+cwix:asset0 a cwix:Class0 ; rdfs:label "Asset 0"@en .
+cwix:Class1 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 1"@en ; rdfs:subClassOf cwix:Class0 .
+cwix:asset1 a cwix:Class1 ; rdfs:label "Asset 1"@en .
+cwix:Class2 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 2"@en ; rdfs:subClassOf cwix:Class1 .
+cwix:asset2 a cwix:Class2 ; rdfs:label "Asset 2"@en .
+cwix:Class3 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 3"@en ; rdfs:subClassOf cwix:Class2 .
+cwix:asset3 a cwix:Class3 ; rdfs:label "Asset 3"@en .
+cwix:Class4 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 4"@en ; rdfs:subClassOf cwix:Class3 .
+cwix:asset4 a cwix:Class4 ; rdfs:label "Asset 4"@en .
+cwix:Class5 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 5"@en ; rdfs:subClassOf cwix:Class4 .
+cwix:asset5 a cwix:Class5 ; rdfs:label "Asset 5"@en .
+cwix:Class6 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 6"@en ; rdfs:subClassOf cwix:Class5 .
+cwix:asset6 a cwix:Class6 ; rdfs:label "Asset 6"@en .
+cwix:Class7 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 7"@en ; rdfs:subClassOf cwix:Class6 .
+cwix:asset7 a cwix:Class7 ; rdfs:label "Asset 7"@en .
+cwix:Class8 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 8"@en ; rdfs:subClassOf cwix:Class7 .
+cwix:asset8 a cwix:Class8 ; rdfs:label "Asset 8"@en .
+cwix:Class9 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 9"@en ; rdfs:subClassOf cwix:Class8 .
+cwix:asset9 a cwix:Class9 ; rdfs:label "Asset 9"@en .
+cwix:Class10 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 10"@en ; rdfs:subClassOf cwix:Class9 .
+cwix:asset10 a cwix:Class10 ; rdfs:label "Asset 10"@en .
+cwix:Class11 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 11"@en ; rdfs:subClassOf cwix:Class10 .
+cwix:asset11 a cwix:Class11 ; rdfs:label "Asset 11"@en .
+cwix:Class12 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 12"@en ; rdfs:subClassOf cwix:Class11 .
+cwix:asset12 a cwix:Class12 ; rdfs:label "Asset 12"@en .
+cwix:Class13 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 13"@en ; rdfs:subClassOf cwix:Class12 .
+cwix:asset13 a cwix:Class13 ; rdfs:label "Asset 13"@en .
+cwix:Class14 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 14"@en ; rdfs:subClassOf cwix:Class13 .
+cwix:asset14 a cwix:Class14 ; rdfs:label "Asset 14"@en .
+cwix:Class15 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 15"@en ; rdfs:subClassOf cwix:Class14 .
+cwix:asset15 a cwix:Class15 ; rdfs:label "Asset 15"@en .
+cwix:Class16 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 16"@en ; rdfs:subClassOf cwix:Class15 .
+cwix:asset16 a cwix:Class16 ; rdfs:label "Asset 16"@en .
+cwix:Class17 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 17"@en ; rdfs:subClassOf cwix:Class16 .
+cwix:asset17 a cwix:Class17 ; rdfs:label "Asset 17"@en .
+cwix:Class18 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 18"@en ; rdfs:subClassOf cwix:Class17 .
+cwix:asset18 a cwix:Class18 ; rdfs:label "Asset 18"@en .
+cwix:Class19 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 19"@en ; rdfs:subClassOf cwix:Class18 .
+cwix:asset19 a cwix:Class19 ; rdfs:label "Asset 19"@en .
+cwix:Class20 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 20"@en ; rdfs:subClassOf cwix:Class19 .
+cwix:asset20 a cwix:Class20 ; rdfs:label "Asset 20"@en .
+cwix:Class21 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 21"@en ; rdfs:subClassOf cwix:Class20 .
+cwix:asset21 a cwix:Class21 ; rdfs:label "Asset 21"@en .
+cwix:Class22 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 22"@en ; rdfs:subClassOf cwix:Class21 .
+cwix:asset22 a cwix:Class22 ; rdfs:label "Asset 22"@en .
+cwix:Class23 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 23"@en ; rdfs:subClassOf cwix:Class22 .
+cwix:asset23 a cwix:Class23 ; rdfs:label "Asset 23"@en .
+cwix:Class24 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 24"@en ; rdfs:subClassOf cwix:Class23 .
+cwix:asset24 a cwix:Class24 ; rdfs:label "Asset 24"@en .
+cwix:Class25 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 25"@en ; rdfs:subClassOf cwix:Class24 .
+cwix:asset25 a cwix:Class25 ; rdfs:label "Asset 25"@en .
+cwix:Class26 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 26"@en ; rdfs:subClassOf cwix:Class25 .
+cwix:asset26 a cwix:Class26 ; rdfs:label "Asset 26"@en .
+cwix:Class27 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 27"@en ; rdfs:subClassOf cwix:Class26 .
+cwix:asset27 a cwix:Class27 ; rdfs:label "Asset 27"@en .
+cwix:Class28 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 28"@en ; rdfs:subClassOf cwix:Class27 .
+cwix:asset28 a cwix:Class28 ; rdfs:label "Asset 28"@en .
+cwix:Class29 a owl:Class ; rdfs:label "C2SIM Combined CWIX Class 29"@en ; rdfs:subClassOf cwix:Class28 .
+cwix:asset29 a cwix:Class29 ; rdfs:label "Asset 29"@en .
+ex:CWIX2023_Scenario a cwix:ExerciseScenario ;
+  dc:description "CWIX 2023 coalition interoperability scenario."@en ;
+  rdfs:label "CWIX 2023"@en .
+c2sim:taskAssignedTo a owl:ObjectProperty .
+c2sim:taskName a owl:DatatypeProperty .
+c2sim:hasObjective a owl:ObjectProperty .
+lox:GroundUnit a owl:Class ; rdfs:label "GroundUnit"@en .
+c2sim:OperationalEntity a owl:Class ; rdfs:label "OperationalEntity"@en .
+c2sim:Unit_ALPHA a lox:GroundUnit , c2sim:OperationalEntity ; rdfs:label "Task Group ALPHA"@en .
+c2sim:Unit_BRAVO a lox:GroundUnit , c2sim:OperationalEntity ; rdfs:label "CWIX 2023 Force BRAVO"@en .
+c2sim:Obj_ALPHA a c2sim:Class0 ; rdfs:label "Objective ALPHA"@en .
+c2sim:Task_1 a c2sim:Class1 ;
+  c2sim:taskAssignedTo c2sim:Unit_ALPHA ;
+  c2sim:taskName "Secure Objective ALPHA"@en ;
+  c2sim:hasObjective c2sim:Obj_ALPHA ;
+  rdfs:label "Secure Objective ALPHA"@en .
+c2sim:Task_2 a c2sim:Class1 ;
+  c2sim:taskAssignedTo c2sim:Unit_BRAVO ;
+  c2sim:taskName "ISR collection CWIX 2023"@en ;
+  c2sim:hasObjective c2sim:Obj_ALPHA ;
+  rdfs:label "ISR collection CWIX 2023"@en .
+tkeirdoc:doc_nato a tkeir:Document ;
+  tkeir:hasChunk <http://tkeir.local/doc/doc_nato/Chunk/chunk_1> ;
+  tkeir:hasKeyword <http://tkeir.local/doc/doc_nato/Keyword/intsum> ;
+  tkeir:hasMention c2sim:Unit_ALPHA .
+<http://tkeir.local/doc/doc_nato/Keyword/intsum> a tkeir:Keyword ;
+  rdfs:label "INTSUM"@en .
+<http://tkeir.local/doc/doc_nato/Chunk/chunk_1> a tkeir:DocumentChunk ;
+  rdfs:label "sitrep.pdf#chunk-1-alpha" ;
+  tkeir:hasMention c2sim:Unit_ALPHA ;
+  tkeir:hasMention c2sim:Unit_BRAVO .

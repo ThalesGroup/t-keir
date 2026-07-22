@@ -1,10 +1,15 @@
-"""BEIR retrieval evaluation: BM25, dense, and T-KEIR pipeline vs leaderboard.
+"""Title: BEIR retrieval evaluation: BM25, dense, and T-KEIR pipeline vs leaderboard.
 
 Downloads SciFact, FiQA, and ArguAna when missing under ``./datasets/``, runs
 lexical (BM25), dense (SentenceTransformer), and the T-KEIR **retrieval**
 stack (NLP index + QueryAnalyzer + Vespa hybrid; **no answer generation**)
 at top-100, computes NDCG@10 / MAP@100 / Recall@100, performs error
 analysis, and always writes ``tkeir/docs/evaluation_report.md`` (MkDocs).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

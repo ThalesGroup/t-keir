@@ -1,0 +1,1334 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://affd519c3e947668cf29f66b58b0b37fff3647b49db672f4e7aa90d16f965b21/technical_spec_00280_9785db5a.pdf",
+  "title": "AcmeSystems Project ATLAS Technical Specification",
+  "content": [
+    "AcmeSystems Project ATLAS Technical Specification\nTechnical specification â AcmeSystems Project ATLAS\n\nPurpose: define a secure service interface. Requirements: TLS transport, audit events, role-based au"
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "Purpose"
+        ],
+        "lemma_content": [
+          "purpose"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          11
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "define"
+        ],
+        "lemma_content": [
+          "define"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          13
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "service",
+          "interface"
+        ],
+        "lemma_content": [
+          "service",
+          "interface"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          16,
+          17
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "pdf",
+    "source-size-bytes": 838,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:57:29",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://affd519c3e947668cf29f66b58b0b37fff3647b49db672f4e7aa90d16f965b21/technical_spec_00280_9785db5a.pdf",
+  "metadata": {
+    "topic_id": "engineering",
+    "corpus": "enterprise",
+    "doc_type": "technical_spec",
+    "language": "en",
+    "title": "AcmeSystems Project ATLAS Technical Specification",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "engineering",
+  "doc_type": "technical_spec",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999949805619708
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "AcmeSystems",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Project",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ATLAS",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Technical",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Specification",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Technical",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "specification",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "â",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Project",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ATLAS",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Purpose",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "define",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "a",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "secure",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "service",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "interface",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Requirements",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "TLS",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "transport",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "audit",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "events",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "role-based",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "au",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Project",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "ATLAS",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Technical",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Specification",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ATLAS",
+      "text": "ATLAS",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Technical",
+      "text": "Technical",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Specification",
+      "text": "Specification",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ATLAS",
+      "text": "ATLAS",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Technical",
+      "text": "Technical",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Specification",
+      "text": "Specification",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Technical",
+      "text": "Technical",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "specification",
+      "text": "specification",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "â",
+      "text": "â",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Project",
+      "text": "Project",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ATLAS",
+      "text": "ATLAS",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "purpose",
+      "text": "Purpose",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 11
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "VERB",
+      "lemma": "define",
+      "text": "define",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "DET",
+      "lemma": "a",
+      "text": "a",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "secure",
+      "text": "secure",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "service",
+      "text": "service",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "interface",
+      "text": "interface",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "requirement",
+      "text": "Requirements",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 19
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "TLS",
+      "text": "TLS",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "transport",
+      "text": "transport",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "audit",
+      "text": "audit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "event",
+      "text": "events",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "role-based",
+      "text": "role-based",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "X",
+      "lemma": "au",
+      "text": "au",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 0,
+      "end": 5,
+      "label": "organization",
+      "text": "AcmeSystems Project ATLAS Technical Specification"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 0,
+      "end": 6,
+      "label": "organization",
+      "text": "AcmeSystems Project ATLAS Technical Specification Technical"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        6,
+        9
+      ]
+    },
+    {
+      "text": "ATLAS",
+      "lemma": "ATLAS",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Technical",
+      "lemma": "Technical",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Specification",
+      "lemma": "Specification",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    },
+    {
+      "text": "Technical",
+      "lemma": "Technical",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [
+        4
+      ],
+      "rights": []
+    },
+    {
+      "text": "specification",
+      "lemma": "specification",
+      "pos": "NOUN",
+      "head": 1,
+      "dep": "appos",
+      "lefts": [
+        2,
+        5
+      ],
+      "rights": []
+    },
+    {
+      "text": "â",
+      "lemma": "â",
+      "pos": "PROPN",
+      "head": 8,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 9,
+      "dep": "compound",
+      "lefts": [
+        7
+      ],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "appos",
+      "lefts": [
+        8
+      ],
+      "rights": []
+    },
+    {
+      "text": "ATLAS",
+      "lemma": "ATLAS",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Purpose",
+      "lemma": "purpose",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": [
+        12
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 11,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "define",
+      "lemma": "define",
+      "pos": "VERB",
+      "head": 13,
+      "dep": "ROOT",
+      "lefts": [
+        11
+      ],
+      "rights": [
+        17,
+        18
+      ]
+    },
+    {
+      "text": "a",
+      "lemma": "a",
+      "pos": "DET",
+      "head": 17,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "secure",
+      "lemma": "secure",
+      "pos": "ADJ",
+      "head": 17,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "service",
+      "lemma": "service",
+      "pos": "NOUN",
+      "head": 17,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "interface",
+      "lemma": "interface",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "dobj",
+      "lefts": [
+        14,
+        15,
+        16
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 13,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Requirements",
+      "lemma": "requirement",
+      "pos": "NOUN",
+      "head": 27,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": [
+        20,
+        22
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 19,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "TLS",
+      "lemma": "TLS",
+      "pos": "PROPN",
+      "head": 22,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "transport",
+      "lemma": "transport",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "appos",
+      "lefts": [
+        21
+      ],
+      "rights": [
+        23,
+        25,
+        26
+      ]
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 22,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "audit",
+      "lemma": "audit",
+      "pos": "NOUN",
+      "head": 25,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "events",
+      "lemma": "event",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "conj",
+      "lefts": [
+        24
+      ],
+      "rights": []
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 22,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "role-based",
+      "lemma": "role-based",
+      "pos": "ADJ",
+      "head": 27,
+      "dep": "ROOT",
+      "lefts": [
+        19
+      ],
+      "rights": [
+        28
+      ]
+    },
+    {
+      "text": "au",
+      "lemma": "au",
+      "pos": "X",
+      "head": 27,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Project",
+      "lemma": "Project",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [
+        0
+      ],
+      "rights": []
+    },
+    {
+      "text": "ATLAS",
+      "lemma": "ATLAS",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Technical",
+      "lemma": "Technical",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Specification",
+      "lemma": "Specification",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        1,
+        2,
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 25,
+      "text": "acmesystems project atlas technical specification",
+      "span": {
+        "start": 0,
+        "end": 5
+      }
+    },
+    {
+      "score": 9,
+      "text": "secure service interface",
+      "span": {
+        "start": 15,
+        "end": 18
+      }
+    },
+    {
+      "score": 4,
+      "text": "tls transport",
+      "span": {
+        "start": 21,
+        "end": 23
+      }
+    },
+    {
+      "score": 4,
+      "text": "audit event",
+      "span": {
+        "start": 24,
+        "end": 26
+      }
+    },
+    {
+      "score": 1,
+      "text": "purpose",
+      "span": {
+        "start": 11,
+        "end": 12
+      }
+    },
+    {
+      "score": 1,
+      "text": "requirement",
+      "span": {
+        "start": 19,
+        "end": 20
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://affd519c3e947668cf29f66b58b0b37fff3647b49db672f4e7aa90d16f965b21/technical_spec_00280_9785db5a.pdf#chunk-0-9f3ae5cf4f",
+      "parent_doc_id": "ingest://affd519c3e947668cf29f66b58b0b37fff3647b49db672f4e7aa90d16f965b21/technical_spec_00280_9785db5a.pdf",
+      "text_raw": "AcmeSystems Project ATLAS Technical Specification Technical specification â AcmeSystems Project ATLAS Purpose : define a secure service interface . Requirements : TLS transport , audit events , role-based au",
+      "search_vector_payload": "AcmeSystems Project ATLAS Technical Specification Technical specification â AcmeSystems Project ATLAS Purpose : define a secure service interface . Requirements : TLS transport , audit events , role-based au",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "AcmeSystems Project ATLAS Technical Specification Technical"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "Purpose",
+            "define",
+            "service interface"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 29,
+        "sentence_start": 0,
+        "sentence_end": 3
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Purpose define service interface",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "AcmeSystems Project ATLAS Technical Specification Technical",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "AcmeSystems Project ATLAS Technical Specification Technical specification â AcmeSystems Project ATLAS Purpose",
+          "question_type": "Summary-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/purpose\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"purpose\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/requirement\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"requirement\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/service_interface-6ef0471d37ce\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Purpose\"\n    ],\n    \"http://tkeir.local/ontology/define\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/interface-c796d37c6d49\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"service interface\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/tls_transport\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"tls transport\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/acmesystems_project_atlas_technical_specification\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems project atlas technical specification\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/purpose-d4e8830a71c7\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Purpose\"\n    ],\n    \"http://tkeir.local/ontology/define\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/service_interface-6ef0471d37ce\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/interface-c796d37c6d49\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Purpose\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/interface-c796d37c6d49\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Purpose\"\n    ],\n    \"http://tkeir.local/ontology/define\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/interface-c796d37c6d49\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"interface\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Organization/acmesystems_project_atlas_technical_specification_technical-685a3283a971\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems Project ATLAS Technical Specification Technical\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Organization/acmesystems_project_atlas_technical_specification-901253c79b7b\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems Project ATLAS Technical Specification\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Chunk/ingest_affd519c3e947668cf29f66b58b0b37fff3647b49db672f4e7aa90d16f965b21_technical_spec_00280_9785db5a_pdf_chunk_0_9f3ae5cf4f\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Organization/acmesystems_project_atlas_technical_specification_technical-685a3283a971\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/purpose-d4e8830a71c7\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://affd519c3e947668cf29f66b58b0b37fff3647b49db672f4e7aa90d16f965b21/technical_spec_00280_9785db5a.pdf#chunk-0-9f3ae5cf4f\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/secure_service_interface\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"secure service interface\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Chunk/ingest_affd519c3e947668cf29f66b58b0b37fff3647b49db672f4e7aa90d16f965b21_technical_spec_00280_9785db5a_pdf_chunk_0_9f3ae5cf4f\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/acmesystems_project_atlas_technical_specification\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/secure_service_interface\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/tls_transport\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/audit_event\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/purpose\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/requirement\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Organization/acmesystems_project_atlas_technical_specification_technical-685a3283a971\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Organization/acmesystems_project_atlas_technical_specification-901253c79b7b\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Purpose/purpose-d4e8830a71c7\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"technical_spec_00280_9785db5a_pdf\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/technical_spec_00280_9785db5a_pdf/Keyword/audit_event\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"audit event\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 2,
+      "unresolved": 0,
+      "auto_fixed": 2,
+      "affected_node_count": 2,
+      "graph_node_count": 18,
+      "graph_triple_count": 42,
+      "by_result_path": {
+        "define": 2
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 34,
+    "total_tokens": 34,
+    "covered_characters": 226,
+    "total_characters": 226
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 29,
+  "token-count": 34,
+  "source-file-size-bytes": 838,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.035,
+    "tasks": {
+      "converter": 0.004,
+      "language-detection": 0.003,
+      "resource-selection": 0.002,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.004,
+      "ner": 0.005,
+      "syntax": 0.006,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.007,
+      "chunk-questions": 0.002
+    }
+  }
+}

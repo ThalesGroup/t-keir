@@ -1,4 +1,12 @@
-"""Consumable budget tracking per actor."""
+"""Title: Budgets
+
+Consumable budget tracking per actor.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

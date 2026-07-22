@@ -1,7 +1,12 @@
-"""Optional S3-compatible PUT (MinIO) using AWS Signature Version 4.
+"""Title: Optional S3-compatible PUT (MinIO) using AWS Signature Version 4.
 
 Used by the audit WORM store when ``AUDIT_WORM_S3_ENDPOINT`` is set.
 Keeps boto3 out of the core dependency set.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

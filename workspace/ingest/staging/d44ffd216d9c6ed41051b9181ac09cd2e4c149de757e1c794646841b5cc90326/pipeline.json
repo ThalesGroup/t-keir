@@ -1,0 +1,2112 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://d44ffd216d9c6ed41051b9181ac09cd2e4c149de757e1c794646841b5cc90326/kb_article_00086_c45de840.html",
+  "title": "AcmeSystems KB: Reset Service Credential",
+  "content": [
+    "# AcmeSystems KB: Reset Service Credential\n\n```\nKnowledge base article — AcmeSystems\nUse the identity portal to rotate a service credential. Update the vault entry, redeploy the dependent workload, and verify audit logs. Never send credentials through email.\n```"
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "AcmeSystems"
+        ],
+        "lemma_content": [
+          "AcmeSystems"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          14
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "Use"
+        ],
+        "lemma_content": [
+          "use"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          15
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "the",
+          "identity",
+          "portal"
+        ],
+        "lemma_content": [
+          "the",
+          "identity",
+          "portal"
+        ],
+        "pos": [
+          "DET",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          16,
+          17,
+          18
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "AcmeSystems"
+        ],
+        "lemma_content": [
+          "AcmeSystems"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          14
+        ],
+        "label": "organization"
+      },
+      "property": {
+        "content": [
+          "Use"
+        ],
+        "lemma_content": [
+          "use"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          15
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "the",
+          "identity",
+          "portal"
+        ],
+        "lemma_content": [
+          "the",
+          "identity",
+          "portal"
+        ],
+        "pos": [
+          "DET",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          16,
+          17,
+          18
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "AcmeSystems"
+        ],
+        "lemma_content": [
+          "AcmeSystems"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          14
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "Use"
+        ],
+        "lemma_content": [
+          "use"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          15
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "identity",
+          "portal"
+        ],
+        "lemma_content": [
+          "identity",
+          "portal"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          17,
+          18
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "the",
+          "identity",
+          "portal"
+        ],
+        "lemma_content": [
+          "the",
+          "identity",
+          "portal"
+        ],
+        "pos": [
+          "DET",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          16,
+          17,
+          18
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "rotate"
+        ],
+        "lemma_content": [
+          "rotate"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          20
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "a",
+          "service",
+          "credential"
+        ],
+        "lemma_content": [
+          "a",
+          "service",
+          "credential"
+        ],
+        "pos": [
+          "DET",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          21,
+          22,
+          23
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "html",
+    "source-size-bytes": 391,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:53:04",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://d44ffd216d9c6ed41051b9181ac09cd2e4c149de757e1c794646841b5cc90326/kb_article_00086_c45de840.html",
+  "metadata": {
+    "topic_id": "engineering",
+    "corpus": "enterprise",
+    "doc_type": "kb_article",
+    "language": "en",
+    "title": "AcmeSystems KB: Reset Service Credential",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "engineering",
+  "doc_type": "kb_article",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.999997083299405
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "#",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "KB",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Reset",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Service",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Credential",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "`",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Knowledge",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "base",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "article",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Use",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "identity",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "portal",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "to",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "rotate",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "a",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "service",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "credential",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Update",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "vault",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "entry",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "redeploy",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "dependent",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "workload",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "verify",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "audit",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "logs",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Never",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "send",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "credentials",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "through",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "email",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "`",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "`",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "KB",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": ":",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Reset",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Service",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Credential",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "KB",
+      "text": "KB",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Reset",
+      "text": "Reset",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Service",
+      "text": "Service",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Credential",
+      "text": "Credential",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "#",
+      "text": "#",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "KB",
+      "text": "KB",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Reset",
+      "text": "Reset",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Service",
+      "text": "Service",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Credential",
+      "text": "Credential",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 7
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Knowledge",
+      "text": "Knowledge",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "base",
+      "text": "base",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "article",
+      "text": "article",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "VERB",
+      "lemma": "use",
+      "text": "Use",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "identity",
+      "text": "identity",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "portal",
+      "text": "portal",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PART",
+      "lemma": "to",
+      "text": "to",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "VERB",
+      "lemma": "rotate",
+      "text": "rotate",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "DET",
+      "lemma": "a",
+      "text": "a",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "service",
+      "text": "service",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "credential",
+      "text": "credential",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "VERB",
+      "lemma": "update",
+      "text": "Update",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 25
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "vault",
+      "text": "vault",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "entry",
+      "text": "entry",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "VERB",
+      "lemma": "redeploy",
+      "text": "redeploy",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "dependent",
+      "text": "dependent",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "workload",
+      "text": "workload",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "VERB",
+      "lemma": "verify",
+      "text": "verify",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "audit",
+      "text": "audit",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "log",
+      "text": "logs",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "ADV",
+      "lemma": "never",
+      "text": "Never",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 40
+    },
+    {
+      "pos": "VERB",
+      "lemma": "send",
+      "text": "send",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "credential",
+      "text": "credentials",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "ADP",
+      "lemma": "through",
+      "text": "through",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "email",
+      "text": "email",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 46
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "`",
+      "text": "`",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [
+    {
+      "start": 14,
+      "end": 15,
+      "label": "organization",
+      "text": "AcmeSystems"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "#",
+      "lemma": "#",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "KB",
+      "lemma": "KB",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "ROOT",
+      "lefts": [
+        0,
+        1
+      ],
+      "rights": [
+        3
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 2,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Reset",
+      "lemma": "Reset",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        6
+      ]
+    },
+    {
+      "text": "Service",
+      "lemma": "Service",
+      "pos": "PROPN",
+      "head": 6,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Credential",
+      "lemma": "Credential",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "dobj",
+      "lefts": [
+        5
+      ],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Knowledge",
+      "lemma": "Knowledge",
+      "pos": "PROPN",
+      "head": 11,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "base",
+      "lemma": "base",
+      "pos": "NOUN",
+      "head": 12,
+      "dep": "compound",
+      "lefts": [
+        10
+      ],
+      "rights": []
+    },
+    {
+      "text": "article",
+      "lemma": "article",
+      "pos": "NOUN",
+      "head": 12,
+      "dep": "ROOT",
+      "lefts": [
+        7,
+        8,
+        9,
+        11
+      ],
+      "rights": [
+        13,
+        15,
+        24
+      ]
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 15,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Use",
+      "lemma": "use",
+      "pos": "VERB",
+      "head": 12,
+      "dep": "appos",
+      "lefts": [
+        14
+      ],
+      "rights": [
+        18,
+        20
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 18,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "identity",
+      "lemma": "identity",
+      "pos": "NOUN",
+      "head": 18,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "portal",
+      "lemma": "portal",
+      "pos": "NOUN",
+      "head": 15,
+      "dep": "dobj",
+      "lefts": [
+        16,
+        17
+      ],
+      "rights": []
+    },
+    {
+      "text": "to",
+      "lemma": "to",
+      "pos": "PART",
+      "head": 20,
+      "dep": "aux",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "rotate",
+      "lemma": "rotate",
+      "pos": "VERB",
+      "head": 15,
+      "dep": "xcomp",
+      "lefts": [
+        19
+      ],
+      "rights": [
+        23
+      ]
+    },
+    {
+      "text": "a",
+      "lemma": "a",
+      "pos": "DET",
+      "head": 23,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "service",
+      "lemma": "service",
+      "pos": "NOUN",
+      "head": 23,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "credential",
+      "lemma": "credential",
+      "pos": "NOUN",
+      "head": 20,
+      "dep": "dobj",
+      "lefts": [
+        21,
+        22
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 12,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Update",
+      "lemma": "update",
+      "pos": "VERB",
+      "head": 25,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        28,
+        29,
+        30,
+        39
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 28,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "vault",
+      "lemma": "vault",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "entry",
+      "lemma": "entry",
+      "pos": "NOUN",
+      "head": 25,
+      "dep": "dobj",
+      "lefts": [
+        26,
+        27
+      ],
+      "rights": []
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 25,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "redeploy",
+      "lemma": "redeploy",
+      "pos": "VERB",
+      "head": 25,
+      "dep": "conj",
+      "lefts": [],
+      "rights": [
+        33,
+        34,
+        35,
+        36
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 33,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "dependent",
+      "lemma": "dependent",
+      "pos": "ADJ",
+      "head": 33,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "workload",
+      "lemma": "workload",
+      "pos": "NOUN",
+      "head": 30,
+      "dep": "dobj",
+      "lefts": [
+        31,
+        32
+      ],
+      "rights": []
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 30,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 30,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "verify",
+      "lemma": "verify",
+      "pos": "VERB",
+      "head": 30,
+      "dep": "conj",
+      "lefts": [],
+      "rights": [
+        38
+      ]
+    },
+    {
+      "text": "audit",
+      "lemma": "audit",
+      "pos": "NOUN",
+      "head": 38,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "logs",
+      "lemma": "log",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "dobj",
+      "lefts": [
+        37
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 25,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Never",
+      "lemma": "never",
+      "pos": "ADV",
+      "head": 41,
+      "dep": "neg",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "send",
+      "lemma": "send",
+      "pos": "VERB",
+      "head": 41,
+      "dep": "ROOT",
+      "lefts": [
+        40
+      ],
+      "rights": [
+        42,
+        43,
+        45
+      ]
+    },
+    {
+      "text": "credentials",
+      "lemma": "credential",
+      "pos": "NOUN",
+      "head": 41,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "through",
+      "lemma": "through",
+      "pos": "ADP",
+      "head": 41,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        44
+      ]
+    },
+    {
+      "text": "email",
+      "lemma": "email",
+      "pos": "NOUN",
+      "head": 43,
+      "dep": "pobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 41,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 46,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 47,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        48
+      ]
+    },
+    {
+      "text": "`",
+      "lemma": "`",
+      "pos": "PUNCT",
+      "head": 47,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "KB",
+      "lemma": "KB",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2,
+        3
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 1,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Reset",
+      "lemma": "Reset",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "acl",
+      "lefts": [],
+      "rights": [
+        5
+      ]
+    },
+    {
+      "text": "Service",
+      "lemma": "Service",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Credential",
+      "lemma": "Credential",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "dobj",
+      "lefts": [
+        4
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 9,
+      "text": "reset service credential",
+      "span": {
+        "start": 3,
+        "end": 6
+      }
+    },
+    {
+      "score": 4,
+      "text": "acmesystems kb",
+      "span": {
+        "start": 0,
+        "end": 2
+      }
+    },
+    {
+      "score": 9,
+      "text": "# acmesystems kb",
+      "span": {
+        "start": 0,
+        "end": 3
+      }
+    },
+    {
+      "score": 9,
+      "text": "knowledge base article",
+      "span": {
+        "start": 10,
+        "end": 13
+      }
+    },
+    {
+      "score": 8,
+      "text": "reset service credential",
+      "span": {
+        "start": 4,
+        "end": 7
+      }
+    },
+    {
+      "score": 5,
+      "text": "service credential",
+      "span": {
+        "start": 22,
+        "end": 24
+      }
+    },
+    {
+      "score": 4,
+      "text": "vault entry",
+      "span": {
+        "start": 27,
+        "end": 29
+      }
+    },
+    {
+      "score": 4,
+      "text": "dependent workload",
+      "span": {
+        "start": 32,
+        "end": 34
+      }
+    },
+    {
+      "score": 1,
+      "text": "email",
+      "span": {
+        "start": 44,
+        "end": 45
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://d44ffd216d9c6ed41051b9181ac09cd2e4c149de757e1c794646841b5cc90326/kb_article_00086_c45de840.html#chunk-0-93d976de35",
+      "parent_doc_id": "ingest://d44ffd216d9c6ed41051b9181ac09cd2e4c149de757e1c794646841b5cc90326/kb_article_00086_c45de840.html",
+      "text_raw": "# AcmeSystems KB : Reset Service Credential ` ` ` Knowledge base article — AcmeSystems Use the identity portal to rotate a service credential . Update the vault entry , redeploy the dependent workload , and verify audit logs . Never send credentials through email . ` ` `",
+      "search_vector_payload": "# AcmeSystems KB : Reset Service Credential ` ` ` Knowledge base article — AcmeSystems Use the identity portal to rotate a service credential . Update the vault entry , redeploy the dependent workload , and verify audit logs . Never send credentials through email . ` ` `",
+      "metadata": {
+        "implicit_subjects": [
+          "the identity -> the identity portal",
+          "a service -> the identity portal",
+          "the vault -> the identity portal"
+        ],
+        "primary_entities": {
+          "organization": [
+            "AcmeSystems"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "AcmeSystems",
+            "Use",
+            "the identity portal"
+          ],
+          [
+            "AcmeSystems",
+            "Use",
+            "the identity portal"
+          ],
+          [
+            "AcmeSystems",
+            "Use",
+            "identity portal"
+          ],
+          [
+            "the identity portal",
+            "rotate",
+            "a service credential"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 49,
+        "sentence_start": 0,
+        "sentence_end": 5
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "AcmeSystems Use the identity portal",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "AcmeSystems",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "# AcmeSystems KB : Reset Service Credential ` ` ` Knowledge base",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "AcmeSystems Use identity portal",
+          "question_type": "SVO-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/knowledge_base_article\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"knowledge base article\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/AServiceCredential/a_service_credential-acd96f7ca5ef\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/AServiceCredential\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"a service credential\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acmesystems/acmesystems-14032de724d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Acmesystems\"\n    ],\n    \"http://tkeir.local/ontology/use\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acme/the_identity_portal-48e83b01ca68\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acme/identity_portal-7b38c392e18b\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acme/portal-d0960501f897\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/service_credential\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"service credential\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/TheIdentityPortal/the_identity_portal-48e83b01ca68\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Theidentityportal\"\n    ],\n    \"http://tkeir.local/ontology/rotate\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/AServiceCredential/a_service_credential-acd96f7ca5ef\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"the identity portal\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/email\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"email\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acme/portal-d0960501f897\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Acme\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"portal\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Chunk/ingest_d44ffd216d9c6ed41051b9181ac09cd2e4c149de757e1c794646841b5cc90326_kb_article_00086_c45de840_html_chunk_0_93d976de35\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acmesystems/acmesystems-14032de724d9\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acmesystems/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/TheIdentityPortal/the_identity_portal-48e83b01ca68\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://d44ffd216d9c6ed41051b9181ac09cd2e4c149de757e1c794646841b5cc90326/kb_article_00086_c45de840.html#chunk-0-93d976de35\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/vault_entry\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"vault entry\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/reset_service_credential\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"reset service credential\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/acmesystems_kb\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"# acmesystems kb\"\n      },\n      {\n        \"@value\": \"acmesystems kb\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Chunk/ingest_d44ffd216d9c6ed41051b9181ac09cd2e4c149de757e1c794646841b5cc90326_kb_article_00086_c45de840_html_chunk_0_93d976de35\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/acmesystems_kb\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/knowledge_base_article\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/reset_service_credential\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/service_credential\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/vault_entry\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/dependent_workload\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/email\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acmesystems/acmesystems-14032de724d9\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acmesystems/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/TheIdentityPortal/the_identity_portal-48e83b01ca68\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"kb_article_00086_c45de840_html\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acme/identity_portal-7b38c392e18b\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Acme\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"identity portal\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Keyword/dependent_workload\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"dependent workload\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/kb_article_00086_c45de840_html/Acme/the_identity_portal-48e83b01ca68\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Acme\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"the identity portal\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 22,
+      "graph_triple_count": 49,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 55,
+    "total_tokens": 55,
+    "covered_characters": 259,
+    "total_characters": 259
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 6,
+  "content-token-count": 49,
+  "token-count": 55,
+  "source-file-size-bytes": 391,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.047,
+    "tasks": {
+      "converter": 0.007,
+      "language-detection": 0.003,
+      "resource-selection": 0.001,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.007,
+      "ner": 0.007,
+      "syntax": 0.007,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.011,
+      "chunk-questions": 0.001
+    }
+  }
+}

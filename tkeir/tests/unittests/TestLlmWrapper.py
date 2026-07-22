@@ -1,4 +1,12 @@
-"""Tests for the unified LLM and embedding wrapper."""
+"""Title: Llm Wrapper
+
+Tests for the unified LLM and embedding wrapper.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

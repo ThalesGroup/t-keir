@@ -1,6 +1,11 @@
-"""MCP tool handlers — tenant-scoped wrappers over Vespa / ontology utils.
+"""Title: MCP tool handlers — tenant-scoped wrappers over Vespa / ontology utils.
 
 ``user_space`` is always injected by authz; client arguments never set it.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations
@@ -247,7 +252,7 @@ class VespaMcpBackend:
         max_triples: int = 40,
     ) -> dict[str, Any]:
         from thot.tools.search.ontology_utils import (
-            merge_turtle_graphs,
+            merge_rdf_graphs,
             summarize_graph_for_prompt,
         )
 
@@ -270,9 +275,14 @@ class VespaMcpBackend:
                 LOGGER.debug("ontology skip parent %s: %s", parent, exc)
                 continue
             fields = doc.get("fields") or {}
-            turtle = fields.get("ontology_turtle") or fields.get("ontology")
-            if isinstance(turtle, str) and turtle.strip():
-                turtles.append(turtle)
+            rdf = (
+                fields.get("json_ld")
+                or fields.get("rdf_graph_serialized")
+                or fields.get("ontology_turtle")
+                or fields.get("ontology")
+            )
+            if isinstance(rdf, str) and rdf.strip():
+                turtles.append(rdf)
 
         if not turtles:
             return {
@@ -282,7 +292,7 @@ class VespaMcpBackend:
                 "document_ids": parent_ids,
                 "triple_count": 0,
             }
-        graph = merge_turtle_graphs(turtles)
+        graph = merge_rdf_graphs(turtles)
         summary = summarize_graph_for_prompt(
             graph, query, max_triples=max_triples
         )

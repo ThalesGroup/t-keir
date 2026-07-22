@@ -1,4 +1,12 @@
-"""Pipeline configuration loader."""
+"""Title: Pipeline Configuration
+
+Pipeline configuration loader.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.core.ConfigurationUtils import (
     load_configuration,

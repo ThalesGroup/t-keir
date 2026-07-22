@@ -1,4 +1,12 @@
-"""CLI for audit reports, verification, archive, and GDPR forget."""
+"""Title: Cli
+
+CLI for audit reports, verification, archive, and GDPR forget.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

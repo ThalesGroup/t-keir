@@ -1,0 +1,171 @@
+Tenant egress fallback and fair-share throttling playbook
+
+Summary
+
+This playbook describes the operational procedures, validation tests, and escalation steps for tenant egress fallback and fair-share throttling for Dedicated and Private tenants. It targets customer-success, SRE, and platform engineers responsible for onboarding enterprise customers with unpredictable burst traffic or constrained egress capacity.
+
+Goals
+
+- Ensure predictability for tenant traffic when outbound (egress) capacity is constrained.
+- Maintain latency SLOs for high-priority tenants while applying fair-share policies to noisy neighbors.
+- Provide a deterministic automated fallback that preserves availability and preserves customer data guarantees.
+
+When to use this playbook
+
+Use this playbook during:
+1) Pre-production validation for Dedicated/Private tenant cutovers.
+2) Go-live where tenant traffic patterns are unknown or have burst risk.
+3) Incidents where egress link saturation, pod/instance ejects, or third-party API throttles cause increased latency or errors.
+
+Ownership and contacts
+
+- Primary owner: Customer Success (Onboarding team) — Amira Patel
+- Operational owner: Eng SRE — Diego Morales
+- Runtime/Platform owner: Eng Platform — Priya Natarajan
+- Pager: #sre-oncall (primary), #cs-help (secondary)
+- Escalation: If pager not acknowledged in 15m, escalate to SRE L2 and Customer Success Manager.
+
+Scope and constraints
+
+- Applies to tenants on Dedicated capacity and Private VPC deployments.
+- Not for Hosted (shared) tenants unless explicitly configured with fair-share proxies.
+- Does not modify customer data retention or encryption policies.
+
+Prerequisites and config artifacts
+
+- Tenant capacity profile created in Capacity Service (capacity-service v2): tenant_id, target_rps, burst_rps, expected_seq_len.
+- Ingress and egress proxies must expose the following metrics to metrics-ingest: ingress.rps, egress.bandwidth.bytes, proxy.queue_length, request.latency.p50/p95/p99.
+- Fair-share controller enabled in tenant_proxy.conf with the following knobs: max_tokens_per_second, priority_weight, weight_decay_window_ms.
+- Sufficient observability: synthetic journey for tenant with end-to-end p50/p95 thresholds.
+
+Validation tests (pre-go-live)
+
+Execute the validation harness below in a staging environment that mirrors production network topology. Document all results in the onboarding ticket.
+
+1) Baseline characterization
+- Inject steady traffic at target_rps for 10 minutes. Verify p95 latency < tenant_p95_slo and error rate < 0.1%.
+- Required metrics: ingress.rps, egress.bytes/s, kvcache.hit_rate.
+
+2) Burst resilience check
+- Ramp all tenant test clients from target_rps to burst_rps over 60s. Observe fallback behavior. Expected outcome: lower-priority tenants receive graceful rate-limiting; high-priority tenants retain >= 85% of baseline throughput.
+
+3) Egress saturation simulation
+- Throttle external egress (eg simulate 40% link loss). Verify that fallback to local cache and degraded-mode responses occur: response codes 200 (degraded ok) or 503 (if hard fail) per policy. Verify circuit-breaker triggers at configured thresholds.
+
+4) Fair-share fairness validation
+- Run 10 tenants simultaneously with varied priority_weight values. Measure delivered RPS per tenant and verify proportional share within +/- 10% of configured weights.
+
+Pre-Go-Live checklist (must pass all items)
+
+- [ ] Capacity profile uploaded and approved.
+- [ ] Tenant proxy config reviewed and committed to config repo (reviewer: Eng Platform).
+- [ ] Synthetic journey created and scheduled for tenant.
+- [ ] Alerting rules created: high egress utilization (>85%), proxy queue_length > 50, fair-share-imbalance > 15%.
+- [ ] Backstop fallback policy documented in the customer runbook (customer-facing).
+
+Go-Live steps (recommended timebox: 60–90 minutes)
+
+1) Golden path smoke (0–10m)
+- Verify ingress/routing is pointing to Dedicated/Private capacity.
+- Run 2 quick synthetic requests and validate correlation IDs flow through logs.
+
+2) Canary ramp (10–30m)
+- Start with 5% of traffic routed to new tenant environment. Monitor p50/p95, error rate, and proxy queue.
+- If p95 increases > 25% baseline or error rate > 0.5%, abort canary and roll back routing.
+
+3) Gradual ramp (30–60m)
+- Increase traffic by 20% every 10 minutes, monitoring fairness and egress usage.
+- Confirm fair-share controller is distributing capacity proportionally.
+
+4) Full cutover and verification (60–90m)
+- Update routing to 100%. Keep enhanced monitoring for 6 hours. Document any anomalies.
+
+Degraded-mode behavior and automatic fallback
+
+- Soft-fallback: When proxy queue_length > 75 or egress_bandwidth >= 90% for > 30s, the system applies fair-share throttling and enables degraded responses for non-critical endpoints (e.g., background embeddings refresh).
+- Hard-fallback: If requests.latency.p99 > 3x SLO for > 2 minutes, or error rate > 2% for > 5 minutes, fail open to read-only cached responses and notify SRE.
+- Customer notification: For hard-fallbacks, Customer Success must send a templated notification within 30 minutes describing impact and mitigation steps.
+
+Automated remediation actions (ordered)
+
+1) Activate fair-share throttling profile (fast path).
+2) Evict low-priority background requests for 60s.
+3) Route new tenant traffic to lower-cost region if cross-region fallback policy exists and region latency delta < 50ms.
+4) Provision burst capacity (manual escalation to capacity team if autoscale cannot allocate).
+
+Telemetry, alerts, and SLOs to configure
+
+- Metrics to send to metrics-ingest: tenant.{id}.ingress_rps, tenant.{id}.egress_bps, tenant.{id}.delivered_rps, tenant.{id}.throttle_rate, tenant.{id}.priority_share_pct.
+- Core alerts (severity mapping):
+  - P0: egress_bandwidth >= 95% for > 3m (pager)
+  - P1: proxy.queue_length >= 75 for > 2m (page + slack)
+  - P2: fair-share-imbalance > 20% for > 10m (slack only)
+- Suggested SLOs (tenant-level):
+  - Availability: 99.95% (excluding scheduled maintenance)
+  - Latency p95: tenant-specific (recommended default 300ms)
+  - Throttling transparency: any throttled request must return `X-Redwood-Throttle: true` header and include an advisory in response body where applicable.
+
+Escalation matrix and playbook actions
+
+1) First responder (SRE oncall) — Triage, perform automated remediation steps 1–3.
+2) If unresolved after 15 minutes — SRE L2 and Customer Success notified; open incident channel and begin stakeholder comms.
+3) If unresolved after 60 minutes — Eng Platform and Capacity team pager.
+4) If unresolved after 3 hours — Executive escalation and formal incident postmortem.
+
+Incident comms template (short)
+
+Subject: [Incident] Tenant {tenant_id} - Egress congestion detected\\nBody:
+- Impact: Elevated latency and partial degradation for tenant {tenant_id}.
+- Timeline: {start_time} UTC
+- Mitigation: Applied fair-share throttling and evicted background requests; routing adjusted.
+- Next steps: Capacity team provisioning in progress; monitoring in place.
+
+Post-incident items and QBR inputs
+
+- Document the root cause, timeline, and mitigation in the incident ticket.
+- Recommend capacity or architectural changes: e.g., increase egress pool by N GPUs or enable region-fallback by default.
+- Add the incident to the next QBR with the following artifacts: synthetic journey traces, request/response samples with correlation IDs, and fairness delta graphs.
+
+Testing scenarios matrix (examples)
+
+| Scenario | Goal | Expected outcome | Notes |
+|---|---:|---|---|
+| Single-tenant burst | Verify high-priority preserved | High-priority tenant keeps >=85% throughput | Run for 30m
+| Multi-tenant simultaneous burst | Validate fair-share | Proportional throughput within +/-10% | Use 10 tenants
+| Egress link failure | Validate degraded-mode | Cached responses + advisory header | Simulate packet loss at edge
+
+Appendix: sample tenant_proxy.conf snippet
+
+# Example TOML snippet for fair-share controller
+[fair_share]
+max_tokens_per_second = 1200
+priority_weights = { gold = 10, standard = 5, trial = 1 }
+weight_decay_window_ms = 60000
+eviction_policy = "background-first"
+
+Appendix: basic CLI checks for oncall
+
+# Verify current queue lengths and throttle rates (run on proxy-host)
+curl -sS http://proxy-host.local/metrics | grep tenant.{tenant_id}.throttle_rate
+
+# Force a synthetic request with correlation id
+curl -H "X-Correlation-ID: onboarding-123" -X POST https://tenant-ingress.example/v1/generate -d '{"prompt": "smoke test"}' -v
+
+Recovery and rollback guidance
+
+- Immediate rollback: Re-route traffic back to incumbent environment via edge-router config if p95 > 2x SLO during canary.
+- Long-term remediation: Schedule capacity expansion, add egress caching layer for large-response endpoints, or adjust tenant priority weights for steady-state fairness.
+
+Document history and change log
+
+- 2026-01-15: Created by Amira Patel (initial draft).
+- 2026-03-02: Added automated remediation ordering and telemetry section (reviewer: Diego Morales).
+- 2026-08-02: Published with expanded testing matrix and CLI snippets (reviewer: Priya Natarajan).
+
+Related pages and references
+
+- Dedicated tenant cutover safety-net playbook — see related_pages for link.
+- Synthetic health suite implementation guide (health-and-qbr).
+- Eng SRE capacity profiling guide for tenant planning.
+
+End of playbook

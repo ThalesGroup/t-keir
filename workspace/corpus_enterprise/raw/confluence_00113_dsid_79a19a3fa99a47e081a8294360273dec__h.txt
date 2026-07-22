@@ -1,0 +1,173 @@
+Hybrid routing incident choreography and status railbook
+
+Summary
+
+This playbook defines the incident choreography, evidence collection, automated mitigations, and customer-status templates for incidents that affect Hybrid Routing — the layer that routes inference requests across Hosted API, Dedicated capacity, and Private deployments. It is intended for first responders, bridge operators, SREs, and customer success engineers.
+
+Goals
+
+- Restore customer-facing traffic within SLA windows.
+- Contain blast radius between routing tiers (Hosted / Dedicated / Private).
+- Collect forensics and SLO evidence for postmortem and regulatory reporting.
+- Provide clear, low-friction customer status messages when customers are impacted.
+
+When to use this doc
+
+Use this playbook when one or more of the following occur:
+1) Route errors spike > 1% of overall traffic for 5 consecutive minutes.
+2) P95 or P99 latency for gateway-router increases beyond configured SLO thresholds (table below).
+3) Cross-tier failover events occur (e.g., Dedicated -> Hosted fallback) or private deployment routing failures are observed.
+4) Automatic remediation (see section) triggers but fails to bring metrics back within threshold.
+
+Ownership and roles
+
+- First Responder (FR): primary oncall for the service owning the route-orchestrator or gateway-router. Responsibility: initial triage & short-term remediation.
+- Bridge Operator (BO): coordinates cross-team comms, opens/maintains the incident bridge, and authorizes customer messages.
+- Routing Engineer (RE): deep ownership of route-orchestrator and fallbacks. Responsible for rolling configuration changes and hotfixes.
+- Private Deployments SME (PD-SME): contacts customer's infra owner for tenant-specific issues.
+- Customer Success Lead (CSL): prepares customer-sensitive notices and escalation to account teams.
+
+Service map (quick reference)
+
+- gateway-router: edge service accepting API traffic; enforces quotas and performs tenant lookup.
+- route-orchestrator: decision engine that routes to hosted / dedicated / private model endpoints.
+- inference-proxy: per-tier proxy that normalizes model requests and manages KV cache use.
+- kv-cache: shared prefix cache used to reduce token cost; lives in-host for hosted, edge cache for dedicated.
+- fallback-router: lightweight fallback service used when primary path is overloaded.
+- model-variant-service: catalog and compatibility map for model variants used by fallback logic.
+
+Key SLOs and thresholds
+
+| Metric | Target | Immediate alert threshold | Escalation threshold |
+|---|---:|---:|---:|
+| Hosted API 95th latency (inference, token-gen) | < 200ms | > 350ms sustained 5m | > 500ms sustained 3m |
+| Dedicated 95th latency (inference) | < 250ms | > 400ms sustained 5m | > 800ms sustained 2m |
+| Route error rate (5m) | < 0.1% | > 0.5% | > 1% and growing |
+| Cross-tier failover rate | 0 (expected rare) | > 0.5% of traffic/month | > 2% in 1h |
+| KV cache eviction rate | baseline | +200% vs baseline 10m | +500% vs baseline 5m |
+
+Severity levels and routing-specific examples
+
+- Sev3: single-customer private routing failure where Hosted & Dedicated unaffected. Use PD-SME and coordinate private infra. Customer comms via CSL.
+- Sev2: Elevated route errors or latency for a tier (Hosted or Dedicated) affecting multiple customers; may trigger temporary global fallback to alternate tier. Bridge Operator required.
+- Sev1: Multi-region routing outage or cascading failover with customer-impacting errors or SLA breaches. All hands on bridge; exec comms.
+
+Initial triage checklist (First 10 minutes)
+
+1. Acknowledge pager and join incident bridge.
+2. Capture incident context and severity on bridge header: time, alerts, impact (tenants affected), and systems implicated.
+3. Run quick health checks:
+   - curl -f https://observability.internal.redwood/gateway-router/health || true
+   - kubectl -n infra get pods -l app=gateway-router -o wide
+   - kubectl -n infra logs deploy/route-orchestrator -c orchestrator --tail=200 | grep -i error
+4. Check routing metrics dashboards (Routing -> Hybrid-routing overview). Note delta vs baseline for P95/P99 and error rates.
+5. If private tenant(s) listed, ping PD-SME and set expectation with CSL.
+
+Evidence capture (must be preserved for postmortem)
+
+- Time-series snapshot: export 15 minutes before incident start to 30 minutes after; include P50/P95/P99, error rate, fallback rate, and kv-cache eviction. Use our dump script:
+
+```
+# Example: export metrics window to S3 for forensics
+./scripts/export_metrics_window.sh --service=route-orchestrator --start=2026-02-15T14:20:00Z --end=2026-02-15T15:00:00Z --out=s3://redwood-incident-evidence/IR-2026-XXXX/
+```
+
+- Request traces: pull 100 sampled traces from tracer with route-orchestrator tag and error=true.
+- Router config snapshot: pull current route-orchestrator config and active fallbacks.
+- KV cache state: sample keys with highest eviction and top prefixes.
+
+Automated mitigation runbook (safe, reversible)
+
+These automated mitigations are wired into the routing control plane. They should only escalate to manual steps if they fail within configured windows.
+
+1) Rate-limited fallback (default): if route errors > 0.5% for 2m AND P95 > alert threshold, gradually shift 5% of traffic from affected tier to fallback-router per minute up to 50%. Monitor for error amplification.
+2) KV cache warmup: if eviction spike detected, start controlled cache warmup for top-10 prefixes and limit writes from non-critical customers.
+3) Model-variant demotion: when model-variant-service reports incompatible quantized kernels rising errors, demote to verified CPU-friendly variant for 10m and re-evaluate.
+
+Manual remediation steps (if automation insufficient)
+
+1. Hold traffic: route-orchestrator supports per-tenant hold. Command:
+
+```
+# Pause routing for tenant-123 for 10 minutes
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" https://api.internal.redwood/route-orchestrator/hold -d '{"tenant":"tenant-123","duration_minutes":10,"reason":"investigating eviction storm"}'
+```
+
+2. Rollback recent route-config change: check /config/audit for commits in last 15m.
+
+```
+kubectl -n infra exec deploy/route-orchestrator -- /usr/local/bin/config-rollback --commit=HEAD~1
+```
+
+3. Scale inference-proxy pool for affected tier by +25% and observe latency. Use autoscaling override only after confirming capacity shortage not caused by noisy neighbor.
+
+Status messaging and cadence (Bridge Operator template)
+
+- Bridge header: Incident ID, Severity, Start time (UTC), Services impacted, Oncall list.
+- Status cadence: Initial (10m), Update (30m), Update (60m), Hourly until stabilized, Post-incident summary within 24h.
+
+Public/internal status templates
+
+Internal (engineering) — use for internal Slack #incidents and the incident bridge: 
+
+"""
+[IR-2026-XXXX] Hybrid routing: elevated route errors for Hosted -> fallback in progress. Sev2. Start: 2026-02-15T14:35Z. Impact: ~12% of requests briefly retried to fallback-router, P95 gateway-router = 420ms. Actions: automated 10% fallback started; routing-engineer investigating cache evictions. Next update in 30m.
+"""
+
+Customer-facing (status page short):
+
+"""
+We are investigating elevated response times for the Redwood Hosted API for a subset of customers. A controlled fallback to alternate capacity is in progress to protect request success. We will provide updates in 30 minutes. If you are seeing errors, please contact support@redwood.ai with Incident ID IR-2026-XXXX.
+"""
+
+Customer-facing (detailed email for affected enterprise customers):
+
+Subject: Incident IR-2026-XXXX: Temporary service degradation & mitigation steps
+
+Body: Hello <Account Owner>,
+
+At 2026-02-15T14:35Z we detected elevated routing errors that affected a subset of traffic for your account. A controlled fallback to alternate capacity was initiated to preserve success rates. Current status: traffic routed successfully through fallback with slight latency increase. We will follow up with a technical post-incident report within 24 hours.
+
+If you would like a dedicated bridge or proactive mitigation on your private deployment, reply and we will connect PD-SME.
+
+— Redwood Support
+
+Escalation matrix and decision ladder
+
+- If fallback causes >10% additional errors within 10m: escalate to Routing Engineer and SRE Lead immediately.
+- If rollback/hold does not reduce P95 below alert threshold within 20m: consider full soft-fallback (shift majority traffic to Hosted/dedicated depending on origin) and notify CSL.
+- For private tier-specific incidents, the PD-SME must confirm customer's private network health within 15m or incident escalates to Sev1 boundary.
+
+Game day scenarios (recommended for quarterly drills)
+
+1. KV eviction storm: simulate high churn traffic to trigger eviction threshold. Validate automated cache warmup and rollback.
+2. Noisy-tenant spike: create a tenancy that generates high token rates to validate per-tenant holds and cascading fallback safety.
+3. Cross-tier failover cascade: shut down a dedicated pool to simulate mass fallback to Hosted and validate rate-limited ramp.
+
+Post-incident checklist (24–72 hours)
+
+- Draft 1-page incident timeline (FR). Include alert origin, actions taken, automation triggers, and decision points.
+- Export preserved evidence to S3 and attach to postmortem doc.
+- Owner submits RCA draft within 72 hours. Include: root cause, contributing factors, mitigations, and preventive actions.
+- Assign action items with owners and due dates in the postmortem.
+- If an SLA was impacted, coordinate with Finance-Legal for customer remediation and SLA credits.
+
+Runbook links and references
+
+- route-orchestrator runbook: /confluence/oncall-and-incident-response/route-orchestrator-operational-guide-2025
+- kv-cache playbook: /confluence/eng-serving-runtime/kv-cache-ops-playbook-2024
+- customer comm templates: /confluence/oncall-and-incident-response/customer-comm-templates-2026
+
+Appendix: safe commands and audit notes
+
+- Always record commands run on bridge in the bridge transcript. If using prod-runner, prefix with //TODO and tag your name.
+- Safe scaling example (increase inference-proxy by 3 replicas):
+
+kubectl -n inference scale deploy/inference-proxy --replicas=$(( $(kubectl -n inference get deploy inference-proxy -o jsonpath='{.status.replicas}')+3 ))
+
+- Evidence export reminder: name S3 folder with incident id and UTC timestamp: s3://redwood-incident-evidence/IR-2026-XXXX/diagnostics/
+
+Notes and changes
+
+- 2026-02-15: Created by Aisha Patel.
+- 2026-02-28: Added automated mitigation details and new customer templates (reviewed by Marco Chen).

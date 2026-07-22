@@ -1,4 +1,12 @@
-"""Build document RDF graphs from T-KEIR SVO triples and NER spans."""
+"""Title: Ontology Builder
+
+Build document RDF graphs from T-KEIR SVO triples and NER spans.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

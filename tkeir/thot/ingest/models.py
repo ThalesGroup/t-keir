@@ -1,4 +1,12 @@
-"""Pydantic models for ingest jobs, manifests, and API payloads."""
+"""Title: Models
+
+Pydantic models for ingest jobs, manifests, and API payloads.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -110,11 +118,24 @@ class IngestJob(BaseModel):
     user_space: str | None = None
 
 
+class OntologyUpload(BaseModel):
+    """Client-uploaded ontology content (server never reads client paths)."""
+
+    filename: str = "ontology.ttl"
+    content_base64: str = Field(
+        ...,
+        description="Base64-encoded OWL/TTL/RDF bytes",
+    )
+
+
 class DocumentIngestRequest(BaseModel):
     """JSON body for ``POST /ingest/document`` when not uploading multipart."""
 
     url: HttpUrl | str
     filename: str | None = None
+    metadata: dict[str, Any] | None = None
+    # Ontology *content* only — not filesystem paths on the server.
+    ontologies: list[OntologyUpload] | None = None
 
 
 class BatchItem(BaseModel):
@@ -122,6 +143,8 @@ class BatchItem(BaseModel):
 
     url: HttpUrl | str
     filename: str | None = None
+    metadata: dict[str, Any] | None = None
+    ontologies: list[OntologyUpload] | None = None
 
 
 class BatchIngestRequest(BaseModel):

@@ -1,4 +1,12 @@
-"""Unit tests for agent SPIFFE identity (ADR-0008)."""
+"""Title: Spiffe identity
+
+Unit tests for agent SPIFFE identity (ADR-0008).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -55,6 +55,12 @@ dependencies = [
 mcp = [
     "mcp>=1.0.0",
 ]
+# OWL reasoners via OWLAPY + OWLAPI (Java/JPype). Used by
+# POST /rag/ontology/query when prefer_owlapy=true.
+# Requires Python >= 3.11 (owlapy 1.6.3+).
+owl = [
+    "owlapy>=1.6.3; python_full_version >= '3.11'",
+]
 # Optional Workload API client (import guarded in thot.agent.spiffe).
 # PyPI package is currently 0.3.x; env/file SPIFFE_ID works without it.
 spiffe = [

@@ -1,4 +1,12 @@
-"""Tests for pipeline configuration."""
+"""Title: Pipeline Configuration
+
+Tests for pipeline configuration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 

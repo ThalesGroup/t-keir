@@ -1,0 +1,210 @@
+ClearData Stitch Adapter Integration Guide (SDK setup, endpoint migration, retries, rate limits)
+
+This page supersedes earlier email-based guidance shared with ClearData AI (thread: th_20260729_grace_stitch_sdk_001). It consolidates the recommended production client defaults, retry/idempotency guidance, endpoint migration steps, and canary metrics used by CS for Stitch adapter rollouts.
+Prerequisites:
+- Redwood account + environment-specific API key(s): staging and prod.
+- Confirm target region (us/eu) and data handling constraints.
+- Decide on traffic management approach: gateway/routing layer (recommended) vs direct application integration.
+- Observability access: ability to log request_id, latency, status code, model_id, token usage headers.
+
+Request to CS:
+- Provision staging key tied to the customer account.
+- Enable tracing tag for rapid rollbacks if using 24-hour ramp steps.
+- Provide plan quota targets (sustained RPS + burst guidance) for customer-side token-bucket settings.
+Migration objective:
+Move from the customer’s legacy endpoint (e.g., https://api.cleardata.ai/v1/llm) to Redwood API endpoints while preserving reliability and enabling safe rollback.
+
+Current Redwood endpoint (recommended):
+- Non-streaming: POST /v1/responses
+- Streaming: POST /v1/responses (stream=true)
+
+Note: Older references may mention /v1/generate. That endpoint is supported for backward compatibility in some environments, but /v1/responses is the default for new integrations and has the most consistent behavior across SDKs.
+h2. Implementation checklist (high level)
+1) Acquire API key
+- CS provisions a staging key tied to the customer account.
+- Confirm environment separation: do not reuse staging keys in production.
+
+2) Sandbox test
+- Make a single non-streaming call and validate:
+  - HTTP 2xx
+  - request_id present
+  - model_id matches expectation
+  - token counts are returned/observable
+
+3) Dual-write gateway (recommended where feasible)
+- Route traffic to both:
+  - Redwood (new) and
+  - Existing LLM endpoint (old)
+- Log-only for the secondary path (do not return to user) to compare latency, errors, and output characteristics.
+
+4) Canary traffic split
+- Start at 5–10% for at least 48 hours.
+- Increase in steps: 10% → 25% → 50% → 100%.
+- If customer insists on a faster cadence, 24-hour steps are allowed only if tracing-based rollback hooks are enabled.
+
+5) Telemetry
+- Capture per request:
+  - request_id
+  - latency (client + server, if available)
+  - token usage
+  - model_id
+  - customer correlation id (if available)
+
+6) Rollback plan
+- Immediate fallback to old endpoint on:
+  - error rate spike, or
+  - sustained latency regression vs agreed thresholds, or
+  - unexpected model_id mismatches.
+- Rollback should be executable without redeploy (gateway flag preferred).
+h2. SDK setup (recommended defaults)
+Use these as starting points; tune after benchmarking with representative prompts.
+
+h3. Timeouts
+- Connect timeout: 2s
+- Read timeout:
+  - Streaming: 45s (updated from older 30s guidance to reduce false timeouts for long generations)
+  - Non-streaming: 20s (updated from older 15s guidance to accommodate longer outputs)
+
+h3. Concurrency
+- Max in-flight requests per process: start at 8
+- Typical safe range after validation: 8–16 depending on prompt length and average max_tokens
+
+h3. Client batching
+- If using the Redwood SDK batching layer, keep the default batch window of ~25ms unless you have strict latency SLOs.
+
+h3. Idempotency
+- For retryable non-streaming POST requests, include an idempotency_key.
+- For streaming requests:
+  - Prefer stream resumption when supported (stream_id / cursor semantics).
+  - Avoid blind “restart from scratch” retries unless the operation is explicitly idempotent and the customer experience tolerates duplication.
+
+h3. Headers and tags
+- Always log request_id.
+- Tag requests with a stable integration identifier (e.g., "cleardata-stitch-adapter") to isolate traffic during canaries and incident triage.
+h2. Retry and backoff guidance
+h3. What to retry
+Retry on:
+- Network timeouts / connection resets
+- HTTP 429
+- HTTP 502 / 503 / 504
+
+Do not retry on:
+- HTTP 400 / 401 / 403 (except 429)
+- Validation errors (treat as integration bugs)
+
+h3. Backoff parameters (recommended)
+- Strategy: exponential backoff with jitter
+- initial_delay: 250ms (updated from older 200ms guidance)
+- max_delay: 5s
+- max_retries: 6 (updated from older 5 retries to reduce customer-visible failures on brief throttling events)
+
+h3. Streaming retry guidance
+- Streaming requests should not be aggressively retried from the beginning.
+- Preferred approach:
+  - reconnect and resume when stream resumption is supported (stream_id/cursor)
+  - otherwise surface an ergonomic error to the caller and allow the application to decide whether to retry.
+
+h3. Idempotency note
+- If the application cannot guarantee idempotency_key uniqueness per logical request, it should disable automatic retries for non-streaming calls to prevent duplicate outputs and confusing UX.
+h2. Rate limiting patterns
+h3. Client-side limiter (recommended)
+- Implement a local token-bucket limiter per process keyed by API key.
+- Configure:
+  - capacity = burst allowance (example starting point: 20)
+  - refill rate = sustained RPS target (CS supplies plan-specific quota targets)
+
+h3. Behavior on 429
+- Back off client-side for a randomized window (2s–8s) in addition to exponential backoff.
+- This reduces thundering-herd behavior during shared throttling windows.
+
+h3. Route-level protections
+- Apply per-route concurrency limits for heavy generation calls (long max_tokens / long contexts).
+- Consider separate pools for streaming vs non-streaming to prevent long streams from starving short requests.
+h2. Operational checks for endpoint migration
+Before routing >50% traffic to Redwood:
+- Verify metrics parity vs old endpoint
+  - latency (p50/p95/p99)
+  - error rates
+  - token counts for a representative prompt set
+- Validate output quality
+  - run a fixed prompt set through both systems
+  - review deltas with the customer
+- Confirm cost and throughput expectations
+  - validate sustained QPS and peak burst behavior against plan targets
+
+Automated health checks CS can run (if enabled):
+- 2xx ratio and 5xx/4xx trends
+- token usage delta per request type
+- model mismatch alerts (returned model_id differs from expected)
+h2. Network allowlisting / IPs
+- By default, customers do not need to allowlist specific Redwood ingress IPs for outbound calls to the Redwood API.
+- If the customer environment requires strict egress allowlisting, follow the Security page: confluence://security-and-compliance/network/egress-and-allowlisting-guidance.
+- Important nuance: static IP ranges may differ by region and can change as infrastructure evolves; prefer domain-based allowlisting when possible and follow the current Security guidance rather than copying IPs into customer runbooks.
+h2. Minimal code samples
+These snippets are intentionally minimal; wrap them with your organization’s retry + rate limiting utilities.
+
+h3. Node.js (minimal)
+const { RedwoodClient } = require('@redwood-inference/sdk');
+
+const client = new RedwoodClient({
+  apiKey: process.env.REDWOOD_API_KEY,
+  timeout: 20000,
+  connectTimeout: 2000
+});
+
+async function generate(prompt, idempotencyKey) {
+  return await client.responses.create({
+    model: 'redwood-large-v2',
+    input: prompt,
+    idempotency_key: idempotencyKey
+  });
+}
+
+h3. Python (minimal)
+import os
+from redwood import RedwoodClient
+
+client = RedwoodClient(
+  api_key=os.environ['REDWOOD_API_KEY'],
+  connect_timeout=2,
+  read_timeout=20
+)
+
+def generate(prompt, idempotency_key=None):
+  return client.responses.create(
+    model='redwood-large-v2',
+    input=prompt,
+    idempotency_key=idempotency_key
+  )
+h2. Rollout tempo and thresholds
+Default canary windows:
+- 48 hours minimum per ramp step
+- Target thresholds during canary:
+  - error rate < 0.5% (aggregate)
+  - stable p95 latency vs baseline
+
+Optional faster cadence:
+- 24-hour steps permitted if tracing tag + rapid rollback hook is enabled.
+- Use stricter on-call readiness (customer + CS) during the first 24 hours of each step.
+h2. Ownership and support
+Customer Success (CS):
+- Owns canary planning, ramp schedule, and success criteria.
+- Coordinates staging/prod key provisioning and integration readiness.
+
+Engineering Support (as needed):
+- Assists with SDK-level issues, retries, streaming resumption, and performance tuning.
+
+Escalation trigger examples:
+- sustained 5xx rate increase
+- repeated 429 spikes after client limiter deployed
+- unexplained model_id mismatch alerts
+h2. Changelog
+2026-09-12
+- Updated default endpoint guidance to /v1/responses (non-streaming and streaming).
+- Updated recommended read timeouts (streaming 45s, non-streaming 20s).
+- Increased recommended max_retries from 5 to 6; initial backoff from 200ms to 250ms.
+- Updated sample model from redwood-large-v1 to redwood-large-v2.
+- Added explicit note on allowlisting guidance and avoiding hard-coded IPs.
+
+2026-08-04
+- Initial publication consolidating SDK setup, migration steps, retries, rate limiting, and canary metrics used for ClearData Stitch adapter rollout.

@@ -1,8 +1,11 @@
-"""Task information
-Author : Eric Blaudez (Eric Blaudez)
+"""Title: Task information
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+T-KEIR core package module.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import os

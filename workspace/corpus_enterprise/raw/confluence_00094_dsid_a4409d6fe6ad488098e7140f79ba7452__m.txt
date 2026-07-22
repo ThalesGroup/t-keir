@@ -1,0 +1,106 @@
+Multi-Account GPU Change Orchestrator and CI Canary Handbook
+
+Operational handbook describing the orchestration pattern used to roll platform-wide GPU infra changes across multiple cloud accounts and regions using a CI-driven canary pipeline and Terraform/IaC controllers. Focuses on automated safety gates, account-level throttling, telemetry-driven promotion, and post-deploy reconciliation.
+Redwood runs a multi-account, multi-region GPU fleet with strict SLOs for latency and availability. Changes to GPU node profiles, network egress plans, or allocation operators can have cross-account impact (egress spikes, tenant evictions, thermal hotspots). We historically relied on manual change windows for large changes. This handbook defines the automated orchestrator and canary pattern to reduce human toil and risk while preserving predictable capacity behavior.
+- Declarative, auditable change promotion across AWS/GCP accounts
+- Fast rollback and safe halting on safety gate failures
+- Minimal steady-state customer-visible disruption during rollouts
+- Reusable IaC and CI patterns for new change types
+Applies to: Terraform module updates affecting GPU pools, node-image rotations, driver/kernel rollouts, burst-broker operator changes, VPC egress routing policies, and admission-policy changes that affect pod scheduling. Excludes application-level model changes and customer-managed private deployments unless explicitly opted-in.
+1) Author creates IaC change in feature branch with change-meta.yaml (targets, risk-level, estimated-duration).
+2) CI runs static safety checks (policy-as-code, cost-estimate, tfplan diffs, image-signature verification).
+3) Successful CI triggers a canary promotion to a synthetic 'canary account' with mirrored telemetry.
+4) Observability agent evaluates canary for 30m–2h depending on risk level.
+5) If all gates pass, orchestrator promotes change incrementally to account groups (low->medium->high).
+6) Each account promotion includes preflight snapshot, staggered rollout, and post-promotion reconciliation.
+7) Automatic rollback on gate failures and alert-driven manual review if repeated failures.
+- TF plan contains only allowed resource types for the target risk-level.
+- Image/container signatures validate against signing KMS/HSM.
+- Cost delta estimate computed and within budget threshold.
+- RBAC approval label present for high-risk changes.
+- Smoke job definitions included for deployed components (eg: tiny inference traffic injectors).
+Safety rules used by the orchestrator (examples):
+- Critical SLOs: node_p95_latency < 120ms, tenant_throttle_rate < 0.5%
+- Thermal spike threshold: GPU inlet delta > 8C within 15m triggers halt
+- Egress spike threshold: Bps increase > 30% over baseline for account
+- Preemptive eviction rate: > 2 evictions/min across pool halts rollout
+- Max concurrent accounts promoted: configurable by risk-level (default low=6, medium=3, high=1)
+Example GitHub Actions snippet (simplified):
+
+name: gpu-change-canary
+on: [push, pull_request]
+jobs:
+  static-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: ./ci/policy-check.sh $CHANGED_FILES
+      - run: ./ci/cost-estimate.py --plan tfplan.out
+  plan-and-sign:
+    needs: static-safety
+    runs-on: ubuntu-latest
+    steps:
+      - run: terraform init
+      - run: terraform plan -out=tfplan.out
+      - run: sigstore sign --input=tfplan.out --key-ref=projects/redwood/kms/keys/cicd
+  trigger-orchestrator:
+    needs: plan-and-sign
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -X POST $ORCHESTRATOR_ENDPOINT -d @change-meta.yaml -H 'Authorization: Bearer $ORCHESTRATOR_TOKEN'
+- Each change must include a change-meta.yaml with: targets (accounts/tags), risk_level (low|medium|high), rollback_strategy (auto|manual), and smoke_test job.
+- Use module versions (semantic tags) and tfstate promotion: canary -> staging -> prod workspaces.
+- Include 'preflight-and-snapshot' module that captures current allocation, warm pool sizes, and egress config into an S3/GCS snapshot before each account promotion.
+- Avoid cross-account resource creation in a single plan; orchestrator splits plans per account and creates a promotion bundle.
+Canary account requirements (text table):
+- Minimum mirrored fleet size: 2% of production GPU capacity (or 4 nodes, whichever is larger)
+- Synthetic tenants: pre-seeded tenants with deterministic traffic (qps, sequence lengths)
+- Observability: full traces, per-tenant cost telemetry, thermal sensors exposed to control plane
+- Network: egress path mirrors production (NAT or proxy) and pre-authorized peering to telemetry backends
+Representative gates (PromQL/SQL examples described):
+- Latency gate: increase in model-serving tail latency p99 > 10% over baseline for 30m -> fail
+- Eviction gate: sum(increase(gpu_preemptions[15m])) > account_threshold -> fail
+- Egress gate: increase in outbound_bytes_account_rate > 25% for two consecutive 10m windows -> warn/hold
+- Error budget gate: active_slo_error_budget(account) < 10% -> hold promotion
+Promotion groups and timing guidance:
+- Group definitions by tenant criticality and cost center (eg: infra-dev, non-prod, core-prod, enterprise-prod).
+- Default stagger: low risk: 6 accounts every 45m; medium: 3 accounts every 90m; high: 1 account every 4h.
+- Orchestrator supports backoff and paused windows if external incidents are open (references incident tracker).
+Rollback procedure (automated + manual):
+1) Automated rollback triggers on gate failure: orchestrator applies stored 'preflight snapshot' and runs a reconciliation plan to restore previous node-pool sizes and routes.
+2) If automated rollback fails or partial state remains, oncall performs described manual rollback steps (CLI snippets included).
+3) After a rollback, create an incident and assign to area owner; run postmortem within 72 hours.
+
+Post-deploy reconciliation: orchestrator runs a 24h reconciliation job to ensure tfstate consistency and repair drift (retries up to 5 times with exponential backoff).
+Trigger point: CI notifies Orchestrator with change bundle (change-meta.yaml + signed tfplan).
+Canary: Orchestrator deploys to canary account and starts synthetic traffic. Wait 30m–2h depending on risk. Monitor gates.
+Evaluate gates: If any FAIL -> automated rollback and paged alert to oncall. If WARN -> hold and notify owners for manual approval.
+Promotion: If canary PASS -> orchestrator promotes to next account group with configured concurrency and delay windows.
+Stabilization: After each account, run smoke tests (predefined test jobs) and wait stabilization window before next promotion.
+Post-promotion audit: Orchestrator emits audit event and snapshot for each account; record in deployment ledger.
+Completion: After final group promoted, run 24h reconciliation and file a short deployment summary in the change ticket.
+Examples (aws/gcloud + terraform):
+
+# fetch snapshot and apply rollback plan
+aws s3 cp s3://redwood-preflight-snapshots/account-123/snapshot.json ./snapshot.json
+terraform apply -var-file=snapshot.json -auto-approve
+
+# force plan split for single account
+TF_WORKSPACE=account-123 terraform plan -out=tfplan-account-123.out
+terraform apply tfplan-account-123.out
+- Dashboards: Canary Health (latency p50/p95/p99, eviction rate, egress delta, thermal delta).
+- Alerts: configured as policy thresholds in Alertmanager; critical alerts page to oncall Slack + PagerDuty.
+- Audit trail: Orchestrator posts signed events to internal eventbus and writes deployment ledger entries to DynamoDB/BigTable.
+- Cost telemetry: each promotion logs cost delta per account and tags for billing reconciliation.
+Testing matrix before merging to main:
+- Unit: policy-as-code rules, module contract tests.
+- Integration: terraform plan apply in ephemeral test accounts.
+- Canary simulation: run a synthetic canary in the staging canary account that intentionally exercises edge conditions (eg: small thermal spike).
+- Chaos: optional chaos run to validate orchestrator's pause/rollback behavior under network partitions.
+Owners: GPU Fleet (primary): @gpu-fleet-team; CI/IaC Orchestrator: @ci-platform; Observability SRE: @obs-sre.
+Oncall rotation: gpu-fleet oncall (primary), infra-sre (secondary). PagerDuty escalation policy defined in team runbooks.
+After every high-risk rollout or any rollback, complete the postmortem template: summary, timeline, root cause, action items (owner + ETA). Key KPIs tracked per rollout: mean time to rollback, % change promotions that required manual intervention, average eviction delta during promotion, cost delta vs baseline.
+link: /confluence/eng-infra/terraform-and-iac/change-meta-schema
+link: /confluence/eng-infra/runbooks/preflight-gpu-deployment-validation-and-rollback-playbook.json
+link: /confluence/eng-infra/ci-cd-and-build/gpu-ci-safety-orchestrator-and-cost-simulation-harness.json
+link: /confluence/eng-infra/gpu-fleet-and-capacity/gpu-tenant-eviction-predictor-and-provisioning-guidelines.json

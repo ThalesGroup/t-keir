@@ -36,6 +36,56 @@ export interface FusedOntology {
   entities: SemanticEntity[];
   keywords: SemanticKeyword[];
   json_ld: string;
+  /** RDF triple count in the fused graph */
+  triple_count?: number;
+  /** Number of unique Vespa parent ontology payloads merged */
+  source_count?: number;
+  /** Parent document ids that contributed ontology */
+  document_ids?: string[];
+}
+
+export type OntologyReasonerOperation =
+  | "consistency"
+  | "subclasses"
+  | "superclasses"
+  | "instances"
+  | "types"
+  | "sparql"
+  | "infer";
+
+export type OntologyReasonerEngine =
+  | "HermiT"
+  | "Pellet"
+  | "ELK"
+  | "JFact"
+  | "Openllet"
+  | "Structural"
+  | "rdflib";
+
+export interface OntologyReasonerRequest {
+  json_ld: string;
+  operation: OntologyReasonerOperation | string;
+  class_iri?: string;
+  individual_iri?: string;
+  sparql?: string;
+  reasoner?: OntologyReasonerEngine | string;
+  direct?: boolean;
+  limit?: number;
+  prefer_owlapy?: boolean;
+}
+
+export interface OntologyReasonerResponse {
+  operation: string;
+  backend: string;
+  reasoner?: string;
+  results: Record<string, string>[];
+  count: number;
+  consistent?: boolean | null;
+  triple_count: number;
+  owlapy_available: boolean;
+  note?: string | null;
+  /** JSON-LD graph of the reasoner answer (for display / graph view) */
+  json_ld?: string | null;
 }
 
 export interface QueryResponse {

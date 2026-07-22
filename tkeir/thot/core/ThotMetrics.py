@@ -1,9 +1,11 @@
-"""Observability Metrics
+"""Title: Observability Metrics
 
-Author: Eric Blaudez (Eric Blaudez)
+Core T-KEIR libraries (logging, config, paths, utilities).
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

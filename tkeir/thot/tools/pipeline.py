@@ -1,4 +1,12 @@
-"""Unified T-KEIR pipeline CLI."""
+"""Title: Unified NLP pipeline CLI
+
+Unified T-KEIR pipeline CLI.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -144,6 +152,10 @@ def _collect_inputs(input_path: str) -> list:
     """
     if os.path.isfile(input_path):
         return [input_path]
+    if not os.path.isdir(input_path):
+        raise FileNotFoundError(
+            f"Pipeline input path does not exist: {input_path}"
+        )
     files = []
     for root, _, filenames in os.walk(input_path):
         for filename in filenames:
@@ -217,7 +229,12 @@ def main(args=None):
         call_context = LogUserContext("pipeline-cli")
         processed = 0
         failed = 0
-        for input_file in _collect_inputs(parsed.input):
+        input_files = _collect_inputs(parsed.input)
+        if not input_files:
+            raise FileNotFoundError(
+                "No input files found under: " + parsed.input
+            )
+        for input_file in input_files:
             file_context = LogUserContext(call_context["correlation-id"])
             file_context.update(call_context)
             file_context["input-file"] = os.path.abspath(input_file)

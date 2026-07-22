@@ -1,4 +1,12 @@
-"""Document ontology pipeline task."""
+"""Title: Document Ontology Builder
+
+Document ontology pipeline task.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.core.KeywordRules import DEFAULT_MIN_KEYWORD_LENGTH
 from thot.core.ThotLogger import ThotLogger

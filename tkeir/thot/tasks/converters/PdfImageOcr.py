@@ -1,4 +1,12 @@
-"""Extract text from images embedded in PDF documents."""
+"""Title: Pdf Image Ocr
+
+Extract text from images embedded in PDF documents.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import base64
 import os

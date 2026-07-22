@@ -1,0 +1,133 @@
+Mini Emulator + Telemetry Mirror Playbook for SDK Onboarding
+
+Summary
+
+This playbook explains the 'mini emulator' pattern we use for rapid SDK onboarding, local integration tests, and Support first-response debugging. The emulator is a lightweight, single-process stub that reproduces key runtime behaviors of Redwood's hosted inference API: streaming, batching (approximate behavior), token accounting, configurable latency, and an optional telemetry mirror that emits a compact golden trace for deterministic replay. The goal is fast developer feedback loops and a reproducible first-level-support workflow.
+
+Intended audience
+
+- SDK engineers authoring client libraries
+- Developer Experience (DevX) engineers creating quickstarts and templates
+- Support engineers doing rapid reproduction and canonical fixes
+
+Motivation
+
+New integrators often get stuck on three recurring issues: (1) streaming/diffing mismatches, (2) token-count and pricing surprises, and (3) telemetry gaps that prevent reproducing incidents. A small, deterministic emulator drastically reduces time-to-root-cause by providing a reproducible local target and a telemetry mirror that matches the production event shape.
+
+When to use the mini emulator
+
+- Local dev iteration and unit tests for SDK logic (timeouts, retry behavior, incremental decoding).
+- Integration tests in CI that need deterministic outputs without contacting hosted APIs.
+- Support reproduction for customer-reported non-deterministic streaming or token-count errors.
+
+Key features of the mini emulator
+
+- Lightweight: single binary / Python process with zero external dependencies by default.
+- Replays: deterministic golden traces driven by seed files.
+- Streaming semantics: chunked responses with configurable inter-chunk latency and jitter.
+- Batch simulation: configurable batching window (ms) and max-batch-size to test client-side backpressure and concurrency.
+- Token accounting: same tokenization rules as production (uses production tokenizer library config).
+- Telemetry mirror: emits compact event stream to file or local UDP/HTTP collector that mirrors prod telemetry fields (request_id, route, latency_ms, token_counts, checksum).
+
+Quickstart: run the emulator locally
+
+1) Download the single-file release for your platform: curl -L -o redwood-mini-emu https://releases.internal.redwood/mini-emulator/v1.3/redwood-mini-emu-linux-x86_64
+2) Make executable and run a smoke mode: chmod +x redwood-mini-emu && ./redwood-mini-emu --mode=smoke
+3) Configure your SDK to point to the emulator: export REDWOOD_API_URL=http://localhost:8900
+4) Run the sample request in the SDK quickstart: python examples/stream_echo.py --prompt 'Hello from mini-emulator'
+
+Configuration reference (env + CLI)
+
+| Name | Default | Description |
+|------|---------|-------------|
+| MINI_EMU_PORT | 8900 | HTTP port the emulator listens on |
+| MINI_EMU_LATENCY_MS | 5 | Base per-chunk latency in milliseconds |
+| MINI_EMU_JITTER_MS | 10 | Max additional jitter per chunk |
+| MINI_EMU_BATCH_WINDOW_MS | 25 | Simulated batching window to combine requests |
+| MINI_EMU_MAX_BATCH | 8 | Max requests combined in a simulated batch |
+| MINI_EMU_TELEM_MODE | file | file | udp | none | Where to send telemetry mirror |
+| MINI_EMU_TELEM_TARGET | ./telemetry/golden.trace | Path or host:port for telemetry |
+
+Notes: the table is intentionally compact; exact field names are stable for SDK tests. The emulator honors the standard Redwood API surface (POST /v1/generate, WebSocket streaming, simple auth header).
+
+Example SDK snippet (Python)
+
+```python
+# minimal SDK config to use the emulator
+from redwood_sdk import RedwoodClient
+client = RedwoodClient(base_url=os.environ.get('REDWOOD_API_URL'), api_key='test')
+resp = client.generate(prompt='Local test')
+for chunk in resp.stream():
+    print(chunk.text, end='')
+```
+
+Golden trace & telemetry mirror format
+
+We emit one compact JSON-lines stream for deterministic replay and for debugging. Fields: request_id, trace_id, route, seed, events[]. Each event contains timestamp_ms, phase (recv, batch_start, batch_end, send_chunk), chunk_index, chunk_text_checksum, token_delta, latency_ms. Example line: 
+
+{
+  "request_id": "r-123",
+  "trace_id": "t-20260211-a",
+  "route": "/v1/generate",
+  "seed": "seed-42",
+  "events": [{"timestamp_ms": 1670000000000, "phase": "recv"}, {"phase": "send_chunk", "chunk_index":0, "chunk_text_checksum":"c2f1...", "token_delta":5, "latency_ms":7}]
+}
+
+Use the supplied replay utility to feed golden traces back into the emulator to reproduce exact chunk boundaries and timings: `./emu-replay --trace-file telemetry/golden.trace --port 8900`
+
+CI integration patterns
+
+- Unit tests: run the emulator in 'deterministic' mode with TELEMETRY_MODE=file and a seeded trace repository checked into the tests directory.
+- Integration tests: spin emulator in ephemeral container (Dockerfile supplied in repo) and point SDK to the container network.
+- Flaky test hunts: enable TELEMETRY_MODE=udp to stream to a local tap and use the trace-as-artifact plugin to attach the golden.trace to CI runs for debugging.
+
+Support play: canonical reproduction flow
+
+1) Triage: request request_id, SDK version, and a short repro from Support ticket.
+2) If streaming mismatch: ask the customer to run SDK with `REDWOOD_API_URL` pointing to emulator and send generated golden trace (mini-emulator emits a `--save` file by default).
+3) Reproduce locally by running: `./redwood-mini-emu --seed <seed> --telemetry-target ./telemetry/customer.trace` and then point SDK at emulator and run the sample snippet.
+4) If issue reproduces, create a canonical fix branch documenting the delta and add a test to the SDK repo using the saved golden trace.
+
+Top canonical fixes and troubleshooting checklist
+
+- Symptom: Streaming non-determinism between SDK and hosted API
+  - Fix: Ensure SDK uses chunk checksum verification and preserves order when reassembling. Add a client-side dedupe buffer (max 2 chunks) to handle transient reorder.
+- Symptom: Token-count doesn't match billing estimate
+  - Fix: Confirm tokenizer version in emulator config matches production tokenizer; update tokenization config in SDK test matrix.
+- Symptom: Telemetry gaps in prod vs in emulator
+  - Fix: Confirm telemetry mirror is enabled and the SDK propagates request_id via X-Request-Id header; update telemetry schema mapping script.
+- Symptom: Client timeouts triggered under simulated batching
+  - Fix: Tune SDK default timeouts to account for batch window (recommended: client_timeout_ms = 3 * MINI_EMU_BATCH_WINDOW_MS + 100ms).
+
+Operational runbook snippets
+
+- Restart emulator service locally: `pkill -f redwood-mini-emu || true; ./redwood-mini-emu --port $PORT --mode=smoke &`
+- Dump current golden traces: `find ./telemetry -name '*.trace' -mtime -1 -print`
+- Quick checksum of a trace to attach to tickets: `jq -c '.events[] | {phase,chunk_index,chunk_text_checksum,token_delta}' < telemetry/customer.trace | shasum`
+
+Design notes and rationale
+
+- We intentionally keep the emulator behavior approximate for expensive runtime characteristics (e.g., exact kernel selection, quantization effects) but faithful for protocol surface, token counts, and streaming semantics. The goal is to help users debug SDK-level logic and integration plumbing without incurring production complexity.
+- Telemetry mirror is compact by design to minimize PII risk while keeping the fields required to correlate traces with production logs. Telemetry mirrors must not contain full prompt text unless the customer explicitly enables it in `MINI_EMU_PRIVACY=allow-full-text` for on-prem troubleshooting.
+
+Ownership and maintenance
+
+- Primary owner: DevX Runtime Team (owner contact: Ava Chen)
+- Emergency contact: Support Escalation Rotation (oncall@redwood.internal)
+- Release cadence: minor emulator releases every 8 weeks; security/compatibility patches as needed.
+
+Appendix: Helpful commands and sample artifacts
+
+- Docker run for CI:
+  docker run --rm -p 8900:8900 -v $(pwd)/telemetry:/telemetry redwood/mini-emulator:v1.3 --mode=deterministic
+
+- Sample golden.trace (single-line) for quick copy:
+  {"request_id":"r-demo-01","trace_id":"t-demo","route":"/v1/generate","seed":"demo","events":[{"timestamp_ms":1676000000000,"phase":"recv"},{"phase":"send_chunk","chunk_index":0,"chunk_text_checksum":"abc123","token_delta":6,"latency_ms":8}]}
+
+- Contact for feature requests / bugs: devx-runtime@redwood.internal
+
+Revision history
+
+- 2026-02-11: initial draft (Ava Chen)
+- 2026-02-18: added telemetry mirror schema and CI section (Diego Morales)
+- 2026-03-01: canonical fixes and operational snippets added (Priya Kannan)

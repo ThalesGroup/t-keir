@@ -1,8 +1,11 @@
-"""Package initialization
-Author : Eric Blaudez (Eric Blaudez)
+"""Title: Package initialization
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Syntactic tagging and SVO triple extraction.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import os

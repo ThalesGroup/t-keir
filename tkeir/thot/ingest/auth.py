@@ -1,4 +1,12 @@
-"""Authorization helpers for ingest endpoints."""
+"""Title: Auth
+
+Authorization helpers for ingest endpoints.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

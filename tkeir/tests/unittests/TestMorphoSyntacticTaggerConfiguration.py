@@ -1,4 +1,12 @@
-"""Test morphosyntactic tagger configuration."""
+"""Title: Morpho Syntactic Tagger Configuration
+
+Test morphosyntactic tagger configuration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import json
 import os

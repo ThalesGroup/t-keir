@@ -10,12 +10,76 @@ Keycloak principal (or **`dev@tkeir`** when auth is off).
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/ingest/document` | Multipart file **or** JSON `{"url": "..."}` |
-| `POST` | `/ingest/batch` | JSON manifest of URL items |
+| `POST` | `/ingest/document` | Multipart file **or** JSON `{"url": "..."}` (+ optional `ontologies`) |
+| `POST` | `/ingest/batch` | JSON manifest of URL items (each may set `ontologies`) |
+| `POST` | `/ingest/stop` | Stop the ingest process (client `--stop-on-failed`) |
 | `GET` | `/ingest/status/{id}` | Job status + manifest |
 | `GET` | `/health`, `/ready`, `/metrics` | Probes (same pattern as RAG API) |
 
 Default port: **8091**.
+
+### Stop on first failure
+
+For fast debug loops, stop both server and client on the first failed document:
+
+```bash
+# Terminal A
+make ingest STOP_ON_FAILED=1
+
+# Terminal B
+make corpus-ingest STOP_ON_FAILED=1
+```
+
+- Server: `INGEST_STOP_ON_FAILED=1` exits the process when a job fails.
+- Client: `--stop-on-failed` cancels remaining uploads and calls `POST /ingest/stop`.
+
+### Per-document external ontologies (client uploads content)
+
+The ingest **server never reads client filesystem paths**. Ontologies must be
+uploaded as **file bytes** in the same request as the document (same rule as
+the document itself).
+
+| Channel | How to send ontologies |
+|---------|------------------------|
+| Multipart | Repeatable `-F ontology_file=@domain.ttl` (content) |
+| JSON | `"ontologies": [{"filename": "domain.ttl", "content_base64": "..."}]` |
+
+The server stages uploads under `${INGEST_ROOT}/uploaded_ontologies/{id}/` and
+passes those **server-local** paths to NER / syntax / document-ontology.
+
+**Multipart**
+
+```bash
+curl -X POST http://localhost:8091/ingest/document \
+  -F "file=@sitrep.txt" \
+  -F "ontology_file=@/path/on/client/c2sim_combined.ttl" \
+  -F "ontology_file=@/path/on/client/c2sim_c4isr.ttl" \
+  -F 'metadata={"corpus":"osint","topic_id":"situational_awareness"}'
+```
+
+**JSON**
+
+```bash
+# content_base64 = base64 of the ontology file bytes (not a path string)
+curl -X POST http://localhost:8091/ingest/document \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "file:///path/to/doc.txt",
+    "ontologies": [
+      {"filename": "c2sim_combined.ttl", "content_base64": "<base64>"},
+      {"filename": "c2sim_core.owl", "content_base64": "<base64>"}
+    ],
+    "metadata": {"corpus": "osint"}
+  }'
+```
+
+`make corpus-ingest` reads local files via `--ontology-dir` / `CORPUS_ONTOLOGY_DIR`
+on the **client** and uploads each file’s bytes with every OSINT document.
+
+Host ingest serializes the heavy NLP pipeline (`INGEST_MAX_CONCURRENCY=1` by
+default). Raising concurrency often OOMs a laptop process (SIGKILL / exit 137)
+because each job loads spaCy models. Prefer more upload workers only when the
+server has headroom, and keep `make corpus-ingest` at `INGEST_WORKERS=1`.
 
 ## Idempotency
 

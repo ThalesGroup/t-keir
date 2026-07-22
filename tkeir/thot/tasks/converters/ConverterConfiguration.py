@@ -1,4 +1,12 @@
-"""Converter configuration."""
+"""Title: Converter Configuration
+
+Converter configuration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.core.ConfigurationUtils import load_configuration
 from thot.core.LoggerConfiguration import LoggerConfiguration

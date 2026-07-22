@@ -1,4 +1,12 @@
-"""Tests for chunk→document score aggregation."""
+"""Title: Search Aggregate
+
+Tests for chunk→document score aggregation.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tools.search.search_aggregate import (
     aggregate_chunks_to_documents,

@@ -1,3 +1,13 @@
+"""Title: Tkeir Paths
+
+Automated tests for T-KEIR (unit / functional).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
+
 import os
 
 from thot.core.ConfigurationUtils import load_json_configuration

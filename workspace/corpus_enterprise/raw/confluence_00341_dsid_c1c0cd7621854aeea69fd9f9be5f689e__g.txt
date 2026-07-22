@@ -1,0 +1,180 @@
+GPU BuildKit cache reproducibility and invalidation playbook
+
+Overview
+
+This playbook documents Redwood's approach to making GPU image builds reproducible and safe to cache across accounts and regions using BuildKit (moby/buildkit) and our CI platform (Buildkite). It covers how caching works for large GPU runtimes, practical invalidation strategies, Terraform/IaC hooks, pipeline examples, and an on-call runbook for cache-related incidents.
+
+Goals
+- Ensure deterministic GPU image builds for release promotion and rollback.
+- Minimize redundant rebuilds to save GPU CI minutes while avoiding stale artifact bugs.
+- Provide clear operational steps for invalidating, signing, and promoting caches.
+
+Non-goals
+- Prescribing a single base image for all workloads (we support multiple base families).
+- Replacing artifact registries or CAS mechanisms used by other teams.
+
+Key definitions
+- Cache snapshot: a content-addressed BuildKit cache exported to S3/CAS used to seed future builds.
+- Provenance tag: a metadata tag injected into images and caches (build id, git sha, kernel/cuda-driver hashes).
+- Promotion: copying a build artifact and associated cache from ephemeral CI storage to the production registry and long-term cache bucket.
+
+Why this matters for GPU images
+- GPU base images (CUDA, CuDNN, drivers) are large (several GB). Rebuilding these frequently is wasteful.
+- Subtle mismatches (different driver minor versions, glibc) can cause runtime failures that are non-obvious.
+- Determinism requires both content-addressable layers and stable environment inputs (seven reproducible inputs below).
+
+Reproducibility checklist (every GPU image build)
+1) Source inputs: pinned git SHA, deterministic dependency manifest (lockfile).
+2) Tooling: pinned BuildKit version and pinned dockerfile-linter in CI.
+3) Base image GUID: base image digest (NOT tag). Store digest in build metadata.
+4) Host kernel/driver fingerprint: record target runtime driver versions in metadata.
+5) Build args: all ARGs that affect layers must be explicit in pipeline.
+6) Cache provenance: export cache with a signed metadata payload.
+7) Post-build tests: smoke test on a minimal GPU instance, attach results to artifact.
+
+Design: cache model and lifecycle
+- Cache export: CI exports BuildKit cache to a region-specific S3 bucket using the build id: cache://buildkit/snapshot/<sha256(build-meta)>
+- Cache signing: after a successful pipeline and smoke tests, a COSIGN-signed provenance JSON is added to the same prefix. Signing key is KMS-backed and rotated per security policy.
+- Promotion: promotion job copies both image (OCI) and cache snapshot to the production bucket and sets lifecycle tags (promoted_by, promote_date).
+- Eviction: LRU with pinning. Promoted caches are pinned for 90 days by default. Non-promoted caches expire after 14 days.
+
+Cache invalidation policy (practical rules)
+- Automatic invalidation triggers:
+  - base image digest changes (important): immediate cache invalidation for derived images.
+  - buildpack or dependency lockfile hash changes: invalidate dependent caches.
+  - explicit manual invalidation via promotion UI or CI step.
+- Soft invalidation: mark caches as "stale" but keep for quick fallback for 7 days.
+- Hard invalidation: delete cache objects and update registry tags to a new digest. Use for security fixes or kernel-driver mismatches.
+
+Operational surface and SLOs
+- CI warm seed latency: 95th percentile warm-seeded build start < 90s (target).
+- Promotion success: 99% of promoted images have signed provenance attached within 10 minutes.
+- Eviction correctness: 100% of pinned caches must not be deleted by lifecycle job.
+Owners:
+- Primary: eng-infra/ci-cd (on-call: ci-infra@redwood.internal)
+- Secondary: eng-infra/gpu-fleet (image compatibility investigation)
+
+CI pipeline examples
+1) Minimal Dockerfile pattern (GPU-friendly layering)
+```Dockerfile
+# Use literal digests for reproducibility
+FROM nvidia/cuda@sha256:<sha256-of-base>
+ARG DEBIAN_FRONTEND=noninteractive
+# Layer: system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates build-essential \
+    && rm -rf /var/lib/apt/lists/*
+# Layer: python / app dependencies
+COPY pyproject.lock /app/
+RUN pip wheel --no-deps -r /app/requirements.txt -w /wheels
+COPY . /app
+RUN pip install --no-index --find-links=/wheels -r /app/requirements.txt
+```
+
+2) Buildkite pipeline snippet (key parts)
+```yaml
+steps:
+  - label: ":docker: build GPU image"
+    plugins:
+      - docker#v3.7.0:
+          image: moby/buildkit:master
+    command:
+      - |
+        buildctl --addr tcp://buildkitd:1234 build \
+          --frontend dockerfile.v0 \
+          --local dockerfile=. \
+          --local context=. \
+          --export-cache type=inline \
+          --export-cache type=registry,ref=cache-registry.redwood.internal/gpu-cache/${BUILDKIT_SNAPSHOT_TAG} \
+          --output type=image,name=registry.redwood.internal/gpu/${IMAGE_NAME}:${GIT_SHA},push=true
+```
+Notes: we use both inline and registry cache exporters to speed up CI warmups while preserving an exported snapshot URL for cross-account reuse.
+
+Terraform / IaC integration
+- We provide a terraform module: redwood/gpu_buildkit_cache_bucket
+- Required variables (table):
+| variable | description | example |
+|---------|-------------|---------|
+| bucket_name | Region-scoped cache bucket | redwood-buildkit-cache-us-west-2 |
+| lifecycle_days_unpromoted | TTL for non-promoted caches | 14 |
+| pin_label_prefix | Prefix used by promotion job to pin caches | promoted/ |
+| kms_key_arn | KMS key for signing cache provenance | arn:aws:kms:us-west-2:123:key/abcd |
+| cross_account_readers | List of account IDs allowed to read caches | ["111111111111", "222222222222"] |
+
+Example snippet: 
+```hcl
+module "buildkit_cache_bucket" {
+  source = "git::ssh://git@github.com/redwood-iac/modules.git//buildkit-cache?ref=v1.2.0"
+
+  bucket_name               = "redwood-buildkit-cache-us-west-2"
+  lifecycle_days_unpromoted = 14
+  pin_label_prefix          = "promoted/"
+  kms_key_arn               = var.cache_kms_key
+  cross_account_readers     = [data.aws_caller_identity.secondary.account_id]
+}
+```
+
+Access pattern and cross-account sharing
+- We expose cache snapshots via S3 with restricted read policies for dedicated tenant accounts. Sharing is read-only: a consumer BuildKit instance can pull a cache snapshot into its local cache via the export/import API.
+- To avoid TOCTOU races, the promotion job writes a "completed" marker file after the cache and provenance are available. Consumers must wait for marker presence.
+
+Provenance and signing
+- Every promoted cache has a provenance.json containing: build_id, git_sha, base_image_digest, dependency_lock_hash, buildkit_version, signer, cosign_signature.
+- Signing workflow: CI uploads provenance.json -> invokes a promotion service that calls KMS to get a signing nonce -> cosign signs -> upload signature alongside provenance.json.
+
+Runbook: cache-related incidents
+1) Symptom: CI warm builds unexpectedly rebuild large layers (cache misses)
+  - Check CI logs for cache pull errors (403/404) against cache-registry or S3.
+  - Verify marker file for latest promoted cache: `aws s3 ls s3://redwood-buildkit-cache-us-west-2/promoted/<prefix>/marker`
+  - If unauthorized, examine cross-account read IAM policy audit (CloudTrail) and rotate cross-account role ARN if needed.
+  - If marker missing, inspect promotion job logs (promotion-service) for failure and re-run promotion for the latest candidate.
+2) Symptom: promoted image fails on runtime with driver mismatch
+  - Compare promoted provenance (base_image_digest, kernel/driver fingerprint) to target runtime fleet node fingerprint (fleet-service/_fingerprint endpoint).
+  - If mismatch: rollback to previous promoted image (promotion job supports rollbacks). Trigger a targeted canary to validate.
+  - Notify eng-infra/gpu-fleet and open incident if multiple customers impacted.
+3) Hard invalidation (security patch)
+  - Create a signed invalidation request in the cache-control service (HTTP API).
+  - Promotion service executes hard delete of matching S3 prefixes, updates the cache index, and publishes a message on `eng-infra-cache-events` SNS for consumers to purge local caches.
+
+Troubleshooting commands (quick)
+- List promoted caches: `aws s3api list-objects --bucket redwood-buildkit-cache-us-west-2 --prefix promoted/ --query 'Contents[].Key'`
+- Validate provenance signature: `cosign verify --key <kms-public-key.pem> s3://redwood-buildkit-cache-us-west-2/promoted/<prefix>/provenance.json`
+- Re-seed a builder from snapshot: `buildctl-remote cache import --from s3://.../snapshot.tar` (internal wrapper provided by ci-infra team)
+
+Monitoring and alerts
+- Metric: cache-pull-failure-rate > 1% triggers P1 to on-call CI infra.
+- Metric: promotion-latency P99 > 10min triggers warning to CI infra channel.
+- Dashboard: CI cache health (pulls, exports, promoted count) in Grafana under `eng-infra/ci/cache-health`.
+
+Change management and rollout steps for cache system changes
+1) Spec PR in eng-infra repo describing change and impact matrix. Add reviewer from gpu-fleet.
+2) Run canary flows: two builds with unchanged git sha but toggled cache policy to measure delta.
+3) Promote to staging region with a pinned window of 48 hours.
+4) After no regression, update terraform module version and announce in #eng-infra.
+
+Owners and contacts
+- Cache infra service (promotion-service): owner: Daniel Kim (eng-infra/ci-cd)
+- Build pipelines and scripts: owner: Ava Martinez (eng-infra/ci-cd)
+- GPU compatibility investigations: owner: Priya Nair (eng-infra/gpu-fleet)
+
+Appendix: example provenance.json
+```json
+{
+  "build_id": "bk-2025-11-02-42",
+  "git_sha": "a1b2c3d4e5f6",
+  "base_image_digest": "sha256:...",
+  "dependency_lock_hash": "sha256:...",
+  "buildkit_version": "v0.11.4",
+  "signer": "promotion-service@redwood.internal"
+}
+```
+
+Change history
+- 2024-05-12: Initial draft authored by Ava Martinez.
+- 2024-11-09: Added Terraform module schema and cross-account guidance (reviewer: Daniel Kim).
+- 2025-11-02: Added cache signing workflow and hard invalidation runbook (reviewer: Priya Nair).
+
+References
+- BuildKit docs: https://github.com/moby/buildkit
+- Cosign signing: https://github.com/sigstore/cosign
+- Internal: eng-infra/ci-infra/promotion-service (internal repo link)

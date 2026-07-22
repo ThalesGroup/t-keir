@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Fix merged assert lines produced during unittest migration."""
+"""Title: Fix merged asserts
+
+Fix merged assert lines produced during unittest migration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

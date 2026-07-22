@@ -1,4 +1,12 @@
-"""Export closed hot-store segments to WORM storage."""
+"""Title: Archiver
+
+Export closed hot-store segments to WORM storage.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

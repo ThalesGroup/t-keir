@@ -1,8 +1,11 @@
-"""Synatctic tagger configuration
-Author : Eric Blaudez (Eric Blaudez)
+"""Title: Synatctic tagger configuration
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Syntactic tagging and SVO triple extraction.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.core.ConfigurationUtils import load_configuration

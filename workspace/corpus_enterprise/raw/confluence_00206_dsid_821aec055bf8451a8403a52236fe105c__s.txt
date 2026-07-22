@@ -1,0 +1,123 @@
+Synthetic Canary Stress Harness for SLO Regression Detection
+
+Summary:
+This runbook describes the Synthetic Canary Stress Harness (SCSH) used to detect SLO regressions, capacity degradations, and error-budget consumption risk prior to model/service rollouts. The harness combines targeted synthetic traffic profiles, tenant-aware capacity hedging, and automated telemetry checks to surface regressions that are not visible from production sampling alone.
+
+Goals:
+- Detect SLO regressions and cost-impacting performance changes before promoting a rollout to >10% traffic.
+- Validate autoscaling policies and burst-absorber behavior under realistic tenant mixes.
+- Provide deterministic pass/fail criteria and automated evidence for release decisions and postmortem artifacts.
+
+Scope:
+- Applies to: model-serving endpoints, inference routing layers, cache/KV-priming flows, and the Redwood request routing stack.
+- Not covered: long-tail noisy integrations (third-party vendor outages) unless explicitly included in scenario templates.
+
+Ownership and RACI:
+- Owner: runtime-infra-sre (primary contact: oncall-runtime@redwood.com).
+- Contributors: model-serving, eng-sre-observability, product-ops (for tenant profiles).
+- Approver: Head of SRE for production-rollout gates.
+
+Key Concepts and Definitions:
+- Canary cohort: A traffic slice (1–10%) receiving a new model variant or config.
+- Synthetic profile: A scripted request distribution that mimics tenant classes (low-latency chat, high-throughput batch embeddings, mixed small prompt flows).
+- Stress scenario: A targeted load pattern (burst, ramp, sustained tail) used to exercise autoscaling, batching, and caching behavior.
+- Evidence bundle: Aggregated logs, traces, token-cost breakdown, and SLO telemetry attached to the release ticket.
+
+Acceptance Criteria (Pass/Fail):
+- Latency SLOs: p50/p95/p99 for the canary cohort must not degrade beyond a configurable delta (default: +10% p95, +25% p99) vs baseline for the same workload pattern.
+- Error rate: increase must be <= 25% of prior error budget burn rate for the last 7 days; absolute error rate must remain below service threshold (default 1%).
+- Autoscale response: cold-start and scale-up time must be within SLO (default: scale to 80% target in < 60s for standard pools).
+- Cost impact: projected per-token cost delta <= +15% for the canary scenario; flagged if above.
+- No persistent KV/cache thrash: cache hit-rate must stay within -5% of baseline during sustained traffic test.
+
+Synthetic Profiles (examples):
+1) Chat-Interactive (low latency): 50 rps, 8 token average, single-turn, high p95 sensitivity.
+2) Embeddings-Batch (throughput): 500 qps in parallel 128-size batches, long-running steady-state, measures throughput-latency tradeoffs.
+3) Mixed-tenant burst: 10x ramp over 2 minutes across 200 simulated tenants with per-tenant fairshare limits.
+
+Observability and Telemetry Requirements:
+- Required metrics: request_latency_ms.{p50,p95,p99}, token_cost_per_request, error_rate, batch_size_distribution, kv_cache_hit_ratio, gpu_utilization, queue_length, cold_start_count.
+- Traces: distributed traces captured with sampled end-to-end context; must include kernel selection tags and quantization_profile labels.
+- Dashboards: SCSH release dashboard (templated) that surfaces baseline vs canary time-series and a summary pass/fail tile.
+
+Test Harness Architecture (high level):
+- Traffic generator service (scs-traffic) pulls tenant profiles from product-ops and emits requests into the routing layer with a canary header.
+- Orchestrator (scoordinator) runs scenarios, collects telemetry via the telemetry-API, computes comparison metrics, and produces an evidence bundle.
+- Validator: a rules engine that evaluates acceptance criteria and emits a result code and rationale.
+
+Operational Playbook: Running a Harness Manually
+1) Prepare release branch and register canary configuration in the deployment system.
+2) Select target scenario(s) from the template library and the baseline time window (recommended: last 72 hours of stable traffic).
+3) Trigger the SCSH via CLI:
+   $ scsctl run --release-id=rls-2025-089 --scenarios=chat-interactive,mixed-tenant --duration=30m --canary-slice=5%
+4) Monitor the real-time dashboard and watch the pass/fail tile.
+5) On failure: collect evidence bundle (see section "Evidence and Post-Failure Steps"), pause rollout, and open an incident with severity tag P2.
+
+Automated Gates (recommended):
+- Block rollout promotions if validation returns FAIL or if the evidence bundle includes any of: p99 increase > 25%, error spike > 2x baseline, autoscale slowstart > 60s.
+- Allow fast-tracked passes if run under a low-risk profile (1% slice, non-critical model) and validating run passes with green metrics.
+
+Evidence and Post-Failure Steps:
+- Evidence bundle includes: time-series exports (CSV), trace snapshots (zip of spans), profiler output (profiling windows if available), kernel-selection logs, and cost delta calc.
+- Post-failure triage steps:
+  1. Verify traffic generator correctness (check header injection and tenant weights).
+  2. Correlate traces to identify hot paths (kernel selection, batching delays, cache misses).
+  3. If degradation is autoscale-related, run targeted capacity-only stress (see "Autoscale Forensics" below).
+  4. Determine rollback vs mitigation (tuning batch sizing, adjusting autoscale thresholds, adjusting route fallback).
+
+Autoscale Forensics (quick guide):
+- Re-run scenario with metrics export at 10s resolution.
+- Check GPU utilization vs queue_length to determine whether the bottleneck is compute or scheduling.
+- Validate that the controller applied scale actions (controller logs) and that new nodes warmed kernels and KV caches.
+- If cold-starts dominate, consider pre-warming policies for the next rollout slice.
+
+Sample YAML: scenario template
+---
+name: mixed-tenant-burst
+duration: 00:30:00
+tenant_profile_source: product-ops/mix-aug-2025
+ramp: {start: 1, peak: 10, window: 120}
+requests_per_second: 200
+headers: {canary: true}
+---
+
+Example CLI commands and debug snippets:
+- Check traffic generator status: $ scsctl status --run-id=sr-2025-003
+- Export evidence bundle: $ scsctl export --run-id=sr-2025-003 --out=evidence-sr-2025-003.zip
+- Quick trace query (tempo): trace.query("service:runtime AND http.status_code>=500", start, end)
+
+Cost and Scheduling Considerations:
+- Default run cadence: pre-release runs on every candidate (1–2 hours prior to canary promotion) and weekly smoke runs for critical services.
+- Budget guardrail: limit synthetic runs to a monthly token budget per service (configurable per team).
+- If cost exceeds threshold, reduce slice size or run targeted micro-scenarios focusing on weak signals.
+
+Run Frequency and Drift Detection:
+- Canary runs should be performed for: every major model/config release, every autoscaler change, and monthly for long-running services.
+- Drift detection: maintain a rolling baseline and trigger an out-of-band run if drift crosses a 10% p95 change over 7 days.
+
+Incident Review and SRE Integration:
+- If SCSH detects a regression that would have consumed >50% of a weekly error budget, the release is escalated to an SRE-led incident review.
+- Attach the evidence bundle to the incident record and use the standard incident review template (link on dashboard).
+
+Playbook: Failure -> Mitigation -> Re-validate
+1) Pause rollout and tag the release.
+2) Run targeted mitigation (tune batch sizing, increase burst capacity, pre-warm kernels).
+3) Re-run the failing scenario at equal or reduced slice (>= 1% slice minimum for meaningful samples).
+4) If metrics return within acceptance, resume promotion with extended observation window.
+
+Appendix: Templates and Links
+- Scenario library: product-ops/scenarios (internal).
+- Templated dashboard: dashboards/sch-release-template.
+- Telemetry event names: scs.run.started, scs.run.finished, scs.run.failed.
+
+Revision history:
+- 2025-03-12: Initial publication (Liam Chen).
+- 2025-05-05: Added autoscale forensics and cost guardrails (Priya Nair).
+- 2025-06-01: Standardized acceptance thresholds and added evidence bundle format (Marcus Reed).
+
+Notes and future work:
+- Add synthetic trace injection to simulate downstream 3rd-party latencies.
+- Integrate with automated release controller to block promotions without manual gating for high-risk services.
+
+Contact and support:
+- runtime-infra-sre (oncall-runtime@redwood.com)

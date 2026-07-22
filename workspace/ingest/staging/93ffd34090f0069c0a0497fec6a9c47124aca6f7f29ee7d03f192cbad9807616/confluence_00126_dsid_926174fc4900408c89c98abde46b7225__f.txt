@@ -1,0 +1,371 @@
+First Production Launch Checklist (Canonical Template)
+
+## Purpose
+This page defines the **canonical step catalog** for the “Guided onboarding + First Production Launch” checklist.
+
+This template is the **single source of truth** for:
+- Step IDs (stable identifiers used by Console + progress service + telemetry)
+- Step ordering, dependencies, and completion criteria
+- Deep links in the Redwood Console
+- Canonical docs + quickstart/example links (with language parity expectations)
+
+This template is used in:
+- **Redwood Console** checklist UI
+- **Docs** (mirrors the same steps and order)
+- **Support playbooks** (triage by step state)
+
+---
+
+## Template versioning and change control
+**Template version:** 1.0
+
+**Rules**
+1. **Step IDs are immutable.** Do not reuse an ID for a different meaning.
+2. Any change that affects completion logic (criteria or event mapping) requires review from:
+   - DevEx (Docs/Quickstarts): Wei Chen / Elliot Price
+   - Console PM/Eng: Marissa Cole / Dylan Brooks
+   - Telemetry: Logan Wright
+   - Support enablement: Dev Patel
+3. Backward compatibility: existing tenants’ progress must not regress due to template edits.
+
+**Update cadence**
+- Minor copy/link changes: anytime (no code changes required).
+- Criteria/event changes: batched; target 1–2 releases/month.
+
+---
+
+## Definitions
+- **TTFS (Time to First Success):** elapsed time from tenant creation → first successful (2xx) Hosted API response for a supported endpoint.
+- **TTFP (Time to First Production Traffic):** elapsed time from tenant creation → first request classified as production traffic per telemetry rules.
+
+**Checklist step states**
+- Not started: no evidence yet
+- In progress: partial evidence (where applicable)
+- Completed: acceptance criteria met
+- Blocked: step cannot complete due to detected error state (Console may show guidance)
+
+---
+
+## Supported environments (MVP)
+This template is authored for **Hosted API** onboarding (self-serve and sales-assisted). Dedicated/Private steps will be added later.
+
+Supported language tracks for “Quickstart/Examples” links:
+- Python
+- TypeScript/Node
+- Go
+- cURL
+
+Parity expectation: each step should have at least one canonical docs URL and at least two language tracks with working code samples by GA.
+
+---
+
+## Canonical step catalog (ordered)
+
+### Step 1 — Create an API key
+**Step ID:** ONB_API_KEY_CREATED
+
+**Goal:** Ensure the developer has a valid key and knows where to rotate/revoke it.
+
+**Acceptance criteria (completion):**
+- At least one active API key exists for the tenant in the Console.
+
+**Recommended Console deep link:** /console/settings/api-keys
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/api-keys
+- Quickstart (cURL): https://docs.redwoodinference.com/quickstarts/first-call#curl
+
+**Common pitfalls to address in step detail UI:**
+- Using the wrong environment variable name
+- Copying a key with extra whitespace
+- Using an org admin key in a restricted project context
+
+**Telemetry / progress evidence:**
+- Server-side event: api_key.created (source=console)
+
+---
+
+### Step 2 — Configure environment (SDK + env vars)
+**Step ID:** ONB_ENV_CONFIGURED
+
+**Goal:** Ensure the key is stored safely and the SDK can authenticate reliably.
+
+**Acceptance criteria:**
+- Tenant has at least one successful authenticated request (2xx) OR explicit verification event from Console “Test connection”.
+
+**Recommended Console deep link:** /console/developer/quickstart
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/authentication#environment-variables
+- Quickstart (Python): https://docs.redwoodinference.com/quickstarts/first-call#python
+- Quickstart (TypeScript): https://docs.redwoodinference.com/quickstarts/first-call#typescript
+- Quickstart (Go): https://docs.redwoodinference.com/quickstarts/first-call#go
+
+**Notes:**
+- Step detail should recommend using a secrets manager for production deployments.
+
+**Telemetry / progress evidence:**
+- Server-side event: auth.success (first occurrence)
+- Optional client hint: sdk.initialized (no secrets; SDK name/version only)
+
+---
+
+### Step 3 — Make your first successful request (non-streaming)
+**Step ID:** ONB_FIRST_2XX_REQUEST
+
+**Goal:** Achieve TTFS and validate basic request/response.
+
+**Acceptance criteria:**
+- First 2xx response from one of: /v1/chat/completions, /v1/responses, /v1/embeddings, /v1/rerank (Hosted API).
+
+**Recommended Console deep link:** /console/usage/requests (filtered to last 15 minutes)
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/first-request
+- Example (TypeScript): https://github.com/redwood-inference/redwood-examples (folder: examples/first-request-ts)
+- Example (Python): https://github.com/redwood-inference/redwood-examples (folder: examples/first-request-py)
+
+**Telemetry / progress evidence:**
+- Server-side event: request.2xx.first
+
+---
+
+### Step 4 — Try streaming (and handle disconnects)
+**Step ID:** ONB_STREAMING_ESTABLISHED
+
+**Goal:** Validate streaming works end-to-end and the client behaves correctly on disconnect.
+
+**Acceptance criteria:**
+- At least one streaming response established (server confirms stream opened and at least one token chunk delivered).
+
+**Recommended Console deep link:** /console/developer/streaming
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/streaming
+- Troubleshooting: https://docs.redwoodinference.com/guides/streaming#disconnects
+- Example (prod-ready): https://github.com/redwood-inference/redwood-examples (folder: examples/streaming-chat-prod-ready)
+
+**Implementation guidance to surface in step detail:**
+- Recommend read timeouts appropriate for long generations
+- Recommend reconnect pattern (resume vs retry) and how to avoid duplicate side effects
+
+**Telemetry / progress evidence:**
+- Server-side event: streaming.opened.first
+- Server-side event: streaming.chunk.sent.first
+
+---
+
+### Step 5 — Set production-safe timeouts and retries
+**Step ID:** ONB_RETRIES_TIMEOUTS_CONFIGURED
+
+**Goal:** Prevent common early-production failures (hanging requests, spiky error rates, retry storms).
+
+**Acceptance criteria:**
+- Tenant has generated at least one request using an SDK client configured with recommended presets OR Console “Prod defaults acknowledged” action (for non-SDK use cases).
+
+**Recommended Console deep link:** /console/developer/production-defaults
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/production-readiness/timeouts-retries
+- Python SDK guide: https://docs.redwoodinference.com/sdk/python#retries-timeouts
+- TypeScript SDK guide: https://docs.redwoodinference.com/sdk/typescript#retries-timeouts
+- Go SDK guide: https://docs.redwoodinference.com/sdk/go#retries-timeouts
+
+**Recommended defaults (for docs + SDK presets):**
+- Connect timeout: 2–5s
+- Overall request timeout: 30–90s (non-streaming); streaming uses read timeout/keepalive guidance
+- Retry policy: exponential backoff with jitter; retry on 429/408/409/5xx where safe
+- Max attempts: 3–5 (cap total retry time)
+
+**Telemetry / progress evidence:**
+- Client hint (preferred): sdk.retry_policy.enabled (no config values, only preset name)
+- Server-side fallback: request.retry_observed (inferred; less reliable)
+
+---
+
+### Step 6 — Review usage and latency in the Console
+**Step ID:** ONB_USAGE_DASHBOARD_VIEWED
+
+**Goal:** Ensure the user knows where to see token usage, latency, and errors; reduce “usage dashboard mismatch” tickets.
+
+**Acceptance criteria:**
+- User visits usage dashboard page OR API call to /usage summary is made.
+
+**Recommended Console deep link:** /console/usage/overview
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/usage-and-billing/usage-dashboard
+- Notes on data freshness: https://docs.redwoodinference.com/guides/usage-and-billing#data-freshness
+
+**Copy requirements (Console step detail):**
+- Clearly state expected ingestion delay (e.g., “Usage may take up to ~5 minutes to fully reflect in dashboards.”)
+
+**Telemetry / progress evidence:**
+- Server-side event: console.page_view (page=usage_overview)
+
+---
+
+### Step 7 — Configure quotas and budget alerts
+**Step ID:** ONB_QUOTAS_BUDGETS_SET
+
+**Goal:** Prevent surprise spend and reduce 429 confusion by making limits explicit.
+
+**Acceptance criteria:**
+- Tenant has set at least one of:
+  - Monthly budget alert threshold, OR
+  - Per-minute request/token limit policy, OR
+  - Project-level quota override
+
+**Recommended Console deep link:** /console/settings/quotas-budgets
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/usage-and-billing/quotas-budgets
+- Terraform snippet: https://github.com/redwood-inference/redwood-terraform (path: examples/budget-alerts)
+
+**Guidance to surface in step detail:**
+- Explain how 429s work (quota vs rate limit vs concurrency)
+- Recommend adding client-side backoff and server-side circuit-breakers
+
+**Telemetry / progress evidence:**
+- Server-side event: quotas.updated
+- Server-side event: budgets.updated
+
+---
+
+### Step 8 — Pin a model version (avoid surprise changes)
+**Step ID:** ONB_MODEL_PINNED
+
+**Goal:** Stabilize production behavior by pinning a model and (where applicable) a revision.
+
+**Acceptance criteria:**
+- Tenant has set a default model for the project and pinned to a specific version/revision OR explicitly acknowledged “floating model” risk.
+
+**Recommended Console deep link:** /console/models (then “Set default”)
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/models/model-versioning
+- Quickstart section: https://docs.redwoodinference.com/quickstarts/production-readiness#model-pinning
+
+**Telemetry / progress evidence:**
+- Server-side event: model.default_set
+- Server-side event: model.version_pinned
+
+---
+
+### Step 9 — Configure fallback policy (reliability under load)
+**Step ID:** ONB_FALLBACK_POLICY_CONFIGURED
+
+**Goal:** Ensure the application stays online during capacity constraints or model-specific incidents.
+
+**Acceptance criteria:**
+- A fallback policy exists for at least one route (same family or compatible variant), OR the tenant acknowledges “no fallback” for the project.
+
+**Recommended Console deep link:** /console/routing/fallbacks
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/reliability/fallbacks
+- Quickstart section: https://docs.redwoodinference.com/quickstarts/production-readiness#fallback-policy
+
+**Telemetry / progress evidence:**
+- Server-side event: routing.fallback_policy.updated
+
+---
+
+### Step 10 — Add basic observability hooks (request IDs + tracing)
+**Step ID:** ONB_OBSERVABILITY_ENABLED
+
+**Goal:** Make debugging first production incidents fast (correlate customer logs ↔ Redwood request IDs, add traces/metrics).
+
+**Acceptance criteria:**
+- At least one of:
+  - Request ID propagation enabled in client logs, OR
+  - Tracing headers enabled and seen by gateway, OR
+  - Webhook/log export integration configured (if available)
+
+**Recommended Console deep link:** /console/observability/overview
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/observability/request-ids
+- Docs: https://docs.redwoodinference.com/guides/observability/tracing
+- Example: https://github.com/redwood-inference/redwood-examples (folder: examples/observability-headers)
+
+**Telemetry / progress evidence:**
+- Server-side event: observability.request_id_seen
+- Server-side event: observability.trace_context_seen
+
+---
+
+### Step 11 — Send first production traffic
+**Step ID:** ONB_FIRST_PRODUCTION_TRAFFIC
+
+**Goal:** Mark TTFP and ensure “go-live” is measurable.
+
+**Acceptance criteria:**
+- First request classified as production traffic according to telemetry rules (e.g., environment tag, header, allowlisted domain, or production API key).
+
+**Recommended Console deep link:** /console/usage/requests?filter=production
+
+**Docs / quickstarts:**
+- Docs: https://docs.redwoodinference.com/guides/production/go-live
+- Checklist doc (canonical): https://docs.redwoodinference.com/guides/onboarding/first-production-launch-checklist
+
+**Telemetry / progress evidence:**
+- Server-side event: request.production.first
+
+---
+
+## Step-to-language link map (minimum requirements)
+The following table is used by Docs + Console step detail drawers. If a language link is missing, the step detail must fall back to the canonical docs page.
+
+Table columns: Step ID | Docs | Python | TypeScript | Go | cURL | Example repo
+
+- ONB_API_KEY_CREATED | https://docs.redwoodinference.com/guides/api-keys | https://docs.redwoodinference.com/quickstarts/first-call#python | https://docs.redwoodinference.com/quickstarts/first-call#typescript | https://docs.redwoodinference.com/quickstarts/first-call#go | https://docs.redwoodinference.com/quickstarts/first-call#curl | https://github.com/redwood-inference/redwood-quickstarts
+- ONB_ENV_CONFIGURED | https://docs.redwoodinference.com/guides/authentication#environment-variables | https://docs.redwoodinference.com/quickstarts/first-call#python | https://docs.redwoodinference.com/quickstarts/first-call#typescript | https://docs.redwoodinference.com/quickstarts/first-call#go | https://docs.redwoodinference.com/quickstarts/first-call#curl | https://github.com/redwood-inference/redwood-quickstarts
+- ONB_FIRST_2XX_REQUEST | https://docs.redwoodinference.com/guides/first-request | https://docs.redwoodinference.com/quickstarts/first-call#python | https://docs.redwoodinference.com/quickstarts/first-call#typescript | https://docs.redwoodinference.com/quickstarts/first-call#go | https://docs.redwoodinference.com/quickstarts/first-call#curl | https://github.com/redwood-inference/redwood-examples
+- ONB_STREAMING_ESTABLISHED | https://docs.redwoodinference.com/guides/streaming | https://docs.redwoodinference.com/quickstarts/streaming#python | https://docs.redwoodinference.com/quickstarts/streaming#typescript | https://docs.redwoodinference.com/quickstarts/streaming#go | https://docs.redwoodinference.com/quickstarts/streaming#curl | https://github.com/redwood-inference/redwood-examples
+- ONB_RETRIES_TIMEOUTS_CONFIGURED | https://docs.redwoodinference.com/guides/production-readiness/timeouts-retries | https://docs.redwoodinference.com/sdk/python#retries-timeouts | https://docs.redwoodinference.com/sdk/typescript#retries-timeouts | https://docs.redwoodinference.com/sdk/go#retries-timeouts | https://docs.redwoodinference.com/guides/production-readiness/timeouts-retries#curl | https://github.com/redwood-inference/redwood-quickstarts
+- ONB_USAGE_DASHBOARD_VIEWED | https://docs.redwoodinference.com/guides/usage-and-billing/usage-dashboard | N/A | N/A | N/A | N/A | N/A
+- ONB_QUOTAS_BUDGETS_SET | https://docs.redwoodinference.com/guides/usage-and-billing/quotas-budgets | N/A | N/A | N/A | N/A | https://github.com/redwood-inference/redwood-terraform
+- ONB_MODEL_PINNED | https://docs.redwoodinference.com/guides/models/model-versioning | https://docs.redwoodinference.com/quickstarts/production-readiness#model-pinning | https://docs.redwoodinference.com/quickstarts/production-readiness#model-pinning | https://docs.redwoodinference.com/quickstarts/production-readiness#model-pinning | https://docs.redwoodinference.com/quickstarts/production-readiness#model-pinning | https://github.com/redwood-inference/redwood-quickstarts
+- ONB_FALLBACK_POLICY_CONFIGURED | https://docs.redwoodinference.com/guides/reliability/fallbacks | https://docs.redwoodinference.com/quickstarts/production-readiness#fallback-policy | https://docs.redwoodinference.com/quickstarts/production-readiness#fallback-policy | https://docs.redwoodinference.com/quickstarts/production-readiness#fallback-policy | https://docs.redwoodinference.com/quickstarts/production-readiness#fallback-policy | https://github.com/redwood-inference/redwood-quickstarts
+- ONB_OBSERVABILITY_ENABLED | https://docs.redwoodinference.com/guides/observability/request-ids | https://docs.redwoodinference.com/guides/observability/tracing#python | https://docs.redwoodinference.com/guides/observability/tracing#typescript | https://docs.redwoodinference.com/guides/observability/tracing#go | https://docs.redwoodinference.com/guides/observability/tracing#curl | https://github.com/redwood-inference/redwood-examples
+- ONB_FIRST_PRODUCTION_TRAFFIC | https://docs.redwoodinference.com/guides/production/go-live | https://docs.redwoodinference.com/guides/production/go-live#python | https://docs.redwoodinference.com/guides/production/go-live#typescript | https://docs.redwoodinference.com/guides/production/go-live#go | https://docs.redwoodinference.com/guides/production/go-live#curl | https://github.com/redwood-inference/redwood-examples
+
+---
+
+## Console UX requirements (template-driven)
+The Console implementation should treat this template as authoritative for:
+- Step ordering
+- Step titles (short) and step detail copy (long)
+- Deep links
+
+**Copy constraints (for step titles):**
+- 42 characters max (including spaces)
+- Verb-first (“Configure…”, “Add…”, “Review…”)
+
+**Step detail requirements:**
+- Must show: why it matters, how to complete, and troubleshooting for the top failure mode
+- Must include at least one docs link
+
+---
+
+## Support enablement notes (what Support should see)
+For each step, Support tooling should be able to display:
+- Step state (not started/in progress/completed/blocked)
+- Last evidence timestamp
+- Evidence type (Console action vs server-side event)
+
+Recommended macros (to be maintained in Support playbook):
+- “401/403 during quickstart” → Steps 1–3
+- “Streaming disconnect confusion” → Step 4 + Step 5
+- “429 surprise” → Step 7 + Step 5
+- “Usage dashboard mismatch” → Step 6
+
+---
+
+## Open questions (tracked outside this template)
+- Final production traffic classification signal(s) for ONB_FIRST_PRODUCTION_TRAFFIC
+- Whether ONB_RETRIES_TIMEOUTS_CONFIGURED should require SDK detection or allow an “I’ve configured this” acknowledgment
+- Whether ONB_MODEL_PINNED should be mandatory for self-serve Hosted API go-live
+
+(See PRD and ADR for current decisions and rationale.)

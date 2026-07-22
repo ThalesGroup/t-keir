@@ -1,9 +1,11 @@
-"""Tokenizer
+"""Title: Tokenizer
 
-Author : Eric Blaudez (Eric Blaudez)
+Tokenization and MWE handling for T-KEIR documents.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import gc
@@ -417,6 +419,9 @@ class SpacyTokenizer:
             default={"is-compound": False, "data": {}},
             force=True,
         )
+        # load_spacy_model() returns a process-cached Language; do not add_pipe twice.
+        if "spacy_thot_tokenizer" in self._nlp.pipe_names:
+            self._nlp.remove_pipe("spacy_thot_tokenizer")
         self._nlp.add_pipe(
             "spacy_thot_tokenizer",
             config={

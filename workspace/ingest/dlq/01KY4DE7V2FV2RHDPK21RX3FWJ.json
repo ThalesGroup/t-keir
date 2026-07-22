@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4DE7V2FV2RHDPK21RX3FWJ",
+  "reason": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+  "job": {
+    "ingest_id": "01KY4DE7V2FV2RHDPK21RX3FWJ",
+    "correlation_id": "9a9aa350c4dd75157e76b36fea413099",
+    "status": "failed",
+    "doc_id": "b7de8e123f0172ff2ed5fa070d2564f5d3a269a3b80b3c1a5673db85b8ebdba4",
+    "batch_id": null,
+    "manifest_path": "staging/b7de8e123f0172ff2ed5fa070d2564f5d3a269a3b80b3c1a5673db85b8ebdba4/ingest.manifest.json",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+    "created_at": "2026-07-22T08:00:27.490Z",
+    "updated_at": "2026-07-22T08:00:47.607Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4DE7V2FV2RHDPK21RX3FWJ",
+    "correlation_id": "9a9aa350c4dd75157e76b36fea413099",
+    "doc_id": "b7de8e123f0172ff2ed5fa070d2564f5d3a269a3b80b3c1a5673db85b8ebdba4",
+    "source": {
+      "uri": "upload://01KY4DE7V2WDXT01S3WYMN4HR2/SITREP_01309_03d0ac19.pdf",
+      "filename": "SITREP_01309_03d0ac19.pdf",
+      "content_type": "application/octet-stream",
+      "size_bytes": 932
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T08:00:27.493Z",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'tagger', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']"
+  },
+  "failed_at": "2026-07-22T08:00:47.607Z"
+}

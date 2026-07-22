@@ -1,0 +1,162 @@
+Live Regression Experiment Runner: spec-and-runbook-2026
+
+Summary:
+This document specifies the design, configuration, and operational runbook for the Live Regression Experiment Runner (LRER). LRER is an executable orchestration layer that runs short-lived, hypothesis-driven regression experiments against live or shadow traffic to validate regressions, quantify impact, and produce triage artifacts for debugging. It connects the eval harness, prompt/benchmark catalog, and model-onboarding outputs to produce deterministic, auditable experiment runs.
+
+Goals and non-goals:
+- Goals:
+  - Run reproducible, short-duration experiments (minutes to hours) against representative traffic slices to confirm suspected regressions.
+  - Produce structured artifacts suitable for automated bisect, blame, and trigger remediation playbooks.
+  - Integrate with quantization and kv-cache variants to surface compatibility failures.
+- Non-goals:
+  - LRER is not a replacement for full-scale shadow promotion; it is a fast validation tool for targeted triage.
+
+When to use LRER:
+1. Telemetry spike or quality alert where the regression index indicates an emergent delta.
+2. After a model or quantization rollout when automated sentinels report fidelity degradations for a slice.
+3. For candidate patch validation (prompt rewrite, quant profile tweak) before promoting a canary.
+
+High-level architecture:
+- Controller service (lrer-controller): accepts experiment manifests and schedules runner tasks. Owned by Applied ML platform team.
+- Worker pool (lrer-worker): executes experiments against configured targets (shadow, private bucket of synthetic probes, live-sampled traffic).
+- Artifact store: S3-style bucket with standardized result schema and provenance metadata.
+- Alerting hooks: posts to regression-queue and creates a triage incident if run confirms an actionable regression.
+- Integrations: eval-harness (probe execution), prompt registry (probe templates), quant-profiles service (variant matrix), telemetry (metrics/trace ingestion).
+
+Experiment manifest: required fields (YAML example)
+---
+experiment_id: "rgr-20260915-42"
+owner: "service-team-name"
+trigger_reason: "embedding-stability-drop:cohort:billing_api"
+start_time: "2026-09-15T16:00:00Z"
+duration: "00:30:00"
+mode: "shadow"   # shadow | live-sampled | synthetic
+traffic_source:
+  type: "sampled"
+  fraction: 0.01
+probes: ["billing-edgecase-primers:v1", "fewshot-invoice-parse:v2"]
+variants:
+  - name: "baseline"
+    model_ref: "service-a:v2026-09-01"
+  - name: "candidate-quant"
+    model_ref: "service-a:quant-v2"
+  - name: "kv-cache-off"
+    model_ref: "service-a:v2026-09-01"
+    runtime_flags: ["disable-kv-cache"]
+metrics: ["response-stability-index", "answer-coherence", "token-likelihood-delta"]
+acceptance_criteria:
+  response-stability-index.delta: -0.03   # candidate must not drop by more than 3%
+  latency.p50.delta_ms: 100
+  failure_rate.absolute: 0.005
+tags: ["suspected-regression","billing"]
+---
+
+Execution semantics:
+- Runner will clone probes listed to a local ephemeral execution context.
+- For shadow mode, requests are forked to baseline and candidate variants; only baseline responses are returned to the caller.
+- For live-sampled mode, the runner will forward a configurable fraction of traffic to candidate paths. A kill-switch is wired to the controller (instant stop on safety thresholds).
+- Synthetic mode executes stored probe sets against variants with deterministic RNG seeds.
+
+Result artifact schema (flattened JSON fields):
+- experiment_id (string)
+- timestamp (string)
+- variant (string)
+- probe_id (string)
+- request_hash (string)
+- response_tokens (integer)
+- rsi_score (float)  # response-stability-index
+- coherence_score (float)
+- latency_ms (integer)
+- traces (list)  # list of trace ids (as strings)
+- warnings (list)
+- failure_class (string)  # e.g., quant-exception, tokenize-failure, runtime OOM
+- provenance (string)  # git hash / runtime binary id
+
+Telemetry and alerting thresholds (default):
+- If any variant has response-stability-index drop > 4% vs baseline for >= 5 probes in the run => create regression incident and escalate to owner.
+- If latency.p95 increases > 300 ms => auto-stop and annotate with latency-failure.
+- If failure_rate > 1% absolute => auto-stop and mark as critical.
+
+Operational runbook: step-by-step
+1) Triage lead kicks off LRER run via UI or CLI: lrer run --manifest s3://manifests/rgr-2026.yaml
+2) Controller schedules workers in the nearest region to the service to reduce network variance.
+3) Worker executes probes and pushes partial artifacts to Artifact store every 2 minutes.
+4) Controller computes provisional metrics in-stream and checks thresholds.
+5) If thresholds crossed, controller will: a) stop experiment; b) post to #regression-queue w/ link to artifact; c) create triage ticket with prefilled hypothesis template.
+6) If run completes without crossing thresholds, controller stores final artifact and posts a run summary.
+
+Hypothesis template (filled automatically):
+- observed_delta: "response-stability-index -0.05 for cohort:billing_api"
+- candidate_variant: "candidate-quant"
+- suspect_change_list: ["quant-profile-update v2", "kernel-update 2026-09-03"]
+- top-failing-probes: ["billing-edgecase-primers:v1"]
+- suggested-next-step: ["run per-probe bisect", "run probe with kv-cache-on/off"]
+
+Bisect and experiment chaining:
+- LRER produces artifacts compatible with the automated-bisect assistant (see related pages). After a failing LRER run, the bisect assistant can spawn a binary-search across model-revision ranges and quant profiles.
+- Chained experiments: manifests can reference previous run artifacts to seed new probe selections. Example use-case: isolate whether a degradation is due to tokenization, quant, or prompt change.
+
+Quality guardrails & safety controls:
+- All live-sampled runs require owner-team approval and a maximum sampling fraction of 5% by default.
+- Any run that may return customer-identifiable data to the candidate path must run in shadow or synthetic mode; privacy review required for live-sampled.
+- Rate limiting: LRER respects service route quotas and will never exceed a safe-percentage of route capacity (default 2% of RPS).
+
+Integration notes for quantization profiles and prompts:
+- LRER consults the quant-profile registry to build the variant matrix. If a candidate quant profile is not present, the run will fail-fast.
+- Probes must reference canonical prompt-set ids from the prompt registry. Probes that exercise long-context behavior should declare context_length and warmup_steps.
+
+Operational ownership and escalation:
+- Service owner: the team that owns the upstream API (required field in manifest). Responsible for triage actions.
+- LRER platform oncall: Applied ML platform SRE rotates 24/7 and is responsible for runner health and emergency kill-switch.
+- Escalation path: Service owner -> Applied ML lead -> Platform SRE -> Eng SRE.
+
+Post-run artifacts and required follow-ups:
+- Per-run report (auto-generated): run-summary.md, artifacts.json.gz, top10-failing-probes.csv, trace-links.txt.
+- If an incident is created, an immediate "micro-postmortem" (1-page) is required within 24 hours by the service owner.
+- If LRER identifies quant-induced failures, require a quant safety checklist sign-off before re-rollout: includes cross-tenant privacy scan, numeric-stability test, and memory/regression smoke.
+
+Operational metrics to monitor for LRER service health:
+- run_success_rate (target >= 98%)
+- avg_run_latency (median time to complete a 30-minute run)
+- artifact_upload_error_rate (target < 0.5%)
+- time_to_incident_create (target < 3 minutes on threshold breach)
+
+Troubleshooting cheatsheet:
+- Worker OOM during quant tests: 1) check worker logs for CUDA OOM; 2) reduce batch_size or switch to lower-precision quant profile; 3) re-run synthetic mode.
+- High variance in latency_p95 across baseline vs candidate: 1) confirm same region execution; 2) run synthetic-mode with empty network to isolate runtime overhead; 3) capture perf traces.
+- Missing probes: ensure prompt registry permissions and that the probe version exists.
+
+Change history and governance:
+- LRER manifests and controller code are owned by Applied ML platform (team: applied-ml-platform).
+- Any change to default safety thresholds requires a cross-team review from Security and Eng SRE.
+- Annual audit of artifact retention and privacy compliance is performed by Security.
+
+Appendices:
+A) CLI examples:
+- Start a run: lrer run --manifest s3://manifests/rgr-20260915-42.yaml --dry-run=false
+- Abort: lrer abort --experiment-id rgr-20260915-42 --reason "latency spike"
+
+B) Minimal manifest for quick debug:
+---
+experiment_id: "quick-debug-0001"
+owner: "platform-team"
+mode: "synthetic"
+probes: ["edgecase-minimal:v1"]
+variants:
+  - name: "baseline"
+    model_ref: "service-a:canary"
+  - name: "candidate"
+    model_ref: "service-a:canary-quant"
+duration: "00:05:00"
+---
+
+C) Contacts:
+- Applied ML lead: Priya Nair (priya@redwoodai.com)
+- Platform SRE primary: Liam O'Connor (liam@redwoodai.com)
+- LRER owner Slack: #lrer-platform
+
+D) Related reading:
+- eval-harness: eval-mesh-and-workload-fingerprinting-2026
+- regression triage: automated-regression-bisect-and-blame-assistant-2026
+
+This spec is intended to be a living document. Create a doc update whenever thresholds, sampling policies, or integrations change.

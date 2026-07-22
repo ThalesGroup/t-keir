@@ -1,7 +1,11 @@
-"""Test converter
-Author: Eric Blaudez (Eric Blaudez)
+"""Title: Test converter
 
-Copyright (c) 2020 by THALES
+Automated tests for T-KEIR (unit / functional).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import base64

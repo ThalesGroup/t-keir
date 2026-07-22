@@ -1,0 +1,167 @@
+Upgrade rehearsal and failover circuit-breaker playbook
+
+Summary
+This playbook defines a repeatable, low-risk process for rehearsing major Private deployment upgrades and for exercising the automated failover / circuit-breaker layers that protect customer SLAs. It covers rehearsal cadence, scenario templates, instrumentation requirements, rollback triggers, and a sample circuit-breaker policy with concrete thresholds. The goal is to reduce surprise failures during live upgrades and to ensure evidence for forensic analysis is captured automatically.
+
+Scope
+- Applies to Private (VPC and on-prem) deployments across all supported architectures.
+- Focus on control-plane upgrades, runtime binary/model swaps, and KV cache/stateful migrations.
+- Excludes purely client-side SDK changes. For multi-tenant Hosted/Dedicated upgrades see the separate hosted upgrade playbooks.
+
+Goals and SLOs
+- Validate upgrade plan end-to-end in a staging environment that mirrors production network topology and telemetry hooks.
+- Ensure automated circuit-breakers engage before customer-visible SLA impact exceeds defined limits.
+- Maintain <5% error-rate delta and <25% median latency increase during a canary rehearsal for 10 minutes.
+- Preserve forensic evidence for any exercised rollback (minimum: chronological logs, artifact digests, snapshot manifest).
+
+Roles and ownership
+- Upgrade Lead (owner): coordinates rehearsals, runbook gating, and customer notifications. Typical owner: release-engineering.
+- Operator on-call: executes operator playbook actions during rehearsal and assesses abort/rollforward decisions.
+- SRE/Telemetry: ensures traces/metrics/logs are collected and stored in the evidence bucket.
+- Security/Compliance: verifies signatures and snapshot attestation where required.
+
+Prerequisites
+1) Inventory: list target clusters, tenant mappings, model variants, and control-plane endpoints.
+2) Backups & snapshots: confirm last successful snapshot <24h, and that snapshot retention policy is met.
+3) Telemetry hooks: traces, request-level telemetry, token-level cost logging, request IDs.
+4) Circuit-breaker policies deployed and tested in dry-run mode.
+5) Cross-team scheduling: at least 48h lead time and stakeholder ack.
+
+Rehearsal types
+- Canary Rehearsal: small percentage (1–5%) of synthetic or shadow traffic routed to upgraded path. Quick validation of correctness and perf.
+- Fault-injection Rehearsal: induce controlled resource faults (CPU spike, GPU OOM, network blackhole) to validate degradations and failover.
+- Full Swap Dry-run: perform model binary swap on staging with full KV migrations, no customer traffic, verify snapshot rehydrate.
+- Multi-tenant Evacuation Rehearsal: simulate tenant migration/evacuation and verify state consistency.
+
+Example rehearsal scenarios (prioritized)
+1) Model quantized-swap + prefix cache migration under synthetic 95th percentile token load.
+2) Control-plane API schema bump with canary route and automatic fallback to older schema handler.
+3) Device preemption: simulate node-level GPU preempt and validate warm-start fallback.
+4) Telemetry partition: drop logs to aggregator for 5 minutes and verify on-disk circular buffer retention and evidence export.
+
+Step-by-step rehearsal runbook
+1) Preflight (T-72h to T-2h)
+   - Publish rehearsal window and owners.
+   - Snapshot artifacts: image digests, model checksums, migration plans.
+   - Validate staging mirrors: topologies, VM types, kernel versions, and container runtime.
+   - Confirm test dataset and traffic generator with deterministic seeds.
+2) Dry-run deployment (T-2h)
+   - Deploy upgrade to staging control-plane; do not route production traffic.
+   - Run the smoke-test suite (end-to-end inference, quota checks, auth paths).
+   - Validate observability: dashboards update, synthetic traces appear, log retention policy applied.
+3) Canary (T)
+   - Shift 1%–5% of traffic or replay synthetic workload to upgraded nodes.
+   - Monitor SLOs and circuit-breaker metrics for 10–30 minutes.
+   - Owner accepts if acceptance criteria met.
+4) Fault injection (optional; parallel)
+   - Execute one fault scenario for 5–15 minutes.
+   - Confirm circuit-breaker engages and traffic is routed to fallback.
+5) Rollback/rollforward decision point
+   - Abort and rollback if any of the failure conditions are met (see Rollback triggers).
+   - When safe, rollforward with gradual ramp and increased telemetry sampling.
+6) Postmortem and evidence preservation
+   - Archive artifact manifests, logs, and traces to the evidence bucket.
+   - Run the post-rehearsal checklist and produce a 1-page summary for stakeholders.
+
+Rollback triggers (explicit thresholds)
+- Error rate: sustained increase >5 percentage points above baseline for 5 minutes.
+- Latency: 95th percentile latency > baseline * 1.8 for 5 minutes.
+- Throughput: backpressure causing queue growth > 50% of buffer for 3 consecutive intervals (60s windows).
+- Data integrity: any inconsistency detected between snapshot manifests and rehydrated state.
+- Security: failed signature verification of artifacts or missing attestations.
+
+Circuit-breaker design and example policy
+Design principles\- Prefer fast local circuit-breakers at the node/proxy level for immediate mitigation; use global circuit-breakers at the control-plane to coordinate routing decisions.
+- Circuit-breakers should act conservatively and favor preserving correctness and data integrity over latency improvements.
+- Policies must be parametric with a dry-run mode to validate without impacting traffic.
+
+Operational thresholds (suggested)
++----------------------+-------------------------------+
+| Metric               | Trigger                       |
++----------------------+-------------------------------+
+| Node error-rate      | > 12% sustained for 60s       |
+| Route error-rate     | > 8% sustained for 120s       |
+| Node GPU OOM count   | >= 2 OOMs within 10 minutes   |
+| KV-consistency fail  | any detected mismatch         |
++----------------------+-------------------------------+
+
+Example circuit-breaker policy (YAML snippet)
+---
+cb_policy_version: v1
+name: regional-fallback-cb
+scope: region
+triggers:
+  - metric: route_error_rate
+    window_seconds: 120
+    threshold_pct: 8
+    action: divert_to_fallback
+  - metric: node_gpu_oom_count
+    window_seconds: 600
+    threshold_count: 2
+    action: cordon_node_and_drain
+  - metric: kv_reconciliation_errors
+    window_seconds: 300
+    threshold_count: 1
+    action: pause_model_refresh
+failback_policy:
+  grace_period_seconds: 300
+  validation_checks:
+    - smoke_tests: true
+    - telemetry_lag_seconds: < 30
+---
+
+Circuit-breaker playbook steps (when CB fires)
+1) Immediate notification to on-call and upgrade lead.
+2) Automated action (divert to fallback model or route) executed by routing service.
+3) Operator performs quick triage: check recent errors, OOM traces, and last artifact hashes.
+4) If condition is transient, increase sampling and monitor for 15 minutes; otherwise progress to rollback/evacuation.
+
+Rollback and forensic evidence requirements
+- When rollback is executed, the system must capture and store the following artifacts in a tamper-evident evidence bucket:
+  - Artifact digests (images, model weights) and attestations.
+  - Last successful snapshots and rehydration manifests.
+  - Complete logs (control-plane, node-level, and operator commands) for T-30m before trigger and T+30m after.
+  - Traces for affected requests with request IDs.
+- Evidence retention: retain rehearsal evidence for 90 days for internal audits; extend to 1 year for regulated customers per contract.
+
+Acceptance criteria for a successful rehearsal
+- All rehearsed scenarios completed without hitting rollback triggers, or they hit triggers and circuit-breaker behaved per policy and evidence was captured.
+- Runbook acknowledgments: Upgrade Lead and Operator sign-off in the runbook journal.
+- Post-rehearsal report: includes metrics table, timeline of events, root-cause hypothesis for any anomalies, and action items.
+
+Templates and example commands
+- Snapshot command (example):
+  rinfctl snapshot create --cluster tenant-prod-eu --note "pre-upgrade-2026-06-15" --output manifest.json
+- Evidence export (example):
+  rinfctl evidence export --manifest manifest.json --bucket s3://redwood-evidence/private-rehearsals/2026-06-15
+- Dry-run CB validation:
+  rinfctl cb validate --policy regional-fallback-cb.yaml --dry-run
+
+Post-rehearsal checklist (minimum)
+1) Evidence export successful and checksum-verified.
+2) Acceptance criteria documented and stored.
+3) Action items created with owners and deadlines.
+4) Dashboards returned to baseline sampling and retention.
+5) Customer-impact review completed if any degradations occurred.
+
+Appendix A — Example artifacts to attach to postmortem
+- manifest.json (artifact digests)
+- cb-policy.yaml (the exact policy file used)
+- timeline.log (annotated sequence of operator actions)
+- perf-metrics.csv (raw telemetry for the rehearsal window)
+
+Appendix B — Quick reference: decision matrix
+- If error-rate > rollback threshold AND CB failed to divert => immediate rollback and forensic snapshot.
+- If CB diverted successfully and service remained within customer SLA => escalate incident for RCA but continue rollforward when safe.
+
+Change log
+- 2026-06-15: Initial published version (A. Kapoor).
+- 2026-08-02: Added explicit rollback thresholds and evidence retention guidance (M. Chen).
+
+Related policies and pages
+- See the Private Deploy: Forensic rollback playbook for evidence formats and signature formats.
+- See tenant-evacuation and snapshot runbooks for stateful migration commands.
+
+Contact
+- Upgrade lead: release-eng@redwood.com
+- SRE on-call rotation: oncall-sre@redwood.com

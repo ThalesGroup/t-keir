@@ -1,4 +1,4 @@
-"""T-KEIR full NLP pipeline + Vespa hybrid retrieval for BEIR evaluation.
+"""Title: T-KEIR full NLP pipeline + Vespa hybrid retrieval for BEIR evaluation.
 
 Indexes each BEIR document through :class:`PipelineRunner` (tokenizer →
 chunking → structural question projections), embeds with the production
@@ -8,6 +8,11 @@ and maps chunk hits back to BEIR document ids.
 **Retrieval only:** answer generation (``UnifiedLLMWrapper.generate`` / RAG
 prompting) is never invoked. LLM access is restricted to embeddings via
 :class:`RetrievalEmbeddingClient`.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

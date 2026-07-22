@@ -1,4 +1,12 @@
-"""Test syntactic tagger configuration."""
+"""Title: Syntactic Tagger Configuration
+
+Test syntactic tagger configuration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import json
 import os

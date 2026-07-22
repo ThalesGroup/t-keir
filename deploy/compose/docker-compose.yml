@@ -17,6 +17,12 @@ x-tkeir-build-args: &tkeir-build-args
   NODE_BASE: ${NODE_BASE:-node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3}
   MODEL_MODE: ${MODEL_MODE:-fetch}
 
+# Shared Python runtime — built once; api/ingest/mcp/agent/governor/audit
+# reference it via additional_contexts (no per-service uv sync).
+x-tkeir-from-lib: &tkeir-from-lib
+  additional_contexts:
+    tkeir-lib: "docker-image://${IMAGE_REGISTRY:-local}/tkeir-lib:${IMAGE_TAG:-dev}"
+
 services:
   vespa:
     profiles: ["core"]
@@ -42,10 +48,11 @@ services:
 
   tkeir-api:
     profiles: ["core"]
-    image: ${IMAGE_REGISTRY:-ghcr.io/thalesgroup/t-keir}/tkeir-api:${IMAGE_TAG:-dev}
+    image: ${IMAGE_REGISTRY:-local}/tkeir-api:${IMAGE_TAG:-dev}
     build:
       context: ../..
       dockerfile: deploy/images/Dockerfile.tkeir-api
+      <<: *tkeir-from-lib
       args:
         <<: *tkeir-build-args
     container_name: tkeir-api
@@ -91,7 +98,7 @@ services:
 
   tkeir-indexer:
     profiles: ["core"]
-    image: ${IMAGE_REGISTRY:-ghcr.io/thalesgroup/t-keir}/tkeir-indexer:${IMAGE_TAG:-dev}
+    image: ${IMAGE_REGISTRY:-local}/tkeir-indexer:${IMAGE_TAG:-dev}
     build:
       context: ../..
       dockerfile: deploy/images/Dockerfile.tkeir-indexer
@@ -126,7 +133,7 @@ services:
 
   tkeir-hmi:
     profiles: ["core"]
-    image: ${IMAGE_REGISTRY:-ghcr.io/thalesgroup/t-keir}/tkeir-hmi:${IMAGE_TAG:-dev}
+    image: ${IMAGE_REGISTRY:-local}/tkeir-hmi:${IMAGE_TAG:-dev}
     build:
       context: ../..
       dockerfile: deploy/images/Dockerfile.tkeir-hmi
@@ -158,10 +165,11 @@ services:
 
   tkeir-ingest:
     profiles: ["ingest"]
-    image: ${IMAGE_REGISTRY:-ghcr.io/thalesgroup/t-keir}/tkeir-ingest:${IMAGE_TAG:-dev}
+    image: ${IMAGE_REGISTRY:-local}/tkeir-ingest:${IMAGE_TAG:-dev}
     build:
       context: ../..
       dockerfile: deploy/images/Dockerfile.tkeir-ingest
+      <<: *tkeir-from-lib
       args:
         <<: *tkeir-build-args
     container_name: tkeir-ingest
@@ -173,6 +181,8 @@ services:
       INGEST_ROOT: /var/tkeir/ingest
       INGEST_AUTH_ENABLED: ${INGEST_AUTH_ENABLED:-false}
       INGEST_DEV_TOKEN: ${INGEST_DEV_TOKEN:-}
+      # Mounted host workspace (corpus_nato ontologies for OSINT derive-from)
+      TKEIR_WORKSPACE: /workspace
       VESPA_URL: http://vespa:8080
       VESPA_CONFIG_URL: http://vespa:19071
       VESPA_USER_SPACE: ${VESPA_USER_SPACE:-dev@tkeir}
@@ -188,6 +198,7 @@ services:
     volumes:
       - ingest_data:/var/tkeir/ingest
       - governor_state:/var/tkeir/governor
+      - ${TKEIR_WORKSPACE_HOST:-../../workspace}:/workspace:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -207,10 +218,11 @@ services:
 
   tkeir-governor:
     profiles: ["governor"]
-    image: ${IMAGE_REGISTRY:-ghcr.io/thalesgroup/t-keir}/tkeir-governor:${IMAGE_TAG:-dev}
+    image: ${IMAGE_REGISTRY:-local}/tkeir-governor:${IMAGE_TAG:-dev}
     build:
       context: ../..
       dockerfile: deploy/images/Dockerfile.tkeir-governor
+      <<: *tkeir-from-lib
       args:
         <<: *tkeir-build-args
     container_name: tkeir-governor
@@ -307,10 +319,11 @@ services:
 
   tkeir-audit:
     profiles: ["audit"]
-    image: ${IMAGE_REGISTRY:-ghcr.io/thalesgroup/t-keir}/tkeir-audit:${IMAGE_TAG:-dev}
+    image: ${IMAGE_REGISTRY:-local}/tkeir-audit:${IMAGE_TAG:-dev}
     build:
       context: ../..
       dockerfile: deploy/images/Dockerfile.tkeir-audit
+      <<: *tkeir-from-lib
       args:
         <<: *tkeir-build-args
     container_name: tkeir-audit
@@ -468,10 +481,11 @@ services:
 
   tkeir-mcp:
     profiles: ["mcp"]
-    image: ${IMAGE_REGISTRY:-ghcr.io/thalesgroup/t-keir}/tkeir-mcp:${IMAGE_TAG:-dev}
+    image: ${IMAGE_REGISTRY:-local}/tkeir-mcp:${IMAGE_TAG:-dev}
     build:
       context: ../..
       dockerfile: deploy/images/Dockerfile.tkeir-mcp
+      <<: *tkeir-from-lib
       args:
         <<: *tkeir-build-args
     container_name: tkeir-mcp
@@ -496,10 +510,11 @@ services:
 
   tkeir-agent:
     profiles: ["agents"]
-    image: ${IMAGE_REGISTRY:-ghcr.io/thalesgroup/t-keir}/tkeir-agent:${IMAGE_TAG:-dev}
+    image: ${IMAGE_REGISTRY:-local}/tkeir-agent:${IMAGE_TAG:-dev}
     build:
       context: ../..
       dockerfile: deploy/images/Dockerfile.tkeir-agent
+      <<: *tkeir-from-lib
       args:
         <<: *tkeir-build-args
     container_name: tkeir-agent

@@ -1,4 +1,12 @@
-"""Load workflow YAML specs from ``tkeir/configs/workflows/``."""
+"""Title: Workflows
+
+Load workflow YAML specs from ``tkeir/configs/workflows/``.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

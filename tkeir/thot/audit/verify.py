@@ -1,4 +1,12 @@
-"""Hash-chain verification for hot and WORM tiers."""
+"""Title: Verify
+
+Hash-chain verification for hot and WORM tiers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

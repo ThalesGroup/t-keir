@@ -1,8 +1,13 @@
-"""Resolve Vespa streaming user-space from Keycloak identity.
+"""Title: Resolve Vespa streaming user-space from Keycloak identity.
 
 In production, each authenticated principal gets an isolated Vespa group
 (``streaming.groupname`` / ``g=<user_space>``). When auth is off (P0 / local
 dev), the fixed principal ``dev@tkeir`` is used.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

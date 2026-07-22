@@ -1,4 +1,12 @@
-"""Tests for SVO context TF-IDF clustering."""
+"""Title: Triple Context Vectorizer
+
+Tests for SVO context TF-IDF clustering.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tasks.document_ontology.OntologyAlignment import (
     AlignmentSettings,

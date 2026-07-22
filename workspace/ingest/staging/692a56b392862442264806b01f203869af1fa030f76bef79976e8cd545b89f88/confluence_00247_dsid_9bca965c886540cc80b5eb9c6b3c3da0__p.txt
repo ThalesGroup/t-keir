@@ -1,0 +1,199 @@
+Permissions and Change Orchestration Handbook
+
+Overview
+
+This handbook consolidates company-wide policies and operational processes for permissions & access, change management, data governance, procurement and expenses, vendor management, and travel. It is intended as the canonical reference for managers, approvers, and operational teams responsible for day-to-day controls and exceptions.
+
+Key principles
+- Least privilege: default to minimum access necessary for job functions.
+- Separation of duties: no single person should have unchecked access to approve, provision, and audit the same critical control.
+- Auditability: every change, approval, and procurement must be traceable to a requestor, approver, and ticket.
+- Risk-based controls: apply stricter verification for high-impact assets and vendors.
+- Automation first: use identity providers (Okta/SCIM), IaC, and procurement tooling to reduce manual error.
+
+Scope
+This handbook covers the following topics across the company, including Hosted, Dedicated, and Private product teams, and shared services:
+- Access & permissions (cloud, internal apps, data stores, production systems)
+- Change management (infra and software, normal/standard/emergency)
+- Data management (classification, retention, encryption)
+- Procurement & expenses (hardware, cloud spend, third-party SaaS)
+- Vendor management (security reviews, contract SLAs)
+- Travel policies and expense submission templates
+
+Roles & ownership (high level)
+- Requestor: individual who needs access, change, or purchase.
+- Approver: manager or owner defined for the resource. Approvers must be explicitly listed in the Approval Matrix.
+- Provisioner: SRE/IT/Platform engineer or automated system that performs the work.
+- Control owner: designated team owning the asset or process (e.g., Eng-SRE for infra, Finance for procurement).
+- Audit owner: Security/Compliance team responsible for quarterly reviews.
+
+Access & Permissions
+1) Policy summary
+- All system access must be requested via the Access Request portal (Confluence link + Okta ticket).
+- Role-based groups are the only supported method for granting long-term access to services. Direct user grants to production systems are temporary and expire after 7 days unless extended with justification.
+- MFA is required for all accounts with access to production or billing consoles.
+
+2) Request workflow (standard request)
+1. Requestor files an access request ticket in the Access portal with resource, role, justification, and duration.
+2. Manager (line manager) approval required.
+3. Resource owner approval required for sensitive resources (see classification table below).
+4. Automation executes (SCIM group membership change or IAM role grant) and ticket is closed with audit logs.
+
+3) Approval matrix (examples)
+- Non-sensitive internal tools: Manager approval.
+- Production application logs and dashboards: Manager + Control owner.
+- Production host shell / root access: Manager + SRE approval + VP sign-off for >30-day duration.
+
+4) Periodic review
+- Teams run access review every 90 days. Security will run an automated cross-check every 30 days to identify stale memberships and flag anomalies.
+
+5) Naming and group hygiene
+- Group names: team-service-role (e.g., infra-redis-admin).
+- Avoid granting wildcard groups across environments.
+
+6) Automation examples
+- SCIM provisioning via Okta: examples/okta-scim-sync.yml (internal repo).
+- CLI sample to query memberships:
+  - aws iam get-group --group-name infra-redis-admin
+
+Change Management
+1) Change types
+- Standard/Pre-approved: low-risk changes documented and approved by process owners; require a scheduled window but not CAB for each occurrence.
+- Normal: changes that affect production but require CAB review and scheduled deployment.
+- Emergency: immediate fixes to restore service; must be followed by a post-implementation review.
+
+2) CAB (Change Advisory Board) guidelines
+- Membership: SRE lead, Product owner, Security representative, and an independent Engineering reviewer.
+- Cadence: daily triage for high-volume windows, weekly formal CAB for planned rollouts.
+- Thresholds for CAB: any change affecting >10% user traffic, PII scope changes, infra/hardware changes to production clusters.
+
+3) Change request template (required fields)
+- Change ID, owner, risk level, impact, rollback plan, deployment steps, monitoring checklist, post-change validation criteria, scheduled window, and approvers.
+
+4) Rollout and rollback checklist
+- Pre-runbook verification: smoke tests, canary plan, alerts and runbooks attached.
+- During rollout: incrementally increase traffic, monitor latency/error budget, pause/back out if key metrics breach thresholds.
+- Rollback: execute steps in runbook within approved time window and file an incident if rollback deviates.
+
+5) Emergency change postmortem
+- Must be created within 72 hours and include timeline, decision rationale, and preventive actions.
+
+Data Management
+1) Classification
+- Public: safe for external publication.
+- Internal: company-internal non-sensitive.
+- Confidential: business-sensitive (contracts, financials).
+- Restricted/PII: regulated or personal data requiring encryption at rest and in transit, strict access controls, and retention limits.
+
+2) Handling rules
+- Encrypt Restricted and Confidential data at rest (AES-256) and enforce TLS1.2+ in transit.
+- Never copy Restricted data to developer laptops without explicit exception and MDM.
+- Use anonymized or synthetic data for development and testing whenever possible.
+
+3) Retention & deletion
+- Logs (standard observability): 90 days hot, 365 days archived.
+- Financial records: 7 years.
+- Customer contracts: retention per legal requirements; default 10 years unless otherwise specified.
+
+4) Backups & DR
+- Critical production data: RTO 4 hours, RPO 6 hours.
+- Backup verification: weekly restore test of a subset and quarterly full restore for critical services.
+
+Procurement & Expenses
+1) Approval thresholds (examples)
+- <$2,500: Requestor's manager can approve.
+- $2,500–$50,000: Department head approval + Finance review.
+- >$50,000: VP approval + Legal contract review and Finance sign-off.
+- Cloud provider commitment (Reserved/Dedicated): requires Finance + Product leadership approval regardless of amount.
+
+2) Procurement process (step-by-step)
+1. Requestor fills Procurement Request form with business justification, estimated cost, budget code.
+2. Department approver reviews and approves.
+3. Finance reviews budget and payment terms.
+4. Legal reviews contracts if vendor or spend >$10,000 or data will be shared.
+5. Purchase order (PO) created and vendor on boarded in vendor registry.
+
+3) Expense submission standards
+- All travel and expense receipts must be uploaded within 30 days.
+- Per diem and mileage chart in Appendix A.
+- Cardholder reconciliation monthly; missed reconciliations escalate to manager and People Ops.
+
+Vendor Management
+1) Onboarding checklist
+- Vendor questionnaire completed (security and privacy).
+- Reference and financial checks for new strategic vendors.
+- Contract terms: data residency, breach notification, indemnity clauses, and SLA definitions.
+- Security controls: SOC2 or equivalent for vendors handling Restricted/PII.
+
+2) SLA & performance monitoring
+- Define measurable SLAs: uptime %, mean time to respond (MTTR), escalation contacts.
+- Quarterly business reviews for strategic vendors (> $100k ARR).
+
+3) Offboarding
+- Revoke all access using the vendor access registry.
+- Confirm data deletion or return per contract terms.
+- Archive contract and close PO.
+
+Travel Policy (summary)
+- Booking: employees should use company travel tool and select economy or business class only per policy thresholds.
+- Approval: manager approval required for all trips. International travel requires Security review for devices and People Ops travel checklist.
+- Expenses: clear allowable items (meals, lodging, transport) and disallowed items (alcohol beyond defined per-diem unless business-hosted).
+- Safety & incident reporting: any travel security incident must be reported to People Ops and Security within 24 hours.
+
+Templates & Examples (quick references)
+1) Access request (example fields):
+- Subject: Production DB Read Access
+- Requestor: name, email, team
+- Resource: rds-prod.cluster-east-1
+- Role: read-only
+- Justification: on-call incident investigation
+- Duration: 7 days
+
+2) Change request checklist (abridged):
+- ID, owner, rollback steps, verification script, monitoring alerts and thresholds, post-check schedule.
+
+3) Procurement form fields (abridged):
+- Vendor name, contact, product, budget code, expected start date, annual cost, data handling notes.
+
+Enforcement, Exceptions & Escalations
+- Non-compliance: repeated failure to follow processes may result in access removal, expense reimbursement denial, or HR escalation.
+- Exception requests: must be submitted to Security or Finance (depending on control) with explicit compensating controls and an expiration. Exceptions are valid for a maximum of 90 days unless renewed with stronger justification.
+
+Audit & Continuous Improvement
+- Quarterly internal audits by Security/Compliance focusing on access reviews, vendor security questionnaires, and procurement approvals.
+- Annual table-top exercises to validate change management in high-impact scenarios.
+- Roadmap for automation: target to reduce manual approvals by 40% through policy-as-code and tighter SCIM/Okta integration by Q4 2026.
+
+Appendix A — Threshold Tables
+- Access reviews: team review every 90 days; cross-team automation every 30 days.
+- Procurement thresholds: see section above (summary).
+- Data retention summary: logs 90/365, financial 7y, contracts 10y.
+
+Appendix B — Sample Access Request Template (plain text)
+-----BEGIN ACCESS REQUEST-----
+Requestor: {{full_name}}
+Team: {{team}}
+Resource: {{resource_identifier}}
+Role: {{role}}
+Justification: {{business_reason}}
+Duration: {{days}}
+Manager Approval: {{manager_email}}
+Resource Owner Approval: {{owner_email}}
+-----END ACCESS REQUEST-----
+
+Appendix C — Contacts and Escalation
+- Security on-call: security-oncall@redwood.ai and PagerDuty (see internal roster).
+- Procurement & Finance: procurement@redwood.ai.
+- People Ops: people-ops@redwood.ai.
+
+Document maintenance
+- Control owners must review this handbook annually and propose updates via the Policy Change Request process.
+- All changes to this document follow the Change Management procedures above (normal change).
+
+Related documents
+- Central Policy Index (link above)
+- SRE runbooks for provisioning and rollback
+- Vendor registry and onboarding portal
+
+Sign-off
+This handbook was approved by Finance & Legal and Security on 2026-01-05.

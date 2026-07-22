@@ -1,0 +1,333 @@
+Runbook: Optimize Quality Gate Failures (triage, mitigation, rollback, escalation)
+
+## Purpose
+This runbook covers operational response when **Optimize quality gates** fail, flap, or time out. It is intended for SRE oncall and incident commanders during beta/limited production rollout.
+
+Quality gates are mandatory evaluation checks required before applying Optimize recommendations (batching, prefix/KV caching, quantization profile changes) to production traffic.
+
+This runbook focuses on:
+- Triage steps (what failed, where, why)
+- Distinguishing **real quality regressions** vs **eval flakiness / infrastructure issues**
+- Safe mitigations (pause/rollback/disable) and when to use overrides
+- Escalation paths and required artifacts
+
+## When to use this runbook
+Use this runbook when any of the following occurs:
+- A production or staging rollout is **blocked** due to `quality_gate_failed`.
+- Gate run pass rate drops sharply (potential system issue or a regression).
+- Gate runs exceed expected runtime (timeouts / capacity constraints).
+- Customers report “change blocked by quality gate” and claim it is a false positive.
+- Oncall receives alerts for spikes in gate failures or flakiness.
+
+## Definitions
+- **Gate run**: A single evaluation execution comparing baseline vs proposed config (smoke tier and/or full tier).
+- **Baseline**: The currently active production config for the route/model (or quantization baseline selected per model family + GPU SKU).
+- **Proposed config**: The Optimize-recommended config diff pending apply/canary.
+- **Smoke gates**: Fast subset evaluation intended to complete quickly and catch obvious regressions.
+- **Full gates**: Broader prompt set coverage for higher confidence.
+- **Flake score**: Eval-harness signal indicating run-to-run variance or instability.
+
+## Severity guidance
+Use the following severity guidance for operational handling:
+- **SEV-2**: Gate system failure blocks multiple rollouts, or widespread timeouts across a region; customer impact likely (blocked deploys, delayed cost savings) but production inference quality is stable.
+- **SEV-1**: Gate failure correlates with live production quality incident (customer-visible output degradation) OR a bypass/bug allows Optimize changes to ship without gating.
+
+## Ownership / escalation (who to page)
+Primary:
+- **SRE Oncall**: Coordinates incident and mitigations.
+
+Escalate based on failure class:
+- **Applied ML / Evals** (gate metric validity, prompt set issues): Jonas Weber, Karthik Iyer, Selene Huang
+- **Eval-harness / integration** (timeouts, retries, artifact generation): Olivia Grant
+- **Runtime safety** (config diff correctness, unsafe combos): Noah Patel, Sofia Ivanova, Omar El-Sayed, Grace Kim
+- **Rollout controller** (promotion blocked, rollback hooks): Hannah Rivera, Jada Williams
+- **Release engineering / CI capacity** (GPU scarcity, job scheduling): Connor O'Brien, Sahana Iyer
+- **Product** (customer comms, override approvals): Aditya Rao, Paula Mendes
+
+If uncertain: page **Sean Gallagher** (SRE lead) or **Allison Grant** (observability/alerts).
+
+## Quick start (first 10 minutes)
+1) Identify scope:
+- Is this a **single route/account** or **system-wide** (multiple routes/models/regions)?
+
+2) Pull the gate run details:
+- Gate run ID
+- Route / model / region
+- Config diff type(s): batching, cache, quant profile
+- Tier(s) executed: smoke, full
+- Failure reason code(s)
+- Flake score + number of retries
+- Artifact links (per-suite results)
+
+3) Decide initial posture:
+- **If system-wide failures/timeouts:** treat as infra/system issue; prioritize restoring gate pipeline (avoid mass overrides).
+- **If localized failures:** treat as likely true regression or prompt set sensitivity; proceed with regression triage.
+
+## Where to look (dashboards, logs, traces)
+### Dashboards
+Use the “Quality Gates” dashboard:
+- Funnel: proposed → gates started → passed → applied
+- Failures by reason, config type, model family
+- Gate execution latency (p50/p95) and timeout rate
+- Flake rate / quarantine rate
+
+### Key metrics (common names; confirm in dashboard)
+- `redwood.optimize.gates.run_count` (tags: route, model, region, tier)
+- `redwood.optimize.gates.pass_rate`
+- `redwood.optimize.gates.fail_rate` (tags: reason)
+- `redwood.optimize.gates.flake_rate` (tags: prompt_set_id, suite)
+- `redwood.eval_harness.job_latency_ms` (tags: suite, region)
+- `redwood.eval_harness.job_timeout_rate`
+- `redwood.optimize.gates.block_apply_count`
+- `redwood.rollouts.promotion_blocked_count` (reason = quality_gate)
+
+### Logs
+- Optimize service logs for gate orchestration: filter on `gate_run_id` and `state_transition`.
+- Eval-harness logs for the corresponding job IDs.
+
+### Traces
+- Look for the distributed trace spanning Optimize → eval-harness trigger → result aggregation.
+- Common choke points: artifact upload, result parse, retry storms.
+
+## Triage decision tree
+### Step A: Classify the failure
+1) **Quality regression (likely real)**
+Typical signals:
+- Stable infra metrics; low timeout rate.
+- Failure reasons like `metric_regression_exceeds_threshold`, `rubric_score_drop`, `task_success_drop`.
+- Consistent failure across reruns; low flake score.
+
+2) **Eval flakiness / prompt set instability**
+Typical signals:
+- High flake score; pass/fail flips across reruns.
+- One or two suites dominate failures; others are stable.
+- Known “hard case” prompts in the failure list; large variance.
+
+3) **Infrastructure / capacity / regional issues**
+Typical signals:
+- Elevated eval-harness latency/timeout in a region (e.g., eu-west).
+- Many runs failing with `timeout`, `artifact_upload_failed`, `insufficient_capacity`, `job_evicted`.
+- Correlated with GPU scarcity, queue backlog, or object store errors.
+
+4) **Config diff validation / safety checks**
+Typical signals:
+- Failures before eval starts: `invalid_config_diff`, `unsupported_combo`, `baseline_not_found`, `quant_baseline_mismatch`.
+- Consistent immediate failure after proposal creation.
+
+### Step B: Take the appropriate action
+Proceed to the matching section below.
+
+---
+
+## Case 1: Suspected real quality regression
+### Goal
+Prevent degraded outputs from reaching production traffic. Keep rollouts safe and ensure clear evidence for owners.
+
+### Immediate actions
+1) **Block promotion / freeze apply** (if not already blocked)
+- Confirm rollout controller has halted promotion for the affected canary.
+- Ensure Optimize “one-click apply” remains blocked for this proposal.
+
+2) **Do not override by default**
+Overrides are for exceptional cases and require evidence + approval (see override policy).
+
+3) Collect required artifacts
+- Gate run summary (baseline vs proposed)
+- Per-suite metric deltas and failing prompts list
+- Model/version, hardware SKU, quant profile IDs
+- Route traffic characteristics (context length distribution if available)
+
+### Investigation steps
+1) Validate baseline correctness
+- Confirm baseline is the currently active production config for the same route/model.
+- For quant changes: ensure baseline selection is correct for model family + GPU SKU.
+
+2) Check whether regression is tied to a specific config type
+- Batching changes: look for long-context or high-concurrency sensitivity.
+- Cache changes: look for prefix/KV cache correctness or eviction policy impacts.
+- Quant changes: look for long-context degradation, specific token ranges, or decoding instability.
+
+3) Re-run full gates once (optional)
+- Only if the run did not show flakiness and infra is healthy.
+- Do not loop reruns; avoid burning GPU time.
+
+### Mitigation / rollback
+- **Preferred**: Keep proposal blocked; ship no config change.
+- If a change was partially applied (should be rare):
+  1) Trigger rollback to baseline via rollout controller.
+  2) Verify traffic is fully back on baseline config.
+  3) Add a temporary “deny apply” policy for that config diff signature if the same recommendation keeps reappearing.
+
+### Escalation
+- Page Applied ML (metrics/threshold interpretation) and Runtime owner for the specific knob.
+- File a regression ticket with:
+  - gate_run_id
+  - route/model/region
+  - config diff
+  - failing suites + prompts
+  - artifacts links
+
+---
+
+## Case 2: Eval flakiness (false positives / unstable suites)
+### Goal
+Avoid blocking safe optimizations due to unreliable evals while maintaining safety.
+
+### Identification checklist
+- Flake score above policy threshold.
+- Pass/fail flips across reruns.
+- Failures cluster in a single prompt set or suite.
+- High variance in rubric scoring or task success under identical config.
+
+### Actions
+1) Confirm rerun policy was applied
+- Eval-harness should perform limited automatic reruns and aggregate results.
+
+2) Perform a controlled rerun (one time)
+- Rerun the same tier (smoke/full) once.
+- If the result flips, treat as flaky and proceed to quarantine.
+
+3) Quarantine the flaky prompt set/suite (admin action)
+- Quarantine at the suite/prompt-set granularity with a reason code and expiration/owner.
+- Ensure quarantine is visible in the gate results UI and audit logs.
+
+4) Apply temporary policy adjustment (only if needed)
+- Prefer quarantine over relaxing thresholds globally.
+- If many routes are blocked, consider switching certain config types temporarily to smoke-only *with explicit approval from Product + Applied ML*.
+
+### Escalation
+- Page Applied ML (Jonas Weber / Selene Huang) to:
+  - confirm suite health
+  - adjust suite sampling or golden outputs
+  - recalibrate variance assumptions
+
+### Customer support note
+If a customer reports a false positive:
+- Provide the gate run summary and explain quarantine/rerun process.
+- Do not recommend override as the default workaround unless approved.
+
+---
+
+## Case 3: Infra/capacity/timeouts (gate pipeline unhealthy)
+### Goal
+Restore gate pipeline reliability quickly. Avoid widespread overrides that defeat safety.
+
+### Identification checklist
+- Spike in `job_timeout_rate` or p95 eval latency.
+- Fail reason codes: `timeout`, `queue_backlog`, `insufficient_capacity`, `artifact_upload_failed`.
+- Concentrated in a region (commonly seen: eu-west).
+
+### Actions
+1) Confirm scope
+- Is it one region, one suite, or global?
+
+2) Mitigate load
+- Temporarily reduce concurrency for eval-harness jobs in the impacted region.
+- Prefer shifting eval execution region if supported (per integration contract) while keeping baseline/proposed identical.
+
+3) Fix the underlying bottleneck
+Common fixes:
+- Increase eval GPU pool capacity / adjust scheduling priority.
+- Resolve object storage / artifact upload errors.
+- Reduce retry storms (cap retries; add jitter/backoff).
+
+4) Communicate expected delays
+- Notify Product/Program (Aditya Rao, Talia Benson) if gates will block rollouts beyond the SLA.
+
+### Escalation
+- Page eval-harness owner (Olivia Grant) and Release Eng (Connor O'Brien / Sahana Iyer).
+- If regional: involve Infra/SRE for that region.
+
+### Temporary policy option (last resort)
+If the gate system is broadly down and customers are blocked:
+- Temporarily pause Optimize auto-apply globally.
+- Allow manual config changes **only** via change management workflow and with audit logging.
+- Document duration and follow-up actions. Do not disable enforcement without VP Eng approval.
+
+---
+
+## Case 4: Pre-eval validation failures (config diff / baseline issues)
+### Goal
+Stop invalid proposals early and prevent repeated noisy failures.
+
+### Common causes
+- Unsupported knob combinations for a model family/hardware SKU.
+- Missing or mismatched baselines (especially quantization baseline selection).
+- Schema drift between Optimize and eval-harness contract.
+
+### Actions
+1) Verify rejection reason
+- Look for `invalid_config_diff` or `baseline_not_found` in Optimize logs.
+
+2) Confirm schema/version compatibility
+- Check whether Optimize and eval-harness contract versions are aligned.
+
+3) Block repeated proposals
+- If a specific recommendation keeps being generated, add/adjust static validation rules to prevent proposing it.
+
+### Escalation
+- Runtime safety architect (Noah Patel) for unsafe combos.
+- Control-plane integration lead (Ethan Park) if baseline resolution is broken.
+
+---
+
+## Rollback / disable procedures
+### A) Rollback an applied optimization (if it made it to canary or beyond)
+1) In rollout controller, select the impacted rollout and trigger **Rollback to baseline config**.
+2) Confirm:
+- Promotion is halted.
+- Traffic percentage returns to baseline.
+- Error budget / inference quality signals stabilize.
+3) Create a follow-up ticket to prevent re-recommendation (validation rule or recommendation suppression).
+
+### B) Disable auto-apply (recommended safety lever)
+Use when gate system is unstable or a specific recommendation class is suspected unsafe.
+- Disable auto-apply at the route or account tier.
+- Keep one-click apply enabled only if gates are healthy and passing.
+
+### C) Disable Optimize recommendations for a route (surgical)
+Use when a customer is repeatedly blocked and work is ongoing.
+- Disable recommendation generation for the route (temporary).
+- Record reason and expiration.
+
+### D) Override (exception-only)
+Overrides must follow the exception policy:
+- Time-bound expiration
+- Named approver
+- Required evidence (gate artifacts and rationale)
+- Audit log entry and follow-up task
+
+SRE guidance:
+- SRE oncall may facilitate the process but should not act as the default approver.
+
+## Evidence checklist (attach to incident / escalation ticket)
+- gate_run_id(s) and timestamps
+- route, model, region, account tier
+- config diff (sanitized)
+- baseline identifier and quant baseline selection details (if relevant)
+- failure reason codes
+- flake score, rerun counts
+- artifact links (suite outputs, prompt IDs)
+- screenshots or links to dashboard panels showing failure spike
+
+## Post-incident / follow-up checklist
+- Was enforcement correctly defense-in-depth (Optimize apply + rollout promotion)?
+- Did alerts trigger appropriately (no noise, no missed detection)?
+- Were timeouts within expected bounds? If not, file capacity/scheduling follow-ups.
+- Were flaky suites quarantined with clear reason codes and owners?
+- Were any overrides granted? Confirm expiration and follow-up tasks are tracked.
+- Update this runbook with new failure modes or improved queries.
+
+## Appendix: Common failure reasons and interpretation
+- `metric_regression_exceeds_threshold`: Likely real regression; validate which metric/suite.
+- `rubric_score_drop`: Check variance; may be flaky if close to threshold.
+- `task_success_drop`: Usually higher-confidence; treat as regression until disproven.
+- `timeout`: Infra/capacity; correlate with regional latency.
+- `artifact_upload_failed`: Infra; often object store or permissions.
+- `invalid_config_diff`: Schema/validation; fix recommendation generator or validation rules.
+- `baseline_not_found`: Baseline resolution issue; block proposals until fixed.
+
+## Appendix: Known patterns (as of limited production rollout)
+- Quant profile regressions can appear only on **long-context prompts**; ensure suites include long-context coverage for the affected model family.
+- EU-West timeouts typically correlate with eval GPU pool saturation; reduce concurrency and coordinate capacity.
+- Flakiness clusters are often suite-specific; quarantine is preferred over relaxing thresholds globally.

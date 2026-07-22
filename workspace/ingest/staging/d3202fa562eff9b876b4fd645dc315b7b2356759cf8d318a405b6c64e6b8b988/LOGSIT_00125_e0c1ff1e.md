@@ -1,0 +1,10 @@
+# LOGSIT 00125 — Training Area 7
+
+LOGISTICS SITUATION REPORT
+Area: Training Area 7
+Fuel status: 70 percent
+Medical supplies: adequate
+Transport availability: mission capable
+Request: confirm resupply route security.
+
+Note linguistique: diffusion de travail en français; situation opérationnelle stable.

@@ -1,8 +1,11 @@
-"""Annotation configuration
-Author : Eric Blaudez (Eric Blaudez)
+"""Title: Annotation configuration
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Annotation resource builders and gazetteers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.core.CommonConfiguration import CommonConfiguration

@@ -1,0 +1,143 @@
+Capacity Supply-Chain Runbook: Forecasting, Signals, and Emergency Scaling
+
+Summary:
+This runbook defines the capacity ‘supply chain’ at Redwood Inference: how we forecast demand, convert signals into capacity actions, coordinate automation and human escalation, and tie post-incident reviews to reliability initiatives. It is intended for SREs, platform engineers, and oncall responders who own service availability and cost-accuracy tradeoffs.
+
+Purpose and scope:
+- Purpose: reduce surprise outages due to capacity shortfalls, shorten mean time to scale (MTTS), and make error budget consumption actionable.
+- Scope: applies to Redwood-hosted inference endpoints, Dedicated pools, and private deployment orchestration components (control plane only). Does NOT prescribe customer infra for on-prem model hosts.
+
+Key definitions (for readers unfamiliar with the term):
+- SLO: the target objective that defines acceptable service quality (e.g., P99 latency < 1200ms for /v1/generate).
+- Error budget: remaining fraction of allowed SLO violations in a rolling window.
+- Capacity supply: available serving units (vGPU slots, model shards, CPU workers) that can be provisioned or reallocated.
+- Demand signal: telemetry inputs representing load (RPS, token/sec, batch size distribution, queued requests, burst ratio).
+- Supply signal: telemetry on available capacity and headroom (idle GPU %, free KV-cache memory, queue depth thresholds).
+
+Ownership and roles:
+- Service SRE (owner): maintains SLOs, defines alert thresholds, owns the emergency scaling runbook.
+- Platform Capacity Team: owns autoscaler configuration, quota pools, and reserved Dedicated allocations.
+- Oncall responder: follows this runbook during incidents; executes scaling, fallback, and rollback steps.
+- Product/Feature owner: signs off on any change that lowers SLO target or increases tolerated error budget.
+
+Signals & metrics (primary observability surface):
+| Metric | Source | Frequency | Owner | Alert purpose | Thresholds |
+| --- | --- | --- | --- | --- | --- |
+| RPS /v1/generate | Prometheus (ingest) | 15s | Service SRE | Detect traffic burst | > 1.5x baseline for 10m |
+| Token/sec | Platform metrics | 60s | Platform Capacity | Token pressure / billing signal | > 200k tokens/sec system-wide |
+| P99 latency | Tracing/metrics | 60s | Service SRE | SLO violation detection | > SLO for 5m |
+| Queue depth | Serving runtime | 15s | Platform Capacity | Backpressure / queuing | queue > 50 for 2m |
+| GPU idle % | Node exporter | 30s | Platform Capacity | Headroom | < 15% for 10m |
+| Error budget burn rate | Alerting engine | 1m | SRE Lead | Escalation control | burn_rate > 2x for 30m |
+
+(Represented above as a reference table — dashboards must expose these columns)
+
+Forecasting and planning process (weekly and monthly cadence):
+1. Weekly demand sanity check (owner: Service SRE)
+   - Pull 7-day trending dashboard (RPS, tokens/sec, batch size histograms) and 24-hr anomaly list.
+   - If forecasted peak (7-day forward) exceeds reserved capacity by > 10%, open a Capacity Adjustment RFC (see section below).
+2. Monthly forecasting sync (owner: Platform Capacity)
+   - Run model-based forecast (ARIMA/Prophet baseline used by capacity pipeline) and compare against product release calendar.
+   - Validate forecast against cost budgets; produce recommended reserve increases or autoscaler parameter changes.
+3. Pre-release capacity gating
+   - For any release that increases expected qps by > 20%, require capacity sign-off from Platform Capacity and SRE lead.
+
+Capacity Adjustment RFC checklist (minimum fields):
+- Impacted services (list), expected delta (RPS and tokens/sec), target lead time, proposed action (increase reserved pool / adjust autoscaler), rollback criteria, cost delta estimate, approvers.
+- Use template: /templates/capacity-rfc in Confluence.
+
+Emergency scaling runbook (operational steps to perform under active capacity degradation):
+1. Triage (first 5 minutes)
+   - Confirm SLO alerts: check P99, error budget burn, and queue depth.
+   - Identify whether degradation is demand-driven (spike) or supply-driven (node failure/eviction).
+2. Immediate mitigations (5–15 minutes)
+   - If demand spike: temporarily flip heavy-slow model routes to lightweight variants using traffic routing API: 1) enable lightweight model alias, 2) apply canary rate 50% for 5m, 3) incrementally shift.
+   - If supply loss: attempt automated node reclaim via orchestration (k8s scale-up job / provision from reserved pool).
+   - Throttle non-essential internal jobs (batch evals, long running diagnostics) using job-priority gate.
+3. Capacity-increase actions (15–60 minutes)
+   - Execute fast-path autoscale: call platform CLI: redwoodctl capacity apply --pool <pool> --delta <n-gpus> --reason "emergency-scale-<incident-id>".
+   - If fast-path fails, escalate to Platform Capacity pager to manually allocate reserve or approve cloud burst.
+4. Stabilization and observation (60+ minutes)
+   - Monitor error budget burn and latency. If stabilization not achieved in 90 minutes, initiate customer-facing mitigation steps (limit per-customer throughput, activate fallback region).
+5. Rollback criteria
+   - When P99 latency is consistently below SLO and queue depth < 10 for 30 minutes, begin rolling back emergency changes in reverse order.
+
+Incident review and runbook compliance standards:
+- Evidence collection (required for all incidents > Sev3):
+  - Timeline with 1-minute granularity for first 30 minutes, 5-minute granularity thereafter until recovery.
+  - Relevant graph exports (RPS, tokens/sec, P99, queue depth, GPU idle) and raw alert logs.
+  - Commands executed and exact CLI args (redwoodctl history + shell logs).
+- Post-incident classification: capacity_root_cause = {demand_spike, supply_eviction, misconfig_autoscaler, downstream-degradation, other}.
+- Remediation obligation: a patch or configuration change must be scheduled within 7 calendar days for anything classified as misconfig_autoscaler or supply_eviction.
+- Reliability initiative linkage: convert action items into a labeled JIRA epic with priority according to impact and likelihood using the RCA templating wizard.
+
+Operational tooling integrations (recommended and supported):
+- Metrics: Prometheus + Thanos (long term), with per-service recording rules for token/sec and batch histograms.
+- Traces: Jaeger distributed traces with service maps for model shards.
+- Alerts & orchestration: Alertmanager -> PagerDuty for paging; Alertmanager webhooks trigger redwood-ops-runbooks lambda.
+- Capacity commands: redwoodctl (CLI) and capacity service API (documented in /eng-platform/how-tos).
+- Dataplane telemetry: Kafka topics (telemetry.tokens and telemetry.queues) consumed by the forecasting pipeline.
+- Incident management: Jira for tracking, Confluence for evidence, Slack #incidents for comms.
+
+Automation recipes (examples):
+- Autoscaler tuning snippet (YAML):
+  autoscaler:
+    name: inference-primary-autoscaler
+    target_metric: tokens_per_gpu
+    scale_window: 120s
+    scale_up_rate: 1.5
+    scale_down_delay: 900s
+    max_roaming_capacity: 25%
+
+- Alert rule example (Prometheus):
+  - alert: HighCapacityBurn
+    expr: increase(error_budget_burn_total[30m]) > 2
+    for: 10m
+    labels:
+      severity: page
+    annotations:
+      summary: "High error budget burn for {{ $labels.service }}"
+
+Rollout & validation checklist (pre-change):
+- Validate the RFC and confirm the exact time window for change.
+- Run a canary with synthetic traffic that matches the 95th-percentile token distribution.
+- Measure canary P99, queue depth, and GPU idle for 15 minutes before global rollout.
+- Notify the incident rotation (pager) and product owners 30 minutes before expansion.
+
+Post-incident follow-up (7–30 day lifecycle):
+- 24–72 hours: tactical follow-ups (config patches, autoscaler parameter updates).
+- 7 days: schedule and begin a remediation epic (sprint-planned). Owner must attach progress to the RCA.
+- 30 days: reliability initiative review meeting to decide whether to: 1) fund an engineering project (medium term), 2) codify a runbook change, or 3) accept residual risk.
+
+Common pitfalls and anti-patterns to avoid:
+- Relying on raw RPS instead of token/sec for inference services (different models have different tokens per request).
+- Treating GPU idle % as sole headroom signal — pair with queue depth and token-per-second metrics.
+- Over-automating without sufficient rollback controls and safety checks (can worsen incidents).
+
+Appendix A — example thresholds (copy to service template and adjust per-service):
+- SLO: P99 latency < 1200ms, availability 99.9% (30-day window)
+- Alert: Queue depth > 50 for 2m -> paging
+- Alert: Error budget burn rate > 2x for 30m -> paging + capacity review
+- Autoscaler: scale_up_rate <= 2.0, max_roaming_capacity <= 30%
+
+Appendix B — quick CLI snippets:
+- Check current pool utilization: redwoodctl capacity list --pool inference-primary
+- Trigger fast-path allocation: redwoodctl capacity apply --pool inference-primary --delta 4 --reason "emergency-scale-<incident-id>"
+- Revert canary routing: redwoodctl routing set --route /v1/generate --model main-model:stable
+
+Related pages and templates:
+- /templates/capacity-rfc
+- /eng-sre/runbooks/oncall-evidence-collection-and-retro-playbook-2026 (reference)
+- /eng-platform/how-tos/redwoodctl-capacity-api
+
+Contact and escalation matrix:
+- Platform Capacity pager: #platform-capacity PagerDuty (team: Platform Capacity)
+- SRE Lead: priya.shah@redwood.ai (primary)
+- Exec escalation: eng-ops@redwood.ai (after 4 hours unresolved)
+
+Change log:
+- 2024-09-12 (Priya Shah) — initial draft
+- 2025-01-20 (Maya Chen) — added autoscaler tuning snippet and RFC checklist
+- 2026-02-10 (Priya Shah) — expanded incident evidence requirements and updated CLI commands
+
+End of document.

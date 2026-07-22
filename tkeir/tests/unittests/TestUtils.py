@@ -1,4 +1,12 @@
-"""Tests for thot.core.Utils helpers."""
+"""Title: Utils
+
+Tests for thot.core.Utils helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 import time

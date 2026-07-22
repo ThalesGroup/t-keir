@@ -1,4 +1,12 @@
-"""Rerank Vespa / retrieval hits via :class:`UnifiedLLMWrapper.rerank`."""
+"""Title: Rerank
+
+Rerank Vespa / retrieval hits via :class:`UnifiedLLMWrapper.rerank`.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

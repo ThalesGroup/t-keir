@@ -1,4 +1,12 @@
-"""RAG report assembly: structured answers, markdown export, highlight labels."""
+"""Title: Rag report
+
+RAG report assembly: structured answers, markdown export, highlight labels.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -1031,50 +1039,6 @@ def format_input_prompt(system_prompt: str, user_prompt: str) -> str:
     return "\n\n".join(parts)
 
 
-def _input_prompt_section_markdown(input_prompt: str) -> str:
-    """Render the LLM input prompt as a markdown section.
-
-    Example:
-        >>> from thot.tools.search.rag_report import _input_prompt_section_markdown
-        >>> "## LLM Input Prompt" in _input_prompt_section_markdown("[USER]\\nhello")
-        True
-    """
-    if not input_prompt.strip():
-        return ""
-    return "\n".join(
-        [
-            "## LLM Input Prompt",
-            "",
-            "```text",
-            input_prompt.strip(),
-            "```",
-            "",
-        ]
-    )
-
-
-def _vespa_query_section_markdown(vespa_query: str) -> str:
-    """Render the Vespa search payload as a markdown JSON section.
-
-    Example:
-        >>> from thot.tools.search.rag_report import _vespa_query_section_markdown
-        >>> "## Vespa Search Query" in _vespa_query_section_markdown('{"yql": "select * from chunk where true"}')
-        True
-    """
-    if not vespa_query.strip():
-        return ""
-    return "\n".join(
-        [
-            "## Vespa Search Query",
-            "",
-            "```json",
-            vespa_query.strip(),
-            "```",
-            "",
-        ]
-    )
-
-
 def assemble_report_markdown(
     *,
     query: str,
@@ -1099,7 +1063,6 @@ def assemble_report_markdown(
         ...     chunks=[RetrievedChunk(chunk_id="c1", text_raw="Alice works at Acme.", parent_doc_id="doc")],
         ...     ontology={"entities": [], "keywords": []},
         ...     vespa_hits=1,
-        ...     vespa_query='{"yql": "select * from chunk where true"}',
         ... )
         >>> "# T-KEIR RAG Report" in report
         True
@@ -1128,12 +1091,9 @@ def assemble_report_markdown(
         short_answer.strip(),
         "",
     ]
-    prompt_section = _input_prompt_section_markdown(input_prompt)
-    if prompt_section:
-        sections.extend([prompt_section.rstrip(), ""])
-    vespa_section = _vespa_query_section_markdown(vespa_query)
-    if vespa_section:
-        sections.extend([vespa_section.rstrip(), ""])
+    # ``input_prompt`` and ``vespa_query`` stay on the API for the HMI
+    # technical panel — keep them out of the downloadable report.
+    _ = (input_prompt, vespa_query)
     sections.extend(
         [
             detailed,

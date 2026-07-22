@@ -1,4 +1,12 @@
-"""Unified embedding and LLM wrapper for OpenAI, Ollama, and vLLM."""
+"""Title: Llm Wrapper
+
+Unified embedding and LLM wrapper for OpenAI, Ollama, and vLLM.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,12 @@
-"""Governor action tokens — constrained JWT-like tokens with revocation."""
+"""Title: Tokens
+
+Governor action tokens — constrained JWT-like tokens with revocation.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

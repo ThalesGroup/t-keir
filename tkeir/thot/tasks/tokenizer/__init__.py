@@ -1,9 +1,11 @@
-"""Package initialization
+"""Title: Package initialization
 
-Author : Eric Blaudez (Eric Blaudez)
+Tokenization and MWE handling for T-KEIR documents.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import os

@@ -1,0 +1,140 @@
+Blackbox SLO Emulation and Testbed Specification
+
+Summary:
+
+This page defines the Blackbox SLO Emulation Testbed used to validate SLOs, verify degradation policies, and exercise fallback routing under realistic multi-tenant inference workloads. The testbed produces reproducible, telemetry-rich experiments that bridge the gap between unit benchmarks and production incident simulations.
+
+Goals:
+- Provide a standardized, reproducible environment for SLO validation across API, infra, and model-serving changes.
+- Emulate customer-visible latency, throughput, and quality signals under controlled failure modes.
+- Generate telemetry that maps directly to on-call SLIs and downstream alerting.
+- Offer gating criteria for rollouts (canary -> gradual -> full).
+
+Scope and non-goals:
+- In scope: request-path latency/throughput emulation, KV-cache warm/cold scenarios, multi-variant model routing, preemption, quantization fallbacks, and downstream SLA correlation.
+- Out of scope: detailed per-model accuracy evaluations (these are handled by the Evals team) and proprietary customer data injection.
+
+Definitions and conventions:
+- Blackbox run: a full experiment that includes workload generation, canonical model responses (golden set), and metric ingestion to the observability store. Each run is tagged with run_id and git_sha.
+- Emulated tenant: logical tenant profile (qps distribution, max tokens, session affinity) used to create synthetic traffic.
+- Playback level: the degree of realism for token-level timing: basic (arrival process only), medium (per-token variance), high (prefix caching/kv-cache dynamics).
+
+Architecture overview (text diagram):
+- Test harness (controller): coordinates experiments, generates config YAML, and triggers traffic generators. -> Owner: infra-test
+- Traffic generator fleet: headless clients that can replay recorded traces or synthesize requests; supports per-session KV caching and streaming. -> Owner: eng-serving-runtime/testing
+- Golden response store: canonical model outputs used for fidelity checks and structured output assertion. -> Owner: applied-ml-and-evals
+- Comparator and evaluator: computes quality deltas, token divergence, and structural schema validation. -> Owner: applied-ml-and-evals
+- Observability bridge: forwards detailed traces, request/response timing, and resource usage to the telemetry pipeline under a dedicated test namespace. -> Owner: eng-platform/observability
+- Orchestration overlay: introduces faults (gpu preemption, slow kernels, network partitions) via fault-injector service. -> Owner: eng-infra
+
+Experiment life cycle (step-by-step):
+1) Draft config: author creates YAML experiment definition (see example).
+2) Dry-run validation: harness validates schema, checks model compatibility, and simulates low-volume traffic.
+3) Full run: orchestrate traffic generators, apply scheduled faults, collect traces, and store artifacts.
+4) Analysis pass: comparator computes SLO emulation report and highlights alerts.
+5) Gating decision: compare metrics to gating thresholds and either pass -> archive or fail -> open a triage ticket.
+
+Sample experiment YAML (example):
+---
+name: slo-emulation-2026-10-05
+run_id: auto
+git_sha: "{{git_sha}}"
+playback_level: high
+tenants:
+  - name: ecommerce-prod
+    qps: 12.5
+    session_affinity: true
+    max_tokens: 1024
+    request_mix: 
+      - op: chat.generate
+        percent: 70
+      - op: embeddings.encode
+        percent: 30
+faults:
+  - type: gpu_preempt
+    target_pool: pool-3
+    start_after_s: 300
+    duration_s: 90
+metrics_to_collect:
+  - request.latency.p50
+  - request.latency.p95
+  - tokens.per.request
+  - kv_cache.hit_ratio
+  - model.quality.delta_f1
+---
+
+Telemetry and metric mapping:
+- All test runs must export metrics with the prefix testbed.blackbox.<run_id>. Key SLI mappings:
+  - request.latency.p95 -> SLO emulation p95 latency
+  - request.error_rate -> SLO emulation error rate
+  - model.quality.delta_f1 -> fidelity gate
+- Traces: span names must include experiment/run_id and the tenant profile. Use tag experiment=blackbox and deploy_tag={canary,dip,full}.
+- Logs: structured JSON lines with keys: run_id, tenant, request_id, op, step, gpu_id (if applicable), kernel_ms.
+
+Gating criteria (minimum):
+- Latency: p95 must be <= target_p95 * 1.15 for a passing run; p95 > target_p95 * 1.35 is a hard fail that should block rollout.
+- Errors: request error rate must be < 0.5% for pass; >2% is hard fail.
+- Fidelity: model quality delta (task-level F1 or BLEU where applicable) must be within -0.8% for pass; -2.0% is hard fail.
+- Resource stability: GPU memory OOMs or preemption count > 3 in a 15-minute window is hard fail.
+
+Experiment matrix (example rows):
+- axis 1: traffic shape (steady, burst 3x, diurnal, staircase)
+- axis 2: playback level (basic/medium/high)
+- axis 3: fault type (none, preempt, cold-start, slow-kernel)
+- axis 4: model variant (fp16, int8, quantized-adaptive)
+- axis 5: tenant mix (single-tenant, mixed-tenants 10)
+
+Evaluation outputs and artifacts to store:
+- metrics.json: aggregated SLI time series and percentiles.
+- traces.zip: sampled spans (20% sample by default).
+- diffs.csv: top-100 requests with highest quality divergence.
+- run-manifest.yaml: resolved config and environment snapshot.
+
+Runbook / triage playbook (when a run fails gating):
+1) Open triage ticket in JIRA with label blackbox-failure and attach metrics.json and run-manifest.yaml.
+2) Alert on-call via PagerDuty with subject: Blackbox SLO Emulation Failure - <run_id>.
+3) Initial triage (owner: eng-serving-runtime): check metric spikes, top error types, and compare to dry-run baseline.
+4) If faulted by infra (OOM/preempt), engage eng-infra (owner).
+5) If quality regressions found, capture top diffs and notify applied-ml-and-evals and model-onboarding.
+6) Re-run isolating to narrow the root cause (reduce axes).
+
+Operationalization and integration points:
+- CI: small-scope smoke runs (playback_level: basic, single tenant) run on every release branch pre-merge.
+- Canary: canary pipelines trigger medium-scope runs. Results are required for automated canary pass.
+- Post-deploy health: nightlies run a full test matrix against the currently deployed model catalog.
+
+Ownership and responsibilities:
+- Test harness and CI integration: eng-serving-runtime/testing.
+- Traffic generation and orchestration: eng-infra/qa-fleet.
+- Comparator, golden stores and fidelity metrics: applied-ml-and-evals.
+- Telemetry ingestion and alerting mapping: eng-platform/observability.
+- Gate decisions and policy: product + reliability (SRE) jointly.
+
+Security and data handling:
+- No customer PII or customer-request payloads may be injected into the testbed. Use anonymized or synthetic traces only.
+- Telemetry published to test namespace is retained for 90 days unless flagged for extended analysis.
+- Access to goldens and run artifacts is RBAC-controlled; use internal groups: testbed-admins and testbed-readers.
+
+Governance and ADR considerations:
+- This specification is the canonical contract for SLO emulation. Any change that impacts gating thresholds, telemetry prefixes, or retention policy must be recorded as an ADR with at least two reviewers from SRE and applied-ml.
+- Major architecture changes (new fault injectors, new traffic generation modes) require a design review and an incremental rollout plan.
+
+Appendix: quick CLI examples:
+- Start a dry run: redwood-testctl run --config experiments/slo-emulation-quick.yaml --dry-run
+- Launch full run and stream logs: redwood-testctl run --config experiments/slo-emulation-2026-10-05.yaml --stream-logs
+- Fetch results: redwood-testctl artifact fetch --run-id <run_id> --out ./artifacts/<run_id>
+
+FAQ (short):
+- Q: Can we use real customer traces?
+  A: Only anonymized, approved traces via the data-ops team and only in restricted runs; default is synthetic.
+- Q: How often should nightly matrix runs be executed?
+  A: Nightly every 24 hours; full matrix runs should be scheduled weekly to limit cost.
+
+Contact and escalation:
+- Primary contact: eng-serving-runtime (pager: #eng-serving-runtime on Slack, owner: Lena Ortega)
+- Secondary: eng-platform/observability (Ayesha Khan)
+
+Change log:
+- 2026-03-12: Initial draft (Lena Ortega).
+- 2026-06-02: Added fidelity gating and run artifacts spec (reviewers: Marco Reyes).
+- 2026-10-05: Finalized retention and RBAC sections; published.

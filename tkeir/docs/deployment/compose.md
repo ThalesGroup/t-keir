@@ -1,13 +1,16 @@
-# Docker Compose (P1)
+# Docker Compose (P1+)
 
 Bring up a full demo stack on macOS (Apple Silicon) or Linux without Kubernetes.
+**P0 development** runs T-KEIR tools on the host (`make rag`, `make ingest`,
+`uv`) and only containers Vespa — see [Zero to Hero §3–4](../zero_to_hero.md).
 
 ```bash
-# Copy env defaults once
+# Copy env defaults once (IMAGE_REGISTRY=local by default)
 cp deploy/compose/.env.example deploy/compose/.env
 
-# Build images (or rely on compose build)
-make images            # or: make image-api image-hmi …
+# Build images into the local Docker daemon (not GHCR)
+make images            # tags: local/tkeir-*:$IMAGE_TAG
+# or: make image-api image-hmi …
 
 # Start core + Keycloak
 make compose-up PROFILES=core,auth
@@ -17,6 +20,12 @@ make compose-logs
 
 # Tear down (add VOLUMES=1 to wipe data)
 make compose-down
+```
+
+Publish (CI / shared registry) is explicit:
+
+```bash
+make images-push IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir
 ```
 
 ## Compose profiles

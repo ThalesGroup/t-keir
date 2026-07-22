@@ -1,4 +1,12 @@
-"""Golden chunking task for hierarchical indexing."""
+"""Title: Golden Chunker
+
+Golden chunking task for hierarchical indexing.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tasks.golden_chunking import (
     __date_golden_chunking__,

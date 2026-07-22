@@ -1,4 +1,12 @@
-"""Shared pytest fixtures for T-KEIR tests."""
+"""Title: Conftest
+
+Shared pytest fixtures for T-KEIR tests.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

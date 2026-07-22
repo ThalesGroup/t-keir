@@ -1,0 +1,166 @@
+Postmortem: Perf Canary False-Positive Alert Storm (baseline drift + cardinality)
+
+## Summary
+On 2026-02-12, the production performance canary generated a burst of false-positive alerts across multiple models and regions shortly after enabling warning + paging rules in the first expansion beyond the initial 2-model rollout. Alerts were high volume (warning + paging) and repeatedly reopened due to dedupe failures, resulting in on-call interruption and a temporary release freeze request.
+
+There was **no confirmed customer-facing latency regression** attributable to this incident. The event was an alerting/observability failure caused primarily by (1) **baseline drift + baseline key mismatch** and (2) **metric label cardinality inflation** that fragmented the canary’s time series, defeating min-sample gating and dedupe.
+
+## Impact
+### Customer impact
+- **None confirmed.** Runtime and customer SLO dashboards did not show correlated sustained p95 latency increases for customer traffic.
+
+### Internal impact
+- **Paging noise:** 19 paging alerts over ~38 minutes (with multiple re-pages due to missing dedupe keys).
+- **Warning noise:** 60+ warning alerts over ~75 minutes.
+- **Operational disruption:** SRE on-call and runtime on-call diverted to triage; release engineering requested a short freeze while signals stabilized.
+- **Confidence impact:** Reduced trust in the perf canary as a rollout gate until remediations were in place.
+
+### Services/systems involved
+- perf-canary service (prod)
+- observability-pack alert rules + Grafana dashboards
+- baseline store + baseline fetch client
+- telemetry pipeline (metrics ingestion + aggregation)
+- incident-bot alert handler
+
+## Detection
+- Detected via automated paging to the on-call channel and incident-bot threads.
+- Secondary signal: Grafana dashboard showed many “regression detected” annotations without corresponding customer latency change.
+
+## Timeline (UTC)
+- **2026-02-12 16:05** – Expanded canary coverage from 3 → 8 models in us-east; enabled paging rule for “top models”.
+- **16:12** – First warning alerts fire for 3 models (p95 latency regression > threshold). Incident-bot starts threads.
+- **16:16** – Paging alerts begin for a top model; on-call acknowledges.
+- **16:18** – Additional paging alerts fire for multiple models; dedupe fails and creates multiple parallel threads.
+- **16:23** – Runtime on-call compares canary runtime-only latency vs customer e2e; no matching regression observed.
+- **16:28** – Telemetry team notices time series fragmentation: unexpected label combinations, very low samples per series.
+- **16:34** – SRE disables paging rules (keeps warnings) and increases dampening window.
+- **16:41** – Baseline store reads show frequent “baseline not found” with fallback to default thresholds.
+- **16:46** – Canary config rolled back to previous 3-model set; alert volume drops.
+- **17:02** – Incident declared resolved; follow-up investigation assigned.
+
+## What happened (symptoms)
+The canary’s regression evaluator compared observed p95 latency/tokens-sec against per-model baselines. After model expansion:
+- Many evaluations used **fallback baseline values** because the baseline lookup key did not match (baseline existed under a different dimension set).
+- Metric series were fragmented by high-cardinality labels; the regression evaluator saw many “small-N” series and oscillated between “enough samples” and “not enough samples” depending on which series was queried.
+- Alert rules did not consistently enforce **minimum sample size across the same grouping** used by the evaluator, which allowed small, noisy slices to trip thresholds.
+- incident-bot dedupe keys lacked stable identifiers for (model, version, region, sku, runtime_build), so the same underlying symptom created repeated threads/pages.
+
+## Root cause
+### RC1: Baseline drift + key mismatch (primary)
+Baselines were stored per (model, runtime_version, hardware_sku, region) in the baseline store, but the canary emitted/evaluated metrics with an expanded set of labels including transient fields and “bucketed” dimensions that were not part of the baseline artifact key.
+
+Specifically:
+- The canary evaluation path constructed a baseline key using **(model, model_version, runtime_build, region, hardware_sku, prompt_shape_bucket)**.
+- Baseline artifacts were generated for **(model, model_version, runtime_build, region, hardware_sku)** only (no prompt bucket), and in some cases had **region omitted** (older artifacts) because early staging used a simplified schema.
+- When the lookup did not match, the evaluator fell back to default thresholds, which are intentionally conservative and therefore easier to breach.
+
+Additionally, baseline updates were set to a rolling policy during the first expansion.
+- A rolling baseline can be valid, but in this case it introduced “baseline drift” during a period of changing model coverage and metric schema. Drift made alerts oscillate because the baseline distribution was not stable across the same label set.
+
+### RC2: Metric label cardinality inflation (primary)
+Several labels unintentionally increased cardinality:
+- `prompt_template_id` (seeded but still high cardinality across the prompt set)
+- `workload_run_id` (unique per canary run)
+- `route` (included full internal route string with version suffix)
+
+This caused:
+- Fragmentation of histograms/counters into many short-lived series.
+- “Min samples” checks passing on one series while the alert query aggregated differently.
+- Increased ingestion lag and higher query variance due to sparse buckets.
+
+### RC3: Alert policy mismatch with evaluator grouping (contributing)
+The alert rules aggregated time series on a different dimension set than the evaluator used for baseline comparison.
+- The evaluator grouped by (model, model_version, region, hardware_sku, runtime_build).
+- Warning alert queries grouped by (model, region) for readability.
+- Paging rules grouped by (model) only for top-model simplicity.
+
+This mismatch made it possible for a small, noisy slice (e.g., one SKU) to trigger evaluator regressions while alerts appeared “global”, causing confusion in triage.
+
+### RC4: Incident-bot dedupe gaps (contributing)
+incident-bot dedupe was based on (alert_name, model) only.
+- As a result, changes in alert labels and repeated firing produced new threads/pages.
+- With many models firing simultaneously, this amplified perceived severity and burden.
+
+## Contributing factors
+- **Schema change during rollout:** Metric label set changed between the initial 3-model rollout and expansion.
+- **Baseline artifact heterogeneity:** Some baseline artifacts were generated in a prod-like shadow environment with a different region/SKU mapping.
+- **Telemetry ingestion delay:** During the event, ingestion lag fluctuated (minutes), causing “sawtooth” alert evaluation.
+- **Runbook ambiguity:** The runbook guided “compare to baseline” but didn’t explicitly call out “baseline not found → fallback thresholds” as a first-class failure mode.
+
+## Resolution and immediate mitigations
+Actions taken during the incident:
+1. **Disabled paging rules** for perf-canary regressions (kept warning-level visibility). (Owner: SRE on-call)
+2. **Rolled back canary model coverage** to the previously stable 3-model configuration. (Owner: Runtime on-call)
+3. **Pinned evaluator to fixed baseline artifacts** (no rolling updates) until schema/keys were corrected. (Owner: Nadia Rahman)
+4. **Hotfix to drop high-cardinality labels** from canary metrics (`workload_run_id`, `prompt_template_id`, full `route`). (Owner: Logan Wright)
+
+## Corrective and preventative actions (CPAs)
+### Implemented (completed)
+- **Baseline key normalization:** Baseline lookup now uses a canonical key:
+  - `model_id` (canonical registry ID)
+  - `model_version` (registry version)
+  - `runtime_build_id`
+  - `hardware_sku`
+  - `region`
+  - (explicitly does *not* include prompt bucket or run IDs)
+- **Metric label contract:** Reduced emitted labels to an approved set; added a CI check that fails if new labels are added without review.
+- **Evaluator “baseline missing” behavior:** Baseline missing is now treated as **“canary unhealthy”** (warn once) rather than “assume default regression thresholds”.
+- **Min-sample + dampening alignment:** Alert rules now match the evaluator grouping and require:
+  - minimum N requests per grouping
+  - sustained breach across multiple evaluation intervals
+- **Incident-bot dedupe key update:** Dedupe keys now include (model_id, model_version, region, hardware_sku, runtime_build_id, alert_type).
+
+### Planned (in progress)
+- **Region/SKU-aware thresholds:** Allow thresholds that differ by SKU/region where variance is known to differ (documented + versioned).
+- **Baseline drift guardrails:** Rolling baselines require an explicit “baseline update window” and block updates during rollout expansion or telemetry schema changes.
+- **Canary alert gating:** Rollout gates will consume only “high-confidence” regression signals (enforced min samples + stable baseline + low ingestion lag).
+
+## Action items
+| ID | Action | Owner | Due date | Status |
+|---|---|---|---|---|
+| ENG-4882 | Noise reduction: add smoothing (EWMA) + sustained-breach logic + ingestion-lag guard | Allison Grant | 2026-03-08 | In progress |
+| ENG-4874 | Baseline store versioning: pin artifact schema + backfill missing region/SKU fields | Nadia Rahman | 2026-03-01 | In progress |
+| ENG-4873 | Publish metric contract: required labels, forbidden labels, query examples | Logan Wright | 2026-02-28 | Complete |
+| ENG-4878 | Update alert rules to align grouping with evaluator + enforce min samples | Aisha Bello | 2026-02-26 | Complete |
+| ENG-4883 | Update runbook: add baseline-missing play + dedupe verification steps | Rafael Mendes | 2026-02-27 | In progress |
+| ENG-4884 | CI perf smoke: verify metrics emission + no-cardinality regression + dashboards load | Caleb Johnson | 2026-03-15 | Not started |
+| PM-642 | Rollout gates integration: define “auto-pause” policy + UX for confidence level | Paula Mendes | 2026-03-22 | Not started |
+
+## Lessons learned
+### What went well
+- On-call validated against independent customer-traffic dashboards quickly and avoided an unnecessary rollback of the runtime.
+- Teams (Runtime/SRE/Telemetry) coordinated rapidly; paging rules were disabled within ~20 minutes.
+- The canary’s strict “no customer prompts” policy kept investigation clean (no privacy concerns during deep dive).
+
+### What didn’t go well
+- Baseline missing → fallback thresholds created a failure mode where instrumentation/config drift looked like performance regressions.
+- Cardinality review was incomplete; labels that seemed “harmless” for logs caused large fragmentation for metrics.
+- Alert grouping mismatch created confusion (alerts appeared “global” while underlying series were per-SKU/per-region slices).
+- Dedupe failures amplified the incident by creating parallel incident-bot threads and repeated pages.
+
+### Where we got lucky
+- The storm happened during an expansion window and not during a high-risk runtime rollout; impact was primarily internal.
+
+## Follow-up validation plan
+Before re-enabling paging and using signals as rollout gates, we will:
+1. Run a **7-day warning-only bake** with expanded coverage and confirm:
+   - baseline hit-rate > 99.5%
+   - no unexpected label growth (cardinality budget)
+   - alert volume within noise budget
+2. Re-enable paging for **one top model** in one region with clear success criteria.
+3. Only after stable paging, enable rollout gate consumption in “advisory” mode for 2 weeks, then move to “blocking” mode.
+
+## Appendix
+### Key decision: baseline missing is a health signal
+We changed behavior from:
+- “baseline missing → compare against default thresholds (often too strict)”
+
+to:
+- “baseline missing → emit canary health warning + stop regression evaluation for that grouping until baseline exists”.
+
+Rationale: baseline absence is an operational/config issue. Treating it as a performance regression creates noisy pages and reduces trust.
+
+### References
+- ADR: Baseline computation + thresholds: sources/confluence/architecture-and-standards/decision-records/adr-perf-canary-baseline-and-thresholds.json
+- Runbook: Responding to perf canary regression alerts: sources/confluence/eng-sre/runbooks/runbook-perf-regression-canary-alert.json
+- Dashboard spec: sources/confluence/eng-platform/dashboards-and-alerts/perf-canary-dashboards-spec.json

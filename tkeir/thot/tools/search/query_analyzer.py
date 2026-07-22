@@ -1,4 +1,12 @@
-"""Analyze user queries and build structured Vespa hybrid search payloads."""
+"""Title: Query analyzer
+
+Analyze user queries and build structured Vespa hybrid search payloads.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,0 +1,165 @@
+Platform Adoption Roadmap and Decision Playbook — Pilot to Production
+
+Executive summary
+
+This playbook codifies a repeatable path that sales and solutions engineering can follow to convert a technical pilot into a predictable production deployment on Redwood Inference. It combines positioning, competitive differentiation, pricing guardrails, rollout milestones, a short two-case study evidence pack, and a prospect-facing security FAQ. Use this as a prescriptive checklist in commercial discussions and handoffs to customer success and onboarding.
+
+Audience
+- Account executives and solution engineers running pilots
+- Customer success managers owning post-pilot activation
+- Sales engineering leadership reviewing win/loss patterns
+
+Primary objectives
+1. De-risk pilot outcomes for prospects by setting measurable acceptance criteria.
+2. Make pricing and capacity trade-offs transparent early.
+3. Provide a standardized Handoff and Rollout checklist to reduce time-to-production.
+
+1) Positioning & messaging framework (short elevator + technical hooks)
+- Elevator (for executive buyer): "Redwood Inference helps engineering teams deliver consistent, low-latency LLM features at predictable unit cost across hosted, dedicated, and private deployments — so product roadmaps don't stall on infrastructure."
+- Technical hook (for platform/infra): "We unify serving, batching, KV-cache reuse and model variants under a single API and routing policy, enabling predictable SLOs and automatic fallbacks during capacity pressure."
+- Risk / buyer reassurance: emphasize SLA tiers, private deployment option (VPC or on-prem), and our audit logging + KMS integrations.
+
+Key proof points to use in pitch
+- Observable: token-level cost & latency dashboards per route.
+- Predictable: Dedicated pools with commit-backed capacity and SLA.
+- Resilient: policy-based routing + model fallbacks keep services available.
+- Economic: Optimize recommends batching/quantization profiles and tracks unit-cost delta pre/post changes.
+
+2) Competitive brief (one-page summary for fast reference)
+- Contenders: public LLM APIs, cloud-managed endpoint services, self-hosted inference orchestration vendors.
+- Primary disadvantages of competitor approaches:
+  - Public LLM APIs: inconsistent latency under load and limited rollout controls for private deployments.
+  - Cloud endpoint services: lack of model-specific kernel optimization and limited KV cache reuse; higher per-token cost at scale.
+  - Self-hosted inference vendors: heavy operational burden and longer time-to-value.
+
+Redwood advantage checklist (callouts to use)
+- Unified runtime + smart routing reduces missed-SLO incidents by default (cite internal benchmark: 20–40% token-cost reduction vs naive self-hosting in similar workloads).
+- Developer ergonomics: same API across hosted/dedicated/private reduces integration risk.
+- Cost controls: Optimize suggestions can reduce monthly inference spend by 15–30% on production workloads.
+
+3) Pilot scope, success criteria, and timeline (recommended template)
+- Pilot duration: 4–8 weeks (typical).
+- Success metrics (example):
+  - Latency: 95th percentile generation latency <= 250ms for targeted routes.
+  - Cost: per-10k-token unit cost within 20% of projected budget after one optimization pass.
+  - Accuracy/quality: BLEU/ROUGE/F1 or product-specific precision metric relative to baseline >= -2% degradation.
+  - Stability: <1% error rate and <0.5% request retry rate over a 7-day window.
+- Deliverables:
+  - End-to-end integration checklist (API keys, routes, role-based tokens).
+  - Telemetry dashboard access (token-level cost, per-route latency histograms).
+  - Optimization proposal (batching, quantization, model variant mapping).
+
+Pilot timeline (recommended milestones)
+1. Week 0: Kickoff — define routes, sample traffic, and acceptance metrics. Owner: SE + customer infra lead.
+2. Week 1–2: Integration — API routing, telemetry hooks, and sample load. Owner: SE.
+3. Week 3–4: Profiling & optimization — run perf suite, propose batch/cache profiles. Owner: Runtime team (ops).
+4. Week 5–6: Validation at scale — run representative traffic, measure SLOs. Owner: Customer + Redwood SRE.
+5. Week 7–8: Rollout plan and handoff — commit sizing, cost estimate, and runbook. Owner: Customer success.
+
+4) Pricing guidance & example scenarios
+Principles to communicate:
+- Separate price components: model compute (per-token or per-inference), dedicated capacity commit (if applicable), storage/traffic, and premium observability/retention.
+- For pilots, offer time-limited pilot credits or low-tier dedicated bursts to demonstrate production SLAs.
+- Anchoring guidance: always quote an example monthly cost for three workload buckets (conservative / expected / aggressive).
+
+Sample pricing scenarios (illustrative, internal guidance only)
+- Small pilot (proof-of-concept): 100k tokens/day average, hosted API: estimated $1,500–$2,500/month after discounts.
+- Mid-scale production: 5M tokens/day, dedicated shared pool: committed monthly price + variable token charge; typical range $25k–$40k/month depending on model family and quantization.
+- Large enterprise: private deployment with reserved GPU fleet: start with an annual contract; initial platform fee + per-GPU seat.
+
+Guidance on discounts and concessions
+- Offer pilot credits for up to 8 weeks; require a follow-up technical review and sample traffic to qualify.
+- Reduce per-token price in exchange for a minimum committed monthly capacity on Dedicated.
+- For Private deployments, structure proposal with a phased payment schedule tied to milestones (kickoff, baseline integration, production go-live).
+
+5) Pitch deck outline (10 slides — one-liner per slide)
+1. Title + customer logo and objective
+2. Problem statement for this customer (latency/cost/reliability pain)
+3. Redwood solution summary (hosted/dedicated/private)
+4. Architecture sketch showing smart routing and KV cache reuse
+5. Performance & cost proof points (benchmarks relevant to industry)
+6. Pilot plan & acceptance criteria (timeline)
+7. Pricing scenarios & commitment options
+8. Security & compliance summary (KMS, audit logs, VPC, SOC2 if relevant)
+9. Case studies / customer references (one paragraph each)
+10. Next steps & recommended decision (pilot proposal)
+
+6) Two short case studies (concise evidence pack)
+Case study: Retail commerce personalization
+- Customer profile: mid-sized e-commerce platform with peak traffic and strict p99 latency targets for product recommendations.
+- Challenge: previously-hosted LLMs had 90th percentile latency spikes during promotions.
+- Redwood approach: deployed a dedicated inference pool, enabled prefix KV cache for logged-in user contexts, and applied Optimize batching rules.
+- Outcome: 95th percentile latency reduced from 720ms to 180ms; monthly inference cost fell ~22% after quantization + batching changes; time-to-rollout from pilot to production: 6 weeks.
+
+Case study: Fintech document understanding (confidential)
+- Customer profile: regulated fintech needing private deployment and strict audit trails.
+- Challenge: compliance prohibits third-party access to raw documents; performance must meet sub-second latency for extraction.
+- Redwood approach: private deployment in customer VPC, HSM-backed key wrapping, and long-term retention disabled for sensitive routes.
+- Outcome: successful SOC2 + internal audit sign-off; production SLA met, and the solution reduced full-processing time by 45% vs prior pipeline.
+
+7) Security FAQ for prospects (top 12 questions with short answers)
+Q1: Can Redwood operate entirely within our VPC?
+A1: Yes. Our Private deployment supports a customer-managed control plane and data plane within your VPC or on-prem environment.
+
+Q2: How are encryption keys managed?
+A2: We integrate with customer KMS providers (AWS KMS, Google KMS, Vault) and provide HSM-backed key wrapping for Private customers.
+
+Q3: Do you retain request/response data?
+A3: By default, hosted API telemetry retains request metadata for 30 days. For sensitive customers we disable content retention and provide opt-out at route level.
+
+Q4: What auditing capabilities are available?
+A4: Audit logs include API key usage, model version changes, and admin actions. Logs can be shipped to customer SIEM via syslog or S3 export.
+
+Q5: How do you handle model drift and quality regressions?
+A5: Redwood Optimize maintains evals tied to prompt sets; regression alerts trigger automatic rollback to the prior model variant and notify owners.
+
+Q6: What compliance certifications do you offer?
+A6: Redwood maintains SOC 2 Type II for hosted services. Private deployments are configurable to meet customer-specific standards and we provide attestation packages.
+
+Q7: Are there role-based access controls?
+A7: Yes — RBAC at token and route granularity, with SSO integrations (SAML/OIDC) and audit trails.
+
+Q8: How is network egress controlled for Private deployments?
+A8: Customers configure egress allowlists; the private data plane can be air-gapped with local model bundles.
+
+Q9: What mitigations exist for model poisoning or malicious prompts?
+A9: We recommend layered defenses: input sanitization at the application layer, rate limiting, content filters (built-in), and canary model A/B tests before rollout.
+
+Q10: How are updates and patches delivered to Private deployments?
+A10: We provide signed update artifacts and a phased upgrade tool with rollback. Critical patches can be applied out-of-band per customer SLA.
+
+Q11: Can we request on-prem packaging for audits?
+A11: Yes — our on-prem package includes installer artifacts, deployment manifests, and a security checklist to support auditor reviews.
+
+Q12: Who is the security contact for escalations?
+A12: For pre-sales security questions, contact security@redwood.ai; for signed contracts we provide a named security liaison.
+
+8) Handoff checklist (what to deliver to Customer Success on pilot success)
+- Signed scope and committed capacity (contract extract).
+- Finalized runbook: failure modes, rollback steps, cost and alert thresholds.
+- Access inventory: API keys, SSO connectors, KMS integration details, logging endpoints.
+- Performance baseline: telemetry snapshots for reference week.
+- Optimization artifacts: chosen batching/quantization profiles and rationale.
+
+9) Common objections and short scripts
+- "We can self-host for less money." — Response: "Self-hosting often shifts cost and risk to engineering teams; we provide measurable unit-cost reductions through runtime optimizations and manage the operational risk of production inference."
+- "We need absolute data residency." — Response: "Our Private deployment option runs inside your VPC or on-prem; we integrate with your KMS and support air-gapped modes."
+
+10) Contacts and escalation path
+- Sales lead (for commercial questions): Aisha Patel (aisha.patel@redwood.ai)
+- Solutions Engineering (technical pilot): Evan Morales (evan.morales@redwood.ai)
+- Security pre-sales: Sofia Klein (security@redwood.ai)
+- Customer success handoff: Marcus Lee (cs-handoffs@redwood.ai)
+
+Appendix: Useful CLI examples and config snippets
+- Example: request to Redwood hosted API (curl)
+  curl -X POST https://api.redwood.ai/v1/generate \\n    -H 'Authorization: Bearer $REDWOOD_KEY' \\n    -H 'Content-Type: application/json' \\n    -d '{"model":"rw-medium-8b", "input":"Summarize customer ticket."}'
+
+- Example: brief JSON for batching profile (illustrative)
+  {"route": "recommendations", "batch_window_ms": 10, "max_batch_size": 64, "kv_cache": true}
+
+Document maintenance
+- Owner: Go-to-market (Aisha Patel)
+- Review cadence: Quarterly for pricing & security content; after every major platform release for technical guidance.
+
+End of document.

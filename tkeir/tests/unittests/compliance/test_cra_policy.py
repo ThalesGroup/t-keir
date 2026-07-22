@@ -1,4 +1,12 @@
-"""CRA / GDPR / NIS2 / DORA / PLD OPA policy smoke tests."""
+"""Title: Cra policy
+
+CRA / GDPR / NIS2 / DORA / PLD OPA policy smoke tests.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

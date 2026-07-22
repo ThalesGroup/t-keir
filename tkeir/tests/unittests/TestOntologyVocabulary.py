@@ -1,4 +1,12 @@
-"""Tests for ontology vocabulary naming helpers."""
+"""Title: Ontology Vocabulary
+
+Tests for ontology vocabulary naming helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, RDFS

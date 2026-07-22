@@ -1,4 +1,12 @@
-"""Backward-compatible shim for ontology label vectorization."""
+"""Title: Embedding service
+
+Backward-compatible shim for ontology label vectorization.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

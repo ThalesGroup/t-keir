@@ -1,0 +1,149 @@
+SDK Accelerated Onramp: Observability & Fault Quickstart
+
+Overview
+
+This quickstart documents the recommended observability and fault-handling onramp for new SDK integrations (JS/Python/Go) with Redwood’s hosted and dedicated inference surfaces. It is written for SDK authors, developer productivity engineers, and support engineers who are responsible for onboarding third-party integrations or internal SDK consumers. The goal is a reproducible, low-friction integration that provides high-fidelity telemetry with actionable alerts and a short remediation playbook for common failure modes.
+
+Key outcomes
+- Instrumentation baseline: requests, responses, retries, latencies, token counts, and error taxonomy.
+- Dashboards and pre-baked alerts for first-contact failures and degradation.
+- A short triage checklist + canonical fixes for top 6 issues seen in SDK integrations.
+- Safe rollout checklist (canary + dark-launch telemetry).
+
+Owner and scope
+- Owner: eng-developer-experience (contact: @aisha.patel).
+- Implementation teams: SDK (client) teams and integration owners.
+- Applies to: hosted (Redwood API) + Dedicated endpoints + local SDK runtime adapters.
+
+Before you start (prereqs)
+1) Access to DX telemetry: Grafana (dx-sdk-observability), Loki (logs), and Honeycomb/Tracing (dx-traces).
+2) API key and example tenant environment (staging) with reserved dev tokens.
+3) Basic CI with a smoke test that exercises generation and embeddings calls.
+
+Telemetry contract (minimal fields)
+- This section lists required events and metrics. Instrumentation must map to our ingestion schema so ingestion rules can reliably parse and route.
+
+Required application metrics (names are canonical; implement exactly):
+1) sdk.request.count - counter (tags: sdk_language, sdk_version, route, customer_tier, env)
+2) sdk.request.success_count - counter (same tags)
+3) sdk.request.error_count - counter (error_class tag; see taxonomy)
+4) sdk.request.latency_ms - histogram (p50/p95/p99)
+5) sdk.token.outbound - counter (tokens_sent, prompt_vs_prefix tag)
+6) sdk.token.inbound - counter (tokens_returned)
+
+Required structured logs (JSON lines)
+- event: 'sdk.request'
+- fields: timestamp, request_id, sdk_language, sdk_version, route, latency_ms, status_code, error_class, token_sent, token_returned, upstream_model, region
+
+Example log line (JSON)
+{"timestamp":"2026-02-10T15:04:05Z","event":"sdk.request","request_id":"req_1234","sdk_language":"python","sdk_version":"1.3.0","route":"generation","latency_ms":142.1,"status_code":200,"error_class":"none","token_sent":84,"token_returned":120,"upstream_model":"gpt-redwood-3b","region":"us-west-2"}
+
+SDK instrumentation snippets
+- Python (requests wrapper):
+
+```python
+# instrumentation snippet (python)
+import time
+import requests
+import json
+
+def send_with_telemetry(payload, ctx):
+    start = time.time()
+    r = requests.post(ctx.url, json=payload, headers={"Authorization": f"Bearer {ctx.api_key}"})
+    latency = (time.time() - start) * 1000
+    # emit metric sdk.request.latency_ms and counters via SDK metrics client
+    metrics.emit("sdk.request.count", 1, tags=ctx.tags)
+    metrics.emit("sdk.request.latency_ms", latency, tags=ctx.tags)
+    if r.status_code >= 200 and r.status_code < 300:
+        metrics.emit("sdk.request.success_count", 1, tags=ctx.tags)
+    else:
+        metrics.emit("sdk.request.error_count", 1, tags={**ctx.tags, "error_class": classify_error(r)})
+    logs.json("sdk.request", {
+        "request_id": ctx.request_id,
+        "latency_ms": latency,
+        "status_code": r.status_code
+    })
+    return r.json()
+```
+
+Observability artifacts (deliverables)
+- Dashboards: dx-sdk-quickstart-overview (latency histograms, success rate, token usage), dx-sdk-errors-by-class, dx-sdk-canary-health.
+- Alerts (recommended):
+  - ALERT A: SDK integration: error_rate_high
+    - Query: increase in sdk.request.error_count over 5m, error_rate > 2% and > 100 calls in 5m.
+    - Severity: P2
+    - Notify: #sdk-integration, PagerDuty (oncall-sdk).
+  - ALERT B: SDK integration: latency_p95_degrade
+    - Query: p95(sdk.request.latency_ms) > 750ms for 10m.
+    - Severity: P3
+  - ALERT C: SDK integration: token_consumption_anomaly
+    - Query: tokens_sent per request increases by >3x relative to a rolling 24h baseline.
+
+Safe rollout checklist (canary + telemetry)
+1) Dark launch: enable SDK telemetry in production but traffic routed to a canary model variant.
+2) Validate p50/p95 against baseline within 10% for 30 minutes.
+3) Check error_rate < 0.5% for the canary cohort.
+4) Gradually increase to 10% traffic and hold for 60 minutes with A/B telemetry collection.
+5) If any alert fires, abort and revert configuration.
+
+Canonical failure modes and remediation (top 6)
+1) Authentication failures (401/403)
+   - Symptom: immediate error_count spike with error_class=auth_failed and status_code 401.
+   - Root causes: expired API keys, token scope mismatch, misconfigured local environment secrets.
+   - Fix: rotate staging key; confirm SDK picks up KEY via env var; verify scope via `redwood-cli auth check`.
+2) Payload serialization errors (400 / schema mismatch)
+   - Symptom: 400 with error_class=bad_request; often caused by malformed JSON or unsupported fields.
+   - Fix: run local JSON schema validator (included in SDK: `redwood_sdk.validate(payload)`) and add schema unit tests.
+3) Upstream model OOM or capacity fallbacks (5xx with transient spikes)
+   - Symptom: 5xx errors with error_class=upstream_capacity or upstream_oom; higher latencies preceding errors.
+   - Fix: switch route to a smaller model using routing hints, enable client-side retries with exponential backoff, notify infra (tag: runtime-team).
+4) Unbounded token growth (cost anomalies)
+   - Symptom: sudden rise in sdk.token.outbound and high token cost alerts.
+   - Fix: enable prompt length caps in client, add pre-send token count sample, run regression tests for prompt templates.
+5) Streaming connection failures (network flaps)
+   - Symptom: stream disconnects, partial responses, repeated reconnection attempts.
+   - Fix: implement resumable-streaming logic in SDK (sequence numbers), fall back to non-streaming endpoint, add backoff jitter.
+6) Telemetry ingestion mismatch (logs not parsed)
+   - Symptom: empty dashboard panels, missing traces for request_id.
+   - Fix: confirm log schema keys match ingestion rules (see dx-telemetry-ingest rules), instrument library version used by SDK, redeploy ingestion mapping if required.
+
+Fast triage checklist (first 10 minutes)
+1) Verify request_id and correlate logs -> traces -> metrics.
+2) Check error class breakdown in last 15m.
+3) Confirm SDK version and language tag in telemetry.
+4) Reproduce in staging with identical payload if possible.
+5) If production impact, follow incident escalation matrix and create an incident in PagerDuty.
+
+Runbook excerpts (commands and dashboards)
+- Grafana: open /d/dx-sdk-quickstart-overview?orgId=1&var-env=production
+- Trace lookup (Honeycomb): query by trace.tag=request_id:req_1234
+- Log tail (Loki): `{app="dx-sdk", env="production", request_id="req_1234"}`
+- Rotation (safe key rotate): `redwood-cli keys rotate --env staging --service sdk-integration`
+
+Testing and CI guardrails
+- Add golden-case smoke tests that assert success_rate >= 99.5% and p95 latency < 700ms on CI against a staging endpoint.
+- Include a telemetry regression test that sends synthetic traces and verifies ingestion within 30s.
+- Block merges if telemetry events for an approved smoke request_id are missing.
+
+Appendix: example alert rule (PromQL-like pseudo)
+- error_rate_high: 
+  sum_over_time(sdk_request_error_count[5m]) / sum_over_time(sdk_request_count[5m]) > 0.02 and sum_over_time(sdk_request_count[5m]) > 100
+
+Common observability resources
+- Dashboards: Grafana dx-sdk-quickstart-overview (owner: eng-developer-experience)
+- Traces: Honeycomb dataset dx-sdk-traces (owner: eng-platform)
+- Logs: Loki index dx-logs (owner: eng-infra)
+- Runbooks: /confluence/eng-developer-experience/support-top-issues/sdk-telemetry-fidelity-audit-and-fix-runbook-2028
+
+Contacts and escalation
+- SDK oncall: #sdk-integration (Slack), PagerDuty: oncall-sdk.
+- Developer XP owner: Aisha Patel (aisha.patel@redwood.ai).
+
+Change history
+- 2026-02-10: created by Aisha Patel (initial quickstart and canonical fixes).
+- 2026-03-01: updated reviewer feedback (added token anomaly thresholds and streaming fallback guidance).
+
+Document notes
+- This quickstart is intentionally prescriptive: SDKs should implement the telemetry contract verbatim to allow centralized dashboards and reliable alerting. If a different metric name is required for platform constraints, raise an exception with eng-developer-experience for mapping.
+
+End of document.

@@ -1,9 +1,18 @@
-"""Derive / enrich a document ontology from existing reference ontologies.
+"""Title: Derive / enrich a document ontology from existing reference ontologies.
 
-Loads OWL/TTL/RDF reference graphs (for example generated C2SIM / C4ISR
-ontologies under ``workspace/corpus_nato/ontologies/``), matches document
-classes and labeled individuals by label similarity, then adds linking
-triples before SHACL validation and Vespa ``json_ld`` storage.
+Loads OWL/TTL/RDF reference graphs (bundled under
+``tkeir/resources/ontologies/`` and/or absolute paths such as ingest-staged
+uploads), matches document classes and labeled individuals by label
+similarity, then adds linking triples before SHACL validation and Vespa
+``json_ld`` storage.
+
+Corpus / application ontologies are not discovered from the workspace —
+clients upload them with each ingest request.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations
@@ -227,23 +236,32 @@ def resolve_ontology_path(
 
 
 def default_search_roots() -> list[Path]:
-    """Return default directories used to resolve relative ontology paths.
+    """Return directories used to resolve relative ontology paths.
+
+    Only product-bundled locations are searched (never corpus / workspace
+    application data). Absolute paths (e.g. ingest-staged uploads under
+    ``INGEST_ROOT``) resolve directly in :func:`resolve_ontology_path`.
 
     Returns:
-        Ordered unique :class:`~pathlib.Path` roots (cwd, workspace, parents).
+        Ordered unique roots under ``tkeir/resources/``.
 
     Example:
         >>> roots = default_search_roots()
         >>> isinstance(roots[0], Path) and len(roots) >= 1
         True
     """
-    cwd = Path.cwd()
-    roots = [cwd, cwd / "workspace", cwd / "tkeir"]
-    # Repo layout: tkeir/thot/... → parents include monorepo root when present.
-    here = Path(__file__).resolve()
-    for parent in here.parents[:5]:
-        roots.append(parent)
-        roots.append(parent / "workspace")
+    from thot.core.TkeirPaths import ontologies_dir, package_root
+
+    roots = [
+        Path(ontologies_dir()),
+        Path(package_root()) / "resources",
+        Path(package_root()) / "resources" / "modeling" / "ontologies",
+    ]
+    # Optional override for operators who ship extra generic ontologies.
+    env_root = os.environ.get("TKEIR_ONTOLOGY_ROOT", "").strip()
+    if env_root:
+        roots.insert(0, Path(env_root).expanduser())
+
     seen: set[str] = set()
     ordered: list[Path] = []
     for root in roots:
@@ -985,8 +1003,8 @@ def derivation_paths_for_document(
 ) -> list[str]:
     """Merge config paths with optional per-document overrides.
 
-    Document keys consulted: ``derive_from_ontologies``, ``ontology_sources``,
-    and ``metadata.derive_from_ontologies``.
+    Document keys consulted: ``ontologies``, ``derive_from_ontologies``,
+    ``ontology_sources``, and the same keys under ``metadata``.
 
     Args:
         tkeir_doc: T-KEIR document dict.
@@ -998,25 +1016,17 @@ def derivation_paths_for_document(
     Example:
         >>> settings = DerivationSettings(paths=("base.ttl",))
         >>> derivation_paths_for_document(
-        ...     {"derive_from_ontologies": ["extra.ttl"]},
+        ...     {"ontologies": ["extra.ttl"]},
         ...     settings,
         ... )
         ['base.ttl', 'extra.ttl']
     """
+    from thot.tasks.document_ontology.OntologyLexicon import (
+        ontology_paths_from_document,
+    )
+
     paths: list[str] = list(settings.paths)
-    for key in ("derive_from_ontologies", "ontology_sources"):
-        extra = tkeir_doc.get(key)
-        if isinstance(extra, str) and extra.strip():
-            paths.append(extra.strip())
-        elif isinstance(extra, (list, tuple)):
-            paths.extend(str(p) for p in extra if str(p).strip())
-    metadata = tkeir_doc.get("metadata")
-    if isinstance(metadata, dict):
-        extra = metadata.get("derive_from_ontologies")
-        if isinstance(extra, str) and extra.strip():
-            paths.append(extra.strip())
-        elif isinstance(extra, (list, tuple)):
-            paths.extend(str(p) for p in extra if str(p).strip())
+    paths.extend(ontology_paths_from_document(tkeir_doc))
     seen: set[str] = set()
     ordered: list[str] = []
     for path in paths:

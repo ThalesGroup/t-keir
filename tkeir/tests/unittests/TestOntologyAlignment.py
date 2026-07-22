@@ -1,4 +1,12 @@
-"""Tests for ontology class/property alignment and SHACL induction."""
+"""Title: Ontology Alignment
+
+Tests for ontology class/property alignment and SHACL induction.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

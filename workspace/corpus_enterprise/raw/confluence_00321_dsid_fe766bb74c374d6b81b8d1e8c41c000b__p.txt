@@ -1,0 +1,184 @@
+Probabilistic Capacity Forecasting and Allocation Spec
+
+Summary
+-------
+This document specifies the probabilistic capacity forecasting and automated allocation system used to allocate GPU and CPU capacity across Redwood's inference pools. The aim is to convert time-series telemetry and business-level signals into a daily probabilistic demand distribution, map that distribution to allocation decisions (reserved, burst, and standby), and expose human-friendly dashboards and runbooks for operators.
+
+Scope
+-----
+- Applies to: hosted/high-throughput inference fleets (all GPU classes), dedicated pools, and the regional burst fabric.
+- Out of scope: spot-instance provisioning for experimental clusters, and per-customer pricing decisions (handled by finance).
+
+Goals
+-----
+1. Provide a 7- and 30-day probabilistic forecast (median, 75th, 90th, 97.5th percentiles) for per-region and per-instance-type token throughput and concurrent sessions.
+2. Produce allocation recommendations: reserved capacity commit and burst-capacity uplift with explicit confidence margins.
+3. Flag forecast drift and provide actionable remediation runbooks for the Ops team.
+4. Reduce overprovisioning waste by 12% year-over-year while keeping latency SLOs met 99.9% of the time.
+
+Terminology
+-----------
+- Consumption window: 1-minute bucketing of token-generation requests (tokens/sec).
+- P95 concurrency: 95th percentile of concurrent requests sampled every minute.
+- Allocation unit: 1 x A100-80GB-equivalent GPU slot. All instance types are normalized to this unit via a compute equivalence table.
+- Safety margin: the percent multiplier applied to a percentile forecast to set committed reservation.
+
+Data sources
+------------
+- telemetry.ingest.tokens (1m) — token counts by tenant, region, model_variant
+- infra.metrics.gpu_util (1m) — GPU utilization per instance
+- routing.requests.latency (1m) — latency and tail percentiles per route
+- tenant.contracts (daily) — reserved commitments and priority tiers
+- calendar.holidays (region) — business day adjustments
+
+Modeling approach
+-----------------
+1. Preprocessing
+   - Normalize token throughput into allocation units.
+   - Decompose signals: trend, weekly seasonality, daily seasonality, holiday adjustment, anomaly residuals (robust STL).
+2. Probabilistic forecasting
+   - Use a two-stage hybrid model:
+     a) Hierarchical time-series model (Bayesian structural time series, BSTS) at per-tenant postcode aggregated level for long-range uncertainty.
+     b) Gradient-boosted quantile regressor (LightGBM quantile objective) for short-term (1-7 day) fine-grained percentile estimates with features for routing hints and model changes.
+   - Combine outputs via weighted ensembling with weight decay based on horizon. BSTS weight increases with forecast horizon.
+3. Queuing layer
+   - Convert throughput forecasts to expected concurrency using an M/G/c approximation per model family that accounts for average generation latency and KV-cache hit rates.
+4. Decision layer
+   - Map concurrency percentile -> allocation recommendation using capacity-smoothing rules and safety margins defined below.
+
+Decision rules and safety margins
+--------------------------------
+- Reserved commit = round_up( predicted_concurrency_at_90th_percentile * (1 + reserved_margin) )
+- Immediate-burst target = predicted_concurrency_at_97.5th_percentile * (1 + burst_margin)
+- Standby (pre-warm) = if predicted P99 latency degradation > 5% at 90p, pre-warm standby nodes equal to 10% of reserved commit
+- Default safety margins: reserved_margin = 0.08 (8%), burst_margin = 0.15 (15%). Owners may override per-tenant based on SLA tier.
+- Minimum reservation floor: do not downscale reserved commits by more than 20% week-over-week to avoid oscillation.
+
+Allocation API (config example)
+-------------------------------
+The allocation engine exposes a REST endpoint for proposals and a write API for committing reservations. Example proposal request body (JSON):
+
+```
+{
+  "region": "us-west-2",
+  "instance_type": "A100-80GB",
+  "horizon_days": 7,
+  "percentiles": [50,75,90,97.5]
+}
+```
+
+Example response (abbreviated):
+
+```
+{
+  "region": "us-west-2",
+  "instance_type": "A100-80GB",
+  "median_alloc_units": 124,
+  "p90_alloc_units": 186,
+  "recommended_reserved": 201,
+  "recommended_burst_target": 234,
+  "confidence": "0.90",
+  "explanation": "p90*1.08 + tenant_safety_override"
+}
+```
+
+Dashboards and alerts
+---------------------
+Dashboards are split into three views: Fleet Health, Forecast Quality, and Allocation Decisions.
+- Fleet Health
+  - Live GPU utilization heatmap by region and instance family.
+  - Request tail latency P50/P95/P99 stacked.
+  - Active burst capacity and pre-warmed standby count.
+- Forecast Quality
+  - Forecast vs actual banded plot (median, p75, p90) annotated with model version and major feature changes.
+  - Calibration curve for probabilistic forecasts (expected exceedance vs observed).
+  - Feature drift indicators: KV cache hit rate shift, model_variant mix change.
+- Allocation Decisions
+  - Time series of recommended_reserved vs committed_reserved.
+  - Cost delta estimate (USD/day) vs baseline.
+  - Owner annotations for manual overrides.
+
+Alerting rules (examples)
+- forecast_drift_high: if mean absolute percentage error (MAPE) on p90 > 12% over a 6-hour window AND calibration shows > 2x expected misses, severity P1 to oncall.
+- undercommit_risk: if actual concurrency > recommended_burst_target for > 10 minutes and latency P99 > latency_slo*1.10, open P0 incident runbook.
+- overcommit_waste: if committed_reserved > p75_alloc_units * 1.25 for 7 consecutive days, create a ticket to Capacity Optimization board.
+
+Runbook: Forecast drift (operator steps)
+----------------------------------------
+1. Triage alert and open /incident/capacity with snapshot (automated from dashboard).
+2. Pull model diagnostics (model_version, feature_histograms) from forecasting service.
+3. Check for upstream events:
+   - Deployment of new model variants in the last 24h
+   - Marketing/partner events (customer list from tenant.contracts)
+   - Cloud provider instance interruptions
+4. Remediation paths:
+   - Short-term: apply burst uplift (API) to region/instance_type and raise priority.
+   - Medium-term: increase reserved_margin from 8% to 20% for affected tenants and schedule a capacity commit.
+   - Long-term: retrain quantile model with the last 14 days and re-evaluate BSTS hyperparameters.
+5. Postmortem: capture root cause and update the calibration chart explanation tag.
+
+Simulation & validation
+-----------------------
+We require backtest validation over the previous 12 months and forward-simulation for 30 days using synthetic surge scenarios (1.5x and 3x sustained spikes). Acceptance criteria:
+- Median absolute error on p90 < 10% across regions in backtest.
+- No simulated scenario should cause tail-latency SLO breach > 0.5% when burst target is applied.
+- Cost regression: expected cost must not increase > 5% relative to baseline for median demand.
+
+Rollout plan (phases)
+---------------------
+1. Canary (2 regions): run forecasting in read-only 'proposal' mode for 14 days, surface dashboards, no automatic commits.
+2. Operator-assist (4 regions): enable proposal -> manual-commit workflow for 30 days. Collect operator feedback.
+3. Automated (global): enable automatic commit for non-enterprise tenants with an audit log and daily email digest.
+
+Metrics tracked
+---------------
+- Forecast calibration (observed exceedance vs expected) per percentile
+- Backtest MAPE per region/horizon
+- Latency SLO burn attributable to allocation decisions
+- Weekly committed_cost vs predicted_cost_savings
+
+Open questions & future work
+---------------------------
+- Incorporate live queue micro-burst detection (<30s) into allocation decisions.
+- Tenant-aware dynamic safety margins using contractual SLAs and historical elasticity.
+- Integrate with pricing signals and spot-instance markets for long tail cost reductions.
+
+Ownership & contacts
+--------------------
+- Primary owner: Platform Capacity & Cost team (pager: #platform-capacity)
+- Doc owner: Maya Chen (mayachen@redwood.example)
+- Reviewers: Arjun Patel, Leah O'Neil, Diego Alvarez
+
+Appendix: sample queries & local config
+---------------------------------------
+Sample SQL to build 1m token ingestion series (Postgres/Timescale simplified):
+
+```
+SELECT time_bucket('1 minute', received_at) as minute,
+       region,
+       model_variant,
+       SUM(tokens) as tokens
+FROM telemetry_tokens
+WHERE received_at >= now() - interval '90 days'
+GROUP BY minute, region, model_variant;
+```
+
+Sample allocation override CLI: 
+
+```
+# propose
+curl -X POST -H "Authorization: Bearer $TOKEN" \
+  -d '{"region":"eu-west-1","instance_type":"A100-80GB","horizon_days":7}' \
+  https://platform-api.internal/v1/capacity/propose
+
+# commit (operator)
+curl -X POST -H "Authorization: Bearer $OP_TOKEN" \
+  -d '{"region":"eu-west-1","instance_type":"A100-80GB","commit_units":150,"reason":"operator_override - sales event"}' \
+  https://platform-api.internal/v1/capacity/commit
+```
+
+Change log
+----------
+- 2025-10-12: Initial spec (Maya Chen)
+- 2025-12-03: Added queuing layer and M/G/c conversion notes (Arjun Patel)
+- 2026-02-10: Updated safety margins and rollout plan after pilot analysis (Leah O'Neil)

@@ -1,4 +1,12 @@
-"""Tests for pipeline summary metadata."""
+"""Title: Pipeline Summary
+
+Tests for pipeline summary metadata.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tasks.pipeline.PipelineSummary import (
     annotate_pipeline_summary,

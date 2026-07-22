@@ -1,0 +1,136 @@
+Telemetry rollup and sampling strategies for the serving runtime
+
+Summary:
+This document describes the telemetry aggregation (rollup) and sampling strategies used by the Redwood serving runtime. It gives concrete rollup policies, sampling heuristics for traces/requests, cardinality guidance, example ingestion configurations (Prometheus/OTLP/agent), and migration/runbook steps to reduce telemetry cost while preserving SLO-aligned visibility.
+
+Goals:
+- Keep operational dashboards and SLO alerting robust while lowering metric cardinality and storage costs.
+- Standardize rollup windows and aggregation keys across runtime services to make cross-service joins reliable.
+- Provide deterministic sampling rules for traces and high-frequency events so debugging remains possible for class-of-failures.
+- Preserve fine-grained telemetry for canaries and high-priority customers (Dedicated/Private) while applying stronger rollups for best-effort workloads.
+
+Audience:
+- Observability engineers, runtime/infrastructure owners, SREs, and oncall responders.
+
+Principles and tradeoffs:
+1) SLO-driven fidelity: choose retention and granularity so that any alertable SLO has the required percentile and time-window fidelity. If a 10-minute p99 is an SLO target, ensure that rollups keep 1s/10s resolution-derived p99 for the relevant signal.
+2) Limit cardinality at the ingestion layer: drop or hash low-value tags before series creation. Use label allowlists per metric.
+3) Separate control-plane vs data-plane telemetry: control-plane operations (deploys, rollouts) keep full labels; high-volume data-plane metrics use coarser keys.
+4) Deterministic sampling: sampling decisions should be stable (based on deterministic hash of request id / customer id) when possible so traces for a customer are consistent across retries and fallbacks.
+
+Metric naming and canonical tags:
+- Metric prefix: runtime_<component>_<metric> (e.g., runtime_shard_kernel_latency_seconds).
+- Canonical tags (allowlist order of importance): service, model, model_variant, region, shard, priority_tier, customer_tier.
+- Non-canonical / scrubbed tags: request_id, user_prompt_digest (hashed), raw_input_size (binned: small/medium/large).
+
+Rollup windows and retention (recommended defaults):
+- 15s raw ingestion retention: 7 days (default for critical metrics tied to SLO).
+- 1m rollups: 30 days.
+- 5m rollups: 90 days.
+- 1h rollups (aggregated summaries): 1 year.
+Notes: For Dedicated/Private customer lanes, maintain 15s raw for 30 days when contract requires longer retention.
+
+Aggregation semantics:
+- Counters: standard delta aggregation.
+- Gauges: last-sample aggregation for rollup window, plus min/max.
+- Histograms: keep exemplars where available; rollup histograms by merging buckets using consistent bucket boundaries. Avoid dynamic buckets per-instance.
+- Summaries: discouraged for cross-host rollups; prefer histogram-based approach for pXX calculations.
+
+Cardinality control and label strategies:
+1) Enforce label allowlists at the ingestion client (agent): only forward tags in canonical list.
+2) Hash low-entropy user identifiers when they must be retained, and annotate the metric with hashed_id_bucket (e.g., hashed_customer_bucket=0..1023).
+3) Use per-metric label limits: if unique label values exceed 1000 in a 5m window, trigger autoscrub mode for that metric and remove the offending label.
+4) Example denylist: full_text, prompt_blob, kvcache_key.
+
+Sampling rules (traces and request spans):
+- Default sampling: 1% deterministic trace sampling (by stable hash of request_id) for production best-effort workloads.
+- Priority sampling: 100% for errors (HTTP 5xx, internal error flags), timeouts, and requests contributing to tail-latency (e.g., if token-generation time > 2x median).
+- Canary and customer lanes: 100% traces for canary clusters and Dedicated customer_tier requests.
+- Adaptive spike sampling: when trace storage budget exceeded for the minute, reduce best-effort sampling to preserve error+tail capture. Implementations should lower non-error sampling stochastically but keep deterministic sampling for a fixed seed segment.
+
+Example agent configuration (OTel/Prometheus hybrid):
+- Rollup policy (YAML):
+  rollup_policy_version: v1
+  metrics:
+    - name: runtime_kernel_latency_seconds
+      rollup_windows: [15s, 1m, 5m, 1h]
+      labels_allowed: [service, model, model_variant, region, priority_tier]
+      cardinality_limit: 2000
+    - name: runtime_requests_total
+      rollup_windows: [15s, 1m, 5m]
+      labels_allowed: [service, region, shard, customer_tier]
+      cardinality_limit: 1000
+  trace_sampling:
+    default_rate: 0.01
+    priorities:
+      - condition: error_or_status_5xx
+        rate: 1.0
+      - condition: customer_tier == "dedicated"
+        rate: 1.0
+      - condition: canary == true
+        rate: 1.0
+
+PromQL and query examples (for dashboards/alerts):
+- p50/p95/p99 from histogram (Prometheus):
+  histogram_quantile(0.99, sum(rate(runtime_kernel_latency_seconds_bucket[5m])) by (le, service, model, model_variant))
+- request rate (per-region):
+  sum(rate(runtime_requests_total[1m])) by (region)
+
+SLO mapping examples (how metrics map to SLOs):
+- Inference latency SLO (small_seq): objective: p99 < 150ms over 10m window.
+  Signal: runtime_kernel_latency_seconds histogram filtered by model_variant=small_seq.
+  Required retention: 15s raw or 1m rollup that preserves histogram buckets.
+- Request success SLO: 99.95% success over 1h.
+  Signal: 1 - (sum(increase(runtime_requests_total{status!~"2.."}[1h])) / sum(increase(runtime_requests_total[1h])))
+
+Alert thresholds (examples):
+- P99 latency breach: when 99th percentile > target for 3 of 5 consecutive 1m windows -> P0 alert.
+- Error-rate spike: when error rate increases 3x baseline or > 0.5% absolute for 15m -> P1.
+
+Dashboards and slices to maintain:
+- Service overview: throughput, p50/p95/p99 latencies, error rate, autocost estimates.
+- Kernel health: per-shard GPU utilization, kernel queue length, average kernel execution time.
+- KV cache impact: cache hit ratio, warmup rate, cache-size-by-shard.
+- Customer-tier slices: Dedicated vs Hosted vs Private.
+
+Runbook excerpt: handling a sudden cost spike from metric churn
+1) Detect: Alert triggers for cardinality explosion (metric series growth > 15%/min).
+2) Triage: Identify metric and offending label via series cardinality query (example query: topk(10, increase(prometheus_tsdb_head_series_total[5m]))).
+3) Mitigate: Apply ingress label drop rule for the offending metric (agent config push): remove label or replace with hashed bucket.
+4) Validate: Confirm series count stabilizes and dashboard panels return to expected series counts.
+5) Postmortem: Create incident note with root cause and owner, adjust label allowlist or client instrumentation accordingly.
+
+Compatibility and migration guidance:
+- Backfill approach: do not backfill histograms by merging old dynamic-bucket histograms; instead regenerate from raw request logs where necessary.
+- Rolling agent update: deploy rollup/allowlist changes via the config service in a canary->region->global rollout with feature flag to revert.
+- Coordinate with telemetry-cost team for major label changes (expected cost delta estimation required) before global rollout.
+
+Cost estimation guidelines:
+- Use 5k series per node as a budgeting heuristic for standard best-effort nodes.
+- Estimate trace storage: 1% sample of 10k rps with average 10 spans/request -> ~1MM spans/day; use compression and exemplar policies to reduce long-term retention.
+
+Ownership, escalation, and contacts:
+- Ownership: Observability team owns ingestion pipelines and rollup infra. Runtime infra (serving-runtime) owns metric naming and client-side allowlist.
+- Oncall: Observability rotation for ingestion issues; runtime SRE rotation for metric correctness and SLO alerts.
+- Contacts: obs-oncall@redwood.ai, runtime-sre@redwood.ai.
+
+Open action items and future work:
+- (Action) Define per-model bucket schemas for histograms to avoid bucket mismatches during rollup. Owner: Priya Nair. Target: 2026-04-01.
+- (Action) Implement adaptive sample-rate controller that lowers sample rate during ingestion spikes but preserves deterministic sampling for hashed buckets. Owner: Jordan Li. Target: 2026-06-15.
+- (Research) Evaluate compressed histogram encodings (t-digest / HDR) for long-term retention cost savings.
+
+Appendix: quick CLI examples
+- Force an ingress allowlist update (example):
+  curl -X POST https://config.redwood.internal/v1/rollup-policies \\n    -H 'Authorization: Bearer <token>' \\n    -H 'Content-Type: application/json' \\n    -d '{"policy_name": "reduce-cardinality-2026-02", "updates": [{"metric": "runtime_requests_total", "drop_labels": ["raw_prompt"]}]}'
+
+- Check current top series by growth:
+  promql: topk(20, increase(prometheus_tsdb_head_series_total[5m]))
+
+References:
+- Related: runtime-observability-data-model-and-tracebook-2026 (data model and tracebook)
+- Related: production-rollout-tuning-checklist-2026 (rollout steps for infra changes)
+
+Document history:
+- 2024-11-12: initial draft
+- 2025-03-10: added deterministic sampling rules and cost heuristics
+- 2026-02-18: finalized rollup windows and added runbook steps

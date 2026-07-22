@@ -1,4 +1,12 @@
-"""Create annotation MWE trie from lexicon configuration."""
+"""Title: Create annotation resource
+
+Create annotation MWE trie from lexicon configuration.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

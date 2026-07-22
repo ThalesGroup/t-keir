@@ -1,0 +1,144 @@
+Adaptive operator feedback and deploy safety roadmap — 2028
+
+Summary
+-------
+This roadmap describes a cross-team program to reduce operator cognitive load while improving deployment safety for the LLM inference platform. The program combines tightly instrumented telemetry, an operator feedback loop (OFL) service, and safe deploy controls so operators can act faster, with higher confidence, during both planned rollouts and unexpected regressions.
+
+Background
+----------
+We have recurring cost and latency incidents where operator intervention is necessary (examples: KV-cache misbinding, sudden p95 token latency regressions after a model variant rollout). Current runbooks are detailed but rely on manual signal correlation across multiple dashboards. The goal of this initiative is to build a set of primitives and a staged rollout plan that: 
+- Provides automatic signal synthesis and prioritized playbooks to the oncall UI.
+- Introduces deploy-time safety checks and soft-guards that prevent high-risk rollouts from progressing.
+- Collects structured operator feedback to continuously improve alert routing, dashboard relevance, and automatic remediations.
+
+Goals and success criteria (measurable)
+-------------------------------------
+1) Reduce average operator action time (OAT) for platform-degradation incidents from 18m to <=10m within 12 months.
+2) Reduce high-severity deploy regressions (SEV impacting >1 customer) due to model swap or kernel switch by 50% year-over-year.
+3) Increase precision of high-priority alerts (true-positive rate) seen by operator UI from ~58% to >=75%.
+4) Ship the OFL service with a minimum viable telemetry-synthesis pipeline and expose it in the operator console by Q2 2027.
+
+Scope and non-goals
+------------------
+In-scope:
+- Instrumentation taxonomy and dashboard templates for operator-facing signals (latency, token cost spikes, eviction rates, prefetch misses).
+- The OFL service (signal fusion + ranking + suggested playbook).
+- Deploy safety gates integrated with the canary orchestration service (canary-policy-enforcer).
+- Operator UI panels and a small set of automated corrective actions (cache-reset, model-variant-rollback).
+
+Out-of-scope:
+- Full autonomous remediation for all regressions (we will limit automated actions to safe, idempotent ops).
+- Rewriting existing model serving runtime kernels; instead we will provide stronger guardrails around kernel-swaps.
+
+Timeline & milestones (high-level)
+----------------------------------
+- Q4 2026: Pilot instrumentation taxonomy and 3 operator dashboard prototypes (regional and global views).
+- Q1 2027: Launch telemetry-synthesis pipeline (Kafka -> fusion -> ranked-events) and OFL alpha in staging.
+- Q2 2027: Operator console integration; pilot with Platform oncall team; gating prototype added to canary-policy-enforcer.
+- Q3 2027: Expand pilots to three customer-facing regions; add automated cache-reset action and rollback playbook.
+- Q4 2027: Ramp to beta; run live gamedays and chaos scenarios; validate success criteria.
+- Q1 2028: GA for OFL + deploy-safety feature set.
+
+Implementation details
+----------------------
+1) Telemetry taxonomy and dashboards
+   - Core signals to collect (metric names and intent):
+     * platform.token_latency_ms.p50/p95/p99 (latency SLI)
+     * runtime.kv_cache_hit_rate (cache health)
+     * runtime.eviction_rate_per_min (eviction pressure)
+     * orchestrator.deployment_canary_error_rate (canary health)
+     * billing.token_rate_change_pct_1h (cost surges)
+   - Dashboard templates: a regional operator view (per-region heatmap), a global regressions page (ranked regressions), and a deploy-safety cockpit.
+
+   Example SLOs and thresholds (for dashboard alerting and OFL ranking):
+   | SLO id | Metric | Target | Warning | Trigger |
+   |--------|--------|--------|---------|---------|
+   | SLO-LLM-LAT-P95 | platform.token_latency_ms.p95 | <=200 ms | 200-350 ms | >350 ms for 5m |
+   | SLO-KV-HIT | runtime.kv_cache_hit_rate | >=92% | 85-92% | <85% for 10m |
+   | SLO-EVICT | runtime.eviction_rate_per_min | <=5/min | 5-15/min | >15/min for 10m |
+
+   Note: thresholds will be parameterized by region and tenant tier.
+
+2) Operator Feedback Loop (OFL) service
+   - Purpose: fuse telemetry signals, enrich with recent deploy context (committer, variant, kernel flags), run heuristics and ML-based classifiers to produce a ranked list of prioritized events and suggested playbooks.
+   - Ingestion: Kafka topics (metrics, traces, deploy-events). Fusion layer will attach a TTLed context object per tenant/region.
+   - Output: ranked-events API (JSON) consumed by the operator UI and by canary-policy-enforcer webhooks.
+
+   Minimal OFL API example (HTTP):
+   POST /v1/fusion/query {"region":"us-west-2", "window":"5m"} -> returns [{"event_id":"evt-123","score":0.94, "suggested_playbook":"cache-reset-v1","confidence":0.88}]
+
+3) Deploy safety gates and canary-policy-enforcer integration
+   - Extend canary-policy-enforcer with:
+     a) preflight checks (synthetic smoke metrics, dependency-liveness, model-compatibility matrix)
+     b) mid-canary automatic hold when OFL reports high-risk ranked-events (score > 0.8)
+     c) staged rollback automation (first attempt: automated rollback trigger with manual confirmation window default 3 minutes for non-critical tenants).
+
+Operator workflows and runbook changes
+-------------------------------------
+- New operator console panels: "Ranked Regressions", "Deploy Safety Cockpit", and "OFL Playbook Suggestions".
+- Example operator flow for a canary hold:
+  1. Operator receives a high-priority ranked-event in console (score>0.8).
+  2. Console displays: top 3 signals, likely root cause, suggested playbook, and one-click actions (cache-reset, pause-canary, rollback).
+  3. Operator either authorizes an automated action or escalates to L3.
+  4. Automated action is executed and result recorded as structured feedback back to OFL for future tuning.
+
+Runbook snippet (human-readable):
+1) If p95 latency rises above 350ms and kv_cache_hit_rate < 80% within 10m:
+   - Pause canary (canary-policy-enforcer -> pause)
+   - Run cache-reset action for the affected shard(s) (operator console -> cache-reset)
+   - If latency does not recover in 5 minutes, trigger model-variant rollback.
+
+Telemetry & dashboards (implementation notes)
+---------------------------------------------
+- Use high-cardinality metrics sparingly; prefer aggregated telemetry with dimensions [region, tenant_tier, model_variant].
+- Add a "regression fingerprint" field to fused events to allow quick deduplication of signals across tenants.
+- Dashboards will include a single boolean column "OFL-suggested" to surface events already triaged by the service.
+
+Owner matrix and responsibilities
+---------------------------------
+| Area | Primary owner | Secondary owner |
+|------|----------------|-----------------|
+| OFL service | eng-platform/fusion (Marina Kovács) | eng-serving-runtime (Ethan Zhao) |
+| canary-policy-enforcer changes | eng-platform/orchestration (Luis Herrera) | eng-infra (Priya Nair) |
+| operator console UI | eng-developer-experience (Priya Nair) | eng-platform/product (Marina Kovács) |
+
+Risk register & mitigations
+---------------------------
+- False positives from OFL: roll out scoring conservatively; provide "dismiss and teach" operator actions to improve classifier.
+- Hard fails during automated rollback: enforce canary-size limits on automated rollback; require manual confirmation for high-revenue tenants.
+- Data lag causing stale decisions: instrument end-to-end latency for telemetry pipeline and surface metric in console; default to manual hold if data freshness < 30s.
+
+Validation and experiments
+-------------------------
+- Phase 1 (staging): run seeded regressions and measure OAT and precision.
+- Phase 2 (limited production): opt-in tenants and region for 4 weeks, run canary-hold experiments, track false-positive and false-negative rates.
+- Phase 3 (beta): widen to 50% of regions, run gamedays with simulated multi-region degradations.
+
+Appendix: operator CLI examples and safe automations
+---------------------------------------------------
+# Pause canary for rollout id
+redwoodctl rollout pause --id rlt-20270901 --reason "OFL:high-score"
+
+# Trigger cache-reset action (idempotent)
+redwoodctl runtime cache-reset --shard us-west-2-a --force --dry-run=false
+
+# Query OFL ranked events (example JSON output):
+# [{"event_id":"evt-123","score":0.94,"suggested_playbook":"cache-reset-v1","confidence":0.88}]
+
+Related artifacts and links
+--------------------------
+- Playbooks: /confluence/eng-platform/runbooks/operator-safe-mode-and-manual-intervention-playbook-2026
+- Dashboards: Platform/Operator Feedback (dash-id: dash-ops-feedback-usw2)
+- Canary service: canary-policy-enforcer (repo: github.com/redwood/platform-canary-enforcer)
+
+Next steps (immediate actions for Q4 2026)
+-----------------------------------------
+1) Align instrumentation taxonomy with eng-serving-runtime and SRE (owner: Marina Kovács). Deadline: 2026-10-15.
+2) Kickoff OFL alpha prototype sprint and define minimal fusion schema. Deadline: 2026-11-30.
+3) Create operator console mockups and run two user interviews with oncall rotation members. Deadline: 2026-12-10.
+
+Contact and ownership
+---------------------
+Primary contact: Marina Kovács (marina.kovacs@redwood.ai)
+Secondary: Luis Herrera (luis.herrera@redwood.ai)
+

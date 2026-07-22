@@ -1,0 +1,131 @@
+Rapid Hiring Blitz & Volatile Headcount Playbook
+
+Overview:
+This playbook describes an operational pattern for executing a time-boxed, high-throughput hiring surge (a "hiring blitz") while also managing volatile headcount plans (hiring freezes, rapid rollbacks, conversion of contractors). It condenses processes, ownership, and guardrails so hiring quality and new-hire experience do not degrade during fast growth or contraction cycles.
+
+Scope and intent:
+- Applies to company-level or org-level hiring surges lasting between 2 and 12 weeks.
+- Covers sourcing, screening, offer flow, rapid onboarding, manager handoffs, and contingency de-escalation when headcount changes.
+- Not a replacement for long-term recruiting strategy or diversity initiatives; those run in parallel.
+
+Key principles:
+1) Quality over volume: retain minimum scorecard thresholds and structured interviews to avoid bad hires.
+2) Transparent capacity signals: hiring managers must publish role prioritization and de-prioritization triggers before a blitz begins.
+3) Short feedback loops: reviewers must return feedback within 36 hours during an active blitz.
+4) Safe retraction: have an offer retraction and conversion policy ready to preserve fairness and legal compliance.
+
+Roles & ownership:
+- Blitz Lead (people-ops): overall coordinator, daily standup facilitator, escalation owner.
+- Sourcing Captain (recruiting): channel allocation and pipeline pacing.
+- Hiring Managers: interview commitment, final decision, onboarding sponsor.
+- Interview Ops (people-ops/recruiting): scheduling, scorecard enforcement, candidate communications.
+- Finance Partner: verifies budget approvals and backstops contingency scenarios.
+
+Pre-blitz checklist (to be completed 7–3 days before start):
+1. Confirm executive approval and budget: finance signature required.
+2. Publish prioritized role list with 3 tiers (A: critical, B: backfill, C: discretionary).
+3. Assign interview panels and backups; guarantee at least two trained interviewers per role.
+4. Prepare templated offer letters and compensation bands for rapid approval.
+5. Update ATS tags and create blitz pipeline views.
+6. Schedule daily 15-minute standups (Blitz Lead + Sourcing + Hiring Managers).
+
+Blitz operating cadence (example daily rhythm):
+- 09:00 — Pipeline sync (exceptions, blockers).
+- 10:00 — Interview slot release and scheduling window opens.
+- 14:00 — Manager review block; managers commit 2 hours to deconflict feedback.
+- 16:00 — Offer approvals and comp decision window.
+- 17:00 — End-of-day report (pipeline movements, offers extended, declines).
+
+Structured interview scale (mandatory):
+- Score 1–4 across three dimensions: Role Match, Problem Solving, Team Fit.
+- Minimum pass: average >= 3.0 and no single dimension < 2.
+
+Quick reference: scorecard table (copy into ATS/scorecard form):
+| Field | Description | Threshold |
+| Role Match | Demonstrated technical/functional skills | avg >= 3.0 |
+| Problem Solving | Clear approach and trade-off reasoning | avg >= 3.0 |
+| Team Fit | Communication, collaboration, and values alignment | avg >= 3.0 |
+
+Decision & offer flow (numbered procedure):
+1. Interviewers submit structured feedback within 36 hours.
+2. Hiring manager consolidates feedback and makes a tentative decision.
+3. Compensation approval route: Manager -> Recruiting Lead -> Finance (auto-approve if within band).
+4. Blitz Lead validates candidate experience checks (no back-to-back technical interviews > 2 hours without a break, compensation within published bands).
+5. Offer is extended and tracked in the blitz offer tracker.
+
+Offer management and fairness guardrails:
+- All offers must include a written justification if compensation exceeds band by > 10%.
+- Rolling re-evaluation: candidates who receive offers but have > 10 days lapse are re-run through a 1-hour reconfirmation interview with the hiring manager.
+- Offer retraction policy: in contraction scenarios, priority-based retraction is used only after legal review and with transition support. People-ops manages communications and severance guidance.
+
+Onboarding fast-path (first 30 days):
+Purpose: compress essential onboarding so new hires are productive while preserving mentorship and cultural integration.
+Week 0 (pre-boarding):
+- IT provisioning checklist (device, VPN, account creation) completed 48 hours before start.
+- Welcome packet & role objectives delivered via onboarding portal.
+Week 1 (foundation):
+- Day 1 orientation (people-ops): company values, security, benefits, payroll, policies (2 hours).
+- Manager 30/60/90 expectation sync (30 minutes).
+- Buddy pairing assigned.
+Week 2–4 (ramp):
+- Technical onboarding tasks and two starter tickets assigned by manager.
+- Weekly 1:1 with manager + weekly onboarding cohort sync.
+
+Manager handoff & performance check cadence for blitz hires:
+- 1:1 frequency: weekly for first 8 weeks, then biweekly until quarter-end.
+- Written 30/60/90 goals due by day 7.
+- Early talent review: at week 6, hiring manager submits a 6-week progress snapshot to people-ops and L&D for targeted interventions.
+
+Contingency planning for headcount volatility:
+Trigger matrix (examples):
+- Trigger A (Revenue shock > 10% QoQ): freeze Tier C roles immediately; pause Tier B hires in 48 hours.
+- Trigger B (Budget reduction confirmed): people-ops initiates offer pause and conversion review within 72 hours.
+- Trigger C (Unexpected scale-down): retract offers only after legal and manager-level mitigation plans are prepared.
+
+Contingency communications checklist:
+- Draft templates for (a) offer pauses, (b) rescind letters, (c) contractor conversion offers, (d) internal manager notice.
+- People-ops to run empathy-first outreach and provide relocation/transition support where appropriate.
+
+Metrics and SLAs (blitz KPIs):
+- Time-to-offer (median) target: <= 10 days from first interview to offer.
+- Offer acceptance rate target: >= 65% during blitz; monitor by channel.
+- Interviewer turnaround: 90% of interviewer feedback returned within 36 hours.
+- New-hire retention at 90 days: >= 85% for hires made during the blitz (tracked cohort).
+
+Risk register (top items):
+- Quality decay: mitigate with strict scorecards and post-hire audits.
+- Candidate experience issues: mitigate with dedicated candidate communications lead.
+- Legal/regulatory exposure for retractions: mitigate with early legal involvement and standardized severance packages.
+
+Post-blitz retrospective and data capture (3–10 days after):
+1. Blitz Lead runs a 90-minute retrospective with stakeholders: sourcing, hiring managers, interviewers, legal, finance.
+2. Capture quantitative outcomes (time-to-hire, acceptance, cost-per-hire) and qualitative feedback.
+3. Create a one-page lessons-learned and update this playbook.
+
+Templates and artifacts (available in HR drive):
+- Blitz pipeline tracker (spreadsheet): columns = Role, Tier, Status, Candidate, Stage, Interviewer, Score, Offer Date, Offer Outcome.
+- Offer letter templates (with local legal clauses for US, UK, EU).
+- Manager 30/60/90 goal template.
+- Candidate communication templates for pause/retract/accept.
+
+References and related docs:
+- Hiring panel calibration guidelines (link in related_pages).
+- Onboarding immersion rotation playbook for extended ramp support.
+
+Appendix A — Example blitz timeline (4-week sample):
+Week 0: prep, roles prioritized, panels assigned.
+Week 1: sourcing surge, 60% of interviews scheduled, first offers extended.
+Week 2: accelerated debriefs, remaining offers extended, onboarding slots reserved.
+Week 3: ramp cohorts start, early 6-week reviews scheduled.
+Week 4: retrospective and adjustment of remaining open roles.
+
+Appendix B — Quick legal notes (non-exhaustive):
+- Local labor law differences may constrain offer retraction and notice periods. Always involve legal before any retraction.
+- Use standardized severance bands to expedite approvals when retraction is unavoidable.
+
+Contact and escalation:
+- Blitz Lead (People Ops): maya.chen@redwood.ai
+- Recruiting Lead: recruiting-lead@redwood.ai
+- Legal escalation: legal-escalations@redwood.ai
+
+This playbook is a living document. If you run a blitz, file the post-blitz lessons-learned and update the playbook within 10 business days.

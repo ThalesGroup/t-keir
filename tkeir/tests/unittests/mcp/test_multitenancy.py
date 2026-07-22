@@ -1,4 +1,12 @@
-"""Multi-tenancy tests: MCP handlers never honour foreign user_space."""
+"""Title: Multitenancy
+
+Multi-tenancy tests: MCP handlers never honour foreign user_space.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

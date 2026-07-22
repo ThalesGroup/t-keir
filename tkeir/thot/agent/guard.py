@@ -1,4 +1,12 @@
-"""Governor integration for agent runs: kill switch, budgets, ActionRecords."""
+"""Title: Guard
+
+Governor integration for agent runs: kill switch, budgets, ActionRecords.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

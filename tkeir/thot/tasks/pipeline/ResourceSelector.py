@@ -1,4 +1,12 @@
-"""Select lexical resource directory for a detected language."""
+"""Title: Resource Selector
+
+Select lexical resource directory for a detected language.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 

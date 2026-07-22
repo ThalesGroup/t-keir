@@ -1,4 +1,12 @@
-"""GDPR pseudonymization and crypto-shredding helpers."""
+"""Title: Privacy
+
+GDPR pseudonymization and crypto-shredding helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

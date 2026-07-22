@@ -1,9 +1,11 @@
-"""Keyword extractor based on RAKE algorithm
+"""Title: Keyword extractor based on RAKE algorithm
 
-Author: Eric Blaudez (Eric Blaudez)
+Keyword and keyphrase extraction.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 import json

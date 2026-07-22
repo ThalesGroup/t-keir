@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4DE21EYY7DQK44G4555SDP",
+  "reason": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'morphologizer', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+  "job": {
+    "ingest_id": "01KY4DE21EYY7DQK44G4555SDP",
+    "correlation_id": "3a41c19731a39b09da543d1056205c10",
+    "status": "failed",
+    "doc_id": "4f02a07efb39d8d9af42637dba3a94b357c39c0db8b336d9ec561c5611aac9eb",
+    "batch_id": null,
+    "manifest_path": "staging/4f02a07efb39d8d9af42637dba3a94b357c39c0db8b336d9ec561c5611aac9eb/ingest.manifest.json",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'morphologizer', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']",
+    "created_at": "2026-07-22T08:00:21.550Z",
+    "updated_at": "2026-07-22T08:00:41.120Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4DE21EYY7DQK44G4555SDP",
+    "correlation_id": "3a41c19731a39b09da543d1056205c10",
+    "doc_id": "4f02a07efb39d8d9af42637dba3a94b357c39c0db8b336d9ec561c5611aac9eb",
+    "source": {
+      "uri": "upload://01KY4DE21EPS78RDQ54PQZ4AB4/SITREP_01120_0e0ec75e.docx",
+      "filename": "SITREP_01120_0e0ec75e.docx",
+      "content_type": "application/octet-stream",
+      "size_bytes": 1093
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T08:00:21.555Z",
+    "error": "[E007] 'spacy_thot_tokenizer' already exists in pipeline. Existing names: ['tok2vec', 'morphologizer', 'parser', 'senter', 'attribute_ruler', 'lemmatizer', 'ner', 'spacy_thot_tokenizer']"
+  },
+  "failed_at": "2026-07-22T08:00:41.121Z"
+}

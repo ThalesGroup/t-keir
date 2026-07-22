@@ -1,0 +1,248 @@
+ADR-0247: Route normalization and cost attribution semantics for Usage Insights
+
+## Summary
+This ADR defines how Redwood canonicalizes API routes for reporting and how we attribute usage and cost across retries, fallbacks, and model aliases for the **In-console usage insights** feature.
+
+The decision introduces:
+- A shared **route normalization** library used at ingestion and query time.
+- A canonical **route key** and **route group** for stable aggregation (guarding against cardinality blow-ups).
+- A **model bucketing** scheme (family + serving profile + version bucket) that resolves aliases.
+- Explicit attribution rules for **retries** and **fallbacks** so totals reconcile with billing and are explainable to users.
+
+## Status
+Published. Effective for Usage Insights Beta, with compatibility shims for existing metering events.
+
+## Context / Problem
+Usage Insights needs to break down cost by *route* and *model* (e.g., `/v1/chat/completions` on `llama-3.1-70b`). Today:
+- Routes can include high-cardinality path params (IDs, hashes), causing aggregation explosion.
+- Customers use both Redwood-native and OpenAI-compatible endpoints; naming varies.
+- Model identifiers appear as aliases (e.g., `llama-3.1-70b`, `meta/llama-3.1-70b-instruct`, `llama3.1-70b`), leading to duplicated rows.
+- Retries and fallbacks complicate attribution: users want to understand drivers, but totals must match billing (within tolerance).
+
+We need a stable canonicalization and attribution strategy that is:
+- **Correct** (reconciles with billing hooks)
+- **Stable** over time (reports don’t “drift” with new endpoints or model alias changes)
+- **Explainable** (clear definitions for retries/fallbacks)
+- **Safe** (limits cardinality and PII leakage)
+
+## Decision
+### 1) Canonical route key
+We define a canonical `route_key` as:
+
+`<http_method> <normalized_path>`
+
+Examples:
+- `POST /v1/chat/completions`
+- `POST /v1/embeddings`
+- `GET /v1/files/{file_id}`
+
+Notes:
+- We do **not** include hostname, scheme, query string, or workspace subdomain in the route key.
+- We include the HTTP method to avoid collisions (`GET /v1/models` vs `POST /v1/models`).
+
+### 2) Route normalization rules
+A shared library (`route-normalization`) will normalize raw requests into `normalized_path` using the following precedence:
+
+1. **First-party known route templates**
+   - For Redwood and OpenAI-compat endpoints, we maintain a registry mapping to templates (e.g., `/v1/files/:id` → `/v1/files/{file_id}`).
+   - The registry is versioned and reviewed (changes require PR + tests).
+
+2. **Heuristic templating for unknown paths (guardrailed)**
+   - If no template match exists, we apply conservative heuristics:
+     - Replace UUID-like segments with `{id}`
+     - Replace base64/hex-like segments above a length threshold with `{token}`
+     - Replace purely numeric segments with `{n}`
+   - Heuristics are limited to **at most 2 substitutions** per path; otherwise path is mapped to `/__other__` (see below).
+
+3. **Fallback bucket**
+   - Paths that still appear high-cardinality after heuristic templating (or violate thresholds) are aggregated under:
+     - `normalized_path = /__other__`
+     - `route_group = other`
+
+### 3) Route group
+We also compute a coarse `route_group` used for UI grouping and guardrails:
+- `chat_completions` → `/v1/chat/completions` and OpenAI-compatible equivalents
+- `completions` → `/v1/completions`
+- `embeddings` → `/v1/embeddings`
+- `rerank` → `/v1/rerank`
+- `batch` → batch endpoints
+- `files` → upload/download endpoints
+- `other` → `/__other__` and any non-classified endpoints
+
+This is intentionally opinionated and limited to a fixed set for explainability and stable dashboards.
+
+### 4) Cardinality guardrails
+To prevent runaway dimensions:
+- `normalized_path` must be <= 120 characters; otherwise normalize to `/__other__`.
+- Maximum unique routes per workspace per day for interactive queries: **2,000**. Above this, queries degrade gracefully by aggregating least-used routes into `other` and emitting a `route_cardinality_capped=true` flag in query metadata.
+- We do not include raw path segments in telemetry; only `route_key`, `normalized_path`, and `route_group` are stored for reporting.
+
+### 5) Model identity and bucketing
+We define a canonical model breakdown key using the following fields (resolved at ingestion):
+
+- `model_family`: stable family name (e.g., `llama-3.1`, `qwen2.5`, `mistral-large`)
+- `model_size`: size label when applicable (e.g., `70b`, `8b`), else empty
+- `model_variant`: instruct/chat/base when applicable (e.g., `instruct`)
+- `serving_profile`: Redwood serving profile that affects economics (e.g., `fp16`, `int8`, `int4`, `speculative`, `longctx`)
+- `model_version_bucket`: stable “reporting version” (see below)
+- `model_id_display`: a user-facing string (best-effort alias) for UI
+
+#### 5.1 Model version bucket definition
+We bucket versions so minor backend changes don’t create new rows, but meaningful changes do.
+
+- For models with semantic versions: bucket to **major.minor** (e.g., `3.1.x` → `3.1`)
+- For dated releases: bucket to **YYYY-MM** (e.g., `2026-01-17` → `2026-01`)
+- For internal Redwood builds: bucket to **serving profile version** (e.g., `rp-17`) when it impacts performance/cost
+
+We retain a raw `model_build_id` internally for debugging but do not expose it in the core UI breakdown tables.
+
+#### 5.2 Aliases
+All customer-specified model strings are resolved through the Model Registry:
+- `model_id_input` (what caller sent)
+- `model_id_canonical` (registry canonical)
+- `model_id_display` (preferred UI label)
+
+Aggregation is done on canonical + bucket fields to avoid duplicate rows. If alias mapping changes, the backfill strategy is to keep historical data stable (no rewrite) unless a correctness issue is found (see Consequences).
+
+### 6) Attribution semantics for retries and fallbacks
+Usage Insights must answer two questions:
+1) “Where did we spend money?” (billing-consistent)
+2) “Why did it change?” (explainable drivers)
+
+We make the following decisions.
+
+#### 6.1 Primary attribution principle
+**Attribute cost to the model and route that actually performed the work.**
+- If a request attempts model A, then falls back to model B, the tokens billed for A are attributed to A; tokens billed for B are attributed to B.
+- This ensures totals reconcile with billing and makes fallbacks visible as a cost driver.
+
+#### 6.2 What counts as a retry?
+A “retry” is any additional attempt for the same logical request after an initial failure/timeout/capacity event.
+
+Telemetry fields:
+- `request_id` (logical request)
+- `attempt_id` (unique per attempt)
+- `attempt_number` (1..n)
+- `retry_reason` (enum: `timeout`, `capacity`, `upstream_5xx`, `client_disconnect`, `rate_limit_replay`, `other`)
+
+Attribution:
+- **All attempts contribute** to usage/cost totals (billing-consistent).
+- In the UI, we expose a driver metric: `retry_overhead_cost = total_cost - cost_of_successful_attempt_only`.
+
+#### 6.3 What counts as a fallback?
+A “fallback” is a retry where the chosen model differs from the previous attempt due to routing policy.
+
+Telemetry fields:
+- `fallback_from_model_id_canonical`
+- `fallback_to_model_id_canonical`
+- `fallback_reason` (enum: `capacity`, `policy_latency`, `policy_cost`, `regional_outage`, `model_degraded`, `safety`, `other`)
+
+Attribution:
+- Tokens/cost are attributed to the actual attempt’s model.
+- Additionally, Usage Insights computes:
+  - `fallback_count`
+  - `fallback_cost` (cost incurred on attempts where `attempt_number > 1` AND model differs)
+
+#### 6.4 Streaming and partial tokens
+For streaming responses, we attribute:
+- `tokens_out` that were actually generated before disconnect
+- cost associated with those generated tokens
+
+If the client disconnects and the server aborts generation:
+- We still count the generated tokens (as they incurred compute)
+- We tag the attempt with `termination_reason=client_disconnect`
+
+#### 6.5 Cache hits/misses
+Caching is represented as an attribution driver, not a separate route/model.
+- If a prefix/KV cache is hit, tokens served from cache are reflected as reduced compute cost per token (where applicable).
+- Usage Insights will report:
+  - `cache_hit_tokens_in` and `cache_hit_rate`
+  - `cache_miss_tokens_in`
+
+Important: cache events must be attached to the attempt that benefited from the cache, to keep route/model aggregation consistent.
+
+### 7) Time semantics
+Aggregation uses `usage_event_time` (when the attempt executed) and reports in the workspace’s configured timezone for day boundaries.
+- Late events are accepted up to **72 hours**; after that they may appear only in billing totals, not in breakdowns (data quality banner required).
+
+## Options considered
+### Option A: Attribute everything to the final successful attempt
+Pros: simpler mental model.
+Cons: hides retry and fallback costs, breaks reconciliation with billing, under-reports wasted spend.
+
+### Option B: Attribute everything to the original route/model requested
+Pros: aligns with caller intent.
+Cons: incorrect when routing changes model, obscures fallback economics, complicates debugging.
+
+### Option C (Chosen): Attribute to the attempt that executed (per-attempt accounting)
+Pros: billing-consistent, makes retries/fallbacks visible, supports “top drivers” insights.
+Cons: requires attempt-level instrumentation and careful UI explanations.
+
+## Implementation notes
+### Services / ownership
+- **api-gateway**: emits request metadata (raw path, method, compat mode) and request_id.
+- **metering-ingester** (Telemetry & Analytics): applies route-normalization and model registry resolution at ingestion; stores canonical dimensions.
+- **usage-insights-aggregator**: builds rollups by workspace/project, time bucket, route_key, model bucket.
+- **billing-hooks**: remains source of truth for invoice totals; reconciliation job compares aggregates vs billing.
+
+Primary owners:
+- Route normalization library: Thomas Baird
+- Model registry mapping + bucketing: Nadia Rahman
+- Reconciliation vs billing: Cole Summers
+
+### Migration plan
+1. Add normalization library and run in shadow mode: store `route_key_v2` alongside existing fields for 2 weeks.
+2. Validate cardinality and reconciliation drift (alerts if >0.5% daily cost mismatch).
+3. Switch Usage Insights queries to `route_key_v2`.
+4. Deprecate legacy route fields after beta, keeping an internal compatibility view for historical exports.
+
+## Consequences
+### Positive
+- Stable route/model breakdowns with controlled cardinality.
+- Clear attribution of retries and fallbacks (drives “top cost drivers” and “what changed” insights).
+- Reduced customer confusion caused by model aliases producing duplicate rows.
+
+### Tradeoffs / risks
+- `/__other__` bucket can hide actionable endpoints for customers with many custom proxy routes.
+  - Mitigation: provide guidance for using Redwood-standard endpoints; consider allowing an allowlisted custom template registry per workspace in a future iteration (out of scope for initial release).
+- Alias mapping changes can shift UI labels over time.
+  - Mitigation: keep aggregation keys canonical; use `model_id_display` as presentation only.
+- Heuristic templating could accidentally template meaningful segments.
+  - Mitigation: conservative rules, substitution caps, tests, and monitoring of `/__other__` percentage.
+
+## Monitoring / correctness requirements
+- Daily reconciliation: Usage Insights total cost vs billing total cost per workspace/day.
+  - Alert thresholds: warn at 0.5%, page at 1.0% (after excluding known late-event windows).
+- Cardinality dashboards:
+  - Unique `route_key` per workspace/day
+  - `% in /__other__`
+- Data quality checks:
+  - Missing route tags by region/endpoint (especially streaming endpoints)
+  - Missing attempt_id/attempt_number rates
+
+## Open questions
+- Should we allow “route template overrides” for customers who heavily proxy Redwood APIs through their own gateway? (Likely future enterprise feature.)
+- Do we need a separate reporting mode that attributes fallbacks to the originally requested model for FinOps chargeback? (Currently out of scope; could be a computed view.)
+
+## Appendix: Examples
+### Example 1: Path templating
+Raw: `GET /v1/files/8f1d2a0f-2b3d-4c19-a3ef-4f9d0a5c0c90`
+Normalized: `GET /v1/files/{file_id}`
+
+### Example 2: Retry attribution
+Request `POST /v1/chat/completions`:
+- Attempt 1 on `llama-3.1-70b` times out after generating 120 tokens
+- Attempt 2 on `llama-3.1-70b` succeeds generating 520 tokens
+
+Attribution:
+- Route/model row counts both attempts’ tokens and cost.
+- `retry_overhead_cost` reflects cost of attempt 1.
+
+### Example 3: Fallback attribution
+Request `POST /v1/chat/completions`:
+- Attempt 1 on `llama-3.1-70b` fails (capacity)
+- Attempt 2 on `llama-3.1-8b` succeeds
+
+Attribution:
+- Costs appear in two rows (70b and 8b) for the same route.
+- `fallback_cost` and `fallback_count` are reported as drivers.

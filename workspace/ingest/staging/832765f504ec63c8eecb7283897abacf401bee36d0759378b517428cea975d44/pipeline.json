@@ -1,0 +1,1885 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://832765f504ec63c8eecb7283897abacf401bee36d0759378b517428cea975d44/LOGSIT_00574_00801ed9.docx",
+  "title": "LOGSIT 00574 — Baltic Sea",
+  "content": [
+    "LOGSIT 00574 — Baltic Sea\n\nLOGISTICS SITUATION REPORT\n\nArea: Baltic Sea\n\nFuel status: 74 percent\n\nMedical supplies: adequate\n\nTransport availability: mission capable\n\nRequest: confirm resupply route security.\n\nNote linguistique: diffusion de travail en français; situation opérationnelle stable."
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "mission"
+        ],
+        "lemma_content": [
+          "mission"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          24
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "capable"
+        ],
+        "lemma_content": [
+          "capable"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          25
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "Request"
+        ],
+        "lemma_content": [
+          "Request"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          26
+        ],
+        "label": "misc"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "docx",
+    "source-size-bytes": 1034,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:18:51",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_smx.owl"
+  ],
+  "source": "ingest://832765f504ec63c8eecb7283897abacf401bee36d0759378b517428cea975d44/LOGSIT_00574_00801ed9.docx",
+  "metadata": {
+    "topic_id": "operations",
+    "corpus": "osint",
+    "doc_type": "LOGSIT",
+    "language": "fr",
+    "title": "LOGSIT 00574 — Baltic Sea",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "operations",
+  "doc_type": "LOGSIT",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "fr",
+    "confidence": 0.8571406000697057
+  },
+  "resource-selection": {
+    "detected-language": "fr",
+    "processing-language": "fr",
+    "spacy-language": "fr",
+    "resources-base-path": null,
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "LOGISTICS",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "SITUATION",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "REPORT",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Area",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Baltic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sea",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "LOGSIT",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "00574",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Baltic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sea",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Fuel",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "status",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "74",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "percent",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Medical",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "supplies",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "adequate",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Transport",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "availability",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "mission",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "capable",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Request",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "confirm",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "resupply",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "route",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "security",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Note",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "linguistique",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "diffusion",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "de",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "travail",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "en",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "français",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "situation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "opérationnelle",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "stable",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "LOGSIT",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "00574",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Baltic",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Sea",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "logsit",
+      "text": "LOGSIT",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00574",
+      "text": "00574",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "X",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "X",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "logistic",
+      "text": "LOGISTICS",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "situation",
+      "text": "SITUATION",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "report",
+      "text": "REPORT",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 3
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "X",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "X",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "logsit",
+      "text": "LOGSIT",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 7
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00574",
+      "text": "00574",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "X",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "X",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "X",
+      "lemma": "Fuel",
+      "text": "Fuel",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "status",
+      "text": "status",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "NUM",
+      "lemma": "74",
+      "text": "74",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "VERB",
+      "lemma": "percer",
+      "text": "percent",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "X",
+      "lemma": "Medical",
+      "text": "Medical",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 17
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "supplie",
+      "text": "supplies",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "adequat",
+      "text": "adequate",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "transport",
+      "text": "Transport",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 21
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "availability",
+      "text": "availability",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "mission",
+      "text": "mission",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "VERB",
+      "lemma": "capable",
+      "text": "capable",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Request",
+      "text": "Request",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 26
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "X",
+      "lemma": "confirm",
+      "text": "confirm",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "resupply",
+      "text": "resupply",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "route",
+      "text": "route",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "VERB",
+      "lemma": "security",
+      "text": "security",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "note",
+      "text": "Note",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 33
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "linguistique",
+      "text": "linguistique",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "diffusion",
+      "text": "diffusion",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "ADP",
+      "lemma": "de",
+      "text": "de",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "travail",
+      "text": "travail",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "ADP",
+      "lemma": "en",
+      "text": "en",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "français",
+      "text": "français",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "situation",
+      "text": "situation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "opérationnel",
+      "text": "opérationnelle",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "stable",
+      "text": "stable",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 0,
+      "end": 5,
+      "label": "misc",
+      "text": "LOGSIT 00574 — Baltic Sea"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 0,
+      "end": 3,
+      "label": "misc",
+      "text": "LOGISTICS SITUATION REPORT"
+    },
+    {
+      "start": 5,
+      "end": 7,
+      "label": "misc",
+      "text": "Baltic Sea"
+    },
+    {
+      "start": 10,
+      "end": 12,
+      "label": "misc",
+      "text": "Baltic Sea"
+    },
+    {
+      "start": 17,
+      "end": 18,
+      "label": "misc",
+      "text": "Medical"
+    },
+    {
+      "start": 21,
+      "end": 23,
+      "label": "misc",
+      "text": "Transport availability"
+    },
+    {
+      "start": 26,
+      "end": 27,
+      "label": "misc",
+      "text": "Request"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "LOGISTICS",
+      "lemma": "logistic",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SITUATION",
+      "lemma": "situation",
+      "pos": "NOUN",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "REPORT",
+      "lemma": "report",
+      "pos": "NOUN",
+      "head": 2,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        4
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 3,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "X",
+      "head": 6,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "X",
+      "head": 6,
+      "dep": "ROOT",
+      "lefts": [
+        5
+      ],
+      "rights": []
+    },
+    {
+      "text": "LOGSIT",
+      "lemma": "logsit",
+      "pos": "NOUN",
+      "head": 7,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        8
+      ]
+    },
+    {
+      "text": "00574",
+      "lemma": "00574",
+      "pos": "NUM",
+      "head": 7,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "X",
+      "head": 10,
+      "dep": "ROOT",
+      "lefts": [
+        9
+      ],
+      "rights": [
+        11
+      ]
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "X",
+      "head": 10,
+      "dep": "dep",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Fuel",
+      "lemma": "Fuel",
+      "pos": "X",
+      "head": 12,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "status",
+      "lemma": "status",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        14,
+        16
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 13,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "74",
+      "lemma": "74",
+      "pos": "NUM",
+      "head": 16,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "percent",
+      "lemma": "percer",
+      "pos": "VERB",
+      "head": 13,
+      "dep": "parataxis",
+      "lefts": [
+        15
+      ],
+      "rights": []
+    },
+    {
+      "text": "Medical",
+      "lemma": "Medical",
+      "pos": "X",
+      "head": 18,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "supplies",
+      "lemma": "supplie",
+      "pos": "ADJ",
+      "head": 18,
+      "dep": "ROOT",
+      "lefts": [
+        17
+      ],
+      "rights": [
+        19,
+        20
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 18,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "adequate",
+      "lemma": "adequat",
+      "pos": "ADJ",
+      "head": 18,
+      "dep": "conj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Transport",
+      "lemma": "transport",
+      "pos": "NOUN",
+      "head": 21,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "availability",
+      "lemma": "availability",
+      "pos": "ADJ",
+      "head": 22,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        23,
+        24,
+        25
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 22,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "mission",
+      "lemma": "mission",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "capable",
+      "lemma": "capable",
+      "pos": "VERB",
+      "head": 22,
+      "dep": "acl",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Request",
+      "lemma": "Request",
+      "pos": "PROPN",
+      "head": 26,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        27
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 26,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "confirm",
+      "lemma": "confirm",
+      "pos": "X",
+      "head": 29,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "resupply",
+      "lemma": "resupply",
+      "pos": "NOUN",
+      "head": 29,
+      "dep": "ROOT",
+      "lefts": [
+        28
+      ],
+      "rights": [
+        30,
+        31,
+        32
+      ]
+    },
+    {
+      "text": "route",
+      "lemma": "route",
+      "pos": "NOUN",
+      "head": 29,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "security",
+      "lemma": "security",
+      "pos": "VERB",
+      "head": 29,
+      "dep": "parataxis",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 29,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Note",
+      "lemma": "note",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        34,
+        35,
+        36,
+        41
+      ]
+    },
+    {
+      "text": "linguistique",
+      "lemma": "linguistique",
+      "pos": "ADJ",
+      "head": 33,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "diffusion",
+      "lemma": "diffusion",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": [
+        38,
+        40
+      ]
+    },
+    {
+      "text": "de",
+      "lemma": "de",
+      "pos": "ADP",
+      "head": 38,
+      "dep": "case",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "travail",
+      "lemma": "travail",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "nmod",
+      "lefts": [
+        37
+      ],
+      "rights": []
+    },
+    {
+      "text": "en",
+      "lemma": "en",
+      "pos": "ADP",
+      "head": 40,
+      "dep": "case",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "français",
+      "lemma": "français",
+      "pos": "NOUN",
+      "head": 36,
+      "dep": "nmod",
+      "lefts": [
+        39
+      ],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "situation",
+      "lemma": "situation",
+      "pos": "NOUN",
+      "head": 42,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        43,
+        44,
+        45
+      ]
+    },
+    {
+      "text": "opérationnelle",
+      "lemma": "opérationnel",
+      "pos": "ADJ",
+      "head": 42,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "stable",
+      "lemma": "stable",
+      "pos": "ADJ",
+      "head": 42,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 42,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "LOGSIT",
+      "lemma": "logsit",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1
+      ]
+    },
+    {
+      "text": "00574",
+      "lemma": "00574",
+      "pos": "NUM",
+      "head": 0,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 2,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "X",
+      "head": 4,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "X",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 9,
+      "text": "logistic situation report",
+      "span": {
+        "start": 0,
+        "end": 3
+      }
+    },
+    {
+      "score": 9,
+      "text": "situation opérationnel stable",
+      "span": {
+        "start": 42,
+        "end": 45
+      }
+    },
+    {
+      "score": 4,
+      "text": "transport availability",
+      "span": {
+        "start": 21,
+        "end": 23
+      }
+    },
+    {
+      "score": 4,
+      "text": "note linguistique",
+      "span": {
+        "start": 33,
+        "end": 35
+      }
+    },
+    {
+      "score": 1,
+      "text": "area",
+      "span": {
+        "start": 3,
+        "end": 4
+      }
+    },
+    {
+      "score": 1,
+      "text": "adequat",
+      "span": {
+        "start": 20,
+        "end": 21
+      }
+    },
+    {
+      "score": 1,
+      "text": "request",
+      "span": {
+        "start": 26,
+        "end": 27
+      }
+    },
+    {
+      "score": 1,
+      "text": "diffusion",
+      "span": {
+        "start": 36,
+        "end": 37
+      }
+    },
+    {
+      "score": 1,
+      "text": "travail",
+      "span": {
+        "start": 38,
+        "end": 39
+      }
+    },
+    {
+      "score": 1,
+      "text": "français",
+      "span": {
+        "start": 40,
+        "end": 41
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://832765f504ec63c8eecb7283897abacf401bee36d0759378b517428cea975d44/LOGSIT_00574_00801ed9.docx#chunk-0-ce00453104",
+      "parent_doc_id": "ingest://832765f504ec63c8eecb7283897abacf401bee36d0759378b517428cea975d44/LOGSIT_00574_00801ed9.docx",
+      "text_raw": "LOGISTICS SITUATION REPORT Area : Baltic Sea LOGSIT 00574 — Baltic Sea Fuel status : 74 percent Medical supplies : adequate Transport availability : mission capable Request : confirm resupply route security . Note linguistique : diffusion de travail en français ; situation opérationnelle stable .",
+      "search_vector_payload": "LOGISTICS SITUATION REPORT Area : Baltic Sea LOGSIT 00574 — Baltic Sea Fuel status : 74 percent Medical supplies : adequate Transport availability : mission capable Request : confirm resupply route security . Note linguistique : diffusion de travail en français ; situation opérationnelle stable .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "misc": [
+            "LOGISTICS SITUATION REPORT",
+            "Baltic Sea",
+            "Medical",
+            "Transport availability",
+            "Request"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "mission",
+            "capable",
+            "Request"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 46,
+        "sentence_start": 0,
+        "sentence_end": 8
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "mission capable Request",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "LOGISTICS SITUATION REPORT",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "LOGISTICS SITUATION REPORT Area : Baltic Sea LOGSIT 00574 — Baltic Sea",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "Baltic Sea",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Chunk/ingest_832765f504ec63c8eecb7283897abacf401bee36d0759378b517428cea975d44_logsit_00574_00801ed9_docx_chunk_0_ce00453104\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/transport_availability\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/note_linguistique\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/area\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/adequat\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/request\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/diffusion\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/travail\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/fran_ais\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/logistics_situation_report-8bacf2d30c63\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/baltic_sea-467833b59030\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/medical-fec80bef0d8a\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/transport_availability-7be8b7ed9d3e\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/request-59f03d642b41\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/logsit_00574_baltic_sea-97c6cc61f08a\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Mission/mission-ceb00a91525d\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/N74/74-eb624dbe56eb\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"logsit_00574_00801ed9_docx\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/logistics_situation_report-8bacf2d30c63\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Misc\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"LOGISTICS SITUATION REPORT\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/request-59f03d642b41\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Misc\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Request\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/diffusion\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"diffusion\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Chunk/ingest_832765f504ec63c8eecb7283897abacf401bee36d0759378b517428cea975d44_logsit_00574_00801ed9_docx_chunk_0_ce00453104\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/logistics_situation_report-8bacf2d30c63\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/baltic_sea-467833b59030\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/medical-fec80bef0d8a\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/transport_availability-7be8b7ed9d3e\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/request-59f03d642b41\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Mission/mission-ceb00a91525d\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://832765f504ec63c8eecb7283897abacf401bee36d0759378b517428cea975d44/LOGSIT_00574_00801ed9.docx#chunk-0-ce00453104\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/request\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"request\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/logsit_00574_baltic_sea-97c6cc61f08a\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Misc\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"LOGSIT 00574 — Baltic Sea\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/area\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"area\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Mission/mission-ceb00a91525d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Mission\"\n    ],\n    \"http://tkeir.local/ontology/capable\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Request/request-59f03d642b41\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"mission\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/travail\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"travail\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/adequat\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"adequat\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/transport_availability\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"transport availability\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/baltic_sea-467833b59030\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Misc\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Baltic Sea\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/N74/74-eb624dbe56eb\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/N74\"\n    ],\n    \"http://tkeir.local/ontology/percer\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"74\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/transport_availability-7be8b7ed9d3e\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Misc\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Transport availability\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Misc/medical-fec80bef0d8a\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Misc\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Medical\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/note_linguistique\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"note linguistique\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Request/request-59f03d642b41\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Request\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Request\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/logsit_00574_00801ed9_docx/Keyword/fran_ais\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"français\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 26,
+      "graph_triple_count": 63,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 51,
+    "total_tokens": 51,
+    "covered_characters": 273,
+    "total_characters": 273,
+    "derivation": {
+      "enabled": true,
+      "status": "NO_MATCHES",
+      "matches": 0,
+      "subclass_links": 0,
+      "type_links": 0,
+      "same_as_links": 0,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4HXSAZ47DEKMWR14M70PJN/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 46,
+  "token-count": 51,
+  "source-file-size-bytes": 1034,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.225,
+    "tasks": {
+      "converter": 0.009,
+      "language-detection": 0.004,
+      "resource-selection": 0.001,
+      "tokenizer": 0.016,
+      "morphosyntax": 0.006,
+      "ner": 0.043,
+      "syntax": 0.007,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.138,
+      "chunk-questions": 0.001
+    }
+  }
+}

@@ -1,0 +1,2544 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://7532878cbd948bf74dc546a668dac4a4d248a417c01ff0181759cb4878d90caa/SITREP_00975_34be5f01.docx",
+  "title": "SITREP 00975 — Baltic Sea",
+  "content": [
+    "SITREP 00975 — Baltic Sea\n\nSITUATION REPORT\n\nDTG: 2026-07-01T07:42Z\n\nUnit: Maritime Component\n\nArea: Baltic Sea\n\nObjective: Objective ALPHA\n\nSITREP Objective ALPHA — operational picture remains stable. ISR collection confirms routine maritime traffic. Commander assesses no immediate escalation indicators.\n\nNote linguistique: diffusion de travail en français; situation opérationnelle stable."
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "operational",
+          "picture"
+        ],
+        "lemma_content": [
+          "operational",
+          "picture"
+        ],
+        "pos": [
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          26,
+          27
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "remains"
+        ],
+        "lemma_content": [
+          "remain"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          28
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "stable"
+        ],
+        "lemma_content": [
+          "stable"
+        ],
+        "pos": [
+          "ADJ"
+        ],
+        "positions": [
+          29
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "ISR",
+          "collection"
+        ],
+        "lemma_content": [
+          "ISR",
+          "collection"
+        ],
+        "pos": [
+          "PROPN",
+          "NOUN"
+        ],
+        "positions": [
+          31,
+          32
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "confirms"
+        ],
+        "lemma_content": [
+          "confirm"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          33
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "routine",
+          "maritime",
+          "traffic"
+        ],
+        "lemma_content": [
+          "routine",
+          "maritime",
+          "traffic"
+        ],
+        "pos": [
+          "ADJ",
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          34,
+          35,
+          36
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "ISR"
+        ],
+        "lemma_content": [
+          "ISR"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          31
+        ],
+        "label": "organization"
+      },
+      "property": {
+        "content": [
+          "confirms"
+        ],
+        "lemma_content": [
+          "confirm"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          33
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "routine",
+          "maritime",
+          "traffic"
+        ],
+        "lemma_content": [
+          "routine",
+          "maritime",
+          "traffic"
+        ],
+        "pos": [
+          "ADJ",
+          "ADJ",
+          "NOUN"
+        ],
+        "positions": [
+          34,
+          35,
+          36
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "ISR",
+          "collection"
+        ],
+        "lemma_content": [
+          "ISR",
+          "collection"
+        ],
+        "pos": [
+          "PROPN",
+          "NOUN"
+        ],
+        "positions": [
+          31,
+          32
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "confirms"
+        ],
+        "lemma_content": [
+          "confirm"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          33
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "traffic"
+        ],
+        "lemma_content": [
+          "traffic"
+        ],
+        "pos": [
+          "NOUN"
+        ],
+        "positions": [
+          36
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Commander"
+        ],
+        "lemma_content": [
+          "Commander"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          38
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "property": {
+        "content": [
+          "assesses"
+        ],
+        "lemma_content": [
+          "assess"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          39
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "no",
+          "immediate",
+          "escalation",
+          "indicators"
+        ],
+        "lemma_content": [
+          "no",
+          "immediate",
+          "escalation",
+          "indicator"
+        ],
+        "pos": [
+          "DET",
+          "ADJ",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          40,
+          41,
+          42,
+          43
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    },
+    {
+      "subject": {
+        "content": [
+          "Commander"
+        ],
+        "lemma_content": [
+          "Commander"
+        ],
+        "pos": [
+          "PROPN"
+        ],
+        "positions": [
+          38
+        ],
+        "label": "dep_subject"
+      },
+      "property": {
+        "content": [
+          "assesses"
+        ],
+        "lemma_content": [
+          "assess"
+        ],
+        "pos": [
+          "VERB"
+        ],
+        "positions": [
+          39
+        ],
+        "label": "dep_verb"
+      },
+      "value": {
+        "content": [
+          "escalation",
+          "indicators"
+        ],
+        "lemma_content": [
+          "escalation",
+          "indicator"
+        ],
+        "pos": [
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          42,
+          43
+        ],
+        "label": "dep_object"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "docx",
+    "source-size-bytes": 1090,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:33",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:33",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:33",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:33",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:33",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:34",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:34",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:34",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:34",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:32:34",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_smx.owl"
+  ],
+  "derive_from_ontologies": [
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_c4isr.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_combined.ttl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_core.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_cwix2023.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_lox.owl",
+    "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_smx.owl"
+  ],
+  "source": "ingest://7532878cbd948bf74dc546a668dac4a4d248a417c01ff0181759cb4878d90caa/SITREP_00975_34be5f01.docx",
+  "metadata": {
+    "topic_id": "situational_awareness",
+    "corpus": "osint",
+    "doc_type": "SITREP",
+    "language": "fr",
+    "title": "SITREP 00975 — Baltic Sea",
+    "user_space": "dev@tkeir",
+    "ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_smx.owl"
+    ],
+    "derive_from_ontologies": [
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_c4isr.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_combined.ttl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_core.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_cwix2023.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_lox.owl",
+      "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_smx.owl"
+    ]
+  },
+  "corpus": "osint",
+  "topic_id": "situational_awareness",
+  "doc_type": "SITREP",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.5714264733001849
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "SITUATION",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "REPORT",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "DTG",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "2026-07-01T07:42Z",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Unit",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Maritime",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Component",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Area",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Baltic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sea",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Objective",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Objective",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ALPHA",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "SITREP",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "00975",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Baltic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Sea",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "SITREP",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Objective",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ALPHA",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "—",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "operational",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "picture",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "remains",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "stable",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "ISR",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "collection",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "confirms",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "routine",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "maritime",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "traffic",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Commander",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "assesses",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "no",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "immediate",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "escalation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "indicators",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Note",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "linguistique",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "diffusion",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "de",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "travail",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "en",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "français",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ";",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "situation",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "opérationnelle",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "stable",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "SITREP",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "00975",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "—",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Baltic",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Sea",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "SITREP",
+      "text": "SITREP",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00975",
+      "text": "00975",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "situation",
+      "text": "SITUATION",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "ADV",
+      "lemma": "report",
+      "text": "REPORT",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "dtg",
+      "text": "DTG",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 2
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "NUM",
+      "lemma": "2026-07-01t07:42z",
+      "text": "2026-07-01T07:42Z",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Unit",
+      "text": "Unit",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 5
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Maritime",
+      "text": "Maritime",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Component",
+      "text": "Component",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Area",
+      "text": "Area",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 9
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "objective",
+      "text": "Objective",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 13
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "objective",
+      "text": "Objective",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "alpha",
+      "text": "ALPHA",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "sitrep",
+      "text": "SITREP",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 17
+    },
+    {
+      "pos": "NUM",
+      "lemma": "00975",
+      "text": "00975",
+      "is_oov": true,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Baltic",
+      "text": "Baltic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Sea",
+      "text": "Sea",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "SITREP",
+      "text": "SITREP",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 22
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "objective",
+      "text": "Objective",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "alpha",
+      "text": "ALPHA",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "—",
+      "text": "—",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "operational",
+      "text": "operational",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "picture",
+      "text": "picture",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "VERB",
+      "lemma": "remain",
+      "text": "remains",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "stable",
+      "text": "stable",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ISR",
+      "text": "ISR",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 31
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "collection",
+      "text": "collection",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "VERB",
+      "lemma": "confirm",
+      "text": "confirms",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "routine",
+      "text": "routine",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "maritime",
+      "text": "maritime",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "traffic",
+      "text": "traffic",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Commander",
+      "text": "Commander",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 38
+    },
+    {
+      "pos": "VERB",
+      "lemma": "assess",
+      "text": "assesses",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 39
+    },
+    {
+      "pos": "DET",
+      "lemma": "no",
+      "text": "no",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "immediate",
+      "text": "immediate",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "escalation",
+      "text": "escalation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "indicator",
+      "text": "indicators",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "VERB",
+      "lemma": "note",
+      "text": "Note",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 45
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "linguistique",
+      "text": "linguistique",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "diffusion",
+      "text": "diffusion",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "ADV",
+      "lemma": "de",
+      "text": "de",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "X",
+      "lemma": "travail",
+      "text": "travail",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 50
+    },
+    {
+      "pos": "X",
+      "lemma": "en",
+      "text": "en",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "X",
+      "lemma": "français",
+      "text": "français",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ";",
+      "text": ";",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 53
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "situation",
+      "text": "situation",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 54
+    },
+    {
+      "pos": "X",
+      "lemma": "opérationnelle",
+      "text": "opérationnelle",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 55
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "stable",
+      "text": "stable",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 56
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 57
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 3,
+      "end": 5,
+      "label": "location",
+      "text": "Baltic Sea"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 11,
+      "end": 13,
+      "label": "location",
+      "text": "Baltic Sea"
+    },
+    {
+      "start": 20,
+      "end": 22,
+      "label": "location",
+      "text": "Baltic Sea"
+    },
+    {
+      "start": 31,
+      "end": 32,
+      "label": "organization",
+      "text": "ISR"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "SITUATION",
+      "lemma": "situation",
+      "pos": "NOUN",
+      "head": 1,
+      "dep": "npadvmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "REPORT",
+      "lemma": "report",
+      "pos": "ADV",
+      "head": 1,
+      "dep": "ROOT",
+      "lefts": [
+        0
+      ],
+      "rights": []
+    },
+    {
+      "text": "DTG",
+      "lemma": "dtg",
+      "pos": "NOUN",
+      "head": 2,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        3,
+        4
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 2,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "2026-07-01T07:42Z",
+      "lemma": "2026-07-01t07:42z",
+      "pos": "NUM",
+      "head": 2,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Unit",
+      "lemma": "Unit",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        6,
+        8
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 5,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Maritime",
+      "lemma": "Maritime",
+      "pos": "PROPN",
+      "head": 8,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Component",
+      "lemma": "Component",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "appos",
+      "lefts": [
+        7
+      ],
+      "rights": []
+    },
+    {
+      "text": "Area",
+      "lemma": "Area",
+      "pos": "PROPN",
+      "head": 9,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        10
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "PROPN",
+      "head": 12,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "PROPN",
+      "head": 12,
+      "dep": "ROOT",
+      "lefts": [
+        11
+      ],
+      "rights": []
+    },
+    {
+      "text": "Objective",
+      "lemma": "objective",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        14,
+        16
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 13,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Objective",
+      "lemma": "objective",
+      "pos": "ADJ",
+      "head": 16,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ALPHA",
+      "lemma": "alpha",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "appos",
+      "lefts": [
+        15
+      ],
+      "rights": []
+    },
+    {
+      "text": "SITREP",
+      "lemma": "sitrep",
+      "pos": "NOUN",
+      "head": 17,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        18,
+        19
+      ]
+    },
+    {
+      "text": "00975",
+      "lemma": "00975",
+      "pos": "NUM",
+      "head": 17,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 17,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "PROPN",
+      "head": 21,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "PROPN",
+      "head": 21,
+      "dep": "ROOT",
+      "lefts": [
+        20
+      ],
+      "rights": []
+    },
+    {
+      "text": "SITREP",
+      "lemma": "SITREP",
+      "pos": "PROPN",
+      "head": 22,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Objective",
+      "lemma": "objective",
+      "pos": "ADJ",
+      "head": 24,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ALPHA",
+      "lemma": "alpha",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "nsubj",
+      "lefts": [
+        23
+      ],
+      "rights": [
+        25
+      ]
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 24,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "operational",
+      "lemma": "operational",
+      "pos": "ADJ",
+      "head": 27,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "picture",
+      "lemma": "picture",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "nsubj",
+      "lefts": [
+        26
+      ],
+      "rights": []
+    },
+    {
+      "text": "remains",
+      "lemma": "remain",
+      "pos": "VERB",
+      "head": 28,
+      "dep": "ROOT",
+      "lefts": [
+        24,
+        27
+      ],
+      "rights": [
+        29,
+        30
+      ]
+    },
+    {
+      "text": "stable",
+      "lemma": "stable",
+      "pos": "ADJ",
+      "head": 28,
+      "dep": "acomp",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 28,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ISR",
+      "lemma": "ISR",
+      "pos": "PROPN",
+      "head": 32,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "collection",
+      "lemma": "collection",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "nsubj",
+      "lefts": [
+        31
+      ],
+      "rights": []
+    },
+    {
+      "text": "confirms",
+      "lemma": "confirm",
+      "pos": "VERB",
+      "head": 33,
+      "dep": "ROOT",
+      "lefts": [
+        32
+      ],
+      "rights": [
+        36,
+        37
+      ]
+    },
+    {
+      "text": "routine",
+      "lemma": "routine",
+      "pos": "ADJ",
+      "head": 36,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "maritime",
+      "lemma": "maritime",
+      "pos": "ADJ",
+      "head": 36,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "traffic",
+      "lemma": "traffic",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "dobj",
+      "lefts": [
+        34,
+        35
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Commander",
+      "lemma": "Commander",
+      "pos": "PROPN",
+      "head": 39,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "assesses",
+      "lemma": "assess",
+      "pos": "VERB",
+      "head": 39,
+      "dep": "ROOT",
+      "lefts": [
+        38
+      ],
+      "rights": [
+        43,
+        44
+      ]
+    },
+    {
+      "text": "no",
+      "lemma": "no",
+      "pos": "DET",
+      "head": 43,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "immediate",
+      "lemma": "immediate",
+      "pos": "ADJ",
+      "head": 43,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "escalation",
+      "lemma": "escalation",
+      "pos": "NOUN",
+      "head": 43,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "indicators",
+      "lemma": "indicator",
+      "pos": "NOUN",
+      "head": 39,
+      "dep": "dobj",
+      "lefts": [
+        40,
+        41,
+        42
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 39,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Note",
+      "lemma": "note",
+      "pos": "VERB",
+      "head": 45,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        46,
+        47,
+        50,
+        56,
+        57
+      ]
+    },
+    {
+      "text": "linguistique",
+      "lemma": "linguistique",
+      "pos": "ADJ",
+      "head": 45,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 45,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "diffusion",
+      "lemma": "diffusion",
+      "pos": "NOUN",
+      "head": 50,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "de",
+      "lemma": "de",
+      "pos": "ADV",
+      "head": 50,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "travail",
+      "lemma": "travail",
+      "pos": "X",
+      "head": 45,
+      "dep": "appos",
+      "lefts": [
+        48,
+        49
+      ],
+      "rights": [
+        51,
+        52,
+        53
+      ]
+    },
+    {
+      "text": "en",
+      "lemma": "en",
+      "pos": "X",
+      "head": 50,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "français",
+      "lemma": "français",
+      "pos": "X",
+      "head": 50,
+      "dep": "npadvmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ";",
+      "lemma": ";",
+      "pos": "PUNCT",
+      "head": 50,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "situation",
+      "lemma": "situation",
+      "pos": "PROPN",
+      "head": 55,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "opérationnelle",
+      "lemma": "opérationnelle",
+      "pos": "X",
+      "head": 56,
+      "dep": "nsubj",
+      "lefts": [
+        54
+      ],
+      "rights": []
+    },
+    {
+      "text": "stable",
+      "lemma": "stable",
+      "pos": "ADJ",
+      "head": 45,
+      "dep": "ccomp",
+      "lefts": [
+        55
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 45,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "SITREP",
+      "lemma": "SITREP",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "00975",
+      "lemma": "00975",
+      "pos": "NUM",
+      "head": 4,
+      "dep": "dep",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2
+      ]
+    },
+    {
+      "text": "—",
+      "lemma": "—",
+      "pos": "PUNCT",
+      "head": 1,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Baltic",
+      "lemma": "Baltic",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Sea",
+      "lemma": "Sea",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        1,
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 4,
+      "text": "baltic sea",
+      "span": {
+        "start": 3,
+        "end": 5
+      }
+    },
+    {
+      "score": 9,
+      "text": "immediate escalation indicator",
+      "span": {
+        "start": 41,
+        "end": 44
+      }
+    },
+    {
+      "score": 7,
+      "text": "sitrep objective alpha",
+      "span": {
+        "start": 22,
+        "end": 25
+      }
+    },
+    {
+      "score": 4,
+      "text": "objective alpha",
+      "span": {
+        "start": 15,
+        "end": 17
+      }
+    },
+    {
+      "score": 4,
+      "text": "maritime component",
+      "span": {
+        "start": 7,
+        "end": 9
+      }
+    },
+    {
+      "score": 4,
+      "text": "baltic sea",
+      "span": {
+        "start": 20,
+        "end": 22
+      }
+    },
+    {
+      "score": 2,
+      "text": "objective",
+      "span": {
+        "start": 13,
+        "end": 14
+      }
+    },
+    {
+      "score": 1,
+      "text": "situation",
+      "span": {
+        "start": 0,
+        "end": 1
+      }
+    },
+    {
+      "score": 1,
+      "text": "dtg",
+      "span": {
+        "start": 2,
+        "end": 3
+      }
+    },
+    {
+      "score": 1,
+      "text": "unit",
+      "span": {
+        "start": 5,
+        "end": 6
+      }
+    },
+    {
+      "score": 1,
+      "text": "area",
+      "span": {
+        "start": 9,
+        "end": 10
+      }
+    },
+    {
+      "score": 1,
+      "text": "diffusion",
+      "span": {
+        "start": 48,
+        "end": 49
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://7532878cbd948bf74dc546a668dac4a4d248a417c01ff0181759cb4878d90caa/SITREP_00975_34be5f01.docx#chunk-0-a94e9b0a61",
+      "parent_doc_id": "ingest://7532878cbd948bf74dc546a668dac4a4d248a417c01ff0181759cb4878d90caa/SITREP_00975_34be5f01.docx",
+      "text_raw": "SITUATION REPORT DTG : 2026-07-01T07:42Z Unit : Maritime Component Area : Baltic Sea Objective : Objective ALPHA SITREP 00975 — Baltic Sea SITREP Objective ALPHA — operational picture remains stable . ISR collection confirms routine maritime traffic . Commander assesses no immediate escalation indicators . Note linguistique : diffusion de travail en français ; situation opérationnelle stable .",
+      "search_vector_payload": "SITUATION REPORT DTG : 2026-07-01T07:42Z Unit : Maritime Component Area : Baltic Sea Objective : Objective ALPHA SITREP 00975 — Baltic Sea SITREP Objective ALPHA — operational picture remains stable . ISR collection confirms routine maritime traffic . Commander assesses no immediate escalation indicators . Note linguistique : diffusion de travail en français ; situation opérationnelle stable .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "location": [
+            "Baltic Sea"
+          ],
+          "organization": [
+            "ISR"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "operational picture",
+            "remains",
+            "stable"
+          ],
+          [
+            "ISR collection",
+            "confirms",
+            "routine maritime traffic"
+          ],
+          [
+            "ISR",
+            "confirms",
+            "routine maritime traffic"
+          ],
+          [
+            "ISR collection",
+            "confirms",
+            "traffic"
+          ],
+          [
+            "Commander",
+            "assesses",
+            "no immediate escalation indicators"
+          ],
+          [
+            "Commander",
+            "assesses",
+            "escalation indicators"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 58,
+        "sentence_start": 0,
+        "sentence_end": 10
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "operational picture remains stable",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "Baltic Sea",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "SITUATION REPORT DTG : 2026-07-01T07:42Z Unit : Maritime Component Area : Baltic",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "ISR collection confirms routine maritime traffic",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "ISR confirms routine maritime traffic",
+          "question_type": "SVO-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/objective\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"objective\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Obj_ALPHA\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/OperationalPicture/operational_picture-33e704f9aa4e\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Operationalpicture\"\n    ],\n    \"http://tkeir.local/ontology/remain\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Stable/stable-f379ccb92b91\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"operational picture\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Stable/stable-f379ccb92b91\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Stable\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"stable\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/objective_alpha\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"objective alpha\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Obj_ALPHA\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Confirm/routine_maritime_traffic-403e4c668387\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Confirm\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"routine maritime traffic\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Remain/picture-2cea274d0bed\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Remain\"\n    ],\n    \"http://tkeir.local/ontology/remain\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"picture\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/sitrep_objective_alpha\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"sitrep objective alpha\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Obj_ALPHA\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Indicators/indicators-44089be1da32\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Indicators\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"indicators\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Confirm/traffic-075f4ab854e2\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Confirm\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"traffic\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Chunk/ingest_7532878cbd948bf74dc546a668dac4a4d248a417c01ff0181759cb4878d90caa_sitrep_00975_34be5f01_docx_chunk_0_a94e9b0a61\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/immediate_escalation_indicator\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/sitrep_objective_alpha\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/objective_alpha\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/maritime_component\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/baltic_sea\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/objective\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/situation\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/dtg\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/unit\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/area\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/diffusion\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Location/baltic_sea-467833b59030\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Organization/isr-99fb5e7c8b05\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/OperationalPicture/operational_picture-33e704f9aa4e\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Organization/isr_collection-a3505a3b7157\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Organization/isr-99fb5e7c8b05\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/commander-16af7be312e1\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Remain/alpha-73ab66a033c2\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Remain/picture-2cea274d0bed\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Collection/collection-fa7496e4ae84\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"sitrep_00975_34be5f01_docx\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/no_immediate_escalation_indicators-c83937a16884\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Commander\"\n    ],\n    \"http://tkeir.local/ontology/assess\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Indicators/indicators-44089be1da32\"\n      }\n    ],\n    \"http://tkeir.local/ontology/assesses\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/escalation_indicators-7f27bd3ee7e4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"no immediate escalation indicators\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/escalation_indicators-7f27bd3ee7e4\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Commander\"\n    ],\n    \"http://tkeir.local/ontology/assess\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Indicators/indicators-44089be1da32\"\n      }\n    ],\n    \"http://tkeir.local/ontology/assesses\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/escalation_indicators-7f27bd3ee7e4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"escalation indicators\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/situation\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"situation\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/diffusion\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"diffusion\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Organization/isr-99fb5e7c8b05\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\",\n      \"http://www.nato.int/ontologies/c4isr#Class0\"\n    ],\n    \"http://tkeir.local/ontology/confirms\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Confirm/routine_maritime_traffic-403e4c668387\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ISR\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.nato.int/ontologies/c4isr#\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/maritime_component\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"maritime component\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Location/baltic_sea-467833b59030\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Location\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Baltic Sea\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/unit\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\",\n      \"http://www.sisostds.org/ontologies/lox#GroundUnit\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"unit\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/commander-16af7be312e1\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Commander\"\n    ],\n    \"http://tkeir.local/ontology/assess\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Indicators/indicators-44089be1da32\"\n      }\n    ],\n    \"http://tkeir.local/ontology/assesses\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/no_immediate_escalation_indicators-c83937a16884\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/escalation_indicators-7f27bd3ee7e4\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Commander\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Organization/isr_collection-a3505a3b7157\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://tkeir.local/ontology/confirms\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Confirm/routine_maritime_traffic-403e4c668387\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Confirm/traffic-075f4ab854e2\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ISR collection\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Task_2\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Remain/alpha-73ab66a033c2\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Remain\"\n    ],\n    \"http://tkeir.local/ontology/remain\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ALPHA\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Unit_ALPHA\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/immediate_escalation_indicator\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"immediate escalation indicator\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/baltic_sea\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"baltic sea\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Collection/collection-fa7496e4ae84\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Collection\"\n    ],\n    \"http://tkeir.local/ontology/confirms\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Confirm/traffic-075f4ab854e2\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"collection\"\n      }\n    ],\n    \"http://www.w3.org/2002/07/owl#sameAs\": [\n      {\n        \"@id\": \"http://www.sisostds.org/ontologies/C2SIM#Task_2\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Chunk/ingest_7532878cbd948bf74dc546a668dac4a4d248a417c01ff0181759cb4878d90caa_sitrep_00975_34be5f01_docx_chunk_0_a94e9b0a61\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Location/baltic_sea-467833b59030\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Organization/isr-99fb5e7c8b05\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/OperationalPicture/operational_picture-33e704f9aa4e\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Organization/isr_collection-a3505a3b7157\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Organization/isr-99fb5e7c8b05\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Commander/commander-16af7be312e1\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://7532878cbd948bf74dc546a668dac4a4d248a417c01ff0181759cb4878d90caa/SITREP_00975_34be5f01.docx#chunk-0-a94e9b0a61\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/dtg\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"dtg\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/sitrep_00975_34be5f01_docx/Keyword/area\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"area\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED_AFTER_REPAIR",
+    "correction_attempts": 1,
+    "incoherences": {
+      "total": 4,
+      "unresolved": 0,
+      "auto_fixed": 4,
+      "affected_node_count": 2,
+      "graph_node_count": 45,
+      "graph_triple_count": 104,
+      "by_result_path": {
+        "assess": 2,
+        "assesses": 2
+      },
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 63,
+    "total_tokens": 63,
+    "covered_characters": 360,
+    "total_characters": 360,
+    "derivation": {
+      "enabled": true,
+      "status": "APPLIED",
+      "matches": 9,
+      "subclass_links": 0,
+      "type_links": 2,
+      "same_as_links": 7,
+      "paths": [
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_c4isr.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_combined.ttl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_core.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_cwix2023.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_lox.owl",
+        "/Users/blaudez/workspace/t-keir/workspace/ingest/uploaded_ontologies/01KY4JPWRB3XVQNZA2CSN1G8BV/c2sim_smx.owl"
+      ]
+    }
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 58,
+  "token-count": 63,
+  "source-file-size-bytes": 1090,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.285,
+    "tasks": {
+      "converter": 0.008,
+      "language-detection": 0.007,
+      "resource-selection": 0.001,
+      "tokenizer": 0.038,
+      "morphosyntax": 0.006,
+      "ner": 0.038,
+      "syntax": 0.007,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.178,
+      "chunk-questions": 0.001
+    }
+  }
+}

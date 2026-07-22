@@ -1,0 +1,2164 @@
+{
+  "title": "AcmeSystems ISO 27001 Change Procedure",
+  "content": [
+    "Procedure (ISO 27001 / SOC2)\n1. Record the change request.\n2. Obtain Security and Operations approval.\n3. Deploy in the approved maintenance window.\n4. Validate monitoring and document rollback.\nCompany: AcmeSystems (Paris / Berlin / Montreal).\n\nNote: document interne AcmeSystems (version française de travail)."
+  ],
+  "metadata": {
+    "topic_id": "quality",
+    "corpus": "enterprise",
+    "doc_type": "procedure",
+    "language": "fr",
+    "title": "AcmeSystems ISO 27001 Change Procedure",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "quality",
+  "doc_type": "procedure",
+  "user_space": "dev@tkeir",
+  "language": "fr",
+  "source_doc_id": "ingest://4ec2f937dace02e24808e747e76677946afb9d730055659f3f716d507b48d402/procedure_00045_e9f2e2ba.json",
+  "source": "ingest://4ec2f937dace02e24808e747e76677946afb9d730055659f3f716d507b48d402/procedure_00045_e9f2e2ba.json",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.99999745632812
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:51:54",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "error": false,
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "Procedure",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "(",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "ISO",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "27001",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "/",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "SOC2",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ")",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "1",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Record",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "change",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "request",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "2",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Obtain",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Security",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Operations",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "approval",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "3",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Deploy",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "in",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "the",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "approved",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "maintenance",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "window",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "4",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Validate",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "monitoring",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "and",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "document",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "rollback",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Company",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "(",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Paris",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "/",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Berlin",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "/",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Montreal",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ")",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Note",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "document",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "interne",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "(",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "version",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "française",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "de",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "travail",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ")",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "ISO",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "27001",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Change",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Procedure",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ISO",
+      "text": "ISO",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "NUM",
+      "lemma": "27001",
+      "text": "27001",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Change",
+      "text": "Change",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Procedure",
+      "text": "Procedure",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "NOUN",
+      "lemma": "procedure",
+      "text": "Procedure",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "(",
+      "text": "(",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "ISO",
+      "text": "ISO",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "NUM",
+      "lemma": "27001",
+      "text": "27001",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "/",
+      "text": "/",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "SOC2",
+      "text": "SOC2",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ")",
+      "text": ")",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "NUM",
+      "lemma": "1",
+      "text": "1",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 7
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "VERB",
+      "lemma": "record",
+      "text": "Record",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "change",
+      "text": "change",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "request",
+      "text": "request",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "X",
+      "lemma": "2",
+      "text": "2",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 14
+    },
+    {
+      "pos": "X",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "VERB",
+      "lemma": "obtain",
+      "text": "Obtain",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Security",
+      "text": "Security",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 17
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Operations",
+      "text": "Operations",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "approval",
+      "text": "approval",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "X",
+      "lemma": "3",
+      "text": "3",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 22
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "VERB",
+      "lemma": "deploy",
+      "text": "Deploy",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 24
+    },
+    {
+      "pos": "ADP",
+      "lemma": "in",
+      "text": "in",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "DET",
+      "lemma": "the",
+      "text": "the",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "VERB",
+      "lemma": "approve",
+      "text": "approved",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "maintenance",
+      "text": "maintenance",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "window",
+      "text": "window",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "X",
+      "lemma": "4",
+      "text": "4",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 31
+    },
+    {
+      "pos": "X",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "VERB",
+      "lemma": "validate",
+      "text": "Validate",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "monitoring",
+      "text": "monitoring",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "CCONJ",
+      "lemma": "and",
+      "text": "and",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "document",
+      "text": "document",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 36
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "rollback",
+      "text": "rollback",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 37
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 38
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "company",
+      "text": "Company",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 39
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 40
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 41
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "(",
+      "text": "(",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 42
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Paris",
+      "text": "Paris",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 43
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "/",
+      "text": "/",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 44
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Berlin",
+      "text": "Berlin",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 45
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "/",
+      "text": "/",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 46
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Montreal",
+      "text": "Montreal",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 47
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ")",
+      "text": ")",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 48
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 49
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "note",
+      "text": "Note",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 50
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 51
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "document",
+      "text": "document",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 52
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "interne",
+      "text": "interne",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 53
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 54
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "(",
+      "text": "(",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 55
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "version",
+      "text": "version",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 56
+    },
+    {
+      "pos": "X",
+      "lemma": "française",
+      "text": "française",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 57
+    },
+    {
+      "pos": "X",
+      "lemma": "de",
+      "text": "de",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 58
+    },
+    {
+      "pos": "X",
+      "lemma": "travail",
+      "text": "travail",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 59
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ")",
+      "text": ")",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 60
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 61
+    }
+  ],
+  "title_ner": [],
+  "content_ner": [
+    {
+      "start": 41,
+      "end": 42,
+      "label": "organization",
+      "text": "AcmeSystems"
+    },
+    {
+      "start": 43,
+      "end": 44,
+      "label": "location",
+      "text": "Paris"
+    },
+    {
+      "start": 54,
+      "end": 55,
+      "label": "organization",
+      "text": "AcmeSystems"
+    }
+  ],
+  "kg": [],
+  "content_deps": [
+    {
+      "text": "Procedure",
+      "lemma": "procedure",
+      "pos": "NOUN",
+      "head": 0,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        1,
+        2,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "text": "(",
+      "lemma": "(",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ISO",
+      "lemma": "ISO",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [],
+      "rights": [
+        3
+      ]
+    },
+    {
+      "text": "27001",
+      "lemma": "27001",
+      "pos": "NUM",
+      "head": 2,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "/",
+      "lemma": "/",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "SOC2",
+      "lemma": "SOC2",
+      "pos": "PROPN",
+      "head": 0,
+      "dep": "appos",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ")",
+      "lemma": ")",
+      "pos": "PUNCT",
+      "head": 0,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "1",
+      "lemma": "1",
+      "pos": "NUM",
+      "head": 9,
+      "dep": "meta",
+      "lefts": [],
+      "rights": [
+        8
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 7,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Record",
+      "lemma": "record",
+      "pos": "VERB",
+      "head": 9,
+      "dep": "ROOT",
+      "lefts": [
+        7
+      ],
+      "rights": [
+        12,
+        13
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 12,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "change",
+      "lemma": "change",
+      "pos": "NOUN",
+      "head": 12,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "request",
+      "lemma": "request",
+      "pos": "NOUN",
+      "head": 9,
+      "dep": "dobj",
+      "lefts": [
+        10,
+        11
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 9,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "2",
+      "lemma": "2",
+      "pos": "X",
+      "head": 16,
+      "dep": "meta",
+      "lefts": [],
+      "rights": [
+        15
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "X",
+      "head": 14,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Obtain",
+      "lemma": "obtain",
+      "pos": "VERB",
+      "head": 16,
+      "dep": "ROOT",
+      "lefts": [
+        14
+      ],
+      "rights": [
+        20,
+        21
+      ]
+    },
+    {
+      "text": "Security",
+      "lemma": "Security",
+      "pos": "PROPN",
+      "head": 20,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": [
+        18,
+        19
+      ]
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 17,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Operations",
+      "lemma": "Operations",
+      "pos": "PROPN",
+      "head": 17,
+      "dep": "conj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "approval",
+      "lemma": "approval",
+      "pos": "NOUN",
+      "head": 16,
+      "dep": "dobj",
+      "lefts": [
+        17
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 16,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "3",
+      "lemma": "3",
+      "pos": "X",
+      "head": 22,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        23
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 22,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Deploy",
+      "lemma": "deploy",
+      "pos": "VERB",
+      "head": 24,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        25,
+        30
+      ]
+    },
+    {
+      "text": "in",
+      "lemma": "in",
+      "pos": "ADP",
+      "head": 24,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        29
+      ]
+    },
+    {
+      "text": "the",
+      "lemma": "the",
+      "pos": "DET",
+      "head": 29,
+      "dep": "det",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "approved",
+      "lemma": "approve",
+      "pos": "VERB",
+      "head": 29,
+      "dep": "amod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "maintenance",
+      "lemma": "maintenance",
+      "pos": "NOUN",
+      "head": 29,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "window",
+      "lemma": "window",
+      "pos": "NOUN",
+      "head": 25,
+      "dep": "pobj",
+      "lefts": [
+        26,
+        27,
+        28
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 24,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "4",
+      "lemma": "4",
+      "pos": "X",
+      "head": 31,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        32
+      ]
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "X",
+      "head": 31,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Validate",
+      "lemma": "validate",
+      "pos": "VERB",
+      "head": 33,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        34,
+        38
+      ]
+    },
+    {
+      "text": "monitoring",
+      "lemma": "monitoring",
+      "pos": "NOUN",
+      "head": 33,
+      "dep": "dobj",
+      "lefts": [],
+      "rights": [
+        35,
+        37
+      ]
+    },
+    {
+      "text": "and",
+      "lemma": "and",
+      "pos": "CCONJ",
+      "head": 34,
+      "dep": "cc",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "document",
+      "lemma": "document",
+      "pos": "NOUN",
+      "head": 37,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "rollback",
+      "lemma": "rollback",
+      "pos": "NOUN",
+      "head": 34,
+      "dep": "conj",
+      "lefts": [
+        36
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 33,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Company",
+      "lemma": "company",
+      "pos": "NOUN",
+      "head": 39,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        40,
+        41,
+        49
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 39,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 39,
+      "dep": "appos",
+      "lefts": [],
+      "rights": [
+        42,
+        47,
+        48
+      ]
+    },
+    {
+      "text": "(",
+      "lemma": "(",
+      "pos": "PUNCT",
+      "head": 41,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Paris",
+      "lemma": "Paris",
+      "pos": "PROPN",
+      "head": 47,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": [
+        44
+      ]
+    },
+    {
+      "text": "/",
+      "lemma": "/",
+      "pos": "PUNCT",
+      "head": 43,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Berlin",
+      "lemma": "Berlin",
+      "pos": "PROPN",
+      "head": 47,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "/",
+      "lemma": "/",
+      "pos": "PUNCT",
+      "head": 47,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Montreal",
+      "lemma": "Montreal",
+      "pos": "PROPN",
+      "head": 41,
+      "dep": "appos",
+      "lefts": [
+        43,
+        45,
+        46
+      ],
+      "rights": []
+    },
+    {
+      "text": ")",
+      "lemma": ")",
+      "pos": "PUNCT",
+      "head": 41,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 39,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Note",
+      "lemma": "note",
+      "pos": "NOUN",
+      "head": 50,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        51,
+        54,
+        61
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 50,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "document",
+      "lemma": "document",
+      "pos": "NOUN",
+      "head": 54,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "interne",
+      "lemma": "interne",
+      "pos": "NOUN",
+      "head": 54,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 50,
+      "dep": "appos",
+      "lefts": [
+        52,
+        53
+      ],
+      "rights": [
+        55,
+        59,
+        60
+      ]
+    },
+    {
+      "text": "(",
+      "lemma": "(",
+      "pos": "PUNCT",
+      "head": 54,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "version",
+      "lemma": "version",
+      "pos": "NOUN",
+      "head": 59,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "française",
+      "lemma": "française",
+      "pos": "X",
+      "head": 59,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "de",
+      "lemma": "de",
+      "pos": "X",
+      "head": 59,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "travail",
+      "lemma": "travail",
+      "pos": "X",
+      "head": 54,
+      "dep": "appos",
+      "lefts": [
+        56,
+        57,
+        58
+      ],
+      "rights": []
+    },
+    {
+      "text": ")",
+      "lemma": ")",
+      "pos": "PUNCT",
+      "head": 54,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 50,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 1,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "ISO",
+      "lemma": "ISO",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "nmod",
+      "lefts": [
+        0
+      ],
+      "rights": [
+        2
+      ]
+    },
+    {
+      "text": "27001",
+      "lemma": "27001",
+      "pos": "NUM",
+      "head": 1,
+      "dep": "nummod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Change",
+      "lemma": "Change",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Procedure",
+      "lemma": "Procedure",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "ROOT",
+      "lefts": [
+        1,
+        3
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 7,
+      "text": "document interne acmesystems",
+      "span": {
+        "start": 52,
+        "end": 55
+      }
+    },
+    {
+      "score": 4,
+      "text": "document rollback",
+      "span": {
+        "start": 36,
+        "end": 38
+      }
+    },
+    {
+      "score": 4,
+      "text": "change request",
+      "span": {
+        "start": 11,
+        "end": 13
+      }
+    },
+    {
+      "score": 4,
+      "text": "operations approval",
+      "span": {
+        "start": 19,
+        "end": 21
+      }
+    },
+    {
+      "score": 2,
+      "text": "acmesystems",
+      "span": {
+        "start": 41,
+        "end": 42
+      }
+    },
+    {
+      "score": 1,
+      "text": "procedure",
+      "span": {
+        "start": 0,
+        "end": 1
+      }
+    },
+    {
+      "score": 1,
+      "text": "soc2",
+      "span": {
+        "start": 5,
+        "end": 6
+      }
+    },
+    {
+      "score": 1,
+      "text": "company",
+      "span": {
+        "start": 39,
+        "end": 40
+      }
+    },
+    {
+      "score": 1,
+      "text": "paris",
+      "span": {
+        "start": 43,
+        "end": 44
+      }
+    },
+    {
+      "score": 1,
+      "text": "berlin",
+      "span": {
+        "start": 45,
+        "end": 46
+      }
+    },
+    {
+      "score": 1,
+      "text": "montreal",
+      "span": {
+        "start": 47,
+        "end": 48
+      }
+    },
+    {
+      "score": 1,
+      "text": "note",
+      "span": {
+        "start": 50,
+        "end": 51
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://4ec2f937dace02e24808e747e76677946afb9d730055659f3f716d507b48d402/procedure_00045_e9f2e2ba.json#chunk-0-cfe11af3bf",
+      "parent_doc_id": "ingest://4ec2f937dace02e24808e747e76677946afb9d730055659f3f716d507b48d402/procedure_00045_e9f2e2ba.json",
+      "text_raw": "Procedure ( ISO 27001 / SOC2 ) 1 . Record the change request . 2 . Obtain Security and Operations approval . 3 . Deploy in the approved maintenance window . 4 . Validate monitoring and document rollback . Company : AcmeSystems ( Paris / Berlin / Montreal ) . Note : document interne AcmeSystems ( version française de travail ) .",
+      "search_vector_payload": "Procedure ( ISO 27001 / SOC2 ) 1 . Record the change request . 2 . Obtain Security and Operations approval . 3 . Deploy in the approved maintenance window . 4 . Validate monitoring and document rollback . Company : AcmeSystems ( Paris / Berlin / Montreal ) . Note : document interne AcmeSystems ( version française de travail ) .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "AcmeSystems"
+          ],
+          "location": [
+            "Paris"
+          ]
+        },
+        "svo_triplets": [],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 62,
+        "sentence_start": 0,
+        "sentence_end": 7
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "Paris",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "Procedure ( ISO 27001 / SOC2 ) 1 . Record the change",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "AcmeSystems",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/document_rollback\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"document rollback\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Organization/acmesystems-14032de724d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/procedure\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"procedure\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/company\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"company\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/acmesystems\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/operations_approval\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"operations approval\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Chunk/ingest_4ec2f937dace02e24808e747e76677946afb9d730055659f3f716d507b48d402_procedure_00045_e9f2e2ba_json_chunk_0_cfe11af3bf\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/document_interne_acmesystems\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/document_rollback\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/change_request\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/operations_approval\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/acmesystems\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/procedure\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/soc2\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/company\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/paris\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/berlin\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/montreal\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/note\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Location/paris-5dd272b4f316\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"procedure_00045_e9f2e2ba_json\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Chunk/ingest_4ec2f937dace02e24808e747e76677946afb9d730055659f3f716d507b48d402_procedure_00045_e9f2e2ba_json_chunk_0_cfe11af3bf\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Organization/acmesystems-14032de724d9\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Location/paris-5dd272b4f316\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://4ec2f937dace02e24808e747e76677946afb9d730055659f3f716d507b48d402/procedure_00045_e9f2e2ba.json#chunk-0-cfe11af3bf\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Location/paris-5dd272b4f316\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Location\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Paris\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/change_request\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"change request\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/document_interne_acmesystems\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"document interne acmesystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/berlin\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"berlin\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/montreal\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"montreal\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/note\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"note\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/paris\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"paris\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/procedure_00045_e9f2e2ba_json/Keyword/soc2\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"soc2\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 21,
+      "graph_triple_count": 49,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 67,
+    "total_tokens": 67,
+    "covered_characters": 302,
+    "total_characters": 302
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 5,
+  "content-token-count": 62,
+  "token-count": 67,
+  "source-file-size-bytes": 526,
+  "pipeline-timing": {
+    "elapsed-seconds": 0.043,
+    "tasks": {
+      "language-detection": 0.005,
+      "resource-selection": 0.001,
+      "tokenizer": 0.003,
+      "morphosyntax": 0.009,
+      "ner": 0.009,
+      "syntax": 0.009,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.005,
+      "chunk-questions": 0.001
+    }
+  }
+}

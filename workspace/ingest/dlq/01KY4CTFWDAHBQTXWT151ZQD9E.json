@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4CTFWDAHBQTXWT151ZQD9E",
+  "reason": "'source_doc_id'",
+  "job": {
+    "ingest_id": "01KY4CTFWDAHBQTXWT151ZQD9E",
+    "correlation_id": "0c620880034228a49a6965e3c6c8ac8a",
+    "status": "failed",
+    "doc_id": "64a63b2a175fd75178c73d21d2b245f35341d556a50347c77b06575481db9016",
+    "batch_id": null,
+    "manifest_path": "staging/64a63b2a175fd75178c73d21d2b245f35341d556a50347c77b06575481db9016/ingest.manifest.json",
+    "error": "'source_doc_id'",
+    "created_at": "2026-07-22T07:49:40.365Z",
+    "updated_at": "2026-07-22T07:49:56.282Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4CTFWDAHBQTXWT151ZQD9E",
+    "correlation_id": "0c620880034228a49a6965e3c6c8ac8a",
+    "doc_id": "64a63b2a175fd75178c73d21d2b245f35341d556a50347c77b06575481db9016",
+    "source": {
+      "uri": "upload://01KY4CTFWDXTQRBBRZ3AGQ0PN5/ADSB_00013_66245bfa.json",
+      "filename": "ADSB_00013_66245bfa.json",
+      "content_type": "application/octet-stream",
+      "size_bytes": 432
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T07:49:40.512Z",
+    "error": "'source_doc_id'"
+  },
+  "failed_at": "2026-07-22T07:49:56.303Z"
+}

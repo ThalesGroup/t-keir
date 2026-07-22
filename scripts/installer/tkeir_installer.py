@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""tkeir-installer — on-demand cluster capability detection and Helm apply.
+"""Title: tkeir-installer — on-demand cluster capability detection and Helm apply.
 
 Usage:
   tkeir-installer plan [--kubeconfig PATH] [--output json|table]
@@ -8,6 +8,11 @@ Usage:
 
 Detection probes a kubeconfig context and prints which platform capabilities
 already exist so the umbrella chart only deploys missing pieces.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

@@ -1,4 +1,12 @@
-"""Tests for YAML/JSON configuration loading helpers."""
+"""Title: Configuration Utils
+
+Tests for YAML/JSON configuration loading helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

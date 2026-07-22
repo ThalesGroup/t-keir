@@ -1,0 +1,168 @@
+Developer Cohort Telemetry and Cost Triangulation PRD
+
+Overview:
+
+This PRD describes the Developer Cohort Telemetry and Cost Triangulation feature. The goal is to provide product and go-to-market teams with automated, reliable mappings from developer cohorts (by onboarding path, SDK usage, integration type, and region) to normalized runtime cost signals and consumption patterns. The feature will enable pricing experiments, onboarding funnels optimizations, and early detection of high-cost adoption patterns.
+
+Problem statement:
+
+- We lack a standard, low-friction way to link developer onboarding cohorts to downstream consumption economics.
+- Current cost signals are per-tenant and noisy; it is time-consuming to reconcile cost drivers with SDK/feature choices.
+- Sales and Growth teams run ad-hoc analyses; a repeatable product-grade pipeline will increase iteration velocity and reduce billing disputes.
+
+Objectives (success metrics):
+
+1) Provide cohort-level cost reports with 95% reproducibility for the top 80% of cohorts by volume.
+2) Reduce time-to-answer for cohort-cost questions from days to < 2 hours for standard queries.
+3) Surface early-warning signals for cohorts whose cost-per-active-dev increases > 30% week-over-week.
+
+Non-goals:
+
+- This PRD does not change billing semantics or invoices. It is analytics and decisioning only.
+- Not intended to replace low-level per-token billing exports.
+
+User stories:
+
+- As a Growth PM, I want to compare 7-day and 30-day cost-per-active-dev between email-onboarded users and self-serve API key users so I can prioritize onboarding fixes.
+- As a Solutions Engineer, I want to see which SDK versions are associated with higher KV cache misses and token churn so I can recommend runtime config changes.
+- As a Pricing Analyst, I want cohort elasticity curves (price vs usage) for cohorts that adopted the 'warm capacity' option.
+
+Feature scope (MVP):
+
+- Cohort definition engine: allow cohorts by attributes (signup_channel, onboarding_flow, SDK_version, tenant_size, region, first_route).
+- Telemetry ingestion: lightweight SDK tags + server-side enrichment to attach cohort_id to runtime traces and cost events.
+- Normalization layer: map raw cost events to normalized cost buckets (compute, storage, network, prefetching) and apply cohort weighting.
+- Query surface: precomputed cohort dashboards and a permissive ad-hoc query API for product/finance users.
+- Alerting: cohort-cost anomaly alerts (email/Slack) with suggested root-cause pointers.
+
+Out of scope (MVP):
+
+- Auto-enforced pricing changes.
+- Deep ML-driven attribution beyond heuristics.
+
+Telemetry contract (example payload):
+
+POST /telemetry/cohort-event  HTTP/1.1
+Content-Type: application/json
+
+{
+  "event_type": "runtime_cost_event",
+  "timestamp": "2028-02-14T15:04:05Z",
+  "tenant_id": "tenant_12345",
+  "cohort_id": "cohort_email_2028_q1",
+  "route": "/v1/generate",
+  "tokens_in": 24,
+  "tokens_out": 180,
+  "compute_ms": 720,
+  "kv_cache_hit": true,
+  "quant_profile": "q4_8bit",
+  "region": "us-west-2"
+}
+
+Normalization rules (explicit):
+
+- compute_cost = compute_ms * per_ms_rate(region, instance_class)
+- storage_cost = embedding_storage_bytes * storage_rate_tier
+- network_cost = bytes_out * egress_rate(region)
+- discounted_cost_for_warm_capacity applied at cohort attribution step (not invoice).
+
+Data model (fields required for cohort mapping):
+
+| field             | required | description |
+|-------------------|----------|-------------|
+| tenant_id         | yes      | unique tenant id |
+| cohort_id         | conditional | assigned by onboarding pipeline or fallback to derived_cohort |
+| signup_channel    | optional | web_console | sdk | partner |
+| sdk_version       | optional | semantic version string |
+| region            | yes      | AWS/GCP region |
+| event_timestamp   | yes      | ISO8601 UTC |
+| compute_ms        | yes      | runtime compute in milliseconds |
+| tokens_total      | yes      | tokens_in + tokens_out |
+
+Privacy and retention:
+
+- Cohort identifiers must not contain PII.
+- Retention defaults: raw runtime events retained 30 days; precomputed cohort aggregates retained 18 months.
+- For regulated tenants (confidentiality: restricted), only aggregated, anonymized cohorts are stored.
+
+Security and compliance considerations:
+
+- SDK tags are optional and default to "no-cohort" when disabled.
+- Cross-check with privacy/legal to ensure cohort granularity does not enable deanonymization.
+- Audit logs for cohort assignment changes stored for 7 years (audit-only, restricted access).
+
+UX and dashboards:
+
+- Prebuilt dashboard tiles: cohort summary, cost-per-active-dev trend, cost component breakdown (compute/storage/network), SDK-version heatmap, onboarding funnel overlay.
+- Drilldown: click a cohort -> open route-level and tenant-sample views; do not expose raw tenant IDs unless user has "finance_analyst" role.
+
+APIs and exports:
+
+- GET /api/v1/cohorts/{cohort_id}/metrics?window=30d&granularity=1d -> returns precomputed timeseries.
+- CSV export for finance with column-level hashed tenant ids.
+
+Rollout plan and milestones:
+
+1) 3-week discovery: finalize cohort attributes and sample SDK tagging. (Owner: Product, 2027-11-08 to 2027-11-29)
+2) 6-week implementation: ingestion pipeline, normalization, and initial dashboard (Owner: Eng-Platform, 2027-12-01 to 2028-01-12)
+3) 2-week limited beta: opt-in tenants and internal finance testing (Owner: Customer Success, 2028-01-16 to 2028-01-30)
+4) Production rollout: dashboard enabled for Product and Finance (Owner: Product, 2028-02-14)
+
+Ownership and stakeholders:
+
+- Product: Priya Nair (PRD owner)
+- Eng-Platform: Owen Zhang (ingestion + normalization)
+- Eng-Data: Sara López (aggregation and retention)
+- Finance: Ethan Ramirez (use cases + acceptance)
+- Customer Success: Leah Morgan (beta coordination)
+
+Monitoring, SLOs and alerts:
+
+- Ingestion SLO: 99.9% of telemetry events processed within 120s.
+- Dashboard freshness: precomputed cohorts available within 10 minutes for 99% of events.
+- Anomaly alert precision target: > 70% true positive rate on simulated anomalies.
+
+Acceptance criteria (MVP):
+
+- Cohort definitions UI exists and saves definitions to the cohort registry.
+- Telemetry SDK or server-side enrichment can attach a cohort_id and the payload accepted by ingestion API.
+- Precomputed cohort dashboard with cost-per-active-dev and component breakdowns accessible to Product and Finance roles.
+- Export CSV contains reproducible, hashed tenant references for reconciliation.
+- Beta cohort anomaly alerts deliver examples to Slack channel #cohort-cost-alerts with a sample precision >= 70% on test data.
+
+Open questions and risks:
+
+- How to map legacy tenants lacking SDK tags to cohorts reliably? Proposed mitigation: derived cohort heuristics (first_route, signup_timestamp) and a manual mapping UI.
+- Potential for cohort identifiers to leak business-sensitive adoption patterns. Mitigation: enforce access controls and aggregation thresholds (min 5 tenants per cohort before cohort-level export).
+- Billing disputes: ensure documentation that this product is analytics-only and not a billing source.
+
+Appendix: sample cohort definition YAML
+
+---
+name: "email_onboard_q1_2028"
+description: "Users who completed email verification and used SDK v2.x within 7 days"
+filters:
+  - field: signup_channel
+    operator: equals
+    value: email
+  - field: signup_date
+    operator: between
+    value: ["2028-01-01","2028-03-31"]
+  - field: sdk_version
+    operator: starts_with
+    value: "2."
+aggregation_window: 1d
+min_tenants: 5
+---
+
+Appendix: sample alert rule (pseudocode)
+
+IF cohort.cost_per_active_dev(7d) / cohort.cost_per_active_dev(14d) > 1.3 AND cohort.volume(7d) > 50 THEN alert("cohort_cost_spike", severity=high)
+
+Related artifacts and next steps:
+
+- Product to approve final cohort attribute list and retention windows.
+- Engineering to provide SDK tagging examples and a lightweight server-side enrich endpoint.
+- Finance to identify first three canonical cohort reports for reconciliation.
+
+Contact: Priya Nair (priya@redwood.ai)

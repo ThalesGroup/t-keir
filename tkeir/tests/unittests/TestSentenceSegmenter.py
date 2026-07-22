@@ -1,4 +1,12 @@
-"""Tests for pySBD sentence segmentation."""
+"""Title: Sentence Segmenter
+
+Tests for pySBD sentence segmentation.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.core.SentenceSegmenter import (
     SentenceSegmenter,

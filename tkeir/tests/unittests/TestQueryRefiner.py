@@ -1,4 +1,12 @@
-"""Tests for RAG query refinement helpers."""
+"""Title: Query Refiner
+
+Tests for RAG query refinement helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tools.search.query_refiner import meaningful_tokens_from_morphosyntax
 

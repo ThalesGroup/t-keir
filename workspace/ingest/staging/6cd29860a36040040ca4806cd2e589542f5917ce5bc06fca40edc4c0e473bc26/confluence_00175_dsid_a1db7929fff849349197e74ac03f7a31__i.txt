@@ -1,0 +1,156 @@
+incremental-kv-cache-migration-with-zero-query-loss-playbook
+
+Overview
+
+Purpose: This playbook describes a step-by-step, operator-focused procedure for migrating KV (key-value) cache state across private deployments with the objective of zero query loss for live traffic. It is intended for field operators, SREs, and the runtime team executing stateful rollforwards when model artifacts, runtime versions, or topology changes require an in-place KV cache migration.
+
+Scope and assumptions:
+- Applies to Private (VPC / on-prem) deployments managed by Redwood Operator.
+- Target runtime supports snapshot-and-restore of per-tenant KV cache (runtime version >= 3.9.0).
+- Customer traffic must be routable through an operator-managed proxy that supports request mirroring and short-circuit quiescing.
+- Operators have access to the control plane and the field operator toolkit (kvctl).
+
+When to use this playbook:
+1. Upgrading runtime where KV cache format changed (compatible-by-conversion).
+2. Moving tenant state between clusters or AZs for capacity rebalancing.
+3. Performing a live model swap that requires warm KV cache on the new model variant.
+
+Owners and roles:
+- Run: Field Operator (runbook executor)
+- Validation & Escalation: Runtime SRE (on-call)
+- Customer liaison: Solutions Engineer (if customer-visible windows are needed)
+
+Prerequisites and checklist (must pass before initiating):
+- [ ] Current SLOs and traffic windows approved by customer (if applicable).
+- [ ] Snapshot storage bucket reachable and encrypted (KMS key id provided).
+- [ ] kvctl >= 1.12 installed on operator host.
+- [ ] Canary tenant traffic generator available.
+- [ ] Baseline telemetry captured (latency / error / cache hit-rate) and uploaded to evidence bucket.
+
+Key safety principles:
+- Always prefer staged, shard-by-shard migration over big-bang for tenant-level isolation.
+- Keep a forensic snapshot at every phase boundary (before any irreversible change).
+- Use traffic quarantine (mirror-and-divert) to validate correctness before switching live traffic.
+- Automate verifications and make thresholds explicit.
+
+High-level approach (phases):
+1) PREPARE: Validate topology, take global snapshot, set safe circuit-breakers.
+2) WARMUP: Stream historical prefixes and replay hot keys to target cache (shadow writes).
+3) INCREMENTAL MIGRATE: Move cache shards one-by-one with live validation and mirrored read-checks.
+4) QUARANTINE CUTOVER: Divert a small percentage of live traffic to the migrated shard and confirm parity.
+5) FINALIZE: Promote migrated shards to live, remove mirror, and retire source shard.
+6) POST-VALIDATION: Run extended check and collect forensic evidence for rollback readiness.
+
+Detailed procedure
+
+Phase 0 - Safety gates (operator must complete these first)
+- Confirm operator-host clock synced (NTP).
+- Ensure control-plane connectivity: kubectl get pods -n redwood-control
+- Confirm snapshot bucket ACL and KMS access: aws s3 ls s3://redwood-kv-snapshots/ --profile fieldops
+- Set service-level circuit breaker: PATCH /api/operator/config {"kv.cache.migration.safe_mode": true, "traffic.diversion_threshold": 0.0}
+
+Phase 1 - Global forensic snapshot
+1. Create a read-consistent snapshot for the tenant(s) in scope:
+   kvctl snapshot create --tenant tenant-42 --output s3://redwood-kv-snapshots/tenant-42/pre-migrate-20260301.tar.gz --encrypt --kms-key arn:aws:kms:region:acct:key/xxxx
+2. Verify checksum and retention: kvctl snapshot verify --uri s3://...
+3. Record the snapshot id and manifest in the runbook evidence section.
+
+Phase 2 - Warmup (shadow writes + prefix replay)
+- Goal: Populate hot keys on the target runtime without changing live responses.
+- Steps:
+  a) Enable mirror mode on the proxy for tenant-42: proxyctl route update --tenant tenant-42 --mirror-target cluster-B --mode read-write-mirror
+  b) Run prefix replay using historical logs (or synthetic generator):
+     ./tools/prefix-replayer --source logs/tenant-42/ --target cluster-B --concurrency 16 --rate 500rps
+  c) Monitor mirrored write success and error ratio for 30 minutes. Acceptable thresholds: mirror-write-error < 0.2% and mirror-latency P95 < baseline+50ms.
+
+Phase 3 - Incremental shard migration (repeat per shard)
+1. Select one shard (shard-id from topology map).
+2. Lock routing for that shard to a fenced operator path (prevent autoscaler evictions):
+   operatorctl shard lock --shard shard-13 --reason "kv-migrate-2026-03-01"
+3. Create shard-level snapshot:
+   kvctl snapshot create --shard shard-13 --output s3://.../shard-13-pre.tar.gz
+4. Restore into target nodes and validate checksum: kvctl restore --shard shard-13 --from s3://... --nodes node-a,node-b
+5. Run read parity checks:
+   - Configure mirrored read-checks: proxyctl readcheck enable --shard shard-13 --comparison-mode strict
+   - Send 1,000 sampled reads with span distribution that targets hot keys.
+6. Tolerances for progress: read-parity mismatches <= 0.05% for 10m window. If mismatch rate exceeds threshold, mark shard as degraded and escalate to runtime SRE.
+7. If parity passes, proceed to quarantine cutover for that shard (Phase 4).
+
+Phase 4 - Quarantine cutover (canary live traffic)
+1. Shift 1% of real traffic to the new shard using the operator traffic-steering controller:
+   trafficctl steer --tenant tenant-42 --shard shard-13 --percentage 1 --duration 10m
+2. Monitor metrics (live request latency, error rate, generated tokens, cache hit-rate).
+3. Automated gating rules (fail if any triggered):
+   - live-error-rate increase > 0.5% absolute over baseline
+   - P95 latency regression > 150ms over baseline
+   - cache-hit-rate drop > 10%
+4. If all gates pass for 10 minutes, increment to 10%, then 25% with 10m stabilization windows.
+5. On successful 25% window, promote shard to 100% and remove mirror for that shard.
+
+Phase 5 - Finalize and retirement
+- Mark source shard retired: operatorctl shard retire --shard shard-13 --retain-snapshot s3://.../shard-13-post.tar.gz
+- Rotate any shard-specific routing config and update runbook evidence with final metrics.
+
+Rollback decision matrix
+- Soft rollback (fast revert): if live error-rate > 1.5% within a 5m window OR parity mismatches persist > 0.25% -> divert traffic back to source for affected shard and stop migration.
+- Hard rollback (forensic restore): if data divergence is large or snapshot corrupted -> restore source from pre-migration snapshot and open a P1 incident.
+- Escalation path: Runtime SRE -> Head of Platform -> Customer Solutions if customer impact > 10% traffic.
+
+Rollback steps (soft revert)
+1. trafficctl steer --tenant tenant-42 --shard shard-13 --percentage 0 --target source --immediate
+2. operatorctl shard unlock --shard shard-13
+3. Re-enable mirror mode for diagnostics for 30 minutes and capture parity logs.
+4. If necessary, restore from pre-migration snapshot:
+   kvctl restore --shard shard-13 --from s3://redwood-kv-snapshots/tenant-42/pre-migrate-20260301.tar.gz --force
+
+Forensic snapshot and evidence collection
+- Always collect:
+  * operator logs: kubectl logs -n redwood-tenant-ops controller --since=2h > evidence/controller-logs.txt
+  * parity snapshots: kvctl parity dump --shard shard-13 --out evidence/parity-shard-13.json
+  * telemetry export: metrics-exporter --range "2026-03-01T00:00:00Z/2026-03-01T02:00:00Z" --tenant tenant-42 > evidence/metrics.json
+- Tag evidence in S3 under runbook id and notify oncall via #ops-incident with presigned links.
+
+Operational thresholds and example config table
+| Parameter | Recommended value | Notes |
+|---|---:|---|
+| Mirror concurrency | 16 | Increase for fast warmup; watch I/O on target nodes |
+| Mirror error threshold | 0.2% | Fail if exceeded during warmup |
+| Read parity tolerance | 0.05% | Strict parity required for zero-loss goal |
+| Canary step sizes | 1% -> 10% -> 25% -> 100% | 10m stabilization windows between steps |
+| Snapshot retention | 30 days | Longer retention for regulated customers |
+
+CLI examples and snippets
+- Create tenant snapshot:
+  kvctl snapshot create --tenant tenant-42 --output s3://redwood-kv-snapshots/tenant-42/pre-migrate-20260301.tar.gz --encrypt --kms-key arn:aws:kms:...
+- Start prefix replayer (local):
+  ./tools/prefix-replayer --tenant tenant-42 --from logs/ --target cluster-B --rate 500rps --concurrency 16
+- Enable strict read-checks:
+  proxyctl readcheck enable --tenant tenant-42 --shard shard-13 --comparison-mode strict
+
+Monitoring and verification (automate where possible)
+- Dashboards to monitor during migration:
+  * tenant-42: Live latency by shard (P50/P95/P99)
+  * parity-checker: mismatch-rate by shard
+  * cache-hit-rate: 1m and 5m windows
+- Required alerts:
+  * parity-mismatch > 0.1% for 5m -> auto-pause migration and page SRE
+  * live-error-rate delta > 0.5% absolute for 1m -> auto-revert to previous traffic steering
+
+Common failure modes and remediation
+- High mirror-write errors: reduce concurrency, validate network egress path, check disk IOPS on target.
+- Persistent parity mismatches: run kvctl parity dump for a sample keyset, compare values, and escalate to runtime engineering.
+- Latency regressions: disable mirror write, revert shard traffic, and capture heap/GC diagnostics from target nodes.
+
+Post-migration checklist
+- [ ] All shards promoted and mirrors removed.
+- [ ] Final forensic snapshots stored and checksums verified.
+- [ ] Post-migration metrics show no sustained SLO regressions for 24h.
+- [ ] Customer notified with runbook evidence bundle (signed off).
+
+Appendix: Helpful commands and links
+- kvctl docs: internal link /confluence/eng-infra/team-wiki/kvctl-docs
+- Traffic controller API: /confluence/eng-platform/systems-and-services/traffic-controller-api
+- Incident template: /confluence/oncall-and-incident-response/postmortems/incident-template-2025
+
+Summary
+This playbook provides an operator-centric, low-risk path to migrate KV cache shards with minimal customer impact. The emphasis is on repeated verification (parity checks), short staged cutovers, and clear rollback decision points. Operators should practice this playbook in a staging environment before running in customer production.

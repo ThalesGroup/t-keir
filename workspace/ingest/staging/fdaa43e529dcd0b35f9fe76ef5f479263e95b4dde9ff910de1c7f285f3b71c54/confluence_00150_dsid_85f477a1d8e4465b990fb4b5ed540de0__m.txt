@@ -1,0 +1,197 @@
+Marketplace Packaging & Reference Architecture (2026) — Packaged/Helm First, Hybrid Connector Patterns
+
+## Overview
+This page consolidates Redwood guidance for partner marketplace packaging and the recommended reference architecture patterns for **hybrid deployments** (partner-hosted control plane + customer VPC installs + optional on‑prem connector). It incorporates learnings from the Peregrine Systems packaging review (July 2026) and subsequent internal updates.
+
+**Key update vs. earlier guidance (July 2026):**
+- We now recommend a **packaged listing first (AWS Marketplace Container Product + Helm chart)** for partners with strong “customer VPC / no public egress” requirements.
+- A separate **SaaS marketplace tile** can be added later, but should not block initial launch.
+- Marketplace validation has become stricter on image size and install-time network calls (see “Packaging checklist”).
+
+## Decision Framework: SaaS Listing vs Packaged Listing
+### SaaS listing (partner-hosted)
+Use when:
+- Billing is primarily usage-based and partners want the marketplace purchase flow mapped to API usage.
+- Most customers accept public endpoint access or can use PrivateLink to partner VPC.
+- Partner can operate a production-grade multi-tenant service with clear SLOs and region availability.
+
+Pros:
+- Simplified purchase flow and metering.
+- Lower customer operational burden.
+
+Cons:
+- Harder for customers requiring “in-customer-VPC” deployments or strict egress controls.
+
+### Packaged listing (container/Helm)
+Use when:
+- A significant portion of customers require deployment into **their own AWS account/VPC**.
+- There are air-gapped or “offline registry” customers.
+- Procurement requires explicit customer control of runtime, networking, and keys.
+
+Pros:
+- Strongest fit for enterprise security and network controls.
+- Supports customer-operated observability, scaling, and isolation models.
+
+Cons:
+- Higher packaging and certification effort.
+- Billing models typically skew license-based or capacity-based.
+
+**2026 recommendation:** If the partner expects >25% of deployments in customer VPCs or on‑prem connected scenarios, start with **packaged Helm**.
+
+## Target Marketplace Scope (2026 baseline)
+**Clouds:**
+- **AWS Marketplace: in scope** (initial launch)
+- **GCP Marketplace: optional / later** (track as a separate project; artifacts can be reused but certification differs)
+
+**Orchestrators (initial):**
+- **EKS + Helm chart** (required)
+- ECS and GKE support can be added later if needed; do not expand scope until the EKS listing passes.
+
+## Reference Architecture: Hybrid Deployment
+### Goals
+- Support customer VPC installs with “no public egress” patterns.
+- Support on‑prem connectivity through a connector with strict outbound-only posture.
+- Provide clear data flow, encryption boundaries, and auditability for marketplace compliance.
+
+### Canonical components
+- **Customer VPC (AWS account):**
+  - EKS cluster
+  - Inference/runtime service (container)
+  - Optional Redis (distributed cache)
+  - Optional customer-managed telemetry stack (Prometheus/Grafana)
+- **Partner VPC:**
+  - Control plane (multi-tenant or dedicated)
+  - License/entitlement verification service (must have offline/limited mode for restricted environments)
+  - Optional shared telemetry ingestion endpoint
+- **Connectivity options (preferred order):**
+  1) **AWS PrivateLink** from customer VPC to partner endpoints (preferred)
+  2) VPC peering (when PrivateLink not feasible)
+  3) Outbound TLS-only connector tunnel (on‑prem or restricted networks)
+
+### Data flow (minimum diagrams required for listing)
+Partners should publish a diagram and short narrative covering:
+1) **Onboarding & entitlement**: purchase → entitlement check → license token issuance (or offline license file)
+2) **Normal inference/requests**: ingress → runtime → model → response; include cache placement
+3) **Audit logging**: tenant-level request logs and admin actions; where stored and retention
+4) **Failure modes**: partner control plane unavailable; customer VPC still operates with defined degraded behavior
+
+### KV cache guidance
+- **Default**: local KV cache on inference pods for latency.
+- **Optional**: Redis for multi-node / horizontally scaled scenarios.
+
+### “No public egress” requirements
+If a customer forbids internet egress:
+- Do not require install-time downloads from public URLs.
+- Provide:
+  - A PrivateLink path for required control plane calls, OR
+  - An offline mode with pre-provisioned license artifacts.
+
+## Security & Compliance Artifact Pack (Marketplace readiness)
+Partners should be prepared to supply:
+- **SOC 2 Type II** (redacted acceptable) or equivalent controls statement.
+- Encryption-at-rest documentation:
+  - Storage encryption (EBS, S3, or partner storage)
+  - Key management model (AWS KMS; customer-managed keys when applicable)
+- **SSO integration** docs (SAML/OIDC) for admin console (if applicable).
+- **Audit logging** documentation:
+  - What is logged
+  - Tenant isolation
+  - Export/retention options
+- **Data residency statement**:
+  - Supported regions
+  - Where payloads, prompts, responses, and telemetry are processed/stored
+- **DPA template** and support/SLA statement.
+
+### BYOK / HSM / XKS notes (updated)
+- **Dedicated/private deployments**: BYOK is supported via AWS KMS customer-managed keys; HSM-backed keys may be supported depending on the partner environment.
+- **Multi-tenant hosted SaaS**: BYOK is not universally available; provide a clear statement of what is and is not supported for each tier.
+
+## Packaging Checklist (Helm + Container Product)
+### Helm chart requirements
+- Provide:
+  - values.yaml with safe defaults
+  - RBAC with least privilege
+  - Resource requests/limits specified
+  - Liveness/readiness probes
+  - Clear upgrade/migration notes
+- Avoid:
+  - Mandatory post-install hooks that call external URLs
+  - Installing cluster-wide CRDs unless strictly necessary
+
+### Container image requirements (updated thresholds)
+- Keep images small; marketplace scanning and customer registries penalize large images.
+- **Target image size:** ideally < 8 GB (compressed layers). (Earlier guidance referenced 10 GB; scanning friction increased.)
+- Provide SBOM and signature where possible.
+- Multi-arch images:
+  - Recommended if supporting Graviton/ARM, but do not block launch if the partner’s customer base is x86-only.
+
+### Air-gapped / offline registry support
+If claiming air-gapped support:
+- Document:
+  - Pre-pull steps
+  - Offline registry mirroring instructions
+  - How license/entitlements work offline
+  - Image signing verification steps
+
+## Billing, Metering & Private Offers
+### Private offers
+- Recommended for enterprise motion.
+- Ensure listing language and internal process covers:
+  - discounting approvals
+  - term lengths
+  - renewal and support alignment
+
+### Metering guidance (updated)
+Partners must choose one primary model for the initial packaged listing:
+- **License-based** (common for packaged/Helm):
+  - Example: “runtime node” or “provisioned capacity unit” per hour/month.
+- **Usage-based** (more common for SaaS):
+  - Example: “inference units” based on token volume.
+
+**Redwood recommended starting point for packaged listings:**
+- A capacity-based dimension (e.g., `capacity_unit_hour`) mapped to a documented throughput baseline.
+
+**If usage-based is required:**
+- Provide a deterministic mapping to “inference units” (e.g., per 1k tokens) with explicit rounding rules.
+
+### Sample invoice line items (template)
+- Base platform subscription
+- Capacity units / nodes
+- Optional add-ons: enhanced support, compliance pack, dedicated region
+
+## Observability & Telemetry
+- Must offer a customer-managed option:
+  - Prometheus metrics endpoint (scrape)
+  - Structured logs to stdout + optional sidecar
+- If offering SaaS ingestion:
+  - Make it optional and clearly documented
+  - Provide controls to disable
+
+## Certification Readiness: What reviewers look for
+Marketplace reviewers commonly request or reject based on:
+- Missing or unclear network/data-flow diagrams
+- Excessive RBAC privileges
+- Install scripts that fetch from public internet
+- Lack of documented upgrade path
+- Vague billing dimensions
+
+## Implementation Plan (recommended)
+1) Confirm listing type: **AWS Marketplace Container Product + Helm**
+2) Produce partner artifact pack:
+   - architecture diagram (PNG) + editable source
+   - install playbook
+   - security artifact pack
+3) Build and validate Helm chart in a clean EKS environment
+4) Run a benchmark week with a partner-provided prompt set:
+   - define latency SLOs
+   - define token/request distribution
+   - compare local KV only vs Redis option
+5) Prepare listing assets:
+   - hero blurb (short)
+   - screenshots/flow
+   - support contact + SLA
+   - pricing + private offer process
+
+## Change Log
+- 2026-09-02: Updated container image size target (<8 GB) and clarified BYOK support boundaries for hosted vs dedicated deployments.
+- 2026-08-06: Initial publication consolidating partner packaging + hybrid reference architecture guidance based on July 2026 partner review.

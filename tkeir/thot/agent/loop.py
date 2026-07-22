@@ -1,4 +1,12 @@
-"""Single-agent reason→act→observe loop (from scratch)."""
+"""Title: Loop
+
+Single-agent reason→act→observe loop (from scratch).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

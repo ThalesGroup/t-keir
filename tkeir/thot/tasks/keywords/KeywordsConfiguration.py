@@ -1,8 +1,11 @@
-"""Keyword configuration
-Author: Eric Blaudez (Eric Blaudez)
+"""Title: Keyword configuration
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Keyword and keyphrase extraction.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.core.ConfigurationUtils import load_configuration

@@ -1,4 +1,12 @@
-"""Append-only hot store for sealed ActionRecords."""
+"""Title: Hot store
+
+Append-only hot store for sealed ActionRecords.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

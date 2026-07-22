@@ -1,4 +1,12 @@
-"""Tests for Vespa hit reranking helpers."""
+"""Title: Rerank
+
+Tests for Vespa hit reranking helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,12 @@
-"""Unit tests for input_generator category logic (no OPA required)."""
+"""Title: Input generator
+
+Unit tests for input_generator category logic (no OPA required).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

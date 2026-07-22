@@ -1,9 +1,11 @@
-"""Trie structure for lexical resources
+"""Title: Trie structure for lexical resources
 
-Author: Eric Blaudez (Eric Blaudez)
+Core T-KEIR libraries (logging, config, paths, utilities).
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from thot.core.ThotLogger import ThotLogger

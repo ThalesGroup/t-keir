@@ -1,0 +1,1542 @@
+{
+  "data_source": "converter-service",
+  "source_doc_id": "ingest://b0cb5b52e25b42c3923b361297b91dfae01e2025ccffed5adb5368e000ed904c/hr_policy_00161_de23f191.pdf",
+  "title": "AcmeSystems Remote Work Policy",
+  "content": [
+    "AcmeSystems Remote Work Policy\nHR policy â AcmeSystems\nEmployees may work remotely subject to manager approval. Protect company information, use managed de\n\nNote: document interne AcmeSystems (version franˆ§aise de travail)."
+  ],
+  "kg": [
+    {
+      "subject": {
+        "content": [
+          "â",
+          "AcmeSystems",
+          "Employees"
+        ],
+        "lemma_content": [
+          "â",
+          "AcmeSystems",
+          "Employees"
+        ],
+        "pos": [
+          "PROPN",
+          "PROPN",
+          "PROPN"
+        ],
+        "positions": [
+          6,
+          7,
+          8
+        ],
+        "label": "organization"
+      },
+      "property": {
+        "content": [
+          "may",
+          "work",
+          "remotely"
+        ],
+        "lemma_content": [
+          "may",
+          "work",
+          "remotely"
+        ],
+        "pos": [
+          "AUX",
+          "VERB",
+          "ADV"
+        ],
+        "positions": [
+          9,
+          10,
+          11
+        ],
+        "label": "pattern_verb_phrase"
+      },
+      "value": {
+        "content": [
+          "subject",
+          "to",
+          "manager",
+          "approval"
+        ],
+        "lemma_content": [
+          "subject",
+          "to",
+          "manager",
+          "approval"
+        ],
+        "pos": [
+          "ADJ",
+          "ADP",
+          "NOUN",
+          "NOUN"
+        ],
+        "positions": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "label": "pattern_syntagm_or_prep_group"
+      },
+      "automatically_fill": true,
+      "confidence": 0.0,
+      "weight": 0.0,
+      "field_type": "content"
+    }
+  ],
+  "error": false,
+  "conversion-info": {
+    "datatype": "pdf",
+    "source-size-bytes": 875,
+    "image-extraction": {
+      "enabled": true,
+      "used": false,
+      "mode": "tesseract",
+      "image-regions": 0,
+      "scanned-pages": 0
+    }
+  },
+  "tasks-info": [
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "converter"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "language-detection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "resource-selection"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "tokenizer"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "morphosyntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "ner"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2022/09",
+      "task-name": "syntax"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "golden-chunking"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "document-ontology"
+    },
+    {
+      "os": [
+        "Darwin",
+        "yoda.local",
+        "25.5.0",
+        "Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142",
+        "arm64"
+      ],
+      "hostname": "yoda.local",
+      "host": "127.0.0.1",
+      "execution-date": "Jul 22 2026 09:54:57",
+      "task-version": "2.0.0",
+      "task-development-date": "2026/07",
+      "task-name": "chunk-questions"
+    }
+  ],
+  "source": "ingest://b0cb5b52e25b42c3923b361297b91dfae01e2025ccffed5adb5368e000ed904c/hr_policy_00161_de23f191.pdf",
+  "metadata": {
+    "topic_id": "hr",
+    "corpus": "enterprise",
+    "doc_type": "hr_policy",
+    "language": "fr",
+    "title": "AcmeSystems Remote Work Policy",
+    "user_space": "dev@tkeir"
+  },
+  "corpus": "enterprise",
+  "topic_id": "hr",
+  "doc_type": "hr_policy",
+  "user_space": "dev@tkeir",
+  "language-detection": {
+    "language": "en",
+    "confidence": 0.9999948707301567
+  },
+  "resource-selection": {
+    "detected-language": "en",
+    "processing-language": "en",
+    "spacy-language": "en",
+    "resources-base-path": "/Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en",
+    "available-languages": [
+      "en"
+    ]
+  },
+  "content_tokens": [
+    [
+      [
+        {
+          "token": "AcmeSystems",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Remote",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Work",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Policy",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "HR",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "policy",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "â",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "Employees",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "may",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "work",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "remotely",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "subject",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "to",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "manager",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "approval",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Protect",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "company",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "information",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ",",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "use",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "managed",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "de",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ],
+      [
+        {
+          "token": "Note",
+          "start_sentence": true,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ":",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "document",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "interne",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "AcmeSystems",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "(",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "version",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "franˆ§aise",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "de",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": "travail",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ")",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        },
+        {
+          "token": ".",
+          "start_sentence": false,
+          "mwe": {
+            "is-compound": false,
+            "data": {}
+          }
+        }
+      ]
+    ]
+  ],
+  "title_tokens": [
+    [
+      {
+        "token": "AcmeSystems",
+        "start_sentence": true,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Remote",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Work",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      },
+      {
+        "token": "Policy",
+        "start_sentence": false,
+        "mwe": {
+          "is-compound": false,
+          "data": {}
+        }
+      }
+    ]
+  ],
+  "title_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Remote",
+      "text": "Remote",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Work",
+      "text": "Work",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Policy",
+      "text": "Policy",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    }
+  ],
+  "content_morphosyntax": [
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 0
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Remote",
+      "text": "Remote",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 1
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Work",
+      "text": "Work",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 2
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Policy",
+      "text": "Policy",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 3
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "HR",
+      "text": "HR",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 4
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "policy",
+      "text": "policy",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 5
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "â",
+      "text": "â",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 6
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 7
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "Employees",
+      "text": "Employees",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 8
+    },
+    {
+      "pos": "AUX",
+      "lemma": "may",
+      "text": "may",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 9
+    },
+    {
+      "pos": "VERB",
+      "lemma": "work",
+      "text": "work",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 10
+    },
+    {
+      "pos": "ADV",
+      "lemma": "remotely",
+      "text": "remotely",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 11
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "subject",
+      "text": "subject",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 12
+    },
+    {
+      "pos": "ADP",
+      "lemma": "to",
+      "text": "to",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 13
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "manager",
+      "text": "manager",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 14
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "approval",
+      "text": "approval",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 15
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 16
+    },
+    {
+      "pos": "ADJ",
+      "lemma": "protect",
+      "text": "Protect",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 17
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "company",
+      "text": "company",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 18
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "information",
+      "text": "information",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 19
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ",",
+      "text": ",",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 20
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "use",
+      "text": "use",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 21
+    },
+    {
+      "pos": "VERB",
+      "lemma": "manage",
+      "text": "managed",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 22
+    },
+    {
+      "pos": "X",
+      "lemma": "de",
+      "text": "de",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 23
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "note",
+      "text": "Note",
+      "is_oov": false,
+      "is_sent_start": true,
+      "position": 24
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ":",
+      "text": ":",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 25
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "document",
+      "text": "document",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 26
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "interne",
+      "text": "interne",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 27
+    },
+    {
+      "pos": "PROPN",
+      "lemma": "AcmeSystems",
+      "text": "AcmeSystems",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 28
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": "(",
+      "text": "(",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 29
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "version",
+      "text": "version",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 30
+    },
+    {
+      "pos": "X",
+      "lemma": "franˆ§aise",
+      "text": "franˆ§aise",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 31
+    },
+    {
+      "pos": "X",
+      "lemma": "de",
+      "text": "de",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 32
+    },
+    {
+      "pos": "NOUN",
+      "lemma": "travail",
+      "text": "travail",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 33
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ")",
+      "text": ")",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 34
+    },
+    {
+      "pos": "PUNCT",
+      "lemma": ".",
+      "text": ".",
+      "is_oov": false,
+      "is_sent_start": false,
+      "position": 35
+    }
+  ],
+  "title_ner": [
+    {
+      "start": 0,
+      "end": 4,
+      "label": "organization",
+      "text": "AcmeSystems Remote Work Policy"
+    }
+  ],
+  "content_ner": [
+    {
+      "start": 0,
+      "end": 4,
+      "label": "organization",
+      "text": "AcmeSystems Remote Work Policy"
+    },
+    {
+      "start": 6,
+      "end": 9,
+      "label": "organization",
+      "text": "â AcmeSystems Employees"
+    },
+    {
+      "start": 28,
+      "end": 29,
+      "label": "organization",
+      "text": "AcmeSystems"
+    }
+  ],
+  "content_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Remote",
+      "lemma": "Remote",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Work",
+      "lemma": "Work",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Policy",
+      "lemma": "Policy",
+      "pos": "PROPN",
+      "head": 4,
+      "dep": "compound",
+      "lefts": [
+        0,
+        1,
+        2
+      ],
+      "rights": []
+    },
+    {
+      "text": "HR",
+      "lemma": "HR",
+      "pos": "PROPN",
+      "head": 5,
+      "dep": "compound",
+      "lefts": [
+        3
+      ],
+      "rights": []
+    },
+    {
+      "text": "policy",
+      "lemma": "policy",
+      "pos": "NOUN",
+      "head": 8,
+      "dep": "compound",
+      "lefts": [
+        4
+      ],
+      "rights": []
+    },
+    {
+      "text": "â",
+      "lemma": "â",
+      "pos": "PROPN",
+      "head": 8,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 8,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Employees",
+      "lemma": "Employees",
+      "pos": "PROPN",
+      "head": 10,
+      "dep": "nsubj",
+      "lefts": [
+        5,
+        6,
+        7
+      ],
+      "rights": []
+    },
+    {
+      "text": "may",
+      "lemma": "may",
+      "pos": "AUX",
+      "head": 10,
+      "dep": "aux",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "work",
+      "lemma": "work",
+      "pos": "VERB",
+      "head": 10,
+      "dep": "ROOT",
+      "lefts": [
+        8,
+        9
+      ],
+      "rights": [
+        12,
+        16
+      ]
+    },
+    {
+      "text": "remotely",
+      "lemma": "remotely",
+      "pos": "ADV",
+      "head": 12,
+      "dep": "advmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "subject",
+      "lemma": "subject",
+      "pos": "ADJ",
+      "head": 10,
+      "dep": "advmod",
+      "lefts": [
+        11
+      ],
+      "rights": [
+        13
+      ]
+    },
+    {
+      "text": "to",
+      "lemma": "to",
+      "pos": "ADP",
+      "head": 12,
+      "dep": "prep",
+      "lefts": [],
+      "rights": [
+        15
+      ]
+    },
+    {
+      "text": "manager",
+      "lemma": "manager",
+      "pos": "NOUN",
+      "head": 15,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "approval",
+      "lemma": "approval",
+      "pos": "NOUN",
+      "head": 13,
+      "dep": "pobj",
+      "lefts": [
+        14
+      ],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 10,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Protect",
+      "lemma": "protect",
+      "pos": "ADJ",
+      "head": 22,
+      "dep": "advcl",
+      "lefts": [],
+      "rights": [
+        19
+      ]
+    },
+    {
+      "text": "company",
+      "lemma": "company",
+      "pos": "NOUN",
+      "head": 19,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "information",
+      "lemma": "information",
+      "pos": "NOUN",
+      "head": 17,
+      "dep": "dobj",
+      "lefts": [
+        18
+      ],
+      "rights": []
+    },
+    {
+      "text": ",",
+      "lemma": ",",
+      "pos": "PUNCT",
+      "head": 22,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "use",
+      "lemma": "use",
+      "pos": "NOUN",
+      "head": 22,
+      "dep": "nsubj",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "managed",
+      "lemma": "manage",
+      "pos": "VERB",
+      "head": 22,
+      "dep": "ROOT",
+      "lefts": [
+        17,
+        20,
+        21
+      ],
+      "rights": [
+        23
+      ]
+    },
+    {
+      "text": "de",
+      "lemma": "de",
+      "pos": "X",
+      "head": 22,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Note",
+      "lemma": "note",
+      "pos": "NOUN",
+      "head": 24,
+      "dep": "ROOT",
+      "lefts": [],
+      "rights": [
+        25,
+        28,
+        35
+      ]
+    },
+    {
+      "text": ":",
+      "lemma": ":",
+      "pos": "PUNCT",
+      "head": 24,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "document",
+      "lemma": "document",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "interne",
+      "lemma": "interne",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 24,
+      "dep": "appos",
+      "lefts": [
+        26,
+        27
+      ],
+      "rights": [
+        30,
+        34
+      ]
+    },
+    {
+      "text": "(",
+      "lemma": "(",
+      "pos": "PUNCT",
+      "head": 30,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "version",
+      "lemma": "version",
+      "pos": "NOUN",
+      "head": 28,
+      "dep": "appos",
+      "lefts": [
+        29
+      ],
+      "rights": [
+        33
+      ]
+    },
+    {
+      "text": "franˆ§aise",
+      "lemma": "franˆ§aise",
+      "pos": "X",
+      "head": 33,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "de",
+      "lemma": "de",
+      "pos": "X",
+      "head": 33,
+      "dep": "nmod",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "travail",
+      "lemma": "travail",
+      "pos": "NOUN",
+      "head": 30,
+      "dep": "appos",
+      "lefts": [
+        31,
+        32
+      ],
+      "rights": []
+    },
+    {
+      "text": ")",
+      "lemma": ")",
+      "pos": "PUNCT",
+      "head": 28,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": ".",
+      "lemma": ".",
+      "pos": "PUNCT",
+      "head": 24,
+      "dep": "punct",
+      "lefts": [],
+      "rights": []
+    }
+  ],
+  "title_deps": [
+    {
+      "text": "AcmeSystems",
+      "lemma": "AcmeSystems",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Remote",
+      "lemma": "Remote",
+      "pos": "PROPN",
+      "head": 2,
+      "dep": "compound",
+      "lefts": [],
+      "rights": []
+    },
+    {
+      "text": "Work",
+      "lemma": "Work",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "compound",
+      "lefts": [
+        1
+      ],
+      "rights": []
+    },
+    {
+      "text": "Policy",
+      "lemma": "Policy",
+      "pos": "PROPN",
+      "head": 3,
+      "dep": "ROOT",
+      "lefts": [
+        0,
+        2
+      ],
+      "rights": []
+    }
+  ],
+  "keywords": [
+    {
+      "score": 16,
+      "text": "acmesystems remote work policy",
+      "span": {
+        "start": 0,
+        "end": 4
+      }
+    },
+    {
+      "score": 77,
+      "text": "acmesystems remote work policy hr policy â acmesystems employees",
+      "span": {
+        "start": 0,
+        "end": 9
+      }
+    },
+    {
+      "score": 13,
+      "text": "document interne acmesystems",
+      "span": {
+        "start": 26,
+        "end": 29
+      }
+    },
+    {
+      "score": 9,
+      "text": "protect company information",
+      "span": {
+        "start": 17,
+        "end": 20
+      }
+    },
+    {
+      "score": 4,
+      "text": "manager approval",
+      "span": {
+        "start": 14,
+        "end": 16
+      }
+    },
+    {
+      "score": 1,
+      "text": "subject",
+      "span": {
+        "start": 12,
+        "end": 13
+      }
+    },
+    {
+      "score": 1,
+      "text": "note",
+      "span": {
+        "start": 24,
+        "end": 25
+      }
+    }
+  ],
+  "golden_chunks": [
+    {
+      "chunk_id": "ingest://b0cb5b52e25b42c3923b361297b91dfae01e2025ccffed5adb5368e000ed904c/hr_policy_00161_de23f191.pdf#chunk-0-bd7804741d",
+      "parent_doc_id": "ingest://b0cb5b52e25b42c3923b361297b91dfae01e2025ccffed5adb5368e000ed904c/hr_policy_00161_de23f191.pdf",
+      "text_raw": "AcmeSystems Remote Work Policy HR policy â AcmeSystems Employees may work remotely subject to manager approval . Protect company information , use managed de Note : document interne AcmeSystems ( version franˆ§aise de travail ) .",
+      "search_vector_payload": "AcmeSystems Remote Work Policy HR policy â AcmeSystems Employees may work remotely subject to manager approval . Protect company information , use managed de Note : document interne AcmeSystems ( version franˆ§aise de travail ) .",
+      "metadata": {
+        "implicit_subjects": [],
+        "primary_entities": {
+          "organization": [
+            "AcmeSystems Remote Work Policy",
+            "â AcmeSystems Employees",
+            "AcmeSystems"
+          ]
+        },
+        "svo_triplets": [
+          [
+            "â AcmeSystems Employees",
+            "may work remotely",
+            "subject to manager approval"
+          ]
+        ],
+        "context_summary_before": "",
+        "context_summary_after": "",
+        "token_start": 0,
+        "token_end": 36,
+        "sentence_start": 0,
+        "sentence_end": 3
+      },
+      "synthetic_questions": [
+        {
+          "question_text": "â AcmeSystems Employees may work remotely subject to manager approval",
+          "question_type": "SVO-driven"
+        },
+        {
+          "question_text": "AcmeSystems Remote Work Policy",
+          "question_type": "Entity-driven"
+        },
+        {
+          "question_text": "AcmeSystems Remote Work Policy HR policy â AcmeSystems Employees may work remotely",
+          "question_type": "Summary-driven"
+        },
+        {
+          "question_text": "â AcmeSystems Employees",
+          "question_type": "Entity-driven"
+        }
+      ]
+    }
+  ],
+  "document_ontology": {
+    "json_ld": "[\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/acmesystems_remote_work_policy_hr_policy_acmesystems_employees\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems remote work policy hr policy â acmesystems employees\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Employees/employees-c98270317b51\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Employees\"\n    ],\n    \"http://tkeir.local/ontology/work\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"Employees\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/acmesystems_remote_work_policy\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"acmesystems remote work policy\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Chunk/ingest_b0cb5b52e25b42c3923b361297b91dfae01e2025ccffed5adb5368e000ed904c_hr_policy_00161_de23f191_pdf_chunk_0_bd7804741d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/DocumentChunk\"\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Organization/acmesystems_remote_work_policy-60ff91efb308\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/AcmesystemsEmployees/acmesystems_employees-f3d034692e2a\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Organization/acmesystems-14032de724d9\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/AcmesystemsEmployees/acmesystems_employees-f3d034692e2a\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"ingest://b0cb5b52e25b42c3923b361297b91dfae01e2025ccffed5adb5368e000ed904c/hr_policy_00161_de23f191.pdf#chunk-0-bd7804741d\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/AcmesystemsEmployees/acmesystems_employees-f3d034692e2a\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/AcmesystemsEmployees\"\n    ],\n    \"http://tkeir.local/ontology/mayWorkRemotely\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/SubjectToManagerApproval/subject_to_manager_approval-6f9409d3ec7d\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"â AcmeSystems Employees\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/subject\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"subject\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/note\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"note\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/manager_approval\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"manager approval\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/document_interne_acmesystems\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"document interne acmesystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Organization/acmesystems-14032de724d9\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Document\"\n    ],\n    \"http://tkeir.local/ontology/hasChunk\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Chunk/ingest_b0cb5b52e25b42c3923b361297b91dfae01e2025ccffed5adb5368e000ed904c_hr_policy_00161_de23f191_pdf_chunk_0_bd7804741d\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasKeyword\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/acmesystems_remote_work_policy\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/acmesystems_remote_work_policy_hr_policy_acmesystems_employees\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/document_interne_acmesystems\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/protect_company_information\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/manager_approval\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/subject\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/note\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasMention\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Organization/acmesystems_remote_work_policy-60ff91efb308\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/AcmesystemsEmployees/acmesystems_employees-f3d034692e2a\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Organization/acmesystems-14032de724d9\"\n      }\n    ],\n    \"http://tkeir.local/ontology/hasStatement\": [\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/AcmesystemsEmployees/acmesystems_employees-f3d034692e2a\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Employees/employees-c98270317b51\"\n      },\n      {\n        \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Use/use-a3b142af6e97\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"hr_policy_00161_de23f191_pdf\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/SubjectToManagerApproval/subject_to_manager_approval-6f9409d3ec7d\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Subjecttomanagerapproval\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"subject to manager approval\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Keyword/protect_company_information\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Keyword\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"protect company information\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Organization/acmesystems_remote_work_policy-60ff91efb308\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Organization\"\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"AcmeSystems Remote Work Policy\"\n      }\n    ]\n  },\n  {\n    \"@id\": \"http://tkeir.local/doc/hr_policy_00161_de23f191_pdf/Use/use-a3b142af6e97\",\n    \"@type\": [\n      \"http://tkeir.local/ontology/Use\"\n    ],\n    \"http://tkeir.local/ontology/manage\": [\n      {\n        \"@value\": \"\"\n      }\n    ],\n    \"http://www.w3.org/2000/01/rdf-schema#label\": [\n      {\n        \"@value\": \"use\"\n      }\n    ]\n  }\n]",
+    "shacl_status": "PASSED",
+    "correction_attempts": 0,
+    "incoherences": {
+      "total": 0,
+      "unresolved": 0,
+      "auto_fixed": 0,
+      "affected_node_count": 0,
+      "graph_node_count": 23,
+      "graph_triple_count": 51,
+      "by_result_path": {},
+      "by_severity": {}
+    },
+    "text_coverage_percent": 100.0,
+    "covered_tokens": 40,
+    "total_tokens": 40,
+    "covered_characters": 223,
+    "total_characters": 223
+  },
+  "chunk_questions_ready": true,
+  "title-token-count": 4,
+  "content-token-count": 36,
+  "token-count": 40,
+  "source-file-size-bytes": 875,
+  "image-extraction": {
+    "enabled": true,
+    "used": false,
+    "mode": "tesseract",
+    "image-regions": 0,
+    "scanned-pages": 0
+  },
+  "pipeline-timing": {
+    "elapsed-seconds": 0.043,
+    "tasks": {
+      "converter": 0.007,
+      "language-detection": 0.003,
+      "resource-selection": 0.002,
+      "tokenizer": 0.002,
+      "morphosyntax": 0.007,
+      "ner": 0.006,
+      "syntax": 0.006,
+      "keywords": 0.0,
+      "chunking": 0.001,
+      "ontology": 0.009,
+      "chunk-questions": 0.001
+    }
+  }
+}

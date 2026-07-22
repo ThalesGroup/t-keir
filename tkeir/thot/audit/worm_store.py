@@ -1,4 +1,12 @@
-"""Filesystem WORM segment store (dev / non-prod GOVERNANCE mode)."""
+"""Title: Worm store
+
+Filesystem WORM segment store (dev / non-prod GOVERNANCE mode).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,12 @@
-"""Tests for raw text converter."""
+"""Title: Raw Converter
+
+Tests for raw text converter.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 import os
 

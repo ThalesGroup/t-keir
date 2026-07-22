@@ -1,0 +1,125 @@
+Invoice "Overage Adjustment" After Quota Threshold Change — Proration & Rate-Lookup RCA (2026)
+
+## Summary
+A dedicated-plan customer (Maple Health) reported an unexpected invoice increase immediately after changing their quota threshold from **1M tokens to 2M tokens** via the Console UI on **2026-03-09**. The subsequent invoice generated on **2026-03-10** included a large line item labeled **"overage adjustment"**.
+
+Engineering confirmed the charge was caused by a **rate-lookup fallback to a legacy/default mapping** during a narrow failure window in the quota metadata write path. The invoicing pipeline proceeded using the fallback rate rather than retrying rate lookup after metadata became available.
+
+Finance issued a manual credit and Engineering shipped a hotfix to prevent recurrence.
+
+---
+
+## Customer & Scope
+- Customer: **Maple Health**
+- Tier: **Dedicated**
+- Environment: **prod (us-east)**
+- Affected model(s) observed in ledger context: **gpt-4o-mini**
+- Primary artifact: **invoice_82419** (customer-provided PDF referenced in ticket)
+
+### Impact
+- Customer received an invoice containing an **"overage adjustment"** line item for **~1.1M tokens** at an unexpectedly high/legacy rate.
+- No service downtime was reported; impact was limited to **billing correctness and customer trust**.
+
+### Additional exposure (post-incident audit)
+- We identified **7** other accounts with quota updates during the same failure window.
+- **0** additional incorrect invoices were ultimately issued (either no invoice generated in the window or invoices were generated after metadata became consistent).
+
+---
+
+## Timeline (UTC)
+- **2026-03-09 17:42** — Console quota change event recorded for Maple Health (quota_update by user@maplehealth.com).
+- **2026-03-09 (deploy window)** — Invoicing job **v2.3.1** running; quota metadata store experienced intermittent **HTTP 500** responses.
+- **2026-03-10** — Invoice generated; includes **"overage adjustment"** line item.
+- **2026-03-11** — Support engineering flags known proration edge case: rate/proration lookup can fall back when quota metadata is missing.
+- **2026-03-12** — Finance places provisional credit hold pending confirmation.
+- **2026-03-15** — Root cause confirmed: quota update event emitted, metadata write failed transiently, invoicing job proceeded with fallback.
+- **2026-03-18** — Hotfix deployed: invoicing job **v2.3.2** (retry rate lookup; block fallback on proration-required paths).
+- **2026-03-19** — Manual credit issued to Maple Health; customer notified with explanation and prevention steps.
+- **2026-03-21** — Completed audit for similarly timed quota updates and reconciled ledgers.
+
+---
+
+## What Happened (Technical)
+When the customer increased their quota threshold, the system should:
+1) persist the new quota configuration and effective date metadata,
+2) emit/consume an update event, and
+3) compute proration using the correct rate schedule for the billing period.
+
+During the **2026-03-09 deploy window**, the quota metadata store returned **HTTP 500** for a short interval. The quota-service still emitted the update event, but the metadata write was not committed in time for the invoicing job’s rate/proration computation. The invoicing job **v2.3.1** then:
+- retried the invoice job itself, but
+- did **not** retry the downstream rate/proration lookup sufficiently, and
+- fell back to a default/legacy mapping when quota metadata was missing.
+
+This produced a line item labeled **"overage adjustment"** at the incorrect rate.
+
+---
+
+## Root Cause
+**Primary root cause:** Invoicing job **v2.3.1** treated missing quota metadata as a non-fatal condition and used a **default/legacy rate fallback** rather than enforcing consistency (retry/backoff) for proration-required invoices.
+
+**Contributing factors:**
+- Intermittent metadata store **500s** during a deploy window.
+- A brittle contract between quota-service metadata persistence and the invoicing pipeline’s assumptions about metadata availability.
+- Insufficient alerting on "fallback rate mapping used" events (logged but not paged/alerted).
+
+---
+
+## Customer Resolution
+- Finance issued a **manual credit** for the incorrect portion of the "overage adjustment" line item (issued **2026-03-19**).
+- Customer received:
+  - confirmation that the charge was due to an internal proration/rate-lookup error,
+  - credit confirmation details, and
+  - a summary of prevention steps (hotfix + monitoring).
+
+---
+
+## Fix Implemented
+### Engineering changes (deployed)
+- **Invoicing job v2.3.2** (deployed **2026-03-18**):
+  - Retries rate/proration lookup with exponential backoff when quota metadata is missing.
+  - Prevents use of legacy/default fallback mapping for proration-required paths; instead marks invoice generation as "retryable" until metadata is available or a max retry threshold is exceeded.
+  - Adds structured logging for "metadata missing" and "fallback prevented" outcomes.
+
+### Monitoring/alerting (added)
+- New metric: `invoicing.rate_lookup.fallback_attempted` (should be ~0)
+- New alert: page on sustained nonzero fallback attempts over 5 minutes in prod.
+
+---
+
+## Finance & RevRec Guidance (Operational)
+When a customer reports a sudden post-quota-change invoice increase with an "overage adjustment" line:
+1) Check whether a quota threshold change occurred within 48 hours before invoice generation.
+2) Ask Engineering to confirm whether metadata was missing/fallback used.
+3) If confirmed, issue a manual credit and tag it as: **Billing correction — proration/rate lookup**.
+
+### Minimum evidence to capture (for audit)
+- Invoice ID (e.g., invoice_82419)
+- Ledger snapshot (line item details)
+- Console quota change timestamp
+- Region/environment
+- Confirmation of invoicing job version
+
+---
+
+## Appendix A — Key Data Points
+| Field | Value |
+|---|---|
+| Support ticket | SUP-92477 |
+| Customer | Maple Health |
+| Tier | Dedicated |
+| Region | us-east |
+| Console quota change | 2026-03-09 17:42 UTC |
+| Invoice generated | 2026-03-10 |
+| Line item label | "overage adjustment" |
+| Token quantity referenced | ~1.1M tokens |
+| Invoicing version observed | v2.3.1 |
+| Fix version | v2.3.2 |
+
+---
+
+## Appendix B — Notes on Policy vs. Bug
+This incident was a **billing correctness bug**, not a pricing/policy change.
+- Policy: proration must reflect the correct rate schedule and effective dates for quota changes.
+- Bug: missing metadata led to an incorrect legacy/default rate mapping being applied.
+
+For any future disputes, reference the support ticket and this RCA for justification of credits/refunds when the fallback path is implicated.

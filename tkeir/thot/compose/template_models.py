@@ -1,8 +1,13 @@
-"""Ontology-driven template models (Phase C).
+"""Title: Ontology-driven template models (Phase C).
 
 Templates declare typed slots filled from the fused KG and/or a Writer agent.
 Every filled slot must carry provenance (``chunk_ids`` / ``document_ids``);
 ungrounded slots are reported as unfilled — never hallucinated.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

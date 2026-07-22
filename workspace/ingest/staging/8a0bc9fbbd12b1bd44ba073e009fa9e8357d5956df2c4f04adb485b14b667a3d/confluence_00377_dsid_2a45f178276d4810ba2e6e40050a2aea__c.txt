@@ -1,0 +1,355 @@
+PRD: Baseline Compliance Reporting Pack (On-demand Exports + Customer Package)
+
+## Summary
+The Baseline Compliance Reporting Pack is a standardized, customer-ready set of exports and summaries that Redwood Inference can generate on-demand to accelerate enterprise security reviews and support internal audits. The pack focuses on the minimum evidence that repeatedly blocks deals: audit log coverage and exports, retention configuration, data residency/region posture, and access control/RBAC posture.
+
+This PRD defines the pack contents, customer expectations (what it proves / what it does not), integrations (audit-log-exporter + telemetry), output formats and versioning, and MVP scope for the initial GA.
+
+## Problem statement
+Enterprise prospects adopting Dedicated and Private deployments consistently request:
+- Proof that Redwood maintains audit logs for key administrative and access events.
+- A time-windowed export of audit events for their review.
+- Clear retention controls and a reproducible export of retention configuration.
+- Data residency confirmation (regions used; where logs live).
+- A summary of access control model (RBAC) and administrative access.
+
+Today, Sales Engineering, Security, and GRC assemble these artifacts manually, which is slow, error-prone, and inconsistently formatted.
+
+## Goals (what success looks like)
+1) Provide a baseline compliance pack that can be generated in < 30 minutes end-to-end for a standard time window (e.g., last 30 days), with minimal Engineering intervention.
+2) Reduce repetitive Security/GRC work during sales cycles by standardizing:
+   - Contents
+   - Report templates/filters
+   - Output formats and naming
+   - Evidence checklist
+3) Ensure the pack is defensible and auditable:
+   - Export is versioned
+   - Inputs/time windows are recorded
+   - Access to generate/download is permissioned and logged
+4) Support Hosted, Dedicated, and Private deployment modes with tier-appropriate data availability and wording.
+
+## Non-goals (initial GA)
+- Full custom report builder or arbitrary customer-defined report sections.
+- “Bring your own GRC” integrations beyond standard exports (JSON/CSV) and a generated PDF/HTML summary.
+- Per-field redaction policy framework (handled under logging standards and product logging controls).
+- Attestation that substitutes for SOC 2/ISO certificates (we provide evidence artifacts; we do not provide audit opinions).
+
+## Target customers and personas
+### External
+- Customer Security Reviewer / Auditor: needs evidence, clarity, and repeatability.
+- Customer Security Admin: needs configuration exports (retention, access control) and region posture.
+- Customer Platform/SRE: wants operational details (availability, where logs live, export mechanics).
+
+### Internal
+- GRC Lead (Olga Petrov): owns evidence set, checklist alignment to controls, packaging.
+- Security Engineering (Marcus Lin): validates audit event coverage, security of exports, access control.
+- Engineering (Kevin Osei, Platform/Control Plane): owns exporter integration and retention config export.
+- Sales Engineering / Customer Success: uses pack as standard response to questionnaires and procurement.
+
+## Customer expectations and promises
+### What the pack should answer
+- “What administrative/security-relevant events are logged?”
+- “Can you export audit logs for a specific time window?”
+- “What is your retention configuration for key data classes, and can we get it in writing/export form?”
+- “Where is our data processed/stored (regions), and does the report reflect that?”
+- “Who has access (RBAC) and how do you control administrative actions?”
+
+### What the pack is NOT
+- Not a guarantee of absence of incidents.
+- Not a replacement for SOC 2 Type II report or ISO certificate.
+- Not a record of customer application-level content unless explicitly enabled and within configured retention.
+
+## Pack overview (baseline contents)
+The Baseline Compliance Reporting Pack includes the following sections and artifacts.
+
+### A) Executive summary (customer-facing)
+- Pack name and version
+- Customer tenant/org identifier(s)
+- Generation timestamp and requested time window
+- Deployment mode: Hosted / Dedicated / Private
+- Regions included
+- Short narrative: what’s included, limitations, and how to validate authenticity
+
+### B) Audit logging coverage summary (customer-facing)
+- Coverage statement: event categories logged and where they originate
+- Known exclusions for the customer’s deployment mode
+- Definitions:
+  - “Audit logs” vs “Request/Response logs”
+  - “Actor” (user vs service account)
+  - “Control plane” vs “data plane”
+
+Deliverable: PDF/HTML section + JSON coverage manifest.
+
+### C) Audit log export (customer-facing)
+- Time-windowed export of audit events
+- Must support filtering templates:
+  - Admin changes (RBAC/permissions, retention policy changes)
+  - Authentication/security events (API key lifecycle, SSO/SAML changes where applicable)
+  - Configuration and deployment operations (model pinning/rollouts where in scope)
+
+Deliverables:
+- CSV export (preferred for reviewers)
+- JSON export (canonical; used for verification and machine parsing)
+
+### D) Retention configuration export (customer-facing)
+- Export of current retention settings by data class
+- Includes safe defaults by tier and customer overrides
+- Includes legal hold state (if present) and change history summary for the window
+
+Deliverables:
+- JSON export of effective policy + metadata (policy version, applied scope)
+- PDF/HTML summary table
+
+### E) Data residency / region summary (customer-facing)
+- Regions enabled for the tenant and where primary control plane data is stored
+- Notes on dedicated/private topology when applicable (customer-managed regions/VPC)
+
+Deliverables:
+- PDF/HTML summary + JSON region manifest
+
+### F) Access control / RBAC report (customer-facing)
+- Roles present and high-level permissions
+- Users/service accounts with assigned roles (optionally limited to admins)
+- SSO enforcement status (if applicable)
+
+Deliverables:
+- CSV/JSON export + PDF/HTML summary
+
+### G) Evidence collection checklist (internal + optionally shareable)
+- Checklist aligned to SOC 2/ISO-style controls with “where to find it” pointers
+- Owner, frequency, and validation steps
+
+Deliverable: checklist document included in internal bundle; shareable variant must omit internal-only system names where required.
+
+## Integration points and dependencies
+### Audit logs
+- Source of truth: audit-log-exporter
+- Required capabilities:
+  - Time-windowed exports
+  - Standard templates (field set + filters)
+  - Support bundling attachments (e.g., retention config export) into a single package
+- Ownership: Kevin Osei (engineering) + Marcus Lin (security review)
+
+### Retention controls
+- Source of truth: Retention Policy Service (control plane)
+- Must export:
+  - Effective policy evaluated for the tenant
+  - Policy change history for requested window
+  - Legal hold status and hold reason codes (if any)
+- Ownership: Ethan Park / Benji Okafor (engineering)
+
+### Telemetry / observability
+- Used for:
+  - Verification signals included in internal appendix (optional): TTL lag, purge success metrics, backlog indicators
+  - Confidence check that retention enforcement is working for the tenant/region
+- Ownership: Logan Wright / Caleb Johnson
+
+### Console and packaging
+- Primary generation triggers:
+  - Console “Generate compliance pack” action (RBAC-restricted)
+  - API endpoint for internal automation / Private deployments
+- Packaging service assembles artifacts, renders PDF/HTML summary, and stores package metadata.
+
+## Functional requirements
+### FR1: Pack generation request
+- Inputs:
+  - Tenant/org identifier
+  - Time window (start/end) with validated max range (MVP: up to 90 days)
+  - Region scope (auto = all regions where tenant is active)
+  - Template selection (baseline templates only in MVP)
+- Output:
+  - Job ID + status endpoint
+  - Estimated completion time
+
+### FR2: Access control and auditability
+- Only authorized roles can generate/download packs:
+  - Internal: Security/GRC/SE roles
+  - Customer: Org Admin (Dedicated/Private), subject to feature flag
+- Every generation and download must itself be written to the audit log.
+- Generated artifacts are stored with an immutable manifest and checksum.
+
+### FR3: Deterministic content and versioning
+- Pack must include:
+  - Pack schema version (e.g., “baseline.v1”)
+  - Component versions (exporter version, retention service schema version)
+  - Field dictionary for audit export columns
+- Backward compatibility:
+  - CSV/JSON fields are additive within a major version
+  - Breaking changes require a new major pack version
+
+### FR4: Audit log export templates (baseline)
+MVP must include at least these templates:
+1) Administrative changes (RBAC, retention policy changes, org settings)
+2) Authentication & credential lifecycle (API keys, SSO toggles where supported)
+3) Access events (admin console access, privileged actions)
+
+Each template defines:
+- Event type set
+- Required fields
+- Default filters
+- Output file naming convention
+
+### FR5: Retention export
+- Must export effective retention for the following data classes (where applicable by tier):
+  - Audit logs
+  - Request/response logs (if enabled)
+  - Traces
+  - Metrics
+  - Artifacts (eval datasets) if present in the customer environment
+- Must clearly label “not collected” vs “collected but retention disabled/short” vs “collected and retained”.
+
+### FR6: RBAC export
+- Must include:
+  - Role definitions (name, description)
+  - Role assignments (principal, role, scope)
+  - “Admin-equivalent” indicator for top roles
+- Must support omission of non-admin users for large tenants (MVP: default to admins-only; toggle for full export internal-only).
+
+### FR7: Data residency summary
+- Must include:
+  - Regions where the tenant is configured to run
+  - Regions where control plane config is stored
+  - Notes for Dedicated/Private: customer-managed networking and storage boundaries
+
+### FR8: Delivery formats
+- Customer bundle:
+  - PDF or HTML summary
+  - CSV exports
+  - JSON exports
+  - Manifest file (checksums, timestamps, versions)
+- Internal bundle:
+  - Everything above plus optional verification appendix (telemetry checks) and internal run references.
+
+## Non-functional requirements
+- Reliability: 99% successful generation for standard windows (<= 30 days); failures must be actionable with clear error codes.
+- Performance: Export generation should not impact production workloads; adhere to rate limits and use batching.
+- Security:
+  - At-rest encryption for stored packages
+  - Time-limited download URLs
+  - Principle of least privilege for pack generator service
+- Privacy:
+  - Exports contain metadata about actions and actors; must avoid including prompt/completion content unless explicitly configured elsewhere.
+
+## User experience and workflows
+### Console (primary UX)
+- Location: Security & Compliance → “Compliance reporting pack”
+- Actions:
+  1) Select time window
+  2) Select baseline pack
+  3) Generate
+  4) Download
+- UI must display:
+  - Included sections
+  - Notes/limitations by deployment mode
+  - Generation status and last generated packs
+  - “Who can access” explanation
+
+### API (secondary)
+- Endpoint group: /v1/compliance-packs
+- Operations:
+  - POST create generation job
+  - GET job status
+  - GET download links
+- Use cases:
+  - Internal automation by GRC
+  - Private deployments where customer prefers scripted export
+
+## Data sources and field-level expectations
+### Audit log export fields (baseline)
+Required fields:
+- event_id
+- event_type
+- event_timestamp (RFC3339)
+- actor_type (user/service)
+- actor_id (stable identifier)
+- actor_email (if available)
+- source_ip (if captured)
+- region
+- resource_type / resource_id
+- action
+- outcome (success/failure)
+- request_id / correlation_id
+
+Optional fields (best effort, additive):
+- user_agent
+- mfa_present (if applicable)
+- auth_provider (if applicable)
+
+### Retention export fields (baseline)
+- tenant_id
+- policy_version
+- effective_at
+- data_class
+- retention_ttl
+- purge_semantics (soft/hard where applicable)
+- legal_hold (true/false)
+- exceptions summary
+
+### RBAC export fields (baseline)
+- principal_id
+- principal_type
+- principal_email (if applicable)
+- role
+- scope
+- created_at
+- last_updated_at
+
+## Analytics and success metrics
+Product metrics:
+- Time-to-deliver pack to customer (median; target < 1 business day once requested)
+- % of enterprise security reviews where baseline pack is accepted without follow-up
+- # of manual GRC hours per deal (target reduction)
+
+Operational metrics (SLIs):
+- Pack generation success rate
+- Median generation time by window size
+- Export job failure rate by component (audit exporter vs retention export vs RBAC export)
+
+## Rollout plan
+Phase 1 (MVP):
+- Internal-only generation for design partners and active deals (GRC/Security/SE)
+- Baseline pack with audit export, retention export, region summary, RBAC export
+- PDF/HTML summary + CSV/JSON + manifest
+
+Phase 2:
+- Customer-admin generation in Console for Dedicated/Private tenants (feature-flagged)
+- Expanded templates and improved wording/limitations
+
+GA criteria:
+- Documented runbook for failures
+- Standard FAQ and customer-facing doc page published
+- Security sign-off on content and access controls
+- Backward-compatible versioning strategy implemented
+
+## Risks and mitigations
+- Risk: Missing audit event types or inconsistent event naming reduces customer trust.
+  - Mitigation: baseline template review with Security; coverage manifest; gap tracking.
+- Risk: Export contains sensitive internal fields or customer content.
+  - Mitigation: field allowlist for customer bundle; Security review required for new fields.
+- Risk: Export generation increases load on audit store.
+  - Mitigation: rate limits, batching, async job queue, and SRE-defined guardrails.
+- Risk: Confusion between audit logs and request logs.
+  - Mitigation: strong definitions in summary; explicit “not included” statements.
+
+## Open questions
+1) Which RBAC scopes should be included by default for large enterprises (org-wide vs project/workspace)?
+2) Should we include an optional “verification appendix” in customer bundle, or keep strictly internal?
+3) For Private deployments, what is the minimum supported packaging mechanism when the customer does not allow outbound storage?
+
+## Appendix: baseline pack naming and storage
+- Pack name: Redwood Inference Baseline Compliance Reporting Pack
+- Version: baseline.v1 (MVP)
+- File naming convention:
+  - summary-baseline-v1.pdf (or .html)
+  - audit-logs-admin-changes-<start>_<end>.csv
+  - audit-logs-admin-changes-<start>_<end>.json
+  - retention-config-effective-<timestamp>.json
+  - rbac-admins-<timestamp>.csv
+  - regions-<timestamp>.json
+  - manifest-<timestamp>.json
+
+Ownership
+- Product owner: Naomi Feldman
+- GRC owner of evidence set: Olga Petrov
+- Security sign-off: Dr. Aisha Rahman / Marcus Lin
+- Engineering DRI: Kevin Osei

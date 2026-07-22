@@ -1,4 +1,12 @@
-"""Tests for document ontology derivation from reference ontologies."""
+"""Title: Ontology Derivation
+
+Tests for document ontology derivation from reference ontologies.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

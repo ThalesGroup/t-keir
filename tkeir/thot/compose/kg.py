@@ -1,8 +1,13 @@
-"""Per-``user_space`` fused knowledge graph with SPARQL (rdflib backend).
+"""Title: Per-``user_space`` fused knowledge graph with SPARQL (rdflib backend).
 
 Reuse :func:`thot.tools.search.ontology_utils.merge_turtle_graphs`. The
 SPARQL surface is isolated behind :class:`SparqlBackend` so oxigraph (or
 another store) can replace rdflib later without touching the composer.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

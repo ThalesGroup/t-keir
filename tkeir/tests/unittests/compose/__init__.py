@@ -1,1 +1,9 @@
-"""Package marker for compose unit tests."""
+"""Title: compose package init
+
+Package marker for compose unit tests.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""

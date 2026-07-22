@@ -1,4 +1,12 @@
-"""Bridge ActionRecords into the audit hot store."""
+"""Title: Sink bridge
+
+Bridge ActionRecords into the audit hot store.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

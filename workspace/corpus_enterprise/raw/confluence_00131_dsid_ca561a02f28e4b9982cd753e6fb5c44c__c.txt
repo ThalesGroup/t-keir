@@ -1,0 +1,142 @@
+Canary Drift Detection — Tenant Isolation and Automated Switchback Playbook
+
+Overview
+
+Purpose:
+This playbook describes detection, containment, and automated switchback procedures for canary-driven model or configuration rollouts that show silent degradation for a subset of tenants ("canary drift"). It is intended for Customer Success, SRE, and Platform Engineers supporting enterprise Dedicated and Private deployments.
+
+Goals:
+- Detect tenant-specific regressions before broad impact.
+- Contain affected tenants quickly (isolation, throttling, model fallback).
+- Execute safe automated switchback (rollback) with minimal human intervention where appropriate.
+- Provide clear manual runbook when automation is insufficient.
+
+Scope and definitions
+- Canary drift: statistical divergence between canary cohort output/latency/quality signals and baseline model expectations leading to customer-visible regressions.
+- Tenant isolation: actions (routing, throttling, model pinning) that limit blast radius to individual tenant(s).
+- Automated switchback: an automated process that reverts traffic from the new variant back to a known good variant for specific tenant(s).
+- Applicability: Hosted/Dedicated/Private where canary cohorts are used. Not for production-wide emergency rollback (see major incident runbooks).
+
+Owners and escalation contacts
+- Primary oncall: Customer Success Pager (CS-Pager) — first responder for customer comms and impact triage.
+- Platform SRE: responsible for automation health, telemetry queries and execution rights.
+- Runtime team: owner of model rollout and switchback automation.
+- Engineering stakeholder: product or feature owner for the rollout.
+
+Contact matrix (roles and after-hours):
+- Customer Success oncall: cs-oncall@redwood.example / +1-555-0100
+- Platform SRE: platform-sre-oncall@redwood.example / +1-555-0101
+- Runtime lead (pager): runtime-pager@redwood.example
+
+Signals and thresholds (detectors)
+Primary signals (per-tenant, 1m and 5m windows):
+- Error rate: 5xx or model runtime errors > 1% absolute increase over baseline for 5 minutes.
+- Latency: p95 increase > 200ms absolute and > 40% relative vs baseline.
+- Quality regressions: sudden drop in eval-similarity or hallucination score — e.g., BLEU/ROUGE proxy or semantic-similarity delta > 0.12 over baseline.
+- Token cost spike: per-request token usage > 50% higher and unexplained by prompt length.
+- Customer complaints: new support ticket labeled "regression" linked to canary cohort.
+
+Alert table (examples)
+| Signal | Query (high level) | Threshold | Severity |
+|--------|--------------------|-----------|----------|
+| Error rate delta | per-tenant 5xx / total | >1% absolute for 5m | Sev-2 |
+| Latency p95 | p95(latency, tenant) | >200ms && >40% rel | Sev-2 |
+| Quality proxy | eval.similarity delta | >0.12 | Sev-2 |
+| Token spike | tokens/request | >50% increase | Sev-3 |
+
+Detection queries (examples)
+- Prometheus/Tempo (high-level):
+  - promql: "sum(rate(runtime_errors_total{tenant=~\"$TENANT\"}[5m])) / sum(rate(requests_total{tenant=~\"$TENANT\"}[5m]))"
+  - promql latency: "histogram_quantile(0.95, sum(rate(request_duration_seconds_bucket{tenant=\"$TENANT\"}[5m])) by (le))"
+- Search/semantic eval quick check (kql/sql): recent_samples where tenant='$TENANT' and similarity < baseline - 0.12 limit 50
+
+Containment strategies (recommended order, least disruptive first)
+1) Traffic shaping and throttling (automated): reduce new-variant percentage for affected tenant to 0% over 2 steps (50% -> 0%) while preserving traffic for other tenants.
+2) Model fallback (automated): pin tenant to prior stable model binary or quantization profile.
+3) Prefix/KV cache flush (targeted): when cache corruption suspected, invalidate tenant-specific caches.
+4) Per-tenant circuit breaker: reject non-critical large-batch requests and route them to offline/backfill flows.
+5) Tenant quarantine (manual): route all traffic to a stable regional endpoint or isolate to dedicated capacity.
+
+Automated actions and safety gates
+- Auto-containment is enabled for canary rollouts with "containment_policy: on" in rollout config.
+- Safety prechecks before automated switchback:
+  - Affected tenant has >100 requests in the last 10 minutes (to avoid noisy small-tenants flips).
+  - Runtime automation service healthcheck passes (cpu, memory within normal limits).
+  - No active global incident or maintenance window.
+- Auto-switchback behavior:
+  - If two of {latency, errors, quality} exceed thresholds for 6m, automation will
+    1) Pin tenant to stable variant and
+    2) Reduce new-variant weight to 0% for that tenant and
+    3) Notify PagerDuty with context and link to runbook steps.
+
+Manual runbook (ordered steps)
+1) Confirm alerts and gather context:
+   - Use incidents dashboard to fetch tenant metrics (p95, error rate, eval proxies) for t=-30m..now.
+   - Gather recent deployment/event history for the rollout: ci/build id, model hash, quantize profile.
+2) Apply safe containment (if automation not triggered):
+   a) Use rollout CLI to reduce traffic for tenant:
+      - Example: curl -X POST -H "Authorization: Bearer $API_TOKEN" \
+        "https://console.internal/api/rollouts/adjust" -d '{"tenant":"$TENANT","variant":"new","weight":50}'
+   b) Wait 3 minutes and re-evaluate metrics.
+   c) If signals persist, set weight to 0 and pin to previous variant:
+      - curl -X POST https://console.internal/api/tenants/pin -d '{"tenant":"$TENANT","variant":"stable-v2026-02-18"}'
+3) If pinned, inform Customer Success lead to open a priority support ticket and prepare customer communication.
+4) If containment fails or multiple tenants are affected, escalate to a Sev-1 path per Incident Response runbook.
+
+Rollback / Switchback checklist (when to perform manual rollback)
+- Perform manual switchback if any of the following are true:
+  - Automated switchback disabled for this rollout.
+  - Automation attempted but metrics show continued regression after 15 minutes.
+  - Customer executive requests immediate revert.
+Steps:
+1) Mark rollout as paused in the Rollout Dashboard.
+2) Pin tenant(s) to stable variant with deployment tag.
+3) If rollback requires code/artifact revert, coordinate with Runtime team for artifact re-promotion.
+4) Re-run smoke tests for pinned tenant(s) (see smoke test checklist below).
+
+Smoke test checklist (minimal):
+- 20 representative requests from the tenant test harness executed with known ground-truth prompts.
+- p95 latency under baseline + 100ms for 5m window.
+- Error rate below baseline + 0.5%.
+- Semantic similarity to baseline above configured threshold.
+
+Customer communication templates
+- Initial acknowledgement (Customer Success): "We detected atypical behavior during a recent rollout and have contained the issue for your tenant. We are currently routing your traffic to a stable variant; we expect to restore full service in [TBD]. We will follow up with an RCA within 72 hours."
+- After pin/switchback: "Your traffic was pinned to a known stable model at [time UTC]. No data was lost; some requests may have experienced increased latency during the containment window. Next steps: We will run extended validation and share a remediation plan."
+
+Post-containment tasks and RCA inputs
+- Gather the following artifacts into the incident folder:
+  - Tenant metrics (last 24h): latency histograms, error logs, token usage.
+  - Rollout metadata: build id, model hash, config diff, quantization profile.
+  - Evaluation samples: top 50 requests with before/after outputs and similarity scores.
+  - Automation decision log: timestamps and reasons for any automated actions.
+- RCA template items:
+  - Timeline of events, root cause hypothesis, contributing factors (telemetry gaps, insufficient canary size, config drift), corrective actions, and preventive actions.
+
+Metrics to report in QBRs and health checks
+- Canary-to-baseline drift rate (% of canaries that trigger containment per quarter).
+- Mean time to contain (MTTC) for tenant-level regressions.
+- False-positive containment rate (containments reversed within 10m).
+- Customer impact minutes (sum across tenants).
+
+Safety engineering considerations
+- Canary cohort sizing: prefer cohorts with >= 1% of expected tenant traffic and >1,000 requests/day. Smaller tenants should be folded into aggregated canaries or excluded from auto-switchback.
+- Telemetry enrichment: ensure request-level correlation ids and tenant tags are present for all telemetry emitted by the runtime.
+- Rate-limited notifications: to avoid alert storms, group per-tenant alerts into a single incident when the same signal fires within 3 minutes.
+
+Related pages and references
+- Rollouts Dashboard (internal link: /rollouts/dashboard)
+- Incident Response: Major Incident Runbook (internal link: /oncall/major-incident)
+- Tenant Stability Predictive Signals (internal link: /health/tenant-predictive-signals)
+
+Appendix: Example diagnostic commands
+- Fetch last 30m p95 and error rate (promql):
+  curl -G "https://metrics.internal/api/v1/query_range" --data-urlencode "query=histogram_quantile(0.95, sum(rate(request_duration_seconds_bucket{tenant=\"$TENANT\"}[5m])) by (le))" --data-urlencode "start=$(date -u -d \"-30 minutes\" +%s)" --data-urlencode "end=$(date -u +%s)"
+- Pin tenant to variant (CLI):
+  rwdctl tenant pin --tenant $TENANT --variant stable-v2026-02-18 --reason "Canary drift containment"
+
+Revision history
+- 2026-03-01: Created by Aisha Patel.
+- 2026-03-05: Added safety gates and auto-switchback thresholds (reviewed by Carlos Mendes).
+- 2026-03-12: Clarified smoke test checklist and contact matrix (reviewed by Riley Chen).
+

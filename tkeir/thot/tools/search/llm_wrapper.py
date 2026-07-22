@@ -1,4 +1,12 @@
-"""Backward-compatible re-exports for :mod:`thot.core.LlmWrapper`."""
+"""Title: Llm wrapper
+
+Backward-compatible re-exports for :mod:`thot.core.LlmWrapper`.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.core.LlmWrapper import (
     DEFAULT_EMBEDDING_DIM,

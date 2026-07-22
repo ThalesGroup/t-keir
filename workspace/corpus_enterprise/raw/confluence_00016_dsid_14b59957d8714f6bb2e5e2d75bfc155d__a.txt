@@ -1,0 +1,175 @@
+ADR: Dedicated rollout stage model (replica partitions vs traffic percentages)
+
+## Decision
+We will represent staged rollouts for **Dedicated (reserved-capacity) pools** using **replica-based capacity partitions**, not pure traffic-percentage splits.
+
+A rollout stage is defined as a **target allocation of pool capacity** (replicas/GPU slots) assigned to the *candidate* vs *baseline* configuration, computed **per region**. The router then selects a partition deterministically and relies on the partition’s capacity to bound traffic.
+
+We will still allow stage definitions authored as “percent-like” values in the UX/API (e.g., 1/10/50/100), but those will be treated as **capacity fractions** and compiled into **integer replica allocations** with explicit small-pool guardrails.
+
+## Status
+Published (implemented in design spec v1; APIs in progress).
+
+## Context
+Dedicated customers expect:
+- **Deterministic, auditable change control** (promotion is a discrete action; rollback is reversible).
+- **Safety under fixed capacity** (no surprise overload, no silent starvation).
+- **Predictable behavior for streaming / long-lived requests**.
+- **Multi-region correctness** (rollout behavior should not be “accidentally 0%” in a small region).
+
+For Dedicated pools, “staged rollout” must manage not only *routing* but also the effective capacity impact of splitting a fixed reservation. A stage model that is too abstract (e.g., traffic % only) creates failure modes where the canary receives more requests than it can serve.
+
+## Problem statement
+We need a stage representation that:
+1) Maps cleanly to reserved capacity pools (replicas / GPU slots).
+2) Produces deterministic routing decisions suitable for audit and debugging.
+3) Avoids capacity starvation and protects customer SLOs.
+4) Handles small pools (2–16 replicas) and multi-region pools (heterogeneous region sizes).
+
+## Options considered
+### Option A — Traffic percentage stages (weighted routing)
+**Description:** Stage defines a traffic weight to candidate vs baseline (e.g., 1% / 10% / 50%), implemented as weighted random routing.
+
+**Pros**
+- Simple mental model.
+- Works without data-plane capacity re-partitioning.
+- Smooth progression possible (many small increments).
+
+**Cons / why we’re not choosing this for Dedicated**
+- **Not capacity-bounded.** A 10% weight can exceed 10% of capacity when the pool is saturated (queue effects, retries, uneven request sizes).
+- **Small pools behave badly.** With 2–8 replicas, “1%” is not meaningful and produces non-deterministic sampling.
+- **Harder to audit.** A traffic-weight stage cannot easily explain “why did this request go to canary?” without reproducing RNG/hashing state.
+- **Streaming sessions** and client retries can create correlated load on the canary even with low weights.
+- Earlier beta investigations (elevated 429 / queue depth spikes) showed that splitting traffic without hard capacity constraints can starve a partition or overload it unpredictably.
+
+### Option B — Replica/capacity partitions (slice the pool)
+**Description:** Stage defines how many replicas/GPU slots are assigned to candidate vs baseline, and routing selects between partitions. Candidate traffic cannot exceed candidate partition capacity.
+
+**Pros**
+- **Capacity-bounded by construction.** Candidate can only serve what it has replicas for.
+- **Deterministic and explainable.** Partition assignment can be stable via consistent hashing; audit logs can reference explicit allocations.
+- **Small-pool friendly.** “1 replica canary” is meaningful.
+- Aligns with Dedicated operational realities (GPU health, node drains, fleet changes).
+
+**Cons**
+- Splitting reduces pooling efficiency; small partitions are more sensitive to burstiness.
+- Requires robust infra/scheduler support to allocate and rebalance partitions.
+- Multi-region allocations require explicit rules.
+
+### Option C — Hybrid (traffic % with replica floors/ceilings)
+**Description:** Use traffic percentages but enforce min/max replica capacity to each variant.
+
+**Pros**
+- Attempts to preserve simplicity.
+
+**Cons**
+- Complexity shifts into “two sources of truth”; debugging becomes harder.
+- In practice, you still need an integer allocation strategy; once you have that, replica partitions are the primary model.
+
+## Decision details
+### 1) Canonical stage representation
+The canonical internal representation for a stage is:
+- **candidate_allocation[region] = integer replicas**
+- **baseline_allocation[region] = integer replicas**
+- baseline + candidate + (optional) spare <= reserved replicas in that region
+
+Where “replica” means the smallest scheduling unit for the Dedicated pool (GPU slot / serving replica as defined by fleet config).
+
+The external stage configuration MAY be authored as a **capacity fraction** (e.g., 0.10) or named presets (1/10/50/100). The control plane compiles authored stages into integer allocations using the rules below.
+
+### 2) Mapping authored “percent stages” to replicas
+For each region independently:
+- Let `R = reserved_replicas_in_region`.
+- Let `f = stage_fraction` (0.00–1.00).
+- Compute `candidate = clamp(round_half_up(R * f), min=0, max=R)`.
+- Apply guardrails:
+  - If `f > 0` then `candidate >= 1` **only if** `R >= min_region_size_for_canary`.
+  - Enforce `baseline >= min_baseline_replicas` when `R` is large enough.
+  - If guardrails cannot be satisfied, the stage is invalid for that pool/region and must be adjusted (see small pool policy).
+
+Defaults (v1):
+- `min_region_size_for_canary = 4` (regions with fewer replicas do not receive canary until final cutover).
+- `min_baseline_replicas = 2` when `R >= 6`.
+
+Rationale:
+- Below 4 replicas, the canary partition would be 1 replica at best, which is often too burst-sensitive and can distort gate signals.
+- Keeping at least 2 baseline replicas (when feasible) reduces the risk of customer-visible saturation in the “known-good” path.
+
+### 3) Small pool policy (2–16 replicas)
+Small pools require fewer stages and stronger guardrails.
+
+We will support the following **recommended** stage sets depending on pool size (per region):
+- **R = 2–3:** [0%, 1 replica, 100%]
+- **R = 4–7:** [0%, 1 replica, 50% (rounded), 100%]
+- **R = 8–15:** [0%, 1 replica, ~25%, 50%, 100%] (exact compiled allocations shown in Console)
+- **R >= 16:** [0%, 1%, 10%, 50%, 100%] (fractions compiled to replicas)
+
+Notes:
+- Console will display both the authored stage (e.g., “10%”) and the compiled result (e.g., “3/32 replicas”).
+- Control plane validation will warn (and in some cases reject) plans that produce candidate allocations that are too small to generate meaningful gate evidence (see gate ADR).
+
+### 4) Multi-region pools
+**Decision:** Stages compile and apply **per region**, not as a single global pool-wide percentage.
+
+Rules:
+- The stage fraction `f` is applied to each region’s `R_region` independently.
+- Regions with `R_region < min_region_size_for_canary` remain **baseline-only** until the final cutover stage, unless explicitly overridden by an operator/admin.
+- The rollout is considered “at stage N” globally when every enabled region has successfully reached stage N (or is explicitly exempted/held).
+
+Rationale:
+- A global percentage can produce “0 canary” in small regions, which defeats the purpose of staged safety and creates region-specific surprises.
+- Per-region compilation makes the effective change explicit and auditable.
+
+### 5) Routing behavior (high-level)
+Routing must be stable and explainable.
+
+At a given stage, requests are routed to either baseline or candidate partition using **consistent hashing** on a partition key (exact key definition is in the design spec; typically derived from account_id + pool_id + rollout_id + request-level key).
+
+Key properties required:
+- **Determinism:** same request key maps to same partition unless the stage allocation changes.
+- **Auditability:** we can explain routing with: (rollout_id, stage_id, region, partition assignment).
+- **Safety:** when candidate partition is unhealthy/saturated beyond thresholds, policy engine may trigger abort/rollback (per rollback ADR).
+
+### 6) Trade-offs and consequences
+**What we gain**
+- Stage semantics that match the Dedicated customer mental model: “we allocated 2 GPUs to the new build.”
+- More predictable canary capacity and reduced risk of accidental overload.
+- Cleaner alignment with SRE/Infra signals (GPU health, saturation, OOM, drop/429).
+
+**What we pay**
+- Implementation complexity in the data plane and fleet orchestration.
+- Reduced pooling efficiency when the pool is partitioned (especially at small canary sizes).
+- Some regions may not receive canary exposure for very small reservations (explicitly documented and shown in Console).
+
+## Non-goals
+- A fully general experimentation platform for Dedicated (this model is for staged safety rollouts).
+- Arbitrary per-customer custom stage math; we standardize the compilation rules in v1.
+
+## Open questions / follow-ups
+1) **Regional serial rollouts:** Do we want a first-class “region-by-region” stage type (e.g., canary us-east first, then eu-west) vs the current implicit exemption behavior? (Tracked in design spec backlog.)
+2) **Spare/headroom allocation:** Whether to reserve explicit “spare replicas” outside baseline/candidate for burst absorption vs keeping all capacity allocated. Current v1 assumes baseline+candidate consumes the whole reservation; headroom is managed via gate criteria and rate limiting.
+3) **Session pinning:** Final decision on how streaming requests are pinned across a promotion (see rollback ADR).
+
+## Implementation notes (validation requirements)
+Control plane MUST validate at plan create/update time:
+- Compiled allocations are integers and monotonic (candidate does not decrease across stages).
+- No stage produces candidate>0 in regions below `min_region_size_for_canary` unless explicitly overridden.
+- Baseline replicas do not drop below `min_baseline_replicas` when feasible.
+- The plan clearly communicates compiled allocations in API responses for audit and Console display.
+
+## Appendix: Example compilation
+Pool: Dedicated, 2 regions
+- us-east: R=24
+- eu-west: R=6
+
+Authored stages: 0%, 10%, 50%, 100%
+
+Compiled:
+- Stage 0%: us-east candidate=0 baseline=24; eu-west candidate=0 baseline=6
+- Stage 10%: us-east candidate=2 baseline=22; eu-west candidate=1 baseline=5 (allowed because R=6 >= 4)
+- Stage 50%: us-east candidate=12 baseline=12; eu-west candidate=3 baseline=3
+- Stage 100%: us-east candidate=24 baseline=0; eu-west candidate=6 baseline=0
+
+Pool: single region, R=3
+Authored: 0%, 10%, 50%, 100%
+Compiled (after small-pool policy): 0%, 1 replica, 100% (10% and 50% collapse to 1 replica and 2 replicas, but 2 replicas would violate baseline minimum; recommended plan is 0 -> 1 -> 3).

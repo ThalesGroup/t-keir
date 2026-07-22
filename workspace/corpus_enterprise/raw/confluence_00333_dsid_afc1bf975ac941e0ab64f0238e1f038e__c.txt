@@ -1,0 +1,148 @@
+Chronological Upgrade Timeline and Customer Notification Protocol
+
+Overview:
+This document prescribes a chronological, role-oriented upgrade timeline for private deployments (VPC and on-prem), and the customer-facing notification protocol that must accompany each phase. It is intended for Release Engineering, Field Operations, Solutions Engineering, and Customer Success when coordinating upgrades that may affect tenant SLAs, network topology, or runtime state.
+
+Goals:
+- Provide a single, reproducible timeline for upgrades and rollbacks that balances operator safety and customer transparency.
+- Define measurable thresholds and automated gates used to trigger rollback decisions.
+- Standardize customer communications and escalation templates to reduce confusion during events.
+
+Scope and assumptions:
+- Applies to private deploy upgrades that touch runtime artifacts (model binaries, runtime shards, KV cache format, networking proxies, control plane components).
+- Assumes a pre-existing support contract and a named Customer Success owner per upgrade.
+- Assumes telemetry and synthetic checks are available (see acceptance checks table).
+
+Actors and ownership:
+- Release Lead (RL): coordinates timeline, signs off preflight, primary decision-maker for go/no-go.
+- Field Operator (FO): performs the change, runs operator commands, coordinates rollbacks.
+- Solutions/SE: verifies customer-specific traffic shaping and runbook coverage.
+- Customer Success (CS): triages customer communications and captures acceptance.
+- Oncall/Observability (OBS): monitors real-time metrics and runs regression tests after rollout.
+
+Preflight checklist (minimum pass to schedule upgrade):
+1) Signed release plan document with risk classification and backout window (RL).
+2) Snapshot and evidence: model/artifact hashes, control-plane state snapshot (FO).
+3) Telemetry health baselines: 24h baseline of 95p latency, error rate, and KV cache hit-rate (OBS).
+4) Customer readiness: written confirmation of maintenance window and support contacts (CS).
+5) Rollback artifacts present: previous model image, previous control-plane manifest, and automated rollback job validated in staging (FO).
+6) Acceptance tests: smoke script list and synthetic traffic profile validated against baseline (SE).
+
+Acceptance checks table:
+| Check | Frequency | Pass criteria | Owner |
+| --- | --- | --- | --- |
+| 95th latency (token gen) | continuous | <= 1.5x baseline for 30m | OBS |
+| Error rate (client-facing 5xx) | continuous | <= baseline + 2% absolute | OBS |
+| KV cache miss ratio | every 5m | <= baseline + 10% relative | OBS |
+| Token throughput | continuous | within expected throughput envelope | FO/OBS |
+| Telemetry ingestion lag | every 1m | < 60s | OBS |
+
+Chronological timeline (recommended template)
+Phase A — Planning (T-14d to T-7d):
+- T-14d: Release Lead publishes schedule and initial risk assessment. CS notifies customer with a courtesy heads-up.
+- T-10d: SE runs customer-specific compatibility checks (networking, KMS/HSM, image allowlist).
+- T-7d: Final preflight checklist completed; RL requests formal customer acknowledgement of maintenance window.
+
+Customer notification (Planning):
+Subject: Planned maintenance: Redwood private upgrade scheduled [DATE]
+Body (short): We plan a maintenance window on [DATE] targeting component(s): [component list]. Expected customer impact: [none | transient latency | brief unavailability]. Primary CS: [name] — escalation: [email/phone].
+
+Phase B — Pre-deployment (T-2d to T-0):
+- T-2d: Run full synthetic acceptance suite against a realistic replay for the target tenant. Save results to artifact store.
+- T-1d: Operator dry-run in staging that mirrors operator steps for production (FO).
+- T-12h: Final go/no-go sync: RL, FO, OBS, SE, CS. RL records decision outcome in release tracker.
+- T-1h: Customer reminder: maintenance start in 1 hour with link to status page and ticket.
+
+Customer notification (Reminder):
+Subject: Reminder: maintenance window starts in 1 hour — [DATE]
+Body (short): Maintenance will begin at [TIME]. No anticipated data loss. If you have high-priority traffic, please notify CS immediately.
+
+Phase C — Deployment (T0 to T+48h):
+- T0 (start): FO begins staggered rollout by operator-defined shard. Stagger cadence: 5–10% of tenants or control-plane nodes per batch depending on risk class.
+- After each batch:
+  - Run smoke acceptance (3–5 min): latency, error rate, kv-consistency.
+  - If all checks green, proceed to next batch.
+  - If any check fails, pause and escalate. Observe for 10–30 minutes depending on severity.
+- Automated gating: CI/CD job will automatically halt rollout if error rate breach occurs and will notify the RL and OBS slack channel.
+
+Rollforward success criteria (during Deployment):
+- 30m stable with all acceptance checks green at batch-level.
+- No customer-reported incidents >P2 during staged rollout.
+
+Immediate rollback triggers (examples and thresholds):
+- Client-facing 5xx increases by >5 percentage points over baseline across affected tenants for >10 minutes.
+- 95th percentile latency >2x baseline for >15 minutes.
+- KV cache miss delta >25% leading to sustained throughput degradation >20% for >10 minutes.
+- Any data corruption or mismatch detected in model artifact checksums.
+
+Rollback decision matrix (simplified):
+- If a critical trigger appears within 30 minutes of batch completion: immediate rollback of that batch. FO executes batch backout script.
+- If systemic across multiple batches and cannot be isolated: halt rollout and initiate full release rollback (see procedure).
+
+Rollback procedure (operator steps — checklist):
+1) Mark release as ROLLBACK in release tracker and notify all stakeholders (RL/CS/OBS/SE).
+2) Execute backout job: `rdu operator rollback --release <release-id> --target-batch <id>` (FO).
+3) Verify checksum and model artifacts on rolled-back hosts.
+4) Re-run smoke acceptance against rolled-back batch.
+5) If rollback successful: notify customer with rollback confirmation and follow-up timeline for remediation.
+6) Open postmortem ticket and assign to RL for RCA within 72 hours.
+
+Post-deploy observation (T+48h to T+7d):
+- T+48h: Full-system synthetic run and customer acceptance validation (SE + CS).
+- T+72h: Performance regression sweep; if no regressions, RL moves release to stable and schedules a retrospective.
+- T+7d: Close release after final evidence bundle is saved and postmortem (if any) is published.
+
+Customer notification templates (examples):
+1) Successful upgrade confirmation:
+Subject: Maintenance complete — Upgrade applied to your private deploy [DATE]
+Body: The planned upgrade completed at [TIME]. Observability checks show system health within expected ranges (95p latency: [value], error rate: [value]). If you observe issues, open a ticket referencing [release-id].
+
+2) Rollback notification (immediate):
+Subject: Action taken: Rollback executed during maintenance [DATE]
+Body: We detected [brief reason] and executed a rollback for affected nodes at [TIME]. Impact: [summary]. Next steps: [investigation timeline]. Primary contact: [CS name].
+
+3) Postmortem summary (P3/P2):
+Subject: Postmortem: [summary title] — incident summary and remediation
+Body: Short timeline, root cause, mitigation steps, and planned preventative actions with owners and ETA.
+
+Operator runbook snippets (commands and short examples):
+- Snapshot control plane: `rdu operator snapshot --component control-plane --out /artifacts/$(release-id)-snapshot.tgz`
+- Trigger batch rollout: `rdu operator rollout --release <id> --batch-size 10% --wait`
+- Force rollback of batch: `rdu operator rollback --release <id> --batch <n> --confirm`
+- Evidence upload: `rdu artifacts upload --path /artifacts/<release-id> --tag release-evidence`
+
+Evidence and audit requirements:
+- For regulated customers, persist: release manifest, operator commands with timestamps, telemetry window (T-24h to T+72h), and signed customer acknowledgement. Retention: 7 years for financial customers; 1 year default otherwise.
+
+Escalation flow during failures:
+1) FO attempts mitigation and notifies RL (within 5m of detection).
+2) If mitigation fails within 15m, RL declares incident and pages SRE/P0 channel.
+3) CS posts to the customer ticket and triggers customer call if impact >P2.
+
+Checklist for customer-facing readiness before sign-off:
+- Maintenance window confirmed and logged.
+- Backup snapshots created and verified.
+- Rollback artifacts validated in staging.
+- Operator runbooks reviewed and practiced within the last 30 days.
+- Observability dashboards and synthetic checks configured and smoke test green.
+
+Appendix A — Example timeline (condensed):
+- T-14d: Schedule and risk notice sent.
+- T-7d: Final signoff and evidence snapshot.
+- T-1d: Dry run completed.
+- T-1h: Customer reminder.
+- T0: Start staggered batch rollout.
+- T+48h: Full-system validation.
+- T+7d: Release close and evidence archive.
+
+Appendix B — Quick links and references:
+- Upgrade runbook (operator): /confluence/eng-private-deployments/upgrade-and-rollback/operator-sentinel-escrow-and-durable-rollback-procedures-2026
+- Operator cutover checklist: /confluence/eng-private-deployments/day-2-ops/operator-cutover-chronicle-and-customer-communication-template-2026
+- Evidence retention policy: /confluence/security-and-compliance/data-residency-and-retention/policy-2025
+
+Revision history:
+- 2024-09-10: Initial draft (Daniel Park)
+- 2025-06-03: Added automated gating thresholds and rollback triggers (Leah Kim)
+- 2026-01-14: Expanded customer templates and evidence retention details (Omar Ruiz)
+
+End of document.

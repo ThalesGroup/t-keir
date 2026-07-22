@@ -1,4 +1,12 @@
-"""Unit tests for ingest manifest, store, worker, and API."""
+"""Title: Ingest
+
+Unit tests for ingest manifest, store, worker, and API.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 
@@ -51,8 +59,132 @@ def ingest_root(monkeypatch):
         governor_settings.cache_clear()
 
 
-def test_doc_id_is_sha256_of_content():
-    assert doc_id_from_content(b"hello") == sha256_hex(b"hello")
+def test_document_extras_from_metadata_promotes_nato_paths():
+    from thot.ingest.worker import document_extras_from_metadata
+
+    # Server only stamps already-staged absolute paths (from uploaded bytes).
+    extras = document_extras_from_metadata(
+        {
+            "corpus": "osint",
+            "topic_id": "situational_awareness",
+            # Client path strings in metadata must not leak into derive-from.
+            "ontologies": ["/client/secret/path.ttl"],
+        },
+        ontologies=[
+            "/var/tkeir/ingest/uploaded_ontologies/abc/c2sim_combined.ttl",
+        ],
+    )
+    assert extras is not None
+    assert extras["corpus"] == "osint"
+    assert extras["ontologies"] == [
+        "/var/tkeir/ingest/uploaded_ontologies/abc/c2sim_combined.ttl",
+    ]
+    assert extras["derive_from_ontologies"] == [
+        "/var/tkeir/ingest/uploaded_ontologies/abc/c2sim_combined.ttl",
+    ]
+
+
+def test_ontology_upload_decode_rejects_path_strings():
+    from thot.ingest.ontology_upload import (
+        decode_ontology_uploads,
+        stage_ontology_bytes,
+    )
+    import base64
+    import tempfile
+    from pathlib import Path
+
+    try:
+        decode_ontology_uploads(["/client/path.ttl"])
+        assert False, "expected ValueError"
+    except ValueError as exc:
+        assert "content" in str(exc).lower() or "path" in str(exc).lower()
+
+    payload = base64.b64encode(b"@prefix : <http://ex/> .").decode()
+    items = decode_ontology_uploads(
+        [{"filename": "mini.ttl", "content_base64": payload}]
+    )
+    assert items[0][0] == "mini.ttl"
+    with tempfile.TemporaryDirectory() as tmp:
+        staged = stage_ontology_bytes(Path(tmp), items)
+        assert len(staged) == 1
+        assert Path(staged[0]).read_bytes().startswith(b"@prefix")
+
+
+def test_preserve_pipeline_extras_keeps_derive_from_after_convert():
+    from thot.tasks.pipeline.PipelineRunner import _preserve_pipeline_extras
+
+    source = {
+        "datatype": "txt",
+        "data": "x",
+        "source": "ingest://a.txt",
+        "ontologies": ["corpus_nato/ontologies/c2sim_core.owl"],
+        "derive_from_ontologies": ["corpus_nato/ontologies/c2sim_core.owl"],
+        "corpus": "osint",
+        "metadata": {"topic_id": "t1"},
+    }
+    converted = {"content": ["hello"], "source_doc_id": "abc"}
+    out = _preserve_pipeline_extras(source, converted)
+    assert out["ontologies"] == ["corpus_nato/ontologies/c2sim_core.owl"]
+    assert out["derive_from_ontologies"] == [
+        "corpus_nato/ontologies/c2sim_core.owl"
+    ]
+    assert out["corpus"] == "osint"
+    assert out["metadata"]["topic_id"] == "t1"
+
+
+def test_ontology_lexicon_phrase_match():
+    from thot.tasks.document_ontology.OntologyLexicon import (
+        match_ontology_phrases_in_tokens,
+        ontology_paths_from_document,
+        stamp_document_ontologies,
+    )
+
+    spans = match_ontology_phrases_in_tokens(
+        [{"text": "Ground"}, {"text": "Unit"}, {"text": "ready"}],
+        [("ground", "unit")],
+    )
+    assert spans == [
+        {
+            "start": 0,
+            "end": 2,
+            "label": "concept",
+            "text": "Ground Unit",
+        }
+    ]
+    doc = stamp_document_ontologies({}, ["a.ttl", "b.owl"])
+    assert ontology_paths_from_document(doc) == ["a.ttl", "b.owl"]
+
+
+def test_request_ingest_shutdown_is_idempotent(monkeypatch):
+    from thot.ingest import shutdown as shutdown_mod
+
+    calls: list[tuple[int, int]] = []
+
+    def fake_kill(pid, sig):
+        calls.append((pid, sig))
+
+    monkeypatch.setattr(shutdown_mod, "_shutdown_requested", False)
+    monkeypatch.setattr(shutdown_mod, "_shutdown_reason", None)
+    monkeypatch.setattr(shutdown_mod.os, "kill", fake_kill)
+    shutdown_mod.request_ingest_shutdown("first")
+    shutdown_mod.request_ingest_shutdown("second")
+    assert len(calls) == 1
+    assert shutdown_mod.shutdown_reason() == "first"
+
+
+def test_ensure_source_doc_id_for_corpus_json():
+    from thot.ingest.worker import ensure_source_doc_id
+
+    doc = {"title": "SALUTE", "content": ["body text"]}
+    out = ensure_source_doc_id(
+        doc, filename="SALUTE_00012.json", content_digest="abc123"
+    )
+    assert out["source_doc_id"] == "ingest://abc123/SALUTE_00012.json"
+    # Idempotent when already set
+    out2 = ensure_source_doc_id(
+        {"source_doc_id": "keep-me"}, filename="x.json"
+    )
+    assert out2["source_doc_id"] == "keep-me"
 
 
 def test_idempotency_key_stable():
@@ -718,9 +850,17 @@ def test_api_health_vespa_down(ingest_root):
             "aclose",
             new=AsyncMock(),
         ),
+        patch(
+            "thot.ingest.app.readiness_report",
+            new=AsyncMock(
+                return_value={"status": "not_ready", "vespa": False}
+            ),
+        ),
     ):
         with TestClient(ingest_app.app) as client:
-            assert client.get("/health").status_code == 503
+            # Liveness stays up even if Vespa is down; readiness fails.
+            assert client.get("/health").status_code == 200
+            assert client.get("/ready").status_code == 503
 
 
 def test_auth_missing_bearer(ingest_root, monkeypatch):

@@ -1,4 +1,12 @@
-"""Aggregate pipeline output statistics for result documents."""
+"""Title: Pipeline Summary
+
+Aggregate pipeline output statistics for result documents.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

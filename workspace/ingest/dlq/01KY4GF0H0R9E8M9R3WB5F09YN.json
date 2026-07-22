@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4GF0H0R9E8M9R3WB5F09YN",
+  "reason": "'source_doc_id'",
+  "job": {
+    "ingest_id": "01KY4GF0H0R9E8M9R3WB5F09YN",
+    "correlation_id": "03597a334c48fadc05c1b4ba9b61a3e0",
+    "status": "failed",
+    "doc_id": "20a47b1d8af439c99d331ff19c492b3c3eeb8926ac350cc68ae99c137ddb7cf8",
+    "batch_id": null,
+    "manifest_path": "staging/20a47b1d8af439c99d331ff19c492b3c3eeb8926ac350cc68ae99c137ddb7cf8/ingest.manifest.json",
+    "error": "'source_doc_id'",
+    "created_at": "2026-07-22T08:53:18.496Z",
+    "updated_at": "2026-07-22T08:53:19.410Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4GF0H0R9E8M9R3WB5F09YN",
+    "correlation_id": "03597a334c48fadc05c1b4ba9b61a3e0",
+    "doc_id": "20a47b1d8af439c99d331ff19c492b3c3eeb8926ac350cc68ae99c137ddb7cf8",
+    "source": {
+      "uri": "upload://01KY4GF0H0QVDSYZP9K88Q918V/SALUTE_00012_d0e6e660.json",
+      "filename": "SALUTE_00012_d0e6e660.json",
+      "content_type": "application/octet-stream",
+      "size_bytes": 393
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T08:53:18.498Z",
+    "error": "'source_doc_id'"
+  },
+  "failed_at": "2026-07-22T08:53:19.411Z"
+}

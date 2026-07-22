@@ -39,11 +39,13 @@ After pipeline output is produced, index fixtures or your own JSON under
 ### Agentic layer (MCP, agents, templates)
 
 T-KEIR also exposes the indexed corpus to **agents** and external **MCP**
-clients, and can **compose** grounded documents from the fused ontology:
+clients, and can **compose** grounded documents from the fused ontology.
+Agents reuse the MCP *handlers* in-process; the `tkeir-mcp` service is only
+needed for external MCP hosts (see [MCP](mcp.md)).
 
 | Capability | Make / docs |
 |---|---|
-| MCP read-only tools | `make mcp` — [MCP server](mcp.md) |
+| MCP read-only tools (external clients) | `make mcp` — [MCP server](mcp.md) |
 | Single-agent / workflows | `make agent`, `make workflow-run` — [Agents](agents.md) |
 | Ontology templates | `make compose TEMPLATE=synthesis_note` — [Templates](templates.md) |
 | HMI run monitor | `/agents` — [HMI](../hmi.md) |

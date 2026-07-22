@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""Generate ``tkeir/docs/quality/index.md`` from ``reports/quality/`` artefacts.
+"""Title: Generate ``tkeir/docs/quality/index.md`` from ``reports/quality/`` artefacts.
 
 Called by ``make quality-docs``. Paths are relative to the repository root.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

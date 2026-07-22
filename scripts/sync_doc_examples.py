@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Generate and inject Google-style docstring examples across thot/."""
+"""Title: Sync doc examples
+
+Generate and inject Google-style docstring examples across thot/.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,0 +1,282 @@
+Marketplace onboarding docs: information architecture (IA) plan
+
+## Summary
+This page defines the docs site information architecture (IA) for Redwood Inference customers who start their relationship via **AWS Marketplace** or **Google Cloud Marketplace**.
+
+The IA is designed to:
+- Reduce time-to-first-success for marketplace buyers (subscription → entitlement → org provisioning → API key → first request).
+- Provide a **single, marketplace-specific** path that works for both procurement-led and developer-led users.
+- Make security documentation easy to find and consistent with the marketplace security packet.
+- Support common edge cases (existing org linking, multiple subscriptions, delayed entitlements).
+
+This is an IA plan for the docs site (public). It is intentionally aligned with:
+- Console onboarding UX entrypoint and error states
+- Marketplace listing copy (AWS/GCP)
+- Security packet publication plan and review constraints
+
+---
+
+## Target audiences
+1) **Developer / evaluator** (PLG): wants an API key and quick start immediately after subscribing.
+2) **Platform / infra buyer**: needs clarity on Dedicated vs Private, networking options, and SSO/audit log integrations.
+3) **Security / compliance reviewer**: wants encryption, retention, audit logging, residency, and shared responsibility.
+4) **Procurement / finance**: needs billing semantics, invoicing expectations, and support routing.
+
+---
+
+## Principles
+- **Marketplace-first path is explicit** (users shouldn’t have to translate generic onboarding steps).
+- **Two marketplaces, one flow**: keep shared content unified; only split when instructions are provider-specific.
+- **Minimize ambiguity**: clear “what you do in marketplace” vs “what you do in Redwood”.
+- **Troubleshooting is part of onboarding**, not a separate knowledge base.
+- **Security content is discoverable without oversharing**: publish a marketplace-friendly overview and link to evidence access paths.
+
+---
+
+## Proposed top-level docs structure
+Add a “Marketplace” section under the main “Get started” area.
+
+### Navigation placement
+- Primary nav: **Get started** → **Marketplace onboarding**
+- Secondary cross-links:
+  - **Security** → “Marketplace security overview”
+  - **Pricing** → “Marketplace SKUs and how billing works” (high-level)
+
+---
+
+## URL and page map (customer-facing)
+The following URLs are the intended canonical URLs for marketplace submission forms and listing links.
+
+| Page | Proposed URL | Owner | Notes |
+|---|---|---|---|
+| Marketplace onboarding landing | /docs/marketplace | Docs (Elliot) | Single entrypoint from AWS/GCP listings |
+| AWS Marketplace: subscribe & link | /docs/marketplace/aws | Docs (Wei) | AWS-specific subscription steps and entitlement timing |
+| GCP Marketplace: subscribe & link | /docs/marketplace/gcp | Docs (Wei) | GCP-specific subscription steps and billing account considerations |
+| Step 1: Verify entitlement | /docs/marketplace/entitlement | Docs (Jean-Paul) | Shared troubleshooting + expected propagation delays |
+| Step 2: Link or create Redwood org | /docs/marketplace/org-provisioning | Docs (Jean-Paul) | Covers existing org linking + multi-subscription |
+| Step 3: Create API key & first request | /docs/marketplace/first-api-call | Docs (Wei) | Copy/paste quickstart + common errors |
+| Metering & billing behavior (high level) | /docs/marketplace/billing | Docs (Kira) | Non-legal, non-finance; link to support |
+| Marketplace FAQ | /docs/marketplace/faq | Docs (Kira) | Procurement + security + support FAQs |
+| Marketplace security overview | /docs/security/marketplace | Security + Docs (Naomi/Elliot) | Overview only; links to evidence access |
+| Marketplace troubleshooting index | /docs/marketplace/troubleshooting | Docs (Jean-Paul) | Consolidates error codes and next steps |
+
+Redirects/aliases required (for marketplace submission consistency):
+- /marketplace → /docs/marketplace
+- /docs/aws-marketplace → /docs/marketplace/aws
+- /docs/gcp-marketplace → /docs/marketplace/gcp
+(Tracked via internal redirect request ticket; ensure redirects are live before final submissions.)
+
+---
+
+## Landing page outline: /docs/marketplace
+Purpose: give a crisp “how it works” flow with clear branch for AWS vs GCP.
+
+**Above the fold**
+- What you get when you subscribe via marketplace (entitlement + billing through provider)
+- What you do next in Redwood (link org, create API key, start sending requests)
+- CTA buttons:
+  - “AWS Marketplace setup”
+  - “GCP Marketplace setup”
+
+**Core flow diagram (simple 5-step)**
+1) Subscribe in AWS/GCP Marketplace
+2) Redwood verifies entitlement
+3) Create or link Redwood org
+4) Create API key
+5) Make your first request (and confirm metering)
+
+**Fast answers**
+- “How long does it take?” (set expectation: can be near-real-time; sometimes delayed)
+- “Can I link to an existing org?”
+- “What if I subscribed twice?”
+- “Where are security docs?”
+
+**Links out**
+- Marketplace security overview
+- Marketplace FAQ
+- Troubleshooting
+
+---
+
+## Provider-specific setup pages
+### /docs/marketplace/aws
+Include:
+- What to click in AWS Marketplace (subscribe, accept terms)
+- Where to find the product-specific “Set up your account” action
+- Expected entitlement propagation notes (set realistic expectation; provide “if it’s taking longer than X minutes” guidance)
+- How to confirm you’re logged into the correct AWS account
+- Link: “Verify entitlement” (shared page)
+
+### /docs/marketplace/gcp
+Include:
+- Subscribe steps and billing account considerations (who must have permissions)
+- Clarify that GCP marketplace entitlements may reference billing account/project context
+- Link: “Verify entitlement” (shared page)
+
+Both pages should include a short section: “If you already have a Redwood org” linking to /org-provisioning.
+
+---
+
+## Shared step-by-step guides
+### /docs/marketplace/entitlement
+Goal: help users validate that Redwood can see the marketplace subscription.
+
+Include:
+- What “entitlement” means at Redwood
+- Where to start in the Redwood Console (marketplace entrypoint)
+- Common failure modes and what to do:
+  - Entitlement not found (likely propagation delay)
+  - Provider account mismatch
+  - Subscription in the wrong provider region/account
+- Clear retry guidance (e.g., wait and retry; how often)
+- When to contact support and what to include (provider subscription ID, timestamp, Redwood org ID if known)
+
+### /docs/marketplace/org-provisioning
+Goal: make org linking predictable and safe.
+
+Include:
+- Create a new org vs link to existing
+- Guardrails:
+  - One org can have multiple marketplace subscriptions (explain how we represent this)
+  - Avoid accidental linking to the wrong org
+- Edge cases:
+  - You’re invited to an existing org after subscribing
+  - Your company already has a direct contract org
+  - Multiple subscriptions (AWS + GCP) and how this behaves
+
+### /docs/marketplace/first-api-call
+Goal: time-to-first-token.
+
+Include:
+- Create API key
+- Minimal curl example (hosted inference)
+- SDK snippets (Python/TS)
+- Verification steps:
+  - See a successful request in logs/usage
+  - Confirm you’re using the correct base URL and key
+- Common errors:
+  - 401/403 (wrong key/org)
+  - 429 (quota/limits)
+  - Model not available in your deployment mode
+
+---
+
+## Troubleshooting structure
+### /docs/marketplace/troubleshooting
+Organize by “what the user sees”, not by internal component.
+
+Sections:
+- Subscription succeeded but Redwood can’t find it
+- Entitlement found but org provisioning fails
+- API key creation is blocked
+- First request fails (auth / quota / model)
+- Billing/metering questions (how to validate usage is being attributed)
+
+Include:
+- “What to collect before contacting support”
+- Typical resolution times / escalation path (support → SE → engineering)
+
+Note: Align troubleshooting headings with console error copy so users can copy/paste the exact heading into support.
+
+---
+
+## FAQ page outline
+### /docs/marketplace/faq
+Group FAQs into sections:
+
+**Procurement & billing**
+- Do you support private offers?
+- How do marketplace charges relate to Redwood usage limits?
+- When will charges appear?
+- Can I get an invoice?
+
+**Onboarding & accounts**
+- Can I link to an existing Redwood org?
+- What happens if I subscribe multiple times?
+- How do I add teammates?
+
+**Security & compliance**
+- Where are the marketplace security docs?
+- Do you support customer-managed keys (KMS)?
+- What audit logs are available?
+- What are retention defaults and options?
+
+**Support**
+- How do I open a support ticket?
+- What’s the SLA for marketplace customers?
+- What info should I include?
+
+---
+
+## Security documentation placement and linking
+Marketplace buyers look for security content in two places:
+1) The marketplace listing itself
+2) The vendor docs site
+
+### What we will publish on the docs site
+- **Marketplace security overview** (/docs/security/marketplace)
+  - SOC 2 / ISO posture at a high level (no sensitive report content)
+  - Shared responsibility model (Redwood vs customer)
+  - Data handling summary: what we store, retention defaults, configurability
+  - Encryption summary: in transit + at rest; KMS integration statement
+  - Audit logs: event types and export options
+  - Residency statement (where available) and how to request constraints
+  - “How to request evidence” (process + contacts) rather than direct attachments
+
+### What remains gated / on-request
+- SOC 2 report / ISO certificate copies (as applicable)
+- Detailed evidence artifacts, pen test results, etc.
+
+Cross-link from marketplace onboarding pages to:
+- /docs/security/marketplace
+- Data retention/residency public pages (if published) or “contact us” flow
+
+---
+
+## Instrumentation and success metrics (docs-side)
+We will add docs analytics tags/UTMs to support funnel measurement and partner reporting.
+
+Required tracking (minimum):
+- Visits to /docs/marketplace landing page (by referrer: AWS vs GCP)
+- Click-through rate to provider-specific pages
+- Click-through rate to “first API call”
+- Top troubleshooting entries
+
+Nice-to-have:
+- Track copy/paste interactions for curl/SDK snippets
+
+Note: funnel measurement also depends on console and backend telemetry (entitlement verification latency, provisioning completion, first successful request). Docs events should align naming with onboarding funnel dashboards where possible.
+
+---
+
+## Content ownership and update workflow
+**Owners**
+- Marketplace onboarding IA and landing pages: Alex Martinez / Elliot Price
+- Provider-specific pages: Wei Chen
+- Troubleshooting and step-by-step content: Jean-Paul Laurent
+- Dedicated/Private nuances + billing FAQ: Kira Thompson
+- Security overview and claims: Naomi Feldman (review) + Dr. Aisha Rahman (approval path)
+
+**Review gates**
+- Security claims: Security/Compliance required approval before publish
+- Marketplace billing language: Finance/Legal review for wording risk; docs should avoid contractual guarantees
+- Copy alignment: PMM sign-off for headings/value props used on landing pages
+
+**Cadence**
+- Pre-launch: weekly review until marketplace submissions are approved
+- Post-launch: monthly audit of FAQs/troubleshooting; immediate updates for onboarding UX changes
+
+---
+
+## Open questions / follow-ups
+1) Final canonical docs URLs needed for AWS/GCP submission forms (confirm before go-live).
+2) Confirm which security pages are public vs gated per publication plan.
+3) Finalize expected entitlement propagation guidance (what time window we state and how we escalate).
+4) Confirm naming of marketplace SKUs as displayed in docs to match listing language.
+
+---
+
+## Changelog
+- 2026-02-10: Marked as published; confirmed URL map and security overview placement; added redirect requirements.
+- 2026-02-04: Added troubleshooting index and FAQ sections; clarified shared vs provider-specific content boundaries.
+- 2026-01-30: Initial IA draft.

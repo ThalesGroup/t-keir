@@ -1,4 +1,12 @@
-"""Phase D: orchestrator, outbound MCP, injection defenses."""
+"""Title: Orchestrator phase d
+
+Phase D: orchestrator, outbound MCP, injection defenses.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,15 +1,30 @@
-"""Tests for spaCy model selection."""
+"""Title: Spacy Model Loader
+
+Tests for spaCy model selection.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from unittest.mock import patch
 
 from thot.core.SpacyModelLoader import (
     MULTILINGUAL_MODEL,
+    clear_spacy_model_cache,
     load_spacy_model,
     model_name_candidates,
 )
 
 
 class TestSpacyModelLoader:
+    def setup_method(self):
+        clear_spacy_model_cache()
+
+    def teardown_method(self):
+        clear_spacy_model_cache()
+
     def test_model_candidates_for_english(self):
         assert model_name_candidates("en", size="sm")[0] == "en_core_web_sm"
 
@@ -24,6 +39,14 @@ class TestSpacyModelLoader:
         mock_load.return_value = object()
         _, model_name = load_spacy_model("en", size="sm")
         assert model_name == "en_core_web_sm"
+        mock_load.assert_called_once_with("en_core_web_sm")
+
+    @patch("thot.core.SpacyModelLoader.spacy.load")
+    def test_reuses_cached_model(self, mock_load):
+        mock_load.return_value = object()
+        first, _ = load_spacy_model("en", size="sm")
+        second, _ = load_spacy_model("en", size="sm")
+        assert first is second
         mock_load.assert_called_once_with("en_core_web_sm")
 
     @patch("thot.core.SpacyModelLoader.spacy.load")

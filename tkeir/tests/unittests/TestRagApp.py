@@ -1,4 +1,12 @@
-"""Tests for RAG prompt configuration helpers."""
+"""Title: Rag App
+
+Tests for RAG prompt configuration helpers.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tools.search.app import (
     _build_generation_prompts,

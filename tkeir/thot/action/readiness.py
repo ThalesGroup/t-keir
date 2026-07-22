@@ -1,9 +1,11 @@
-"""Readiness probes for Vespa and the configured LLM provider.
+"""Title: Readiness
 
-Author: Eric Blaudez (Eric Blaudez)
+Readiness probes for Vespa and the configured LLM provider.
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

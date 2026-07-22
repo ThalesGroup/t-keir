@@ -1,0 +1,23 @@
+{
+  "schema": "tkeir.ingest.manifest.v1",
+  "ingest_id": "01KY4JGTE35C1NNN3G97MKKZ1E",
+  "correlation_id": "480bae16a8162bb9f2a7891abd675ca1",
+  "doc_id": "3cc8735882a0ae576ad0ff1755c0769311c9b45a3378c3b56c991e3846947cf2",
+  "source": {
+    "uri": "upload://01KY4JGTE03G461GDFKJXYZAMH/NATOPUB_00878_daafb63a.html",
+    "filename": "NATOPUB_00878_daafb63a.html",
+    "content_type": "application/octet-stream",
+    "size_bytes": 456
+  },
+  "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+  "embedder": {
+    "model": "bge-m3",
+    "provider": "ollama",
+    "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+  },
+  "lineage": {},
+  "status": "indexed",
+  "chunk_count": 1,
+  "indexed_at": "2026-07-22T09:29:15.841Z",
+  "created_at": "2026-07-22T09:29:14.952Z"
+}

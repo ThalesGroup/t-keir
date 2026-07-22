@@ -1,7 +1,12 @@
-"""Ontology-driven template composer (Phase C).
+"""Title: Ontology-driven template composer (Phase C).
 
 Fill order: KG / SPARQL / retrieval-shaped slots first, then Writer for
 ``freeform_grounded``, then Reviewer grounding check, then Jinja2 render.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 from __future__ import annotations

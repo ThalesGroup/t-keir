@@ -1,14 +1,21 @@
 "use client";
 
+import { Bot, Network } from "lucide-react";
 import { memo, useMemo } from "react";
 
+import { AgentDialog } from "@/components/agent-dialog";
 import { AiSynthesis } from "@/components/ai-synthesis";
 import { CorrelationIdBadge } from "@/components/correlation-id";
 import { DocumentResults } from "@/components/document-results";
-import { InputPromptPanel } from "@/components/input-prompt-panel";
-import { VespaQueryPanel } from "@/components/vespa-query-panel";
 import { OntologySidebar } from "@/components/ontology-sidebar";
 import { RagReportPanel } from "@/components/rag-report";
+import { TechnicalDetails } from "@/components/technical-details";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import type {
   QueryResponse,
   SemanticEntity,
@@ -20,6 +27,7 @@ interface RagResultsProps {
   response: QueryResponse | null;
   correlationId: string | null;
   loading: boolean;
+  agentAvailable: boolean;
   activeChunkIds: Set<string> | null;
   activeLabel: string | null;
   onSelectEntity: (entity: SemanticEntity) => void;
@@ -32,6 +40,7 @@ export const RagResults = memo(function RagResults({
   response,
   correlationId,
   loading,
+  agentAvailable,
   activeChunkIds,
   activeLabel,
   onSelectEntity,
@@ -65,16 +74,6 @@ export const RagResults = memo(function RagResults({
         <CorrelationIdBadge correlationId={correlationId} />
       )}
 
-      <InputPromptPanel
-        inputPrompt={response?.input_prompt ?? null}
-        loading={loading}
-      />
-
-      <VespaQueryPanel
-        vespaQuery={response?.vespa_query ?? null}
-        loading={loading}
-      />
-
       <RagReportPanel
         query={submittedQuery}
         reportMarkdown={response?.report_markdown ?? null}
@@ -84,26 +83,71 @@ export const RagResults = memo(function RagResults({
         loading={loading}
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem] xl:grid-cols-[1fr_22rem]">
-        <DocumentResults
-          chunks={chunks}
-          loading={loading}
-          activeChunkIds={activeChunkIds}
-          highlightEntities={highlightEntities}
-          highlightKeywords={highlightKeywords}
-          highlightQueryTerms={highlightQueryTerms}
-        />
+      <DocumentResults
+        chunks={chunks}
+        loading={loading}
+        activeChunkIds={activeChunkIds}
+        highlightEntities={highlightEntities}
+        highlightKeywords={highlightKeywords}
+        highlightQueryTerms={highlightQueryTerms}
+      />
 
-        <OntologySidebar
-          ontology={response?.ontology ?? null}
-          loading={loading}
-          activeChunkIds={activeChunkIds}
-          activeLabel={activeLabel}
-          onSelectEntity={onSelectEntity}
-          onSelectKeyword={onSelectKeyword}
-          onClearFilter={onClearFilter}
-        />
-      </div>
+      <Accordion
+        key={submittedQuery || "idle"}
+        type="multiple"
+        defaultValue={
+          agentAvailable
+            ? ["ontology", "agent"]
+            : response?.ontology
+              ? ["ontology"]
+              : []
+        }
+        className="rounded-xl border bg-card px-4 shadow-sm"
+      >
+        <AccordionItem value="ontology" className="border-b">
+          <AccordionTrigger className="text-sm font-medium hover:no-underline">
+            <span className="flex items-center gap-2">
+              <Network className="h-4 w-4 text-primary" />
+              Ontology navigator
+              {response?.ontology
+                ? ` (${response.ontology.entities.length} entities)`
+                : ""}
+            </span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <OntologySidebar
+              embedded
+              ontology={response?.ontology ?? null}
+              loading={loading}
+              activeChunkIds={activeChunkIds}
+              activeLabel={activeLabel}
+              onSelectEntity={onSelectEntity}
+              onSelectKeyword={onSelectKeyword}
+              onClearFilter={onClearFilter}
+            />
+          </AccordionContent>
+        </AccordionItem>
+
+        {agentAvailable && (
+          <AccordionItem value="agent" className="border-b-0">
+            <AccordionTrigger className="text-sm font-medium hover:no-underline">
+              <span className="flex items-center gap-2">
+                <Bot className="h-4 w-4 text-primary" />
+                Agent dialog
+              </span>
+            </AccordionTrigger>
+            <AccordionContent>
+              <AgentDialog initialGoal={submittedQuery} />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+      </Accordion>
+
+      <TechnicalDetails
+        inputPrompt={response?.input_prompt ?? null}
+        vespaQuery={response?.vespa_query ?? null}
+        loading={loading}
+      />
     </>
   );
 });

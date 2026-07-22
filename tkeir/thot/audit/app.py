@@ -1,4 +1,12 @@
-"""Audit API service (``tkeir-audit``)."""
+"""Title: Audit FastAPI application
+
+Audit API service (``tkeir-audit``).
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

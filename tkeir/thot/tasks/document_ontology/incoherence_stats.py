@@ -1,4 +1,12 @@
-"""Compact SHACL incoherence statistics for pipeline output."""
+"""Title: Incoherence stats
+
+Compact SHACL incoherence statistics for pipeline output.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

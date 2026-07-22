@@ -1,0 +1,41 @@
+{
+  "ingest_id": "01KY4FZXJ3Q7BB2KVCRHNC9KVG",
+  "reason": "'source_doc_id'",
+  "job": {
+    "ingest_id": "01KY4FZXJ3Q7BB2KVCRHNC9KVG",
+    "correlation_id": "3344b7c475b062ece7c5a68cb73830fd",
+    "status": "failed",
+    "doc_id": "c135a5a06e257b48ad11e60f7e4d8dcbed26fe7d901b8de21b7d9067ba390cd7",
+    "batch_id": null,
+    "manifest_path": "staging/c135a5a06e257b48ad11e60f7e4d8dcbed26fe7d901b8de21b7d9067ba390cd7/ingest.manifest.json",
+    "error": "'source_doc_id'",
+    "created_at": "2026-07-22T08:45:03.939Z",
+    "updated_at": "2026-07-22T08:45:04.076Z",
+    "noop": false,
+    "user_space": "dev@tkeir"
+  },
+  "manifest": {
+    "schema": "tkeir.ingest.manifest.v1",
+    "ingest_id": "01KY4FZXJ3Q7BB2KVCRHNC9KVG",
+    "correlation_id": "3344b7c475b062ece7c5a68cb73830fd",
+    "doc_id": "c135a5a06e257b48ad11e60f7e4d8dcbed26fe7d901b8de21b7d9067ba390cd7",
+    "source": {
+      "uri": "upload://01KY4FZXJ3VYK0BZGA2DYJKT7A/AIS_00052_c0b6fce2.json",
+      "filename": "AIS_00052_c0b6fce2.json",
+      "content_type": "application/octet-stream",
+      "size_bytes": 311
+    },
+    "pipeline_config_sha256": "62b9b357c8c77f338381992cf6d2c68ce05c027c5268f9bd2f00f373fe686eaf",
+    "embedder": {
+      "model": "bge-m3",
+      "provider": "ollama",
+      "sha256": "2688a3848238909d55190a59ea0d7e2544b8f9f6e12f4396cb7d1b59b0d0abc6"
+    },
+    "lineage": {},
+    "status": "failed",
+    "chunk_count": 0,
+    "created_at": "2026-07-22T08:45:03.942Z",
+    "error": "'source_doc_id'"
+  },
+  "failed_at": "2026-07-22T08:45:04.077Z"
+}

@@ -1,4 +1,12 @@
-"""``tkeir-mcp`` entrypoint — FastAPI HTTP + optional MCP stdio transport."""
+"""Title: MCP HTTP server
+
+``tkeir-mcp`` entrypoint — FastAPI HTTP + optional MCP stdio transport.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Common configuration
+"""Title: Common configuration
 
 Common configuration function
 
@@ -6,11 +6,10 @@ Description:
 This file contains the constant string of T-KEIR and
 the function to generation error/trace string
 
-Author: Eric Blaudez (Eric Blaudez)
+Author: Eric Blaudez
 
-Copyright (c) 2022 THALES
-All Rights Reserved.
-
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
 """
 
 SERVICE_HEALTH_OK = "ok"

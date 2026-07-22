@@ -1,4 +1,12 @@
-"""Unit tests for Vespa ontology utilities."""
+"""Title: Ontology Utils
+
+Unit tests for Vespa ontology utilities.
+
+Author: Eric Blaudez
+
+Copyright (c) 2026 Thales
+Licensed under the MIT License.
+"""
 
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,

@@ -32,7 +32,7 @@ jobs:
         uses: astral-sh/setup-uv@v4
 
       - name: Install Docker
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Install Python dependencies
         run: make ci-deps

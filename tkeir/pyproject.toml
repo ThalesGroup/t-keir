@@ -15,7 +15,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "beautifulsoup4==4.11.1",
+    "beautifulsoup4==4.15.0",
     "emoji==2.0.0",
     "fold-to-ascii==1.0.2.post1",
     "Jinja2>=3.1.4",

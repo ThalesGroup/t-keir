@@ -300,4 +300,4 @@ make ci
 
 ## License
 
-See repository license files.
+See MIT license files.

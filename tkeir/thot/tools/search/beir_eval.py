@@ -4,7 +4,9 @@ Downloads SciFact, FiQA, and ArguAna when missing under ``./datasets/``, runs
 lexical (BM25), dense (SentenceTransformer), and the T-KEIR **retrieval**
 stack (NLP index + QueryAnalyzer + Vespa hybrid; **no answer generation**)
 at top-100, computes NDCG@10 / MAP@100 / Recall@100, performs error
-analysis, and always writes ``docs/evaluation_report.md`` (MkDocs).
+analysis, and always writes ``docs/evaluation_report.md`` (MkDocs). After
+each dataset, an intermediate report is also written under
+``results/beir/<dataset>/report.md`` and ``results/beir/report.md``.
 
 Author: Eric Blaudez
 
@@ -26,7 +28,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from thot.core.TkeirPaths import evaluation_report_path
+from thot.core.TkeirPaths import evaluation_report_path, repo_root
 
 LOGGER = logging.getLogger(__name__)
 
@@ -730,6 +732,113 @@ def _gap_to_best(score: float | None, best: float) -> str:
     return _delta(score, best)
 
 
+def intermediate_results_dir() -> Path:
+    """Return ``results/beir`` under the repository root.
+
+    Returns:
+        Absolute path to the BEIR intermediate results directory.
+
+    Example:
+        >>> intermediate_results_dir().name
+        'beir'
+    """
+    return Path(repo_root()) / "results" / "beir"
+
+
+def write_report_file(path: Path, markdown: str) -> None:
+    """Create parent dirs and write a Markdown report.
+
+    Args:
+        path: Destination file path.
+        markdown: Full report body.
+
+    Example:
+        >>> from pathlib import Path
+        >>> import tempfile
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     out = Path(td) / "report.md"
+        ...     write_report_file(out, "# hi\\n")
+        ...     out.read_text(encoding="utf-8").startswith("# hi")
+        True
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(markdown, encoding="utf-8")
+
+
+def save_reports(
+    runs: list[DatasetRun],
+    *,
+    dense_model: str,
+    docs_report: Path,
+    extra_report: Path | None = None,
+    latest_dataset: str | None = None,
+    expected_total: int | None = None,
+) -> None:
+    """Write docs report plus intermediate ``results/beir`` snapshots.
+
+    Always updates ``docs_report`` and ``results/beir/report.md`` with the
+    cumulative runs. When ``latest_dataset`` is set, also writes
+    ``results/beir/<dataset>/report.md`` for that dataset alone.
+
+    Args:
+        runs: Completed dataset runs (cumulative).
+        dense_model: Dense embedding model name.
+        docs_report: MkDocs evaluation report path.
+        extra_report: Optional extra copy path (``--report``).
+        latest_dataset: Dataset id just finished (per-dataset snapshot).
+        expected_total: Total datasets in this CLI run (partial banner).
+
+    Example:
+        >>> save_reports(  # doctest: +SKIP
+        ...     [], dense_model="m", docs_report=Path("/tmp/r.md")
+        ... )
+    """
+    body = render_report(runs, dense_model=dense_model)
+    if (
+        expected_total is not None
+        and expected_total > 0
+        and len(runs) < expected_total
+    ):
+        banner = (
+            f"> **Intermediate:** {len(runs)}/{expected_total} dataset(s) "
+            "completed so far.\n\n"
+        )
+        marker = "_Generated "
+        idx = body.find(marker)
+        if idx != -1:
+            end = body.find("\n", idx)
+            if end != -1:
+                body = body[: end + 1] + "\n" + banner + body[end + 1 :]
+            else:
+                body = banner + body
+        else:
+            body = banner + body
+
+    write_report_file(docs_report, body)
+    LOGGER.info("Wrote documentation report → %s", docs_report.resolve())
+
+    results_root = intermediate_results_dir()
+    cumulative = results_root / "report.md"
+    write_report_file(cumulative, body)
+    LOGGER.info("Wrote intermediate report → %s", cumulative.resolve())
+
+    if latest_dataset:
+        single = [run for run in runs if run.name == latest_dataset]
+        if single:
+            single_body = render_report(single, dense_model=dense_model)
+            dataset_path = results_root / latest_dataset / "report.md"
+            write_report_file(dataset_path, single_body)
+            LOGGER.info(
+                "Wrote per-dataset report → %s", dataset_path.resolve()
+            )
+
+    if extra_report is not None:
+        extra = Path(extra_report)
+        if extra.resolve() != docs_report.resolve():
+            write_report_file(extra, body)
+            LOGGER.info("Wrote extra report copy → %s", extra.resolve())
+
+
 def render_report(runs: list[DatasetRun], dense_model: str) -> str:
     """Build the Markdown evaluation report with T-KEIR vs leaderboard.
 
@@ -1238,7 +1347,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help=(
             "Optional extra Markdown report path. The documentation report "
-            f"({evaluation_report_path()}) is always written."
+            f"({evaluation_report_path()}) and intermediate "
+            "results/beir/report.md are always written after each dataset."
         ),
     )
     parser.add_argument(
@@ -1325,6 +1435,9 @@ def main(argv: list[str] | None = None) -> int:
 
     runs: list[DatasetRun] = []
     interrupted = False
+    docs_report = Path(evaluation_report_path())
+    extra_report = Path(args.report) if args.report is not None else None
+    expected_total = len(args.datasets)
     try:
         for name in args.datasets:
             LOGGER.info("========== %s ==========", name)
@@ -1341,6 +1454,14 @@ def main(argv: list[str] | None = None) -> int:
                 tkeir_max_docs=args.tkeir_max_docs,
             )
             runs.append(run)
+            save_reports(
+                runs,
+                dense_model=args.dense_model,
+                docs_report=docs_report,
+                extra_report=extra_report,
+                latest_dataset=name,
+                expected_total=expected_total,
+            )
             if run.tkeir_error and run.tkeir_error.startswith("interrupted"):
                 interrupted = True
                 LOGGER.warning("Stopping remaining datasets after interrupt")
@@ -1351,23 +1472,27 @@ def main(argv: list[str] | None = None) -> int:
             "Interrupted — writing report for %d completed dataset(s)",
             len(runs),
         )
+        if runs:
+            save_reports(
+                runs,
+                dense_model=args.dense_model,
+                docs_report=docs_report,
+                extra_report=extra_report,
+                expected_total=expected_total,
+            )
 
     if not runs:
         LOGGER.error("No dataset runs completed")
         return 130
 
-    report = render_report(runs, dense_model=args.dense_model)
-    docs_report = Path(evaluation_report_path())
-    docs_report.parent.mkdir(parents=True, exist_ok=True)
-    docs_report.write_text(report, encoding="utf-8")
-    LOGGER.info("Wrote documentation report → %s", docs_report.resolve())
-
-    if args.report is not None:
-        extra = Path(args.report)
-        if extra.resolve() != docs_report.resolve():
-            extra.parent.mkdir(parents=True, exist_ok=True)
-            extra.write_text(report, encoding="utf-8")
-            LOGGER.info("Wrote extra report copy → %s", extra.resolve())
+    # Final write without the intermediate banner.
+    save_reports(
+        runs,
+        dense_model=args.dense_model,
+        docs_report=docs_report,
+        extra_report=extra_report,
+        expected_total=None,
+    )
 
     if interrupted:
         # Avoid asyncio default executor join hang after Ctrl+C.

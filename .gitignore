@@ -20,6 +20,7 @@ site/
 .cache/
 .pytest_cache/
 reports/
+results/
 coverage-reports/
 .tkeir-agent/
 .tkeir-compose/
@@ -31,8 +32,6 @@ compliance/opa/oscal/assessments/assessment_results/*
 !compliance/opa/oscal/assessments/assessment_results/.gitkeep
 compliance/opa/oscal/poam/*
 !compliance/opa/oscal/poam/.gitkeep
-datasets/
-**/datasets/
 # Root-only copy; the tracked report lives in docs/evaluation_report.md
 /evaluation_report.md
 output/

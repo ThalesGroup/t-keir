@@ -92,14 +92,19 @@ BEIR leaderboard numbers (BM25 / SPLADE / Contriever).
 
 ## Report location
 
-Every run **always** writes the Markdown report to:
+After **each** dataset finishes, the harness writes:
 
-`docs/evaluation_report.md`
+| Path | Contents |
+|------|----------|
+| `docs/evaluation_report.md` | Cumulative MkDocs report (always) |
+| `results/beir/report.md` | Same cumulative snapshot (intermediate) |
+| `results/beir/<dataset>/report.md` | That dataset alone |
 
-That file is part of this documentation site (see
-[BEIR evaluation report](evaluation_report.md)). Override with `--report` /
-`BEIR_REPORT` only if you also want a copy elsewhere; the docs path is still
-updated.
+While more datasets remain, the cumulative files include an **Intermediate**
+banner (`N/M` completed). The final write drops the banner.
+
+Override with `--report` / `BEIR_REPORT` for an extra copy; the paths above are
+still updated. See [BEIR evaluation report](evaluation_report.md).
 
 ## Related docs
 

@@ -1219,7 +1219,7 @@ smoke-test: check-curl check-jq ## Post-deploy RAG /health check (SMOKE_TARGET_U
 		echo "FAIL: unexpected status ($$status)"; exit 1; \
 	fi
 
-beir-eval: ## BEIR IR eval → docs/evaluation_report.md (BEIR_DATASETS=scifact for one)
+beir-eval: ## BEIR IR eval → docs + results/beir/*/report.md (BEIR_DATASETS=scifact for one)
 	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python $(PYTHON)
 	cd $(TKEIR_DIR) && \
 		VESPA_NAME="$(BEIR_VESPA_NAME)" \

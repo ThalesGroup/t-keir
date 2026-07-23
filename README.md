@@ -35,8 +35,8 @@ Full documentation: [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io
 | `.devcontainer/` | Reproducible dev environment (Python 3.11, uv, Tesseract, Docker socket) |
 
 Installation profiles (P0 local → P4 platform): start with
-**[Zero to Hero](tkeir/docs/zero_to_hero.md)**, then [INSTALL.md](INSTALL.md) and
-[deployment docs](tkeir/docs/deployment/index.md).
+**[Zero to Hero](docs/zero_to_hero.md)**, then [INSTALL.md](INSTALL.md) and
+[deployment docs](docs/deployment/index.md).
 
 ## Quick start
 
@@ -63,7 +63,7 @@ If `uv sync` fails because of a host-built `tkeir/.venv`, run
 `bash .devcontainer/ensure-venv.sh && make install` inside the container, or
 `rm -rf tkeir/.venv` on the host and retry.
 
-Details: [tkeir/docs/devcontainer.md](tkeir/docs/devcontainer.md)
+Details: [docs/devcontainer.md](docs/devcontainer.md)
 
 ### 2. Pipeline demo (local, no Vespa)
 
@@ -104,7 +104,7 @@ make rag-query RAG_QUERY="Who is Rob Brown?"
 Indexing reads `tkeir/tests/indexing/output/*.pipeline.json` by default.
 Override with `INDEX_INPUT=/path/to/json/dir make index`.
 
-Details: [vespa/README.md](vespa/README.md), [tkeir/docs/tools/vespa_rag.md](tkeir/docs/tools/vespa_rag.md)
+Details: [vespa/README.md](vespa/README.md), [docs/tools/vespa_rag.md](docs/tools/vespa_rag.md)
 
 ### 4. Web UI (HMI)
 
@@ -120,7 +120,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000). The UI proxies `/api/*` to the
 RAG API on port 8090.
 
-Details: [tkeir/docs/hmi.md](tkeir/docs/hmi.md)
+Details: [docs/hmi.md](docs/hmi.md)
 
 ## Document converter
 
@@ -179,7 +179,7 @@ MarkItDown extracts the PDF **text layer** by default. Text trapped in images
 
 The devcontainer and `make setup` install Tesseract for PDF OCR in the pipeline.
 
-Details: [tkeir/docs/tools/converter.md](tkeir/docs/tools/converter.md)
+Details: [docs/tools/converter.md](docs/tools/converter.md)
 
 ## Makefile reference
 
@@ -241,7 +241,7 @@ make pipeline \
 | `make owasp-dependency-check` | OWASP Dependency-Check (Docker) |
 | `make ci` | All quality gates (lint, types, tests, coverage, security, BOM) |
 | `make docs` | MkDocs dev server → http://127.0.0.1:8000 |
-| `make docs-build` | Static site → `tkeir/site/` |
+| `make docs-build` | Static site → `site/` |
 
 ### Search & RAG (Vespa)
 
@@ -263,7 +263,7 @@ make pipeline \
 | `make agent-run` | Create a single-agent run and poll (`GOAL=…`) |
 | `make workflow-run` | Create a workflow run and poll (`WORKFLOW=content_brief`) |
 | `make compose` | Ontology template compose (`TEMPLATE=synthesis_note`) |
-| `make beir-eval` | BEIR IR eval → `tkeir/docs/evaluation_report.md` (`BEIR_DATASETS=scifact` for one) |
+| `make beir-eval` | BEIR IR eval → `docs/evaluation_report.md` (`BEIR_DATASETS=scifact` for one) |
 | `make clean-db` | Wipe Vespa data volume (then re-run `bootstrap`) |
 | `make vespa-clean` | Stop/remove Vespa container (keeps volume) |
 | `make logs` | Tail Vespa Docker logs |

@@ -26,7 +26,7 @@ for _parent in [REPO_ROOT, *REPO_ROOT.parents]:
 
 REPORTS_DIR = REPO_ROOT / "reports" / "quality"
 SRC_ROOT = REPO_ROOT / "tkeir"
-DOCS_QUALITY = SRC_ROOT / "docs" / "quality" / "index.md"
+DOCS_QUALITY = REPO_ROOT / "docs" / "quality" / "index.md"
 
 CC_AVERAGE_THRESHOLD = 7.0
 COPYLEFT_LICENCES = {"GPL", "AGPL", "LGPL", "EUPL", "MPL", "OSL", "CDDL"}
@@ -159,10 +159,10 @@ def test_no_unexpected_copyleft_licences() -> None:
 
 
 def test_quality_dashboard_page_exists() -> None:
-    """``tkeir/docs/quality/index.md`` must exist and cover CC, coverage, licences."""
+    """``docs/quality/index.md`` must exist and cover CC, coverage, licences."""
     assert (
         DOCS_QUALITY.exists()
-    ), "tkeir/docs/quality/index.md missing — run `make quality-docs`"
+    ), "docs/quality/index.md missing — run `make quality-docs`"
     content = DOCS_QUALITY.read_text(encoding="utf-8")
     assert (
         "Cyclomatic" in content or "radon" in content.lower()
@@ -177,7 +177,7 @@ def test_quality_dashboard_page_exists() -> None:
 
 def test_docs_build_after_quality_page() -> None:
     """MkDocs build must succeed with the quality page present."""
-    mkdocs = SRC_ROOT / "mkdocs.yml"
+    mkdocs = REPO_ROOT / "mkdocs.yml"
     if not mkdocs.exists():
         pytest.skip("mkdocs.yml not found")
     result = subprocess.run(
@@ -189,7 +189,7 @@ def test_docs_build_after_quality_page() -> None:
             "-f",
             str(mkdocs),
         ],
-        cwd=str(SRC_ROOT),
+        cwd=str(REPO_ROOT),
         capture_output=True,
         text=True,
         timeout=180,
@@ -202,6 +202,8 @@ def test_docs_build_after_quality_page() -> None:
             [
                 "uv",
                 "run",
+                "--directory",
+                str(SRC_ROOT),
                 "--python",
                 "3.11",
                 "--with",
@@ -212,8 +214,10 @@ def test_docs_build_after_quality_page() -> None:
                 "mkdocs-render-swagger-plugin",
                 "mkdocs",
                 "build",
+                "-f",
+                str(mkdocs),
             ],
-            cwd=str(SRC_ROOT),
+            cwd=str(REPO_ROOT),
             capture_output=True,
             text=True,
             timeout=180,

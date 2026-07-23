@@ -17,11 +17,11 @@ Without OPA, the target prints a warning and exits `0` so `make ci` stays green.
 
 MkDocs pages (precise article tables + gates):
 
-- [EU Compliance OPA Audit](../../tkeir/docs/compliance/eu-audit.md)
-- [Latest audit results](../../tkeir/docs/compliance/latest-results.md)
-- [AI Act](../../tkeir/docs/compliance/ai-act.md) · [CRA](../../tkeir/docs/compliance/cra.md) ·
-  [GDPR](../../tkeir/docs/compliance/gdpr.md) · [NIS2](../../tkeir/docs/compliance/nis2.md) ·
-  [DORA](../../tkeir/docs/compliance/dora.md) · [PLD](../../tkeir/docs/compliance/pld.md)
+- [EU Compliance OPA Audit](../../docs/compliance/eu-audit.md)
+- [Latest audit results](../../docs/compliance/latest-results.md)
+- [AI Act](../../docs/compliance/ai-act.md) · [CRA](../../docs/compliance/cra.md) ·
+  [GDPR](../../docs/compliance/gdpr.md) · [NIS2](../../docs/compliance/nis2.md) ·
+  [DORA](../../docs/compliance/dora.md) · [PLD](../../docs/compliance/pld.md)
 
 Regenerate article tables after editing Rego catalogues:
 
@@ -30,7 +30,7 @@ make compliance-doc-tables
 ```
 
 After each audit, full outcomes are published into
-`tkeir/docs/compliance/generated/` (`make compliance-doc-results` republishes
+`docs/compliance/generated/` (`make compliance-doc-results` republishes
 from the newest `reports/compliance/eu-audit/*/report.json` without re-eval).
 
 ## Layout
@@ -72,4 +72,4 @@ Regenerate catalogs after Rego changes: `make oscal-catalogs`.
 Validate (optional): `make oscal-validate`. Diff two runs:
 `make oscal-diff BASELINE=<ver> CURRENT=<ver>`.
 
-MkDocs: [EU Compliance OPA Audit](../../tkeir/docs/compliance/eu-audit.md).
+MkDocs: [EU Compliance OPA Audit](../../docs/compliance/eu-audit.md).

@@ -810,7 +810,7 @@ Regenerate the dashboard after any refactoring or coverage pass:
 
 ```bash
 make coverage       # refreshes reports/quality/coverage_*.*
-make quality-docs   # writes tkeir/docs/quality/index.md from latest reports
+make quality-docs   # writes docs/quality/index.md from latest reports
 make docs-build     # rebuilds the full MkDocs site
 ```
 

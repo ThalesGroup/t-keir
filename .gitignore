@@ -15,6 +15,7 @@ tkeir-hmi/node_modules/
 tkeir-hmi/.next/
 tkeir/dist
 tkeir/site
+site/
 .venv
 .cache/
 .pytest_cache/
@@ -32,7 +33,7 @@ compliance/opa/oscal/poam/*
 !compliance/opa/oscal/poam/.gitkeep
 datasets/
 **/datasets/
-# Root-only copy; the tracked report lives in tkeir/docs/evaluation_report.md
+# Root-only copy; the tracked report lives in docs/evaluation_report.md
 /evaluation_report.md
 output/
 !tkeir/tests/indexing/output/

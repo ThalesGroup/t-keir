@@ -1,158 +1,139 @@
-# Installation
+# T-KEIR
 
-These tools work on \*nix, WSL and docker environment.
+**T-KEIR** (Thales Knowledge Extraction to Information Retrieval) is a document
+analysis toolkit: unified NLP pipeline, Vespa hybrid search / RAG, HMI, MCP,
+and governed agents. Sources live under `thot/`; buildable docs under `docs/`.
 
-## Pre-requist : prepare T-KEIR
+## Documentation
 
-* install git
+Full site sources are in **`docs/`** (MkDocs Material). After installing
+dependencies from the **repository root**:
 
-```shell  title="Example under ubuntu"
-#> sudo apt install git
+```shell
+make setup          # uv sync + project deps (once)
+make docs           # http://127.0.0.1:8000/  (override: DOCS_PORT=8001)
 ```
 
-* install uv. Follow the instructions : [uv installation documentation](https://docs.astral.sh/uv/getting-started/installation/)
+Or from the repository root with uv:
+
+```shell
+uv run --project tkeir --with mkdocs --with mkdocs-material \
+  --with mkdocs-render-swagger-plugin \
+  mkdocs serve -f mkdocs.yml -a 127.0.0.1:8000
+```
+
+Static build / PDF (optional): `make docs-build`, `make docs-pdf`.
+
+### Site map (nav tabs)
+
+| Tab | What it covers |
+|-----|----------------|
+| **Home** | Product intro, feature list, changelog pointers |
+| **Zero to Hero** | End-to-end path P0→P4; **NLP** page = pipeline quickstart without Vespa |
+| **Overview** | Pipeline stages, agentic layer, RAG path at a glance |
+| **Architecture** | Service topology, data/sequence flows, schemas, ADR index |
+| **Conception** | Design notes: services, modules, storage, config surfaces |
+| **Installation** | Host prereqs, `make setup`, models, TLS/proxy tips |
+| **Dev Container** | VS Code / Codespaces layout and first commands |
+| **Deployment** | Profiles (Compose, k8s, secure); ingest, audit, governor, SPIRE, macOS |
+| **Evaluation** | BEIR datasets (SciFact, FiQA, ArguAna), how to run, scored report |
+| **Tools** | CLIs and APIs: pipeline taggers, Vespa RAG, MCP, agents, templates, HMI, corpus |
+| **Regularity component** | Identity of Action (ActionRecords) and Mastering of Action (governor) |
+| **Compliance** | EU AI Act, CRA, NIS2, DORA, GDPR, PLD; OPA audit and evidence pipeline |
+| **Quality** | Code-quality dashboard (complexity, licenses) |
+| **Runbooks** | Kill switch, agent runaway, injection, rollback, DSR/forget, incidents |
+| **ADR** | Architecture decision records (platform, ingest, audit, agents, SPIFFE, …) |
+| **Security** | Threat model and hardening notes |
+| **Operation and Management** | Day-2 ops (health, metrics, admin) |
+| **About** | Copyright and contact |
+
+Published HTML (when available): [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io/t-keir). Prefer **`make docs`** for the tree that matches this checkout.
 
 ## Directory structure
 
-* **app/bin**           : scripts and tools for server execution
-* **configs**           : bundled service configuration files
-* **docs**              : buildable documentation
-* **resources**         : lexical resources and rule files for taggers
-* **thot**              : tkeir source code
-* **thot/tools**        : CLI tools (pipeline, Vespa search/RAG, annotation resources)
-
-
-## Installation Prerequists
-
-T-KEIR is a python software; **Python >= 3.10** (3.11 recommended) and **uv** are necessary for an installation from gitlab/github.
-Otherwise and from Thales environnement only, you can install by using pip command. The last way is to use docker
-
-Installation options:
-
-1. **uv / wheel** (recommended OSS path) — `make setup` or `uv build` + `pip install`
-2. **Dev container** — reopen in `.devcontainer/` then `make setup`
-3. **Docker / workspace install** — `make install-workspace` (see root `Makefile`)
-
-To run the documentation go to the repository root and run:
-
-```shell  title="Run the documentation server with mkdocs"
-make docs
-# or: cd tkeir && uv run mkdocs serve
-```
+| Path | Role |
+|------|------|
+| `app/bin` | Scripts for model init / server helpers |
+| `configs` | Bundled service and pipeline YAML |
+| `../docs` | MkDocs documentation (repository root) |
+| `resources` | Lexical resources and tagger rules |
+| `thot` | Python package (core NLP + tools) |
+| `thot/tools` | CLIs: pipeline, Vespa search/RAG, annotation |
 
 ## Installation
 
-After git repository cloning.
-```shell  title="Build a python wheel package:"
-#> uv build
-```
+**Python ≥ 3.10** (3.11 recommended) and [uv](https://docs.astral.sh/uv/getting-started/installation/).
+Git is required to clone the repository.
 
-A wheel file will be created in "dist" directory. Then you can simply run a pip install on the created wheel.
-Note that is highly recommanded to run wheel installation in a python virtual environment.
-
-### Install from Wheel
-
-You can directly install T-Keir from weel:
-
-Go in "dist" folder (created by uv)
-
-```shell  title="Create a python virtual environement:"
-#>  python3 -m venv <YOUR_ENV>`
-```
-
-```shell  title="Activate you environement:"
-#> source <YOUR_ENV>/bin/activate
-```
-
-```shell  title="Install the Wheel:"
-#> pip install <FILE_NAME>.whl
-```
-
-If there is a problem with **pycurl** install libcurl4-openssl-dev and libssl
-
-```shell  title="E.G under debian/ubuntu:"
-#> sudo apt install libcurl4-openssl-dev libssl-dev
-```
-
-### Configure the services
-
-Bundled service configuration files live in **configs/**. Edit them directly or copy them to your workspace.
-
-### Initialize/Load the models
-
-Go into directory **app/bin** and run:
-
-```shell
-#> ./init-models.sh <PATH TO TKEIR>/tkeir/configs <MODEL PATH>
-```
-
-Note, that the environment variable TRANSFORMERS_CACHE **HAVE TO BE** always set to model path before run a T-Keir service using models.
-
-
-
-## Copy or create data
-
-T-Keir comes with default configuration file.
-Nevertheless you can modify or add file. Most of them are configuration (see configuration section).
-
-### Resources
-
-The resources are stored in **RESOURCES_DIRECTORY/modeling/tokenizer/\[en|fr...\]**. This directory contains file with list or csv tables.
-The descriptions of these file are in **resources/modeling/tokenizer/en/annotation-resources.json**
-
-
-# Quick start
-
-This section describes the steps to run the T-KEIR document analysis pipeline.
-
-## Run the installation part
-
-Go in installation section and run it.
-
-### Prepare T-KEIR and demo
-
-Run setup, then the bundled quickstart on test fixtures:
+From the **repository root** (recommended):
 
 ```shell
 make setup
-make quickstart
 ```
 
-This runs the pipeline on `tkeir/tests/fixtures/test-raw/` and all `converter_test*` files. Output goes to `output/quickstart/`.
+Other options:
 
-### Analyse your documents
+1. **uv / wheel** — `uv build` then `pip install dist/*.whl` in a venv
+2. **Dev container** — reopen `.devcontainer/`, then `make setup`
+3. **Docker / workspace** — `make install-workspace` (root `Makefile`)
 
-Run the unified pipeline on your documents. Use **`-t auto`** for PDFs and Office
-files; use **`-t raw`** for plain text only.
+If **pycurl** fails to build on Debian/Ubuntu:
 
 ```shell
-tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT FILE OR DIR> -o <OUTPUT DIR> -t auto
+sudo apt install libcurl4-openssl-dev libssl-dev
 ```
 
-The pipeline runs in order: converter → language detection → resource selection → tokenizer → morphosyntax → NER → syntax → keywords. Each step enriches the output JSON document.
+### Configure and models
 
-`make pipeline` installs spaCy models automatically. MWE handling is disabled by
-default; run `make init-models` and pass `--use-mwe` only when you need
-compound-word detection.
+Edit configs under **`configs/`**. Load models with:
 
-### Vespa indexing and RAG
+```shell
+./app/bin/init-models.sh <PATH TO TKEIR>/tkeir/configs <MODEL PATH>
+```
 
-Pipeline outputs (`*.pipeline.json`) can be indexed into Vespa for hybrid retrieval:
+Set `TRANSFORMERS_CACHE` to that model path before running model-backed tools.
+`make pipeline` / `make setup` also pull spaCy models as needed.
+
+### Resources
+
+Tokenizer resources live under
+`resources/modeling/tokenizer/[en|fr|…]`. See
+`resources/modeling/tokenizer/en/annotation-resources.json` for file roles.
+
+## Quick start
 
 ```shell
 # From repository root
-make bootstrap    # start Vespa + deploy schemas
-make index-fixtures   # build tkeir/tests/indexing/output from PDF fixtures
-make index        # index *.pipeline.json (default: tkeir/tests/indexing/output)
-make rag          # FastAPI RAG on :8090
+make setup
+make quickstart          # NLP pipeline on fixtures → output/quickstart/
 ```
 
-Python modules live under `thot/tools/search/`; the root `Makefile` invokes them via `python -m thot.tools.search.*`.
+Analyse your own documents (`-t auto` for PDF/Office; `-t raw` for plain text):
+
+```shell
+tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT> -o <OUTPUT DIR> -t auto
+```
+
+Pipeline order: converter → language → resources → tokenizer → morphosyntax →
+NER → syntax → keywords. MWE compounds are off by default; use `make init-models`
+and `--use-mwe` when needed.
+
+### Vespa indexing and RAG
+
+```shell
+make bootstrap           # Vespa + schemas
+make index-fixtures      # optional fixture index set
+make index               # index *.pipeline.json
+make rag                 # FastAPI RAG on :8090
+```
 
 ### Tool layout (`thot/tools/`)
 
 | Module | Purpose |
-|---|---|
-| `pipeline.py` | Document analysis pipeline (`tkeir-pipeline`) |
-| `search/` | Vespa indexing, init, RAG API |
-| `annotation/` | MWE trie compilation (`tkeir-create-annotation-resource`) |
+|--------|---------|
+| `pipeline.py` | Document analysis (`tkeir-pipeline`) |
+| `search/` | Vespa indexing, RAG API, BEIR eval |
+| `annotation/` | MWE trie compilation |
+
+For the full journey (RAG, HMI, agents, Compose, secure k8s), open the docs
+(`make docs`) and follow **Zero to Hero**.

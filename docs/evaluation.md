@@ -94,7 +94,7 @@ BEIR leaderboard numbers (BM25 / SPLADE / Contriever).
 
 Every run **always** writes the Markdown report to:
 
-`tkeir/docs/evaluation_report.md`
+`docs/evaluation_report.md`
 
 That file is part of this documentation site (see
 [BEIR evaluation report](evaluation_report.md)). Override with `--report` /

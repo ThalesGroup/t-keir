@@ -152,15 +152,17 @@ def docs_dir() -> str:
     """Return the MkDocs documentation directory.
 
     Returns:
-        Absolute path to ``tkeir/docs``.
+        Absolute path to ``docs/`` at the repository root.
 
     Example:
         >>> import os
-        >>> from thot.core.TkeirPaths import docs_dir
+        >>> from thot.core.TkeirPaths import docs_dir, repo_root
         >>> os.path.isdir(docs_dir())
         True
+        >>> docs_dir() == os.path.join(repo_root(), "docs")
+        True
     """
-    return os.path.join(package_root(), "docs")
+    return os.path.join(repo_root(), "docs")
 
 
 def evaluation_report_path() -> str:

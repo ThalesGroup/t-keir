@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Title: Build T-KEIR MkDocs documentation as a single PDF.
 
-Reads ``tkeir/mkdocs.yml`` navigation order, converts Markdown pages to HTML,
+Reads ``mkdocs.yml`` navigation order, converts Markdown pages to HTML,
 then renders a PDF with PyMuPDF (already a project dependency).
 
 Usage (from repo root)::
@@ -12,8 +12,8 @@ Usage (from repo root)::
 
 Environment:
     DOCS_PDF_OUTPUT  Output path (default: output/docs/tkeir-docs.pdf)
-    DOCS_DIR         MkDocs docs_dir (default: tkeir/docs)
-    MKDOCS_YML       MkDocs config (default: tkeir/mkdocs.yml)
+    DOCS_DIR         MkDocs docs_dir (default: docs)
+    MKDOCS_YML       MkDocs config (default: mkdocs.yml)
 
 Author: Eric Blaudez
 
@@ -50,8 +50,8 @@ except ImportError:  # pragma: no cover
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MKDOCS = REPO_ROOT / "tkeir" / "mkdocs.yml"
-DEFAULT_DOCS = REPO_ROOT / "tkeir" / "docs"
+DEFAULT_MKDOCS = REPO_ROOT / "mkdocs.yml"
+DEFAULT_DOCS = REPO_ROOT / "docs"
 DEFAULT_OUTPUT = REPO_ROOT / "output" / "docs" / "tkeir-docs.pdf"
 
 CSS = """

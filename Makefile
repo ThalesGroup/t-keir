@@ -427,7 +427,7 @@ pip-licenses: ci-deps ## generate dependency licence inventory → reports/quali
 
 license-report: pip-licenses ## alias for pip-licenses
 
-quality-docs: complexity-report pip-licenses ## regenerate tkeir/docs/quality/index.md
+quality-docs: complexity-report pip-licenses ## regenerate docs/quality/index.md
 	$(Q)mkdir -p "$(QUALITY_REPORT_DIR)"
 	$(Q)if [ ! -f "$(QUALITY_REPORT_DIR)/coverage_summary.txt" ] \
 		&& [ -f "$(COVERAGE_REPORT_DIR)/coverage.xml" ]; then \
@@ -580,15 +580,15 @@ docs: ci-deps ## MkDocs dev server (override DOCS_PORT; default 8000)
 		echo "  Stop:  kill \$$(lsof -tiTCP:$(DOCS_PORT) -sTCP:LISTEN)"; \
 		exit 1; \
 	fi
-	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+	cd $(ROOT) && $(UV) run --project $(TKEIR_DIR) --python $(PYTHON) \
 		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger-plugin \
-		mkdocs serve -a 127.0.0.1:$(DOCS_PORT)
+		mkdocs serve -f "$(ROOT)/mkdocs.yml" -a 127.0.0.1:$(DOCS_PORT)
 
-docs-build: ci-deps quality-docs ## Build static MkDocs site under tkeir/site/
-	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+docs-build: ci-deps quality-docs ## Build static MkDocs site under site/
+	cd $(ROOT) && $(UV) run --project $(TKEIR_DIR) --python $(PYTHON) \
 		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger-plugin \
-		mkdocs build
-	$(Q)echo "Built static site: $(TKEIR_DIR)/site/index.html"
+		mkdocs build -f "$(ROOT)/mkdocs.yml"
+	$(Q)echo "Built static site: $(ROOT)/site/index.html"
 
 docs-pdf: ci-deps ## Generate documentation PDF (output/docs/tkeir-docs.pdf)
 	DOCS_PDF_OUTPUT="$(DOCS_PDF_OUTPUT)" \
@@ -649,7 +649,7 @@ clean: ## Remove build artifacts, caches, and reports
 	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache htmlcov .cache reports
 	rm -rf "$(COVERAGE_REPORT_DIR)"
 	rm -f $(TESTS_DIR)/.coverage $(TESTS_DIR)/.coverage_* $(TESTS_DIR)/testsuite.log
-	rm -rf $(TKEIR_DIR)/site
+	rm -rf $(TKEIR_DIR)/site $(ROOT)/site
 	find $(TKEIR_DIR) -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 
 # ---------------------------------------------------------------------------

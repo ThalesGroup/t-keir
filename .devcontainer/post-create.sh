@@ -22,7 +22,7 @@ make install
 echo ""
 echo "Devcontainer ready — you are in /workspace"
 echo "  How to enter next time: Cursor/VS Code → Command Palette → Dev Containers: Reopen in Container"
-echo "  Docs: tkeir/docs/devcontainer.md  |  .devcontainer/README.md"
+echo "  Docs: docs/devcontainer.md  |  .devcontainer/README.md"
 echo ""
 echo "  make setup       — spaCy models, Tesseract, optional MWE pickle"
 echo "  make ci          — lint, tests, coverage, security scans"

@@ -91,7 +91,7 @@ make rag-query            # curl sample RAG request
 make clean-db             # wipe Vespa data volume (then run make bootstrap)
 make vespa-clean          # stop/remove container (keeps volume)
 make logs                 # tail Vespa Docker logs
-make beir-eval            # BEIR BM25 + dense eval → tkeir/docs/evaluation_report.md
+make beir-eval            # BEIR BM25 + dense eval → docs/evaluation_report.md
 ```
 
 ## BEIR evaluation
@@ -126,7 +126,7 @@ Downloads SciFact / FiQA / ArguAna into `./datasets/` (if missing), then:
    **No answer generation** (`RetrievalEmbeddingClient` rejects `generate`)
 2. **Local BM25** / **Local dense** — in-process baselines for contrast
 3. Metrics NDCG@10 / MAP@100 / Recall@100 + **gap to best published** system
-4. Always writes `tkeir/docs/evaluation_report.md` (MkDocs) with leaderboard comparison
+4. Always writes `docs/evaluation_report.md` (MkDocs) with leaderboard comparison
 
 Requires a working embedding provider
 (`PROVIDER` / `EMBEDDING_MODEL` / `OLLAMA_BASE_URL`) and spaCy models.
@@ -149,7 +149,7 @@ make clean-db && make bootstrap
 
 If `uv sync` or BEIR downloads fail with TLS / certificate errors behind a
 corporate proxy, see
-[Troubleshooting — enterprise certificates](../tkeir/docs/devcontainer.md#troubleshooting)
+[Troubleshooting — enterprise certificates](../docs/devcontainer.md#troubleshooting)
 (or `source export_certif_macos.source` on macOS).
 
 ## CLI entry points (from tkeir/)

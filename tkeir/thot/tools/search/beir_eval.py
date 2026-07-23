@@ -4,7 +4,7 @@ Downloads SciFact, FiQA, and ArguAna when missing under ``./datasets/``, runs
 lexical (BM25), dense (SentenceTransformer), and the T-KEIR **retrieval**
 stack (NLP index + QueryAnalyzer + Vespa hybrid; **no answer generation**)
 at top-100, computes NDCG@10 / MAP@100 / Recall@100, performs error
-analysis, and always writes ``tkeir/docs/evaluation_report.md`` (MkDocs).
+analysis, and always writes ``docs/evaluation_report.md`` (MkDocs).
 
 Author: Eric Blaudez
 
@@ -1217,7 +1217,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Evaluate T-KEIR pipeline, BM25, and dense retrieval on BEIR "
-            "datasets; always write tkeir/docs/evaluation_report.md"
+            "datasets; always write docs/evaluation_report.md"
         )
     )
     parser.add_argument(

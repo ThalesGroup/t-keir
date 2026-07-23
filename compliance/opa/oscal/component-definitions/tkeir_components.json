@@ -31,7 +31,7 @@
                 "props": [
                   { "name": "implementation-status", "value": "implemented" },
                   { "name": "evidence-artifact", "value": "tkeir/thot/governor/flags.py" },
-                  { "name": "evidence-artifact", "value": "tkeir/docs/runbooks/kill-switch.md" },
+                  { "name": "evidence-artifact", "value": "docs/runbooks/kill-switch.md" },
                   { "name": "test-command", "value": "make governor-kill SCOPE=all ACTIVE=true REASON=test" }
                 ]
               },
@@ -137,11 +137,11 @@
               {
                 "uuid": "91a2b3c4-d5e6-57f6-4e5f-607182930415",
                 "control-id": "ai-act-art-15-1",
-                "description": "Accuracy/robustness via make beir-eval → tkeir/docs/evaluation_report.md.",
+                "description": "Accuracy/robustness via make beir-eval → docs/evaluation_report.md.",
                 "props": [
                   { "name": "implementation-status", "value": "implemented" },
                   { "name": "test-command", "value": "make beir-eval" },
-                  { "name": "evidence-artifact", "value": "tkeir/docs/evaluation_report.md" }
+                  { "name": "evidence-artifact", "value": "docs/evaluation_report.md" }
                 ]
               },
               {

@@ -170,4 +170,4 @@ Agent mastering needs attested workload identity, not only human `user_space`.
 | ontology / kg / vespa | 0006 |
 | provenance / approvals | 0007 |
 
-Checkpoint: each `##` section above maps to one file in `tkeir/docs/adr/000*.md`.
+Checkpoint: each `##` section above maps to one file in `docs/adr/000*.md`.

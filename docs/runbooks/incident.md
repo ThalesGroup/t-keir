@@ -25,7 +25,7 @@ Audit write failure, WORM archiver failure, verify divergence, or security event
 
 ## Restore
 
-- Hot store: rebuild from WORM segments (`tkeir/docs/deployment/audit.md`).
+- Hot store: rebuild from WORM segments (`docs/deployment/audit.md`).
 - Index: `make rollback-index RUN=<id>`.
 
 > Engineering procedure — not legal advice.

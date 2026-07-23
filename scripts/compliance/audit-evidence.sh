@@ -26,7 +26,7 @@ done
 
 # Capture versions.lock + ADRs list
 cp "$ROOT/deploy/versions.lock.yaml" "$OUT/versions.lock.yaml" 2>/dev/null || true
-find "$ROOT/tkeir/docs/adr" -name '*.md' -print > "$OUT/adr-index.txt" 2>/dev/null || true
+find "$ROOT/docs/adr" -name '*.md' -print > "$OUT/adr-index.txt" 2>/dev/null || true
 
 # Sample policy bundle SHA (if Rego present)
 if [ -f "$ROOT/deploy/policies/app/tkeir-intents.rego" ]; then

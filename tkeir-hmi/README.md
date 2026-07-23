@@ -1,6 +1,6 @@
 # T-KEIR HMI
 
-See [tkeir/docs/hmi.md](../tkeir/docs/hmi.md) for full documentation.
+See [docs/hmi.md](../docs/hmi.md) for full documentation.
 
 ```bash
 cd tkeir-hmi
@@ -11,7 +11,7 @@ npm run dev
 Requires the RAG API: `make rag` from the repo root (port 8090).
 
 The dev UI proxies `/api/*` to the RAG server via a Next.js API route (see
-[tkeir/docs/hmi.md](../tkeir/docs/hmi.md)).
+[docs/hmi.md](../docs/hmi.md)).
 
 ## Auth (optional)
 

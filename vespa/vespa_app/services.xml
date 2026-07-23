@@ -13,7 +13,7 @@
 
   <!-- Streaming mode: per-user (group) document spaces.
        Document ids MUST use g=<user_space>:… and queries MUST set
-       streaming.groupname. See tkeir/docs/tools/vespa_rag.md. -->
+       streaming.groupname. See docs/tools/vespa_rag.md. -->
   <content id="content" version="1.0">
     <redundancy>1</redundancy>
     <documents>

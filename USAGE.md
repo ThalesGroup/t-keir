@@ -1,10 +1,10 @@
 # T-KEIR usage (legacy entry point)
 
-> **Prefer:** [Zero to Hero](tkeir/docs/zero_to_hero.md) (dev → prod), or from
+> **Prefer:** [Zero to Hero](docs/zero_to_hero.md) (dev → prod), or from
 > `tkeir/` run `uv run mkdocs serve` and open that page in the nav.
 >
-> Also: [Dev Container](tkeir/docs/devcontainer.md),
-> [NLP](tkeir/docs/ready_to_run.md), [Vespa RAG](tkeir/docs/tools/vespa_rag.md).
+> Also: [Dev Container](docs/devcontainer.md),
+> [NLP](docs/ready_to_run.md), [Vespa RAG](docs/tools/vespa_rag.md).
 
 This file summarizes the current OSS workflow. REST `_svc.py` / `_client.py` services
 were removed; analysis runs through the unified in-process pipeline.
@@ -63,8 +63,8 @@ detection is **disabled** by default (`use-mwe: false` in configs); pass
 
 Vespa uses **streaming mode**. Without Keycloak, index and query use the
 shared group **`dev@tkeir`** (`VESPA_USER_SPACE`). Signed-in users get an
-isolated group from the JWT — see [Vespa RAG](tkeir/docs/tools/vespa_rag.md)
-and [Zero to Hero](tkeir/docs/zero_to_hero.md).
+isolated group from the JWT — see [Vespa RAG](docs/tools/vespa_rag.md)
+and [Zero to Hero](docs/zero_to_hero.md).
 
 ```bash
 # From repository root
@@ -88,17 +88,17 @@ make rag                                    # terminal 1 — FastAPI on :8090
 cd tkeir-hmi && npm install && npm run dev   # terminal 2 — UI on :3000
 ```
 
-See [tkeir/docs/hmi.md](tkeir/docs/hmi.md).
+See [docs/hmi.md](docs/hmi.md).
 
 ## Dev container
 
-See [tkeir/docs/devcontainer.md](tkeir/docs/devcontainer.md).
+See [docs/devcontainer.md](docs/devcontainer.md).
 
 Open the repository root in Cursor or VS Code → Command Palette (`Cmd+Shift+P`) →
 **Dev Containers: Reopen in Container**. Or from the host terminal: `make devcontainer`
-(see [tkeir/docs/devcontainer.md](tkeir/docs/devcontainer.md)).
+(see [docs/devcontainer.md](docs/devcontainer.md)).
 
 ## API documentation
 
 Documented Python examples are tested in `tkeir/tests/unittests/TestToolsDocExamples.py`.
-See [tools/api_reference.md](tkeir/docs/tools/api_reference.md).
+See [tools/api_reference.md](docs/tools/api_reference.md).

@@ -51,7 +51,7 @@ docs-only republish: `make compliance-doc-results`.
 | 4 | `opa eval` of `data.eu.<reg>.summary` for each regulation |
 | 5 | `opa_to_oscal.py` → OSCAL Assessment Results + POA&M under `…/oscal/` |
 | 6 | `report_generator.py` → HTML + JSON (includes OSCAL download links + posture trend) |
-| 7 | `gen_doc_results.py` → full outcomes into `tkeir/docs/compliance/generated/` |
+| 7 | `gen_doc_results.py` → full outcomes into `docs/compliance/generated/` |
 
 Without OPA:
 
@@ -221,17 +221,17 @@ paths (missing → `false`, never `null`):
 | `changelog_present` | `CHANGELOG.md` |
 | `annex_iv_dir_non_empty` | `reports/compliance/annex-iv/` non-empty |
 | `audit_evidence_dir_non_empty` | `reports/evidence/` non-empty |
-| `beir_eval_report_present` | `tkeir/docs/evaluation_report.md` |
+| `beir_eval_report_present` | `docs/evaluation_report.md` |
 | `action_schema_present` | `tkeir/thot/action/schemas/action.v1.json` |
 | `governor_flags_present` | `tkeir/thot/governor/flags.py` |
 | `governor_approvals_present` | `tkeir/thot/governor/approvals.py` |
 | `governor_tokens_present` | `tkeir/thot/governor/tokens.py` |
-| `kill_switch_runbook_present` | `tkeir/docs/runbooks/kill-switch.md` |
+| `kill_switch_runbook_present` | `docs/runbooks/kill-switch.md` |
 | `hmi_admin_page_present` | `tkeir-hmi/app/admin/page.tsx` |
 | `privacy_py_present` | `tkeir/thot/audit/privacy.py` |
 | `ingest_manifest_schema` | `tkeir/thot/ingest/schemas/ingest.manifest.v1.json` |
 | `audit_worm_retention_set` | `AUDIT_WORM_RETENTION_DAYS` in `deploy/compose/.env.example` |
-| `incident_runbook_present` | `tkeir/docs/runbooks/incident.md` |
+| `incident_runbook_present` | `docs/runbooks/incident.md` |
 | `networkpolicy_template` | `deploy/charts/tkeir/templates/networkpolicy.yaml` |
 | `keycloak_realm_present` | `deploy/keycloak/realm-tkeir.json` |
 | `values_secure_present` | `deploy/charts/tkeir/values-secure.yaml` |
@@ -270,7 +270,7 @@ gaps, `UNACCEPTABLE` / Art.5, and `GPAI_SYSTEMIC`.
 
 ## Regenerating article tables in MkDocs
 
-Article tables embedded via snippets under `tkeir/docs/compliance/generated/`
+Article tables embedded via snippets under `docs/compliance/generated/`
 are produced from the Rego catalogues:
 
 ```bash

@@ -166,4 +166,4 @@ CLIs (`tkeir/pyproject.toml` `[project.scripts]`): `tkeir-pipeline`,
 `tkeir-governor`, `tkeir-agent`, `tkeir-mcp`, `tkeir-compose`,
 `tkeir-init-vespa`, `tkeir-beir-eval`, `tkeir-create-annotation-resource`.
 
-Checkpoint: `make docs-build` from the repo root builds `tkeir/site/`.
+Checkpoint: `make docs-build` from the repo root builds `site/`.

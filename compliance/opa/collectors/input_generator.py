@@ -129,7 +129,7 @@ def collect_evidence(root: Path) -> dict[str, bool]:
         # AI Act docs / evidence packs
         "annex_iv_dir_non_empty": _dir_non_empty(root, "reports/compliance/annex-iv"),
         "audit_evidence_dir_non_empty": _dir_non_empty(root, "reports/evidence"),
-        "beir_eval_report_present": _exists(root, "tkeir/docs/evaluation_report.md"),
+        "beir_eval_report_present": _exists(root, "docs/evaluation_report.md"),
         "action_schema_present": _exists(
             root, "tkeir/thot/action/schemas/action.v1.json"
         ),
@@ -138,7 +138,7 @@ def collect_evidence(root: Path) -> dict[str, bool]:
         "governor_approvals_present": _exists(root, "tkeir/thot/governor/approvals.py"),
         "governor_tokens_present": _exists(root, "tkeir/thot/governor/tokens.py"),
         "kill_switch_runbook_present": _exists(
-            root, "tkeir/docs/runbooks/kill-switch.md"
+            root, "docs/runbooks/kill-switch.md"
         ),
         "hmi_admin_page_present": _exists(root, "tkeir-hmi/app/admin/page.tsx")
         or _any_glob(root, "tkeir-hmi/**/admin*"),
@@ -152,7 +152,7 @@ def collect_evidence(root: Path) -> dict[str, bool]:
         ),
         "audit_worm_retention_days": _parse_worm_days(root),
         # NIS2
-        "incident_runbook_present": _exists(root, "tkeir/docs/runbooks/incident.md"),
+        "incident_runbook_present": _exists(root, "docs/runbooks/incident.md"),
         "networkpolicy_template": _exists(
             root, "deploy/charts/tkeir/templates/networkpolicy.yaml"
         ),
@@ -179,7 +179,7 @@ def collect_evidence(root: Path) -> dict[str, bool]:
         "action_records_bind_versions": _exists(
             root, "tkeir/thot/action/schemas/action.v1.json"
         ),
-        "compliance_gdpr_doc": _exists(root, "tkeir/docs/compliance/gdpr.md"),
+        "compliance_gdpr_doc": _exists(root, "docs/compliance/gdpr.md"),
         "values_dev_present": _exists(root, "deploy/charts/tkeir/values-dev.yaml"),
     }
 

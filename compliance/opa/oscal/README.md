@@ -12,4 +12,4 @@ Open Security Controls Assessment Language documents for T-KEIR.
 | `opa_to_oscal.py` | Bridge OPA JSON → Assessment Results + POA&M |
 | `gen_oscal_catalogs.py` | Regenerate catalogs (`make oscal-catalogs`) |
 
-Canonical narrative: `tkeir/docs/compliance/eu-audit.md`.
+Canonical narrative: `docs/compliance/eu-audit.md`.

@@ -3,7 +3,7 @@
 Use this folder to develop T-KEIR inside Docker with Python 3.11, `uv`, Tesseract,
 and access to the host Docker socket (for Vespa).
 
-**Full guide:** [tkeir/docs/devcontainer.md](../tkeir/docs/devcontainer.md)
+**Full guide:** [docs/devcontainer.md](../docs/devcontainer.md)
 
 ## Enter from the terminal (script)
 

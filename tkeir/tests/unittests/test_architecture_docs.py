@@ -1,4 +1,4 @@
-"""Title: Validation tests for architecture documentation under ``tkeir/docs/architecture/``.
+"""Title: Validation tests for architecture documentation under ``docs/architecture/``.
 
 Paths are discovered at test time from ``mkdocs.yml`` (no invented module names).
 
@@ -17,7 +17,7 @@ import sys
 
 import pytest
 
-# Walk up until we find mkdocs.yml (lives in tkeir/)
+# Walk up until we find mkdocs.yml (lives at the repository root)
 _HERE = pathlib.Path(__file__).resolve().parent
 REPO_ROOT = _HERE
 for _parent in [_HERE, *_HERE.parents]:

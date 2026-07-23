@@ -463,7 +463,7 @@ articles = [
   {
     "id": "Art.15(2)", "gate": "high_risk",
     "checks": [
-      {"source": "evidence", "severity": "HIGH", "message": "Performance metrics declared.", "remediation": "Publish tkeir/docs/evaluation_report.md.", "key": "beir_eval_report_present"},
+      {"source": "evidence", "severity": "HIGH", "message": "Performance metrics declared.", "remediation": "Publish docs/evaluation_report.md.", "key": "beir_eval_report_present"},
     ],
   },
   {

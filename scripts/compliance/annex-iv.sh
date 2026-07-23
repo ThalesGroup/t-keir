@@ -31,15 +31,15 @@ EOF
 cat > "$OUT/architecture.md" <<'EOF'
 # System architecture
 
-See `tkeir/docs/adr/0001-platform-architecture.md` and deployment profiles
-(`tkeir/docs/deployment/index.md`).
+See `docs/adr/0001-platform-architecture.md` and deployment profiles
+(`docs/deployment/index.md`).
 
 Primary data path: ingest → NLP pipeline → Vespa two-level index → RAG API → HMI.
 Control plane: Keycloak (IAM), governor (runtime), audit (ActionRecords + WORM).
 EOF
 
-if [ -f "$ROOT/tkeir/docs/evaluation_report.md" ]; then
-  cp "$ROOT/tkeir/docs/evaluation_report.md" "$OUT/evaluation_report.md"
+if [ -f "$ROOT/docs/evaluation_report.md" ]; then
+  cp "$ROOT/docs/evaluation_report.md" "$OUT/evaluation_report.md"
 else
   printf '%s\n' "# Evaluation report" "" "Run \`make beir-eval\` to generate." "" > "$OUT/evaluation_report.md"
 fi

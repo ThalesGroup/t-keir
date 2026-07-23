@@ -2,7 +2,7 @@
 """Title: Publish the latest EU compliance audit report into MkDocs docs.
 
 Reads ``reports/compliance/eu-audit/<version>/report.json`` (or ``--report``)
-and writes Markdown under ``tkeir/docs/compliance/generated/`` so ``make docs``
+and writes Markdown under ``docs/compliance/generated/`` so ``make docs``
 / ``make ci`` can show the full OPA results (summary + every article outcome).
 
 Also builds GDPR/CRA **reviewer checklists**: auto-satisfied controls are
@@ -35,7 +35,7 @@ from catalogue_parse import (  # noqa: E402
 
 EU_AUDIT = ROOT / "reports" / "compliance" / "eu-audit"
 POLICIES = ROOT / "compliance" / "opa" / "policies"
-OUT = ROOT / "tkeir" / "docs" / "compliance" / "generated"
+OUT = ROOT / "docs" / "compliance" / "generated"
 
 REG_ORDER = ("ai_act", "cra", "gdpr", "nis2", "dora", "pld")
 REG_TITLES = {

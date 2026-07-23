@@ -1,7 +1,7 @@
 # SPIRE / SPIFFE (agent workload identity)
 
 Compose and config stubs for SPIRE so `tkeir-agent` can obtain a SPIFFE ID
-per [ADR-0008](../../tkeir/docs/adr/0008-spire-agent-identity.md).
+per [ADR-0008](../../docs/adr/0008-spire-agent-identity.md).
 
 ## Trust domain
 

@@ -265,10 +265,10 @@ modules listed under the scoped include set in `tkeir/pyproject.toml`.
 `reports/quality/radon_cc.json`; refactor functions at grade C or worse.
 
 **New copyleft licence:** check against
-[`compliance/licenses-allowlist.txt`](../../../compliance/licenses-allowlist.txt);
+[`compliance/licenses-allowlist.txt`](../../compliance/licenses-allowlist.txt);
 copyleft licences (GPL, AGPL, EUPL) require legal review before merge.
 Runtime licence policy remains enforced by `make liccheck`
-([`tkeir/liccheck.ini`](../../liccheck.ini)).
+([`tkeir/liccheck.ini`](../../tkeir/liccheck.ini)).
 
 **CI gate:** `make ci` runs `make coverage` (fail-under 90%),
 `make complexity` (average ≤ 7.0 on `thot/`, no grade-D functions), plus

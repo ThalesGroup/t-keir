@@ -6,9 +6,9 @@ security controls are already part of the repository.
 
 For platform controls and engineering details, see:
 
-- [`tkeir/docs/security.md`](tkeir/docs/security.md)
-- [`tkeir/docs/deployment/index.md`](tkeir/docs/deployment/index.md)
-- [`tkeir/docs/compliance/index.md`](tkeir/docs/compliance/index.md)
+- [`docs/security.md`](docs/security.md)
+- [`docs/deployment/index.md`](docs/deployment/index.md)
+- [`docs/compliance/index.md`](docs/compliance/index.md)
 
 ## Supported versions
 
@@ -77,7 +77,7 @@ hardening by default. Notable remaining gaps include:
 - Full-mesh SPIFFE for non-agent services (agents use SPIRE — ADR-0008)
 - full NetworkPolicy allow-listing for every service path
 - deeper rollback automation for index mutations
-- regulation-specific compliance evidence packs under `tkeir/docs/compliance/`
+- regulation-specific compliance evidence packs under `docs/compliance/`
 
 These are tracked as later workstreams rather than treated as default
 requirements for software development.

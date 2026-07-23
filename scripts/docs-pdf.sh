@@ -5,18 +5,17 @@ set -euo pipefail
 
 script_path="$(cd "$(dirname "$0")" && pwd)"
 root_path="$(cd "$script_path/.." && pwd)"
-tkeir_path="$root_path/tkeir"
 
 python_version="${PYTHON_VERSION:-3.11}"
 output_path="${DOCS_PDF_OUTPUT:-$root_path/output/docs/tkeir-docs.pdf}"
-mkdocs_yml="${MKDOCS_YML:-$tkeir_path/mkdocs.yml}"
-docs_dir="${DOCS_DIR:-$tkeir_path/docs}"
+mkdocs_yml="${MKDOCS_YML:-$root_path/mkdocs.yml}"
+docs_dir="${DOCS_DIR:-$root_path/docs}"
 keep_html="${DOCS_PDF_KEEP_HTML:-}"
 
 usage() {
     echo "usage: $(basename "$0") [-h] [-o FILE]"
     echo ""
-    echo "Generate PDF documentation from tkeir/docs (MkDocs navigation order)."
+    echo "Generate PDF documentation from docs (MkDocs navigation order)."
     echo ""
     echo "Options:"
     echo "  -o FILE               Output PDF (default: output/docs/tkeir-docs.pdf)"
@@ -74,11 +73,11 @@ echo "  docs   : $docs_dir"
 echo "  output : $output_path"
 echo ""
 
-cd "$tkeir_path"
+cd "$root_path"
 DOCS_PDF_OUTPUT="$output_path" \
 DOCS_DIR="$docs_dir" \
 MKDOCS_YML="$mkdocs_yml" \
-    uv run --python "$python_version" --with markdown \
+    uv run --project "$root_path/tkeir" --python "$python_version" --with markdown \
     python "$script_path/docs_pdf.py" \
     -o "$output_path" \
     --docs-dir "$docs_dir" \

@@ -145,7 +145,7 @@ def main(args: list[str] | None = None) -> None:
                 "next_steps": [
                     "Attach make audit-evidence output",
                     "Run make audit-verify",
-                    "Follow tkeir/docs/runbooks/incident.md",
+                    "Follow docs/runbooks/incident.md",
                 ],
             }
             print(json.dumps(template, indent=2))

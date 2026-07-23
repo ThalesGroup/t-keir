@@ -15,7 +15,7 @@ Platform packaging for T-KEIR installation profiles P1–P4.
 | `policies/` | Network / app authz / image verify bundles |
 | `spire/` | SPIRE server/agent configs for agent SPIFFE (ADR-0008) |
 
-Canonical docs: [tkeir/docs/deployment/](../tkeir/docs/deployment/index.md).
+Canonical docs: [docs/deployment/](../docs/deployment/index.md).
 
 Image registry:
 

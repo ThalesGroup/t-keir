@@ -23,7 +23,7 @@ if str(SCRIPTS) not in sys.path:
 from catalogue_parse import OWNER_LABEL, owner_for_checks, parse_rego_articles
 
 POL = ROOT / "compliance" / "opa" / "policies"
-OUT = ROOT / "tkeir" / "docs" / "compliance" / "generated"
+OUT = ROOT / "docs" / "compliance" / "generated"
 
 GATE_LABELS = {
     "high_risk": "HIGH_RISK only",

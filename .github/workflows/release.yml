@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python / uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@v7
 
       - name: Set up Node
         uses: actions/setup-node@v4

@@ -200,7 +200,7 @@ setup, pipeline, tests, docs, Vespa, indexing, and RAG.
 | `make quickstart` | Pipeline demo on bundled fixtures → `output/quickstart/` |
 | `make devcontainer` | Start devcontainer and open a shell (`/workspace`) |
 | `make build` | Build Python wheel → `dist/` |
-| `make install-workspace` | Install wheel into `WORKSPACE` via `install.sh` |
+| `make build` | Build wheel → `dist/*.whl` |
 | `make clean` | Remove build artifacts, caches, coverage reports |
 
 **Pipeline variables** (override on the command line):

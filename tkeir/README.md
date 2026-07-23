@@ -75,7 +75,7 @@ Other options:
 
 1. **uv / wheel** — `uv build` then `pip install dist/*.whl` in a venv
 2. **Dev container** — reopen `.devcontainer/`, then `make setup`
-3. **Docker / workspace** — `make install-workspace` (root `Makefile`)
+3. **Compose** — `make images` + `make compose-up` (see deployment docs)
 
 If **pycurl** fails to build on Debian/Ubuntu:
 

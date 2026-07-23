@@ -74,7 +74,7 @@ Or in Cursor / VS Code: **Dev Containers: Reopen in Container**, then `make setu
 
 Full details: [Dev Container](devcontainer.md).
 
-### Option C — Wheel / workspace install (packaging or deployment)
+### Option C — Wheel install (packaging)
 
 Build an installable wheel (rebuilds only when sources change):
 
@@ -83,13 +83,7 @@ make build
 # → dist/*.whl  (stamp: dist/.build_timestamp)
 ```
 
-Install into a dedicated workspace directory:
-
-```bash
-make install-workspace WORKSPACE=$HOME/tkeir-workspace
-```
-
-Or manually:
+Install into a venv:
 
 ```bash
 uv build --directory tkeir
@@ -97,6 +91,9 @@ python3 -m venv $HOME/tkeirenv
 source $HOME/tkeirenv/bin/activate
 pip install dist/tkeir-*.whl
 ```
+
+Prefer **Option A** (`make setup`) for development. Models: `make init-models`
+(or `tkeir/app/bin/init-models.sh`).
 
 ## 3. Configuration and resources
 

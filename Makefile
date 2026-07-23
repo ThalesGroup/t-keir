@@ -22,7 +22,7 @@ endif
 	lint format typecheck liccheck complexity complexity-report pip-licenses license-report quality-docs pip-audit \
 	deps-check deps-update deps-update-safe verify-lockfile tag changelog \
 	bom sbom aibom trivy owasp-dependency-check security-report \
-	docs docs-build docs-pdf pipeline quickstart install-workspace ci-deps ci pre-commit clean devcontainer \
+	docs docs-build docs-pdf pipeline quickstart ci-deps ci pre-commit clean devcontainer \
 	sync pull-models start init bootstrap vespa-check test-vespa test-vespa-py \
 	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test beir-eval clean-db vespa-clean logs \
 	images images-push images-sign \
@@ -609,10 +609,6 @@ quickstart: ci-deps init-models ## Pipeline-only demo on tests/fixtures/test-raw
 		QUICKSTART_OUTPUT="$(QUICKSTART_OUTPUT)" \
 		TRANSFORMERS_CACHE="$(TRANSFORMERS_CACHE)" \
 		bash "$(SCRIPTS_DIR)/quickstart.sh"
-
-install-workspace: check-uv ## Install wheel into WORKSPACE via install.sh
-	$(Q)test -n "$(WORKSPACE)" || { echo "WORKSPACE is required"; exit 1; }
-	bash "$(ROOT)/install.sh" "$(WORKSPACE)"
 
 devcontainer: check-docker ## Enter the project devcontainer
 	bash "$(ROOT)/.devcontainer/enter-devcontainer.sh"

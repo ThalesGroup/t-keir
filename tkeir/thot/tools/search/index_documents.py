@@ -176,6 +176,44 @@ async def _upsert_chunk_fields(
     return True
 
 
+def _collect_indexable_chunks(
+    document: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[str], list[list[str]]]:
+    """Collect chunks with ids/text and their synthetic question groups."""
+    ready_chunks: list[dict[str, Any]] = []
+    index_texts: list[str] = []
+    question_groups: list[list[str]] = []
+    for chunk in document.get("golden_chunks") or []:
+        chunk_id = chunk.get("chunk_id")
+        index_text = chunk_embedding_text(chunk)
+        if not chunk_id or not index_text:
+            continue
+        ready_chunks.append(chunk)
+        index_texts.append(index_text)
+        question_texts = [
+            (item.get("question_text") or "").strip()
+            for item in chunk.get("synthetic_questions") or []
+        ]
+        question_groups.append([text for text in question_texts if text])
+    return ready_chunks, index_texts, question_groups
+
+
+def _split_question_embeddings(
+    flat_question_embeddings: list[list[float]],
+    question_groups: list[list[str]],
+) -> list[list[list[float]]]:
+    """Partition flat question embeddings into per-chunk groups."""
+    question_embeddings_by_chunk: list[list[list[float]]] = []
+    cursor = 0
+    for group in question_groups:
+        n = len(group)
+        question_embeddings_by_chunk.append(
+            flat_question_embeddings[cursor : cursor + n]
+        )
+        cursor += n
+    return question_embeddings_by_chunk
+
+
 async def index_pipeline_document(
     document: dict[str, Any],
     *,
@@ -222,22 +260,9 @@ async def index_pipeline_document(
     )
     parent_ref = document_vespa_id(source_doc_id, user_space=space)
 
-    ready_chunks: list[dict[str, Any]] = []
-    index_texts: list[str] = []
-    question_groups: list[list[str]] = []
-    for chunk in document.get("golden_chunks") or []:
-        chunk_id = chunk.get("chunk_id")
-        index_text = chunk_embedding_text(chunk)
-        if not chunk_id or not index_text:
-            continue
-        ready_chunks.append(chunk)
-        index_texts.append(index_text)
-        question_texts = [
-            (item.get("question_text") or "").strip()
-            for item in chunk.get("synthetic_questions") or []
-        ]
-        question_groups.append([text for text in question_texts if text])
-
+    ready_chunks, index_texts, question_groups = _collect_indexable_chunks(
+        document
+    )
     if not ready_chunks:
         return 1, 0
 
@@ -245,14 +270,9 @@ async def index_pipeline_document(
 
     flat_questions = [text for group in question_groups for text in group]
     flat_question_embeddings = await _embed_batch_locked(llm, flat_questions)
-    question_embeddings_by_chunk: list[list[list[float]]] = []
-    cursor = 0
-    for group in question_groups:
-        n = len(group)
-        question_embeddings_by_chunk.append(
-            flat_question_embeddings[cursor : cursor + n]
-        )
-        cursor += n
+    question_embeddings_by_chunk = _split_question_embeddings(
+        flat_question_embeddings, question_groups
+    )
 
     workers = max(
         1,

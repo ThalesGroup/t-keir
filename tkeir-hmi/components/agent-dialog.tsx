@@ -108,7 +108,6 @@ export function AgentDialog({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (initialGoal.trim() && !draft.trim()) {
@@ -119,14 +118,6 @@ export function AgentDialog({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, busy]);
-
-  useEffect(() => {
-    return () => {
-      if (pollRef.current != null) {
-        window.clearInterval(pollRef.current);
-      }
-    };
-  }, []);
 
   const pollUntilDone = useCallback(async (runId: string): Promise<RunPayload> => {
     const maxAttempts = 120;
@@ -252,7 +243,7 @@ export function AgentDialog({
         </Button>
       </div>
 
-      <div className="flex max-h-72 flex-col gap-2 overflow-y-auto rounded-md border bg-muted/20 p-3">
+      <div className="flex max-h-[min(28rem,60vh)] flex-col gap-2 overflow-y-auto rounded-md border bg-muted/20 p-3">
         {messages.length === 0 ? (
           <p className="text-xs text-muted-foreground">
             No messages yet. Try a goal like the last search query.

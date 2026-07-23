@@ -3,8 +3,8 @@
 > **Prefer:** [Zero to Hero](tkeir/docs/zero_to_hero.md) (dev → prod), or from
 > `tkeir/` run `uv run mkdocs serve` and open that page in the nav.
 >
-> Also: [Dev Container](devcontainer.md), [Quickstart](ready_to_run.md),
-> [Vespa RAG](tools/vespa_rag.md).
+> Also: [Dev Container](tkeir/docs/devcontainer.md),
+> [NLP](tkeir/docs/ready_to_run.md), [Vespa RAG](tkeir/docs/tools/vespa_rag.md).
 
 This file summarizes the current OSS workflow. REST `_svc.py` / `_client.py` services
 were removed; analysis runs through the unified in-process pipeline.

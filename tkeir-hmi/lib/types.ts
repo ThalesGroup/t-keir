@@ -103,6 +103,34 @@ export interface QueryResponse {
   vespa_hits: number;
 }
 
+/** Retrieval-only `/search` (no LLM answer). */
+export interface SearchChunkHit {
+  chunk_id: string;
+  text_raw: string;
+  parent_doc_id: string;
+  score: number;
+  title?: string;
+}
+
+export interface SearchDocumentHit {
+  document_id: string;
+  score: number;
+  chunk_ids: string[];
+  title?: string;
+  hit_count: number;
+}
+
+export interface SearchResponse {
+  query: string;
+  chunks: SearchChunkHit[];
+  documents: SearchDocumentHit[];
+  vespa_hits: number;
+  ranking_profile?: string | null;
+  ontology?: FusedOntology | null;
+}
+
+export type WorkspaceMode = "search" | "rag" | "agent";
+
 export interface DocumentGroup {
   parentDocId: string;
   displayName: string;

@@ -17,7 +17,7 @@ you know you succeeded before moving on.
 | [9](#9-day-2-operations) | — | Kill switch, DSR, evidence | ongoing |
 
 Deep dives stay in sibling pages ([Installation](installation.md),
-[Quickstart](ready_to_run.md), [Deployment](deployment/index.md)). This guide
+[NLP](ready_to_run.md), [Deployment](deployment/index.md)). This guide
 is the narrative glue.
 
 ---
@@ -139,7 +139,7 @@ make pipeline \
 - Use `-t auto` / `PIPELINE_TYPE=auto` for PDF and Office.
 - Use `raw` only for plain text.
 
-More detail: [Quickstart](ready_to_run.md).
+More detail: [NLP](ready_to_run.md).
 
 **Checkpoint:** Your output directory contains `*.json` with `content_tokens` /
 NER fields.

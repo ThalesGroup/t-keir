@@ -26,7 +26,7 @@ endif
 	sync pull-models start init bootstrap vespa-check test-vespa test-vespa-py \
 	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test beir-eval clean-db vespa-clean logs \
 	images images-push images-sign \
-	compose-up compose-down compose-logs compose-smoke audit-report audit-verify audit-archive \
+	compose-up compose-down compose-bootstrap compose-logs compose-smoke audit-report audit-verify audit-archive \
 	governor-flags governor-kill rollback-index check-secrets-staged \
 	hmi-install hmi-lint hmi-typecheck hmi-build \
 	k3d-up k3d-down helm-deps helm-lint helm-template cluster-install cluster-plan cluster-uninstall \
@@ -712,6 +712,12 @@ compose-up: check-docker ## Start Compose profiles (PROFILES=core,auth); build l
 			$$PROFILE_ARGS up -d --remove-orphans
 	$(Q)echo "Compose up (PROFILES=$(COMPOSE_PROFILES) IMAGE_REGISTRY=$(IMAGE_REGISTRY)). HMI http://localhost:3000"
 	$(Q)echo "Local images: make images   |   Publish: make images-push IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir"
+	$(Q)echo "If tkeir-api is unhealthy (Vespa app missing): make compose-bootstrap"
+
+compose-bootstrap: check-docker ## Deploy Vespa schemas into Compose tkeir-vespa (skip host container start)
+	$(Q)echo "Deploying schemas into container tkeir-vespa…"
+	cd $(VESPA_DIR) && VESPA_NAME=tkeir-vespa bash ./init_schema.sh
+	$(Q)echo "Done. Restart API if needed: docker restart tkeir-api"
 
 compose-down: check-docker ## Stop Compose stack (VOLUMES=1 also removes volumes)
 	$(Q)ENV_FILE="$(COMPOSE_DIR)/.env"; \

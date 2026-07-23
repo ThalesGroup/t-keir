@@ -10,6 +10,7 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
+import logging
 from typing import Callable
 
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -50,6 +51,8 @@ from thot.governor.budgets import BudgetStore
 from thot.governor.config import governor_settings
 from thot.governor.flags import RuntimeFlagsStore
 from thot.governor.policy import PolicyEvaluator
+
+LOGGER = logging.getLogger(__name__)
 
 _SKIP_ENFORCE_PATHS = _SKIP_RECORD_PATHS | {
     "/docs",
@@ -119,25 +122,45 @@ class GovernorEnforceMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self._sink = sink if sink is not None else default_action_sink()
         self._service = service or _service_name()
-        if evaluator is not None:
-            self._evaluator = evaluator
-        else:
-            settings = governor_settings()
+        self._evaluator = evaluator
+        self._evaluator_error: str | None = None
+
+    def _get_evaluator(self) -> PolicyEvaluator:
+        if self._evaluator is not None:
+            return self._evaluator
+        settings = governor_settings()
+        try:
             flags = RuntimeFlagsStore(settings.flags_path)
             budgets = BudgetStore(settings.budget_db_path, settings)
             approvals = ApprovalQueue(settings.approvals_path)
-            self._evaluator = PolicyEvaluator(
-                settings, flags, budgets, approvals
-            )
+        except OSError as exc:
+            # Named volumes can be root-owned until volume-init / chown runs.
+            self._evaluator_error = str(exc)
+            raise RuntimeError(
+                f"governor state not writable at {settings.flags_path}: {exc}"
+            ) from exc
+        self._evaluator = PolicyEvaluator(
+            settings, flags, budgets, approvals
+        )
+        return self._evaluator
 
     async def dispatch(
         self, request: Request, call_next: Callable
     ) -> Response:
-        if self._evaluator.mode == "off":
-            return await call_next(request)
-
         path = request.url.path
         if path in _SKIP_ENFORCE_PATHS:
+            return await call_next(request)
+
+        try:
+            evaluator = self._get_evaluator()
+        except RuntimeError as exc:
+            LOGGER.error("Governor middleware unavailable: %s", exc)
+            return Response(
+                content='{"detail":"governor state unavailable"}',
+                status_code=503,
+                media_type="application/json",
+            )
+        if evaluator.mode == "off":
             return await call_next(request)
 
         ctx = correlation_from_headers(
@@ -147,7 +170,7 @@ class GovernorEnforceMiddleware(BaseHTTPMiddleware):
         token = set_trace_context(ctx)
         started = utc_now_rfc3339()
 
-        policy = self._evaluator.evaluate_http(
+        policy = evaluator.evaluate_http(
             method=request.method,
             path=path,
             authorization=request.headers.get("authorization"),
@@ -155,13 +178,13 @@ class GovernorEnforceMiddleware(BaseHTTPMiddleware):
         )
         request.state.governor_decision = policy
 
-        if self._evaluator.mode == "enforce" and policy.result in {
+        if evaluator.mode == "enforce" and policy.result in {
             "deny",
             "escalate",
         }:
             ended = utc_now_rfc3339()
             if policy.result == "escalate":
-                self._evaluator.approvals.enqueue(
+                evaluator.approvals.enqueue(
                     correlation_id=ctx.correlation_id,
                     actor_id=policy.actor_id,
                     intent=policy.intent,
@@ -199,11 +222,11 @@ class GovernorEnforceMiddleware(BaseHTTPMiddleware):
             reset_trace_context(token)
 
         if (
-            self._evaluator.mode in {"observe", "enforce"}
+            evaluator.mode in {"observe", "enforce"}
             and policy.result == "allow"
             and response.status_code < 400
         ):
-            self._evaluator.consume_for_intent(policy)
+            evaluator.consume_for_intent(policy)
 
         if policy.budget and policy.budget.throttled:
             response.headers["X-Budget-Throttled"] = policy.budget.unit

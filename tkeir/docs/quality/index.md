@@ -1,6 +1,6 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-07-21 19:30 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-07-22 17:30 UTC**.
 
 Baseline before the B-grade refactoring pass (``thot/`` only): average was
 already within band after hotspots were reduced; gate target remains
@@ -15,18 +15,18 @@ Scoped line coverage from `make coverage` / `CoverageFast.sh` (same
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Scoped line coverage | 91.52% | ≥ 90% | PASS |
-| Full ``thot/`` XML line-rate | 72.33% | informational | — |
-| Statements (scoped) | 5144 | — | — |
-| Covered lines | 4708 | — | — |
-| Missing lines | 436 | — | — |
+| Scoped line coverage | 90.11% | ≥ 90% | PASS |
+| Full ``thot/`` XML line-rate | 71.52% | informational | — |
+| Statements (scoped) | 5471 | — | — |
+| Covered lines | 4930 | — | — |
+| Missing lines | 541 | — | — |
 
 ### Coverage report (TOTAL)
 
 ```
 Name                                                                                                  Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                  5144    436    92%
+TOTAL                                                                                                  5471    541    90%
 ```
 
 Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
@@ -40,10 +40,10 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Average CC | 3.87 | ≤ 7.0 | PASS |
+| Average CC | 3.92 | ≤ 7.0 | PASS |
 | Grade | A | B or better | PASS |
 | Functions at grade D+ | 0 | 0 | PASS |
-| Lowest MI module | thot/tools/search/query_analyzer.py (16.00) | ≥ 20 preferred | — |
+| Lowest MI module | thot/tasks/syntax/SyntacticTagger.py (15.74) | ≥ 20 preferred | — |
 
 ### Risk reference table
 
@@ -59,8 +59,8 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 ### Full report (summary)
 
 ```
-1470 blocks (classes, functions, methods) analyzed.
-Average complexity: A (3.868707482993197)
+1538 blocks (classes, functions, methods) analyzed.
+Average complexity: A (3.9161248374512354)
 
 Full per-function JSON: reports/quality/radon_cc.json
 ```

@@ -19,7 +19,8 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import Any, Literal as TypingLiteral
+from typing import Any
+from typing import Literal as TypingLiteral
 
 from rdflib import OWL, RDF, RDFS, Graph, Literal, URIRef
 
@@ -72,39 +73,14 @@ def _iri_ref(iri: str) -> URIRef:
     return URIRef(str(iri).strip())
 
 
-def results_as_json_ld(
+def _init_result_set_graph(
     operation: str,
     *,
-    results: list[dict[str, str]],
-    class_iri: str | None = None,
-    individual_iri: str | None = None,
-    consistent: bool | None = None,
+    hit_count: int,
     backend: str = "",
     reasoner: str = "",
-) -> str:
-    """Serialize reasoner hits as a compact JSON-LD graph for HMI display.
-
-    Args:
-        operation: Reasoner operation name.
-        results: Tabular hits (``iri``/``label`` or SPARQL bindings).
-        class_iri: Focus class for hierarchy / instance ops.
-        individual_iri: Focus individual for ``types``.
-        consistent: Consistency flag when ``operation=consistency``.
-        backend: Engine identifier recorded on the result set node.
-        reasoner: Reasoner name recorded on the result set node.
-
-    Returns:
-        JSON-LD string (array of nodes).
-
-    Example:
-        >>> payload = results_as_json_ld(
-        ...     "subclasses",
-        ...     results=[{"iri": "http://ex/B", "label": "B"}],
-        ...     class_iri="http://ex/A",
-        ... )
-        >>> '"@id": "http://ex/B"' in payload or '"@id":"http://ex/B"' in payload
-        True
-    """
+) -> tuple[Graph, URIRef]:
+    """Build an empty result-set graph with metadata triples."""
     graph = Graph()
     graph.bind("rdfs", RDFS)
     graph.bind("owl", OWL)
@@ -139,8 +115,161 @@ def results_as_json_ld(
         (
             result_set,
             URIRef(f"{TKEIR_REASON}hitCount"),
-            Literal(len(results)),
+            Literal(hit_count),
         )
+    )
+    return graph, result_set
+
+
+def _add_focus_nodes(
+    graph: Graph,
+    result_set: URIRef,
+    *,
+    class_iri: str | None,
+    individual_iri: str | None,
+) -> tuple[URIRef | None, URIRef | None]:
+    """Attach focus class / individual nodes to the result set."""
+    focus_class = _iri_ref(class_iri) if class_iri else None
+    focus_ind = _iri_ref(individual_iri) if individual_iri else None
+    if focus_class is not None:
+        graph.add((focus_class, RDF.type, OWL.Class))
+        graph.add(
+            (focus_class, RDFS.label, Literal(_local_name(str(focus_class))))
+        )
+        graph.add((result_set, URIRef(f"{TKEIR_REASON}focus"), focus_class))
+    if focus_ind is not None:
+        graph.add((focus_ind, RDF.type, OWL.NamedIndividual))
+        graph.add(
+            (focus_ind, RDFS.label, Literal(_local_name(str(focus_ind))))
+        )
+        graph.add((result_set, URIRef(f"{TKEIR_REASON}focus"), focus_ind))
+    return focus_class, focus_ind
+
+
+def _add_iri_hit(
+    graph: Graph,
+    result_set: URIRef,
+    *,
+    operation: str,
+    iri: str,
+    label: str,
+    focus_class: URIRef | None,
+    focus_ind: URIRef | None,
+) -> None:
+    """Add a typed IRI hit linked to the result set."""
+    node = _iri_ref(iri)
+    if operation in {"subclasses", "superclasses"}:
+        graph.add((node, RDF.type, OWL.Class))
+        if focus_class is not None:
+            if operation == "subclasses":
+                graph.add((node, RDFS.subClassOf, focus_class))
+            else:
+                graph.add((focus_class, RDFS.subClassOf, node))
+    elif operation == "instances" and focus_class is not None:
+        graph.add((node, RDF.type, focus_class))
+        graph.add((node, RDF.type, OWL.NamedIndividual))
+    elif operation == "types" and focus_ind is not None:
+        graph.add((node, RDF.type, OWL.Class))
+        graph.add((focus_ind, RDF.type, node))
+    else:
+        graph.add((node, RDF.type, OWL.Thing))
+    if label:
+        graph.add((node, RDFS.label, Literal(label)))
+    graph.add((result_set, URIRef(f"{TKEIR_REASON}hit"), node))
+
+
+def _add_spo_binding(
+    graph: Graph,
+    result_set: URIRef,
+    *,
+    index: int,
+    subject: str,
+    predicate: str,
+    obj: str,
+) -> None:
+    """Add a compact SPO triple from SPARQL / generic bindings."""
+    s_node = (
+        _iri_ref(subject)
+        if subject.startswith("http")
+        else URIRef(f"{TKEIR_REASON}blank/{index}/s")
+    )
+    if subject.startswith("http"):
+        pass
+    else:
+        graph.add((s_node, RDFS.label, Literal(subject)))
+    p_node = (
+        _iri_ref(predicate)
+        if predicate.startswith("http")
+        else URIRef(f"{TKEIR_REASON}pred/{_local_name(predicate)}")
+    )
+    if obj.startswith("http"):
+        o_node: Any = _iri_ref(obj)
+    else:
+        o_node = Literal(obj)
+    graph.add((s_node, p_node, o_node))
+    graph.add((result_set, URIRef(f"{TKEIR_REASON}hit"), s_node))
+
+
+def _add_binding_row_fallback(
+    graph: Graph,
+    result_set: URIRef,
+    *,
+    index: int,
+    row: dict[str, str],
+) -> None:
+    """Fallback: one blank Binding node per tabular row."""
+    blank = URIRef(f"{TKEIR_REASON}row/{index}")
+    graph.add((blank, RDF.type, URIRef(f"{TKEIR_REASON}Binding")))
+    for key, value in row.items():
+        if value:
+            graph.add(
+                (
+                    blank,
+                    URIRef(f"{TKEIR_REASON}binding/{key}"),
+                    Literal(value),
+                )
+            )
+    graph.add((result_set, URIRef(f"{TKEIR_REASON}hit"), blank))
+
+
+def results_as_json_ld(
+    operation: str,
+    *,
+    results: list[dict[str, str]],
+    class_iri: str | None = None,
+    individual_iri: str | None = None,
+    consistent: bool | None = None,
+    backend: str = "",
+    reasoner: str = "",
+) -> str:
+    """Serialize reasoner hits as a compact JSON-LD graph for HMI display.
+
+    Args:
+        operation: Reasoner operation name.
+        results: Tabular hits (``iri``/``label`` or SPARQL bindings).
+        class_iri: Focus class for hierarchy / instance ops.
+        individual_iri: Focus individual for ``types``.
+        consistent: Consistency flag when ``operation=consistency``.
+        backend: Engine identifier recorded on the result set node.
+        reasoner: Reasoner name recorded on the result set node.
+
+    Returns:
+        JSON-LD string (array of nodes).
+
+    Example:
+        >>> payload = results_as_json_ld(
+        ...     "subclasses",
+        ...     results=[{"iri": "http://ex/B", "label": "B"}],
+        ...     class_iri="http://ex/A",
+        ... )
+        >>> '"@id": "http://ex/B"' in payload or '"@id":"http://ex/B"' in payload
+        True
+    """
+    graph, result_set = _init_result_set_graph(
+        operation,
+        hit_count=len(results),
+        backend=backend,
+        reasoner=reasoner,
     )
 
     if operation == "consistency":
@@ -154,41 +283,25 @@ def results_as_json_ld(
         )
         return serialize_graph_json_ld(graph)
 
-    focus_class = _iri_ref(class_iri) if class_iri else None
-    focus_ind = _iri_ref(individual_iri) if individual_iri else None
-    if focus_class is not None:
-        graph.add((focus_class, RDF.type, OWL.Class))
-        graph.add((focus_class, RDFS.label, Literal(_local_name(str(focus_class)))))
-        graph.add((result_set, URIRef(f"{TKEIR_REASON}focus"), focus_class))
-    if focus_ind is not None:
-        graph.add((focus_ind, RDF.type, OWL.NamedIndividual))
-        graph.add((focus_ind, RDFS.label, Literal(_local_name(str(focus_ind)))))
-        graph.add((result_set, URIRef(f"{TKEIR_REASON}focus"), focus_ind))
+    focus_class, focus_ind = _add_focus_nodes(
+        graph,
+        result_set,
+        class_iri=class_iri,
+        individual_iri=individual_iri,
+    )
 
     for index, row in enumerate(results):
         iri = (row.get("iri") or "").strip()
         label = (row.get("label") or "").strip()
         if iri:
-            node = _iri_ref(iri)
-            if operation in {"subclasses", "superclasses"}:
-                graph.add((node, RDF.type, OWL.Class))
-                if focus_class is not None:
-                    if operation == "subclasses":
-                        graph.add((node, RDFS.subClassOf, focus_class))
-                    else:
-                        graph.add((focus_class, RDFS.subClassOf, node))
-            elif operation == "instances" and focus_class is not None:
-                graph.add((node, RDF.type, focus_class))
-                graph.add((node, RDF.type, OWL.NamedIndividual))
-            elif operation == "types" and focus_ind is not None:
-                graph.add((node, RDF.type, OWL.Class))
-                graph.add((focus_ind, RDF.type, node))
-            else:
-                graph.add((node, RDF.type, OWL.Thing))
-            if label:
-                graph.add((node, RDFS.label, Literal(label)))
-            graph.add(
-                (result_set, URIRef(f"{TKEIR_REASON}hit"), node)
+            _add_iri_hit(
+                graph,
+                result_set,
+                operation=operation,
+                iri=iri,
+                label=label,
+                focus_class=focus_class,
+                focus_ind=focus_ind,
             )
             continue
 
@@ -197,41 +310,17 @@ def results_as_json_ld(
         predicate = (row.get("p") or row.get("predicate") or "").strip()
         obj = (row.get("o") or row.get("object") or "").strip()
         if subject and predicate and obj:
-            s_node = (
-                _iri_ref(subject)
-                if subject.startswith("http")
-                else URIRef(f"{TKEIR_REASON}blank/{index}/s")
+            _add_spo_binding(
+                graph,
+                result_set,
+                index=index,
+                subject=subject,
+                predicate=predicate,
+                obj=obj,
             )
-            if subject.startswith("http"):
-                pass
-            else:
-                graph.add((s_node, RDFS.label, Literal(subject)))
-            p_node = (
-                _iri_ref(predicate)
-                if predicate.startswith("http")
-                else URIRef(f"{TKEIR_REASON}pred/{_local_name(predicate)}")
-            )
-            if obj.startswith("http"):
-                o_node: Any = _iri_ref(obj)
-            else:
-                o_node = Literal(obj)
-            graph.add((s_node, p_node, o_node))
-            graph.add((result_set, URIRef(f"{TKEIR_REASON}hit"), s_node))
             continue
 
-        # Fallback: one blank node per binding row.
-        blank = URIRef(f"{TKEIR_REASON}row/{index}")
-        graph.add((blank, RDF.type, URIRef(f"{TKEIR_REASON}Binding")))
-        for key, value in row.items():
-            if value:
-                graph.add(
-                    (
-                        blank,
-                        URIRef(f"{TKEIR_REASON}binding/{key}"),
-                        Literal(value),
-                    )
-                )
-        graph.add((result_set, URIRef(f"{TKEIR_REASON}hit"), blank))
+        _add_binding_row_fallback(graph, result_set, index=index, row=row)
 
     return serialize_graph_json_ld(graph)
 
@@ -352,9 +441,13 @@ def _sparql_select(
     if "LIMIT" not in capped.upper():
         capped = f"{capped}\nLIMIT {max(1, limit)}"
     rows: list[dict[str, str]] = []
-    for binding in graph.query(capped):
+    for raw in graph.query(capped):
+        labels = getattr(raw, "labels", None)
+        if labels is None:
+            continue
+        binding: Any = raw
         row: dict[str, str] = {}
-        for key in binding.labels:
+        for key in labels:
             value = binding[key]
             row[str(key)] = "" if value is None else str(value)
         rows.append(row)
@@ -408,6 +501,135 @@ def _write_temp_ontology(graph: Graph) -> Path:
     return path
 
 
+def _owlapy_nodes_to_results(
+    nodes: list[Any], *, limit: int
+) -> list[dict[str, str]]:
+    """Map OWLAPY nodes to ``iri``/``label`` result rows."""
+    return [
+        {"iri": _node_ref(node), "label": _local_name(_node_ref(node))}
+        for node in nodes[:limit]
+    ]
+
+
+def _owlapy_consistency(
+    sync: Any, *, operation: str, backend: str
+) -> dict[str, Any]:
+    consistent = bool(sync.has_consistent_ontology())
+    return {
+        "operation": operation,
+        "backend": backend,
+        "consistent": consistent,
+        "results": [{"consistent": str(consistent).lower()}],
+    }
+
+
+def _owlapy_sparql(
+    graph: Graph, *, operation: str, sparql: str | None, limit: int
+) -> dict[str, Any]:
+    if not sparql or not sparql.strip():
+        raise ValueError("sparql operation requires a non-empty query")
+    rows = _sparql_select(graph, sparql, limit=limit)
+    return {
+        "operation": operation,
+        "backend": "rdflib+sparql",
+        "results": rows,
+        "count": len(rows),
+    }
+
+
+def _owlapy_hierarchy(
+    sync: Any,
+    *,
+    operation: OntologyOperation,
+    class_iri: str | None,
+    direct: bool,
+    limit: int,
+    backend: str,
+    owl_class_cls: Any,
+    iri_cls: Any,
+) -> dict[str, Any]:
+    if not class_iri:
+        raise ValueError(f"{operation} requires class_iri")
+    owl_class = owl_class_cls(iri_cls.create(class_iri))
+    if operation == "subclasses":
+        nodes = list(sync.sub_classes(owl_class, direct=direct) or [])
+    elif operation == "superclasses":
+        nodes = list(sync.super_classes(owl_class, direct=direct) or [])
+    else:
+        nodes = list(sync.instances(owl_class) or [])
+    results = _owlapy_nodes_to_results(nodes, limit=limit)
+    return {
+        "operation": operation,
+        "backend": backend,
+        "results": results,
+        "count": len(results),
+    }
+
+
+def _owlapy_types(
+    sync: Any,
+    *,
+    operation: str,
+    individual_iri: str | None,
+    limit: int,
+    backend: str,
+    named_individual_cls: Any,
+    iri_cls: Any,
+) -> dict[str, Any]:
+    if not individual_iri:
+        raise ValueError("types requires individual_iri")
+    individual = named_individual_cls(iri_cls.create(individual_iri))
+    nodes = list(sync.types(individual) or [])
+    results = _owlapy_nodes_to_results(nodes, limit=limit)
+    return {
+        "operation": operation,
+        "backend": backend,
+        "results": results,
+        "count": len(results),
+    }
+
+
+def _owlapy_infer(
+    sync: Any,
+    graph: Graph,
+    *,
+    operation: str,
+    limit: int,
+    backend: str,
+) -> dict[str, Any]:
+    # Materialize inferred class assertions back into JSON-LD when possible.
+    inferred = Graph()
+    for triple in graph:
+        inferred.add(triple)
+    try:
+        axioms = list(
+            sync.infer_axioms(
+                inference_types=["InferredClassAssertionAxiomGenerator"]
+            )
+            or []
+        )
+    except TypeError:
+        axioms = []
+    added = 0
+    for axiom in axioms[: max(limit * 5, limit)]:
+        text = str(axiom)
+        # Best-effort: SyncReasoner axiom objects vary by version;
+        # keep count even when we cannot map every axiom to RDF.
+        added += 1
+        _ = text
+    return {
+        "operation": operation,
+        "backend": backend,
+        "results": [{"inferred_axioms": str(added)}],
+        "count": added,
+        "json_ld": serialize_graph_json_ld(inferred),
+        "note": (
+            "Inferred axiom count from OWLAPY; JSON-LD is the "
+            "pre-inference merge (re-serialize after apply if needed)."
+        ),
+    }
+
+
 def _query_with_owlapy(
     graph: Graph,
     *,
@@ -433,98 +655,46 @@ def _query_with_owlapy(
         backend = f"owlapy:{reasoner}"
 
         if operation == "consistency":
-            consistent = bool(sync.has_consistent_ontology())
-            return {
-                "operation": operation,
-                "backend": backend,
-                "consistent": consistent,
-                "results": [{"consistent": str(consistent).lower()}],
-            }
+            return _owlapy_consistency(
+                sync, operation=operation, backend=backend
+            )
 
         if operation == "sparql":
-            if not sparql or not sparql.strip():
-                raise ValueError("sparql operation requires a non-empty query")
-            rows = _sparql_select(graph, sparql, limit=limit)
-            return {
-                "operation": operation,
-                "backend": "rdflib+sparql",
-                "results": rows,
-                "count": len(rows),
-            }
+            return _owlapy_sparql(
+                graph, operation=operation, sparql=sparql, limit=limit
+            )
 
         if operation in {"subclasses", "superclasses", "instances"}:
-            if not class_iri:
-                raise ValueError(f"{operation} requires class_iri")
-            owl_class = OWLClass(IRI.create(class_iri))
-            if operation == "subclasses":
-                nodes = list(
-                    sync.sub_classes(owl_class, direct=direct) or []
-                )
-            elif operation == "superclasses":
-                nodes = list(
-                    sync.super_classes(owl_class, direct=direct) or []
-                )
-            else:
-                nodes = list(sync.instances(owl_class) or [])
-            results = [
-                {"iri": _node_ref(node), "label": _local_name(_node_ref(node))}
-                for node in nodes[:limit]
-            ]
-            return {
-                "operation": operation,
-                "backend": backend,
-                "results": results,
-                "count": len(results),
-            }
+            return _owlapy_hierarchy(
+                sync,
+                operation=operation,
+                class_iri=class_iri,
+                direct=direct,
+                limit=limit,
+                backend=backend,
+                owl_class_cls=OWLClass,
+                iri_cls=IRI,
+            )
 
         if operation == "types":
-            if not individual_iri:
-                raise ValueError("types requires individual_iri")
-            individual = OWLNamedIndividual(IRI.create(individual_iri))
-            nodes = list(sync.types(individual) or [])
-            results = [
-                {"iri": _node_ref(node), "label": _local_name(_node_ref(node))}
-                for node in nodes[:limit]
-            ]
-            return {
-                "operation": operation,
-                "backend": backend,
-                "results": results,
-                "count": len(results),
-            }
+            return _owlapy_types(
+                sync,
+                operation=operation,
+                individual_iri=individual_iri,
+                limit=limit,
+                backend=backend,
+                named_individual_cls=OWLNamedIndividual,
+                iri_cls=IRI,
+            )
 
         if operation == "infer":
-            # Materialize inferred class assertions back into JSON-LD when possible.
-            inferred = Graph()
-            for triple in graph:
-                inferred.add(triple)
-            try:
-                axioms = list(
-                    sync.infer_axioms(
-                        inference_types=["InferredClassAssertionAxiomGenerator"]
-                    )
-                    or []
-                )
-            except TypeError:
-                axioms = []
-            added = 0
-            for axiom in axioms[: max(limit * 5, limit)]:
-                text = str(axiom)
-                # Best-effort: SyncReasoner axiom objects vary by version;
-                # keep count even when we cannot map every axiom to RDF.
-                added += 1
-                _ = text
-            return {
-                "operation": operation,
-                "backend": backend,
-                "results": [{"inferred_axioms": str(added)}],
-                "count": added,
-                "json_ld": serialize_graph_json_ld(inferred),
-                "note": (
-                    "Inferred axiom count from OWLAPY; JSON-LD is the "
-                    "pre-inference merge (re-serialize after apply if needed)."
-                ),
-            }
+            return _owlapy_infer(
+                sync,
+                graph,
+                operation=operation,
+                limit=limit,
+                backend=backend,
+            )
 
         raise ValueError(f"unsupported operation: {operation}")
     finally:
@@ -555,7 +725,9 @@ def _query_with_rdflib(
             "backend": backend,
             "consistent": consistent,
             "results": [{"consistent": "true"}],
-            "note": "Install owlapy (uv sync --extra owl) for HermiT consistency.",
+            "note": (
+                "Install owlapy (uv sync --extra owl) for HermiT consistency."
+            ),
         }
 
     if operation == "sparql":
@@ -572,7 +744,9 @@ def _query_with_rdflib(
     if operation in {"subclasses", "superclasses"}:
         if not class_iri:
             raise ValueError(f"{operation} requires class_iri")
-        direction = "sub" if operation == "subclasses" else "super"
+        direction: TypingLiteral["sub", "super"] = (
+            "sub" if operation == "subclasses" else "super"
+        )
         results = _rdfs_related_classes(
             graph,
             class_iri,
@@ -616,7 +790,9 @@ def _query_with_rdflib(
             "backend": backend,
             "results": [],
             "count": 0,
-            "note": "infer requires owlapy SyncReasoner (uv sync --extra owl).",
+            "note": (
+                "infer requires owlapy SyncReasoner (uv sync --extra owl)."
+            ),
         }
 
     raise ValueError(f"unsupported operation: {operation}")

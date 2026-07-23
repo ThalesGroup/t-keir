@@ -3,6 +3,7 @@ import type {
   OntologyReasonerResponse,
   QueryRequest,
   QueryResponse,
+  SearchResponse,
 } from "@/lib/types";
 import { enrichQueryResponse } from "@/lib/report";
 
@@ -24,20 +25,27 @@ export interface RagQueryResult {
   correlationId: string | null;
 }
 
-export async function queryRag(request: QueryRequest): Promise<RagQueryResult> {
+export interface SearchQueryResult {
+  response: SearchResponse;
+  correlationId: string | null;
+}
+
+async function postJson<T>(
+  path: string,
+  body: unknown,
+  unreachableHint: string,
+): Promise<{ data: T; correlationId: string | null }> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE}/rag/query`, {
+    response = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
+      body: JSON.stringify(body),
     });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Network request failed";
-    throw new RagApiError(
-      `Cannot reach RAG API (${message}). Start with: make rag`,
-    );
+    throw new RagApiError(`${unreachableHint} (${message})`);
   }
 
   const correlationId =
@@ -57,9 +65,32 @@ export async function queryRag(request: QueryRequest): Promise<RagQueryResult> {
     throw new RagApiError(detail, response.status);
   }
 
-  const raw = (await response.json()) as QueryResponse;
   return {
-    response: enrichQueryResponse(raw, request.query, request.language),
+    data: (await response.json()) as T,
+    correlationId,
+  };
+}
+
+/** Retrieval-only hybrid search (no LLM report). */
+export async function querySearch(
+  request: QueryRequest,
+): Promise<SearchQueryResult> {
+  const { data, correlationId } = await postJson<SearchResponse>(
+    "/search",
+    request,
+    "Cannot reach search API. Start with: make rag",
+  );
+  return { response: data, correlationId };
+}
+
+export async function queryRag(request: QueryRequest): Promise<RagQueryResult> {
+  const { data, correlationId } = await postJson<QueryResponse>(
+    "/rag/query",
+    request,
+    "Cannot reach RAG API. Start with: make rag",
+  );
+  return {
+    response: enrichQueryResponse(data, request.query, request.language),
     correlationId,
   };
 }

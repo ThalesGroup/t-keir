@@ -1,6 +1,6 @@
 # BEIR Retrieval Evaluation Report
 
-_Generated 2026-07-16 20:27 UTC_
+_Generated 2026-07-22 20:05 UTC_
 
 ## Overview
 
@@ -20,7 +20,7 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 | Dataset | Best published | Best score | **T-KEIR** | Gap T-KEIR → best | Local BM25 | Gap BM25 → best | Local Dense | Gap Dense → best |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| SciFact | SPLADE | 0.699 | 0.737 | +0.038 | 0.652 | -0.047 | 0.645 | -0.054 |
+| SciFact | SPLADE | 0.699 | err (interrupted (Ctrl+C during index) | — | 0.652 | -0.047 | 0.645 | -0.054 |
 
 ### Published baselines (reference)
 
@@ -32,7 +32,7 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 | Dataset | Best system | Best NDCG@10 | T-KEIR gap | Local BM25 gap | Local Dense gap | T-KEIR vs BM25 | T-KEIR vs SPLADE | T-KEIR vs Contriever |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| SciFact | SPLADE | 0.699 | +0.038 | -0.047 | -0.054 | +0.072 | +0.038 | +0.060 |
+| SciFact | SPLADE | 0.699 | — | -0.047 | -0.054 | — | — | — |
 
 ## Per-dataset metrics
 
@@ -42,25 +42,21 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 - Test queries: **300**
 - Dense baseline model: `sentence-transformers/all-MiniLM-L6-v2`
 - **Best published system:** `SPLADE` (NDCG@10 = 0.699)
-- T-KEIR status: **ok** (QueryAnalyzer + Vespa hybrid)
-- **T-KEIR gap to best (SPLADE):** `+0.038` (T-KEIR 0.737 − 0.699)
+- T-KEIR status: **failed** — interrupted (Ctrl+C during indexing/retrieval)
+- **T-KEIR gap to best:** —
 - Local BM25 gap to best: `-0.047`
 - Local Dense gap to best: `-0.054`
 
 | Metric | T-KEIR | Local BM25 | Local Dense |
 |---|---:|---:|---:|
-| NDCG@10 | 0.737 | 0.652 | 0.645 |
-| MAP@100 | 0.704 | 0.613 | 0.603 |
-| Recall@100 | 0.855 | 0.873 | 0.925 |
+| NDCG@10 | — | 0.652 | 0.645 |
+| MAP@100 | — | 0.613 | 0.603 |
+| Recall@100 | — | 0.873 | 0.925 |
 
 #### Error analysis (T-KEIR)
 
-- **False positive** — query `1`: «0-dimensional biomaterials show inductive properties.»
-  - Rank #1 doc `13231899` (score=0.0439) is not relevant. Snippet: In situ regulation of DC subsets and T cells mediates tumor regression in mice. Vaccines are largely ineffective for pa…
-- **False negative** — query `1`: «0-dimensional biomaterials show inductive properties.»
-  - Gold doc `31715818` completely missed (not in top-100). Snippet: New opportunities: the use of nanotechnologies to manipulate and track stem cells. Nanotechnologies are emerging platfo…
-- **Near miss** — query `133`: «Assembly of invadopodia is triggered by focal generation of phosphatidylinositol-3,4-biphosphate and the activation of the nonreceptor tyrosine kinase Src.»
-  - Gold doc `12640810` retrieved at rank 14/100 (missed NDCG@10). Snippet: Cortactin regulates cofilin and N-WASp activities to control the stages of invadopodium assembly and maturation Invadop…
+- **False negative** — query `-`: «(tkeir run interrupted)»
+  - interrupted (Ctrl+C during indexing/retrieval)
 
 #### Error analysis (Local BM25)
 

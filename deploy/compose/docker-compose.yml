@@ -24,6 +24,26 @@ x-tkeir-from-lib: &tkeir-from-lib
     tkeir-lib: "docker-image://${IMAGE_REGISTRY:-local}/tkeir-lib:${IMAGE_TAG:-dev}"
 
 services:
+  # Named volumes are created as root; services run as uid 10001. Fix ownership
+  # before api/ingest/governor/agent start so kill-switch flags are writable.
+  tkeir-volume-init:
+    profiles: ["core", "ingest", "governor", "agents"]
+    image: busybox:1.37@sha256:9532d8c39891ca2ecde4d30d7710e01fb739c87a8b9299685c63704296b16028
+    container_name: tkeir-volume-init
+    user: "0:0"
+    volumes:
+      - governor_state:/var/tkeir/governor
+      - ingest_data:/var/tkeir/ingest
+      - agent_data:/var/tkeir/agent
+    command:
+      [
+        "sh",
+        "-c",
+        "chown -R 10001:10001 /var/tkeir/governor /var/tkeir/ingest /var/tkeir/agent && echo volume-init-ok",
+      ]
+    networks: [tkeir]
+    restart: "no"
+
   vespa:
     profiles: ["core"]
     image: vespaengine/vespa
@@ -82,6 +102,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
+      tkeir-volume-init:
+        condition: service_completed_successfully
       vespa:
         condition: service_healthy
     healthcheck:
@@ -202,6 +224,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
+      tkeir-volume-init:
+        condition: service_completed_successfully
       vespa:
         condition: service_healthy
     healthcheck:
@@ -238,6 +262,9 @@ services:
       - "8094:8094"
     volumes:
       - governor_state:/var/tkeir/governor
+    depends_on:
+      tkeir-volume-init:
+        condition: service_completed_successfully
     healthcheck:
       test:
         [
@@ -549,6 +576,9 @@ services:
     # required: false so `PROFILES=spire,agents` validates without core;
     # production demos still use PROFILES=core,agents (or full stack).
     depends_on:
+      tkeir-volume-init:
+        condition: service_completed_successfully
+        required: false
       vespa:
         condition: service_healthy
         required: false

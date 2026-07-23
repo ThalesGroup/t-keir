@@ -64,14 +64,32 @@ class AppState:
         self.vespa: VespaClient | None = None
 
 
+def _ensure_app_state(app: FastAPI) -> AppState:
+    """Return ingest AppState, initializing it if lifespan did not run.
+
+    Uvicorn can skip lifespan when the ASGI stack reports it unsupported
+    (seen after volume permission failures during early middleware init).
+    Endpoints must not crash with ``AttributeError`` in that case.
+    """
+    state = getattr(app.state, "ingest", None)
+    if isinstance(state, AppState):
+        return state
+    LOGGER.warning(
+        "ingest AppState missing (lifespan skipped?); initializing on demand"
+    )
+    state = AppState()
+    state.store.ensure_layout()
+    if state.vespa is None:
+        state.vespa = VespaClient()
+    app.state.ingest = state
+    return state
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize store layout and optional Vespa client."""
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-ingest"))
-    app.state.ingest = AppState()
-    state: AppState = app.state.ingest
-    state.store.ensure_layout()
-    state.vespa = VespaClient()
+    state = _ensure_app_state(app)
     try:
         yield
     finally:
@@ -108,7 +126,9 @@ def _correlation_id() -> str:
     return current_correlation_id() or new_action_id()
 
 
-def _parse_json_object_field(raw: Any, *, field_name: str) -> dict[str, Any] | None:
+def _parse_json_object_field(
+    raw: Any, *, field_name: str
+) -> dict[str, Any] | None:
     """Parse an optional multipart JSON object field."""
     if raw is None or hasattr(raw, "read"):
         return None
@@ -188,9 +208,11 @@ async def _document_extras_from_multipart(
     # Reject path-only ontology lists (client/server separation).
     _parse_ontology_paths_field(form.get("ontologies"))
 
-    metadata = _parse_json_object_field(form.get("metadata"), field_name="metadata")
+    metadata = _parse_json_object_field(
+        form.get("metadata"), field_name="metadata"
+    )
     metadata = strip_client_ontology_paths(metadata)
-    state: AppState = app.state.ingest
+    state = _ensure_app_state(app)
     upload_dir = Path(state.settings.root) / "uploaded_ontologies" / ingest_id
     uploaded = await _stage_uploaded_ontologies(form, upload_dir)
     return document_extras_from_metadata(
@@ -210,7 +232,7 @@ def _queue_job(
     user_space: str,
     document_extras: dict[str, Any] | None = None,
 ) -> IngestAcceptedResponse:
-    state: AppState = app.state.ingest
+    state = _ensure_app_state(app)
     ingest_id = new_action_id()
     correlation_id = _correlation_id()
     now = utc_now_rfc3339()
@@ -248,14 +270,15 @@ def _queue_job(
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    """Liveness probe (process up). Use ``/ready`` for Vespa + deps."""
+    """Liveness probe — also ensures AppState exists (lifespan safeguard)."""
+    _ensure_app_state(app)
     return {"status": "ok"}
 
 
 @app.get("/ready")
 async def ready() -> dict[str, Any]:
     """Readiness probe: Vespa + embedding provider."""
-    state: AppState = app.state.ingest
+    state = _ensure_app_state(app)
     vespa_ok = False
     if state.vespa is not None:
         vespa_ok = await state.vespa.health()
@@ -340,11 +363,11 @@ async def ingest_document(
     )
     from thot.ingest.worker import document_extras_from_metadata
 
-    state: AppState = app.state.ingest
+    state = _ensure_app_state(app)
     staging_id = new_action_id()
     try:
         uploads = decode_ontology_uploads(
-            [item.model_dump() for item in (body.ontologies or [])]
+            [item.model_dump() for item in body.ontologies or []]
             if body.ontologies
             else None
         )
@@ -390,7 +413,7 @@ async def ingest_batch(
     )
     from thot.ingest.worker import document_extras_from_metadata
 
-    state: AppState = app.state.ingest
+    state = _ensure_app_state(app)
     batch_id = new_action_id()
     correlation_id = _correlation_id()
     jobs: list[IngestAcceptedResponse] = []
@@ -398,7 +421,7 @@ async def ingest_batch(
         staging_id = new_action_id()
         try:
             uploads = decode_ontology_uploads(
-                [o.model_dump() for o in (item.ontologies or [])]
+                [o.model_dump() for o in item.ontologies or []]
                 if item.ontologies
                 else None
             )
@@ -438,7 +461,7 @@ async def ingest_status(
     _actor: str = Depends(require_ingest_auth),
 ) -> IngestStatusResponse:
     """Return job status and manifest when available."""
-    state: AppState = app.state.ingest
+    state = _ensure_app_state(app)
     job = state.store.read_job(ingest_id)
     if job is None:
         raise HTTPException(status_code=404, detail="Unknown ingest id")

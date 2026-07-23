@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "T-KEIR Search & RAG",
+  title: "T-KEIR Workspace",
   description:
-    "Human-Machine Interface for T-KEIR two-level document/chunk retrieval and RAG synthesis",
+    "Search, RAG report generation, and agent dialogs over the T-KEIR corpus",
 };
 
 export default function RootLayout({

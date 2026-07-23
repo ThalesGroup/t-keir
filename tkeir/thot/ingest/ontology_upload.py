@@ -103,7 +103,11 @@ def decode_ontology_uploads(raw: Any) -> list[tuple[str, bytes]]:
         filename = str(
             item.get("filename") or item.get("name") or f"ontology_{index}.ttl"
         )
-        b64 = item.get("content_base64") or item.get("content") or item.get("data")
+        b64 = (
+            item.get("content_base64")
+            or item.get("content")
+            or item.get("data")
+        )
         if not isinstance(b64, str) or not b64.strip():
             raise ValueError(
                 f"ontologies[{index}] requires content_base64 (file bytes)"
@@ -120,7 +124,9 @@ def decode_ontology_uploads(raw: Any) -> list[tuple[str, bytes]]:
     return out
 
 
-def strip_client_ontology_paths(metadata: dict[str, Any] | None) -> dict[str, Any] | None:
+def strip_client_ontology_paths(
+    metadata: dict[str, Any] | None,
+) -> dict[str, Any] | None:
     """Remove path-based ontology keys from metadata (server cannot use them)."""
     if not metadata:
         return metadata

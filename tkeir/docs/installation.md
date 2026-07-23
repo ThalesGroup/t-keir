@@ -117,7 +117,7 @@ export TRANSFORMERS_CACHE=$PWD/.cache/models
 
 | Goal | Command |
 |---|---|
-| Pipeline demo on fixtures | `make quickstart` → [Quickstart](ready_to_run.md) |
+| Pipeline demo on fixtures | `make quickstart` → [NLP](ready_to_run.md) |
 | Analyse your own files | `make pipeline PIPELINE_INPUT=… PIPELINE_OUTPUT=…` |
 | Vespa + RAG | `make bootstrap && make index-fixtures && make index && make rag` → [Vespa RAG](tools/vespa_rag.md) |
 | Quality gate before push | `make pre-commit` or `make ci` |

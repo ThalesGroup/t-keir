@@ -25,10 +25,21 @@ charts/Compose services with stricter value presets.
   for RAG-only deployments.
 - **Pins:** `deploy/versions.lock.yaml`.
 
+## Control plane docs
+
+| Topic | Doc |
+|-------|-----|
+| ActionRecord hot store + WORM | [Audit store](audit.md) |
+| Kill switch, budgets, approvals, tokens | [Governor](governor.md) |
+| Agent workload identity | [SPIRE / SPIFFE](spire.md) |
+| Ingest pipeline | [Ingest](ingest.md) |
+
 ## Related design
 
 - [ADR-0001](../adr/0001-platform-architecture.md)
 - [ADR-0002](../adr/0002-ingest-supersede.md)
+- [ADR-0003](../adr/0003-audit-store-worm.md)
+- [ADR-0008](../adr/0008-spire-agent-identity.md)
 - [Identity of Action](../regularity-component/action-identiy.md)
 - [Mastering of Action](../regularity-component/action-mastering.md)
 - [Security](../security.md)

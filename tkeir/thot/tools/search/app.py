@@ -928,6 +928,89 @@ async def metrics() -> Response:
     )
 
 
+def _extract_ranking_profile(
+    vespa_payload: Any,
+    query_analysis: Any,
+) -> str | None:
+    """Resolve ranking profile from Vespa payload or query analysis."""
+    ranking_profile = None
+    if isinstance(vespa_payload, dict):
+        ranking_profile = vespa_payload.get("ranking.profile") or (
+            vespa_payload.get("ranking")
+            if isinstance(vespa_payload.get("ranking"), str)
+            else None
+        )
+        if ranking_profile is None and isinstance(
+            vespa_payload.get("ranking"), dict
+        ):
+            ranking_profile = vespa_payload["ranking"].get("profile")
+    if ranking_profile is None and isinstance(query_analysis, dict):
+        ranking_profile = query_analysis.get("ranking_profile")
+    return str(ranking_profile) if ranking_profile else None
+
+
+def _build_search_chunks(
+    retrieved_chunks: list[RetrievedChunk],
+    parsed_hits: list[tuple[dict[str, Any], float | None]],
+) -> list[SearchChunk]:
+    """Build SearchChunk list from retrieved chunks and hit titles."""
+    title_by_chunk = {
+        str(fields.get("chunk_id") or ""): (
+            str(fields.get("parent_title") or "").strip()
+        )
+        for fields, _ in parsed_hits
+    }
+    return [
+        SearchChunk(
+            chunk_id=chunk.chunk_id,
+            text_raw=chunk.text_raw,
+            parent_doc_id=chunk.parent_doc_id,
+            score=float(chunk.relevance or 0.0),
+            title=title_by_chunk.get(chunk.chunk_id, ""),
+        )
+        for chunk in retrieved_chunks
+    ]
+
+
+def _assemble_search_response(
+    *,
+    query_text: str,
+    search_chunks: list[SearchChunk],
+    parsed_hits: list[tuple[dict[str, Any], float | None]],
+    ranking_profile: str | None,
+    ontology: FusedOntology,
+) -> SearchResponse:
+    """Aggregate chunks into documents and build SearchResponse."""
+    aggregated = aggregate_chunks_to_documents(
+        [
+            {
+                "document_id": chunk.parent_doc_id,
+                "chunk_id": chunk.chunk_id,
+                "score": chunk.score,
+                "title": chunk.title,
+            }
+            for chunk in search_chunks
+        ]
+    )
+    return SearchResponse(
+        query=query_text,
+        chunks=search_chunks,
+        documents=[
+            SearchDocument(
+                document_id=doc.document_id,
+                score=doc.score,
+                chunk_ids=doc.chunk_ids,
+                title=doc.title,
+                hit_count=doc.hit_count,
+            )
+            for doc in aggregated
+        ],
+        vespa_hits=len(parsed_hits),
+        ranking_profile=ranking_profile,
+        ontology=ontology,
+    )
+
+
 @app.post("/search", response_model=SearchResponse)
 async def search(
     request: SearchRequest,
@@ -973,46 +1056,8 @@ async def search(
             status_code=502, detail=f"Search failed: {error}"
         ) from error
 
-    title_by_chunk = {
-        str(fields.get("chunk_id") or ""): (
-            str(fields.get("parent_title") or "").strip()
-        )
-        for fields, _ in parsed_hits
-    }
-    search_chunks = [
-        SearchChunk(
-            chunk_id=chunk.chunk_id,
-            text_raw=chunk.text_raw,
-            parent_doc_id=chunk.parent_doc_id,
-            score=float(chunk.relevance or 0.0),
-            title=title_by_chunk.get(chunk.chunk_id, ""),
-        )
-        for chunk in retrieved_chunks
-    ]
-    aggregated = aggregate_chunks_to_documents(
-        [
-            {
-                "document_id": chunk.parent_doc_id,
-                "chunk_id": chunk.chunk_id,
-                "score": chunk.score,
-                "title": chunk.title,
-            }
-            for chunk in search_chunks
-        ]
-    )
-    ranking_profile = None
-    if isinstance(vespa_payload, dict):
-        ranking_profile = vespa_payload.get("ranking.profile") or (
-            vespa_payload.get("ranking")
-            if isinstance(vespa_payload.get("ranking"), str)
-            else None
-        )
-        if ranking_profile is None and isinstance(
-            vespa_payload.get("ranking"), dict
-        ):
-            ranking_profile = vespa_payload["ranking"].get("profile")
-    if ranking_profile is None and isinstance(query_analysis, dict):
-        ranking_profile = query_analysis.get("ranking_profile")
+    search_chunks = _build_search_chunks(retrieved_chunks, parsed_hits)
+    ranking_profile = _extract_ranking_profile(vespa_payload, query_analysis)
 
     hmi_ontology = build_hmi_ontology(
         rdf_payloads,
@@ -1026,32 +1071,23 @@ async def search(
         min_keyword_length=state.rag_config.ontology.min_keyword_length,
     )
     ontology = FusedOntology.model_validate(hmi_ontology)
+    response = _assemble_search_response(
+        query_text=query_text,
+        search_chunks=search_chunks,
+        parsed_hits=parsed_hits,
+        ranking_profile=ranking_profile,
+        ontology=ontology,
+    )
 
     _log_rag_step(
         "search-total",
         request_started,
         query=repr(query_text),
-        chunks=len(search_chunks),
-        documents=len(aggregated),
+        chunks=len(response.chunks),
+        documents=len(response.documents),
         ontology_triples=ontology.triple_count,
     )
-    return SearchResponse(
-        query=query_text,
-        chunks=search_chunks,
-        documents=[
-            SearchDocument(
-                document_id=doc.document_id,
-                score=doc.score,
-                chunk_ids=doc.chunk_ids,
-                title=doc.title,
-                hit_count=doc.hit_count,
-            )
-            for doc in aggregated
-        ],
-        vespa_hits=len(parsed_hits),
-        ranking_profile=str(ranking_profile) if ranking_profile else None,
-        ontology=ontology,
-    )
+    return response
 
 
 @app.post("/rag/ontology/query", response_model=OntologyReasonerResponse)

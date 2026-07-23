@@ -1,38 +1,21 @@
 "use client";
 
-import { Bot, Network } from "lucide-react";
+import { Network } from "lucide-react";
 import { memo, useMemo } from "react";
 
-import { AgentDialog } from "@/components/agent-dialog";
 import { AiSynthesis } from "@/components/ai-synthesis";
 import { CorrelationIdBadge } from "@/components/correlation-id";
 import { DocumentResults } from "@/components/document-results";
-import { OntologySidebar } from "@/components/ontology-sidebar";
 import { RagReportPanel } from "@/components/rag-report";
 import { TechnicalDetails } from "@/components/technical-details";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import type {
-  QueryResponse,
-  SemanticEntity,
-  SemanticKeyword,
-} from "@/lib/types";
+import type { QueryResponse } from "@/lib/types";
 
 interface RagResultsProps {
   submittedQuery: string;
   response: QueryResponse | null;
   correlationId: string | null;
   loading: boolean;
-  agentAvailable: boolean;
   activeChunkIds: Set<string> | null;
-  activeLabel: string | null;
-  onSelectEntity: (entity: SemanticEntity) => void;
-  onSelectKeyword: (keyword: SemanticKeyword) => void;
-  onClearFilter: () => void;
 }
 
 export const RagResults = memo(function RagResults({
@@ -40,12 +23,7 @@ export const RagResults = memo(function RagResults({
   response,
   correlationId,
   loading,
-  agentAvailable,
   activeChunkIds,
-  activeLabel,
-  onSelectEntity,
-  onSelectKeyword,
-  onClearFilter,
 }: RagResultsProps) {
   const highlightEntities = useMemo(
     () => response?.highlight_entities ?? [],
@@ -92,56 +70,10 @@ export const RagResults = memo(function RagResults({
         highlightQueryTerms={highlightQueryTerms}
       />
 
-      <Accordion
-        key={submittedQuery || "idle"}
-        type="multiple"
-        defaultValue={
-          agentAvailable
-            ? ["ontology", "agent"]
-            : response?.ontology
-              ? ["ontology"]
-              : []
-        }
-        className="rounded-xl border bg-card px-4 shadow-sm"
-      >
-        <AccordionItem value="ontology" className="border-b">
-          <AccordionTrigger className="text-sm font-medium hover:no-underline">
-            <span className="flex items-center gap-2">
-              <Network className="h-4 w-4 text-primary" />
-              Ontology navigator
-              {response?.ontology
-                ? ` (${response.ontology.entities.length} entities)`
-                : ""}
-            </span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <OntologySidebar
-              embedded
-              ontology={response?.ontology ?? null}
-              loading={loading}
-              activeChunkIds={activeChunkIds}
-              activeLabel={activeLabel}
-              onSelectEntity={onSelectEntity}
-              onSelectKeyword={onSelectKeyword}
-              onClearFilter={onClearFilter}
-            />
-          </AccordionContent>
-        </AccordionItem>
-
-        {agentAvailable && (
-          <AccordionItem value="agent" className="border-b-0">
-            <AccordionTrigger className="text-sm font-medium hover:no-underline">
-              <span className="flex items-center gap-2">
-                <Bot className="h-4 w-4 text-primary" />
-                Agent dialog
-              </span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <AgentDialog initialGoal={submittedQuery} />
-            </AccordionContent>
-          </AccordionItem>
-        )}
-      </Accordion>
+      <p className="flex items-center gap-2 text-xs text-muted-foreground">
+        <Network className="h-3.5 w-3.5" />
+        Ontology navigator is shared with Search (below).
+      </p>
 
       <TechnicalDetails
         inputPrompt={response?.input_prompt ?? null}

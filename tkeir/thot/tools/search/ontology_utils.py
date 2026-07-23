@@ -903,7 +903,7 @@ def build_hmi_ontology(
     doc_ids = sorted(
         {
             str(doc_id).strip()
-            for doc_id in (document_ids or [])
+            for doc_id in document_ids or []
             if str(doc_id).strip()
         }
     )

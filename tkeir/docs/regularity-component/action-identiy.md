@@ -49,7 +49,8 @@ Verification: `tkeir-audit verify` re-hashes hot chain and cross-checks WORM
 segments. GDPR: pseudonymize subjects; crypto-shred keys outside WORM
 (`tkeir-audit forget`). Query text off by default (`request_hash` only).
 
-Detailed choice: [ADR-0003](../adr/0003-audit-store-worm.md) (Phase 4).
+Detailed choice: [ADR-0003](../adr/0003-audit-store-worm.md). Ops:
+[Audit store](../deployment/audit.md) (Phase 4).
 
 ## Maturity mapping
 
@@ -68,5 +69,7 @@ HMI admin ops; Keycloak auth events.
 ## Related
 
 - [Mastering of Action](action-mastering.md)
+- [Audit store](../deployment/audit.md)
+- [SPIRE / SPIFFE](../deployment/spire.md)
 - [ADR-0001](../adr/0001-platform-architecture.md)
 - [GDPR mapping](../compliance/gdpr.md) (Phase 9)

@@ -5,7 +5,9 @@ site_author: 'Thales'
 site_url: 'https://github.com/ThalesGroup/t-keir/'
 nav:
     - Home: 'index.md'
-    - Zero to Hero: 'zero_to_hero.md'
+    - Zero to Hero:
+        - From zero to hero: 'zero_to_hero.md'
+        - NLP: 'ready_to_run.md'
     - Overview: 'overview.md'
     - Architecture:
         - Overview & service topology: 'architecture/index.md'
@@ -15,7 +17,6 @@ nav:
     - Conception: 'conception.md'
     - Installation: 'installation.md'
     - Dev Container: 'devcontainer.md'
-    - Quickstart: 'ready_to_run.md'
     - Deployment:
         - Profiles: 'deployment/index.md'
         - Compose (P1): 'deployment/compose.md'

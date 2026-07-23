@@ -202,7 +202,7 @@ def run_pipeline_on_bytes(
             AUTO_DATATYPE,
         )
         encoded = base64.b64encode(content).decode()
-        payload: dict[str, Any] = {
+        payload = {
             "datatype": resolved_type,
             "data": encoded,
             "source": f"ingest://{content_digest}/{filename}",
@@ -278,7 +278,7 @@ class IngestWorker:
         assert self._pipeline_fn is not None
         fn = self._pipeline_fn
         try:
-            params = inspect.signature(fn).parameters
+            params = dict(inspect.signature(fn).parameters)
         except (TypeError, ValueError):
             params = {}
         accepts_extras = "document_extras" in params or any(
@@ -294,29 +294,16 @@ class IngestWorker:
             )
         return fn(runner, content, filename, correlation_id)
 
-    async def process_source(
+    def _bootstrap_job(
         self,
         *,
         ingest_id: str,
         correlation_id: str,
-        source_uri: str,
-        content: bytes | None = None,
-        filename: str | None = None,
-        content_type: str | None = None,
-        batch_id: str | None = None,
-        user_space: str | None = None,
-        document_extras: dict[str, Any] | None = None,
-    ) -> IngestJob:
-        """Fetch (when needed), stage, pipeline, and optionally index."""
-        from thot.tools.search.user_space import resolve_vespa_user_space
-
-        existing_job = self.store.read_job(ingest_id)
-        space = resolve_vespa_user_space(
-            None,
-            fallback=user_space
-            or (existing_job.user_space if existing_job else None),
-        )
-        extras = document_extras
+        batch_id: str | None,
+        space: str,
+        existing_job: IngestJob | None,
+    ) -> IngestJob | None:
+        """Assert governor scope and ensure job record. Return failed job or None."""
         try:
             GovernorClient().assert_scope_active("ingest")
         except RuntimeError as exc:
@@ -345,6 +332,83 @@ class IngestWorker:
             )
         elif existing_job is not None and not existing_job.user_space:
             self.store.update_job(ingest_id, user_space=space)
+        return None
+
+    def _fail_fetch(self, ingest_id: str, exc: FetchError) -> IngestJob:
+        """Mark job failed and write DLQ after a source fetch error."""
+        self.store.update_job(
+            ingest_id,
+            status=IngestJobStatus.FAILED,
+            error=str(exc),
+        )
+        job = self.store.read_job(ingest_id)
+        assert job is not None
+        self.store.write_dlq(
+            ingest_id,
+            job=job,
+            manifest=None,
+            reason=str(exc),
+        )
+        return job
+
+    def _idempotent_noop_job(
+        self,
+        *,
+        ingest_id: str,
+        doc_id: str,
+        key: str,
+    ) -> IngestJob | None:
+        """Return NOOP job update when an indexed/noop idempotency hit exists."""
+        existing = self.store.get_idempotency_record(key)
+        if existing is None:
+            return None
+        manifest = self.store.read_manifest(doc_id)
+        if manifest is None or manifest.status not in {"indexed", "noop"}:
+            return None
+        rel_manifest = str(
+            self.store.manifest_path(doc_id).relative_to(self.store.root)
+        )
+        return self.store.update_job(
+            ingest_id,
+            status=IngestJobStatus.NOOP,
+            doc_id=doc_id,
+            manifest_path=rel_manifest,
+            noop=True,
+        )
+
+    async def process_source(
+        self,
+        *,
+        ingest_id: str,
+        correlation_id: str,
+        source_uri: str,
+        content: bytes | None = None,
+        filename: str | None = None,
+        content_type: str | None = None,
+        batch_id: str | None = None,
+        user_space: str | None = None,
+        document_extras: dict[str, Any] | None = None,
+    ) -> IngestJob:
+        """Fetch (when needed), stage, pipeline, and optionally index."""
+        from thot.tools.search.user_space import resolve_vespa_user_space
+
+        existing_job = self.store.read_job(ingest_id)
+        space = resolve_vespa_user_space(
+            None,
+            fallback=user_space
+            or (existing_job.user_space if existing_job else None),
+        )
+        extras = document_extras
+        failed = self._bootstrap_job(
+            ingest_id=ingest_id,
+            correlation_id=correlation_id,
+            batch_id=batch_id,
+            space=space,
+            existing_job=existing_job,
+        )
+        if failed is not None:
+            return failed
+
         config_path = _default_pipeline_config_path(self.settings)
         pipeline_sha = pipeline_config_sha256(config_path)
         embedder = self._embedder_info()
@@ -356,20 +420,7 @@ class IngestWorker:
                     filename=filename,
                 )
             except FetchError as exc:
-                self.store.update_job(
-                    ingest_id,
-                    status=IngestJobStatus.FAILED,
-                    error=str(exc),
-                )
-                job = self.store.read_job(ingest_id)
-                assert job is not None
-                self.store.write_dlq(
-                    ingest_id,
-                    job=job,
-                    manifest=None,
-                    reason=str(exc),
-                )
-                return job
+                return self._fail_fetch(ingest_id, exc)
             filename = resolved_name
             content_type = content_type or fetched_type
         else:
@@ -377,25 +428,11 @@ class IngestWorker:
 
         doc_id = doc_id_from_content(content)
         key = idempotency_key(doc_id, pipeline_sha, embedder.sha256)
-        existing = self.store.get_idempotency_record(key)
-        if existing is not None:
-            manifest = self.store.read_manifest(doc_id)
-            if manifest is not None and manifest.status in {
-                "indexed",
-                "noop",
-            }:
-                rel_manifest = str(
-                    self.store.manifest_path(doc_id).relative_to(
-                        self.store.root
-                    )
-                )
-                return self.store.update_job(
-                    ingest_id,
-                    status=IngestJobStatus.NOOP,
-                    doc_id=doc_id,
-                    manifest_path=rel_manifest,
-                    noop=True,
-                )
+        noop_job = self._idempotent_noop_job(
+            ingest_id=ingest_id, doc_id=doc_id, key=key
+        )
+        if noop_job is not None:
+            return noop_job
 
         source = SourceInfo(
             uri=source_uri,
@@ -447,7 +484,9 @@ class IngestWorker:
                         correlation_id,
                         document_extras=extras,
                     )
-                pipeline_path = self.store.staging_path(doc_id) / "pipeline.json"
+                pipeline_path = (
+                    self.store.staging_path(doc_id) / "pipeline.json"
+                )
                 pipeline_path.write_text(
                     json.dumps(document, indent=2, ensure_ascii=False) + "\n",
                     encoding="utf-8",

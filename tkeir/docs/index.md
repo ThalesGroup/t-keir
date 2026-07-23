@@ -27,8 +27,8 @@ tool-using research, ontology-driven document composition, and governed publicat
 | Topic | Page |
 |---|---|
 | **Zero to Hero (dev → prod)** | [zero_to_hero.md](zero_to_hero.md) |
+| NLP (pipeline quickstart) | [ready_to_run.md](ready_to_run.md) |
 | Installation | [installation.md](installation.md) |
-| Quick start | [ready_to_run.md](ready_to_run.md) |
 | Dev container | [devcontainer.md](devcontainer.md) |
 | Deployment profiles | [deployment/index.md](deployment/index.md) |
 | Pipeline tools | [tools/tools_overview.md](tools/tools_overview.md) |

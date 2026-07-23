@@ -27,7 +27,10 @@ COPY tkeir/configs ./configs
 COPY tkeir/resources ./resources
 
 # Pipeline + indexer need spaCy language models (dependency-group models).
-RUN uv sync --frozen --no-dev --group models
+RUN uv sync --frozen --no-dev --group models \
+    && find /opt/tkeir/.venv -type d \( -name tests -o -name test -o -name __pycache__ \) \
+         -print0 | xargs -0 rm -rf \
+    && find /opt/tkeir/.venv -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
 
 # ---------------------------------------------------------------------------
 # Runtime

@@ -34,9 +34,10 @@ technical hooks (kill switch, `/admin` panel, approval queue).
 
 ## Kill switch & oversight
 
-`POST /governor/kill {scope: all|ingest|index|inference|hmi-write}` flips
-runtime flags; workers check before and during long operations (target: stop
-in-flight bulk index &lt; 2 s).
+`POST /governor/kill {scope: all|ingest|index|inference|hmi-write|agents}` flips
+runtime flags; workers and `AgentGuard` check before and during long operations
+(target: stop in-flight bulk index &lt; 2 s). Details:
+[Governor deployment](../deployment/governor.md).
 
 HMI **`/admin`** (role `tkeir-admin`): live action feed, approvals with full
 ActionRecord context, budget gauges, kill switch, one-click rollback. Every
@@ -53,5 +54,7 @@ override is itself an ActionRecord (`intent: admin.override`).
 ## Related
 
 - [Identity of Action](action-identiy.md)
+- [Governor deployment](../deployment/governor.md)
+- [SPIRE / SPIFFE](../deployment/spire.md)
 - [AI Act mapping](../compliance/ai-act.md) (Phase 9)
 - [Kill-switch runbook](../runbooks/kill-switch.md)

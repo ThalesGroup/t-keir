@@ -167,9 +167,9 @@ def test_quality_dashboard_page_exists() -> None:
     assert (
         "Cyclomatic" in content or "radon" in content.lower()
     ), "Quality page must mention cyclomatic complexity"
-    assert "coverage" in content.lower(), (
-        "Quality page must mention test coverage"
-    )
+    assert (
+        "coverage" in content.lower()
+    ), "Quality page must mention test coverage"
     assert (
         "licen" in content.lower()
     ), "Quality page must mention dependency licences"

@@ -3,30 +3,37 @@
 import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, Moon, Sun } from "lucide-react";
 
-import { RagResults } from "@/components/rag-results";
-import {
-  SearchHeader,
-  type SearchParams,
-} from "@/components/search-header";
+import { AgentPanel } from "@/components/agent-panel";
 import { AuthButton } from "@/components/auth-button";
+import { ModeSidebar } from "@/components/mode-sidebar";
+import { OntologyNavigator } from "@/components/ontology-navigator";
+import { RagPanel } from "@/components/rag-panel";
+import { SearchPanel } from "@/components/search-panel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { checkAgentHealth, checkHealth, queryRag, RagApiError } from "@/lib/api";
-import type { QueryResponse, SemanticEntity, SemanticKeyword } from "@/lib/types";
+import { checkAgentHealth, checkHealth } from "@/lib/api";
+import type {
+  FusedOntology,
+  SemanticEntity,
+  SemanticKeyword,
+  WorkspaceMode,
+} from "@/lib/types";
 
 export function RagDashboard() {
-  const [submittedQuery, setSubmittedQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [response, setResponse] = useState<QueryResponse | null>(null);
-  const [correlationId, setCorrelationId] = useState<string | null>(null);
+  const [mode, setMode] = useState<WorkspaceMode>("search");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
   const [agentAvailable, setAgentAvailable] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Shared across Search + RAG modes
+  const [ontology, setOntology] = useState<FusedOntology | null>(null);
+  const [ontologyLoading, setOntologyLoading] = useState(false);
+  const [ontologyKey, setOntologyKey] = useState("idle");
   const [activeChunkIds, setActiveChunkIds] = useState<Set<string> | null>(
     null,
   );
   const [activeLabel, setActiveLabel] = useState<string | null>(null);
-  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     void checkHealth().then(setApiHealthy);
@@ -36,6 +43,24 @@ export function RagDashboard() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
+
+  const handleOntologyUpdate = useCallback(
+    (next: FusedOntology | null, meta?: { loading?: boolean; key?: string }) => {
+      if (meta?.loading !== undefined) {
+        setOntologyLoading(meta.loading);
+      }
+      if (meta?.key !== undefined) {
+        setOntologyKey(meta.key);
+      }
+      if (meta?.loading) {
+        return;
+      }
+      setOntology(next);
+      setActiveChunkIds(null);
+      setActiveLabel(null);
+    },
+    [],
+  );
 
   const scrollToFirstMatch = useCallback((chunkIds: string[]) => {
     if (chunkIds.length === 0) {
@@ -47,34 +72,6 @@ export function RagDashboard() {
     element?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, []);
 
-  const handleSearch = useCallback(async ({ query, language, hits }: SearchParams) => {
-    setLoading(true);
-    setError(null);
-    setResponse(null);
-    setCorrelationId(null);
-    setSubmittedQuery(query);
-    setActiveChunkIds(null);
-    setActiveLabel(null);
-
-    try {
-      const result = await queryRag({ query, language, hits });
-      setResponse(result.response);
-      setCorrelationId(result.correlationId);
-    } catch (caught) {
-      const message =
-        caught instanceof RagApiError
-          ? caught.message
-          : caught instanceof Error
-            ? caught.message
-            : "An unexpected error occurred.";
-      setError(message);
-      setResponse(null);
-      setCorrelationId(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   const handleSelectEntity = useCallback(
     (entity: SemanticEntity) => {
       if (activeLabel === entity.label) {
@@ -82,8 +79,7 @@ export function RagDashboard() {
         setActiveLabel(null);
         return;
       }
-      const ids = new Set(entity.chunk_ids);
-      setActiveChunkIds(ids);
+      setActiveChunkIds(new Set(entity.chunk_ids));
       setActiveLabel(entity.label);
       scrollToFirstMatch(entity.chunk_ids);
     },
@@ -97,8 +93,7 @@ export function RagDashboard() {
         setActiveLabel(null);
         return;
       }
-      const ids = new Set(keyword.chunk_ids);
-      setActiveChunkIds(ids);
+      setActiveChunkIds(new Set(keyword.chunk_ids));
       setActiveLabel(keyword.label);
       scrollToFirstMatch(keyword.chunk_ids);
     },
@@ -110,31 +105,30 @@ export function RagDashboard() {
     setActiveLabel(null);
   }, []);
 
+  const showOntology = mode === "search" || mode === "rag";
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b bg-card/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="shrink-0 border-b bg-card/80 backdrop-blur">
+        <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">
               T-KEIR
             </p>
-            <h1 className="text-xl font-bold tracking-tight">
-              Search & RAG Interface
+            <h1 className="text-lg font-bold tracking-tight sm:text-xl">
+              Corpus workspace
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Two-level retrieval — documents & chunks with fused ontology
-            </p>
           </div>
           <div className="flex items-center gap-2">
             <a
               href="/agents"
-              className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+              className="hidden text-sm text-muted-foreground underline-offset-2 hover:underline sm:inline"
             >
               Agents
             </a>
             <a
               href="/admin"
-              className="text-sm text-muted-foreground underline-offset-2 hover:underline"
+              className="hidden text-sm text-muted-foreground underline-offset-2 hover:underline sm:inline"
             >
               Admin
             </a>
@@ -151,44 +145,62 @@ export function RagDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
-        {apiHealthy === false && (
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>RAG API unreachable</AlertTitle>
-            <AlertDescription>
-              Start the FastAPI server with{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-xs">
-                make rag
-              </code>{" "}
-              (default port 8090).
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <SearchHeader loading={loading} onSearch={handleSearch} />
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Query failed</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <RagResults
-          submittedQuery={submittedQuery}
-          response={response}
-          correlationId={correlationId}
-          loading={loading}
+      <div className="flex min-h-0 flex-1">
+        <ModeSidebar
+          mode={mode}
+          onModeChange={setMode}
+          collapsed={sidebarCollapsed}
+          onCollapsedChange={setSidebarCollapsed}
           agentAvailable={agentAvailable}
-          activeChunkIds={activeChunkIds}
-          activeLabel={activeLabel}
-          onSelectEntity={handleSelectEntity}
-          onSelectKeyword={handleSelectKeyword}
-          onClearFilter={handleClearFilter}
         />
-      </main>
+
+        <main className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+          {apiHealthy === false && mode !== "agent" && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>RAG API unreachable</AlertTitle>
+              <AlertDescription>
+                Start the FastAPI server with{" "}
+                <code className="rounded bg-muted px-1 py-0.5 text-xs">
+                  make rag
+                </code>{" "}
+                (default port 8090).
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-6">
+            {mode === "search" && (
+              <SearchPanel
+                onOntologyUpdate={handleOntologyUpdate}
+                activeChunkIds={activeChunkIds}
+              />
+            )}
+            {mode === "rag" && (
+              <RagPanel
+                onOntologyUpdate={handleOntologyUpdate}
+                activeChunkIds={activeChunkIds}
+              />
+            )}
+            {mode === "agent" && <AgentPanel available={agentAvailable} />}
+
+            {showOntology && (
+              <div className="mx-auto w-full max-w-5xl">
+                <OntologyNavigator
+                  ontology={ontology}
+                  loading={ontologyLoading}
+                  activeChunkIds={activeChunkIds}
+                  activeLabel={activeLabel}
+                  onSelectEntity={handleSelectEntity}
+                  onSelectKeyword={handleSelectKeyword}
+                  onClearFilter={handleClearFilter}
+                  accordionKey={ontologyKey}
+                />
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

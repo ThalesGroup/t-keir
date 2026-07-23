@@ -454,17 +454,19 @@ index into Vespa, persist jobs/manifests/DLQ.
 ### 4.4 Governor (`tkeir-governor`)
 
 **Purpose.** Kill switches, budgets, approvals, action tokens for all services.
+Full ops reference: [Governor deployment](deployment/governor.md).
 
 | | |
 |--|--|
-| **Libraries** | **FastAPI**; local state store |
-| **Custom logic** | `PolicyEvaluator` — intent→scope, write gates, observe vs enforce |
+| **Libraries** | **FastAPI**; local state store (`GOVERNOR_STATE_ROOT`) |
+| **Custom logic** | `PolicyEvaluator` — intent→scope, write gates, observe vs enforce; shared with `AgentGuard` |
 
 ---
 
 ### 4.5 Audit (`tkeir-audit`)
 
 **Purpose.** Persist ActionRecords; hot query store + WORM archive.
+Full ops reference: [Audit store](deployment/audit.md).
 
 | | |
 |--|--|
@@ -517,7 +519,8 @@ Deep dive: [Agents](tools/agents.md) · [Templates](tools/templates.md) ·
 4. **Untrusted tool content** — observations wrapped in `<untrusted>`;
    injection / escalation heuristics in `safety.py`.
 5. **Governed** — kill scope `agents`, per-run budgets, ActionRecords with
-   `actor.spiffe_id` ([ADR-0008](adr/0008-spire-agent-identity.md)).
+   `actor.spiffe_id` ([ADR-0008](adr/0008-spire-agent-identity.md);
+   [SPIRE / SPIFFE](deployment/spire.md)).
 
 #### Agent YAML (`configs/agents/`)
 

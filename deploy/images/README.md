@@ -13,9 +13,11 @@
 | `tkeir-indexer-slim` | same, `INSTALL_OCR=0` | `PYTHON_BASE` | same without Tesseract |
 | `tkeir-hmi` | `Dockerfile.tkeir-hmi` | `NODE_BASE` | Next.js standalone (:3000) |
 
-`tkeir-lib` runs `uv sync` **once**. Python service images are thin layers
-(`FROM tkeir-lib`) so the base is not rebuilt per container. HMI is Node-only;
-indexer keeps a separate tree (spaCy `models` group + optional OCR).
+`tkeir-lib` runs `uv sync` **once** (including `--group audit` and
+`--group models` so `tkeir-ingest` can run the spaCy pipeline). Python service
+images are thin layers (`FROM tkeir-lib`) so the base is not rebuilt per
+container. HMI is Node-only; indexer keeps a separate tree (also `models` +
+optional OCR).
 
 Registry (local default): `local` — see `deploy/versions.lock.yaml`.
 Publish: `make images-push IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir`.
@@ -33,3 +35,26 @@ Base images are digest-pinned. `MODEL_MODE=fetch|baked` applies to `tkeir-api`.
 
 Compose build of api/ingest/… expects `local/tkeir-lib:$IMAGE_TAG` already
 present (`make images` or `make image-lib` first).
+
+## Disk / BuildKit I/O errors
+
+`Input/output error` while installing sympy/nltk or on
+`COPY --from=builder …/.venv` usually means the **host or Docker Desktop disk
+is full / corrupted**, not a bad Dockerfile. Check free space (`df -h`); Docker
+Desktop alone can consume hundreds of GiB under
+`~/Library/Containers/com.docker.docker`.
+
+Recover locally:
+
+```bash
+# Free Docker build cache + unused images (destructive to unused local images)
+docker builder prune -af
+docker system prune -af --volumes
+
+# If the daemon still reports blob I/O errors: Docker Desktop → Troubleshoot
+# → Clean / Purge data, then retry:
+make images
+```
+
+Builder stages also strip `tests` / `__pycache__` from the venv after `uv sync`
+to shrink the runtime COPY.

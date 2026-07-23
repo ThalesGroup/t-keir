@@ -83,7 +83,11 @@ def ontology_paths_from_document(tkeir_doc: dict[str, Any]) -> list[str]:
         paths.extend(normalize_ontology_path_list(tkeir_doc.get(key)))
     metadata = tkeir_doc.get("metadata")
     if isinstance(metadata, dict):
-        for key in ("ontologies", "derive_from_ontologies", "ontology_sources"):
+        for key in (
+            "ontologies",
+            "derive_from_ontologies",
+            "ontology_sources",
+        ):
             paths.extend(normalize_ontology_path_list(metadata.get(key)))
     return normalize_ontology_path_list(paths)
 

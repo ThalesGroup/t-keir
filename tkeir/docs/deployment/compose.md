@@ -15,6 +15,11 @@ make images            # tags: local/tkeir-*:$IMAGE_TAG
 # Start core + Keycloak
 make compose-up PROFILES=core,auth
 
+# Deploy Vespa document/chunk schemas into the Compose Vespa container
+# (required once after a fresh vespa_data volume — otherwise tkeir-api /health is 503)
+make compose-bootstrap
+docker restart tkeir-api
+
 # Tail logs
 make compose-logs
 

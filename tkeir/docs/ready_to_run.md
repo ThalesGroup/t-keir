@@ -1,10 +1,9 @@
-# Quickstart
+# NLP
 
-> Prefer the full journey? Start with **[Zero to Hero](zero_to_hero.md)**
-> (P0 → P4). This page is the short P0 pipeline demo.
-
-After [Installation](installation.md) (`make setup` from the repository root), run the
-bundled pipeline demo.
+Short **P0 pipeline** demo (tokenizer → tagging → keywords → ontology) after
+[Installation](installation.md) (`make setup` from the repository root). Part of
+**[Zero to Hero](zero_to_hero.md)** (P0 → P4); this page is the NLP-only path
+without Vespa indexing.
 
 ## Demo on fixtures
 

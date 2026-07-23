@@ -1,8 +1,16 @@
 # T-KEIR Human-Machine Interface (tkeir-hmi)
 
-Modern Next.js dashboard for the T-KEIR two-level RAG stack: hybrid Vespa
-retrieval (streaming mode, per-user group) at document and chunk levels,
-LLM answer synthesis, and an interactive fused ontology navigator.
+Modern Next.js workspace for the T-KEIR corpus with a **retractable left
+accordion** that switches between three modes:
+
+| Mode | Purpose |
+|------|---------|
+| **Search** | Google-style hybrid retrieval (`POST /search`) — documents & chunks, no LLM report |
+| **RAG** | Question → grounded synthesis + downloadable markdown report (`POST /rag/query`) |
+| **Agent** | Chat with researcher / workflows (`tkeir-agent`) to explore data and compose custom reports |
+
+Also includes LLM answer synthesis (RAG mode), an interactive fused ontology
+navigator, and admin/agent run monitors.
 
 ## Prerequisites
 

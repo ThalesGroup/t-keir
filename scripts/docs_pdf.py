@@ -76,6 +76,36 @@ a { color: #1a4d8f; text-decoration: none; }
 """
 
 
+class _MkDocsYamlLoader(yaml.SafeLoader):
+    """SafeLoader that tolerates MkDocs ``!!python/name:…`` tags.
+
+    PDF export only needs ``site_*`` and ``nav``; markdown extension callables
+    are irrelevant and must not force ``FullLoader``.
+    """
+
+
+def _ignore_python_name(
+    loader: yaml.SafeLoader, suffix: str, node: yaml.Node
+) -> None:
+    return None
+
+
+_MkDocsYamlLoader.add_multi_constructor(
+    "tag:yaml.org,2002:python/name:",
+    _ignore_python_name,
+)
+
+
+def _load_mkdocs_yml(mkdocs_yml: Path) -> dict[str, Any]:
+    cfg = yaml.load(
+        mkdocs_yml.read_text(encoding="utf-8"),
+        Loader=_MkDocsYamlLoader,
+    )
+    if not isinstance(cfg, dict):
+        raise ValueError(f"expected mapping in {mkdocs_yml}")
+    return cfg
+
+
 def _walk_nav(nodes: list[Any]) -> list[tuple[str, str]]:
     """Flatten MkDocs nav to (title, relative path) pairs."""
     pages: list[tuple[str, str]] = []
@@ -125,7 +155,7 @@ def _md_to_html(text: str) -> str:
 
 
 def build_html(docs_dir: Path, mkdocs_yml: Path) -> str:
-    cfg = yaml.safe_load(mkdocs_yml.read_text(encoding="utf-8"))
+    cfg = _load_mkdocs_yml(mkdocs_yml)
     site_name = cfg.get("site_name", "T-KEIR")
     site_description = cfg.get("site_description", "")
     nav = cfg.get("nav") or []

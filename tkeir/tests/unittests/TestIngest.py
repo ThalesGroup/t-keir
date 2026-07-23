@@ -18,7 +18,6 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from thot.action.models import sha256_hex
 from thot.ingest.config import ingest_settings
 from thot.ingest.fetch import doc_id_from_content, fetch_bytes
 from thot.ingest.manifest import (
@@ -85,13 +84,14 @@ def test_document_extras_from_metadata_promotes_nato_paths():
 
 
 def test_ontology_upload_decode_rejects_path_strings():
+    import base64
+    import tempfile
+    from pathlib import Path
+
     from thot.ingest.ontology_upload import (
         decode_ontology_uploads,
         stage_ontology_bytes,
     )
-    import base64
-    import tempfile
-    from pathlib import Path
 
     try:
         decode_ontology_uploads(["/client/path.ttl"])

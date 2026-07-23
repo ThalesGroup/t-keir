@@ -29,9 +29,12 @@ COPY tkeir/thot ./thot
 COPY tkeir/configs ./configs
 COPY tkeir/resources ./resources
 
-# audit group is tiny (psycopg) and needed by tkeir-audit; include here so every
-# consumer shares one layer instead of a second sync.
-RUN uv sync --frozen --no-dev --group audit
+# audit (psycopg) + models (spaCy) are shared so ingest can run the pipeline
+# in-container without a second sync. Indexer still builds its own tree.
+RUN uv sync --frozen --no-dev --group audit --group models \
+    && find /opt/tkeir/.venv -type d \( -name tests -o -name test -o -name __pycache__ \) \
+         -print0 | xargs -0 rm -rf \
+    && find /opt/tkeir/.venv -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
 
 # ---------------------------------------------------------------------------
 # Runtime base — non-root user + venv; no service ENTRYPOINT

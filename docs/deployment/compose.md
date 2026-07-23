@@ -7,7 +7,11 @@ Bring up a full demo stack on macOS (Apple Silicon) or Linux without Kubernetes.
 ```bash
 # Copy env defaults once (IMAGE_REGISTRY=local by default)
 cp deploy/compose/.env.example deploy/compose/.env
+```
 
+Variable reference: [Environment variables](environment.md).
+
+```bash
 # Build images into the local Docker daemon (not GHCR)
 make images            # tags: local/tkeir-*:$IMAGE_TAG
 # or: make image-api image-hmi …

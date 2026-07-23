@@ -29,6 +29,7 @@ charts/Compose services with stricter value presets.
 
 | Topic | Doc |
 |-------|-----|
+| Environment variables | [Environment variables](environment.md) |
 | ActionRecord hot store + WORM | [Audit store](audit.md) |
 | Kill switch, budgets, approvals, tokens | [Governor](governor.md) |
 | Agent workload identity | [SPIRE / SPIFFE](spire.md) |

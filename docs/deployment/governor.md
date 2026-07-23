@@ -219,6 +219,7 @@ governor:
 
 ## Related
 
+- [Environment variables](environment.md)
 - [Mastering of Action](../regularity-component/action-mastering.md)
 - [Identity of Action](../regularity-component/action-identiy.md)
 - [Kill-switch runbook](../runbooks/kill-switch.md)

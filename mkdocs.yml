@@ -19,6 +19,7 @@ nav:
     - Dev Container: 'devcontainer.md'
     - Deployment:
         - Profiles: 'deployment/index.md'
+        - Environment variables: 'deployment/environment.md'
         - Compose (P1): 'deployment/compose.md'
         - Kubernetes (P2): 'deployment/k8s.md'
         - Token exchange (RFC 8693): 'deployment/token-exchange.md'

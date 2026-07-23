@@ -123,6 +123,7 @@ export TRANSFORMERS_CACHE=$PWD/.cache/models
 | Quality gate before push | `make pre-commit` or `make ci` |
 | Docs site | `make docs` |
 | Docs PDF | `make docs-pdf` → `output/docs/tkeir-docs.pdf` |
+| Environment variables | [Environment variables](deployment/environment.md) |
 | EU compliance OPA audit | `make audit-compliance` → [EU Compliance OPA Audit](compliance/eu-audit.md) |
 
 ## Troubleshooting

@@ -173,6 +173,7 @@ Deployment and set `SPIFFE_MODE=workload` (+ enforce as needed).
 
 ## Related
 
+- [Environment variables](environment.md)
 - [ADR-0008](../adr/0008-spire-agent-identity.md) (supersedes ADR-0004 deferral)
 - [Agents](../tools/agents.md)
 - [Governor](governor.md)

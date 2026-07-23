@@ -35,7 +35,7 @@ Static build / PDF (optional): `make docs-build`, `make docs-pdf`.
 | **Conception** | Design notes: services, modules, storage, config surfaces |
 | **Installation** | Host prereqs, `make setup`, models, TLS/proxy tips |
 | **Dev Container** | VS Code / Codespaces layout and first commands |
-| **Deployment** | Profiles (Compose, k8s, secure); ingest, audit, governor, SPIRE, macOS |
+| **Deployment** | Profiles, **environment variables**, Compose, k8s, audit, governor, SPIRE |
 | **Evaluation** | BEIR datasets (SciFact, FiQA, ArguAna), how to run, scored report |
 | **Tools** | CLIs and APIs: pipeline taggers, Vespa RAG, MCP, agents, templates, HMI, corpus |
 | **Regularity component** | Identity of Action (ActionRecords) and Mastering of Action (governor) |

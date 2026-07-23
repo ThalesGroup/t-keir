@@ -190,6 +190,7 @@ run `audit` and `mcp` profiles on the same host without remapping one port.
 
 ## Related
 
+- [Environment variables](environment.md)
 - [ADR-0003](../adr/0003-audit-store-worm.md)
 - [Identity of Action](../regularity-component/action-identiy.md)
 - [Governor](governor.md)

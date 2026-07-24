@@ -186,6 +186,7 @@ def test_render_smoke_report_leads_with_focus():
         RankAlert,
         SmokeRun,
         StageTimings,
+        compare_smoke_to_previous,
         render_smoke_report,
     )
 
@@ -212,3 +213,118 @@ def test_render_smoke_report_leads_with_focus():
     assert md.index("Focus — problems") < md.index("Summary metrics")
     assert "Code focus:" in md
     assert "tkeir_ndcg_zero" in md
+
+    previous = {
+        "wall_s": 10.0,
+        "runs": [
+            {
+                "name": "scifact",
+                "tkeir_ndcg10": 0.5,
+                "tkeir_recall10": 0.5,
+                "alerts": [{"severity": "high", "code": "gold_miss_all"}],
+                "timings": {"retrieve_ms": 1000.0},
+            }
+        ],
+    }
+    # Improved NDCG vs previous (even if still zero alerts on this toy run).
+    improved = SmokeRun(
+        name="scifact",
+        queries=1,
+        docs_indexed=5,
+        gold_docs=1,
+        close_docs=4,
+        bm25=Metrics(ndcg={"NDCG@10": 0.9}),
+        tkeir=Metrics(ndcg={"NDCG@10": 0.7}),
+        timings=StageTimings(retrieve_ms=800.0),
+        alerts=[],
+    )
+    comparison = compare_smoke_to_previous(
+        [improved], wall_s=8.0, previous=previous
+    )
+    assert comparison.overall == "better"
+    md2 = render_smoke_report(
+        [improved], wall_s=8.0, comparison=comparison
+    )
+    assert "## Vs previous report" in md2
+    assert md2.index("Vs previous") < md2.index("Focus — problems")
+    assert "**Better**" in md2 or "better" in md2.lower()
+
+
+def test_compare_smoke_to_previous_verdicts():
+    from thot.tools.search.beir_smoke import (
+        RankAlert,
+        SmokeRun,
+        StageTimings,
+        compare_smoke_to_previous,
+    )
+
+    def _run(name: str, ndcg: float, high: int = 0) -> SmokeRun:
+        alerts = (
+            [
+                RankAlert(
+                    code="gold_miss_all",
+                    detail="x",
+                    severity="high",
+                    focus="f",
+                )
+            ]
+            * high
+        )
+        return SmokeRun(
+            name=name,
+            queries=1,
+            docs_indexed=2,
+            gold_docs=1,
+            close_docs=1,
+            bm25=Metrics(ndcg={"NDCG@10": 0.5}),
+            tkeir=Metrics(ndcg={"NDCG@10": ndcg}, recall={"Recall@10": ndcg}),
+            timings=StageTimings(retrieve_ms=100.0),
+            alerts=alerts,
+        )
+
+    assert (
+        compare_smoke_to_previous(
+            [_run("scifact", 0.5)], wall_s=1.0, previous=None
+        ).overall
+        == "no_baseline"
+    )
+
+    previous = {
+        "wall_s": 5.0,
+        "runs": [
+            {
+                "name": "scifact",
+                "tkeir_ndcg10": 0.4,
+                "tkeir_recall10": 0.4,
+                "alerts": [{"severity": "high", "code": "a"}],
+                "timings": {"retrieve_ms": 200.0},
+            },
+            {
+                "name": "fiqa",
+                "tkeir_ndcg10": 0.6,
+                "tkeir_recall10": 0.6,
+                "alerts": [],
+                "timings": {"retrieve_ms": 200.0},
+            },
+        ],
+    }
+    better = compare_smoke_to_previous(
+        [_run("scifact", 0.55), _run("fiqa", 0.65)],
+        wall_s=4.0,
+        previous=previous,
+    )
+    assert better.overall == "better"
+
+    worse = compare_smoke_to_previous(
+        [_run("scifact", 0.2, high=2), _run("fiqa", 0.4)],
+        wall_s=6.0,
+        previous=previous,
+    )
+    assert worse.overall == "worse"
+
+    mixed = compare_smoke_to_previous(
+        [_run("scifact", 0.7), _run("fiqa", 0.3)],
+        wall_s=5.0,
+        previous=previous,
+    )
+    assert mixed.overall == "mixed"

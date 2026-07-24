@@ -14,11 +14,12 @@ Vespa schema change. Streaming corpora must be fully reindexed.
 
 2. Deploy schemas (`make init` or Compose bootstrap).
 
-3. If Vespa rejects `stemming: none` / `normalizing: none` on
-   `title_lemmatized` / `content_lemmatized`, remove those two attributes
-   from the Jinja templates, regenerate, and redeploy. Document the
-   fallback in the templates' comments (default Vespa linguistics then
-   apply on already-normalized text).
+3. Lemmatized fields use `stemming: none` / `normalizing: none` and live in
+   fieldset `lemmatized` (not `default`) so Vespa does not warn about
+   inconsistent linguistics vs raw `title`/`content`. If Vespa rejects those
+   attributes, remove them from the Jinja templates, regenerate, and redeploy.
+   Document the fallback in the templates' comments (default Vespa linguistics
+   then apply on already-normalized text).
 
 ## Reindex order
 

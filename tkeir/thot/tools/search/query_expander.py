@@ -85,11 +85,11 @@ class QueryExpander:
                 normalized_text=normalized,
             )
         ]
-        # Always add scientific / morphological stems so Vespa BM25 can
-        # match aliases (FoxO3a → foxo, p150n → p150) even before ontology.
+        # Structural identifier stems only (FoxO3a → foxo). Language
+        # morphology / synonyms come from TextNormalizer + ontology.
         from thot.tools.search.lexical_signal import tokenize, token_stems
 
-        seen_lower = {query.strip().lower()}
+        seen_lower = {query.strip().casefold()}
         for tok in tokenize(query):
             for stem in token_stems(tok):
                 if stem in seen_lower or len(stem) < 3:

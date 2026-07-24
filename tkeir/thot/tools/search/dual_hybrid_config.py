@@ -194,9 +194,9 @@ class CrossEncoderYaml:
 
     enabled: bool = True
     model: str = "BAAI/bge-reranker-v2-m3"
-    top_m: int = 20
-    max_length: int = 512
-    batch_size: int = 16
+    top_m: int = 8
+    max_length: int = 256
+    batch_size: int = 8
 
 
 @dataclass(frozen=True)
@@ -366,9 +366,9 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
         cross_encoder=CrossEncoderYaml(
             enabled=bool(ce.get("enabled", True)),
             model=str(ce.get("model", "BAAI/bge-reranker-v2-m3")),
-            top_m=int(ce.get("top_m", 20)),
-            max_length=int(ce.get("max_length", 512)),
-            batch_size=int(ce.get("batch_size", 16)),
+            top_m=int(ce.get("top_m", 8)),
+            max_length=int(ce.get("max_length", 256)),
+            batch_size=int(ce.get("batch_size", 8)),
         ),
         final_fusion=FinalFusionYaml(
             weights=final_weights,

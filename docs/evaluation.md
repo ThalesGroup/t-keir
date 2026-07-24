@@ -104,14 +104,17 @@ index path without NLP; ensure the embedder is warm).
 | Path | Contents |
 |------|----------|
 | `reports/beir/smoke/report.md` | Problems-first Markdown (see below) |
-| `reports/beir/smoke/report.json` | Same data + top-level `focus[]` for tooling |
+| `reports/beir/smoke/report.json` | Same data + `comparison` + `focus[]` |
+| `reports/beir/smoke/report.prev.json` | Previous run (archived on each write) |
 
 Report structure (designed to drive code changes):
 
-1. **Focus — problems to fix** — severity-ordered alerts with **Code focus**
-2. **Failure examples** — FP / FN with query text + analysis (reproduce locally)
-3. **Summary metrics** — NDCG@10 vs BM25, Δ, timings
-4. **Timings** — dual-hybrid stages sorted by cost
+1. **Vs previous report** — overall **better / worse / mixed / unchanged**
+   (primary: mean Δ T-KEIR NDCG@10; secondary: high-severity alert count)
+2. **Focus — problems to fix** — severity-ordered alerts with **Code focus**
+3. **Failure examples** — FP / FN with query text + analysis (reproduce locally)
+4. **Summary metrics** — NDCG@10 vs BM25, Δ, timings (NDCG cell notes vs prev)
+5. **Timings** — dual-hybrid stages sorted by cost
 
 Prerequisite: Vespa up (`make bootstrap`). Smoke uses the dedicated BEIR
 volume (`BEIR_VESPA_VOLUME`) so it does not wipe your primary demo index.

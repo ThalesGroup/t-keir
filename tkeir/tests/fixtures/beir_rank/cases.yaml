@@ -249,7 +249,9 @@ cases:
       text: >
         The current austerity measures are not working. The austerity measures
         put in place by the ECB, IMF and European Commission have led to misery
-        for the Greek people.
+        for the Greek people. They have failed to cut the deficit sustainably
+        while collapsing domestic demand across southern member states during
+        the eurozone crisis years.
     qrels:
       gold-counter: 1
     documents:
@@ -266,7 +268,9 @@ cases:
         text: >
           The current austerity measures are not working. The austerity measures
           put in place by the ECB, IMF and European Commission have led to misery
-          for the Greek people.
+          for the Greek people. They have failed to cut the deficit sustainably
+          while collapsing domestic demand across southern member states during
+          the eurozone crisis years.
 
   - id: syn_fn_related_pair_low_overlap
     issue: false_negative

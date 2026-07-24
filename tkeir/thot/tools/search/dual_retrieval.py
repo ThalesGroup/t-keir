@@ -262,21 +262,60 @@ class DualHybridPipeline:
             degraded.append("query_normalization_skipped")
         timings["expand"] = (time.perf_counter() - t0) * 1000
 
+        from thot.tools.search.lexical_signal import (
+            is_long_query,
+            lexical_query_projection,
+            near_copy_penalty,
+            rare_token_multiplier,
+        )
+
+        long_query = is_long_query(query)
+        bm25_projection = lexical_query_projection(query)
+        # Document-as-query: prefer semantic chunk profile + chunk arm weight.
+        chunk_profile = self.config.retrieval.chunk.profile
+        arm_weights = dict(self.config.rrf.arm_weights)
+        fusion_weights = dict(self.config.final_fusion.weights)
+        rerank_strategy = "cross_encoder"
+        rerank_query = query
+        if long_query:
+            chunk_profile = "hybrid_semantic"
+            arm_weights = {"chunk": 0.75, "document": 0.25}
+            # Lexical on long arguments rewards near-copies; lean on RRF +
+            # cheap embedding cosine (full CE on long queries is too slow).
+            fusion_weights = {
+                "rrf": 0.45,
+                "lexical_overlap": 0.10,
+                "ontology_overlap": 0.15,
+                "cross_encoder": 0.30,
+            }
+            rerank_strategy = "embedding_cosine"
+            rerank_query = bm25_projection or query[:400]
+            degraded.append("long_query_semantic")
+
         t1 = time.perf_counter()
         # Sequential arms: Vespa streaming mode often 504s when two
         # nearestNeighbor/BM25 visitors hit the same group concurrently.
         chunk_rank, chunk_meta = await self._search_chunks(
-            expansion, user_space, q_chunk_emb, q_question_emb
+            expansion,
+            user_space,
+            q_chunk_emb,
+            q_question_emb,
+            bm25_projection=bm25_projection,
+            ranking_profile=chunk_profile,
         )
         doc_rank, doc_meta = await self._search_documents(
-            expansion, user_space, normalizer, language
+            expansion,
+            user_space,
+            normalizer,
+            language,
+            bm25_projection=bm25_projection,
         )
         timings["vespa_arms"] = (time.perf_counter() - t1) * 1000
 
         t2 = time.perf_counter()
         rrf_raw = reciprocal_rank_fusion(
             {"chunk": chunk_rank, "document": doc_rank},
-            self.config.rrf.arm_weights,
+            arm_weights,
             self.config.rrf.k,
         )
         rrf_norm = normalize_scores(rrf_raw)
@@ -322,7 +361,10 @@ class DualHybridPipeline:
                 title = str(dmeta.get("title") or "")
                 chunk_text = str(cmeta.get("best_chunk_text") or "")
                 passage = "\n".join(part for part in (title, chunk_text) if part)
-                text = passage or title or chunk_text or doc_id
+                max_chars = max(
+                    120, int(self.config.cross_encoder.max_length) * 4
+                )
+                text = (passage or title or chunk_text or doc_id)[:max_chars]
                 unique_text = (
                     text if text not in text_to_doc else f"{text}\n#{doc_id}"
                 )
@@ -333,9 +375,9 @@ class DualHybridPipeline:
             try:
                 ranked = await rerank_scored_texts(
                     self.llm,
-                    query,
+                    rerank_query,
                     text_items,
-                    strategy="cross_encoder",
+                    strategy=rerank_strategy,
                 )
                 ce_raw = {
                     text_to_doc[text]: float(score)
@@ -353,10 +395,7 @@ class DualHybridPipeline:
         timings["cross_encoder"] = (time.perf_counter() - t4) * 1000
 
         t5 = time.perf_counter()
-        from thot.tools.search.lexical_signal import (
-            lexical_overlap_score,
-            near_copy_penalty,
-        )
+        from thot.tools.search.lexical_signal import lexical_overlap_score
 
         lex_raw: dict[str, float] = {}
         for doc_id in fused_ids:
@@ -377,6 +416,7 @@ class DualHybridPipeline:
                 score *= near_copy_penalty(
                     query, f"{title} {body}".strip()
                 )
+            score *= rare_token_multiplier(query, title=title, body=body)
             lex_raw[doc_id] = score
         lex_norm = normalize_scores(lex_raw)
         timings["lexical"] = (time.perf_counter() - t5) * 1000
@@ -394,11 +434,33 @@ class DualHybridPipeline:
             },
         }
         if ce_norm:
+            # Docs outside CE top_m get neutral, not 0 — zeroing them
+            # buried recall candidates that never entered the CE window.
+            neutral = self.config.fallback.neutral_score
             signals["cross_encoder"] = {
-                doc_id: ce_norm.get(doc_id, 0.0) for doc_id in fused_ids
+                doc_id: ce_norm.get(doc_id, neutral) for doc_id in fused_ids
             }
 
-        final = weighted_fusion(signals, self.config.final_fusion.weights)
+        final = weighted_fusion(signals, fusion_weights)
+        # Near-copy / rare-token gates on the fused score so CE/RRF cannot
+        # resurrect query duplicates (corpus-independent).
+        for doc_id in list(final):
+            cmeta = chunk_meta.get(doc_id) or {}
+            dmeta = doc_fields.get(doc_id) or {}
+            title = str(dmeta.get("title") or "")
+            body = str(
+                cmeta.get("best_chunk_text")
+                or " ".join(
+                    str(x) for x in (dmeta.get("content") or []) if x
+                )
+                or ""
+            )
+            factor = rare_token_multiplier(query, title=title, body=body)
+            if self.config.final_fusion.near_copy_penalty:
+                factor *= near_copy_penalty(
+                    query, f"{title} {body}".strip()
+                )
+            final[doc_id] = float(final[doc_id]) * factor
         ordered = sorted(
             final, key=final.get, reverse=True  # type: ignore[arg-type]
         )[:return_k]
@@ -436,15 +498,39 @@ class DualHybridPipeline:
         user_space: str,
         q_chunk_emb: list[float] | None,
         q_question_emb: list[float] | None,
+        *,
+        bm25_projection: str | None = None,
+        ranking_profile: str | None = None,
     ) -> tuple[list[str], dict[str, dict[str, Any]]]:
         hits = self.config.retrieval.chunk.hits
-        terms = [term.text for term in expansion.terms if term.text]
+        profile = ranking_profile or self.config.retrieval.chunk.profile
+        # Prefer compact distinctive projection over raw expansion join.
+        # Keep ontology synonym/related terms for surface-form recall.
+        probe = (bm25_projection or "").strip()
+        if not probe:
+            terms = [term.text for term in expansion.terms if term.text]
+            probe = " ".join(terms[:12])
+        else:
+            extra: list[str] = []
+            seen = {tok.lower() for tok in probe.split()}
+            for term in expansion.terms:
+                if term.relation not in (
+                    "synonyms",
+                    "narrower",
+                    "related",
+                    "broader",
+                ):
+                    continue
+                tok = (term.text or "").strip()
+                if not tok or tok.lower() in seen or len(tok) < 3:
+                    continue
+                seen.add(tok.lower())
+                extra.append(tok)
+            if extra:
+                probe = f"{probe} {' '.join(extra[:8])}".strip()
         text_clause = ""
-        if terms:
-            # Prefer primary query text for contains; expansions as OR tokens.
-            text_clause = build_text_raw_contains_or_clause(
-                " ".join(terms[:12])
-            )
+        if probe:
+            text_clause = build_text_raw_contains_or_clause(probe)
         parts: list[str] = []
         dim = self.vespa.config.embedding_dim
         if q_chunk_emb and len(q_chunk_emb) == dim:
@@ -466,7 +552,7 @@ class DualHybridPipeline:
         payload: dict[str, Any] = {
             "yql": yql,
             "hits": hits,
-            "ranking.profile": self.config.retrieval.chunk.profile,
+            "ranking.profile": profile,
             "streaming.groupname": user_space,
             "timeout": f"{timeout_s}s",
         }
@@ -474,7 +560,7 @@ class DualHybridPipeline:
             payload["input.query(q_chunk_emb)"] = q_chunk_emb
         if q_question_emb and len(q_question_emb) == dim:
             payload["input.query(q_question_emb)"] = q_question_emb
-        LOGGER.debug("chunk YQL: %s", yql)
+        LOGGER.debug("chunk YQL profile=%s: %s", profile, yql)
         try:
             response = await self.vespa.search(payload)
         except Exception as exc:  # noqa: BLE001
@@ -512,46 +598,77 @@ class DualHybridPipeline:
         user_space: str,
         normalizer: TextNormalizer | None,
         language: str | None = None,
+        *,
+        bm25_projection: str | None = None,
     ) -> tuple[list[str], dict[str, dict[str, Any]]]:
         hits = self.config.retrieval.document.hits
-        raw_terms = [term.text for term in expansion.terms if term.text][:16]
+        projection = (bm25_projection or "").strip()
+        if projection:
+            raw_terms = projection.split()[:16]
+            # Ontology expansions still matter when surface forms diverge.
+            seen = {tok.lower() for tok in raw_terms}
+            for term in expansion.terms:
+                if term.relation not in (
+                    "synonyms",
+                    "narrower",
+                    "related",
+                    "broader",
+                ):
+                    continue
+                tok = (term.text or "").strip()
+                if not tok or tok.lower() in seen or len(tok) < 3:
+                    continue
+                seen.add(tok.lower())
+                raw_terms.append(tok)
+            raw_terms = raw_terms[:16]
+        else:
+            raw_terms = [term.text for term in expansion.terms if term.text][:16]
         # Prefer pre-normalized expansion terms (same TextNormalizer as index).
-        norm_terms = [
-            term.normalized_text
-            for term in expansion.terms
-            if term.normalized_text
-        ][:16]
-        if not norm_terms and normalizer is not None and raw_terms:
+        if projection and normalizer is not None:
             norm_terms = normalize_query_texts(
-                raw_terms[:16],
+                raw_terms,
                 language=language,
                 normalizer=normalizer,
             )
-        elif (
-            not norm_terms
-            and expansion.normalized_query
-            and expansion.normalized_query != expansion.raw_query
-        ):
-            norm_terms = [expansion.normalized_query]
+        else:
+            norm_terms = [
+                term.normalized_text
+                for term in expansion.terms
+                if term.normalized_text
+            ][:16]
+            if not norm_terms and normalizer is not None and raw_terms:
+                norm_terms = normalize_query_texts(
+                    raw_terms[:16],
+                    language=language,
+                    normalizer=normalizer,
+                )
+            elif (
+                not norm_terms
+                and expansion.normalized_query
+                and expansion.normalized_query != expansion.raw_query
+            ):
+                norm_terms = [expansion.normalized_query]
 
         clauses: list[str] = []
         if raw_terms:
             raw_clause = build_multi_field_contains_or_clause(
-                raw_terms[:8],
+                raw_terms[:12],
                 fields=("title", "content"),
             )
             if raw_clause:
                 clauses.append(raw_clause)
         if norm_terms:
             lem_clause = build_multi_field_contains_or_clause(
-                norm_terms[:8],
+                norm_terms[:12],
                 fields=("title_lemmatized", "content_lemmatized"),
             )
             if lem_clause:
                 clauses.append(lem_clause)
         if not clauses:
-            # Fallback: literal query on title
-            lit = escape_yql_literal(expansion.raw_query)
+            # Fallback: compact projection or truncated raw query on title
+            lit = escape_yql_literal(
+                projection or expansion.raw_query[:180]
+            )
             clauses.append(f'title contains "{lit}"')
         yql = "select * from tkeir_document where " + " or ".join(
             f"({clause})" for clause in clauses
@@ -585,6 +702,7 @@ class DualHybridPipeline:
                 "title": fields.get("title") or "",
                 "json_ld": fields.get("json_ld") or "",
                 "source_doc_id": doc_id,
+                "content": fields.get("content") or [],
                 "relevance": child.get("relevance"),
             }
         return ordered, meta

@@ -5,12 +5,14 @@ budgets:
   - id: perf-cross-encoder-budget
     issue: slow_stage_cross_encoder
     severity: medium
-    symptom: CE avg 2.7–3.5s/query in smoke
+    symptom: CE avg 2.1–2.6s/query in smoke at top_m=20×512
     code_focus:
       - dual_retrieval.py cross_encoder stage
       - configs/rag.yaml dual_hybrid.cross_encoder.top_m
     assert: cross_encoder_ms_per_query < 1500 on fixture pool size<=20
-    notes: Use embedding_cosine or top_m=5 in unit/perf harness; do not load full HF model in CI.
+    notes: >
+      Defaults are top_m=8 / max_length=256; long queries use embedding_cosine.
+      Do not load full HF CrossEncoder in CI unit tests.
   - id: perf-ontology-budget
     issue: slow_stage_ontology
     severity: low

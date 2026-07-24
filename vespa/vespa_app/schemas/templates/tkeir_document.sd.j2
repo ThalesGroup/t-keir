@@ -19,8 +19,8 @@ schema tkeir_document {
             index: enable-bm25
         }
         # Lemmatized + asciifolded upstream (TextNormalizer). Avoid double linguistics.
-        # stemming/normalizing:none — if Vespa deploy rejects these field attributes,
-        # remove them and accept default linguistics (document in migration runbook).
+        # Must NOT share a fieldset with raw title/content (Vespa requires matching
+        # stemming/normalizing within a fieldset).
         field title_lemmatized type string {
             indexing: summary | index
             index: enable-bm25
@@ -41,8 +41,14 @@ schema tkeir_document {
         }
     }
 
+    # Raw fields: Vespa default linguistics (stemming/normalizing).
     fieldset default {
-        fields: title, content, title_lemmatized, content_lemmatized
+        fields: title, content
+    }
+
+    # Pre-normalized fields: linguistics disabled (consistent within this set).
+    fieldset lemmatized {
+        fields: title_lemmatized, content_lemmatized
     }
 
     rank-profile document_bm25 {

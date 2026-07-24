@@ -119,6 +119,52 @@ def test_scientific_alias_stems():
     assert score >= 0.4
 
 
+def test_near_copy_and_projection_are_corpus_independent():
+    from thot.tools.search.lexical_signal import (
+        is_long_query,
+        lexical_query_projection,
+        near_copy_penalty,
+        rare_token_multiplier,
+    )
+
+    long_q = (
+        "The current austerity measures are not working. The austerity "
+        "measures put in place by the ECB, IMF and European Commission "
+        "have led to misery for the Greek people. Additional filler text "
+        "about markets access and fiscal consolidation programmes across "
+        "member states during the eurozone crisis years."
+    )
+    assert is_long_query(long_q)
+    proj = lexical_query_projection(long_q)
+    assert "austerity" in proj
+    assert len(proj.split()) <= 16
+    near = (
+        "The current austerity measures are not working. The austerity "
+        "measures put in place by the ECB, IMF and European Commission "
+        "have led to misery for the Greek people."
+    )
+    assert near_copy_penalty(long_q, near) < 0.2
+    # Short claims that restate gold must NOT be near-copy penalized.
+    short_q = "High levels of copeptin decrease risk of diabetes."
+    assert near_copy_penalty(
+        short_q,
+        "Elevated plasma copeptin was associated with decreased risk of "
+        "incident diabetes after adjustment.",
+    ) == 1.0
+    rare = rare_token_multiplier(
+        short_q,
+        title="Statins in primary prevention",
+        body="Statins lower CVD risk without naming the peptide.",
+    )
+    assert rare < 1.0
+    rare_hit = rare_token_multiplier(
+        short_q,
+        title="Copeptin predicts diabetes",
+        body="Elevated copeptin associated with diabetes risk.",
+    )
+    assert rare_hit > 1.0
+
+
 def test_lexical_ranking_satisfies_fixture_asserts():
     for case in _load_cases():
         ranked = _rank(

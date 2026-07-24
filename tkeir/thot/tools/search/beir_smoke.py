@@ -190,9 +190,11 @@ _SLOW_STAGE_MS = {
 
 
 def _fmt_ms(value: float) -> str:
-    if value >= 1000:
-        return f"{value / 1000:.1f}s"
-    return f"{value:.0f}ms"
+    sign = "-" if value < 0 else ""
+    magnitude = abs(value)
+    if magnitude >= 1000:
+        return f"{sign}{magnitude / 1000:.1f}s"
+    return f"{sign}{magnitude:.0f}ms"
 
 
 def _truncate(text: str, limit: int = 160) -> str:
@@ -394,6 +396,301 @@ def _metric_recall10(metrics: Metrics) -> float:
     )
 
 
+def smoke_report_dir(root: Path | None = None) -> Path:
+    """Return ``reports/beir/smoke`` under the repo root."""
+    base = Path(root) if root is not None else Path(repo_root())
+    return base / "reports" / "beir" / "smoke"
+
+
+def load_previous_smoke_report(
+    out_dir: Path | None = None,
+) -> dict[str, Any] | None:
+    """Load the last smoke ``report.json`` if present."""
+    directory = out_dir or smoke_report_dir()
+    path = directory / "report.json"
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        LOGGER.warning("Could not read previous smoke report %s: %s", path, exc)
+        return None
+    if not isinstance(data, dict) or "runs" not in data:
+        return None
+    return data
+
+
+@dataclass
+class DatasetDelta:
+    """Per-corpus delta vs the previous smoke report."""
+
+    name: str
+    prev_ndcg: float | None
+    ndcg: float
+    ndcg_delta: float | None
+    prev_recall: float | None
+    recall: float
+    recall_delta: float | None
+    prev_high_alerts: int | None
+    high_alerts: int
+    high_alerts_delta: int | None
+    prev_retrieve_ms: float | None
+    retrieve_ms: float
+    retrieve_delta_ms: float | None
+    verdict: str  # better | worse | unchanged | new
+
+
+@dataclass
+class SmokeComparison:
+    """Aggregate comparison of the current run vs a previous report."""
+
+    overall: str  # better | worse | mixed | unchanged | no_baseline
+    summary: str
+    datasets: list[DatasetDelta] = field(default_factory=list)
+    prev_wall_s: float | None = None
+    wall_s: float = 0.0
+    wall_delta_s: float | None = None
+    mean_ndcg_delta: float | None = None
+    high_alerts_delta: int | None = None
+
+
+_NDCG_EPS = 0.005
+
+
+def _high_alert_count(alerts: list[Any]) -> int:
+    count = 0
+    for alert in alerts or []:
+        if isinstance(alert, RankAlert):
+            if alert.severity == "high":
+                count += 1
+        elif isinstance(alert, dict) and alert.get("severity") == "high":
+            count += 1
+    return count
+
+
+def _dataset_verdict(
+    *,
+    ndcg_delta: float | None,
+    high_alerts_delta: int | None,
+) -> str:
+    if ndcg_delta is None:
+        return "new"
+    quality = (
+        "better"
+        if ndcg_delta > _NDCG_EPS
+        else "worse"
+        if ndcg_delta < -_NDCG_EPS
+        else "unchanged"
+    )
+    if high_alerts_delta is None:
+        return quality
+    if high_alerts_delta < 0 and quality != "worse":
+        return "better" if quality == "unchanged" else quality
+    if high_alerts_delta > 0 and quality != "better":
+        return "worse" if quality == "unchanged" else quality
+    return quality
+
+
+def compare_smoke_to_previous(
+    runs: list[SmokeRun],
+    *,
+    wall_s: float,
+    previous: dict[str, Any] | None,
+) -> SmokeComparison:
+    """Compare current smoke runs to a previous ``report.json`` payload.
+
+    Ranking quality (T-KEIR NDCG@10) is the primary signal; fewer high-severity
+    alerts is secondary. Wall clock is reported but does not drive the verdict.
+    """
+    if previous is None:
+        return SmokeComparison(
+            overall="no_baseline",
+            summary="No previous report.json — this run becomes the baseline.",
+            wall_s=wall_s,
+        )
+
+    prev_runs = {
+        str(row.get("name")): row
+        for row in (previous.get("runs") or [])
+        if isinstance(row, dict) and row.get("name")
+    }
+    deltas: list[DatasetDelta] = []
+    ndcg_deltas: list[float] = []
+    high_prev = 0
+    high_new = 0
+
+    for run in runs:
+        prev = prev_runs.get(run.name)
+        ndcg = _metric_ndcg10(run.tkeir)
+        recall = _metric_recall10(run.tkeir)
+        high = _high_alert_count(run.alerts)
+        high_new += high
+        retrieve_ms = float(run.timings.retrieve_ms or 0.0)
+        if prev is None:
+            deltas.append(
+                DatasetDelta(
+                    name=run.name,
+                    prev_ndcg=None,
+                    ndcg=ndcg,
+                    ndcg_delta=None,
+                    prev_recall=None,
+                    recall=recall,
+                    recall_delta=None,
+                    prev_high_alerts=None,
+                    high_alerts=high,
+                    high_alerts_delta=None,
+                    prev_retrieve_ms=None,
+                    retrieve_ms=retrieve_ms,
+                    retrieve_delta_ms=None,
+                    verdict="new",
+                )
+            )
+            continue
+        prev_ndcg = float(prev.get("tkeir_ndcg10") or 0.0)
+        prev_recall = float(prev.get("tkeir_recall10") or 0.0)
+        prev_high = _high_alert_count(prev.get("alerts") or [])
+        high_prev += prev_high
+        prev_retrieve = float(
+            (prev.get("timings") or {}).get("retrieve_ms") or 0.0
+        )
+        ndcg_delta = ndcg - prev_ndcg
+        ndcg_deltas.append(ndcg_delta)
+        high_delta = high - prev_high
+        deltas.append(
+            DatasetDelta(
+                name=run.name,
+                prev_ndcg=prev_ndcg,
+                ndcg=ndcg,
+                ndcg_delta=ndcg_delta,
+                prev_recall=prev_recall,
+                recall=recall,
+                recall_delta=recall - prev_recall,
+                prev_high_alerts=prev_high,
+                high_alerts=high,
+                high_alerts_delta=high_delta,
+                prev_retrieve_ms=prev_retrieve,
+                retrieve_ms=retrieve_ms,
+                retrieve_delta_ms=retrieve_ms - prev_retrieve,
+                verdict=_dataset_verdict(
+                    ndcg_delta=ndcg_delta,
+                    high_alerts_delta=high_delta,
+                ),
+            )
+        )
+
+    prev_wall = previous.get("wall_s")
+    prev_wall_f = float(prev_wall) if prev_wall is not None else None
+    wall_delta = (
+        wall_s - prev_wall_f if prev_wall_f is not None else None
+    )
+    mean_ndcg_delta = (
+        sum(ndcg_deltas) / len(ndcg_deltas) if ndcg_deltas else None
+    )
+    high_alerts_delta = high_new - high_prev if prev_runs else None
+
+    verdicts = {d.verdict for d in deltas if d.verdict != "new"}
+    if not verdicts:
+        overall = "unchanged"
+        summary = "No overlapping datasets with the previous report."
+    elif verdicts == {"unchanged"}:
+        overall = "unchanged"
+        summary = (
+            "Quality essentially unchanged vs previous report "
+            f"(mean ΔNDCG@10={mean_ndcg_delta:+.3f})."
+            if mean_ndcg_delta is not None
+            else "Quality essentially unchanged vs previous report."
+        )
+    elif verdicts <= {"better", "unchanged"}:
+        overall = "better"
+        summary = (
+            f"**Better** than previous report "
+            f"(mean ΔNDCG@10={mean_ndcg_delta:+.3f}, "
+            f"high alerts {high_prev}→{high_new})."
+        )
+    elif verdicts <= {"worse", "unchanged"}:
+        overall = "worse"
+        summary = (
+            f"**Worse** than previous report "
+            f"(mean ΔNDCG@10={mean_ndcg_delta:+.3f}, "
+            f"high alerts {high_prev}→{high_new})."
+        )
+    else:
+        overall = "mixed"
+        better_n = sum(1 for d in deltas if d.verdict == "better")
+        worse_n = sum(1 for d in deltas if d.verdict == "worse")
+        summary = (
+            f"**Mixed** vs previous report "
+            f"({better_n} better, {worse_n} worse; "
+            f"mean ΔNDCG@10={mean_ndcg_delta:+.3f})."
+        )
+
+    return SmokeComparison(
+        overall=overall,
+        summary=summary,
+        datasets=deltas,
+        prev_wall_s=prev_wall_f,
+        wall_s=wall_s,
+        wall_delta_s=wall_delta,
+        mean_ndcg_delta=mean_ndcg_delta,
+        high_alerts_delta=high_alerts_delta,
+    )
+
+
+def render_comparison_section(comparison: SmokeComparison) -> list[str]:
+    """Markdown lines for the vs-previous section."""
+    lines = ["## Vs previous report", ""]
+    if comparison.overall == "no_baseline":
+        lines.append(comparison.summary)
+        lines.append("")
+        return lines
+
+    lines.append(comparison.summary)
+    lines.append("")
+    if comparison.wall_delta_s is not None and comparison.prev_wall_s is not None:
+        lines.append(
+            f"Wall clock: {_fmt_ms(comparison.wall_s * 1000)} "
+            f"(prev {_fmt_ms(comparison.prev_wall_s * 1000)}, "
+            f"Δ {_fmt_ms(comparison.wall_delta_s * 1000)})"
+        )
+        lines.append("")
+    lines.extend(
+        [
+            "| Dataset | Verdict | NDCG@10 (prev→new) | Δ | "
+            "High alerts (prev→new) | Retrieve Δ |",
+            "|---------|---------|--------------------:|----:|"
+            "-----------------------:|-----------:|",
+        ]
+    )
+    for row in comparison.datasets:
+        if row.ndcg_delta is None:
+            ndcg_cell = f"— → {row.ndcg:.3f}"
+            delta_cell = "—"
+            high_cell = f"— → {row.high_alerts}"
+            ret_cell = "—"
+        else:
+            ndcg_cell = f"{row.prev_ndcg:.3f}→{row.ndcg:.3f}"
+            delta_cell = f"{row.ndcg_delta:+.3f}"
+            high_cell = f"{row.prev_high_alerts}→{row.high_alerts}"
+            ret_cell = (
+                _fmt_ms(row.retrieve_delta_ms)
+                if row.retrieve_delta_ms is not None
+                else "—"
+            )
+            if (
+                row.retrieve_delta_ms is not None
+                and row.retrieve_delta_ms > 0
+                and not ret_cell.startswith("+")
+                and not ret_cell.startswith("-")
+            ):
+                ret_cell = f"+{ret_cell}"
+        lines.append(
+            f"| {row.name} | **{row.verdict}** | {ndcg_cell} | "
+            f"{delta_cell} | {high_cell} | {ret_cell} |"
+        )
+    lines.append("")
+    return lines
+
+
 def detect_rank_alerts(
     *,
     bm25: Metrics,
@@ -569,8 +866,12 @@ async def _run_tkeir_smoke(
         rag = load_rag_config()
         dual_cfg = rag.dual_hybrid
         # Smoke corpora are tiny: avoid hits=100 + dual NN (streaming 504).
-        arm_hits = max(top_k * 2, min(30, max(10, indexed)))
-        ce_top_m = max(1, min(top_k, dual_cfg.cross_encoder.top_m, 20))
+        # Prefer enough arm hits that gold can enter RRF before CE windowing.
+        arm_hits = max(top_k * 2, min(50, max(15, indexed)))
+        # Cap CE hard: smoke top_k is often raised to rank_docs (100); without
+        # this, CE alone exceeds the 1500 ms/query budget.
+        ce_top_m = max(1, min(top_k, dual_cfg.cross_encoder.top_m, 8))
+        ce_max_length = min(256, int(dual_cfg.cross_encoder.max_length or 256))
         from thot.tools.search.dual_hybrid_config import (
             ArmRetrievalConfig,
             DualRetrievalArms,
@@ -590,7 +891,11 @@ async def _run_tkeir_smoke(
                 ),
             ),
             cross_encoder=replace(
-                dual_cfg.cross_encoder, enabled=True, top_m=ce_top_m
+                dual_cfg.cross_encoder,
+                enabled=True,
+                top_m=ce_top_m,
+                max_length=ce_max_length,
+                batch_size=min(8, int(dual_cfg.cross_encoder.batch_size or 8)),
             ),
             final_fusion=replace(
                 dual_cfg.final_fusion, top_k_returned=max(1, top_k)
@@ -767,7 +1072,12 @@ def evaluate_smoke_dataset(
     )
 
 
-def render_smoke_report(runs: list[SmokeRun], *, wall_s: float) -> str:
+def render_smoke_report(
+    runs: list[SmokeRun],
+    *,
+    wall_s: float,
+    comparison: SmokeComparison | None = None,
+) -> str:
     """Render an action-oriented Markdown smoke report (problems first)."""
     lines = [
         "# BEIR smoke evaluation (dev)",
@@ -775,13 +1085,19 @@ def render_smoke_report(runs: list[SmokeRun], *, wall_s: float) -> str:
         f"Generated: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%SZ')}  ",
         f"Wall clock: **{_fmt_ms(wall_s * 1000)}**  ",
         "",
-        "Use this report to **focus code changes**: fix high-severity items "
-        "first, then medium bottlenecks. Each alert names the symptom and "
-        "where to look in the codebase.",
-        "",
-        "## Focus — problems to fix",
-        "",
     ]
+    if comparison is not None:
+        lines.extend(render_comparison_section(comparison))
+    lines.extend(
+        [
+            "Use this report to **focus code changes**: fix high-severity items "
+            "first, then medium bottlenecks. Each alert names the symptom and "
+            "where to look in the codebase.",
+            "",
+            "## Focus — problems to fix",
+            "",
+        ]
+    )
 
     focus_items: list[tuple[SmokeRun, RankAlert]] = []
     for run in runs:
@@ -850,9 +1166,9 @@ def render_smoke_report(runs: list[SmokeRun], *, wall_s: float) -> str:
         [
             "## Summary metrics",
             "",
-            "| Dataset | Docs | Q | BM25 NDCG@10 | T-KEIR NDCG@10 | "
+            "| Dataset | Docs | Q | BM25 NDCG@10 | T-KEIR NDCG@10 (vs prev) | "
             "Δ vs BM25 | Index | Retrieve | Alerts |",
-            "|---------|-----:|--:|-------------:|---------------:|"
+            "|---------|-----:|--:|-------------:|-------------------------:|"
             "---------:|-------:|---------:|-------:|",
         ]
     )
@@ -868,9 +1184,17 @@ def render_smoke_report(runs: list[SmokeRun], *, wall_s: float) -> str:
             else ""
         )
         note = "err" if err else str(alerts_n)
+        vs_prev = ""
+        if comparison is not None:
+            match = next(
+                (d for d in comparison.datasets if d.name == run.name),
+                None,
+            )
+            if match and match.ndcg_delta is not None:
+                vs_prev = f" {match.verdict}({match.ndcg_delta:+.3f})"
         lines.append(
             f"| {run.name} | {run.docs_indexed} | {run.queries} | "
-            f"{bm25_n:.3f} | {tkeir_n:.3f} | {delta_s} | "
+            f"{bm25_n:.3f} | {tkeir_n:.3f}{vs_prev} | {delta_s} | "
             f"{_fmt_ms(run.timings.index_ms)} | "
             f"{_fmt_ms(run.timings.retrieve_ms)} | {note} |"
         )
@@ -895,12 +1219,36 @@ def render_smoke_report(runs: list[SmokeRun], *, wall_s: float) -> str:
     return "\n".join(lines)
 
 
-def write_smoke_reports(runs: list[SmokeRun], *, wall_s: float) -> Path:
-    """Write Markdown + JSON under ``reports/beir/smoke/``."""
+def write_smoke_reports(
+    runs: list[SmokeRun],
+    *,
+    wall_s: float,
+    comparison: SmokeComparison | None = None,
+    previous: dict[str, Any] | None = None,
+) -> Path:
+    """Write Markdown + JSON under ``reports/beir/smoke/``.
+
+    When a previous ``report.json`` exists it is copied to ``report.prev.json``
+    before overwrite so the next run can still compare.
+    """
     root = Path(repo_root())
-    out_dir = root / "reports" / "beir" / "smoke"
+    out_dir = smoke_report_dir(root)
     out_dir.mkdir(parents=True, exist_ok=True)
-    md = render_smoke_report(runs, wall_s=wall_s)
+    json_path = out_dir / "report.json"
+    if json_path.is_file():
+        try:
+            (out_dir / "report.prev.json").write_text(
+                json_path.read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+        except OSError as exc:
+            LOGGER.warning("Could not archive previous report: %s", exc)
+
+    if comparison is None:
+        comparison = compare_smoke_to_previous(
+            runs, wall_s=wall_s, previous=previous
+        )
+    md = render_smoke_report(runs, wall_s=wall_s, comparison=comparison)
     md_path = out_dir / "report.md"
     md_path.write_text(md, encoding="utf-8")
     focus = []
@@ -958,9 +1306,24 @@ def write_smoke_reports(runs: list[SmokeRun], *, wall_s: float) -> Path:
                 "error": run.error,
             }
         )
-    (out_dir / "report.json").write_text(
+    comparison_payload = {
+        "overall": comparison.overall,
+        "summary": comparison.summary,
+        "mean_ndcg_delta": comparison.mean_ndcg_delta,
+        "high_alerts_delta": comparison.high_alerts_delta,
+        "prev_wall_s": comparison.prev_wall_s,
+        "wall_s": comparison.wall_s,
+        "wall_delta_s": comparison.wall_delta_s,
+        "datasets": [asdict(row) for row in comparison.datasets],
+    }
+    json_path.write_text(
         json.dumps(
-            {"wall_s": wall_s, "focus": focus, "runs": payload},
+            {
+                "wall_s": wall_s,
+                "comparison": comparison_payload,
+                "focus": focus,
+                "runs": payload,
+            },
             indent=2,
         )
         + "\n",
@@ -1114,9 +1477,20 @@ def main(argv: list[str] | None = None) -> int:
                 LOGGER.error("Vespa cleanup failed: %s", exc)
 
     wall_s = time.perf_counter() - wall0
-    report = write_smoke_reports(runs, wall_s=wall_s)
-    print(render_smoke_report(runs, wall_s=wall_s))
+    previous = load_previous_smoke_report()
+    comparison = compare_smoke_to_previous(
+        runs, wall_s=wall_s, previous=previous
+    )
+    report = write_smoke_reports(
+        runs,
+        wall_s=wall_s,
+        comparison=comparison,
+        previous=previous,
+    )
+    print(render_smoke_report(runs, wall_s=wall_s, comparison=comparison))
     print(f"\nWrote {report}")
+    if comparison.overall != "no_baseline":
+        LOGGER.info("Smoke vs previous: %s — %s", comparison.overall, comparison.summary)
     if wall_s > 300:
         LOGGER.warning(
             "Smoke wall clock %.1fs exceeded 5 min target — "

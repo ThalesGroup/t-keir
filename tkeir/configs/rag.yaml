@@ -137,7 +137,8 @@ dual_hybrid:
         download: https://github.com/explosion/spacy-models/releases/download/ja_core_news_md-3.6.0/ja_core_news_md-3.6.0-py3-none-any.whl
   retrieval:
     chunk:
-      profile: "hybrid_2_level"
+      # Semantic-heavy default: denser recall when surface forms diverge.
+      profile: "hybrid_semantic"
       hits: 100
     document:
       profile: "document_bm25"
@@ -202,9 +203,10 @@ dual_hybrid:
   cross_encoder:
     enabled: true
     model: "BAAI/bge-reranker-v2-m3"
-    top_m: 20
-    max_length: 512
-    batch_size: 16
+    # Keep CE window small: dominates dual-hybrid latency (~2s+/query at 20×512).
+    top_m: 8
+    max_length: 256
+    batch_size: 8
   final_fusion:
     weights:
       rrf: 0.35

@@ -1,0 +1,294 @@
+ADR: Usage + Intent Signals Schema v1 (Canonical PLG Signal Object)
+
+## Status
+**Accepted (v1).** Implemented in the signal aggregation + routing service and used for HubSpot routing.
+
+## Context
+Redwood is implementing a privacy-aware pipeline that detects product-led signals (usage thresholds + buying intent), scores them, and routes qualified items into HubSpot for follow-up.
+
+We need a **canonical, versioned signal object** that:
+- Works for both **threshold** signals (e.g., spend velocity, sustained tokens, 429 rate) and **intent** signals (e.g., Dedicated/Private docs interest, security FAQ views).
+- Supports **aggregation windows** (daily/weekly/30d), **deduping**, and **suppression** (to reduce spam).
+- Allows deterministic **scoring** + routing, with auditability.
+- Minimizes sensitive data, aligning with the PLG signal data handling policy.
+
+## Decision
+Adopt a single canonical record called **PLG Signal (schema v1)** emitted by the scoring service and persisted in analytics storage. The router uses this object to:
+- Update HubSpot company properties (latest score/type + history string)
+- Create a HubSpot timeline note
+- Create a follow-up task (when qualified)
+
+The canonical record is **one row per (org, signal_type, window)** (with defined exceptions for multi-dimension signals described below).
+
+## Definitions
+- **Org**: Redwood customer organization (billing/account boundary). Primary entity for scoring and routing.
+- **Workspace**: Sub-entity under an org; may exist for multi-team usage.
+- **Signal Category**: 
+  - **threshold** = derived from product usage / reliability / spend patterns
+  - **intent** = derived from behavior that indicates buying evaluation (docs, security pages, pricing interactions)
+- **Signal Type**: specific reason for outreach (e.g., `usage_tokens_sustained`, `reliability_429s_repeated`, `intent_private_docs_interest`).
+
+## Canonical schema (v1)
+The PLG Signal record is represented in protobuf/JSON with the following fields.
+
+### Required fields
+| Field | Type | Notes |
+|---|---|---|
+| `schema_version` | string | Fixed to `1.0` for this ADR. See Versioning section. |
+| `signal_id` | string | Stable unique ID for the record. Deterministically derived from `dedupe_key` (recommended) or UUID (allowed). |
+| `dedupe_key` | string | Deterministic key used for idempotency and update/overwrite behavior. |
+| `org_id` | string | Internal org identifier (primary routing entity). |
+| `signal_category` | enum | `threshold` \| `intent`. |
+| `signal_type` | enum | See Signal Type enum table below. |
+| `window_type` | enum | `daily` \| `rolling_7d` \| `rolling_30d`. |
+| `window_start` | string | ISO-8601 timestamp (UTC). Start of aggregation window. |
+| `window_end` | string | ISO-8601 timestamp (UTC). End of aggregation window (exclusive). |
+| `observed_at` | string | ISO-8601 timestamp when computed (UTC). |
+| `score` | int | 0–100 (integer). |
+| `confidence` | float | 0.0–1.0. Indicates data completeness + signal reliability. |
+| `severity` | enum | `low` \| `medium` \| `high` \| `critical`. |
+| `qualified` | bool | Output of qualification gate (score + confidence + suppression checks). |
+| `primary_reason` | string | Human-readable explanation intended for HubSpot note/task (no PII). |
+| `signal_source_set` | list<string> | One or more sources that contributed (e.g., `telemetry`, `billing`, `docs_analytics`). |
+
+### Optional fields (recommended)
+| Field | Type | Notes |
+|---|---|---|
+| `workspace_id` | string | Populated when the signal is naturally tied to a workspace (e.g., workspace creation spikes). For most usage/spend signals, keep org-level. |
+| `environment` | enum | `prod` \| `staging` \| `unknown`. Defaults to `prod` when inferred. |
+| `region` | string | Region label for routing context (e.g., `na`, `emea`, `apac`) derived from billing country / usage region. |
+| `account_tier` | enum | `self_serve` \| `startup` \| `enterprise` (if known). |
+| `metrics_json` | string | Compact JSON string of numeric metrics used for scoring (must remain non-PII). |
+| `related_urls` | list<string> | For intent signals: canonical doc/pricing URLs (no querystrings; strip user identifiers). |
+| `model_family` | string | For model-specific signals when relevant (e.g., repeated OOM on a model family). Use broad family labels, not prompts. |
+| `suppressed_until` | string | ISO-8601 timestamp. If set, router must not create a new task before this time. |
+| `suppression_reason` | string | E.g., `recent_outreach`, `false_positive`, `marketing_nurture_active`, `existing_csm_ownership`. |
+| `last_routed_at` | string | ISO-8601 timestamp when last successfully routed to HubSpot. |
+| `hubspot_company_id` | string | Populated by router after lookup/upsert. |
+| `hubspot_task_id` | string | Populated when a follow-up task is created. |
+| `routing_state` | enum | `not_routed` \| `routed_note_only` \| `routed_task_created` \| `routing_failed`. |
+| `routing_error` | string | Truncated error summary (no secrets) when failures occur. |
+
+### `signal_type` enum (v1)
+We standardize signal types to keep scoring/routing consistent and avoid dashboard fragmentation.
+
+**Threshold (usage/reliability/expansion) signal types**
+- `usage_tokens_sustained` — sustained high token volume over rolling window
+- `usage_tokens_spike` — sharp increase vs prior baseline
+- `spend_velocity_increasing` — spend increasing week-over-week above cut line
+- `reliability_429s_repeated` — repeated rate limiting events (429) above threshold
+- `reliability_latency_regression` — p95 latency regression vs baseline (where available)
+- `expansion_new_workspaces_spike` — new workspaces created in window
+- `expansion_org_invite_spike` — spike in org invites/seat growth (where tracked)
+
+**Intent (evaluation/compliance) signal types**
+- `intent_dedicated_docs_interest` — Dedicated docs viewed repeatedly
+- `intent_private_docs_interest` — Private/VPC/on-prem docs viewed
+- `intent_security_faq_interest` — security/SOC2/retention pages viewed
+- `intent_pricing_page_interest` — pricing/packaging page interactions
+- `intent_api_key_rotation_event` — key rotation or security hygiene actions suggesting productionization
+
+Notes:
+- Signal types are intentionally coarse. Any additional detail should go into `metrics_json` and `primary_reason`.
+- New signal types require an update to this ADR (or a v1.x addendum) and a controlled rollout.
+
+## Time windows and aggregation rules
+We support three window types in v1:
+- `daily`: previous UTC day (00:00–24:00) for rate-like measures and anomaly detection
+- `rolling_7d`: last 7*24h for sustained usage and reliability patterns
+- `rolling_30d`: last 30*24h for longer-term upgrades and enterprise readiness
+
+**Window selection guidance**
+- Reliability signals: compute both `daily` and `rolling_7d`. Use `rolling_7d` for qualification; keep `daily` for context.
+- Spend/usage upgrades: use `rolling_7d` for velocity + `rolling_30d` for sustained volume.
+- Intent signals: use `rolling_7d` to reduce vanity noise while keeping the data fresh.
+
+**Late-arriving data / backfills**
+- Aggregator is allowed to recompute windows for up to **7 days** back (telemetry lag/backfill).
+- Recomputes MUST use the same `dedupe_key` so downstream consumers update existing records idempotently.
+
+## Dedupe keys (idempotency)
+Dedupe is required to prevent HubSpot spam and to allow safe retries.
+
+### Default dedupe key
+For most signals:
+
+`dedupe_key = "v1|" + org_id + "|" + signal_type + "|" + window_type + "|" + window_start + "|" + window_end`
+
+### Multi-dimension exception (intent URLs)
+For intent signals where the specific page family matters, we allow a controlled dimension:
+- Only for `intent_*_docs_interest` and `intent_security_faq_interest`
+- Dimension is `canonical_url_group` (e.g., `docs/dedicated/*`, `docs/private/*`, `security/*`)
+
+`dedupe_key = "v1|" + org_id + "|" + signal_type + "|" + canonical_url_group + "|" + window_type + "|" + window_start + "|" + window_end`
+
+Rules:
+- Do **not** include raw URLs with query parameters.
+- Do **not** include user identifiers.
+
+### Multi-dimension exception (workspace-scoped expansion)
+For `expansion_new_workspaces_spike` and `expansion_org_invite_spike`, `workspace_id` may be included if the behavior is workspace-local and actionable.
+
+## Event sources and normalization
+Signals are computed from the following source streams.
+
+### Sources (v1)
+1) **Product telemetry** (`telemetry`)
+- request events: tokens in/out, model, latency, status codes
+- error events: 429s, 5xx, timeouts
+- aggregation joins: org_id/workspace_id mapping (internal)
+
+2) **Billing & metering** (`billing`)
+- spend per day/week, plan type, credit consumption (no payment method details)
+
+3) **Docs & website analytics** (`docs_analytics`)
+- page view counts by canonical path group
+- no raw IPs stored in signal object
+- no per-user identities included in canonical signal
+
+4) **Security-related product events** (`security_events`)
+- API key rotation event counts
+- SSO/SAML configuration events (future; not used for qualification in v1)
+
+### Normalization requirements
+- All sources must map to `org_id` (required).
+- `workspace_id` is optional and only used where it changes the action.
+- Canonicalization of URLs is required: strip querystrings; map to a small set of path groups.
+
+## Scoring approach (v1)
+We use a transparent, rules-based score (0–100). The score is used for:
+- qualification gating
+- prioritization (severity)
+- reporting and tuning
+
+### Score components
+**1) Magnitude (0–60)**
+- how far above threshold the metric is
+
+**2) Persistence (0–25)**
+- whether the signal repeats across windows (e.g., 2+ days in last 7)
+
+**3) Intent boost (0–15)**
+- applies only when both threshold + intent are present for the org within 7 days
+
+### Confidence
+`confidence` reflects data quality and completeness:
+- telemetry coverage for the window (e.g., ingestion lag, missing partitions)
+- docs analytics availability
+- mapping completeness for org/workspace
+
+Routing and task creation must require:
+- `confidence >= 0.70`
+
+### Qualification gate (default)
+A signal is considered qualified when:
+- `score >= 70`
+- `confidence >= 0.70`
+- `suppressed_until` is absent or in the past
+- org is not in internal/test denylist
+
+**Severity mapping**
+- `critical`: score 90–100
+- `high`: 80–89
+- `medium`: 70–79
+- `low`: <70 (stored for analytics but not routed as tasks)
+
+## Privacy and data minimization constraints
+The canonical signal object MUST NOT include:
+- prompts, completions, message content
+- end-user identifiers
+- raw IP addresses
+- full URLs with query parameters (may include user/session identifiers)
+
+Allowed:
+- aggregated counts/sums (tokens, spend, error counts)
+- canonical URL path groups (e.g., `docs/private/*`)
+- coarse region/tier labels
+
+See: PLG Signal Data Handling & Retention policy for retention and deletion requirements.
+
+## Example payload (illustrative)
+```json
+{
+  "schema_version": "1.0",
+  "signal_id": "sig_01HZXE8K2Y...",
+  "dedupe_key": "v1|org_9f3...|reliability_429s_repeated|rolling_7d|2025-05-22T00:00:00Z|2025-05-29T00:00:00Z",
+  "org_id": "org_9f3...",
+  "signal_category": "threshold",
+  "signal_type": "reliability_429s_repeated",
+  "window_type": "rolling_7d",
+  "window_start": "2025-05-22T00:00:00Z",
+  "window_end": "2025-05-29T00:00:00Z",
+  "observed_at": "2025-05-29T03:12:44Z",
+  "score": 86,
+  "confidence": 0.92,
+  "severity": "high",
+  "qualified": true,
+  "primary_reason": "429 rate limiting observed on 4 of last 7 days; token volume up 2.1x WoW. Candidate for Dedicated capacity to stabilize throughput.",
+  "signal_source_set": ["telemetry", "billing"],
+  "metrics_json": "{\"http_429_count\":1432,\"active_days_with_429\":4,\"tokens_7d\":182340000,\"tokens_wow_growth\":2.1}"
+}
+```
+
+## Versioning strategy
+We version the schema with a `schema_version` string.
+
+Rules:
+- **Additive changes** (new optional fields, new enum values) increment **minor**: `1.1`, `1.2`, etc.
+- **Breaking changes** (rename/remove fields, change meaning/units) increment **major**: `2.0`.
+- Router and HubSpot mappings must accept **all 1.x** payloads.
+- `signal_type` expansions are allowed in v1.x but require:
+  - updated documentation (this ADR addendum)
+  - dashboards updated to include new type
+  - a pilot cohort run to validate noise levels
+
+## Consequences
+### Positive
+- Single schema simplifies:
+  - aggregation jobs
+  - scoring logic
+  - HubSpot routing and reporting
+- Deterministic dedupe keys make retries safe and reduce noise.
+- Clear privacy constraints prevent accidental leakage of sensitive content into CRM.
+
+### Negative / tradeoffs
+- Standardizing `signal_type` reduces flexibility for one-off experiments.
+- A coarse schema may require `metrics_json` to carry additional context; must be disciplined to keep it non-PII and compact.
+
+## Alternatives considered
+1) **Separate schemas per signal family (usage vs intent vs reliability)**
+- Pros: tailored fields, potentially clearer per domain
+- Cons: downstream routing becomes brittle; more HubSpot mapping work; harder to audit across signals
+- Decision: rejected in favor of one canonical record.
+
+2) **Store raw events directly in HubSpot (timeline events per occurrence)**
+- Pros: minimal internal storage
+- Cons: HubSpot rate limits; high noise; privacy risk; hard to aggregate and score reliably
+- Decision: rejected.
+
+3) **Maintain bespoke tables only in analytics, with router-specific joins**
+- Pros: quick initial iteration
+- Cons: implicit contracts; difficult to coordinate changes; router becomes tightly coupled to upstream tables
+- Decision: rejected.
+
+4) **ML-based lead scoring model**
+- Pros: could improve precision/recall over time
+- Cons: requires labeled outcomes; harder to explain; slower iteration; governance overhead
+- Decision: defer. Start with transparent rules-based scoring; revisit after collecting outcomes.
+
+## Open questions (tracked for v1.x)
+- Should we add `baseline_window` fields to make anomaly signals more interpretable (e.g., compare to prior 7d)?
+- Should we standardize a `signal_group_id` to cluster multiple signals for a single org into one recommended action?
+- Should we add a first-class `recommended_motion` enum (`hosted_to_dedicated`, `hosted_to_private`, `security_review`, `performance_poc`) rather than inferring from type?
+
+## Implementation notes
+- Aggregation job computes metrics and writes a normalized intermediate table.
+- Scoring service produces PLG Signal objects and persists them to the `plg_signals_v1` table.
+- Router consumes qualified signals and performs HubSpot upserts with idempotency anchored on `dedupe_key`.
+
+Ownership:
+- Schema + scoring: Telemetry & Analytics (Logan Wright / Mei Lin)
+- Router + HubSpot integration: Platform (Priya Natarajan / Ethan Park) + BizOps (David Kim)
+
+Change process:
+- v1.x changes require review by Product (Nikhil Sharma) and BizOps (David Kim) and Security sign-off if new fields touch customer data categories.

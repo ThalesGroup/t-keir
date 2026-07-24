@@ -1,0 +1,143 @@
+Responder Sprint: Incident Orchestration, Runbook Hygiene & Rotation Guidelines
+
+Summary:
+This document defines the "Stability Sprint" cadence: a recurring, team-scale program combining incident orchestration improvements, runbook hygiene, on-call rotation changes, game-day exercises, and standardized customer communications. The goal is to reduce mean time to mitigate (MTTM), harden our runbook coverage, and keep on-call load sustainable while tightening SLO observability and customer trust.
+
+Scope and intent:
+- Scope: company-wide on-call responders, SRE, serving-runtime teams, platform, and customer success communications owners.
+- Intent: provide a prescriptive, repeatable sequence to run a two-week Stability Sprint; include triage ladders, runbook maintenance checklist, rotation adjustments, game-day plan, postmortem template, and status page / customer communication templates.
+
+Roles & responsibilities:
+- Sprint Lead (rotation): coordinates the sprint logistics, schedules game-day, consolidates feedback. Typical owner: rotation engineer on SRE.
+- Runbook Custodians: service owners responsible for updating and validating runbooks in that sprint.
+- On-call Captain: manages short-term schedule changes and escalations during the sprint.
+- Communications Lead: drafts status page and customer notices when required.
+- Observability Owner: ensures SLO dashboards and alert thresholds are available and annotated for the sprint.
+
+Cadence (two-week example):
+1) Planning week (Mon–Wed): inventory runbooks, assign custodians, review recent incidents and pain points.
+2) Hygiene week (Thu–Fri + next Mon–Tue): runbook edits, test playbook steps in a staging ‘ops-lab’.
+3) Game-day (Wed): simulated incident(s) executed end-to-end, followed by a short debrief.
+4) Postmortem & Rollout (Thu–Fri): postmortem writeup, remediation tasks created, rotation policy tweaks applied.
+
+Triage decision ladder (quick reference):
+1) Detection: alert fires (pager, slack alert).
+2) First response (< 5m): acknowledge, capture initial context (service, region, incident id).
+3) Primary mitigation (< 15m): apply runbook primary mitigation steps. If not effective, escalate to Secondary Responder.
+4) Service fallback (< 30m): activate configured fallbacks (circuit-breakers, degraded mode).
+5) Cross-team bridge (> 30m): open incident bridge, involve SRE, platform, and product SMEs.
+6) Customer comms & status page (when customer impact > partial degradation for 15m).
+
+Runbook lifecycle & hygiene checklist:
+- Minimum contents for each runbook (all items must be present):
+  - Runbook title and service owner (name + slack handle).
+  - Pager conditions that trigger runbook.
+  - Clear, ordered mitigation steps with expected outcome and rollback steps.
+  - Telemetry dashboard links and query snippets (PromQL/SQL).
+  - Post-execution verification checklist (what signals confirm success).
+  - Known failure modes and prior incident links.
+  - Safety and customer-communication thresholds.
+- Hygiene checklist items:
+  - Verify CLI commands run in ephemeral test environment within 48 hours of edit.
+  - Validate that SLO thresholds referenced are present on the team dashboard.
+  - Confirm secrets/credentials referenced are fetched from KMS (no inline tokens).
+  - Add automated smoke tests to CI for critical mitigation steps (when applicable).
+  - Tag runbook with last-reviewed date and reviewer initials.
+
+Runbook example (inference-router service):
+- Trigger: Pager when 5xx rate > 2% for 5m AND p95 latency > 750ms for 5m.
+- Primary mitigation:
+  1) Confirm alert: kubectl get pods -l app=inference-router -n prod; note crashlooping pods.
+  2) Check replicas: kubectl describe deploy inference-router -n prod | grep Replicas
+  3) If pod OOMs observed, scale down worker concurrency: kubectl set env deploy/inference-router WORKER_MAX_CONCURRENCY=8
+  4) Validate health: run health-check script: ./scripts/check-inference-healthy.sh --env prod
+- If step 3 fails, fallback: revert to canary model routing: POST /internal/route?target=canary (requires runbook token from Vault)
+
+Runbook testing notes:
+- Playbook steps must be exercised in the ops-lab staging namespace at least quarterly. Record the run and attach timestamps and logs to the runbook page.
+
+On-call rotation health and sustainable load policy:
+- Target on-call load: 1.0 P50 alerts per shift for SRE; escalate if weekly average > 1.8.
+- Max consecutive primary on-call shifts: 5 weekdays (exception must be approved by On-call Captain).
+- Backup coverage: two-week overlap policy when senior engineer transitions off rotation.
+- Timeboxed deep-work windows: block two non-overlapping 3-hour windows per week for responders (protected time).
+
+Game-day design & checklist:
+- Frequency: quarterly for platform-wide, monthly for high-risk services.
+- Pre-game requirements: runbooks assigned and tested; monitoring queries validated; synthetic traffic baseline captured.
+- Scenario creation guidance: use recent near-miss incidents to design realistic simulations. Tag scenarios as either 'degradation' or 'outage'.
+- Execution steps:
+  1) Declare game-day incident and set SAFE marker on status page (internal).
+  2) Execute fault injection (traffic spike, node removal, model rollback).
+  3) Observe and follow runbook steps; record timestamps for each step.
+  4) Capture RCF (Recovery Completion Factor) = minutes to mitigation / expected mitigation time.
+  5) 1-hour post-mortem debrief; create follow-up JIRA tasks for runbook gaps.
+
+Postmortem format (required for P1/P2 or customer-impacting events):
+- Title: [Service] — Short summary — YYYY-MM-DD
+- Summary: one-paragraph executive summary (what happened, impact, status).
+- Timeline: concise, timestamped events and decisions (UTC).
+- Root cause analysis: causal chain, not a single sentence.
+- Contributing factors: people, process, technology.
+- Resolved actions: list of immediate fixes and owners with due dates.
+- Long-term improvements: planned, prioritized items with owners and ETA.
+- Blameless review notes and learning items.
+- Postmortem acceptance: approver and date.
+
+Customer communications & status page templates (examples)
+- Short-form status update (for partial degradation):
+  Title: Service degradation: inference API latency increased
+  Body: We are seeing elevated latency for the inference API in us-west-2 impacting some requests. Engineers are investigating; mitigations are in progress. We will post an update by 15:45 UTC or sooner. Impact: increased latency, some requests may time out.
+  Owner: @communications-lead
+
+- Long-form customer notice (outage declared):
+  Subject: Incident [INC-1234] — Inference API outage — {start-time} UTC
+  Greeting: Hello — we want to share a summary of an ongoing incident affecting inference features.
+  Impact: Customers using hosted inference in us-west-2 may experience complete request failures or elevated latencies.
+  What we are doing: Our SRE and product teams have opened a bridge, applied routing fallbacks, and are rolling a targeted fix. We are prioritizing full restoration and will provide timeline estimates.
+  Next update: {time + 30 min}
+  Contact: support@redwood.ai and tenant-status@redwood.ai (for escalations).
+  Note: This template should be adapted to include mitigation steps when resolved and a pointer to the formal postmortem.
+
+Operational metrics & SLO tie-ins:
+- SLO examples to annotate in runbooks:
+  - Availability SLO: 99.95% monthly for API v1.
+  - Latency SLO: p95 < 300ms for inference router on standard workloads.
+  - Error budget policy: if monthly error budget consumption > 40%, schedule an emergency Stability Sprint and freeze non-essential changes.
+
+Alert tuning guidance (practical rules):
+- Alert fatigue limit: keep only actionable alerts. For every alert evaluate: does it require action? If not, convert to dashboard.
+- Multi-signal alerts: prefer composite alerts (e.g., high latency + increased 5xx) to reduce false positives.
+- Pager escalation: primary (5m), secondary (15m), captain (30m). Escalation steps must be encoded in PagerDuty rules.
+
+Automation & tooling recommendations:
+- Use automation to gather context on alert (attach recent deployment id, git commit, node metadata).
+- Slack bridge templates: prebuilt snippets for opening bridges with incident id, service, and initial runbook step.
+- CI validation: add a runbook-linter step in docs CI to ensure required fields exist and that runbook links are valid.
+
+KPIs for Stability Sprint success:
+- 20% reduction in mean time to mitigate (MTTM) over two sprints.
+- 100% runbook coverage for top-20 services by traffic post-sprint.
+- Reduce noisy pager incidence by 30% in next 90 days.
+
+References and related artifacts:
+- Incident ID naming: INC-<YYYYMMDD>-<sequential>. Use this in any status updates.
+- Ops-lab namespace: ops-lab.redwood.local (staging area for game-day).
+- Runbook repository: confluence runbook pages under /confluence/oncall-and-incident-response/runbook-library (link to page index).
+
+Appendix: quick command snippets
+- Open incident bridge (internal CLI): redwood-ops bridge create --service inference-router --title "GameDay test" --severity P2
+- Retrieve last deploy: curl -s https://deployments.redwood.internal/api/latest?service=inference-router | jq .commit
+- Health-check script example: ./scripts/check-inference-healthy.sh --env prod || echo "health failed"
+
+Revision history:
+- 2025-11-10: Created by Asha Menon (initial cadence and checklist).
+- 2026-01-05: Added game-day RCF metric and CI runbook-linter guidance (reviewed by Priya Kapoor).
+- 2026-02-14: Clarified on-call load targets and added automation snippets (reviewed by Diego Alvarez).
+
+Next steps (action items):
+- Sprint Lead to schedule next Stability Sprint kickoff and assign runbook custodians within 3 business days.
+- Observability Owner to annotate SLOs on runbook pages for top 20 services within one week.
+- Communications Lead to seed customer comm templates into the status page template library.
+
+End of document.

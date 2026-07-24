@@ -1,0 +1,154 @@
+Model-serving incident decision tree, rollback SOP, and customer credit policy
+
+Overview
+
+Purpose: This page provides a compact decision tree for first responders to classify and act on model-serving incidents (latency, throughput, quality regressions), an operational rollback SOP for canary and pinned model variants, and the standardized customer credit policy for measurable SLO violations. It is designed for on-call engineers, incident commanders, and customer-facing SREs.
+
+Scope: Applied to Redwood-hosted and Dedicated model-serving endpoints (hosted API + Dedicated pools). Private deployments should adopt the same play but coordinate with their customer-run control plane.
+
+Quick summary (one-line): Detect -> Classify (latency/throughput/quality) -> Contain -> Route or Rollback -> Notify -> Postmortem + Credit calc (if applicable).
+
+Decision tree: first 10 minutes
+
+1) Alert ingestion: Verify signal source (Grafana alert rule id, synthetic test id, SLO alert id).
+   - Run: curl -s "https://metrics.internal/api/alerts/{alert_id}" | jq .payload
+2) Determine customer impact tier (T1/T2/T3):
+   - T1: >1% request failure rate OR >30% of customer requests exceed latency SLO for >=5m
+   - T2: 0.1%–1% failure or latency SLO breaches on a specific model route for >=5m
+   - T3: transient spike, single-region, or single-pod error with quick recovery (<10m)
+3) Classify incident vector (choose one primary):
+   - Latency: p95 or p99 breaching target (see SLOs below).
+   - Throughput/Throttling: request queuing, retry storms, KV-cache misses, burst saturation.
+   - Model quality: hallucination rate, classification accuracy drop on eval prompt set, customer-reported quality regression.
+   - Dependency failure: GPU node OOM, storage latency, network packet loss.
+4) Containment actions (immediate):
+   - Latency / Throughput:
+     a) Enable conservative throttling by route: set rate-limit to 50% for the affected route in API gateway.
+     b) Bypass heavy preprocessing if safe (feature flag: skip-heuristic-preproc).
+     c) Increase batch timeout to favor throughput if request volume spike and p95 target is not critical.
+   - Model quality:
+     a) Switch to a pinned, older model variant if available (model: my-model:v1.4 -> v1.3).
+     b) Apply prompt-sanitization fallback (FASTER_PROMPT_TEMPLATE).
+   - Dependency failure:
+     a) Evacuate pods from failing node pool via Kubernetes drain with --ignore-daemonsets.
+5) If containment insufficient within 10–15 minutes: escalate to Incident Commander and prepare rollback plan.
+
+SLOs and thresholds (customer-facing and internal):
+
+- Hosted API default SLOs:
+  - Availability: 99.95% (per-region, 30-day window)
+  - Latency: p95 < 1200ms (small inputs), p95 < 2500ms (long tail workloads)
+  - Error rate: <0.1% 4xx/5xx combined
+- Internal fast-response thresholds that trigger paging:
+  - Latency p95 breaches > 2x the SLO for >=5 minutes
+  - Error rate > 1% in a 1-minute rolling window
+
+Escalation matrix (text table)
+
+Owner role | Primary responsibilities | Pager escalation
+Incident responder | Triage, contain, first mitigation | Pager 1
+Service owner | Approve rollback or routing changes | Pager 2
+Incident Commander | Coordinate cross-team, customer comms | Pager 3 (oncall lead)
+SRE Manager | Regulatory evidence / pauses credits | Email + Pager 3 if enterprise with contract
+
+Rollback SOP (canary and global rollback)
+
+Preconditions: Confirm reproducible regression, gather trace IDs, ensure a pinned compatible model exists (variant/tag or quantization level). Ensure runbook approvers are on call.
+
+Steps (Canary rollback - target route):
+1) Mark incident and open bridge (Bridge URL: https://bridges.internal/{incident_id}).
+2) Set traffic split to isolate canary (CLI example):
+   - rdl-cli traffic update --route /v1/generate --split '{"my-model:v2":10, "my-model:v1":90}' --incident-id {incident_id}
+3) If canary fails, escalate to cutback to pinned model (90% -> 0%):
+   - rdl-cli traffic update --route /v1/generate --split '{"my-model:v1":100}' --incident-id {incident_id}
+4) Validate with synthetic test suite (10 queries focused on regression prompts):
+   - scripts/synthetics/run_slow_model_regression_checks.sh --endpoint /v1/generate --ids {trace_ids}
+5) Record rollback action in incident timeline and annotate monitoring dashboards.
+
+Global rollback (all regions) - emergency path:
+1) Confirm approval from Incident Commander and Service Owner. Log decision in bridge.
+2) Run orchestrated rollout revert: rdl-cli rollout revert --policy all --model my-model:v1 --confirm --incident-id {incident_id}
+3) Monitor error/latency dashboards for 15 minutes. If stable, proceed to postmortem steps.
+
+Pre-approved rollback criteria (no legal/regulatory sign-off required):
+- Immediate rollback allowed when model-quality regressions cause user-visible data-loss or classification errors exceeding 5% on customer-critical prompt sets.
+- Latency regressions causing p95 > 3x SLO for >10 minutes and impacting >=2% of requests.
+
+Customer communication templates (rapid variants)
+
+Public short status (for status page):
+- Title: Degraded model serving in <region>
+- Message: We are currently experiencing elevated latency for text-generation requests in <region>. Engineers are investigating and a mitigation is in progress. Impacted customers may see slower responses; some requests may fail. We will provide updates every 30 minutes.
+
+Partner/enterprise status (templated email):
+- Subject: Incident {incident_id}: Model-serving latency affecting <product> in <region>
+- Body: Hello <Contact>, We are investigating an issue causing elevated latency on <route>. Impact: increased request latency and limited throughput for a subset of requests. Mitigation in progress: traffic split to pinned variant + targeted throttling. Next update: {timestamp+30m}. We will share a post-incident summary and any applicable service credit calculations.
+
+Postmortem evidence checklist (must be captured before close):
+- Incident timeline (bridge log)
+- Alert payload and Grafana alert rule IDs
+- Key traces: top 3 trace IDs showing failure path
+- Synthetic test run results before/after rollback
+- Traffic-split history (who executed, CLI/console audit id)
+- Telemetry snapshots: raw p95/p99, error counts, CPU/GPU metrics for affected nodes
+- Customer impact table (tenant ids, percent of requests, logged errors)
+
+Customer credit policy (applied when SLOs violated)
+
+Principles: Credits are proportional to measurable, verifiable SLO breaches and limited to avoid perverse incentives. Credits apply only when Redwood-hosted endpoints fail to meet contracted SLOs.
+
+Rules:
+- Availability credit: If monthly availability for a contracted enterprise route falls below the SLA threshold, the credit = (SLA - actual_availability) * monthly_service_fee * 0.5
+- Latency credit: When p95 latency exceeds SLA for >3 hours aggregated across the billing window, credit = (minutes_breached / total_minutes_in_month) * monthly_service_fee * severity_multiplier
+  - severity_multiplier = 0.25 for minor (>SLA to 1.5x), 0.5 for major (1.5x–3x), 1.0 for critical (>3x)
+- Fast-credit for short incidents (<24h) impacting <1% traffic: capped at 5% of monthly_service_fee
+- Credits do not apply if incident is caused by customer misconfiguration or third-party dependency explicitly excluded in contract.
+
+Automation: evidence collection scripts will compute actual_availability and latency breach minutes. For enterprise incidents flagged in the bridge, the SRE Manager will run 'scripts/credits/calc_credit.py --incident {incident_id}'. Output is attached to postmortem.
+
+Game day and verification harness (playbook snippet)
+
+Objective: Validate paging, rollback automation, and credit calc pipeline with a realistic simulated regression.
+
+Pre-run checklist:
+- Test infra tenant created (tenant: gd-tenant-2026)
+- Synthetic suite prepared with 1000 ramped requests and seeded failing prompts (see scripts/game-days/noisy_model_regression.sh)
+- Make sure runbook approvers are on call and bridge scheduled
+
+Run steps:
+1) Inject 10% synthetic traffic with corrupted prompt tokens to trigger quality regression.
+2) Assert that alert fires: alerts/quality-drop-10p establishes page within 3 minutes.
+3) Execute canary rollout to pinned model via CLI and confirm rollback within 12 minutes.
+4) Run 'scripts/credits/calc_credit.py' against the synthetic incident and validate expected credit capped values.
+5) Scoreboard: time-to-detect, time-to-contain, time-to-rollback, correctness of evidence bundle (pass/fail).
+
+Ownership and responsibilities
+
+- On-call responder: containment, initial mitigation, evidence capture.
+- Service owner (product engineering): approves rollback and customer messaging specifics.
+- Incident Commander: full coordination, external comms sign-off, postmortem owner assignment.
+- SRE Manager: verifies credit calc and legal/regulatory evidence for enterprise customers.
+
+When to close an incident
+
+- All immediate mitigations are validated and show stable telemetry for 30 minutes in the affected region(s).
+- Postmortem owner assigned and evidence bundle uploaded.
+- Customer-facing summary and estimated credits (if any) drafted and approved by Incident Commander + SRE Manager.
+
+Appendix A: Useful CLI snippets and example audit commands
+
+- View recent traffic splits: rdl-cli traffic list --route /v1/generate --since 1h
+- Update rate limit (emergency): rdl-cli rate update --route /v1/generate --rate 100rps --incident-id {incident_id}
+- Fetch trace: x-trace fetch --id {trace_id} --format json > traces/{trace_id}.json
+- Generate synthetic regression test: scripts/synthetics/generate_regression_load.sh --tenant gd-tenant-2026 --rate 200
+
+Appendix B: Example short-form status messages (copy/paste)
+
+- Short status (website): "We are investigating elevated latency for text responses in <region>. Mitigation is in progress and we will update shortly."
+- Email subject: "Incident {incident_id}: Partial service degradation"
+
+Change log
+
+- 2026-02-12: Drafted by Daniel K. Morales
+- 2026-03-02: Added rollback CLI examples and pre-approved criteria (review: Aisha Patel)
+- 2026-08-01: Finalized credit calc automation steps and game-day harness (review: Marco Ruiz, Joanne Lin)

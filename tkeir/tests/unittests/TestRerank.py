@@ -20,7 +20,7 @@ from thot.tools.search.rerank import (
 
 def test_hit_text_for_rerank_prefers_text_raw():
     assert (
-        hit_text_for_rerank({"text_raw": "chunk", "parent_title": "title"})
+        hit_text_for_rerank({"text_raw": "chunk", "title": "title"})
         == "chunk"
     )
 

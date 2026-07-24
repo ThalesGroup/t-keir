@@ -1,0 +1,138 @@
+Capacity Guardrails: Multitenant Throttle Governor and Eviction Escrow Runbook
+
+Summary
+-------
+This runbook documents Redwood's operational playbook for a cluster-level throttle governor and the complementary eviction escrow mechanism used to protect SLOs during multitenant capacity shortfalls. It translates SLO and error budget signals into deterministic actions (rate-limits, admission-control, short lived evictions) while minimizing blast radius and preserving customer fairness.
+
+Scope
+-----
+- Applies to multi-tenant inference clusters running the inference-serving runtime (service names: inference-gateway, kv-router, batch-allocator).
+- Covers detection, automated mitigation (throttle governor), short-lived eviction via "eviction escrow", manual overrides, and post-incident verification.
+- Does NOT replace tenant contract eviction policies for committed Dedicated customers; those follow dedicated-eviction-procedure page.
+
+Objectives
+----------
+- Maintain customer-facing SLOs: 99th percentile latency < 350ms for standard tier; availability >= 99.9%.
+- Keep error budget burn rate below 3x sustained for > 30 minutes before aggressive action.
+- Ensure predictable, auditable eviction decisions with reversible escrow state.
+
+Ownership and Contacts
+----------------------
+- Runbook owner: eng-sre (oncall: inference-cluster-pager)
+- Primary contacts: Elena Kim (SRE), Marcus Li (Platform), Priya Nair (Runtime)
+- Pager escalation: inference-pager -> platform-lead -> eng-sre-manager (see /oncall-and-incident-response/oncall-rotations)
+
+Key Signals and Telemetry
+-------------------------
+1) SLO and error budget signals
+   - service.slo.latency.99p (ms)
+   - service.slo.availability.rolling_1h (%)
+   - service.error_budget.burn_rate.5m
+2) Capacity signals
+   - gpu.utilization.percent per pool
+   - queue.wait_time.p95 (ms)
+   - inflight_requests per tenant
+3) Admission & throttling signals
+   - admission.rejection.rate
+   - token_bucket.fill_level (per priority-slice)
+
+Threshold table (example)
+-------------------------
+| Trigger | Observed signal | Immediate action |
+|---------|-----------------|-----------------|
+| Warning | burn_rate >= 1.5x sustained 10m | Start telemetry shadowing; notify oncall |
+| Elevated | burn_rate >= 3x sustained 30m OR latency.99p >= 350ms for 10m | Activate throttle governor (soft) for lowest-priority slice; reduce burst window by 25% |
+| Severe | burn_rate >= 6x sustained 15m OR availability < 99.5% for 5m | Escalate to eviction-escrow state; apply aggressive admission limits; prepare targeted evictions |
+
+Design: Throttle Governor and Eviction Escrow Concepts
+-----------------------------------------------------
+- Throttle Governor: a distributed policy engine (component: throttle-governor) that enforces per-tenant priority slices (e.g. premium, standard, best-effort). It uses a leaky-bucket algorithm with adaptive windows tuned by observed queueing latency. The governor supports a safe-decay parameter to allow recovery without manual intervention.
+- Eviction Escrow: a reversible short-term marker assigned to candidate workloads/tenants when capacity is critical. Escrowed workloads are flagged for eviction but are kept in a grace state for a configurable period (default 10 minutes) during which autoscaling, routing fallback, or human remediation can prevent termination. All escrow actions are auditable.
+
+Runbook: Automated Response Flow
+--------------------------------
+1) Detection and confirmation (oncall or automation)
+   - Verify signals (SLO dashboards and raw metrics). If alert correlates with queue.wait_time.p95 and gpu.utilization > 85%, treat as confirmed.
+2) Soft governor (automatic)
+   - throttle-governor applies slice-level rate reductions: reduce best-effort to 40% of baseline, standard to 75%, premium unchanged.
+   - Update oracle: post a change event to /events/capacity-governor with reason and change-id.
+3) Escalation and escrow (conditional)
+   - If soft governor does not restore SLOs in 10m, enter escrow evaluation.
+   - Candidate selection heuristic: tenants with highest recent error-budget-burn and lowest contract-priority are shortlisted.
+   - Place shortlisted tenants into eviction escrow with TTL=10min. Notify tenant owners via email/webhook and record in audit log: audit.eviction_escrow.<change-id>.
+4) Forced eviction (manual or automated)
+   - After TTL, if no remediation (autoscale or re-route), execute eviction handler to free nodes. Evictions should prefer ephemeral, non-critical worker pods first.
+   - For each eviction, emit events, update chargeback ledger, and annotate tenant with eviction_reason and remediation_instructions.
+5) Recovery and soft-restoration
+   - Gradually revert governor reductions in 5-minute increments while monitoring SLOs.
+
+Runbook: Manual Intervention Steps
+----------------------------------
+1) Triage (first 10 minutes)
+   - Confirm cluster-level telemetry and cross-check tenant logs.
+   - Run quick capacity audit: kubectl get nodes (filter: inference-enabled), check gpu health and pod eviction counts.
+2) Apply targeted throttles (if automation disabled)
+   - CLI: curl -X POST https://throttle-api.internal/v1/slices/adjust -d '{"slice":"best-effort","multiplier":0.4}' -H 'Authorization: Bearer $SRE_TOKEN'
+3) Place or remove eviction escrow (manual)
+   - CLI: curl -X POST https://allocator.internal/v1/escrow -d '{"tenant":"tenant-id","ttl_seconds":600,"reason":"slo_breach"}'
+4) Execute safe eviction (if required)
+   - Use evacuate node workflow (admin only): admin-evacuate --node <node-id> --prefer-pods ephemeral --dry-run=false
+5) Communicate
+   - Post update to incident channel (#inc-inference), update status page if customer-visible, and notify Customer Success for affected tenants.
+
+Verification and Post-Action Checks
+----------------------------------
+- Verify SLO metrics returning to baseline for 30m window.
+- Confirm eviction events are present in audit.eviction_escrow.<change-id> and reason codes match authorized triggers.
+- Run smoke canaries: send 100 requests to premium/standard slices and verify p95 latency < target.
+
+Recovery and Remediation Playbook
+--------------------------------
+- If evicted tenants report degraded behavior after reinstatement: collect heap traces, model cache metrics, and warm-up traffic via controlled replay (tool: canary-relay).
+- For repeated escrow triggers (>3 times in 7 days): raise a reliability initiative to re-evaluate tenant assignment, capacity sizing, or pricing policy.
+
+Auditing, Billing, and Notifications
+-----------------------------------
+- All throttle adjustments and eviction escrow events must be tagged with change-id and persisted to the capacity-audit-store (retention 90 days).
+- Billing: evictions during non-committed windows will trigger a credit evaluation; finance notifies customers according to the Customer Impact policy.
+
+Simulation and Playbook Validation
+--------------------------------
+- Test this runbook in the staging cluster monthly using the capacity-sim harness: run ./tools/capacity-sim --profile multitenant-spike --duration 20m.
+- Acceptance criteria for the exercise: no committed-dedicated tenant is evicted; SLOs for premium tenants preserved; post-mortem documented within 48h.
+
+Config reference (example JSON for throttle-governor)
+--------------------------------------------------
+{
+  "slices": [
+    {"name": "premium", "weight": 50, "min_mult": 1.0},
+    {"name": "standard", "weight": 30, "min_mult": 0.5},
+    {"name": "best-effort", "weight": 20, "min_mult": 0.2}
+  ],
+  "safe_decay_minutes": 15,
+  "escrow_ttl_seconds": 600
+}
+
+Post-incident and Continuous Improvement
+-----------------------------------------
+- Postmortem requirements: timeline, root cause, decision rationale for throttles/evictions, missed signals, and recommended follow-ups. Owner must schedule a remediation ticket within 5 business days.
+- Suggested improvements: refine candidate selection heuristic, expose per-tenant preemption risk to Customer Success, and run an AB experiment of dynamic slice weights.
+
+Runbook Verification Checklist (quick)
+------------------------------------
+- [ ] Alerts validated and correlated to telemetry
+- [ ] Throttle governor event has change-id and audit entry
+- [ ] Eviction escrow TTL and notifications recorded
+- [ ] Post-incident ticket created and assigned
+- [ ] Metrics verified (p95/p99 latency, availability)
+
+References and Related Docs
+---------------------------
+- /confluence/eng-sre/capacity-planning/capacity-onboarding-checklist-for-new-model-tenants-2026
+- /confluence/eng-sre/operational-tooling/burst-absorber-architecture-and-decision-playbook-2026
+- Capacity simulation toolkit: git.internal/redwood/capacity-sim
+
+Appendix: Decision rationale for escrow TTL=10min
+------------------------------------------------
+- 10 minutes balances giving tenants time for autoscaling and graceful fallback while keeping the window short enough to limit exposure to prolonged SLO degradation. The TTL is tunable and should be validated in chaos drills.
+

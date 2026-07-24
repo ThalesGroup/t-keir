@@ -1,0 +1,54 @@
+Third-party model risk review workflow (Hosted API)
+
+# Purpose
+This page defines the security and compliance review required before Redwood can ship a third-party model in the Hosted API catalog.
+
+# Scope
+Applies to any new upstream weights/tokenizer/artifacts that Redwood will host or make available via the Hosted API.
+
+# Review owner
+- Security & Compliance (Risk & Exceptions)
+
+# Inputs required from requester
+Provide in the model intake ticket:
+- Upstream source (repo URL, commit/tag, download location)
+- License and redistribution terms
+- Known upstream maintainers and any vendor relationship
+- Any customer constraints (data residency, regulated workloads)
+
+# Required checks (all must be completed)
+## 1) Artifact provenance and integrity
+- Verify checksums for downloaded artifacts
+- Record the exact upstream tag/commit and file hashes
+- Store hashes in the model registry change description
+
+## 2) Supply chain scanning
+- Scan container images and build environment used for conversion/quantization
+- Run malware scan on downloaded archives
+- If a conversion script is used, it must come from an approved repo or be reviewed
+
+## 3) License and acceptable use
+- Confirm redistribution rights for hosted serving
+- Document any restrictions we must enforce in docs and/or API terms
+- If restrictions exist, Product must confirm how we communicate them
+
+## 4) Privacy and data handling
+- Confirm no customer data is embedded in the model artifact pipeline
+- Confirm retention and access controls for internal artifacts (weights, logs)
+
+## 5) Abuse and policy alignment
+- Ensure model can be placed behind Redwood policy layer
+- If model is known to be high-risk, require a Product signoff and a staged rollout
+
+# Outputs (artifacts)
+- A risk review entry summarizing: risks, mitigations, restrictions, and decision
+- Decision must be one of: `approved`, `approved-with-restrictions`, `blocked`
+- If `approved-with-restrictions`, include the exact restriction text to appear in docs
+
+# Exception workflow
+- Exceptions (e.g., unclear provenance, incomplete upstream docs) require a Security exception record and VP Engineering approval.
+- Link the exception record in the Linear model intake ticket and in the GitHub model registry PR.
+
+# Related pages
+- Hosted API model intake
+- Hosted model rollout and fallback runbook

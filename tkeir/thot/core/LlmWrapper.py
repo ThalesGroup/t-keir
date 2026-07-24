@@ -30,7 +30,7 @@ class Provider(str, Enum):
 
 
 class RerankStrategy(str, Enum):
-    """Supported second-stage rerank strategies."""
+    """Supported second-stage rerank strategies (no LLM generation)."""
 
     CROSS_ENCODER = "cross_encoder"
     EMBEDDING_COSINE = "embedding_cosine"
@@ -56,7 +56,22 @@ DEFAULT_RERANKER_MODELS = {
 }
 DEFAULT_RERANK_STRATEGY = RerankStrategy.CROSS_ENCODER
 _ALLOWED_RERANK_STRATEGIES = frozenset(
-    strategy.value for strategy in RerankStrategy
+    {
+        RerankStrategy.CROSS_ENCODER.value,
+        RerankStrategy.EMBEDDING_COSINE.value,
+    }
+)
+# LLM-as-judge / generative rerank aliases — explicitly forbidden.
+_FORBIDDEN_LLM_RERANK_STRATEGIES = frozenset(
+    {
+        "llm",
+        "llm_judge",
+        "llm_rerank",
+        "generate",
+        "generation",
+        "chat",
+        "prompt",
+    }
 )
 
 
@@ -139,14 +154,26 @@ def _load_file_model_overrides() -> dict[str, Any]:
 
 
 def _normalize_rerank_strategy(value: object) -> str:
-    """Normalize a rerank strategy name to a supported value.
+    """Normalize a rerank strategy name.
+
+    Allowed: ``cross_encoder``, ``embedding_cosine``.
+    LLM / generative aliases are forbidden and fall back to the default.
 
     Example:
         >>> from thot.core.LlmWrapper import _normalize_rerank_strategy
-        >>> _normalize_rerank_strategy("EMBEDDING_COSINE")
+        >>> _normalize_rerank_strategy("embedding_cosine")
         'embedding_cosine'
+        >>> _normalize_rerank_strategy("llm_judge")
+        'cross_encoder'
     """
     strategy = str(value or DEFAULT_RERANK_STRATEGY.value).strip().lower()
+    if strategy in _FORBIDDEN_LLM_RERANK_STRATEGIES:
+        ThotLogger.warning(
+            f"Rerank strategy={strategy!r} is forbidden "
+            "(LLM generation not allowed for rerank); "
+            f"using {DEFAULT_RERANK_STRATEGY.value!r}"
+        )
+        return DEFAULT_RERANK_STRATEGY.value
     if strategy not in _ALLOWED_RERANK_STRATEGIES:
         return DEFAULT_RERANK_STRATEGY.value
     return strategy
@@ -510,29 +537,24 @@ class UnifiedLLMWrapper:
         top_n: int | None = None,
         strategy: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Score documents against ``query`` with the configured strategy.
+        """Score documents against ``query`` (cross-encoder or embedding cosine).
 
-        Strategies (``RERANK_STRATEGY`` / ``search.rerank.strategy``):
-
-        * ``cross_encoder`` — HuggingFace CrossEncoder via sentence-transformers
-          (default ``BAAI/bge-reranker-v2-m3``)
-        * ``embedding_cosine`` — embed query + docs with the configured
-          embedding provider, rank by cosine similarity
+        Allowed strategies: ``cross_encoder`` (HuggingFace CrossEncoder) and
+        ``embedding_cosine`` (query/doc embedding similarity). LLM / generative
+        rerank is forbidden.
 
         Args:
             query: User / claim query text.
             documents: Candidate document texts (same order as first stage).
             top_n: Optional max results; defaults to ``len(documents)``.
-            strategy: Optional per-call override of ``rerank_strategy``.
+            strategy: Override; defaults to ``WrapperConfig.rerank_strategy``.
 
         Returns:
             List of ``{"index": int, "relevance_score": float}`` sorted by
             score descending. ``index`` refers to the input ``documents`` list.
 
         Raises:
-            ValueError: When the configured strategy is unknown.
-            RuntimeError: When sentence-transformers is missing for
-                ``cross_encoder``.
+            RuntimeError: When sentence-transformers is missing (cross-encoder).
 
         Example:
             >>> import asyncio
@@ -543,17 +565,15 @@ class UnifiedLLMWrapper:
             return []
         keep = len(documents) if top_n is None else max(1, int(top_n))
         chosen = _normalize_rerank_strategy(
-            strategy or self._config.rerank_strategy
+            strategy if strategy is not None else self._config.rerank_strategy
         )
-        if chosen == RerankStrategy.CROSS_ENCODER.value:
-            return await self._cross_encoder_rerank(
-                query, documents, top_n=keep
-            )
         if chosen == RerankStrategy.EMBEDDING_COSINE.value:
             return await self._embedding_cosine_rerank(
                 query, documents, top_n=keep
             )
-        raise ValueError(f"Unknown rerank strategy: {chosen!r}")
+        return await self._cross_encoder_rerank(
+            query, documents, top_n=keep
+        )
 
     def _get_cross_encoder(self):
         """Lazily load the sentence-transformers CrossEncoder.

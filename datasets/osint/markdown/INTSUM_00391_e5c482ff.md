@@ -1,0 +1,6 @@
+# INTSUM 00391 — Baltic Sea
+
+INTELLIGENCE SUMMARY
+Reporting period: 2026-07-27T17:04Z
+Assessment: activity near Baltic Sea is consistent with scheduled logistics. Confidence: moderate.
+Collection priorities: force posture, maritime approaches, communications indicators.

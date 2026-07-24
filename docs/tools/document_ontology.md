@@ -151,7 +151,7 @@ ontology labels  →  concept spans  →  better SVO / kg  →  richer document 
 | Absolute paths | Operator-mounted files, or ingest-staged uploads under `INGEST_ROOT` |
 | Per-request (preferred for domain/corpus) | Client uploads file **bytes** — server never opens client paths |
 
-Corpus demo ontologies (`workspace/corpus_nato/ontologies/`) are **not**
+Corpus demo ontologies (`datasets/osint/ontologies/`) are **not**
 searched by the server; upload them with the document.
 
 Relative `derive-from.paths` resolve only via `default_search_roots()`
@@ -197,7 +197,7 @@ Ingest stages bytes under `INGEST_ROOT/uploaded_ontologies/{id}/`, stamps
 Client path strings in metadata are rejected (HTTP 400) — only staged uploads
 count for derive-from at ingest time.
 
-`make corpus-ingest` reads `--ontology-dir` on the **client** and uploads each
+`make datasets-ingest` reads `--ontology-dir` on the **client** and uploads each
 file’s bytes with OSINT documents. The ingest service stays corpus-agnostic.
 
 Per-document paths **enable derivation even when** config `derive-from.enabled`

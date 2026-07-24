@@ -1,0 +1,346 @@
+KMS IAM Baseline and Rotation Roles (Terraform/IaC Standard)
+
+## Purpose
+This document defines Redwood Inference’s baseline IAM posture for interacting with customer-managed KMS/HSM-backed envelope encryption across Hosted, Dedicated, and Private deployments.
+
+It standardizes:
+- A least-privilege role model for runtime KMS calls vs administrative/rotation operations.
+- Per-environment identity separation (dev/staging/prod) and blast-radius constraints (region/account/project/tenant).
+- Break-glass access patterns that are auditable, time-bound, and safe.
+- A repeatable process to rotate roles/credentials without causing KMS storms, decrypt outages, or prolonged dual-access windows.
+
+This standard is the infra companion to:
+- ADR-007 (KMS client wrapper + failure policy)
+- ADR-008 (dual-read rotation strategy)
+- Key Management Standard (controls + review checklist)
+
+---
+
+## Scope
+### In scope
+- IAM roles/policies used by Redwood services that call KMS (Encrypt/Decrypt/GenerateDataKey/DescribeKey).
+- IAM roles/policies used to validate KMS access during installation/preflight (Private) and ongoing health checks.
+- Separation of duties for rotation/cutover operations.
+- Break-glass access for incident mitigation and evidence gathering.
+- Terraform modules and patterns used to generate and enforce the above.
+
+### Out of scope
+- New cryptographic primitives or changes to encryption algorithms.
+- Customer-specific key policy authoring (we provide guidance, but customers own their KMS key policies in Private).
+- Broad authentication refactors unrelated to KMS.
+
+---
+
+## Principles (non-negotiables)
+1) **Runtime decrypt is sacred.** Only the minimum set of principals needed to serve traffic may call `Decrypt`.
+2) **Separate runtime from rotation.** Roles used to change key versions/config must not be able to decrypt customer data by default.
+3) **Short-lived credentials only.** No long-lived access keys for services. Prefer OIDC/IRSA/workload identity.
+4) **Environment + tenant isolation.** Dev/staging/prod separation, and isolate by customer deployment where applicable.
+5) **Deny-by-default guardrails.** Use permission boundaries and explicit denies to prevent privilege creep.
+6) **Auditable access.** Session tags, CloudTrail/Audit Logs, and Redwood audit events must identify who/what/when.
+7) **Break-glass is time-bound + approved.** Must be issued via ticket, with expiry and post-incident review.
+
+---
+
+## Terminology
+- **KEK**: Key Encryption Key (KMS key used to wrap/unwrap DEKs).
+- **DEK**: Data Encryption Key (generated via KMS `GenerateDataKey`, used for envelope encryption).
+- **Runtime role**: Used by data-plane services to decrypt/encrypt payloads and generate DEKs.
+- **Rotation operator role**: Used by humans/automation to update config, aliases, or key version references (no decrypt).
+- **Validation role**: Used by installers/preflight checks to prove access and report actionable failures.
+- **Break-glass role**: Exceptional access for incident mitigation; time-bound and heavily logged.
+
+---
+
+## Role model (baseline)
+We standardize on four role categories. Names below are canonical; per-repo modules may apply prefixes/suffixes.
+
+### 1) Runtime KMS Client Role (service identity)
+**Used by**: Data-plane services (e.g., `inference-gateway`, `embedding-worker`, `control-plane-secrets`, `private-agent`).
+
+**Allowed actions (minimum)**:
+- `kms:Decrypt`
+- `kms:Encrypt` (only if service performs encryption; otherwise omit)
+- `kms:GenerateDataKey`
+- `kms:DescribeKey`
+
+**Prohibited by default**:
+- Any key policy mutation (`PutKeyPolicy`, `UpdateAlias`, etc.)
+- Key state changes (`DisableKey`, `ScheduleKeyDeletion`, etc.)
+
+**Notes**:
+- Runtime roles should be scoped to a specific key ARN (or alias) and, when possible, to a specific encryption context.
+- Runtime roles must be deployed per-environment and per-deployment boundary (Hosted vs Dedicated vs each Private cluster).
+
+### 2) KMS Validation Role (installer/preflight)
+**Used by**: Private installer, CI validation, and “validate KMS access” workflows.
+
+**Allowed actions (preferred)**:
+- `kms:DescribeKey`
+- `kms:Decrypt` and `kms:GenerateDataKey` *only when required to validate end-to-end envelope flows*.
+
+**Guidance**:
+- Prefer `DescribeKey` for early failure detection.
+- If `Decrypt` is needed for validation, use a dedicated “validation ciphertext” generated for testing, not production data.
+
+### 3) Rotation Operator Role (human/automation)
+**Used by**: Controlled rotation workflows (quarterly/annual) that update configuration and cutover flags (ADR-008).
+
+**Must NOT include**:
+- `kms:Decrypt`
+- `kms:GenerateDataKey`
+
+**Allowed actions (typical)**:
+- Redwood control-plane admin actions (e.g., update key reference, enable dual-read window) via internal APIs.
+- Read-only KMS introspection:
+  - `kms:DescribeKey`
+  - `kms:ListAliases` (AWS only; optional)
+
+**Rationale**:
+Rotation is primarily a *configuration and rollout* process, not a runtime decrypt operation. Decrypt access should remain limited to runtime services.
+
+### 4) Break-glass Roles (exceptional)
+We define two break-glass variants; choose based on the task.
+
+**A) Break-glass Auditor (read-only)**
+- For evidence gathering and triage: read-only views into KMS metadata and logs.
+- Allowed: `kms:DescribeKey`, list operations (as needed), access to log sources (CloudTrail/Audit Logs) via separate log-reader roles.
+
+**B) Break-glass Decrypt (extremely restricted)**
+- Only when required to mitigate an active incident where runtime access is failing and customer impact is severe.
+- Must be time-bound (hours, not days) and limited to the smallest set of keys and environments.
+
+**Approval + tracking**:
+- Requires an access ticket with approvers per the Security & Compliance process.
+- Must include an expiry timestamp and post-incident review notes.
+
+---
+
+## Per-environment separation requirements
+**Minimum**: separate identities and policies for `dev`, `staging`, `prod`.
+
+**Hosted/Dedicated**:
+- Separate AWS accounts/projects/subscriptions per environment.
+- Separate KMS keys per environment.
+
+**Private**:
+- Each customer cluster should have a distinct identity boundary:
+  - Separate IAM roles (or workload identities) per cluster.
+  - Scope policies to that customer’s key(s) only.
+
+**Never**:
+- Reuse prod runtime roles in staging.
+- Allow wildcard `Resource: *` for decrypt in prod.
+
+---
+
+## AWS implementation guidance (primary reference)
+### A) Prefer role assumption with OIDC/IRSA (no long-lived keys)
+- EKS-based services: use IRSA and a dedicated role per service.
+- Self-managed Kubernetes/VMs: use OIDC federation where possible.
+
+### B) Policy scoping
+**Resource scoping**
+- Scope KMS access to explicit key ARNs:
+  - `arn:aws:kms:<region>:<account-id>:key/<key-id>`
+  - Prefer alias ARNs only if alias management is well-controlled.
+
+**Encryption context scoping (recommended)**
+Where supported by the integration, require an encryption context that binds ciphertexts to:
+- `deployment_id`
+- `customer_id` (Private/Dedicated)
+- `service` name (optional)
+
+Example condition (illustrative):
+- `kms:EncryptionContext:deployment_id = <expected>`
+
+### C) Canonical runtime policy (AWS IAM JSON snippet)
+Use as a starting point; apply strict resource and condition scoping.
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "KmsRuntimeDataKeyAndDecrypt",
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:DescribeKey"
+      ],
+      "Resource": [
+        "arn:aws:kms:us-east-1:123456789012:key/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+      ]
+    }
+  ]
+}
+```
+
+**Do not** add:
+- `kms:*`
+- `kms:CreateKey`, `kms:PutKeyPolicy`, `kms:DisableKey`, `kms:ScheduleKeyDeletion`
+
+### D) Permission boundaries (recommended for prod)
+All KMS-capable roles in prod must attach the org-approved permission boundary. The boundary should explicitly deny:
+- KMS administrative actions
+- Cross-account key access not explicitly allowed
+- Any use of `Resource: *` with `kms:Decrypt`
+
+### E) Key policies vs IAM policies
+- For AWS KMS, access is the intersection of the key policy and IAM policy.
+- For Private deployments, customers control key policies. Our installer should validate that the customer key policy allows the runtime principal.
+- Avoid placing broad principals in key policies; prefer explicit role ARNs.
+
+---
+
+## GCP and Azure implementation guidance (high-level)
+We support multiple clouds, but our baseline separation-of-duties model remains the same.
+
+### GCP Cloud KMS
+- Prefer Workload Identity for GKE.
+- Separate service accounts:
+  - `svc-runtime-kms` (decrypt/data key generation)
+  - `svc-rotation-operator` (no decrypt)
+- Use IAM roles aligned to minimum permissions (e.g., CryptoKey Decrypter/Encrypter as needed) and scope to specific CryptoKeys.
+
+### Azure Key Vault / Managed HSM
+- Use Managed Identity for workloads.
+- Separate identities for runtime vs rotation.
+- Scope access policies/RBAC roles to specific vaults/keys and restrict “key management” actions from runtime identities.
+
+---
+
+## Terraform module expectations
+### Required module capabilities
+Our standard Terraform module(s) for KMS IAM must:
+- Generate separate roles for runtime, validation, rotation operator, and break-glass.
+- Enforce per-environment naming and tagging.
+- Support optional encryption context conditions.
+- Emit outputs used by installers and control-plane config (role ARN, principal IDs).
+- Provide safe defaults (least privilege) and require explicit opt-in for expanded permissions.
+
+### Naming + tags
+**Naming**
+- `redwood-<env>-<deployment>-kms-runtime-<service>`
+- `redwood-<env>-<deployment>-kms-validate`
+- `redwood-<env>-<deployment>-kms-rotation-operator`
+- `redwood-<env>-<deployment>-kms-breakglass-auditor`
+- `redwood-<env>-<deployment>-kms-breakglass-decrypt`
+
+**Required tags/labels**
+- `owner_team=eng-infra`
+- `system=kms`
+- `env=<dev|staging|prod>`
+- `deployment=<hosted|dedicated|private-<customer>>`
+- `data_classification=<internal|customer-sensitive>`
+
+---
+
+## Break-glass access process (operational standard)
+Break-glass is not a shortcut for missing permissions.
+
+### When break-glass is allowed
+- Active incident with customer impact where normal runtime access is failing.
+- Evidence gathering required for audit/customer security review (read-only variant).
+
+### Required controls
+- Ticketed request with business justification, scope, and duration.
+- Approval: Security Engineering + SRE on-call lead (or delegate).
+- Time-bound access (prefer 1–4 hours; max 24 hours without re-approval).
+- Session must be attributable (SSO, MFA, session tags).
+- Post-incident note: what actions were taken, and how we prevent recurrence.
+
+### Logging requirements
+- Cloud provider audit logs (e.g., CloudTrail) must be enabled for the account/project/subscription.
+- Redwood audit events must capture:
+  - who granted access
+  - who assumed role
+  - scope (key IDs, environment)
+  - start/end time
+
+---
+
+## Rotating roles/credentials safely (no downtime)
+This section covers rotating *identities* (roles/service accounts/managed identities) and any associated credentials/trust configs.
+
+### Rotation triggers
+- Scheduled rotation (at least annually for trust relationships and access boundaries; more frequently if policy is).
+- Suspected credential compromise.
+- Policy drift or privilege creep.
+- Cloud provider best-practice updates.
+
+### Standard rotation procedure
+1) **Create new role/service account**
+   - Apply least-privilege policy.
+   - Attach permission boundary (prod).
+   - Configure trust (OIDC/IRSA/workload identity) with required conditions.
+
+2) **Deploy to staging first**
+   - Update service configuration to assume/use the new identity.
+   - Validate KMS preflight and runtime behaviors.
+   - Monitor KMS metrics: latency, error rate, throttling.
+
+3) **Canary in prod**
+   - Enable for a small percentage of traffic or a subset of pods.
+   - Confirm:
+     - No increase in `AccessDenied` / `InvalidCiphertext`.
+     - No retry amplification (ADR-007 failure policy).
+
+4) **Full rollout**
+   - Roll out by service and region.
+   - Keep old role enabled during the rollout window to avoid partial cutovers.
+
+5) **Disable old role**
+   - Remove from trust policy / detach from workloads.
+   - Validate that no principals are still assuming it.
+
+6) **Delete old role (after cooldown)**
+   - After a defined cooldown (recommended: 7–14 days), delete.
+   - Retain policy and audit artifacts as evidence.
+
+### Rollback
+- If KMS `AccessDenied` spikes or health checks fail, roll back to the previous identity immediately.
+- File a follow-up task to understand missing permissions; do not “temporarily” broaden runtime permissions in prod without Security review.
+
+---
+
+## Common anti-patterns (do not do these)
+- Using a single shared “kms-admin” role for runtime and rotation.
+- Granting `kms:Decrypt` to humans as a convenience.
+- Allowing `Resource: *` on `kms:Decrypt` in prod.
+- Reusing the same principal across multiple Private customers.
+- Relying on long-lived access keys for services.
+
+---
+
+## Review checklist (for new/changed KMS IAM)
+- [ ] Roles separated: runtime vs rotation vs validation vs break-glass.
+- [ ] Per-environment identities and keys.
+- [ ] Runtime policy contains only required KMS actions.
+- [ ] `kms:Decrypt` scoped to specific key resources.
+- [ ] Permission boundary applied in prod.
+- [ ] Logging enabled and role sessions attributable.
+- [ ] Rotation plan documented (create → stage → canary → rollout → disable → delete).
+- [ ] SRE sign-off for prod changes that affect runtime decrypt.
+
+---
+
+## Ownership and change management
+**Owner**: Eng-Infra (Terraform/IaC), with required review from Security Engineering for any prod policy changes.
+
+**Material changes** (e.g., adding `Decrypt`, widening resources, changing trust conditions) require:
+- Security review
+- Staging validation
+- Canary rollout plan
+- Updated runbook notes if operator behavior changes
+
+---
+
+## Appendix: Suggested role-to-service mapping (typical)
+- `kms-runtime-inference-gateway` → decrypt/generateDataKey for request/response envelope payloads
+- `kms-runtime-control-plane-secrets` → decrypt for control-plane stored secrets (where applicable)
+- `kms-validate-private-installer` → describeKey + optional decrypt on validation ciphertext
+- `kms-rotation-operator` → call Redwood control-plane APIs to stage/cutover key version references (no decrypt)
+- `kms-breakglass-auditor` → read-only metadata + audit logs access
+- `kms-breakglass-decrypt` → exceptional decrypt scoped to specific incident keys (time-bound)

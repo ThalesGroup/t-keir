@@ -1,0 +1,573 @@
+Private Upgrades: Preflight (Precheck) Specification
+
+## Purpose
+This page specifies **preflight checks ("prechecks")** executed by `redwood-private-installer` before any Redwood Private upgrade steps are performed. The goal is to prevent common upgrade failures by validating environment readiness up front and producing **actionable remediation guidance**.
+
+This spec covers:
+- Check categories and required inputs
+- Pass/fail criteria and thresholds
+- **Blocking vs warning** behavior
+- Standardized error codes, messages, and operator remediation
+- Special considerations for **VPC** vs **on-prem/air-gapped** deployments
+
+Non-goals:
+- Replacing runtime monitoring during upgrades (see SRE alert runbooks)
+- Full coverage for every historical migration edge case (installer will explicitly identify "manual intervention required")
+
+---
+
+## Definitions
+- **Private deployment**: Redwood Private control plane + data plane running in customer-controlled environment (VPC or on-prem).
+- **Precheck**: A deterministic validation executed before generating/executing an upgrade plan.
+- **Blocking**: Failure stops the upgrade and requires remediation.
+- **Warning**: Failure does not stop the upgrade, but is surfaced in output and stored in upgrade artifacts; operator must explicitly acknowledge for execution.
+- **Upgrade target**: The requested version(s) of Redwood Private components (installer, charts, platform control plane, data plane services).
+
+---
+
+## Operator Experience (CLI contract)
+Prechecks run as part of plan generation and can be invoked explicitly.
+
+### Commands
+- `redwood-private upgrade plan --to <version> [--bundle <path>] [--format json|table]`
+  - Runs prechecks by default
+  - Writes an auditable plan artifact that includes precheck results
+
+- `redwood-private upgrade precheck --to <version> [--bundle <path>] [--output <file>] [--fail-on-warn]`
+  - Runs only prechecks
+  - Does not mutate cluster state
+
+### Output requirements
+- Human-friendly table output for terminals
+- Structured JSON output for automation
+- Each check must provide:
+  - `id`, `title`, `severity`, `result` (PASS/WARN/FAIL/SKIP)
+  - `reason` (short)
+  - `details` (relevant values; redacted where sensitive)
+  - `remediation` (actionable steps)
+  - Optional `links` (internal docs + commonly used upstream docs)
+
+### Exit codes
+- `0`: all PASS (and WARN only if not using `--fail-on-warn`)
+- `2`: at least one WARN and `--fail-on-warn` enabled
+- `3`: at least one FAIL
+- `4`: execution error (unexpected exception, permissions, network issues that prevent checks from running)
+
+---
+
+## Severity model
+Each precheck has a **default severity** which determines behavior.
+
+| Severity | Behavior | Intended use |
+|---|---|---|
+| BLOCK | Upgrade cannot proceed (plan generation may proceed but execution must be blocked). | High probability of outage or irrecoverable partial upgrade (e.g., unsupported version jump, DB unreachable). |
+| WARN | Upgrade can proceed but requires explicit operator acknowledgement in plan/apply step. | Elevated risk or degraded experience (e.g., storage headroom near threshold, cert expiring soon). |
+| INFO | Informational only; never blocks. | Helpful context for operator (e.g., control plane latency). |
+
+### Acknowledgement rule
+If any WARN checks are present, `upgrade apply` must require either:
+- `--ack-warnings`, or
+- a plan field `warnings_acknowledged_by` + `warnings_acknowledged_at` (set by the installer when applying with acknowledgement)
+
+---
+
+## Execution model
+### Ordering
+Checks execute in the following order to improve signal quality and reduce confusing cascades:
+1) Local environment + inputs (kubeconfig, bundle path)
+2) Kubernetes API connectivity + permissions
+3) Cluster health + capacity checks
+4) Storage + snapshot capability
+5) Control plane endpoints (DNS/TLS)
+6) Database connectivity + migration safety
+7) Artifact availability + integrity verification
+8) Compatibility / supported upgrade path gating
+
+### Mutability
+Prechecks must be **read-only**. The following are allowed:
+- API reads (Kubernetes API, DNS, HTTPS HEAD/GET, DB read-only probes)
+- Listing resources (pods, nodes, PVCs)
+- Creating ephemeral objects **only if explicitly marked** and cleaned up (preferred: avoid). Current policy: **no cluster writes** during prechecks.
+
+### Timeouts
+Default per-check timeout: **20s**
+- Networking-related checks may use **60s** (DNS/TLS, artifact endpoints)
+Overall precheck budget: **5 minutes** (fail fast if BLOCK failures are found)
+
+### Redaction
+- Never print secrets, bearer tokens, client certs, or full connection strings.
+- DB endpoints may be printed; usernames may be printed; passwords must not.
+- Bundle paths are acceptable; bundle contents hashes are acceptable.
+
+---
+
+## Standard error format
+Each check must use:
+- **Stable error code**: `RWPRV-PRE-<category>-<number>`
+- Message should be actionable and reference the failing resource/value.
+
+Example:
+- Code: `RWPRV-PRE-DB-001`
+- Message: `Cannot connect to Postgres at <host>:<port> using configured secret redwood-postgres (timeout after 20s).`
+- Remediation:
+  1. `kubectl -n redwood-private get secret redwood-postgres -o yaml` (verify host/port/user)
+  2. Validate network policy allows egress to DB
+  3. Run `psql` from a debug pod in-cluster
+
+---
+
+## Check catalog (spec)
+The following checks are required for GA. Each includes default severity, pass criteria, and remediation.
+
+### Category A: Inputs & environment
+
+#### A1. Kubeconfig present and usable
+- **ID**: `RWPRV-PRE-K8S-001`
+- **Severity**: BLOCK
+- **What it validates**: Installer can reach the Kubernetes API using provided kubeconfig/context.
+- **Pass criteria**:
+  - Kubernetes API `/version` responds
+  - Current context resolves to a cluster
+- **Fail message**: `Unable to reach Kubernetes API using context <context>.`
+- **Remediation**:
+  - Verify `KUBECONFIG` and context: `kubectl config current-context`
+  - Verify cluster access: `kubectl get ns`
+  - For on-prem: ensure VPN/bastion connectivity to API server
+
+#### A2. Namespace exists
+- **ID**: `RWPRV-PRE-K8S-002`
+- **Severity**: BLOCK
+- **Validates**: Target namespace `redwood-private` (default) exists.
+- **Pass criteria**: Namespace exists.
+- **Remediation**:
+  - Create namespace or set correct namespace flag: `--namespace`
+
+#### A3. Installer/operator permissions (RBAC)
+- **ID**: `RWPRV-PRE-K8S-003`
+- **Severity**: BLOCK
+- **Validates**: Caller has required permissions to read and later upgrade resources.
+- **Pass criteria**:
+  - `kubectl auth can-i` checks pass for:
+    - get/list/watch pods, deployments, sts, jobs, configmaps, secrets (read-only for precheck)
+    - get/list/watch pv/pvc/storageclasses
+    - get nodes (or equivalent via cluster role; if nodes are hidden, allow skip with warning and rely on metrics fallback)
+- **Fail message**: `Insufficient RBAC permissions to validate/upgrade resources in namespace <ns>.`
+- **Remediation**:
+  - Bind required ClusterRole/Role to installer principal.
+  - If using a ServiceAccount, ensure it has `view` + upgrade-specific permissions.
+
+---
+
+### Category B: Kubernetes cluster health & scheduling readiness
+
+#### B1. Cluster version supported
+- **ID**: `RWPRV-PRE-K8S-010`
+- **Severity**: BLOCK
+- **Validates**: Kubernetes version is in the supported matrix for the target Private version.
+- **Pass criteria**: `v1.<minor>` within supported range for `<target version>`.
+- **Fail message**: `Kubernetes <version> is not supported for target <target>.`
+- **Remediation**:
+  - Upgrade cluster to a supported Kubernetes minor version before upgrading Redwood Private.
+  - If customer cannot upgrade K8s, pin Redwood Private to a compatible version.
+
+#### B2. Node readiness
+- **ID**: `RWPRV-PRE-K8S-011`
+- **Severity**: BLOCK
+- **Validates**: Nodes are Ready and schedulable.
+- **Pass criteria**:
+  - 0 nodes in `NotReady`
+  - No control-plane taints that would prevent required jobs/pods (unless workloads are explicitly tolerated)
+- **Fail message**: `Cluster has <n> NotReady nodes; upgrade jobs may not schedule reliably.`
+- **Remediation**:
+  - Fix node health (cloud provider events, kubelet, disk pressure)
+  - Drain/replace unhealthy nodes
+
+#### B3. System pods health (kube-system)
+- **ID**: `RWPRV-PRE-K8S-012`
+- **Severity**: WARN
+- **Validates**: Core components are stable to reduce upgrade flakiness.
+- **Pass criteria**:
+  - `coredns` pods Ready
+  - CNI pods Ready (vendor-specific)
+  - No crashlooping kube-system pods impacting DNS/network
+- **Warn message**: `Detected unhealthy kube-system pods (DNS/CNI). Upgrade may fail due to networking instability.`
+- **Remediation**:
+  - Resolve DNS/CNI issues; confirm name resolution in cluster
+
+#### B4. Redwood namespace baseline health
+- **ID**: `RWPRV-PRE-K8S-013`
+- **Severity**: WARN
+- **Validates**: Existing Redwood components are mostly healthy before upgrading.
+- **Pass criteria**:
+  - No more than 0 CrashLoopBackOff pods in `redwood-private`
+  - No Pending pods older than 10 minutes
+- **Warn message**: `Existing Redwood workloads are unhealthy; upgrading an unhealthy cluster increases rollback risk.`
+- **Remediation**:
+  - Investigate failing pods prior to upgrade: `kubectl -n redwood-private get pods` and `kubectl describe`
+  - Resolve image pull errors, quota, or config issues
+
+---
+
+### Category C: Resource capacity & quotas
+
+#### C1. CPU/memory headroom (best-effort)
+- **ID**: `RWPRV-PRE-CAP-001`
+- **Severity**: WARN
+- **Validates**: There is enough headroom for temporary upgrade jobs and rolling updates.
+- **Pass criteria** (best-effort):
+  - At least 10% allocatable CPU and memory unrequested OR can schedule 1 additional small job (250m CPU, 512Mi) in namespace.
+- **Warn message**: `Cluster appears resource constrained; upgrade jobs may be evicted or fail to schedule.`
+- **Remediation**:
+  - Temporarily scale down non-critical workloads or add capacity.
+  - Ensure namespace quotas allow upgrade jobs.
+
+#### C2. Namespace resource quotas
+- **ID**: `RWPRV-PRE-CAP-002`
+- **Severity**: BLOCK
+- **Validates**: Namespace quotas will not prevent required jobs.
+- **Pass criteria**:
+  - If ResourceQuota exists: available limits for pods/jobs, CPU, memory, PVCs.
+- **Fail message**: `ResourceQuota in <ns> prevents upgrade job creation (pods/jobs quota exhausted).`
+- **Remediation**:
+  - Increase quota or clean up completed jobs.
+
+---
+
+### Category D: Storage & snapshot readiness
+
+#### D1. Persistent volume usage headroom
+- **ID**: `RWPRV-PRE-STO-001`
+- **Severity**: BLOCK
+- **Validates**: PVs used by Redwood control plane services (including Postgres if in-cluster) have sufficient free space.
+- **Pass criteria**:
+  - For each critical PVC: estimated free space >= **15%** OR >= **10GiB** (whichever is larger).
+  - If free-space cannot be measured reliably: require operator override and treat as WARN.
+- **Fail message**: `Insufficient storage headroom on PVC <pvc> (<free> free, requires >= <threshold>).`
+- **Remediation**:
+  - Expand PVC (StorageClass must support expansion)
+  - Clean up logs/retention if applicable
+  - For on-prem: ensure backing storage has headroom and expansion workflow is validated
+
+#### D2. StorageClass supports snapshots or logical backup fallback configured
+- **ID**: `RWPRV-PRE-STO-002`
+- **Severity**: BLOCK
+- **Validates**: A rollback-safe backup mechanism is available.
+- **Pass criteria** (one of):
+  - CSI VolumeSnapshot supported for PVCs that will be backed up, OR
+  - Logical DB backup configured and tested (Postgres dump), OR
+  - Cloud provider snapshot integration available (EBS snapshot for AWS-managed PVs)
+- **Fail message**: `No supported backup mechanism detected for rollback safety (snapshots not available and logical backup not configured).`
+- **Remediation**:
+  - Install CSI snapshot controller and define VolumeSnapshotClass
+  - Enable logical backups in installer config
+  - Validate snapshot permissions (cloud IAM) for VPC deployments
+
+#### D3. Snapshot permission check (cloud/VPC)
+- **ID**: `RWPRV-PRE-STO-003`
+- **Severity**: WARN
+- **Validates**: Snapshot APIs can be invoked by the environment (IAM/permissions), where applicable.
+- **Pass criteria**: Best-effort detection based on cloud environment and snapshot class presence.
+- **Warn message**: `Snapshot controller detected but permissions could not be verified; backup step may fail at runtime.`
+- **Remediation**:
+  - Confirm IAM permissions for snapshot creation
+  - Perform a test snapshot outside of upgrade window
+
+---
+
+### Category E: Database connectivity & migration safety
+
+#### E1. Postgres reachable
+- **ID**: `RWPRV-PRE-DB-001`
+- **Severity**: BLOCK
+- **Validates**: Control plane DB endpoint is reachable from the cluster.
+- **Pass criteria**:
+  - TCP connect succeeds and DB responds to `SELECT 1` within 20s
+- **Fail message**: `Cannot connect to Postgres for control plane state (timeout/refused).`
+- **Remediation**:
+  - Validate service endpoint/hostname
+  - Confirm NetworkPolicy/SG/firewall egress
+  - Confirm DB is running and accepting connections
+
+#### E2. DB credentials valid (least privilege)
+- **ID**: `RWPRV-PRE-DB-002`
+- **Severity**: BLOCK
+- **Validates**: Provided DB user can authenticate and has required privileges for migrations.
+- **Pass criteria**:
+  - Authentication succeeds
+  - Required privileges present for schema migrations (as defined by Private DB role policy)
+- **Fail message**: `DB user lacks required privileges for schema migration.`
+- **Remediation**:
+  - Update role grants per DB policy
+  - Rotate credentials in Kubernetes secret
+
+#### E3. Migration lock availability
+- **ID**: `RWPRV-PRE-DB-003`
+- **Severity**: BLOCK
+- **Validates**: Migration lock can be acquired and there is no concurrent migration.
+- **Pass criteria**:
+  - Lock acquisition probe succeeds within 5s
+  - No active migration recorded in migrations table/state
+- **Fail message**: `Database migration lock is held; another migration may be running or a previous upgrade left a stale lock.`
+- **Remediation**:
+  - Confirm no other upgrade is in progress
+  - Follow runbook to clear stale lock (requires SRE approval)
+
+#### E4. DB version supported and parameters safe
+- **ID**: `RWPRV-PRE-DB-004`
+- **Severity**: WARN
+- **Validates**: Postgres major/minor version supported and safe settings present.
+- **Pass criteria**:
+  - Postgres major version in supported range
+  - `statement_timeout` and lock timeouts meet minimums recommended by Redwood migrations (or are unset)
+- **Warn message**: `Postgres version/settings may cause long locks or timeouts during migration.`
+- **Remediation**:
+  - Adjust timeouts per runbook
+  - Schedule longer maintenance window
+
+---
+
+### Category F: Identity, RBAC, and SSO reachability
+
+#### F1. OIDC/SSO endpoint reachable (if enabled)
+- **ID**: `RWPRV-PRE-AUTH-001`
+- **Severity**: WARN
+- **Validates**: If OIDC is configured for Private Console/API auth, issuer is reachable and metadata can be fetched.
+- **Pass criteria**:
+  - HTTPS GET to `/.well-known/openid-configuration` succeeds
+- **Warn message**: `OIDC issuer is unreachable from cluster; users may not be able to sign in post-upgrade.`
+- **Remediation**:
+  - Validate DNS + egress rules to IdP
+  - For on-prem: ensure IdP is reachable from cluster network
+
+#### F2. ServiceAccount tokens and projected volume support
+- **ID**: `RWPRV-PRE-AUTH-002`
+- **Severity**: BLOCK
+- **Validates**: Cluster supports projected service account tokens used by newer components.
+- **Pass criteria**:
+  - Kubernetes version supports bound service account tokens
+  - Feature gates not disabling required behavior
+- **Fail message**: `Cluster configuration does not support required ServiceAccount token projection for target version.`
+- **Remediation**:
+  - Update cluster configuration or pin to compatible version
+
+---
+
+### Category G: Networking, DNS, and TLS
+
+#### G1. Private control plane FQDN resolves in-cluster
+- **ID**: `RWPRV-PRE-NET-001`
+- **Severity**: BLOCK
+- **Validates**: DNS resolution for configured endpoints used during upgrade and health verification.
+- **Pass criteria**:
+  - A/AAAA record resolves for `private.<customer-domain>` and any configured artifact mirrors
+- **Fail message**: `DNS resolution failed for <hostname> from cluster context.`
+- **Remediation**:
+  - Fix CoreDNS configuration
+  - Fix upstream DNS forwarding / split-horizon DNS
+  - For VPC: validate Route53 private hosted zone associations
+
+#### G2. TLS certificate validity and expiry window
+- **ID**: `RWPRV-PRE-NET-002`
+- **Severity**: WARN (BLOCK if already expired)
+- **Validates**: TLS certs used by console/API/control plane endpoints are valid.
+- **Pass criteria**:
+  - Certificate chain validates (or matches configured trust bundle)
+  - Not expired
+  - Expiry >= **30 days** (else WARN)
+- **Warn message**: `TLS certificate for <hostname> expires in <days> days; upgrade window may overlap renewal.`
+- **Remediation**:
+  - Renew certificate before upgrade
+  - Ensure trust bundle is updated in cluster
+
+#### G3. Egress reachability to required endpoints
+- **ID**: `RWPRV-PRE-NET-003`
+- **Severity**: BLOCK (VPC/hosted artifacts), WARN (on-prem with offline bundle)
+- **Validates**: Cluster can reach required endpoints depending on installation mode:
+  - Online: container registry, chart repo, release metadata
+  - Offline: artifact mirror endpoints (if configured) or local bundle
+- **Pass criteria**:
+  - Online mode: HTTPS reachability to configured endpoints
+  - Offline mode: skip online checks if `--bundle` provided and verified
+- **Remediation**:
+  - Update firewall/proxy settings
+  - Configure `artifact_mirror_endpoint` (on-prem)
+  - Provide verified upgrade bundle
+
+---
+
+### Category H: Artifact availability and integrity
+
+#### H1. Target release metadata available
+- **ID**: `RWPRV-PRE-ART-001`
+- **Severity**: BLOCK
+- **Validates**: Installer can locate the target release manifest (versions, component images, chart versions).
+- **Pass criteria**:
+  - Online: release manifest fetched successfully
+  - Offline: release manifest present in bundle
+- **Fail message**: `Target release metadata for <target> not found (online fetch failed and no valid bundle provided).`
+- **Remediation**:
+  - Check target version name
+  - Provide `--bundle` or configure mirror
+  - Validate proxy settings
+
+#### H2. Helm chart availability
+- **ID**: `RWPRV-PRE-ART-002`
+- **Severity**: BLOCK
+- **Validates**: Required charts can be pulled (or are present in the bundle).
+- **Pass criteria**:
+  - Chart refs resolve and are pullable
+- **Fail message**: `Unable to pull Helm chart <chart>@<version>.`
+- **Remediation**:
+  - Validate chart repo URL/mirror
+  - For air-gapped: ensure bundle contains chart tarballs and index
+
+#### H3. Container image availability (HEAD check)
+- **ID**: `RWPRV-PRE-ART-003`
+- **Severity**: WARN (BLOCK if images are strictly required in offline mode and missing)
+- **Validates**: Image tags/digests exist in registry and are accessible.
+- **Pass criteria**:
+  - For each required image digest: registry responds and auth works
+- **Warn message**: `Some images could not be verified in registry; rollout may fail with ImagePullBackOff.`
+- **Remediation**:
+  - Validate registry credentials and permissions
+  - For on-prem: ensure offline registry mirror is synced
+
+#### H4. Offline bundle checksum/signature verification (on-prem)
+- **ID**: `RWPRV-PRE-ART-004`
+- **Severity**: BLOCK
+- **Validates**: Air-gapped bundle integrity.
+- **Pass criteria**:
+  - Manifest file present
+  - Checksums match
+  - Signature verifies against configured public key (if signature enforcement enabled)
+- **Fail message**: `Upgrade bundle failed integrity verification (checksum/signature mismatch).`
+- **Remediation**:
+  - Re-download bundle from trusted source
+  - Verify transfer method preserves file integrity
+  - Confirm correct public key configured
+
+---
+
+### Category I: Compatibility policy (supported upgrade paths)
+
+#### I1. Supported upgrade path (N-1 → N)
+- **ID**: `RWPRV-PRE-COMPAT-001`
+- **Severity**: BLOCK
+- **Validates**: Upgrade path complies with policy.
+- **Pass criteria**:
+  - Default supported path: **N-1 → N** for the current major/minor train
+  - Installer version is compatible with target platform version
+- **Fail message**: `Unsupported upgrade path from <current> to <target>. Supported: N-1 → N.`
+- **Remediation**:
+  - Upgrade sequentially
+  - If customer requires a jump, engage Release Eng + SRE for a supervised plan
+
+#### I2. Mixed-version constraints (control plane vs data plane)
+- **ID**: `RWPRV-PRE-COMPAT-002`
+- **Severity**: WARN
+- **Validates**: Temporary mixed-version window is within allowed bounds.
+- **Pass criteria**:
+  - Control plane and data plane versions do not exceed allowed skew as defined in compatibility matrix
+- **Warn message**: `Planned upgrade may temporarily exceed recommended version skew; ensure maintenance window and rollback plan.`
+- **Remediation**:
+  - Use staged plan (control plane first, then data plane)
+  - Avoid pausing mid-upgrade
+
+---
+
+## Blocking vs Warning policy (summary)
+The following checks are always **BLOCK** on failure:
+- Kubernetes API connectivity and namespace existence
+- RBAC required for upgrade operations
+- Supported Kubernetes version
+- Node readiness (hard failure)
+- Namespace quota prevents job/pod creation
+- Storage headroom below threshold
+- Backup mechanism not available
+- DB unreachable/invalid credentials/migration lock held
+- DNS failure for required hostnames (when those hostnames are required for health checks)
+- Target release metadata not available
+- Unsupported upgrade path
+- Offline bundle verification failure
+
+The following are **WARN** by default:
+- kube-system instability (DNS/CNI)
+- Existing Redwood namespace unhealthy
+- General CPU/memory headroom
+- Snapshot permission uncertainty
+- Postgres version/timeout settings at risk
+- OIDC issuer reachability
+- TLS cert expiring soon
+- Image availability best-effort verification
+
+Owners may promote WARN → BLOCK for a specific release train via change-management gating (see related policy page).
+
+---
+
+## Remediation guidance style guide
+Each remediation section must:
+1) State the goal in plain language ("Ensure DB is reachable from the cluster")
+2) Provide 2–5 concrete commands or steps
+3) Call out when escalation is required ("If you cannot clear locks safely, contact Redwood Support")
+
+### Example remediation snippet template
+- **Confirm**: `kubectl -n redwood-private get pods`
+- **Inspect**: `kubectl -n redwood-private describe pod <pod>`
+- **Logs**: `kubectl -n redwood-private logs <pod> --tail=200`
+- **Fix**: (specific action)
+- **Re-run**: `redwood-private upgrade precheck --to <target>`
+
+---
+
+## Special considerations
+### On-prem / air-gapped
+- Network egress checks must not block if a valid offline bundle is provided and mirror endpoints are configured.
+- Bundle verification (`RWPRV-PRE-ART-004`) is mandatory and blocking.
+- DNS checks should validate internal artifact mirrors and internal control plane endpoints (not public endpoints).
+
+### VPC
+- Artifact endpoints are typically online; egress reachability (`RWPRV-PRE-NET-003`) is blocking unless an approved mirror/bundle workflow is used.
+- Snapshot permission checks should be enabled where cloud IAM integration is detectable.
+
+---
+
+## Auditability requirements
+Precheck results must be persisted in the upgrade artifact and included in support bundles.
+Minimum fields to record:
+- Timestamp, installer version, current cluster version, current Private version, target version
+- Full precheck list with results and error codes
+- Warning acknowledgements (who/when)
+
+Additionally, the platform must emit audit log events:
+- `private.upgrade.precheck.started`
+- `private.upgrade.precheck.completed` (include counts: pass/warn/fail)
+
+---
+
+## Appendix: Example JSON output (contract)
+(Shown as text for documentation purposes.)
+
+{
+  "prechecks_version": "1",
+  "started_at": "2025-06-07T18:42:10Z",
+  "target_version": "private-2.18.0",
+  "results": [
+    {
+      "id": "RWPRV-PRE-DB-001",
+      "title": "Postgres reachable",
+      "severity": "BLOCK",
+      "result": "FAIL",
+      "reason": "timeout",
+      "details": "dial tcp <redacted-host>:5432 timed out after 20s",
+      "remediation": "Verify DB endpoint, network policies, and credentials; run SELECT 1 from a debug pod.",
+      "links": "eng-private-deployments/day-2-ops/private-upgrade-runbook#db-connectivity"
+    }
+  ]
+}
+
+---
+
+## Change log
+- 2025-06-07: Updated storage headroom thresholds and added explicit bundle integrity BLOCK requirement for on-prem.
+- 2025-05-22: Added migration lock probe and standardized error codes.
+- 2025-04-18: Initial published version.

@@ -1,0 +1,152 @@
+Discrete Stabilization Catalog and Escape-Hatch Playbook
+
+Overview
+
+This document is a compact, operator-friendly catalog of stabilization patterns and 'escape-hatch' procedures for on-call engineers and bridge operators responding to service instability (latency oscillation, transient SLO regressions, noisy-neighbor stalls, KV cache avalanches, and multi-tenant degradation). It is intentionally concise so teams can act quickly without flipping through multiple runbooks. Use this as a decision surface: identify the pattern, follow the associated rapid steps, and escalate to deeper runbooks as needed.
+
+When to use this catalog
+
+- Fast-moving incidents where the priority is to restore customer-facing behavior within the first 30 minutes.
+- Multi-service degradations where automated routing or fallback toggles can limit blast radius.
+- Game day scenarios and tabletop rehearsals as a quick reference for action owners.
+
+Guiding principles
+
+1) Minimize blast radius: prefer targeted mitigations (route, limit, degrade) over global shutdowns.
+2) Observe then act: gather a minimal evidence set (traces, P99, token rates, eviction metrics) before irreversible actions.
+3) Keep customers informed: if an incident impacts tenants for >10 minutes, publish a short status page note and add periodic updates.
+
+Stabilization patterns (catalog)
+
+Pattern: Latency oscillation (periodic P99 spikes)
+- Symptoms: P99 jumps to 300–800ms in bursts for 3+ cycles; throughput sustained.
+- Likely causes: asynchronous background batches, intermittent GC on model workers, autoscaler thrash.
+- Rapid mitigations (escape-hatch):
+  1. Attach live profile: run the tracing hook (obs/trace-link) for the last 10 minutes.
+  2. Toggle conservative batcher mode: /api/admin/batcher?mode=conservative -> reduces batch size and prioritizes latency (no config restart).
+  3. Pin to lower-seq-length model variant for affected route (route config -> set model_variant=fast-latency).
+  4. If oscillation continues, enable per-route rate-limiter at 80% of normal QPS for 15 minutes.
+
+Pattern: Noisy neighbor GPU saturation
+- Symptoms: single-host GPU util spikes to 98% while others at 60%; specific tenant latency increases.
+- Likely causes: oversized burst jobs, driver-level memory leak, misbehaving private deploy.
+- Rapid mitigations:
+  1. Identify host via metrics (gpu-alloc / host-id).
+  2. Migrate affected reservations: run CLI migrate-reservation --host HOSTID --target pool-safe.
+  3. If migration fails, drain the host (drain-host HOSTID) and enable fallback to prewarmed dedicated pool.
+  4. Notify infra-sre and open a follow-up ticket with host logs.
+
+Pattern: KV cache avalanche / mass eviction
+- Symptoms: sudden spike in cold-start token latency; cache-miss rate > 60%; downstream P95 token latency increases.
+- Likely causes: model rollout that changed prefix patterns, cache TTL misconfig change, or eviction due to memory pressure.
+- Rapid mitigations:
+  1. Re-enable prefix-KV sticky policy (config: cache.prefix_policy=sticky).
+  2. Roll back model rollout to previous version for the offending route.
+  3. Gradually ramp requests back with canary traffic (10% -> 25% -> 50%).
+
+Escape-hatch inventory (actions you can invoke immediately)
+
+Table: quick inventory of escape-hatches
+| Action | Owner | Trigger | Immediate rollback criteria | CLI / Console path |
+|---|---|---|---|---|
+| Route-level rate limit (soft) | runtime | P99 > 300ms for 5m | P99 < 250ms for 10m | Console -> Routes -> Rate limits |
+| Switch to fast-latency model variant | runtime | SLO regression + regression test pass | Traffic restored and qualitative checks pass | /api/route/update -> model_variant |
+| Batcher conservative mode | serving-runtime | P95 token latency > threshold | P95 < baseline for 10m | /api/admin/batcher |
+| Drain host and migrate | infra-sre | GPU saturation on host | Host rebalanced and utilization < 70% | infractl drain-host HOSTID |
+| Re-enable KV sticky policy | platform | sudden cache-miss spike | cache-miss < 15% for 20m | Console -> Caching -> Prefix policy |
+
+Step-by-step runbooks (short forms)
+
+Runbook: Rapid route-level throttling (ten-minute stabilization)
+1. Trigger: Alert: route.<service>.p99.latency > 400ms for 3 minutes.
+2. Evidence to collect (first 5 minutes):
+   - P95/P99 traces (jaeger link), top 5 trace spans, and token counts.
+   - Queue depth and drop rates from queue-metrics dashboard.
+   - Identify recent config changes (deploys in last 60m).
+3. Action: apply a soft rate limit at 80% of normal QPS for the affected route.
+   - Console -> Routes -> Edit -> Add soft_limit=80% with 15m TTL.
+4. Observe for 5–10 minutes. If P99 falls below target, start a slow ramp back (90% -> 100% over 20 minutes).
+5. If P99 does not improve, switch model variant to fast-latency and notify product.
+
+Runbook: Noisy-host containment
+1. Trigger: single-host GPU util >95% and tenant errors rising.
+2. Evidence: host metrics, active reservations, and running job list.
+3. Action: mark host as draining, migrate non-critical reservations, re-route latency-sensitive jobs to prewarmed pool.
+4. Communication: post on #ops-bridge channel and update status page if >10 minutes.
+
+Customer status templates (short, copy-paste)
+
+Status update — initial (within 10m):
+"We are investigating elevated latencies impacting model inference for some customers. Engineers are actively identifying the source and applying mitigations. We will post an update within 15 minutes. Impact: partial for some API routes."
+
+Status update — action (after mitigation applied):
+"We have applied a temporary mitigation (rate limiting / model variant switch) which has reduced error rates and latency for affected requests. We are continuing to monitor and will follow with a detailed post-incident note."
+
+Status update — recovery (when stable):
+"Service performance has returned to normal. We are running a set of post-incident checks and will publish a short summary and follow-up actions within 48 hours."
+
+Template: customer-facing root cause summary (48h)
+- Impact: summary of who was affected and approximate timeframe.
+- Root cause: short one-line cause.
+- Resolution: actions taken and why they work.
+- Follow-ups: planned infra/config changes, rollback/rollforward schedule, and timeline for completion.
+
+Game day and drill guidance
+
+Purpose: validate the escape-hatch catalog under stress, exercise communication cadence, and confirm rollback criteria are understood.
+
+Suggested exercises (1–2 hours each)
+- Latency oscillation drill: simulate GC spike on a model worker and practice toggling batcher conservative mode and model-variant pinning.
+- Cache-eviction drill: deploy a synthetic traffic pattern to cause cache churn; practice re-enabling sticky policy and ramping canary traffic.
+- Noisy neighbor drill: mark a host as saturated and exercise drain/migrate and failover into prewarmed pool.
+
+Exercise checklist
+- Pre-run: assign Bridge lead, Evidence owner, and Customer comms owner.
+- During run: collect prescribed evidence, make one mitigation, and document timestamps.
+- Post-run: 30-minute retro capturing time-to-first-action and time-to-recovery, plus a 1-page remediation plan.
+
+Ownership and escalation matrix
+
+- Bridge lead: first 30 minutes orchestration and status page publication.
+- Evidence owner (runtime/op-observability): collects traces, SLO dashboards, and relevant logs.
+- Infra escalation: infra-sre on-call for host-level actions (drain, migrate).
+- Product/Model PM: notified when model variant or behavior change is required.
+
+Escalation thresholds (examples)
+- If incident expected to exceed 60 minutes OR customer-impacting errors > 5% of tenant traffic, escalate to SRE manager and Customer Success lead.
+- If more than 3 tenants report degraded service directly, open a Sev2 and engage GTM lead.
+
+Post-incident guidance
+
+1. Evidence capture: attach SLO timelines, sample traces, and commands executed to the incident timeline.
+2. Blameless postmortem: follow the postmortem template (timeline, root cause, contributing factors, corrective actions, owners, and ETA).
+3. Runbook updates: if an escape-hatch was used, update this catalog with notes on effectiveness and add a section on 'when not to use'.
+
+Appendix: CLI snippets and config quick-reference
+
+- Apply soft route rate limit (example):
+  curl -X POST -H "Authorization: Bearer $TOKEN" "https://admin.redwood/api/routes/route-id/rate-limit" -d '{"soft_limit":0.8, "ttl_minutes":15 }'
+
+- Switch model variant (example):
+  curl -X POST -H "Authorization: Bearer $TOKEN" "https://admin.redwood/api/routes/route-id/model-variant" -d '{"variant":"fast-latency" }'
+
+- Drain host (example):
+  infractl drain-host --host HOSTID --reason "noisy GPU saturation"
+
+Configuration table (example thresholds)
+| Metric | Alert threshold | First action | Owner |
+|---|---:|---|---|
+| route.p99.latency | >300ms for 5m | soft rate limit 80% | runtime |
+| host.gpu.util | >95% for 2m | drain host | infra-sre |
+| cache.miss.rate | >50% | re-enable sticky policy | platform |
+
+Related pages and links
+
+- Include links to the full runbooks: runtime emergency runbook, infra host recovery runbook, and postmortem template.
+
+Revision history
+
+- 2025-11-02: created by Maya Chen.
+- 2026-06-18: added noisy neighbor containment steps (reviewer: Arjun Patel).
+- 2027-03-14: expanded escape-hatch inventory and added game day exercise checklist (reviewer: Lina Gomez).
+

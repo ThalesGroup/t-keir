@@ -17,6 +17,10 @@ import yaml
 
 from thot.core.KeywordRules import DEFAULT_MIN_KEYWORD_LENGTH
 from thot.core.TkeirPaths import rag_config_path
+from thot.tools.search.dual_hybrid_config import (
+    DualHybridConfig,
+    dual_hybrid_from_mapping,
+)
 
 _DEFAULT_MIN_KEYWORD_LENGTH = DEFAULT_MIN_KEYWORD_LENGTH
 _DEFAULT_MAX_ENTITIES = 120
@@ -36,7 +40,20 @@ _ALLOWED_CHUNK_CONTEXT_MODES = frozenset({"chunk_excerpts", "svo_ontology"})
 _DEFAULT_RERANK_ENABLED = True
 _DEFAULT_RERANK_CANDIDATES = 50
 _DEFAULT_RERANK_STRATEGY = "cross_encoder"
-_ALLOWED_RERANK_STRATEGIES = frozenset({"cross_encoder", "embedding_cosine"})
+_ALLOWED_RERANK_STRATEGIES = frozenset(
+    {"cross_encoder", "embedding_cosine"}
+)
+_FORBIDDEN_LLM_RERANK_STRATEGIES = frozenset(
+    {
+        "llm",
+        "llm_judge",
+        "llm_rerank",
+        "generate",
+        "generation",
+        "chat",
+        "prompt",
+    }
+)
 _DEFAULT_VESPA_URL = "http://localhost:8080"
 _DEFAULT_VESPA_CONFIG_URL = "http://localhost:19071"
 _DEFAULT_VESPA_TIMEOUT_SECONDS = 60.0
@@ -97,8 +114,6 @@ class RagSearchConfig:
     use_chunk_embedding: bool = True
     use_question_embedding: bool = True
     use_text_raw: bool = True
-    use_parent_content: bool = True
-    use_parent_title: bool = True
     use_ner: bool = True
     use_svo: bool = True
     use_keywords: bool = True
@@ -109,8 +124,6 @@ class RagSearchConfig:
     weight_chunk_embedding: float = 0.38
     weight_question_embedding: float = 0.17
     weight_text_raw_bm25: float = 0.28
-    weight_parent_content_bm25: float = 0.17
-    weight_parent_title_bm25: float = 0.12
     rerank: RagRerankConfig = RagRerankConfig()
 
 
@@ -194,6 +207,7 @@ class RagConfig:
     search: RagSearchConfig
     models: RagModelsConfig = RagModelsConfig()
     vespa: RagVespaConfig = RagVespaConfig()
+    dual_hybrid: DualHybridConfig = DualHybridConfig()
 
 
 def _normalize_chunk_context_mode(value: object) -> str:
@@ -299,17 +313,23 @@ def _rerank_config_from_mapping(
 ) -> RagRerankConfig:
     """Build :class:`RagRerankConfig` from ``search.rerank`` YAML.
 
+    Allowed strategies: ``cross_encoder``, ``embedding_cosine``.
+    LLM / generative aliases fall back to ``cross_encoder``.
+
     Example:
         >>> _rerank_config_from_mapping(
-        ...     {"enabled": False, "candidates": 20, "strategy": "embedding_cosine"}
+        ...     {"enabled": False, "candidates": 20, "strategy": "cross_encoder"}
         ... )
-        RagRerankConfig(enabled=False, candidates=20, strategy='embedding_cosine')
+        RagRerankConfig(enabled=False, candidates=20, strategy='cross_encoder')
     """
     cfg = mapping if isinstance(mapping, dict) else {}
     strategy = (
         str(cfg.get("strategy", _DEFAULT_RERANK_STRATEGY)).strip().lower()
     )
-    if strategy not in _ALLOWED_RERANK_STRATEGIES:
+    if (
+        strategy in _FORBIDDEN_LLM_RERANK_STRATEGIES
+        or strategy not in _ALLOWED_RERANK_STRATEGIES
+    ):
         strategy = _DEFAULT_RERANK_STRATEGY
     return RagRerankConfig(
         enabled=_as_bool(cfg.get("enabled"), _DEFAULT_RERANK_ENABLED),
@@ -443,8 +463,6 @@ def _search_config_from_mapping(
             cfg.get("use_question_embedding"), True
         ),
         use_text_raw=_as_bool(cfg.get("use_text_raw"), True),
-        use_parent_content=_as_bool(cfg.get("use_parent_content"), True),
-        use_parent_title=_as_bool(cfg.get("use_parent_title"), True),
         use_ner=_as_bool(cfg.get("use_ner"), True),
         use_svo=_as_bool(cfg.get("use_svo"), True),
         use_keywords=_as_bool(cfg.get("use_keywords"), True),
@@ -457,12 +475,6 @@ def _search_config_from_mapping(
             cfg.get("weight_question_embedding", 0.10)
         ),
         weight_text_raw_bm25=float(cfg.get("weight_text_raw_bm25", 0.40)),
-        weight_parent_content_bm25=float(
-            cfg.get("weight_parent_content_bm25", 0.20)
-        ),
-        weight_parent_title_bm25=float(
-            cfg.get("weight_parent_title_bm25", 0.15)
-        ),
         rerank=_rerank_config_from_mapping(cfg.get("rerank")),
     )
 
@@ -507,6 +519,10 @@ def load_rag_config() -> RagConfig:
     if not isinstance(vespa_cfg, dict):
         vespa_cfg = {}
 
+    dual_cfg = payload.get("dual_hybrid") or {}
+    if not isinstance(dual_cfg, dict):
+        dual_cfg = {}
+
     return RagConfig(
         ontology=RagOntologyConfig(
             min_keyword_length=max(1, min_keyword_length),
@@ -544,6 +560,7 @@ def load_rag_config() -> RagConfig:
         search=_search_config_from_mapping(search_cfg),
         models=_models_config_from_mapping(models_cfg),
         vespa=_vespa_config_from_mapping(vespa_cfg),
+        dual_hybrid=dual_hybrid_from_mapping(dual_cfg),
     )
 
 

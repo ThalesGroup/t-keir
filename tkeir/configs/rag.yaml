@@ -62,12 +62,11 @@ prompt:
 search:
   # When enabled, raw queries are analyzed with the full NLP pipeline and the
   # Vespa request is built by QueryAnalyzerTask instead of query_refiner only.
+  # When dual_hybrid.enabled is true, /search uses DualHybridPipeline instead.
   enabled: true
   use_chunk_embedding: true
   use_question_embedding: true
   use_text_raw: true
-  use_parent_content: true
-  use_parent_title: true
   use_ner: true
   use_svo: true
   use_keywords: true
@@ -78,15 +77,141 @@ search:
   hits: 20
   max_yql_terms: 48
   # Informational weights aligned with chunk.sd hybrid_2_level rank profile.
-  weight_chunk_embedding: 0.38
-  weight_question_embedding: 0.17
-  weight_text_raw_bm25: 0.28
-  weight_parent_content_bm25: 0.17
-  weight_parent_title_bm25: 0.12
-  # Second-stage rerank via UnifiedLLMWrapper.rerank
-  # strategy: cross_encoder | embedding_cosine
+  weight_chunk_embedding: 0.45
+  weight_question_embedding: 0.20
+  weight_text_raw_bm25: 0.35
+  # Second-stage rerank: cross_encoder | embedding_cosine (LLM forbidden).
+  # Skipped when dual_hybrid.enabled (pipeline runs its own cross-encoder).
   rerank:
     enabled: true
     strategy: cross_encoder
     # First-stage Vespa hits sent to the reranker (truncated to search.hits after).
     candidates: 50
+
+# Dual-granularity hybrid search (chunk + tkeir_document → RRF → ontology → CE).
+# Rank-profile weights / averageFieldLength feed `make schemas`.
+# Business ontology for query expansion is passed per request (not stored here).
+dual_hybrid:
+  enabled: true
+  preprocessing:
+    # Lemmatize with diacritics, then optionally ASCII-fold (default on).
+    asciifold: true
+    min_token_length: 3
+    drop_numbers: true
+    extra_stopwords: []
+    # Model selected by detected / request language. `default` is mandatory.
+    # Install: python -m spacy download <model>  OR  pip install <download URL>
+    spacy_models:
+      default:
+        model: xx_ent_wiki_sm
+        download: https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.6.0/xx_ent_wiki_sm-3.6.0-py3-none-any.whl
+      xx:
+        model: xx_ent_wiki_sm
+        download: https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.6.0/xx_ent_wiki_sm-3.6.0-py3-none-any.whl
+      en:
+        model: en_core_web_md
+        download: https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl
+      fr:
+        model: fr_core_news_md
+        download: https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl
+      de:
+        model: de_core_news_md
+        download: https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.6.0/de_core_news_md-3.6.0-py3-none-any.whl
+      es:
+        model: es_core_news_md
+        download: https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.6.0/es_core_news_md-3.6.0-py3-none-any.whl
+      it:
+        model: it_core_news_md
+        download: https://github.com/explosion/spacy-models/releases/download/it_core_news_md-3.6.0/it_core_news_md-3.6.0-py3-none-any.whl
+      pt:
+        model: pt_core_news_md
+        download: https://github.com/explosion/spacy-models/releases/download/pt_core_news_md-3.6.0/pt_core_news_md-3.6.0-py3-none-any.whl
+      nl:
+        model: nl_core_news_md
+        download: https://github.com/explosion/spacy-models/releases/download/nl_core_news_md-3.6.0/nl_core_news_md-3.6.0-py3-none-any.whl
+      zh:
+        model: zh_core_web_md
+        download: https://github.com/explosion/spacy-models/releases/download/zh_core_web_md-3.6.0/zh_core_web_md-3.6.0-py3-none-any.whl
+      ja:
+        model: ja_core_news_md
+        download: https://github.com/explosion/spacy-models/releases/download/ja_core_news_md-3.6.0/ja_core_news_md-3.6.0-py3-none-any.whl
+  retrieval:
+    chunk:
+      profile: "hybrid_2_level"
+      hits: 100
+    document:
+      profile: "document_bm25"
+      hits: 100
+  rank_profiles:
+    chunk:
+      hybrid_2_level:
+        closeness_chunk_embedding: 0.45
+        closeness_questions_embeddings: 0.20
+        bm25_text_raw: 0.35
+        rerank_count: 50
+      hybrid_semantic:
+        closeness_chunk_embedding: 0.60
+        closeness_questions_embeddings: 0.25
+        bm25_text_raw: 0.15
+        rerank_count: 50
+      hybrid_lexical:
+        closeness_chunk_embedding: 0.22
+        closeness_questions_embeddings: 0.08
+        bm25_text_raw: 0.70
+        rerank_count: 50
+    document:
+      document_bm25:
+        bm25_title: 0.30
+        bm25_title_lemmatized: 0.20
+        bm25_content: 0.30
+        bm25_content_lemmatized: 0.20
+  average_field_length:
+    chunk:
+      text_raw: 180
+    document:
+      title: 12
+      title_lemmatized: 7
+      content: 800
+      content_lemmatized: 420
+  query_expansion:
+    # Concepts come from the request body (`business_ontology`), not disk.
+    enabled: true
+    max_terms_per_relation: 5
+    weights:
+      original: 1.0
+      synonyms: 0.9
+      narrower: 0.6
+      broader: 0.3
+      related: 0.2
+  rrf:
+    k: 60
+    arm_weights:
+      chunk: 0.6
+      document: 0.4
+    top_n_after_fusion: 50
+  ontology_scoring:
+    enabled: true
+    match_weights:
+      exact: 1.0
+      synonym: 0.9
+      narrower: 0.6
+      broader: 0.3
+      shared_parent: 0.2
+    max_traversal_depth: 2
+    normalize_by_query_concepts: true
+  cross_encoder:
+    enabled: true
+    model: "BAAI/bge-reranker-v2-m3"
+    top_m: 20
+    max_length: 512
+    batch_size: 16
+  final_fusion:
+    weights:
+      rrf: 0.35
+      lexical_overlap: 0.30
+      ontology_overlap: 0.15
+      cross_encoder: 0.20
+    top_k_returned: 10
+    near_copy_penalty: true
+  fallback:
+    neutral_score: 0.5

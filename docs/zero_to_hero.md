@@ -145,121 +145,81 @@ More detail: [NLP](ready_to_run.md).
 **Checkpoint:** Your output directory contains `*.json` with `content_tokens` /
 NER fields.
 
-### 3.4 Generate the demo corpora (recommended)
+### 3.4 Demo datasets (already versioned)
 
-The fixture files cover only a minimal smoke test. For a realistic demo across
-two independent themes, seven formats, and two languages, run:
+OSINT and enterprise demo data ship in the repo under `datasets/` — you do
+**not** need `make datasets` for the Zero-to-Hero path.
 
-```bash
-make corpus
-```
+| Dataset | Theme | Default user | Versioned artifacts |
+|---------|-------|--------------|---------------------|
+| `datasets/osint/` | NATO C4ISR OSINT (SITREP, INTSUM, OPORD…) | `demo-user` | `VERSION`, `corpus.jsonl`, `business_ontology.yaml`, C2SIM ontologies |
+| `datasets/enterprise/` | AcmeSystems (+ optional EnterpriseRAG slice) | `demo-admin` | `VERSION`, `corpus.jsonl`, `business_ontology.yaml` |
 
-This generates two corpora under `workspace/` and, when online, best-effort
-fetches official SISO C2SIM artifacts plus an EnterpriseRAG-Bench slice:
+**Checkpoint:** `cat datasets/osint/VERSION` and
+`cat datasets/enterprise/VERSION` (currently `1.1.0`);
+`ls datasets/osint/corpus.jsonl datasets/enterprise/corpus.jsonl
+datasets/osint/ontologies/*.owl` all exist.
 
-| Corpus | Theme | Default user | Documents | Formats |
-|--------|-------|-------------|-----------|---------|
-| `corpus_nato/` | NATO C4ISR OSINT (SITREP, INTSUM, OPORD…) | `demo-user` | 1 500 generated | txt md html json csv pdf docx |
-| `corpus_enterprise/` | AcmeSystems internal docs + optional EnterpriseRAG | `demo-admin` | 500 generated (+ up to 500 downloaded) | txt md html pdf docx json csv |
-
-Each document carries a `user_space` and a `topic_id` (sub-folder within the
-corpus). Six NATO C2SIM/C4ISR ontologies are written to
-`workspace/corpus_nato/ontologies/`. Pass them at ingest time with
-`--ontology-dir` / `CORPUS_ONTOLOGY_DIR` (the ingest API itself stays
-corpus-agnostic).
-
-Fully offline (skip network fetches):
+Optional — regenerate or re-download only if you are maintaining the datasets
+themselves (see [Datasets](tools/datasets.md)):
 
 ```bash
-make corpus CORPUS_DOWNLOAD=0
+make datasets                 # refresh generate + best-effort download
+make datasets DATASETS_DOWNLOAD=0
 ```
 
-Embedded generators still produce all 1 500 + 500 documents without any
-network access; only SISO / EnterpriseRAG extras are skipped.
-
-**Checkpoint:** `ls workspace/corpus_nato/manifest.json
-workspace/corpus_enterprise/manifest.json
-workspace/corpus_nato/ontologies/*.owl` all exist.
-`python3 -c "import json; m=json.load(open('workspace/corpus_nato/manifest.json'));
-print(m['count_generated'])"` prints `1500`.
-
-### 3.5 Ingest the corpora (P0 — host tools)
+### 3.5 Ingest the datasets (P0 — host tools)
 
 P0 has **no containerization of T-KEIR tools**. Only Vespa runs in Docker;
 pipeline, ingest, RAG, agent, and the HMI run on the host via `uv` / `npm`.
 
-Without Keycloak, both corpora land in the shared `dev@tkeir` space.
-`make corpus-ingest` runs **two passes**: OSINT with client-side
-`--ontology-dir workspace/corpus_nato/ontologies` (the **client** reads those
-files and uploads their **bytes** as `ontology_file` parts — the server never
-opens the client path), then enterprise **without** ontologies.
-
-Copy/paste (two terminals):
+Without Keycloak, both datasets land in the shared `dev@tkeir` space.
+`make datasets-ingest` runs **two passes**: OSINT with client-side
+`--ontology-dir datasets/osint/ontologies` (bytes uploaded as `ontology_file`
+parts), then enterprise without ontologies.
 
 ```bash
 # Terminal A — Vespa + host ingest API (:8091)
 make bootstrap
 make ingest # serializes NLP (INGEST_MAX_CONCURRENCY=1); avoid OOM
 
-# Terminal B — push both corpora into dev@tkeir (1 worker by default)
-make corpus-ingest
-
-# Spot-check the reports
-python3 -c "import json; r=json.load(open('workspace/ingest_osint.json')); print('osint sent', r['sent'], 'failed', r['failed'])"
-python3 -c "import json; r=json.load(open('workspace/ingest_enterprise.json')); print('ent sent', r['sent'], 'failed', r['failed'])"
+# Terminal B — push versioned datasets into dev@tkeir
+make datasets-ingest
 ```
 
-#### Stop on first failure (fast debug)
-
-When a document fails, stop **both** the ingest server and the corpus client
-so you can fix the error immediately instead of waiting for thousands of
-jobs:
+Debug (stop on first failure):
 
 ```bash
-# Terminal A
-make ingest STOP_ON_FAILED=1
-
-# Terminal B
-make corpus-ingest STOP_ON_FAILED=1
+make ingest STOP_ON_FAILED=1          # terminal A
+make datasets-ingest STOP_ON_FAILED=1 # terminal B
 ```
 
-| Flag | Effect |
-|------|--------|
-| `STOP_ON_FAILED=1` on `make ingest` | Sets `INGEST_STOP_ON_FAILED=1` — server exits (SIGTERM) after the first failed job |
-| `STOP_ON_FAILED=1` on `make corpus-ingest` | Passes `--stop-on-failed` — client cancels remaining uploads and calls `POST /ingest/stop` |
-
-Same flag works for `make corpus-ingest-user` / `make corpus-ingest-admin`.
-You can also pass `INGEST_FLAGS='--stop-on-failed'`.
-
-One-shot after corpora exist (ingest must already be listening on `:8091`):
+One-shot ingest (API must already listen on `:8091`):
 
 ```bash
-make corpus-demo # generate (if needed) + ingest
+make datasets-ingest
 ```
 
-If `:8091` is down, `make corpus-ingest` **fails fast**. Start `make ingest`
-(P0) or, from **P1** onward, Compose after building local images:
+If `:8091` is down, start `make ingest` (P0) or Compose from P1:
 
 ```bash
 make images
 make compose-up PROFILES=core,ingest
-make corpus-ingest
+make datasets-ingest
 ```
 
-Host pipeline fallback (no ingest process) is only for small slices — the full
-~2 500-document corpus can take hours:
+Small slice only (host fallback is slow for the full set):
 
 ```bash
-make corpus-ingest INGEST_FLAGS='--topics situational_awareness --formats txt --force-fallback'
+make datasets-ingest INGEST_FLAGS='--topics situational_awareness --formats txt --force-fallback'
 ```
 
-**Checkpoint:** `workspace/ingest_osint.json` and
-`workspace/ingest_enterprise.json` exist with `"failed": 0`.
+**Checkpoint:** `datasets/ingest_osint.json` and
+`datasets/ingest_enterprise.json` exist with `"failed": 0`.
 After [§4.2](#42-start-the-rag-api):
 `make rag-query RAG_QUERY="SITREP Objective ALPHA"` returns chunk hits.
 
 ---
-
 ## 4. P0 — Vespa RAG + HMI + agents
 
 Still **host-native** for T-KEIR: `make rag`, `make agent`, `make okf`, and
@@ -301,15 +261,15 @@ make rag-query RAG_QUERY="What is T-KEIR?"
 API listens on **:8090**. Queries without a Bearer token search **`dev@tkeir`**.
 Each answer carries `X-Correlation-Id` for audit later.
 
-For the richer demo corpus ([§3.4](#34-generate-the-demo-corpora) /
-[§3.5](#35-ingest-the-corpora-p0--host-tools)), keep ingest and RAG on the
+For the richer demo datasets ([§3.4](#34-demo-datasets-already-versioned) /
+[§3.5](#35-ingest-the-datasets-p0--host-tools)), keep ingest and RAG on the
 **host** (no tkeir containers):
 
 ```bash
 make bootstrap
 make ingest # terminal A — :8091
 # other terminal:
-make corpus-demo # generate + ingest (P0)
+make datasets-ingest # versioned datasets/ already in the repo
 make rag # :8090
 make rag-query RAG_QUERY="SITREP Objective ALPHA" # OSINT hits
 make rag-query RAG_QUERY="AcmeSystems Project ATLAS" # Enterprise hits (same space in P0)
@@ -332,7 +292,7 @@ Browse **http://localhost:3000**. For local P0 without login, keep
 
 ### 4.4 Agents on OSINT and enterprise demo data (P0)
 
-After [§3.5](#35-ingest-the-corpora-p0--host-tools) and [§4.2](#42-start-the-rag-api),
+After [§3.5](#35-ingest-the-datasets-p0--host-tools) and [§4.2](#42-start-the-rag-api),
 run grounded agents against the shared `dev@tkeir` index. Agents call
 `search` / `rag_query` / `ontology_query` / `document_get` (and optional
 workflows) over that space — claims must cite chunk or document ids.
@@ -375,7 +335,7 @@ Polling waits up to ~6 minutes for workflows (`WORKFLOW_POLL_ATTEMPTS=180` ×
 `curl -s http://localhost:8092/agent/runs/<run_id> | jq '{status:.run.status,compose_result}'`.
 
 Ontology-aware tools benefit from the C2SIM/C4ISR ontologies uploaded with
-OSINT ingest (`CORPUS_ONTOLOGY_DIR` / `ontology_file` parts).
+OSINT ingest (`DATASETS_ONTOLOGY_DIR` / `ontology_file` parts).
 
 **Enterprise (AcmeSystems corpus)** — same host, same `dev@tkeir` space:
 
@@ -404,7 +364,7 @@ governor allows) publish. Details: [Agents](tools/agents.md).
 **Checkpoint:** `make agent-run` for an OSINT goal and an enterprise goal both
 reach `status=succeeded` (or show grounded `findings` with `chunk_ids`).
 Workflow runs return `handoffs` + `compose_result`. In P0 both themes hit the
-same streaming group; isolation comes in [§5.5](#55-per-user-and-per-topic-corpus-segregation-p1) /
+same streaming group; isolation comes in [§5.5](#55-per-user-and-per-topic-dataset-segregation-p1) /
 [§5.6](#56-agents-on-osint-vs-enterprise-p1).
 
 ### 4.5 OKF export and wiki brief (P0)
@@ -414,7 +374,7 @@ OKF (Open Knowledge Format) turns the indexed `dev@tkeir` corpus into a
 agents. In P0 everything stays host-native — no Compose `okf` profile required.
 Details: [OKF](tools/okf.md).
 
-**Prerequisites:** corpora ingested ([§3.5](#35-ingest-the-corpora-p0--host-tools)),
+**Prerequisites:** corpora ingested ([§3.5](#35-ingest-the-datasets-p0--host-tools)),
 `make rag` on **:8090** ([§4.2](#42-start-the-rag-api)). For the wiki-brief
 workflow, also run `make agent` ([§4.4](#44-agents-on-osint-and-enterprise-demo-data-p0)).
 
@@ -566,9 +526,9 @@ Admin panel: **http://localhost:3000/admin** (auditor/admin).
 observability profile is up); two Keycloak users see **isolated** search
 results when they hold different corpora.
 
-### 5.5 Per-user and per-topic corpus segregation (P1)
+### 5.5 Per-user and per-topic dataset segregation (P1)
 
-Copy/paste — bring up auth + ingest, then load each corpus into its owner’s
+Copy/paste — bring up auth + ingest, then load each dataset into its owner’s
 Vespa group:
 
 ```bash
@@ -576,10 +536,10 @@ make compose-up PROFILES=core,auth,ingest
 make compose-smoke
 
 # OSINT → demo-user streaming group
-make corpus-ingest-user
+make datasets-ingest-user
 
 # Enterprise → demo-admin streaming group
-make corpus-ingest-admin
+make datasets-ingest-admin
 ```
 
 Prerequisite: `make images` so Compose finds `local/tkeir-*:…` (see §5 intro).
@@ -587,9 +547,9 @@ Prerequisite: `make images` so Compose finds `local/tkeir-*:…` (see §5 intro)
 Topic-filtered OSINT (optional):
 
 ```bash
-python3 tools/corpus/ingest_corpus.py \
-  --corpus-dir workspace \
-  --corpus osint --topics intelligence \
+python3 tools/datasets/ingest_dataset.py \
+  --datasets-dir datasets \
+  --dataset osint --topics intelligence \
   --username demo-user --password demo-user \
   --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token
 ```
@@ -597,7 +557,7 @@ python3 tools/corpus/ingest_corpus.py \
 **Prefer the web interface?** HMI drag-and-drop and curl with real filenames:
 
 ```bash
-make corpus-ingest-web
+make datasets-ingest-web
 ```
 
 **Verifying isolation**
@@ -609,7 +569,7 @@ From the CLI:
 
 ```bash
 # demo-user cannot see enterprise docs
-TOKEN_U=$(python3 tools/corpus/ingest_corpus.py --print-token \
+TOKEN_U=$(python3 tools/datasets/ingest_dataset.py --print-token \
   --username demo-user --password demo-user \
   --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token)
 curl -s -H "Authorization: Bearer $TOKEN_U" \
@@ -623,7 +583,7 @@ show `"failed": 0`; cross-user isolation queries return 0 hits.
 
 ### 5.6 Agents on OSINT vs enterprise (P1)
 
-With [§5.5](#55-per-user-and-per-topic-corpus-segregation-p1) loaded and the
+With [§5.5](#55-per-user-and-per-topic-dataset-segregation-p1) loaded and the
 `agents` Compose profile up, agents inherit **`user_space` from the Bearer
 token** (tool args cannot override it). Run OSINT goals as `demo-user` and
 enterprise goals as `demo-admin`.
@@ -633,10 +593,10 @@ enterprise goals as `demo-admin`.
 make compose-up PROFILES=core,auth,ingest,mcp,agents
 # corpora already in demo-user / demo-admin (§5.5)
 
-TOKEN_U=$(python3 tools/corpus/ingest_corpus.py --print-token \
+TOKEN_U=$(python3 tools/datasets/ingest_dataset.py --print-token \
   --username demo-user --password demo-user \
   --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token)
-TOKEN_A=$(python3 tools/corpus/ingest_corpus.py --print-token \
+TOKEN_A=$(python3 tools/datasets/ingest_dataset.py --print-token \
   --username demo-admin --password demo-admin \
   --token-url http://localhost:8082/realms/tkeir/protocol/openid-connect/token)
 ```
@@ -731,14 +691,14 @@ With Keycloak enabled, HMI/API behave like Compose P1: JWT → Vespa
 
 Token exchange notes: [Token exchange](deployment/token-exchange.md).
 
-### 6.4 Agents on demo corpora (P2)
+### 6.4 Agents on demo datasets (P2)
 
 Same agent goals as [§4.4](#44-agents-on-osint-and-enterprise-demo-data-p0) /
 [§5.6](#56-agents-on-osint-vs-enterprise-p1), pointed at the cluster RAG and
 agent Services (port-forward or ingress). With Keycloak on cluster, reuse the
 `demo-user` / `demo-admin` Bearer pattern so OSINT and enterprise stay isolated.
 Without Keycloak, agents use `VESPA_USER_SPACE=dev@tkeir` from
-`values-dev.yaml` (both corpora share one space, like P0).
+`values-dev.yaml` (both datasets share one space, like P0).
 
 **Checkpoint:** `kubectl -n tkeir get pods` shows Running; `helm test` / chart
 smoke succeeds when configured. Optional: one OSINT and one enterprise agent

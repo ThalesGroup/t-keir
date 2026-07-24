@@ -1,0 +1,141 @@
+Continuous Authorization Audit Streaming Playbook
+
+Overview
+
+This playbook defines Redwood's approach for continuous authorization (authz) audit streaming: producing, transporting, storing, and using fine-grained authorization events across RBAC/ABAC systems, service meshes, and platform control planes to satisfy operational, forensic, and compliance evidence requirements. The goal is a reliable, low-latency audit stream that supports live detection, long-term retention for regulatory evidence, and automated packaging for audits.
+
+Scope
+
+- Systems in scope: API gateway, token service, identity provider integrations (OIDC/SAML), service control plane (sidecar/mesh), internal admin consoles, Dedicated/Private proxy layers.
+- Event types: authorization_decision, privilege_escalation, permission_change, role_binding_change, delegated_access_grant, service_account_key_ops.
+- Out of scope: application-specific business logs (those remain with product teams), PII-only event content (see data handling).
+
+Objectives
+
+1. Ensure every authorization decision that affects multi-tenant isolation or privileged actions emits a structured audit event.
+2. Maintain an immutable, tamper-evident audit stream with metadata to support chain-of-custody evidence requests.
+3. Provide streaming and historical query interfaces for SRE, Security, and Compliance.
+4. Automate evidence bundles for scheduled audits and ad-hoc legal requests.
+
+Key roles and ownership
+
+- Security (owner): authz schema, evidence packaging templates, periodic review of retention policies.
+- Eng Platform (producer owners): instrumenting libraries, SDKs, and gateway integration.
+- Eng SRE (stream operator): pipeline SLAs, alerting, retention enforcement.
+- Legal/Compliance (consumer): audit requirements, evidence acceptance criteria.
+- Product teams (local owners): ensure application-level authorizations produce required events when applicable.
+
+Design and data model
+
+- Event transport: Kafka (primary), with fallback to object-store batched uploads for long-term archival in regions without streaming persistence.
+- Immutable append-only event format with signed envelopes (HMAC using service key) to ensure tamper evidence during transit and at rest.
+
+Minimum audit event schema (line-delimited JSON, example):
+
+{
+  "event_type": "authorization_decision",
+  "timestamp": "2028-01-12T14:23:09Z",
+  "request_id": "req_8f3a1b9c",
+  "principal": {
+    "id": "user:alice@example.com",
+    "type": "user",
+    "auth_method": "mfa"
+  },
+  "resource": "/v1/projects/1234/secret",
+  "action": "read",
+  "decision": "deny",
+  "policy_id": "policy-tenant-isolation-v2",
+  "reason": "role-mismatch",
+  "signature": "hmac:v1:BASE64SIG=="
+}
+
+Note: the event JSON above is included verbatim for operators. Producers must ensure that PII elements are either pseudonymized or excluded unless approved by Security and Data Privacy.
+
+Stream topology and guarantees
+
+- Producers (gateway, token-service, control-plane) -> Kafka topics partitioned by tenant-id -> Stream processors for enrichment (geo, device, risk signals) -> Cold-tier: encrypted object store (daily batches signed) -> Evidence API for packaging.
+- Guarantees: at-least-once delivery to Kafka, idempotent enrichment processors, daily signed manifests that map topic offsets to archived batches.
+
+Retention and data residency
+
+- Default retention: 2 years in hot+warm tiers for global logs; 7 years archival for regulated customers on contract.
+- Residency: Events are stored in region of origin by default. Cross-region replication requires an approved Data Residency Exception.
+- Redaction policy: PII fields are redacted at producer if the tenant has chosen privacy shielding. Redaction must be reversible only by Compliance with a legal process when reversible encryption is used.
+
+Evidence packaging workflow
+
+1. Request intake: Legal/Compliance opens an evidence request ticket referencing tenant and time window.
+2. Evidence API call: Evidence service composes manifests mapping topic offsets, enrichment snapshots, and archived batches.
+3. Signing and hash: Package is signed with organizational signing key and hash chain published to the evidence index.
+4. Delivery: Secure transfer (SFTP or customer-configured cloud bucket with pre-signed URL and access logs) and audit of delivery recorded.
+
+Operational runbook (SRE + Security)
+
+- Alerting thresholds:
+  - Consumer lag > 30 minutes -> P1 to SRE-runbook.
+  - Failed manifest generation -> P1 to Security and SRE.
+  - Archive write error -> P0 (investigate immediate write path and fallback uploads).
+
+- Incident triage steps (numbered):
+  1. Confirm scope: which topic(s) and tenants affected, determine last known good offset.
+  2. If producer outage: engage owning service team, toggle short-term diagnostic sampling to avoid noise.
+  3. If integrity suspected (e.g., signature mismatch): freeze further ingestion for affected partitions and create a chain-of-custody ticket.
+  4. For retention misconfiguration: run targeted rehydration from cold backups and replay into append-only archive with new manifest.
+
+Sample queries and investigator tools
+
+- Example KSQL query to find denial spikes for a tenant over 1 hour:
+
+SELECT tenant_id, COUNT(*) AS denials, WINDOWSTART, WINDOWEND
+FROM authz_events_stream
+WHERE event_type = 'authorization_decision' AND decision='deny'
+GROUP BY tenant_id, TUMBLINGWINDOW(hour, 1)
+HAVING denials > 100;
+
+- Investigator checklist: correlate request_id across gateway trace, authz_event, and application logs; validate HMAC signature on event envelope; locate archived batch using manifest ID.
+
+Secure SDLC gating and automation
+
+- Producer changes that modify schema or event semantics require:
+  1. ADR describing schema change and rollover plan.
+  2. Contract tests (producer + enrichment consumer).
+  3. Canary rollout to subset of tenants with monitoring: schema conformance, consumer lag, and sample evidence package verification.
+- CI step: run schema-registry validation + integration test that produces synthetic events and verifies evidence packaging end-to-end.
+
+Risk exceptions and compensating controls
+
+- Temporary disablement of streaming (e.g., for an emergency patch) requires:
+  - Approved exception ticket recorded in the risk register with rationale and end-date.
+  - Compensating control: enable buffered file-based signed uploads, increase retention of local queues, and schedule manual evidence packaging.
+
+KPIs and SLOs
+
+- Stream availability SLO: 99.95% weekly availability of the write path.
+- Evidence packaging latency: 95th percentile < 30 minutes from request to signed manifest for hot-tier queries.
+- Integrity SLO: 100% of archived daily manifests must have verifiable signatures; any failure triggers immediate remediation.
+
+Testing and validation
+
+- Quarterly: cryptographic signature verification audit and end-to-end evidence drill with Compliance.
+- Annual: simulated legal hold request and full-chain-of-custody demonstration with independent witness (internal audit).
+
+Appendix: Implementation checklist (short)
+
+- [ ] Identify producers and integrate SDK (library: platform/authz-audit-sdk v1.3).
+- [ ] Register topic naming convention: authz.events.{region}.{tenant_hash}.v1
+- [ ] Deploy enrichment processors with idempotency keys.
+- [ ] Configure archival buckets with KMS encryption and signed manifests.
+- [ ] Add CI integration tests and ADR templates.
+
+Contact and escalation
+
+- Security on-call: pagerduty/team-security-oncall
+- SRE stream owner: streams-sre@redwood.example.com
+- Evidence intake (Compliance): compliance-evidence@redwood.example.com
+
+Related pages and references
+
+- See: Structured Audit Pipeline and Query Playbook (audit-logging) for topic-level query examples.
+- See: Entitlement Provisioning and Evidence Automation (rbac-and-auth) for role-change event producers.
+
+End of playbook

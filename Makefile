@@ -24,7 +24,7 @@ endif
 	bom sbom aibom trivy owasp-dependency-check security-report \
 	docs docs-build docs-pdf pipeline quickstart ci-deps ci pre-commit clean devcontainer \
 	sync pull-models start init bootstrap vespa-check test-vespa test-vespa-py \
-	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test beir-eval clean-db vespa-clean logs \
+	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test beir-eval beir-smoke clean-db vespa-clean logs \
 	images images-push images-sign \
 	compose-up compose-down compose-bootstrap compose-logs compose-smoke audit-report audit-verify audit-archive \
 	governor-flags governor-kill rollback-index check-secrets-staged \
@@ -33,8 +33,9 @@ endif
 	k3s-server k3s-agent k3s-check cilium-install lima-k3s-up lima-k3s-down \
 	keycloak-export-realm seal kubeflow-install kubeflow-uninstall kubeflow-register-models kubeflow-run-ingest \
 	lineage-report audit-evidence annex-iv \
-	corpus corpus-ontologies corpus-download corpus-ingest corpus-ingest-user corpus-ingest-admin \
-	corpus-ingest-web corpus-demo corpus-clean
+	datasets datasets-ontologies datasets-download datasets-ingest datasets-ingest-user datasets-ingest-admin \
+	datasets-ingest-web datasets-demo datasets-clean \
+	schemas schemas-check
 
 # Composite targets (setup, ci) use sequential $(MAKE) recipes so
 # `make -j setup` / `make -j ci` cannot race on .venv or coverage files.
@@ -622,6 +623,7 @@ ci: ## Full quality gate (serialized; safe under make -j)
 	$(MAKE) check-secrets
 	$(MAKE) verify-lockfile
 	$(MAKE) ci-deps
+	$(MAKE) schemas-check
 	$(MAKE) lint
 	$(MAKE) typecheck
 	$(MAKE) hmi-lint
@@ -887,6 +889,14 @@ annex-iv: ## Generate Annex IV technical pack under reports/compliance/annex-iv/
 # Vespa / search / RAG
 # ---------------------------------------------------------------------------
 
+schemas: ## Generate Vespa .sd files from rag.yaml dual_hybrid weights
+	$(Q)$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) python \
+		$(SCRIPTS_DIR)/generate_vespa_schemas.py
+
+schemas-check: ## Fail if committed Vespa schemas are stale vs rag.yaml
+	$(Q)$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) python \
+		$(SCRIPTS_DIR)/generate_vespa_schemas.py --check
+
 pull-models: install ## Pull Ollama embedding + LLM models
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.search.pull_models
 
@@ -946,7 +956,7 @@ rag: install install-spacy-models ## Start FastAPI RAG API on the host (:8090) �
 		$(UV) run --python $(PYTHON) python -m thot.tools.search.app
 
 INGEST_ROOT_HOST ?= $(WORKSPACE)/ingest
-# STOP_ON_FAILED=1 → ingest server exits on first failed job; corpus client
+# STOP_ON_FAILED=1 → ingest server exits on first failed job; datasets client
 # also aborts and calls POST /ingest/stop (fast debug loop).
 STOP_ON_FAILED ?= 0
 
@@ -1093,146 +1103,152 @@ okf-bundle-ls: check-curl check-jq ## List bundles for USER_SPACE
 	curl -fsS "$(OKF_URL)/okf/bundles" | jq .
 
 # ---------------------------------------------------------------------------
-# Multi-thematic corpus: NATO OSINT + Enterprise (Zero-to-Hero §3.4 + §5.5)
+# Zero-to-Hero datasets: NATO OSINT + Enterprise (§3.4 + §5.5)
+# Versioned under datasets/{osint,enterprise}/ (VERSION + business_ontology.yaml + ontologies/)
 # ---------------------------------------------------------------------------
-CORPUS_OUT           ?= $(WORKSPACE)
-CORPUS_SEED          ?= 42
-CORPUS_COUNT_OSINT   ?= 1500
-CORPUS_COUNT_ENT     ?= 500
-# Set CORPUS_DOWNLOAD=0 for a fully offline generate (skip SISO / EnterpriseRAG fetch).
-CORPUS_DOWNLOAD      ?= 1
-CORPUS_FLAGS         ?=
-INGEST_API_URL       ?= http://localhost:8091
-INGEST_TOKEN_URL     ?= http://localhost:8082/realms/tkeir/protocol/openid-connect/token
-INGEST_WORKERS       ?= 1
-INGEST_FLAGS         ?=
+DATASETS_OUT           ?= $(ROOT)/datasets
+DATASETS_SEED          ?= 42
+DATASETS_COUNT_OSINT   ?= 1500
+DATASETS_COUNT_ENT     ?= 500
+# Set DATASETS_DOWNLOAD=0 for a fully offline generate (skip SISO / EnterpriseRAG fetch).
+DATASETS_DOWNLOAD      ?= 1
+DATASETS_FLAGS         ?=
+INGEST_API_URL         ?= http://localhost:8091
+INGEST_TOKEN_URL       ?= http://localhost:8082/realms/tkeir/protocol/openid-connect/token
+INGEST_WORKERS         ?= 1
+INGEST_FLAGS           ?=
 # Appended when STOP_ON_FAILED=1 (see ingest target too).
 _STOP_ON_FAILED_FLAG = $(if $(filter 1 true TRUE yes YES,$(STOP_ON_FAILED)),--stop-on-failed,)
 
-_CORPUS_PY  := $(ROOT)/tools/corpus/generate_tkeir_corpus.py
-_INGEST_PY  := $(ROOT)/tools/corpus/ingest_corpus.py
-_CORPUS_RUN := cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python
+_DATASETS_PY := $(ROOT)/tools/datasets/generate_tkeir_datasets.py
+_INGEST_PY   := $(ROOT)/tools/datasets/ingest_dataset.py
+_DATASETS_RUN := cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python
 
-corpus: ## [corpus] Generate OSINT+Enterprise and best-effort download official artifacts
-	$(_CORPUS_RUN) $(_CORPUS_PY) \
-	  --output $(CORPUS_OUT) \
-	  --count-osint $(CORPUS_COUNT_OSINT) \
-	  --count-enterprise $(CORPUS_COUNT_ENT) \
-	  --seed $(CORPUS_SEED) \
-	  $(if $(filter 1,$(CORPUS_DOWNLOAD)),--download,) \
-	  $(CORPUS_FLAGS)
-	@echo "Next (P0 host): make bootstrap && make ingest   # other terminal: make corpus-ingest"
-	@echo "Next (P1):      make compose-up PROFILES=core,auth,ingest && make corpus-ingest-user"
-	@echo "Offline-only: make corpus CORPUS_DOWNLOAD=0"
+datasets: ## [datasets] Generate OSINT+Enterprise and best-effort download official artifacts
+	$(_DATASETS_RUN) $(_DATASETS_PY) \
+	  --output $(DATASETS_OUT) \
+	  --count-osint $(DATASETS_COUNT_OSINT) \
+	  --count-enterprise $(DATASETS_COUNT_ENT) \
+	  --seed $(DATASETS_SEED) \
+	  $(if $(filter 1,$(DATASETS_DOWNLOAD)),--download,) \
+	  $(DATASETS_FLAGS)
+	@echo "Next (P0 host): make bootstrap && make ingest   # other terminal: make datasets-ingest"
+	@echo "Next (P1):      make compose-up PROFILES=core,auth,ingest && make datasets-ingest-user"
+	@echo "Offline-only: make datasets DATASETS_DOWNLOAD=0"
 
-corpus-ontologies: ## [corpus] Generate C2SIM/C4ISR ontologies only
-	$(_CORPUS_RUN) $(_CORPUS_PY) \
-	  --output $(CORPUS_OUT) --only-ontologies $(CORPUS_FLAGS)
+datasets-ontologies: ## [datasets] Generate C2SIM/C4ISR + business ontologies / VERSION only
+	$(_DATASETS_RUN) $(_DATASETS_PY) \
+	  --output $(DATASETS_OUT) --only-ontologies $(DATASETS_FLAGS)
 
-# Kept as an alias so older docs/scripts keep working.
-corpus-download: corpus ## [corpus] Alias for 'make corpus' (generate + download)
+datasets-download: datasets ## [datasets] Alias for 'make datasets' (generate + download)
 
-# Process-time ontologies for OSINT ingest (ingest API stays corpus-agnostic).
-# Override with CORPUS_ONTOLOGIES=a.ttl,b.owl or CORPUS_ONTOLOGY_DIR=/other/dir
-# Clear with CORPUS_ONTOLOGY_DIR= only if you intentionally skip ontologies.
-CORPUS_ONTOLOGY_DIR ?= $(CORPUS_OUT)/corpus_nato/ontologies
-CORPUS_ONTOLOGIES ?=
-_INGEST_ONTOLOGY_ARGS = $(if $(CORPUS_ONTOLOGIES),--ontologies $(CORPUS_ONTOLOGIES),$(if $(CORPUS_ONTOLOGY_DIR),--ontology-dir $(CORPUS_ONTOLOGY_DIR),))
+# Process-time OWL/TTL for OSINT ingest (ingest API stays dataset-agnostic).
+# Override with DATASETS_ONTOLOGIES=a.ttl,b.owl or DATASETS_ONTOLOGY_DIR=/other/dir
+DATASETS_ONTOLOGY_DIR ?= $(DATASETS_OUT)/osint/ontologies
+DATASETS_ONTOLOGIES ?=
+_INGEST_ONTOLOGY_ARGS = $(if $(DATASETS_ONTOLOGIES),--ontologies $(DATASETS_ONTOLOGIES),$(if $(DATASETS_ONTOLOGY_DIR),--ontology-dir $(DATASETS_ONTOLOGY_DIR),))
 
-# Fail if OSINT ingest would run without any ontology files.
-define _require_corpus_ontologies
-	@if [ -n "$(CORPUS_ONTOLOGIES)" ]; then \
-	  echo "Using ontologies: $(CORPUS_ONTOLOGIES)"; \
-	elif [ -z "$(CORPUS_ONTOLOGY_DIR)" ]; then \
-	  echo "ERROR: corpus-ingest requires ontologies — set CORPUS_ONTOLOGY_DIR or CORPUS_ONTOLOGIES"; \
+define _require_datasets_ontologies
+	@if [ -n "$(DATASETS_ONTOLOGIES)" ]; then \
+	  echo "Using ontologies: $(DATASETS_ONTOLOGIES)"; \
+	elif [ -z "$(DATASETS_ONTOLOGY_DIR)" ]; then \
+	  echo "ERROR: datasets-ingest requires ontologies — set DATASETS_ONTOLOGY_DIR or DATASETS_ONTOLOGIES"; \
 	  exit 1; \
-	elif [ ! -d "$(CORPUS_ONTOLOGY_DIR)" ]; then \
-	  echo "ERROR: ontology dir missing: $(CORPUS_ONTOLOGY_DIR)"; \
-	  echo "  Run: make corpus   (or make corpus-ontologies)"; \
+	elif [ ! -d "$(DATASETS_ONTOLOGY_DIR)" ]; then \
+	  echo "ERROR: ontology dir missing: $(DATASETS_ONTOLOGY_DIR)"; \
+	  echo "  Run: make datasets   (or make datasets-ontologies)"; \
 	  exit 1; \
-	elif [ -z "$$(find "$(CORPUS_ONTOLOGY_DIR)" -maxdepth 1 \( -name '*.ttl' -o -name '*.owl' -o -name '*.rdf' -o -name '*.xml' \) -print -quit)" ]; then \
-	  echo "ERROR: no OWL/TTL/RDF files in $(CORPUS_ONTOLOGY_DIR)"; \
-	  echo "  Run: make corpus   (or make corpus-ontologies)"; \
+	elif [ -z "$$(find "$(DATASETS_ONTOLOGY_DIR)" -maxdepth 1 \( -name '*.ttl' -o -name '*.owl' -o -name '*.rdf' -o -name '*.xml' \) -print -quit)" ]; then \
+	  echo "ERROR: no OWL/TTL/RDF files in $(DATASETS_ONTOLOGY_DIR)"; \
+	  echo "  Run: make datasets   (or make datasets-ontologies)"; \
 	  exit 1; \
 	else \
-	  echo "Using ontologies from $(CORPUS_ONTOLOGY_DIR)"; \
+	  echo "Using ontologies from $(DATASETS_ONTOLOGY_DIR)"; \
 	fi
 endef
 
-corpus-ingest: ## [corpus] Ingest both corpora via :8091 (OSINT with ontologies; enterprise without)
-	$(call _require_corpus_ontologies)
-	$(_CORPUS_RUN) $(_INGEST_PY) \
-	  --corpus-dir $(CORPUS_OUT) \
+datasets-ingest: ## [datasets] Ingest OSINT+Enterprise via :8091 (OSINT with ontologies; enterprise without)
+	$(call _require_datasets_ontologies)
+	$(_DATASETS_RUN) $(_INGEST_PY) \
+	  --datasets-dir $(DATASETS_OUT) \
 	  --api-url $(INGEST_API_URL) \
-	  --corpus osint \
+	  --dataset osint \
 	  --user-space dev@tkeir \
 	  --workers $(INGEST_WORKERS) \
 	  --fallback-index \
-	  --output-report $(CORPUS_OUT)/ingest_osint.json \
+	  --output-report $(DATASETS_OUT)/ingest_osint.json \
 	  $(_INGEST_ONTOLOGY_ARGS) \
 	  $(_STOP_ON_FAILED_FLAG) \
 	  $(INGEST_FLAGS)
-	$(_CORPUS_RUN) $(_INGEST_PY) \
-	  --corpus-dir $(CORPUS_OUT) \
+	$(_DATASETS_RUN) $(_INGEST_PY) \
+	  --datasets-dir $(DATASETS_OUT) \
 	  --api-url $(INGEST_API_URL) \
-	  --corpus enterprise \
+	  --dataset enterprise \
 	  --user-space dev@tkeir \
 	  --workers $(INGEST_WORKERS) \
 	  --fallback-index \
-	  --output-report $(CORPUS_OUT)/ingest_enterprise.json \
+	  --output-report $(DATASETS_OUT)/ingest_enterprise.json \
 	  $(_STOP_ON_FAILED_FLAG) \
 	  $(INGEST_FLAGS)
-	@echo "If API was down (P0): make bootstrap && make ingest   # then re-run make corpus-ingest"
+	@echo "If API was down (P0): make bootstrap && make ingest   # then re-run make datasets-ingest"
 	@echo "If API was down (P1): make images && make compose-up PROFILES=core,ingest"
 	@echo "OSINT ingested with ontologies; enterprise ingested without"
-	@echo "Debug tip: make ingest STOP_ON_FAILED=1  &&  make corpus-ingest STOP_ON_FAILED=1"
+	@echo "Debug tip: make ingest STOP_ON_FAILED=1  &&  make datasets-ingest STOP_ON_FAILED=1"
 
-corpus-ingest-user: ## [corpus] Ingest OSINT corpus as demo-user (P1, Keycloak required)
-	$(call _require_corpus_ontologies)
-	$(_CORPUS_RUN) $(_INGEST_PY) \
-	  --corpus-dir $(CORPUS_OUT) \
+datasets-ingest-user: ## [datasets] Ingest OSINT as demo-user (P1, Keycloak required)
+	$(call _require_datasets_ontologies)
+	$(_DATASETS_RUN) $(_INGEST_PY) \
+	  --datasets-dir $(DATASETS_OUT) \
 	  --api-url $(INGEST_API_URL) \
-	  --corpus osint \
+	  --dataset osint \
 	  --username demo-user --password demo-user \
 	  --token-url $(INGEST_TOKEN_URL) \
 	  --workers $(INGEST_WORKERS) \
 	  --status-poll \
-	  --output-report $(CORPUS_OUT)/ingest_user.json \
+	  --output-report $(DATASETS_OUT)/ingest_user.json \
 	  $(_INGEST_ONTOLOGY_ARGS) \
 	  $(_STOP_ON_FAILED_FLAG) \
 	  $(INGEST_FLAGS)
 
-corpus-ingest-admin: ## [corpus] Ingest Enterprise corpus as demo-admin (P1, Keycloak required)
-	$(_CORPUS_RUN) $(_INGEST_PY) \
-	  --corpus-dir $(CORPUS_OUT) \
+datasets-ingest-admin: ## [datasets] Ingest Enterprise as demo-admin (P1, Keycloak required)
+	$(_DATASETS_RUN) $(_INGEST_PY) \
+	  --datasets-dir $(DATASETS_OUT) \
 	  --api-url $(INGEST_API_URL) \
-	  --corpus enterprise \
+	  --dataset enterprise \
 	  --username demo-admin --password demo-admin \
 	  --token-url $(INGEST_TOKEN_URL) \
 	  --workers $(INGEST_WORKERS) \
 	  --status-poll \
-	  --output-report $(CORPUS_OUT)/ingest_admin.json \
+	  --output-report $(DATASETS_OUT)/ingest_admin.json \
 	  $(_STOP_ON_FAILED_FLAG) \
 	  $(INGEST_FLAGS)
 
-corpus-ingest-web: ## [corpus] Print HMI drag-and-drop + curl guide for web ingestion
-	$(_CORPUS_RUN) $(_INGEST_PY) \
-	  --corpus-dir $(CORPUS_OUT) \
+datasets-ingest-web: ## [datasets] Print HMI drag-and-drop + curl guide for web ingestion
+	$(_DATASETS_RUN) $(_INGEST_PY) \
+	  --datasets-dir $(DATASETS_OUT) \
 	  --api-url $(INGEST_API_URL) \
 	  --token-url $(INGEST_TOKEN_URL) \
 	  --print-web-guide
 
-corpus-demo: corpus corpus-ingest ## [corpus] One-shot: generate → ingest (P0 host ingest must be up)
-	@echo "=== Corpus demo ready (P0 / dev@tkeir) ==="
+datasets-demo: datasets datasets-ingest ## [datasets] One-shot: generate → ingest (P0 host ingest must be up)
+	@echo "=== Datasets demo ready (P0 / dev@tkeir) ==="
 	@echo "  Prerequisite: make bootstrap && make ingest (host; no tkeir containers)"
 	@echo "  RAG: make rag && make rag-query RAG_QUERY=\"SITREP Objective ALPHA\""
 	@echo "  HMI: cd tkeir-hmi && npm run dev → http://localhost:3000"
 	@echo "  P1 isolation: make images && make compose-up PROFILES=core,auth,ingest"
-	@echo "                make corpus-ingest-user && make corpus-ingest-admin"
+	@echo "                make datasets-ingest-user && make datasets-ingest-admin"
 
-corpus-clean: ## [corpus] Remove generated corpora under workspace/
-	rm -rf $(CORPUS_OUT)/corpus_nato $(CORPUS_OUT)/corpus_enterprise
-	@echo "Cleaned $(CORPUS_OUT)/corpus_nato and $(CORPUS_OUT)/corpus_enterprise"
+datasets-clean: ## [datasets] Remove generated document trees (keeps VERSION / business_ontology / OWL stubs)
+	rm -rf $(DATASETS_OUT)/osint/raw $(DATASETS_OUT)/osint/markdown $(DATASETS_OUT)/osint/html \
+	  $(DATASETS_OUT)/osint/json $(DATASETS_OUT)/osint/pdf $(DATASETS_OUT)/osint/docx \
+	  $(DATASETS_OUT)/osint/csv $(DATASETS_OUT)/osint/xml $(DATASETS_OUT)/osint/ontologies/official \
+	  $(DATASETS_OUT)/osint/manifest.json \
+	  $(DATASETS_OUT)/enterprise/raw $(DATASETS_OUT)/enterprise/markdown $(DATASETS_OUT)/enterprise/html \
+	  $(DATASETS_OUT)/enterprise/json $(DATASETS_OUT)/enterprise/pdf $(DATASETS_OUT)/enterprise/docx \
+	  $(DATASETS_OUT)/enterprise/csv $(DATASETS_OUT)/enterprise/manifest.json \
+	  $(DATASETS_OUT)/ingest_osint.json $(DATASETS_OUT)/ingest_enterprise.json \
+	  $(DATASETS_OUT)/ingest_user.json $(DATASETS_OUT)/ingest_admin.json
+	@echo "Cleaned generated docs under $(DATASETS_OUT)/{osint,enterprise} (versioned ontologies kept)"
 
 smoke-test: check-curl check-jq ## Post-deploy RAG /health check (SMOKE_TARGET_URL)
 	$(Q)echo "=== Smoke test [env=$(ENVIRONMENT)] -> $(SMOKE_TARGET_URL) ==="
@@ -1245,7 +1261,7 @@ smoke-test: check-curl check-jq ## Post-deploy RAG /health check (SMOKE_TARGET_U
 		echo "FAIL: unexpected status ($$status)"; exit 1; \
 	fi
 
-beir-eval: ## BEIR IR eval → docs + results/beir/*/report.md (BEIR_DATASETS=scifact for one)
+beir-eval: ## BEIR IR eval → docs/evaluation_report.md + reports/beir/ (BEIR_DATASETS=scifact for one)
 	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python $(PYTHON)
 	cd $(TKEIR_DIR) && \
 		VESPA_NAME="$(BEIR_VESPA_NAME)" \
@@ -1257,6 +1273,33 @@ beir-eval: ## BEIR IR eval → docs + results/beir/*/report.md (BEIR_DATASETS=sc
 		--dense-model "$(BEIR_DENSE_MODEL)" \
 		$(if $(strip $(BEIR_REPORT)),--report "$(BEIR_REPORT)",) \
 		$(BEIR_EXTRA)
+
+# BEIR smoke: gold + close distractors; NLP chunking by default; cleanup.
+# Defaults: 10 queries, 10 close/query, >=10 pool/query, top_k=10, index=chunking.
+# Override: BEIR_SMOKE_QUERIES=12 BEIR_SMOKE_CLOSE=15 BEIR_SMOKE_RANK_DOCS=20
+# Speed-only (skip NLP): BEIR_SMOKE_INDEX_MODE=fast
+BEIR_SMOKE_QUERIES ?= 10
+BEIR_SMOKE_CLOSE   ?= 10
+BEIR_SMOKE_RANK_DOCS ?= 10
+BEIR_SMOKE_TOP_K   ?= 10
+BEIR_SMOKE_INDEX_MODE ?= chunking
+BEIR_SMOKE_EXTRA   ?=
+
+beir-smoke: ## Fast BEIR smoke (<5 min): isolate corpora, time+NDCG, cleanup Vespa
+	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python $(PYTHON)
+	cd $(TKEIR_DIR) && \
+		VESPA_NAME="$(BEIR_VESPA_NAME)" \
+		VESPA_VOLUME="$(BEIR_VESPA_VOLUME)" \
+		$(UV) run --python $(PYTHON) --group beir --group models \
+		python -m thot.tools.search.beir_smoke \
+		--datasets $(BEIR_DATASETS) \
+		--datasets-dir "$(BEIR_DATASETS_DIR)" \
+		--queries $(BEIR_SMOKE_QUERIES) \
+		--close-docs $(BEIR_SMOKE_CLOSE) \
+		--rank-docs $(BEIR_SMOKE_RANK_DOCS) \
+		--top-k $(BEIR_SMOKE_TOP_K) \
+		--index-mode $(BEIR_SMOKE_INDEX_MODE) \
+		$(BEIR_SMOKE_EXTRA)
 
 clean-db: ## Wipe Vespa data volume
 	cd $(VESPA_DIR) && ./clean_db.sh

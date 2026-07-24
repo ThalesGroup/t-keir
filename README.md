@@ -263,7 +263,7 @@ make pipeline \
 | `make agent-run` | Create a single-agent run and poll (`GOAL=…`) |
 | `make workflow-run` | Create a workflow run and poll (`WORKFLOW=content_brief`) |
 | `make compose` | Ontology template compose (`TEMPLATE=synthesis_note`) |
-| `make beir-eval` | BEIR IR eval → `docs/evaluation_report.md` (`BEIR_DATASETS=scifact` for one) |
+| `make beir-eval` | BEIR IR eval → `docs/evaluation_report.md` + `reports/beir/` (`BEIR_DATASETS=scifact` for one) |
 | `make clean-db` | Wipe Vespa data volume (then re-run `bootstrap`) |
 | `make vespa-clean` | Stop/remove Vespa container (keeps volume) |
 | `make logs` | Tail Vespa Docker logs |

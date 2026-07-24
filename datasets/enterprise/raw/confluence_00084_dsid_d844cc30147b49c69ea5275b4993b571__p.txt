@@ -1,0 +1,193 @@
+Postmortem: Controlled failover test regression (us-east → eu-west) – transient 5xx + tail latency
+
+## Summary
+On **2026-01-15**, during a **planned controlled regional failover test** (Hosted API and a limited Dedicated slice) from **us-east** to **eu-west**, we introduced a **customer-visible regression**. A sequence of noisy regional-impairment signals and insufficient rollback/anti-flap guardrails caused repeated routing policy changes (“flip/rollback”) and a transient overload condition in the target region.
+
+**Customer impact:**
+- **Hosted API:** elevated 5xx/timeouts and tail latency for a subset of routes while traffic re-converged.
+- **Dedicated:** minimal direct impact due to scoped tenants, but some control-plane operations (drain workflow status) were delayed.
+- **Streaming:** some clients experienced disconnects on redirect and did not recover cleanly without application-level retries.
+
+**Why this postmortem exists:** This was an intentional test. The regression was not catastrophic, but it was **customer-visible** and exposed gaps in our automation safety model. The goal is to make sure controlled testing improves reliability without creating new incidents.
+
+## Severity and scope
+- **Incident type:** Planned test causing unplanned customer-visible regression
+- **Severity:** SEV-2 (customer-visible errors for a limited subset; short duration; mitigated quickly)
+- **Services impacted:** Hosted API (gateway + smart routing), failover automation controller, region health evaluation pipeline
+- **Regions:** us-east (source), eu-west (target)
+
+## Customer impact (what users experienced)
+- Transient **HTTP 5xx** and **gateway timeouts** during the flip/rollback window.
+- Elevated **p95/p99 latency** for successful requests during the same interval.
+- Some **streaming sessions** dropped when redirected cross-region; a subset of clients did not resume streaming until they retried from the application.
+
+Notes:
+- We did not publish an external status page incident because this was a planned test with limited blast radius; however, **Support received inbound tickets** from customers who noticed errors during the window. Support response guidance was issued in-channel and via SUP-25310.
+
+## Timeline (UTC)
+> Times are approximate; see dashboard annotations and incident-bot thread for exact event markers.
+
+- **16:55** – Pre-flight checks complete (SRE + Routing + Infra). Dry-run output reviewed; “go” granted.
+- **17:00** – Controlled failover test begins. Routing policy automation enabled for the scoped routes/tenants.
+- **17:02** – Region health aggregator reports degraded reachability for us-east based on synthetic probe failures.
+- **17:03** – Failover controller recommends and executes a policy flip to prefer eu-west (within the scoped policy).
+- **17:04–17:08** – eu-west sees request surge; latency rises. Gateway retries amplify load; some 5xx/timeouts observed.
+- **17:06** – A second reachability signal changes state; controller interprets as recovery + triggers rollback logic sooner than expected.
+- **17:07–17:10** – Flip/rollback oscillation observed (multiple policy updates within minutes). Error rate and p99 spike.
+- **17:10** – On-call disables automation for the scoped policy; routing stabilized manually.
+- **17:14** – Error rates return to baseline; latency recovers as retries subside.
+- **17:25** – Post-test validation begins; Support notified with customer-facing explanation.
+- **18:10** – Initial retro notes captured; action item tracker created.
+
+## Detection and response
+**Detection:**
+- We detected the regression via:
+  - SRE dashboards for failover signals (5xx burn + tail latency burn)
+  - Routing policy flip counters (unexpected rate)
+  - Support ping that a customer saw transient errors (correlated to test window)
+
+**Response:**
+- Disabled failover automation for the scoped policy (feature flag / controller disable).
+- Reduced gateway retry pressure using existing runtime/gateway knobs (temporary tuning) while traffic re-stabilized.
+- Confirmed eu-west capacity headroom and verified no persistent impairment.
+- Coordinated comms with Support: acknowledged planned test, explained transient errors, offered retry guidance.
+
+## Root cause
+The regression was caused by **policy oscillation** (flip/rollback) triggered by **noisy reachability signals**, combined with insufficient guardrails that allowed multiple routing policy changes in a short period. The oscillation produced a traffic pattern that:
+1) **increased cross-region redirects**, and
+2) **amplified retries** at the gateway/client level,
+leading to transient overload and elevated error rates in the target region.
+
+Key technical drivers:
+- **Reachability probes produced false positives** (brief, correlated failures) that were treated as authoritative without adequate corroboration.
+- **Hold-down and anti-flap timers were too permissive** for the observed signal volatility.
+- **Rollback semantics were correct per implementation**, but not aligned with our intended ADR-level behavior (we rolled back too quickly and re-triggered failover immediately).
+
+## Contributing factors
+### 1) Trigger noise and insufficient corroboration
+- Reachability was treated as “high priority,” but we lacked a strict requirement for corroboration (e.g., simultaneous 5xx burn or control-plane health degradation) before acting.
+- Probe failures were short-lived and likely influenced by transient provider/network behavior; the region health pipeline did not dampen enough.
+
+### 2) Rollback gaps / anti-flap guardrails
+- Policy flip rate limiting (per policy/per tenant) was not strict enough for production-like behavior.
+- The controller was allowed to both:
+  - fail over on a high-priority signal transition, and
+  - roll back on early recovery indication,
+  without a sufficiently long “stabilization” window.
+
+### 3) Retry amplification during routing changes
+- Gateway retry budgets and client retry behavior interacted poorly with redirects and timeouts.
+- During oscillation, some requests were retried across regions, increasing load at the exact time the target region was receiving new traffic.
+
+### 4) Observability gaps during the test
+- We had dashboards, but lacked consistent **automation-driven annotations** (start/stop, flip, rollback, reason) visible across all relevant panels.
+- Signal evaluation logs were not easily searchable by policy + decision id, slowing triage.
+
+## What went well
+- Blast radius controls worked: the test scope limited impact to a subset of routes/tenants.
+- On-call and engineering coordination was fast; disabling automation stabilized the system quickly.
+- The team captured decision points and signal state changes in real time, enabling clear follow-up.
+
+## What didn’t go well
+- The automation acted faster than our operational ability to confirm whether the impairment was real.
+- We did not have a single “confidence score” view combining signal corroboration, dampening state, and decision rationale.
+- Support was notified quickly, but we did not proactively message a small set of known sensitive accounts before running the test (we relied on the planned-test guidance rather than a targeted heads-up).
+
+## Where we got lucky
+- eu-west had enough headroom that the overload was short-lived.
+- The oscillation stayed within a few minutes; a longer duration could have caused a larger SLO burn and broader customer impact.
+
+## Immediate remediation (completed during/after the event)
+- Disabled automation for the scoped policy upon observing oscillation.
+- Manual stabilization of routing preference and verification of regional health.
+- Support response guidance provided for inbound tickets about transient errors.
+
+## Corrective and preventive actions (CPAs)
+> This section is the contract: what we will change so a controlled test does not regress customer experience again.
+
+### A. Trigger signal pipeline hardening
+1) **Corroboration requirements**
+   - Require at least one corroborating signal for reachability-based failover in production scopes (e.g., 5xx burn OR control-plane health OR sustained probe failure above threshold).
+   - Owner: **Ravi Menon** (Routing policy)
+   - Target: **2026-02-14**
+
+2) **Dampening + hold-down tuning**
+   - Increase minimum sustain time for reachability impairment and increase recovery hold-down.
+   - Add jitter/TTL protections on health reads to avoid stampedes.
+   - Owner: **Victor Alvarez** (Network) + **Jordan Lee** (Policy engine)
+   - Target: **2026-02-21**
+
+### B. Rollback/anti-flap guardrails
+3) **Rate limiting for policy flips**
+   - Enforce max flips per hour per policy and per tenant tier, with hard stop + paging if exceeded.
+   - Owner: **Benji Okafor** (Guardrails)
+   - Target: **2026-02-21**
+
+4) **Rollback semantics aligned to ADR-043**
+   - Ensure rollback cannot immediately re-open the same decision loop; require stable window before re-evaluating for failover.
+   - Produce an auditable “decision id” for each state transition.
+   - Owner: **Jordan Lee** (Policy engine) + **Ethan Park** (Control plane)
+   - Target: **2026-03-01**
+
+5) **Approval hooks for production game days**
+   - Require on-call acknowledgment before executing an automated flip in production during controlled tests until we meet success criteria in two consecutive game days.
+   - Owner: **Rafael Mendes** (SRE) + **Ethan Park** (Control plane)
+   - Target: **2026-02-10**
+
+### C. Retry/load-shedding behavior
+6) **Gateway retry budget + redirect guidance**
+   - Cap retries during active failover events; prefer fast-fail with standardized Retry-After for overload.
+   - Update SDK/docs guidance for idempotent retries and streaming reconnect.
+   - Owner: **Peter Holtz** (Gateway) + **Vikram Singh** (Data plane)
+   - Target: **2026-03-08**
+
+7) **Streaming reconnect hardening**
+   - Ensure redirect responses carry enough info for safe client reconnection; improve idempotency guidance.
+   - Owner: **Vikram Singh**
+   - Target: **2026-02-28**
+
+### D. Observability and auditing
+8) **Automation-driven annotations**
+   - Add consistent dashboard annotations for: test start/end, flip, rollback, reason, decision id, policy id.
+   - Owner: **Allison Grant** + **Sergio Costa**
+   - Target: **2026-02-14**
+
+9) **Audit log retention + supportability**
+   - Persist failover audit events (recommended/executed/rolled back) with searchable keys: tenant tier, route, policy id, decision id.
+   - Owner: **Devon Price** (Tooling) + **Allison Grant** (Observability)
+   - Target: **2026-03-01**
+
+### E. Process changes for future controlled tests
+10) **Go/no-go criteria update**
+   - Add explicit “anti-flap guardrails enabled + validated in staging” to go/no-go checklist.
+   - Owner: **Talia Benson** (Program) + **Tomáš Novák** (Runbooks)
+   - Target: **2026-02-07**
+
+11) **Customer comms targeting**
+   - For production tests, proactively notify a small set of enterprise accounts with strict HA expectations if their traffic might be in scope, even when blast radius is limited.
+   - Owner: **Dev Patel** (Support escalation) + **Lauren Bishop** (Dedicated PM)
+   - Target: **2026-02-14**
+
+## Success criteria (for declaring this class of regression “fixed”)
+For two consecutive production game days with scoped blast radius:
+- No more than **one** routing policy transition per policy (flip only; rollback only if explicitly invoked by on-call).
+- No customer-visible 5xx increase above agreed threshold for scoped tenants.
+- p99 latency in target region remains within defined tolerance band during convergence.
+- Audit events and dashboard annotations allow reconstruction of the decision timeline within 10 minutes.
+
+## Appendix A: Key lessons
+- “Reachability > 5xx burn” is correct only if reachability is truly authoritative; without corroboration, it can be the noisiest signal.
+- Rollback is not inherently safe; rollback without stabilization can create a control loop that is worse than staying failed over.
+- Controlled tests must be treated like real incidents operationally: annotations, clear decision authority, and customer comms preparedness.
+
+## Appendix B: Open questions
+- Should we treat reachability as authoritative only when multiple independent vantage points fail, or when combined with provider status signals?
+- For Hosted API streaming, do we want a first-class “resume token” pattern to reduce user impact during redirects?
+- What is the right default DNS/traffic-steering posture for faster failover without amplifying transient network noise?
+
+## Owner
+- Primary owner for follow-through: **Rafael Mendes (SRE delivery lead)**
+- Architecture owner: **Miles Thornton (Failover architecture lead)**
+
+## Status
+- This postmortem is complete. Action items are tracked in **ENG-2426** and linked sub-issues. Updates should be reflected here if any CPA materially changes scope or target dates.

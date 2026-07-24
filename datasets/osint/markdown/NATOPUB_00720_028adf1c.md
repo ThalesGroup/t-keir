@@ -1,0 +1,5 @@
+# NATOPUB 00720 — Training Area 7
+
+NATO PUBLICATION EXTRACT
+Subject: interoperability and C4ISR information exchange
+This reference outlines common terminology, message handling, and operational reporting responsibilities for multinational forces.

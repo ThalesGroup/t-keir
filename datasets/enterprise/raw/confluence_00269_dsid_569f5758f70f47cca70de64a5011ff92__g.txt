@@ -1,0 +1,169 @@
+GPU checkpoint bandwidth gating and replication runbook
+
+Summary
+-------
+This runbook documents the operational procedure, Terraform/IaC patterns, CI/CD hooks, and monitoring/alerting for controlled replication of large model checkpoints across regions and accounts. It focuses on bandwidth gating (egress shaping), cost containment, replication correctness, and safe rollback on failures. Use this when moving model artifacts between regions, performing cross-region backup, or seeding private deployments.
+
+When to use
+-----------
+- Scheduled cross-region checkpoint replication (nightly or weekly).
+- On-demand snapshot seeding for private/on-prem deployments.
+- Disaster-recovery copy to warm standby region.
+- Large checkpoint promotion during model release (non-production window recommended).
+
+Background and goals
+--------------------
+- Large checkpoints (tens to thousands of GB) can spike egress & saturate inter-region links. Uncontrolled transfers cause noisy neighbors and billing surprises.
+- Goals: predictable egress cost, minimal impact to latency-sensitive inference traffic, retryable and observable transfers, and Terraform-managed configuration for repeatability.
+
+Key SLOs and thresholds
+-----------------------
+- Replication correctness: 100% checksums match for all checkpoints copied (mandatory).
+- Completion SLO (small): 95% of <500GB checkpoints complete within 2 hours.
+- Completion SLO (large): 90% of 500GB-2TB checkpoints complete within 8 hours.
+- Egress budget per account/region: default 1 TB/day (billing guardrails apply).
+- QoS guard: background replication limited to 200 Mbps sustained per node by default; burst up to 1 Gbps allowed during low-inference windows.
+
+Architecture and components
+---------------------------
+- Source store: S3-compatible buckets (hosted or on-prem object store).
+- Replication controller: Kubernetes Job driven by the replication-operator. Operator accepts a Replication CRD with bandwidthQuota, schedule, and verifyChecksums flags.
+- Egress shaping: egress-sideband rate limiter implemented as a sidecar (tc-based) or host-level CNI egress policy (egress-operator).
+- Billing guard: Terraform-managed quotas + cloud billing alerting (daily usage anomaly detector).
+- CI/CD integration: Promotion pipeline triggers a replication task in a non-production window with a canary followed by bulk copies.
+
+Runbook: pre-flight checklist
+----------------------------
+1. Validate ownership and approvals
+   - Confirm owner (see Ownership section). Confirm cost center and approve egress estimate.
+2. Check current egress budget
+   - Query billing dashboard and ensure budget has room for planned transfer.
+3. Identify checkpoint size and retention policy
+   - Use artifact-store metadata to determine bytes and expected runtime.
+4. Pick time window: prefer low-inference window (00:00–04:00 PT) for large transfers.
+5. Prepare CRD payload (sample below) and IaC changes if adjusting quotas.
+6. Notify impacted teams on #infra-egress-alerts channel.
+
+Runbook: execution steps (operator path)
+-------------------------------------
+1. Canary copy (small slice)
+   - Create a Replication CRD with: bandwidthQuota=50Mbps, verifyChecksums=true, objectList=canary-list.
+   - Apply: kubectl apply -f canary-replication.yaml
+   - Wait for completion and verify checksums and telemetry (see Monitoring).
+2. Safe bulk run
+   - If canary passes, create bulk CRD with gradual ramp: bandwidthQuota=200Mbps, schedule with linear ramp to 1Gbps in off-peak window.
+   - Apply CRD and annotate with git commit and runbook run-id.
+3. Continuous verification
+   - Operator will stream per-object success/failure to /metrics and a replication-log object in the destination bucket.
+   - Failure policy: 3 automatic retries at exponential backoff; after that, alert and pause.
+4. Post-replication validation
+   - Run manifest checksum diff: aws s3api head-object / md5sum checks.
+   - Ensure retention lifecycle metadata preserved.
+
+Runbook: manual rollback and mitigation
+-------------------------------------
+1. If replication causes production impact (inference latency rises > 10% P99):
+   - Pause replication: kubectl patch replication <id> -p '{"spec":{"paused":true}}'
+   - Reduce global egress throttle via egress-operator: set globalLimit to 300Mbps.
+   - Open incident and page infra-oncall.
+2. If transfer stalls with checksum mismatches:
+   - Mark failed objects and run targeted retransfer with verifyChecksums=true.
+   - If repeated failures, escalate to storage team and preserve logs/artifacts.
+
+Terraform / IaC patterns
+-----------------------
+- Principle: all egress quotas, billing alerts, and replication operator configuration must be managed through Terraform modules in infra-repo.
+- Minimal recommended module outputs/inputs:
+  - inputs: account_id, region, egress_daily_limit_gb, default_bandwidth_mbps, billing_alert_threshold_pct
+  - outputs: quota_id, billing_alert_id, operator_config_map_name
+
+Sample Terraform snippet (declarative quota)
+```hcl
+module "replication_egress_quota" {
+  source = "git::ssh://git@repo/internal-terraform-modules//egress-quota"
+  account_id = "123456789012"
+  region = "us-west-2"
+  egress_daily_limit_gb = 1024
+  default_bandwidth_mbps = 200
+  billing_alert_threshold_pct = 80
+}
+```
+
+Sample Replication CRD (canary)
+```yaml
+apiVersion: replication.redwood.com/v1
+kind: Replication
+metadata:
+  name: canary-checkpoint-2026-02
+spec:
+  source: s3://checkpoints-prod/models/resnet50/2026-02-01
+  destination: s3://checkpoints-usw-backup/models/resnet50/2026-02-01
+  bandwidthQuotaMbps: 50
+  verifyChecksums: true
+  schedule: immediate
+  retryPolicy:
+    retries: 3
+    backoffSeconds: 60
+```
+
+CI/CD integration
+-----------------
+- Promotion pipeline steps:
+  1. Create canary artifact list and run canary replication job via kubectl or API.
+  2. On success, mutate Terraform variable (if necessary) and trigger bulk replication job via a pipeline step.
+  3. Post-run, publish replication manifest artifact into the release bucket and tag release branches.
+- Example (Buildkite step):
+  - run: ./scripts/trigger-replication --crd=bulk-replication.yaml --dry-run=false
+
+Monitoring, telemetry and alerts
+-------------------------------
+- Metrics to track (Prometheus):
+  - replication_bytes_transferred_total (labels: account, region, checkpoint_id)
+  - replication_active_jobs
+  - replication_object_failures_total
+  - egress_bytes_by_account_daily
+  - inference_p99_latency_by_node (to detect noisy neighbor impact)
+- Alerting rules:
+  - replication_object_failures_total > 5 within 10m -> pager to infra-oncall (SEV-2).
+  - egress_bytes_by_account_daily > egress_quota * 0.9 -> email + Slack to cost-owners.
+  - inference_p99_latency_by_node increases > 10% relative to 1h baseline during replication -> autoscale replication down and page SRE.
+
+Monitoring queries (Grafana/PromQL)
+- Bandwidth used per replication:
+  sum(rate(replication_bytes_transferred_total[5m])) by (checkpoint_id)
+- Egress budget remaining:
+  egress_quota_gb - sum(increase(egress_bytes_by_account_daily[1d]))
+
+Operational ownership and escalation
+----------------------------------
+- Replication operator maintainers: eng-infra/gpu-storage (primary).
+- Oncall: infra-oncall rotation (primary).
+- Escalate to storage infra lead (Meera Patel) after 30m for SEV-2 or 15m for SEV-1.
+
+Post-incident and RCA guidance
+-----------------------------
+- Collect: replication logs, operator pod logs, egress-operator snapshot, cloud billing snapshots, checkpoint manifests.
+- Preserve: failing objects and a 30-day snapshot of destination bucket objects (for debugging).
+- Run RCA template: include timeline, impact, root cause, mitigation, owner, and follow-up actions.
+
+Appendix: useful commands
+-------------------------
+- Pause a replication: kubectl patch replication <id> -p '{"spec":{"paused":true}}'
+- Stream replication logs: kubectl logs -f job/replication-<id> -c replication-controller
+- Check checksum remotely (S3): aws s3api head-object --bucket <bucket> --key <key> --query ETag
+- Re-run targeted object copy (aws cli): aws s3 cp s3://src/key s3://dst/key --only-show-errors --region us-west-2
+
+Appendix: quick decision matrix
+- If checkpoint < 100GB and no retention change -> canary optional, proceed immediate.
+- If checkpoint 100GB–500GB -> require canary + off-peak bulk.
+- If checkpoint > 500GB -> require budget approval, scheduled window, and cross-team notification.
+
+Notes and cross-references
+-------------------------
+- See also: egress-fencing playbook, replication operator design doc, and terraform egress quota module.
+- Storage performance tips: gzip manifests, split large checkpoint objects into sharded archives to enable parallel transfer.
+
+Document history
+----------------
+- 2025-11-03: Created by Aisha Khan.
+- 2026-02-10: Updated SLOs and added CI/CD examples (reviewers: Diego Ramirez, Meera Patel, Jonah Li).

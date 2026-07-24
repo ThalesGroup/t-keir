@@ -1,0 +1,157 @@
+Execution Stitching and Fallback Orchestration
+
+Overview
+
+Purpose: This document defines the execution-stitching pattern and the fallback orchestration responsible for providing graceful degradation when the primary execution path (high-throughput GPU kernel pipeline) cannot satisfy a request within SLO. It codifies the state machine, scheduling interactions, configuration knobs, observability signals, and an operational runbook for live incidents.
+
+Scope: runtime-gateway, request-router, kernel-scheduler, kvcache-manager, fallback-router, model-variant-proxy. This guide targets on-call SREs, runtime engineers, and platform product owners.
+
+Background and intent
+
+- Problem: Mixed workload bursts, kernel regressions, or cache churn can cause a subset of requests to miss tail-latency SLOs. Uncoordinated retries or naive fallbacks cause thundering cascades, token-cost spikes, and model quality regressions.
+- Intent: Provide a deterministic, observable orchestration that "stitches" partial progress from the primary path into safe fallback executions while minimizing cost and preserving user-visible correctness.
+
+Architecture summary
+
+Execution paths (logical services)
+- runtime-gateway: front-door handling auth, rate limits, and per-token costing.
+- request-router: classifies request by latency budget, priority, and required guarantees; assigns to execution lanes.
+- kernel-scheduler: maps request lanes to kernel execution pools (low-latency, standard, background) and controls kernel handoff.
+- kvcache-manager: supplies KV cache state and prefix-hinting; exposes warmup metrics.
+- fallback-router: executes alternative strategies (quantized variant, truncated-response, stateless re-generation) and merges results.
+- model-variant-proxy: serves model variant redirects and handles compatibility checks.
+
+Execution stitching concept (high level)
+
+1) Progressive execution: a request begins on the primary lane (low-latency pool). The kernel-scheduler allocates slots and attaches a progress token that represents the number of completed token-chunks and current KV epoch.
+2) Checkpoints: At prescribed kernel boundaries (every N tokens or at decoder-layer boundaries), the runtime emits a "stitch-checkpoint" event with progress token, partial logits digest, and KV-origin stamp.
+3) Decision point: If the primary path is delayed beyond budget T_warn (configurable), request-router consults fallback policy to decide: wait, re-route to a compatible curtailed variant, or switch to a stateless fallback.
+4) Stitching: If a fallback executes, the fallback-router attempts to hydrate the fallback with the latest checkpoint (prefix/KV + partial logits) so it continues generation without repeating completed work. If KV state is incompatible, fallback falls back further to truncated restart.
+
+State machine (summary)
+
+- STATES: ACCEPTED -> RUNNING_PRIMARY -> CHECKPOINTED -> FALLBACK_PENDING -> FALLBACK_RUNNING -> MERGING -> COMPLETED | FAILED
+- TRANSITIONS are timebox-driven and signal-driven. Key signals: KERNEL_HEARTBEAT, CHECKPOINT_CREATED, KV_WARM, SCHEDULE_PREEMPT.
+
+Scheduling interactions and kernel implications
+
+- Kernel preemption: kernel-scheduler must annotate preemption reasons (quota, fragmentation, safety-net) in the KERNEL_HEARTBEAT so stitching logic can choose soft vs hard fallback.
+- Slice-aware execution: kernels that support incremental slice commits must expose slice boundaries to runtime-gateway via CHECKPOINT_CREATED, otherwise stitching is not possible.
+- Fairness: scheduler applies a credit-based weight that factors "stitchability_score" per request; low stitchability pushes requests into conservative fallbacks early.
+
+Configuration table (recommended defaults)
+
+| config_key | description | default |
+|-----------|-------------|---------|
+| stitch.max_wait_ms | maximum time to wait for primary before triggering fallback_pending | "80ms" |
+| stitch.warn_ms | time to emit early warning event to tracing | "40ms" |
+| stitch.min_progress_tokens | minimum completed tokens to allow stitching | "8" |
+| stitch.max_merge_attempts | number of attempts to merge fallback output with checkpoint | "2" |
+| fallback.quantized_variant | model variant id for quantized fallback | "gptq-compat-v1" |
+| fallback.truncate_heuristic | apply truncation when KV mismatch ratio > X% | "30%" |
+| merge.similarity_threshold | threshold for partial-logit merge acceptance (cosine) | "0.92" |
+
+Operational runbook: tail-latency incident (step-by-step)
+
+1) Triage signal: alert fires on metric runtime.tail_95_ms > 1.5x SLO for 5m and stitch.fallback_rate > 3%. Channel: #oncall-runtime. Pager: primary SRE.
+2) Initial checks (5 min):
+   a) Verify recent deploys: check runtime-gateway and kernel-scheduler release notes for rollouts in the last 30m.
+   b) Query kvcache-manager: kvcache.hit_ratio_1m and kvcache.warmup_queue length.
+   c) Check kernel health: kernel.pool_fragmentation and kernel.queueing_latency.
+3) Fast mitigation (10–20 min):
+   a) Temporarily increase stitch.max_wait_ms to absorb transient jitter (add 20–40ms), using /admin/api/runtime/config apply --patch '{"stitch.max_wait_ms":"120ms"}'.
+   b) If kernel fragmentation high, trigger node drain of <low-util> batch GPUs and rebind low-latency pools: /ops/gpu-drain --pool batch-3 --timeout 2m.
+   c) If fallback rate is too high and causing cost spike, set fallback.quantized_variant to a cheaper model: /admin/runtime/set-fallback --variant gptq-compact-v2
+4) Investigation (30–90 min):
+   a) Correlate CHECKPOINT_CREATED rates with kernel queue depth. Low checkpoint frequency indicates slices are too large.
+   b) Inspect traces: look for repeated MERGE_REJECT events (merge.similarity_threshold violations). If frequent, raise threshold or disable merging for the affected model.
+5) Post-incident actions (within 5 working days):
+   a) Run synthetic replay of failing traffic shape in the benchmarking suite (see: /confluence/eng-serving-runtime/benchmarking-and-perf-suite/runtime-scaling-experiment-protocol-and-benchmark-checklist-2026).
+   b) Open an ADR PR if code-level scheduler change needed.
+
+Debugging artifacts and observability contract
+
+Core trace fields emitted for each request (required):
+- request_id (string)
+- tenant_id
+- execution_lane ("low-latency" | "standard" | "background")
+- stitch.progress_tokens (int)
+- stitch.checkpoint_ts (epoch-ms)
+- kernel.heartbeat_ts
+- fallback.decision ("none"|"quantized"|"truncate_restart"|"stateless")
+- merge.result ("merged"|"rejected"|"not_attempted")
+
+Metrics (minimum to alert on)
+- runtime.tail_95_ms
+- stitch.fallback_rate (requests/sec and %)
+- stitch.merge_accept_rate
+- kvcache.hit_ratio_1m
+- kernel.queue_latency_p50/p95/p99
+
+Events (audit log items)
+- CHECKPOINT_CREATED: {request_id, tokens_complete, kv_epoch}
+- FALLBACK_TRIGGERED: {request_id, reason, chosen_variant}
+- MERGE_ATTEMPT: {request_id, similarity_score, attempt_index}
+
+Example trace JSON (single-line)
+{"request_id":"req-3f2b","execution_lane":"low-latency","stitch.progress_tokens":12,"stitch.checkpoint_ts":1700000000123,"fallback.decision":"quantized","merge.result":"merged"}
+
+Configuration and testing guidelines
+
+- Bench test: use the mixed-shape generator with prefix-hot distribution and KV-churn enabled. Run at 2x production QPS for 10m. Verify stitch.merge_accept_rate > 98% and stitch.fallback_rate < 2%.
+- Unit tests: add deterministic checkpoint emission tests: synthetic kernel must emit CHECKPOINT_CREATED before each slice commit.
+- Canary plan for changing stitch.max_wait_ms:
+  1) Apply config to canary runtime-gateway cluster (10% of traffic) for 30m.
+  2) Validate metrics: no increase in tail_99 or cost-per-token > 1.1x baseline.
+  3) Gradually promote to 50% then 100% over 2 hours.
+
+Known limitations and failure modes
+
+- KV incompatibility: When model variants have incompatible KV encodings (common across quantized vs FP16 variants), stitching falls back to truncation and re-generation; expect quality delta.
+- Merge false-positives: Partial-logit merging assumes consistent tokenization and output distribution; mismatch can produce incoherent continuations. Use high similarity_threshold for customer-facing models.
+- Cost amplification: Aggressive fallback when primary is slow can double token costs if fallbacks re-generate long prefixes. Config guardrails must disable expensive fallback for low-tier customers.
+
+Operational ownership and escalation
+
+- Owner: eng-serving-runtime team
+- Primary on-call: runtime-sre rotation (see /confluence/oncall-and-incident-response/oncall-rotations)
+- Escalation: after 15m unresolved, page runtime-platform lead (Marco Alvarez). After 60m, involve Director of Infra.
+
+Release and rollout notes (example change)
+
+Change: add CHECKPOINT_CREATED to kernel v2 and enable incremental merge
+- Target branches: kernel/v2, runtime/orchestrator
+- Tests: kernel unit + integration with kvcache emulation
+- Rollout steps:
+  1) Merge to staging, run workload-sim at 1x prod.
+  2) Deploy kernel/v2 to canary pool (5 nodes), enable diagnostics for 1h.
+  3) If no regressions, add to low-latency pool at 10% traffic. Monitor stitch.merge_accept_rate.
+
+Appendices
+
+A. Sample admin CLI snippets
+- Apply temporary config patch:
+  curl -X PATCH -H 'Authorization: Bearer $ADMIN_TOKEN' \
+    https://admin.internal/runtime/config \
+    -d '{"stitch.max_wait_ms":"120ms"}'
+- Force-stop a leaking fallback workers group:
+  /ops/runtime/workerctl stop --group fallback-quantized-3 --soft
+
+B. Recommended thresholds (summary)
+- SLO: 95th percentile latency <= 120ms for low-latency lane
+- stitch.warn_ms: 40ms
+- stitch.max_wait_ms: 80ms (canary), 120ms (temp mitigation)
+- merge.similarity_threshold: 0.92
+
+C. Links and references
+- Related ADR: /confluence/eng-serving-runtime/runtime-architecture/runtime-decision-graph-and-observed-behaviour-catalog-2026
+- Benchmarking playbook: /confluence/eng-serving-runtime/benchmarking-and-perf-suite/runtime-scaling-experiment-protocol-and-benchmark-checklist-2026
+
+Contact and next steps
+
+- For questions or to propose improvements, open a PR and tag reviewers (Marco Alvarez, Priya Shah). Planned Q1 work: increase observability of partial-logits and add a "simulated-merge" test in the CI benchmark suite.
+
+Revision history
+- 2025-11-12: Initial draft (E. Tran)
+- 2025-12-18: Added operational runbook and metrics (review feedback)
+- 2026-02-03: Clarified kernel-heartbeat signals and added canary rollout plan

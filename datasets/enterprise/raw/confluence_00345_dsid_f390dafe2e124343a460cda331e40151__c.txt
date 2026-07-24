@@ -1,0 +1,143 @@
+Customer-facing rollback playbook and communication templates
+
+Summary
+-------
+This document provides a practical, customer-facing rollback playbook for private (VPC and on-prem) deployments. It focuses on: decision criteria, coordinated communication templates (email, status page, Slack, account manager scripts), a timed checklist for field engineers and customer success, and the artifacts we must collect for compliance and postmortem. This complements technical rollback runbooks maintained by the engineering team; it is the canonical source for customer communications during a rollback event.
+
+Goals
+-----
+- Protect customer SLAs and expectations through clear, timely communication.
+- Ensure consistent messaging across channels (status page, email, AM calls, field notes).
+- Minimize churn and trust erosion by setting honest timelines and follow-through.
+- Preserve evidence and timelines required for audits and customer compliance reviews.
+
+When to use this playbook
+-------------------------
+Use this playbook when any of the following apply to a private deployment rollback:
+1) A model or runtime change has caused production degradation (latency or accuracy SLA breaches) for >10% of requests for >15 minutes.
+2) A deployment upgrade fails in canary/tenant-slice and risk of wider impact is high.
+3) Customer escalates and requests immediate revert due to business impact.
+4) Compliance or legal constraints require immediate state preservation and rollback (e.g., data residency or regulatory failure).
+
+Decision criteria matrix (short)
+-------------------------------
+| Signal | Threshold | Action owner | Immediate customer message? |
+|---|---:|---|---|
+| 95th p90 latency increase | >2x baseline sustained 15m | Runtime oncall | Yes (status + AM) |
+| Error rate (5xx) | >3% for 5m | Service owner | Yes (status) |
+| Model quality regression (eval) | >5% score drop on golden set | ML oncall | Yes (AM + scheduled deep-dive) |
+| Canary failure impacting sample customers | Any data corruption risk | Release manager | Yes (immediate AM + legal if needed) |
+
+Roles and responsibilities
+--------------------------
+- Customer Success (CS): primary communicator to customer, coordinates AM/SE join, validates customer messaging, logs customer consent for rollback steps.
+- Release Manager: executes rollback plan (orchestration), confirms target commit, verifies artifacts, and updates status.
+- Field/Operator (Ops): performs on-prem steps (service stop, image revert, KV cache eviction), shares runbook outputs.
+- Engineering Oncall: provides triage, telemetry interpretation, and approval for roll-forward after rollback.
+- Legal/Compliance: consulted when rollback involves data preservation, evidence export, or contractual notice requirements.
+
+Communication cadence and channels
+--------------------------------
+1) Immediate broadcast (T+0): post to status page and send templated email to the customer primary contacts. Mark message with severity and short ETA.
+2) T+15 minutes: follow-up message with initial findings and expected next update. Schedule a 30-minute check-in call if customer impact continues.
+3) T+60 minutes: provide action taken (rollback initiated/completed), verification steps customer can run, and updated ETA for full resolution.
+4) Post-event (T+24–72 hours): publish incident summary, artifacts (logs, timeline), and remediation plan. Offer a technical liaison session.
+
+Templates (do not edit core placeholders except ETA and links)
+-----------------------------------------------------------
+- Status page snippet (short):
+  Incident: Partial degradation for <customer-tenant-id> in eu-west-1 for private deployment.
+  Impact: Increased response latency and errors for a subset of requests.
+  Action: We have initiated a rollback to the prior stable model/runtime. Next update: {{ETA_15m}}.
+
+- Customer email (initial):
+  Subject: Action underway to restore your Redwood private deployment (incident {{INC_ID}})
+
+  Hi {{Customer Primary}},
+
+  We detected degraded behavior impacting your deployment ({{brief symptom}}). Our engineers have initiated a rollback to the previous stable configuration to restore normal service.
+
+  What to expect now:
+  - Rolling back model/runtime to commit {{COMMIT_ID}}. Estimated completion: {{ETA}}.
+  - No customer data will be removed; we are preserving runtime state and logs for review.
+  - Recommended verification: run the smoke test at {{SMOKE_TEST_URL}} once you receive completion confirmation.
+
+  Your technical contact: {{AM Name}} ({{AM email}}). We will update you at {{ETA_15m}} with progress.
+
+  Regards,
+  Redwood Inference Customer Success
+
+- Slack/IM alert (for account team):
+  [INC {{INC_ID}}] Rollback started for {{customer}} (region: {{region}}). RM: @release-manager, Ops: @oncall-op, Eng: @eng-oncall. Next update T+15m.
+
+Operational checklist (timeboxed)
+--------------------------------
+- T-0 (detect):
+  - CS notifies customer and AM initiates internal call.
+  - Release Manager confirms rollback target and posts to status page.
+- T+5m:
+  - Ops performs pre-rollback snapshot (if supported): capture PV backup, DB snapshot reference, and configuration snapshot.
+  - Save the following artifacts: deployment manifest, observed telemetry windows, canary logs.
+- T+10m:
+  - Begin rollback orchestration (or manual revert steps for on-prem). Record start timestamp.
+- T+20m:
+  - Verify health endpoints return expected responses for smoke tests.
+  - If healthy, communicate 'rollback complete' and provide verification steps.
+- T+24h:
+  - Deliver postmortem and evidence bundle to customer. Include: timeline, logs (redacted per customer policy), and proposed mitigations.
+
+Required artifacts and retention table
+------------------------------------
+| Artifact | Who collects | Min retention (customer request) | Format |
+| Deployment manifest | Ops | 90 days | YAML/JSON |
+| Orchestration logs | Release Manager | 180 days | plaintext + structured events |
+| Telemetry slice | Eng Oncall | 90 days | perf/export (parquet) |
+| Snapshots (if taken) | Ops | per-customer policy | object storage reference |
+
+Technical signals and useful commands (examples)
+------------------------------------------------
+- Query rollout state (control-plane API):
+  curl -s -H "Authorization: Bearer $TOKEN" https://controlplane.redwood.example/api/v1/deployments/{{DEPLOYMENT_ID}}/rollout | jq
+
+- Snapshot trigger (onprem operator helper):
+  rdwctl snapshot create --deployment {{DEPLOYMENT}} --reason "pre-rollback-{{INC_ID}}"
+
+- Status page API example (JSON payload):
+  POST /api/incidents
+  {
+    "incident_id": "{{INC_ID}}",
+    "summary": "Rollback started for tenant {{TENANT}}",
+    "severity": "major",
+    "links": ["{{RUNBOOK_URL}}"],
+    "eta": "{{ETA}}"
+  }
+
+Escalation and legal checklist
+------------------------------
+- If rollback affects customer data or regulatory controls: notify Legal (legal-incident@redwood.example) and Compliance immediately (within 30 minutes).
+- If customer contract includes notification SLA (e.g., 60-minute notification), confirm legal timeframe and include signed acknowledgement where required.
+- For customers in regulated industries, include an audit copy of artifacts with redaction notes and a statement of non-repudiation.
+
+Post-event deliverables
+-----------------------
+- Completed timeline with stamps for each action (UTC).
+- Evidence bundle: logs, snapshots, manifests, and the verification test results.
+- Customer-facing postmortem: 1–2 page summary, technical appendix (optional), remediation plan and ETA for permanent fix.
+- Internal retrospective: at least one engaged engineer, product manager, and CS owner present within 5 business days.
+
+Appendix: sample verification checklist for customer
+--------------------------------------------------
+1) Confirm service end-to-end latency: run the sample client test (curl) three times, median p95 < baseline.
+2) Validate model outputs against three golden prompts provided during onboarding.
+3) Confirm no unexpected 5xx errors in the last 10 minutes (search logs or use perf dashboard).
+
+Endnotes and references
+----------------------
+- See technical rollback runbooks: /confluence/eng-private-deployments/upgrade-and-rollback (runtime-specific runbooks and automation cookbooks).
+- For legal evidence requirements, see: /confluence/security-and-compliance/compliance-evidence/ (customer artifacts and redaction guidelines).
+
+Change history
+--------------
+- 2026-09-20: Created by Aisha Patel.
+- 2026-11-02: Added API examples and snapshot guidance (reviewers: Tom Anders).
+- 2027-01-12: Published templates and escalation legal checklist (reviewers: Lena Müller, Diego Rivera).

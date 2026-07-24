@@ -1,0 +1,179 @@
+Region-sliced GPU allocation operator and CI guardrails
+
+Overview
+
+Purpose: This document describes the design and operational runbook for the Region-sliced GPU Allocation Operator (RS-GAO) and the accompanying CI guardrails. RS-GAO is an IaC + control-plane pattern used to partition global GPU fleet capacity by region, tenant eligibility, and feature flags while enforcing network egress constraints and CI-driven safety checks prior to promotion. The goal is to provide predictable tenant SLAs, safe canaries for capacity changes, and automated guardrails that reduce cross-region blast radius.
+
+Audience
+- Platform engineers responsible for GPU fleet provisioning and IaC modules
+- SREs who operate capacity autoscalers and fallback routing
+- CI/CD owners who maintain promotion gates for IaC changes
+
+Context and scope
+- Applies to Redwood dedicated and private deployments where multi-region capacity must be partitioned (hosted API and dedicated pools).
+- Integrates with existing Terraform modules, the burst-orchestrator, and the egress-throttler sidecar.
+- Not a replacement for tenant-level throttling; it operates at the cluster/pool allocation layer.
+
+Goals and non-goals
+- Goals:
+  - Provide deterministic capacity slices per region and per priority class (prod/staging/eval).
+  - Enforce egress accounting and rate limits at allocation time to prevent tenants from exceeding regional egress budgets.
+  - Enable safe, CI-gated rollouts of allocation policy via automated policy tests.
+- Non-goals:
+  - Not intended for per-request routing decisions (that's handled by the smart router).
+  - Not intended to replace runtime autoscaling heuristics.
+
+Design overview
+
+Components
+1) Region-sliced Allocator (K8s operator):
+   - Watches TenantAllocation CRD and ClusterCapacity CRD.
+   - Enforces allocation constraints: region affinity, GPU type, burst credit, and egress budget annotations.
+   - Emits allocation events to the capacity ledger (Kafka topic: capacity.allocations.v1).
+
+2) Terraform operator manifests and module extension:
+   - A Terraform module (module.rs_gao) exposes parameters for region weights, priority-class shares, and egress quotas.
+   - Module outputs include allocation_policy_id and a signed manifest used as an input to the K8s operator.
+
+3) CI Guardrails and Promotion Pipeline:
+   - A pipeline that runs plan-time policy checks, synthetic allocation simulations, and a canary apply to a shadow region.
+   - Failing checks block promotion to prod.
+
+4) Runtime telemetry and SLOs:
+   - Metrics: allocation.latency_ms, allocation.rejections, egress.quota_usage_pct, region.saturation_pct.
+   - SLOs: allocation API P95 < 120ms, allocation success rate >= 99.5% over 24h, egress quota accounting accuracy >= 99.9%.
+
+Allocation flow (high level)
+1) Operator observes a TenantAllocation CRD created by the control plane.
+2) Validates region affinity and sufficient cluster capacity.
+3) Checks tenant egress budget annotation against the regional egress ledger.
+4) Reserves GPUs by creating ClusterReservation objects and emits allocation event.
+5) If capacity insufficient, triggers fallback routing policy (route to compatible region or downgrade priority).
+
+Policy model and configuration table
+
+| Key | Description | Example | Required |
+| ---- | ----------- | ------- | -------- |
+| region_weights | Relative allocation weights per region | {us-west: 60, eu-central: 40} | yes |
+| priority_shares | Percent shares for priority classes | {prod: 70, staging: 20, eval: 10} | yes |
+| egress_quota_bytes | Max egress per allocation window (24h) | 500GB | optional |
+| burst_credit_seconds | Allowed burst duration before throttling | 600 | yes |
+
+Terraform module example (snippet)
+
+```hcl
+module "rs_gao" {
+  source = "git::ssh://git@repo.internal/infrastructure/modules/rs_gao.git//module"
+
+  region_weights = { "us-west-2" = 60, "eu-west-1" = 40 }
+  priority_shares = { prod = 70, staging = 20, eval = 10 }
+  default_egress_quota_gb = 300
+  owner = "platform-capacity-team"
+}
+```
+
+CI promotion pipeline (summary)
+- Branch PR -> Terraform plan + policy check (OPA) -> Run synthetic allocation sim -> Apply in shadow region -> Integration smoke tests -> Canary apply to 5% region weight -> Promote
+
+Example GitHub Actions stage (simplified YAML):
+
+```yaml
+name: promote-rs-gao
+on: [workflow_dispatch]
+jobs:
+  plan-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: terraform init
+        run: terraform init ./modules/rs_gao
+      - name: terraform plan
+        run: terraform plan -out=plan.tfplan
+      - name: opa policy check
+        run: opa eval -f pretty --input plan.tfplan 'data.rs_gao.allow == true'
+      - name: allocation simulation
+        run: ./ci/simulate_allocations.sh --policy plan.tfplan --checks smoke
+  \n  canary-apply:
+    needs: plan-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: apply to shadow
+        run: terraform apply -target=module.rs_gao -var='canary=shadow' -auto-approve
+```
+
+Safety and rollback behavior
+- All operator-initiated reservations are tagged with git revision and allocation_policy_id.
+- If allocation failures > 1% in 10m for prod slices, operator triggers automatic rollback of the last allocation change and opens an incident.
+- Canary policy changes are automatically reverted after 30m if egress_quota_usage_pct increases > 20% vs baseline.
+
+Operational runbook (short form)
+
+When an allocation rejection incident occurs:
+1) Pager alerted (pager duty): alert title: "RS-GAO allocation-rejections >1% (prod)".
+2) Primary oncall: check allocation.rejections and region.saturation_pct dashboards.
+3) Query capacity ledger: kafka topic capacity.allocations.v1 (consumer: infra-ops).
+4) If a recent Terraform promotion is present, run: terraform show -json plan.tfplan | jq '.resource_changes[].change' and identify allocation_policy_id.
+5) Rollback: revert Terraform PR, apply to canary with reduced weights, and run smoke sims.
+6) If failure is due to egress budgets, immediately reduce tenant egress quotas or route tenant traffic through egress-throttler sidecar.
+
+Quick commands
+- Check operator logs:
+  kubectl -n platform logs deploy/rs-gao-operator -f --since=1h
+- Inspect reservations:
+  kubectl get clusterreservations -o wide --selector=policy_id=<policy-id>
+- Revert last applied policy (Git):
+  gh pr checkout <pr-number> && gh pr merge --revert
+
+Testing and verification matrix
+- Unit: CRD validation tests and OPA policies (coverage target: 90%).
+- Integration: allocation simulation against synthetic cluster topologies (small/medium/large).
+- Chaos: simulate region partition (netem) and ensure fallback routing engages within 60s.
+- Perf: allocation P95 under 120ms at 1000 RPS simulated requests.
+
+Telemetry and dashboards
+- Core panels to add to capacity dashboard:
+  - Allocation throughput (RPS), P95 latency, errors/rejections
+  - Region saturation % by GPU-type
+  - Egress quota burn rate (24h rolling)
+  - Canary delta for egress usage and allocation success rate
+
+Ownership and escalation
+- Owner team: capacity-platform (eng).
+- Oncall: infra-sre rotation for immediate paging.
+- Escalation: capacity-platform lead -> infra-tools manager -> Eng VP.
+
+Rollout checklist (for first-time promotes)
+1) Author PR: update module.rs_gao with region_weights and default quotas.
+2) Add simulated topology entries to ci/sim_topologies.json.
+3) Ensure OPA policies updated for new keys.
+4) Run pipeline: plan -> simulate -> shadow apply -> smoke test -> canary -> promote.
+5) Observe metrics for 48h and confirm allocation success rate and egress quotas.
+
+Appendix: CRD skeleton (YAML)
+```yaml
+apiVersion: infra.redwood/v1alpha1
+kind: TenantAllocation
+metadata:
+  name: tenant-12345-allocation
+spec:
+  tenant_id: tenant-12345
+  gpu_type: a100-80gb
+  region_preference: [us-west-2, us-east-1]
+  priority: prod
+  requested_gpus: 4
+  egress_quota_gb: 200
+  annotations:
+    requestor: team-ai
+```
+
+Notes and rationale
+- Region slicing allows predictable billing and capacity runway for prioritized tenants while reducing noisy neighbor effects. Pairing the allocator with CI guardrails reduces human error during policy promotion and provides deterministic rollback behavior. The operator design keeps the control-plane decision making small (validate + reserve) and delegates runtime routing and throttling to existing runtime systems.
+
+Related artifacts
+- Terraform module repo: git@repo.internal:infrastructure/modules/rs_gao.git
+- Simulation harness: /ci/simulate_allocations.sh and /ci/sim_topologies.json
+- OPA policy catalog: /policies/rs_gao/*
+
+Contact
+- Primary: Evan Liu (evan@redwood.example)
+- Runbook owner: Priya Desai (priya@redwood.example)

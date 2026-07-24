@@ -99,6 +99,13 @@ class QueryRequest(BaseModel):
     query: str = Field(..., min_length=1)
     language: str = Field(default="en", pattern="^(en|fr)$")
     hits: int = Field(default=20, ge=1, le=100)
+    business_ontology: list[dict[str, Any]] | dict[str, Any] | None = Field(
+        default=None,
+        description=(
+            "Per-request business ontology concepts for query expansion "
+            "(list of concepts or {concepts: [...]}); not stored server-side"
+        ),
+    )
     max_passages: int | None = Field(
         default=None,
         ge=1,
@@ -124,6 +131,7 @@ class RetrievedChunk(BaseModel):
     text_raw: str
     parent_doc_id: str
     relevance: float | None = None
+    title: str = ""
 
 
 class SearchRequest(BaseModel):
@@ -132,6 +140,13 @@ class SearchRequest(BaseModel):
     query: str = Field(..., min_length=1)
     language: str = Field(default="en", pattern="^(en|fr)$")
     hits: int = Field(default=20, ge=1, le=100)
+    business_ontology: list[dict[str, Any]] | dict[str, Any] | None = Field(
+        default=None,
+        description=(
+            "Per-request business ontology concepts for query expansion "
+            "(list of concepts or {concepts: [...]}); not stored server-side"
+        ),
+    )
 
 
 class SearchChunk(BaseModel):
@@ -266,6 +281,7 @@ class AppState:
         self.pipeline_runners: dict[str, PipelineRunner] = {}
         self.prompts: dict[str, Any] = {}
         self.rag_config: RagConfig = load_rag_config()
+        self.dual_pipeline: Any | None = None
 
 
 def _load_prompts() -> dict[str, Any]:
@@ -594,17 +610,28 @@ async def _enrich_hits(
 
         parent_fields = parent_cache.get(doc_ref, {}) if doc_ref else {}
         parent_doc_id = str(
-            parent_fields.get("source_doc_id") or doc_ref or ""
+            fields.get("source_doc_id")
+            or parent_fields.get("source_doc_id")
+            or doc_ref
+            or ""
         )
+        title = str(
+            fields.get("title")
+            or parent_fields.get("title")
+            or ""
+        ).strip()
+        # Prefer json_ld already on the hit (dual hybrid) over a parent fetch.
+        rdf_source = fields if fields.get("json_ld") else parent_fields
         retrieved_chunks.append(
             RetrievedChunk(
                 chunk_id=chunk_id,
                 text_raw=text_raw,
                 parent_doc_id=parent_doc_id,
                 relevance=relevance,
+                title=title,
             )
         )
-        rdf_payloads.append(_extract_parent_rdf(parent_fields))
+        rdf_payloads.append(_extract_parent_rdf(rdf_source))
 
     return retrieved_chunks, rdf_payloads
 
@@ -616,14 +643,63 @@ async def _retrieve_and_rerank(
     language: str,
     hits: int,
     user_space: str | None = None,
+    business_ontology: Any | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any] | None, dict[str, Any] | None, str]:
     """Run query analysis, Vespa search, and optional second-stage rerank.
+
+    When ``dual_hybrid.enabled`` is true, runs :class:`DualHybridPipeline`
+    (chunk + document arms, RRF, ontology, cross-encoder) instead of the
+    legacy single-arm QueryAnalyzer path.
 
     Returns:
         ``(search_response, vespa_payload, query_analysis, search_query_text)``.
     """
     assert state.vespa is not None
     space = user_space or state.vespa.config.user_space
+    dual_cfg = state.rag_config.dual_hybrid
+    if dual_cfg.enabled and state.llm is not None:
+        from thot.tools.search.dual_retrieval import (
+            DualHybridPipeline,
+            dual_hits_to_vespa_response,
+        )
+
+        if state.dual_pipeline is None:
+            state.dual_pipeline = DualHybridPipeline(
+                dual_cfg, state.vespa, llm=state.llm
+            )
+        pipeline = state.dual_pipeline
+        q_emb = await state.llm.embed(query_text)
+        result = await pipeline.search(
+            query_text,
+            user_space=space,
+            language=language,
+            business_ontology=business_ontology,
+            q_chunk_emb=q_emb,
+            q_question_emb=q_emb,
+        )
+        top = result.hits[:hits]
+        search_response = dual_hits_to_vespa_response(top)
+        query_analysis = {
+            "raw_query": query_text,
+            "lexical_query": (
+                result.expansion.normalized_query
+                if result.expansion
+                else query_text
+            ),
+            "ranking_profile": (
+                f"dual_hybrid/{dual_cfg.retrieval.chunk.profile}"
+            ),
+            "dual_hybrid": {
+                "timings_ms": result.timings_ms,
+                "active_signals": result.active_signals,
+                "degraded": result.degraded,
+                "scores": {
+                    hit.source_doc_id: hit.scores for hit in top
+                },
+            },
+        }
+        return search_response, None, query_analysis, query_text
+
     pipeline_runner = _pipeline_runner_for_language(state, language)
     search_query_text = query_text
     query_analysis: dict[str, Any] | None = None
@@ -956,7 +1032,11 @@ def _build_search_chunks(
     """Build SearchChunk list from retrieved chunks and hit titles."""
     title_by_chunk = {
         str(fields.get("chunk_id") or ""): (
-            str(fields.get("parent_title") or "").strip()
+            str(
+                fields.get("title")
+                or fields.get("parent_title")
+                or ""
+            ).strip()
         )
         for fields, _ in parsed_hits
     }
@@ -966,7 +1046,7 @@ def _build_search_chunks(
             text_raw=chunk.text_raw,
             parent_doc_id=chunk.parent_doc_id,
             score=float(chunk.relevance or 0.0),
-            title=title_by_chunk.get(chunk.chunk_id, ""),
+            title=chunk.title or title_by_chunk.get(chunk.chunk_id, ""),
         )
         for chunk in retrieved_chunks
     ]
@@ -1047,6 +1127,7 @@ async def search(
             language=request.language,
             hits=request.hits,
             user_space=user_space,
+            business_ontology=request.business_ontology,
         )
         parsed_hits = _parse_hits(search_response)
         retrieved_chunks, rdf_payloads = await _enrich_hits(state, parsed_hits)
@@ -1505,6 +1586,7 @@ async def rag_query(
             language=request.language,
             hits=request.hits,
             user_space=user_space,
+            business_ontology=request.business_ontology,
         )
     except Exception as error:
         LOGGER.exception("Query generation failed")

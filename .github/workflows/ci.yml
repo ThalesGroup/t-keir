@@ -29,6 +29,9 @@ jobs:
       - name: Verify lockfile
         run: make verify-lockfile
 
+      - name: Vespa schema freshness
+        run: make schemas-check
+
       - name: Lint
         run: make lint
 

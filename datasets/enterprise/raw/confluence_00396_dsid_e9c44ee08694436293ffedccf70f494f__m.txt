@@ -1,0 +1,228 @@
+Metering & Billing Data Retention and Access Controls Policy
+
+## Purpose
+This policy defines Redwood Inference’s requirements for **retention**, **access control**, and **audit logging** for metering and billing datasets used for:
+- Customer invoicing and credits
+- Revenue recognition support (RevRec) and audit readiness
+- Pricing/packaging analytics and experimentation
+- Support dispute investigation and customer reporting
+- Engineering reliability (meter sanity, drift detection) and incident response
+
+The intent is to maintain **high-integrity, auditable billing telemetry** while minimizing sensitive data exposure and ensuring separation of duties.
+
+## Scope
+This policy applies to:
+- **Hosted API** metering (tokens/requests/embeddings/rerank)
+- **Dedicated** usage metering (GPU-seconds and pool-level allocation)
+- Data flows from request logs → usage events → billing ledger → customer-facing usage exports
+- All environments that store or process metering/billing data (prod, staging where prod data is copied)
+
+**Out of scope:** general application analytics unrelated to billing meters (see Analytics Data Policy), and raw model outputs stored by customers.
+
+## Guiding principles
+1. **Least privilege by default.** Access is granted only to the minimum datasets/columns needed.
+2. **Purpose-based access.** Access approvals must state an allowed purpose (see “Allowed purposes”).
+3. **Separation of duties.** Where possible, the people who implement meter logic are not the only approvers for financial “source of truth” datasets.
+4. **Minimize sensitive payloads.** Metering/billing datasets must not retain prompt/completion text unless explicitly approved as an exception.
+5. **Auditable trail.** All access to restricted datasets is logged and reviewable.
+6. **Time-bounded grants.** Elevated access expires and requires re-approval.
+
+## Definitions
+- **Metering data:** event-level or aggregated records describing usage (e.g., prompt_tokens, completion_tokens, billed_tokens, requests, cache_hit flags, model, region).
+- **Billing ledger (source of truth):** the authoritative dataset used to generate invoices and support RevRec.
+- **Restricted dataset:** customer-sensitive data (billing amounts, credits, contract terms, customer identifiers beyond what’s needed) requiring explicit access controls and audit logging.
+- **Customer-sensitive data:** any data that could materially impact a customer invoice, reveal pricing/discounts, or contain regulated identifiers.
+
+## Data classification for metering & billing
+All metering/billing datasets are classified as **restricted** unless explicitly designated “internal” by Finance/Legal.
+
+### Content minimization requirements
+Metering/billing tables and exports MUST NOT include:
+- Prompt text, completion text, tool arguments, file contents, or user-provided documents
+- End-user identifiers in plaintext (email, phone, government IDs)
+
+Metering/billing tables MAY include:
+- Customer account identifiers (internal account_id / org_id)
+- API key identifiers (hashed or surrogate ids; no raw secret material)
+- Request identifiers (request_id, idempotency_key) needed for dedupe and dispute resolution
+- Usage dimensions (timestamp, model, region, endpoint, cache_hit, status class)
+
+If a debugging workflow requires content inspection, it must use a **separate, tightly controlled debug pipeline** with Security approval and short retention (see “Exceptions”).
+
+## Systems and canonical datasets (summary)
+The following names reflect the common internal naming used in Snowflake/warehouse conventions. Exact schemas may differ by environment.
+
+**Event & aggregation layer**
+- `telemetry.usage_events_v1` / `telemetry.usage_events_v2`
+- `telemetry.request_rollups_hourly` (aggregations)
+
+**Billing source of truth**
+- `billing.billing_ledger` (invoice line item inputs)
+- `billing.credits_ledger` (credits/grants application)
+- `billing.invoice_preview_runs` (pre-send validation outputs)
+
+**Reconciliation exports (Finance-facing)**
+- `finance_billing.recon_export_daily` (stable, documented schema)
+- `finance_billing.meter_drift_checks` (drift metrics by account/model/region)
+
+**Customer-facing**
+- Usage API export tables feeding the customer usage endpoints (e.g., `customer_usage.daily_usage_exports`)
+
+## Retention policy
+Retention balances audit requirements (RevRec, statutory retention) with minimization of sensitive data.
+
+### Retention schedule
+| Data type | Examples / tables | Default retention | Storage notes | Owner |
+|---|---|---|---|---|
+| Raw request logs (non-content) | request metadata logs without prompt/completion text | 30 days queryable + 60 days cold | Cold storage must remain restricted; no prompt/completion payloads | Engineering (Telemetry) |
+| Usage events (event-level metering) | `telemetry.usage_events_*` | 25 months queryable | Designed to cover current + prior fiscal year analyses and dispute windows | Engineering (Telemetry) / Finance |
+| Aggregated usage rollups | hourly/daily rollups used by dashboards | 36 months queryable | Aggregations must be derivable from event data; store for performance | Engineering (Observability) |
+| Billing ledger (source of truth) | `billing.billing_ledger`, invoice inputs | 7 years | Archived after 25 months to low-cost immutable storage with retrieval process | Finance (RevRec) |
+| Credits and adjustments | `billing.credits_ledger`, adjustments | 7 years | Includes approvals and references to ticket IDs | Finance (RevRec) |
+| Invoice previews and close artifacts | `billing.invoice_preview_runs`, close check outputs | 7 years | Treated as audit evidence | Finance (RevRec) |
+| Audit logs (data access) | Snowflake access history, export logs | 12 months queryable + 24 months archived | Must be tamper-evident; access restricted to Security + Finance | Security & Compliance |
+| Customer-facing usage exports | daily/monthly export artifacts | 25 months | Aligned to usage event queryable period | Product/Engineering |
+
+### Deletion and archival requirements
+- **Automated TTL enforcement** is required for tables with finite retention (e.g., request logs, usage events queryable tier).
+- When data moves from queryable to archived tiers:
+  - Archived objects must be **immutable** (write-once where supported) and access-controlled.
+  - Retrieval must be via a documented request process (ticket + owner approval).
+- Any retention changes must be treated as a policy change (see “Change management”).
+
+## Access control policy
+### Allowed purposes
+Access to restricted metering/billing datasets may be approved only for the following purposes:
+1. **Billing operations:** invoice generation, previews, credit application, invoice corrections with approved process.
+2. **RevRec & audit support:** revenue recognition tie-outs, audit evidence, close checklists, materiality analysis.
+3. **Customer support disputes:** investigating a customer-reported discrepancy, validating exports, preparing customer response.
+4. **Engineering reliability:** meter drift detection, incident response, data-quality SLO monitoring.
+5. **Pricing/packaging analytics:** experiments, margin model inputs, cohort analysis (prefer aggregated/anonymized views).
+6. **Legal/commercial:** contract definition validation, dispute handling, litigation hold (when invoked).
+
+Any other purpose requires explicit approval from **CFO (or delegate)** and **GC (or delegate)**.
+
+### Access model (implementation)
+- **Primary enforcement:** Snowflake RBAC roles + schema-level and column-level access controls.
+- **Identity source:** Okta group membership synced to Snowflake roles.
+- **Service accounts:** must use separate named roles; no shared credentials.
+- **Production vs staging:** production restricted datasets must not be copied into staging unless approved, redacted, and time-bounded.
+
+### Role-based access matrix (high level)
+This matrix describes the intended access posture. Exact grants are managed in Snowflake role definitions.
+
+| Function / team | Typical role | Access level | Notes |
+|---|---|---|---|
+| Finance (RevRec/Accounting) | `ROLE_FINANCE_REVREC` | Read/write to billing ledger inputs, credits ledger; read to usage recon exports | Primary operational owner of “source of truth” tables |
+| FP&A | `ROLE_FINANCE_FPA` | Read to aggregated usage and margin views; limited read to recon exports | No write access to billing ledger |
+| Legal (GC/Commercial) | `ROLE_LEGAL_BILLING_VIEW` | Read to invoice artifacts and contract-linked billing summaries | No access to raw event-level data by default |
+| Product Ops / Analytics | `ROLE_PRODUCTOPS_METERING` | Read to aggregated, de-identified views; limited read to usage exports | Event-level access requires explicit justification |
+| RevOps (GTM analytics) | `ROLE_REVOPS_PRICING` | Read to packaging/plan attribution and aggregated spend | No access to credits/discount line-item details by default |
+| Engineering (Telemetry owners) | `ROLE_ENG_TELEMETRY` | Read to usage events; write to telemetry pipeline outputs | No direct write access to billing ledger source-of-truth tables |
+| SRE / On-call | `ROLE_ENG_SRE_METERING` | Read to drift dashboards, checks, and relevant aggregates | Event-level access is time-bounded during incidents |
+| Support (Billing specialists) | `ROLE_SUPPORT_BILLING` | Read to customer usage exports + invoice summary views | Must not access other customers outside assigned case |
+| Security & Compliance | `ROLE_SECURITY_AUDIT` | Read to access logs and audit evidence | Can approve/deny elevated access requests |
+
+### Column-level restrictions (examples)
+The following fields are treated as **high-sensitivity** and should be protected with column masking policies or separate secured views:
+- Invoice amounts, negotiated rates, discount percentages, credit balances
+- Contract identifiers and special terms flags
+- Customer PII (if present in exceptional cases)
+
+Where feasible, provide **approved views**:
+- `*_public_metrics_view` (no customer identifiers)
+- `*_account_rollup_view` (account_id present; no pricing fields)
+- `*_finance_view` (includes pricing/credits; Finance only)
+
+## Requesting access
+### Standard access request process
+1. File an internal access ticket (Data Access queue) with:
+   - Requested role(s)
+   - Purpose (must match “Allowed purposes”)
+   - Duration needed (default 30 days)
+   - Datasets required (tables/views)
+2. Manager approval for the requester.
+3. Data owner approval:
+   - Finance owner for billing ledger and credit datasets
+   - Telemetry owner for usage event datasets
+4. Security review and grant:
+   - Ensure least privilege; propose view-based access if possible
+   - Configure expiration and logging requirements
+5. Quarterly re-certification for persistent access roles.
+
+### Emergency access (“break-glass”)
+- Used only for active billing-impacting incidents or close-blockers.
+- Requires on-call incident channel + ticket reference.
+- Grants expire within 24 hours and require a follow-up review.
+
+## Audit logging requirements
+### What must be logged
+For all restricted datasets:
+- Role used (Snowflake role)
+- User/service identity
+- Time of access
+- Objects accessed (database/schema/table/view)
+- Query identifier and execution metadata
+- Rows/bytes exported (where available)
+- Export destination for approved exports
+
+### Logging controls
+- Access must occur through named roles (no personal default roles for restricted schemas).
+- Prohibit or alert on:
+  - Large result exports from restricted schemas
+  - Bulk unloads to external stages without explicit approval
+  - Queries that join restricted billing data with unrelated datasets
+
+### Log retention and review cadence
+- Queryable access logs retained for **12 months** minimum.
+- Archived access logs retained for **24 months** minimum.
+- Security reviews access anomalies **monthly**; Finance reviews Finance-role access **quarterly** (certification).
+
+## Data exports and handling
+- Prefer **server-side exports** to approved storage with encryption-at-rest and access logging.
+- Avoid local downloads. If unavoidable (e.g., auditor request), the export must:
+  - Be encrypted
+  - Be time-bounded
+  - Be stored only in approved secure locations
+  - Be referenced in a ticket with approver name and expiry
+- Customer-provided dispute packets (CSV exports, screenshots) must be stored in the customer support system and linked to the case; do not paste sensitive billing data into Slack.
+
+## Month-end close controls (billing data freeze)
+To support auditability and consistent RevRec:
+- Finance defines a **usage data freeze window** for month-end close (published in the close checklist).
+- Late-arriving events/backfills after the freeze:
+  - Must not silently alter prior-period billed amounts without Finance/Legal approval
+  - Must be recorded as an adjustment with an audit trail (ticket + approver)
+- Meter changes overlapping experiment windows must be explicitly segmented in analysis outputs (pre/post meter fix).
+
+## Exceptions
+Exceptions to this policy (including retaining prompts/completions, expanding access to pricing/discount fields, or extending retention beyond defaults) require:
+- Written justification
+- Data owner approval
+- Security approval
+- Finance (RevRec) approval if billing/RevRec impacted
+- Legal approval if contract terms, dispute posture, or regulated data is involved
+
+All exceptions must include an expiry date and be tracked in the policy exceptions register.
+
+## Enforcement
+Violations may result in:
+- Immediate revocation of access
+- Security incident review
+- Required retraining
+- Disciplinary action up to termination (per company policy)
+
+## Change management
+- Policy changes require review by Finance (RevRec), Security, and Legal.
+- Metering schema changes that impact billing must follow the metering change control process (shadow billing compare period, sign-off, and audit evidence).
+- The document owner must re-review this policy at least **annually** or after any major billing pipeline redesign.
+
+## Owners
+- **Policy owner (Finance/Legal):** Emily Stone (RevRec)
+- **Telemetry owner:** Logan Wright
+- **Security owner:** Security & Compliance on-call rotation (reviewed by Aisha Bello)
+
+## Changelog
+- 2026-02-22: Clarified retention schedule for usage events vs billing ledger; added explicit audit log retention and quarterly recertification.
+- 2026-01-18: Added column-level restriction guidance for pricing/credits; clarified allowed purposes for Product Ops.
+- 2025-11-12: Initial publication.

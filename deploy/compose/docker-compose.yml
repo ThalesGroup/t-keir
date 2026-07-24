@@ -204,7 +204,7 @@ services:
       INGEST_ROOT: /var/tkeir/ingest
       INGEST_AUTH_ENABLED: ${INGEST_AUTH_ENABLED:-false}
       INGEST_DEV_TOKEN: ${INGEST_DEV_TOKEN:-}
-      # Mounted host workspace (corpus_nato ontologies for OSINT derive-from)
+      # Mounted host workspace (optional local mounts; OSINT ontologies live under datasets/osint/)
       TKEIR_WORKSPACE: /workspace
       VESPA_URL: http://vespa:8080
       VESPA_CONFIG_URL: http://vespa:19071

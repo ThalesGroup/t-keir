@@ -8,6 +8,7 @@ Operational procedures for the platform layer:
 | [Agent runaway](agent-runaway.md) | Budget burn / stuck agent loop |
 | [Injection incident](injection-incident.md) | Prompt injection in corpus/tools |
 | [Retract generated content](retract-generated.md) | Unpublish agent-generated docs |
+| [Dual-hybrid migration](dual-hybrid-migration.md) | Reindex after parent_* schema removal |
 | Incident / early-warning templates | Phase 9 (`tkeir-audit incident`) |
 | Rollback index | `make rollback-index RUN=…` |
 | Data subject request (DSR) | Phase 9 |

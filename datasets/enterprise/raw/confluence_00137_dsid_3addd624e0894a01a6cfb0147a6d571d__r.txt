@@ -1,0 +1,132 @@
+Rapid SLA Triage Runbook and External Briefing Templates
+
+Summary:
+This document defines a compact, operator-focused runbook for rapid triage of SLA-impacting events (availability, latency, throughput regressions) and provides tested external briefing templates for customers and execs. It is optimized for the first 30/60/180 minutes of an incident where the primary goal is to stabilize SLAs and communicate clearly.
+
+Scope and intent:
+- Scope: multi-region inference control plane and serving stack (hosted API + Dedicated routing).
+- Non-scope: billing pipeline, long-term capacity planning (see related pages).
+- Intent: provide a predictable, low-cognitive triage path that on-call responders, bridge operators, and customer success can adopt with minimal prep.
+
+Key definitions:
+- SLA-impacting: any event causing a measurable drop below an SLO threshold for availability or 95th/99th latency for a paid customer tier.
+- Triage Owner: primary on-call for the service indicated by PagerDuty alert tag (e.g., inference-runtime-prod).
+- Bridge Lead: SRE on the active bridge who owns external comms until handed to Customer Success.
+
+SLO thresholds (quick reference):
+| Metric                     | Target        | Alert threshold (auto-trigger) | PagerDuty severity |
+|---------------------------|---------------|-------------------------------|--------------------|
+| API availability (global) | 99.95% monthly| < 99.9% (15m window)          | Sev 1              |
+| 95th latency (text gen)   | < 300ms       | > 350ms (5m window)           | Sev 2              |
+| 99th latency (embeds)     | < 1200ms      | > 1600ms (10m window)         | Sev 1              |
+| Error rate (5m)           | < 0.1%        | > 0.5%                        | Sev 1              |
+
+Ownership matrix (quick):
+- Triage Owner: fix-forward actions, log collection, scope.
+- Bridge Lead: status cadence, external messages.
+- Model/Serving Owner: kernel/quantization teams for model regressions.
+- CS Liaison: customer notices and ticket updates.
+
+Rapid SLA Triage: 0–30 minutes (stabilize & estimate)
+1) Acknowledge and create the bridge (Triage Owner / Bridge Lead):
+   - Create an incident bridge: #oncall-bridge-<service>-<ts>. Invite CS and PM if > 30 customers impacted.
+   - Confirm severity via the SLO dashboard and metric snapshot.
+2) Immediate controls (first 5–10 minutes):
+   - Apply emergency mitigation(s) prioritized by lowest-customer-impact first:
+     a) Route traffic to healthy region: runbook command: curl -X POST https://ops-api.internal/routing/shift -d '{"region":"us-west-2","service":"inference"}'
+     b) Temporarily increase fallback model capacity: ops-cli models set-capacity --model redwood-v1-small --pool dedicated --scale 2
+     c) Toggle caching layer to read-only mode to reduce write pressure: redis-cli -h cache-main CONFIG SET maxmemory-policy allkeys-lru
+3) Rapid evidence capture (parallel):
+   - Export traces for 15 minutes around alert: 
+     - tracing-cli export --service inference-runtime --since "-15m" --out /tmp/trace-<incident>.zip
+   - Grab top error logs: kubectl -n inference logs -l app=inference-runtime --tail=500 > /tmp/errors-<incident>.log
+   - Snapshot autoscaler and pool metrics: ops-monitor snapshot --pools inference* --out /tmp/pools-<incident>.json
+4) Estimate impact & ETA (10–20 minutes):
+   - Use dashboard: open /dashboards/slo-latency?window=15m and capture 1m/5m/15m deltas.
+   - Bridge Lead gives initial ETA: stabilize estimate (e.g., 30m) and next update cadence (10m).
+
+Triage: 30–60 minutes (diagnose & mitigate)
+5) Narrow root cause hypotheses (30–45 minutes):
+   - Common buckets: noisy neighbor (GPU saturation), kernel regression (recent runtime release), networking (regional AZ issues), model size/kv-cache eviction.
+   - Quick checks: GPU utilization (nvidia-smi via fleet-agent), kernel-level error traces, and latest deploy tags: git rev-parse --short HEAD on runtime node.
+6) Apply scoped mitigations (45–60 minutes):
+   - If deployment suspect: rollback runtime: ops-deploy rollback inference-runtime --to-tag v2025.04.12 || kubectl rollout undo deployment/inference-runtime -n inference
+   - If noisy neighbor: isolate offending instance pool and evict pods: kubectl cordon <node>; drain --ignore-daemonsets
+   - If model quality regression: route traffic to previous model variant and throttle new variant: ops-cli models route --from new-variant --to old-variant --weight 0.9
+7) Confirm SLO recovery and document evidence (60 minutes):
+   - Once SLOs back above alert thresholds for 15m window, declare partial mitigation. Capture recovery artifact IDs and evidence bundles.
+
+Escalation ladder and when to involve execs (decision rules):
+- Escalate to on-call manager & PM if: 2 hours elapsed with no sustained SLO recovery or > 5% of paid customers impacted.
+- Engage Legal/Comms if incident is customer data exposure or regulatory risk.
+- For cross-region outages, engage Cloud Ops and network providers immediately.
+
+Customer and executive briefing templates (copyable)
+- Initial acknowledgement (within 10 minutes):
+  Subject: [Redwood] Incident affecting inference API — we’re investigating
+  Body: Hello — we are aware of an issue affecting inference API performance for some customers. Our engineers have opened an incident and are investigating root cause. We're prioritizing SLA stability and will provide an update by <ETA in minutes>. Bridge ID: #oncall-bridge-inference-<ts>.
+
+- Status update (10/30/60 minute cadence):
+  Subject: [Redwood] Update — inference API incident — progress update
+  Body: Current status: Mitigations in progress (routing changes / temporary capacity increases). Impact: X% of requests affected; primary symptom: increased 95th/99th latency. Next update: in 20 minutes. For urgent support, reply to this message or open a support ticket: <link>.
+
+- Resolution notice (post-stabilization):
+  Subject: [Redwood] Resolved — inference API incident — summary and next steps
+  Body: The incident affecting inference API performance has been resolved as of <timestamp>. Root cause: <brief cause>. Actions taken: list of mitigations/rollbacks and timeline. Customer impact: estimated duration and affected customers. If you saw persistent issues, please contact your CS rep. We will publish a post-incident summary within 72 hours.
+
+- Executive brief (if escalated):
+  - One-line: Major SLA-impacting incident affecting inference API, partial customer impact, mitigation in place.
+  - Metrics snapshot: availability pre/post, peak error rate, affected regions.
+  - Next steps: timeline for RCA, compensatory credit assessment, and product/infra remediation plan.
+
+Game day and simulation checklist (pre-run):
+- Objectives: validate bridge process, verify external templates, practice three mitigations (route shift, runtime rollback, pool isolation).
+- Participants: SRE, runtime team, CS, PM, legal (optional).
+- Pre-reqs: synthetic load harness, shadow customer, snapshot restore point.
+- Day-of script: 1) Inject latency to us-west-2 pool. 2) Trigger pager and follow the 0–60 minute runbook. 3) Time each step, capture gaps.
+
+On-call rotation guidance (practical rules):
+- Primary on-call should be reachable for 15 minutes for SEV1 pages and start bridge within 10 minutes.
+- Handoff template (two lines): current active mitigations; next steps; outstanding manual actions.
+- Shadow to primary progression: shadow for 3 rotations, then co-take for 2, then primary.
+
+Post-incident writeup / evidence checklist (what to attach to the postmortem):
+- Incident timeline with wall-clock stamps.
+- Evidence bundle IDs (traces, logs, snapshots).
+- Root cause hypothesis and confirmation steps.
+- Customer impact list and support ticket IDs.
+- Action items (owner + due date) and severity remediations (quick/medium/long term).
+
+Technical play snippets and commands (copy/paste):
+- Check SLOs: curl -s "https://ops-monitor.internal/api/v1/slo?service=inference&window=5m" | jq .
+- Route traffic to a region (API): curl -X POST https://ops-api.internal/routing/shift -H "Authorization: Bearer $OPS_TOKEN" -d '{"service":"inference","target_region":"eu-west-1","drain_seconds":30}'
+- Runtime rollback (k8s): kubectl -n inference rollout undo deployment/inference-runtime --to-revision=3
+- Snapshot traces: tracing-cli export --service inference-runtime --since "-30m" --out s3://incidents/trace-<id>.zip
+
+Runbook maintenance and ownership rules:
+- Every play must have a single owner listed in the runbook header (owner_name@example.com). Owners must review the play annually and after any SEV1 incident.
+- After each game day run, update the playbook with any temporary hacks that became standard operating practice or remove them if unsafe.
+
+Decision log (quick ADR entries for this playbook):
+- 2024-11-05: Adopted 10/30/60 minute cadence as default for SLA incidents.
+- 2025-03-18: Added customer-facing templates and mandatory CS liaison for incidents > 30m.
+
+Related artifacts and page links:
+- SLO library (link): /confluence/eng-sre/slo-and-error-budgets
+- Incident evidence standard: /confluence/oncall-and-incident-response/incident-evidence-collection-standard-2025.json
+
+Appendix: Example customer acknowledgement (multi-tenant sample)
+---
+Hello <CustomerName>,
+
+We detected elevated latency for inference requests affecting some tenants between <start> and <end>. Our engineers mitigated the issue by shifting traffic and performing a controlled rollback. We estimate <percent> of your requests were affected for <duration>. A detailed post-incident report will follow.
+
+Regards,
+The Redwood Inference Reliability Team
+---
+
+Notes and housekeeping:
+- Keep this runbook concise — long investigations belong in the postmortem.
+- If you're unsure which mitigations to use, prioritize actions that reduce customer-visible impact over full root-cause proof.
+
+Maintenance log: last reviewed by Maya Chen on 2025-06-12.

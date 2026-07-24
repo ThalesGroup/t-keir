@@ -43,3 +43,11 @@ deploy/compose/.env
 deploy/charts/**/charts/
 deploy/charts/**/tmpcharts/
 workspace
+# Bulky binary formats only — versioned corpus.jsonl / manifest / text trees are tracked
+datasets/osint/pdf/
+datasets/osint/docx/
+datasets/osint/xml/
+datasets/osint/ontologies/official/
+datasets/enterprise/pdf/
+datasets/enterprise/docx/
+datasets/ingest_*.json

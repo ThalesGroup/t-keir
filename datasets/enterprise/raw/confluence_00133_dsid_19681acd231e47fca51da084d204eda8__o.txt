@@ -1,0 +1,161 @@
+OPA GPU admission testbed and policy benchmark
+
+Overview
+=======
+This page documents the OPA (Open Policy Agent) admission webhook testbed we built to validate GPU provisioning policies, benchmark admission latency under realistic CI/CD workloads, and continuously evaluate policy regressions. The testbed is intended for infra engineers, SREs, and platform owners who maintain Terraform/IaC modules and cluster admission controls.
+
+Goals
+-----
+- Provide a reproducible CI job that runs policy conformance and performance benchmarks on OPA policies governing GPU provisioning (node labels, taints, quota assertions, cost-center tags).
+- Measure admission-path latency and error-rate at commit-time so policy authoring remains safe for high-throughput cluster operations.
+- Validate Terraform/IaC-generated Kubernetes manifests against production policy profiles before promotion.
+- Produce telemetry and a lightweight dashboard for policy regressions (latency, reject-rate, false positives).
+
+Scope and non-goals
+-------------------
+- In scope: cluster admission for GPU nodepool creation, tenant pod requests for fractional/floor GPUs, and tenant egress tagging assertions.
+- Out of scope: runtime KV cache warmup in the serving runtime, pricing decisions, and downstream billing reconciliation.
+
+Architecture and components
+---------------------------
+1) Policy library repo (git)
+   - stores all OPA Rego policies (policy profiles: strict, standard, permissive)
+   - unit tests with conftest and rego test harness (conftest version pinned in repo)
+2) Test harness (k8s test cluster per-PR)
+   - ephemeral KinD clusters in CI for fast logic checks (unit-level)
+   - a medium-sized AWS test cluster (EKS) for latency and throughput benchmarks (integration-level)
+3) Admission webhook + OPA bundle server
+   - admission-proxy: small Go service used by CI to emulate production webhook config (request/response tracing enabled)
+   - bundle-server: OPA configured to fetch bundles from an S3-compatible bucket (promotion pipeline uploads bundles)
+4) CI jobs
+   - fast-policy-lint: run on every PR (KinD + conftest) -> fails fast on logical rejects
+   - policy-benchmark: nightly/in-merge pipeline against EKS cluster measuring latency at target QPS
+   - terraform-preflight: validate IaC-generated k8s manifests with admission webhook in dry-run mode
+5) Metrics and dashboard
+   - metrics exported to Prometheus: opa_admission_latency_seconds, opa_policy_decisions_total{outcome}, opa_bundle_fetch_duration_seconds
+   - Grafana dashboard: Policy Bench (latency P50/P95/P99, reject-rate, bundle-staleness)
+
+Policy profiles and example rules
+-------------------------------
+We maintain three named profiles so teams can choose an experience during rollout: "permissive" (default for experiments), "standard" (recommended), and "strict" (for regulated customers). Example rule (Rego pseudo):
+
+# disallow nodepool without tenant tag
+package gpu.admission
+deny[msg] {
+  input.request.kind.kind == "NodePool"
+  not input.request.object.metadata.labels["tenant-id"]
+  msg = "nodepool missing tenant-id label"
+}
+
+# ensure pod gpu request respects per-tenant fractional rules
+package gpu.admission
+deny[msg] {
+  input.request.kind.kind == "Pod"
+  gpu := input.request.object.spec.containers[_].resources.requests["nvidia.com/gpu"]
+  tonumber(gpu) > data.quotas[input.request.object.metadata.labels["tenant-id"]].max_per_pod
+  msg = sprintf("gpu request %v exceeds per-pod max", [gpu])
+}
+
+CI integration flows
+--------------------
+1) PR submitted to policy library or IaC repo
+2) fast-policy-lint runs (KinD + conftest)
+   - unit tests run: Rego unit tests, conftest assertions on sample manifests.
+   - If fails: block PR, output failure traces and specific input examples to reviewer comments.
+3) On merge to main: bundle build -> sign -> upload to s3-bundles/<sha>/opa-bundle.tar.gz
+4) policy-benchmark job triggered nightly or on-demand:
+   - deploys admission-proxy configured with new bundle URL in dry-run mode
+   - replays a synthetic stream of admission requests (see "Workload design")
+   - collects metrics and stores a benchmark artifact under ci-benchmarks/<date>/<sha>/
+5) Promotion: after approval, apps/dev clusters receive webhook config pointing at latest stable bundle URL.
+
+Workload design for benchmarks
+-----------------------------
+- Input distribution derived from real production traffic: 60% Pod create (small requests), 30% NodePool/DaemonSet updates, 10% CRD ops (TenantQuota, BillingTag).
+- Sequence lengths and concurrent QPS: baseline run is 250 QPS for 5m, spike run is 1k QPS for 60s, long-run test is 50 QPS for 24h to detect memory leakage.
+- Latency budget for webhook: P95 < 50ms for admission decision, P99 < 150ms. These are aspirational targets for standard profile; strict profile allowed slightly higher (P95 < 80ms) because of extra checks.
+
+Telemetry and alerting
+---------------------
+- Prometheus rules (examples):
+  - POLICIES_HIGH_REJECT_RATE: opa_policy_decisions_total{outcome="deny"} / (opa_policy_decisions_total{outcome!="deny"} + opa_policy_decisions_total{outcome="deny"}) > 0.02 for 5m
+  - OPA_ADMISSION_LATENCY_P99: histogram_quantile(0.99, rate(opa_admission_latency_seconds_bucket[5m])) > 0.15
+- Pager thresholds: page SRE on sustained P99 > 200ms for > 10 minutes or reject-rate > 5% and absolute denies > 50/min.
+
+Runbook: Investigate a policy regression in CI
+--------------------------------------------
+1) Open the benchmark artifact from the failing CI run (ci-benchmarks/<date>/<sha>) and inspect the replay logs.
+2) Check opa_policy_decisions_total by rule label to identify which rule(s) increased deny-rate.
+3) If increased latency: check bundle_fetch_duration_seconds and admission-proxy request traces (trace-id included in CI artifact).
+4) Reproduce locally against KinD with the same bundle SHA and failing input sample (CI provides sample request).
+5) If rule is incorrect, propose fix in policy library with accompanying unit test (rego unit + conftest).
+6) If performance issue due to expensive rule (e.g., external lookups), consider:
+   - caching results in data layer (bundle includes precomputed tables)
+   - simplifying policy logic or moving checks to offline preflight steps in Terraform pipeline
+7) After fix, run policy-benchmark in canary mode and verify P95/P99 and deny-rate return to baseline.
+
+Terraform/IaC patterns and example snippet
+----------------------------------------
+- We publish a small terraform module: module.gpu_admission_webhook that configures the admission configuration resource for each cluster. A canonical usage in repo:
+
+module "gpu_admission_webhook" {
+  source = "git::ssh://git@repo/internal/modules//k8s/admission-webhook?ref=v1.2.0"
+  cluster_id = local.cluster_id
+  s3_bundle_url = "s3://redwood-opa-bundles/${var.bundle_sha}/opa-bundle.tar.gz"
+  mode = "dry-run" # can be dry-run/permissive/enforced
+}
+
+- The module also creates a small ConfigMap with profile metadata and a checksum annotation so we can detect drift and trigger rollout pipelines when the checksum changes.
+
+Performance tuning knobs
+------------------------
+- Bundle size: avoid very large static data in bundles; prefer small precomputed tables and reference by key. Bundle size target < 5MB for sub-20ms fetch times from regional S3.
+- Concurrency: OPA sidecar should have worker_pool_size tuned to expected QPS. Default we use in testbed: worker_pool_size = min(32, cpu_cores * 4).
+- Warmup: CI should run a 30s warmup at 10 QPS to force initial bundle fetch before measuring latency.
+
+Acceptance criteria for policy promotion
+--------------------------------------
+- All unit tests pass (rego unit + conftest).
+- Nightly benchmark shows P95 within 10% of baseline and P99 within 20% of baseline for the target profile.
+- Reject-rate does not increase by more than 1% absolute over baseline for the same traffic mix.
+- Bundle size < 10MB and bundle_fetch_duration_seconds P99 < 1s during promotion window.
+
+Ownership and contacts
+----------------------
+- Policy library owner: Priya Shah (infra-policy@redwood.internal)
+- Testbed infra owner: SRE infra team (sre-infra@redwood.internal)
+- Reviewers: see metadata above.
+
+Open questions and next steps
+---------------------------
+- Evaluate running OPA as WASM in the webhook path to reduce cold-start and CPU overhead. Planned spike Q2 2025.
+- Explore a light-weight machine-learning-based anomaly detector to identify unexpected input patterns to policies (low priority).
+- Add multi-region bundle replication to reduce bundle_staleness during cross-region promotions.
+
+Appendices
+----------
+A. Example Grafana panels to include
+- Policy Bench: P50/P95/P99 admission latency by profile (line chart)
+- Deny-rate heatmap by rule (stacked)
+- Bundle fetch latency and success rate
+
+B. Useful CLI snippets
+- Run conftest against a manifest: conftest test -p policies/ manifests/generated.yaml
+- Reproduce sample admission request locally: curl -k -X POST "https://localhost:8443/admit" -H 'Content-Type: application/json' --data-binary @samples/pod-create.json
+
+C. Sample Prometheus rule (YAML excerpt)
+- alert: OPAAdmissionHighRejectRate
+  expr: |
+    sum(increase(opa_policy_decisions_total{outcome="deny"}[5m]))
+      / sum(increase(opa_policy_decisions_total[5m])) > 0.02
+  for: 5m
+  labels:
+    severity: page
+
+References
+----------
+- OPA project: https://www.openpolicyagent.org/
+- Conftest: https://github.com/open-policy-agent/conftest
+- Internal: module repo /confluence/eng-infra/terraform-and-iac/gpu-iac-guardrails-and-cicd-policy-kit.json
+
+Contact this page owner if you want the CI job added to a repo or to get access to the benchmark S3 artifacts.

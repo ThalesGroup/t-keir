@@ -117,16 +117,16 @@ def test_preserve_pipeline_extras_keeps_derive_from_after_convert():
         "datatype": "txt",
         "data": "x",
         "source": "ingest://a.txt",
-        "ontologies": ["corpus_nato/ontologies/c2sim_core.owl"],
-        "derive_from_ontologies": ["corpus_nato/ontologies/c2sim_core.owl"],
+        "ontologies": ["datasets/osint/ontologies/c2sim_core.owl"],
+        "derive_from_ontologies": ["datasets/osint/ontologies/c2sim_core.owl"],
         "corpus": "osint",
         "metadata": {"topic_id": "t1"},
     }
     converted = {"content": ["hello"], "source_doc_id": "abc"}
     out = _preserve_pipeline_extras(source, converted)
-    assert out["ontologies"] == ["corpus_nato/ontologies/c2sim_core.owl"]
+    assert out["ontologies"] == ["datasets/osint/ontologies/c2sim_core.owl"]
     assert out["derive_from_ontologies"] == [
-        "corpus_nato/ontologies/c2sim_core.owl"
+        "datasets/osint/ontologies/c2sim_core.owl"
     ]
     assert out["corpus"] == "osint"
     assert out["metadata"]["topic_id"] == "t1"

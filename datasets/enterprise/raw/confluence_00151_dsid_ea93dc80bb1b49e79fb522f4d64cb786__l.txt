@@ -1,0 +1,184 @@
+Legacy Model Adaptor and Contract Shim Guidelines
+
+Summary
+
+This document describes the recommended pattern for introducing adapter layers ("legacy adaptors" / "contract shims") that allow older or third-party model artifacts to be served through Redwood’s unified inference surface without changing clients. The guidelines balance: safety (no silent contract drift), performance (bounded overhead), and observability (traceability of shim behavior).
+
+Context and motivation
+
+We often ingest models that:
+- originate from external checkpoints with different input/output schemas,
+- expect legacy tokenization or position-encoding semantics, or
+- return different metadata fields (e.g. token-level logits vs. scored spans).
+
+Rewriting all clients to match every incoming model is not viable. Adaptors let us:
+- expose a stable API to clients,
+- perform runtime transformations safely, and
+- manage gradual rollouts while measuring fidelity.
+
+Goals
+
+1. Provide a repeatable, testable adaptor pattern that enforces contract compatibility checks at runtime and during CI.
+2. Ensure adaptor-induced latency and cost overheads are bounded and measurable.
+3. Record lineage and transformation provenance to support debugging and audits.
+4. Allow automated rollback paths if adaptors cause quality regressions.
+
+Principles
+
+- Explicitness: every adaptor is declared and versioned. No implicit field mapping.
+- Observable transforms: all input/output changes must be logged and sampled traces must include pre/post payloads (redacted).
+- Fail-closed for sensitive fields: if a shim cannot safely map a required sensitive field (PII, auth tokens, legal attributes), it must return a 4xx and mark the request for manual triage.
+- Bounded latency: per-request adaptor processing 99th percentile must be <= 5ms for simple mappings and <= 25ms for complex tokenization or sequence reassembly (configurable by model class).
+
+Architecture pattern
+
+Components
+
+- inference-proxy: edge component that enforces client contract and routes to the serving tier.
+- model-adaptor-service (MAS): per-model (or per-family) microservice performing schema translation, tokenization adaptation, and response reshaping.
+- adaptor-manifest: declarative JSON that describes mappings, transforms, and safety checks.
+- contract-gatekeeper: CI/Runtime validator that runs contract tests and approves adaptor manifests for rollout.
+
+Diagram (text)
+
+Client --> inference-proxy --> model-adaptor-service --> model-runtime
+                              ^                        |
+                              |                        v
+                           audit-log               model-storage
+
+Adaptor manifest (example)
+
+A single-line JSON manifest is required for every adaptor and must be stored alongside the model artifact. The manifest must be signed and include a checksum of the adaptor code. Example manifest (abridged):
+
+{
+  "adaptor_version": "v1.3.0",
+  "model_id": "thirdparty/gpt-lite-3b@2025-06-10",
+  "input_schema": "canonical-text-v2",
+  "output_schema": "canonical-chat-v1",
+  "mappings": [
+    {"from": "legacy.tokens", "to": "canonical.tokens", "transform": "legacy-token-to-bpe", "fallback": "reject"},
+    {"from": "metadata.heap", "to": "response.meta", "transform": "flatten", "sensitive": false}
+  ],
+  "safety_checks": ["no-auth-escape", "max-output-length:2048"],
+  "max_added_latency_ms": "25",
+  "checksum": "sha256:...",
+  "signature": "kms:sign-key-1"
+}
+
+Contract validation and CI
+
+Every adaptor must be validated in CI via the contract-gatekeeper. Validation includes:
+- schema conformance tests (unit + property checks),
+- fuzzing of edge payloads (including long sequences and non-UTF8 bytes),
+- sampling-based semantic tests comparing outputs between adaptor-enabled and adaptor-disabled runs on a golden prompt set (see "Fidelity Tests"),
+- performance microbenchmarks that assert added p50/p95 latency and memory boundedness.
+
+Fidelity Tests (example flow)
+
+1. Select canonical prompt set relevant to the model's family (N=200 prompts).
+2. Run baseline inference with model-internal transforms disabled (where possible) and capture outputs.
+3. Run adaptor-enabled run and compare normalized output shapes and critical fields.
+4. Compute fidelity metrics: exact-match-rate, token-level KL divergence of logits, and semantic similarity (embedding cosine > 0.92).
+5. Gate: adaptor may be promoted if exact-match-rate >= 90% OR semantic-similarity >= 0.92 and token-KL < threshold.
+
+Operational SLAs and limits
+
+- Per-request adaptor CPU cap: 50ms of CPU time per request (hard), configurable per tier.
+- Latency budget allocation: adaptor processing must be accounted for in the SLO chain. Example table:
+
+| Layer | Allocated p95 latency | Notes |
+|---|---:|---|
+| Edge (inference-proxy) | 10ms | TLS, auth, routing |
+| Adaptor | 25ms | mapping + tokenization |
+| Model runtime | 200ms | depends on model class |
+| Total p95 budget | 250ms | SLO must include buffer |
+- Cost accounting: adaptor CPU/GPU usage must be tagged with model_id and adaptor_version for billing.
+
+Observability and provenance
+
+Mandatory signals:
+- adaptor_version and checksum on every response header (x-redwood-adaptor-version).
+- transform_histogram metric (counts of mapping operations by type).
+- sampled pre/post payload traces (1 in 10k, configurable) with masking rules.
+- fidelity_regression_alert (on drift of the fidelity metrics above threshold).
+
+Debugging aids
+
+- /adaptor/debug endpoint in MAS (restricted, only accessible by SRE & model-leads) returning recent transform failures and last 500 sampled diffs.
+- lineage table per model in the console: model_id, adaptor_version, deployed_at, CI_build, last_fidelity_score.
+
+Rollout and rollback playbook
+
+1. Create adaptor manifest and open a rollout PR against the model artifact repo.
+2. Contract-gatekeeper CI runs schema + fidelity tests.
+3. Deploy MAS to a canary shard (2% traffic) via canary routing in inference-proxy.
+4. Monitor: errors/traces, fidelity_regression_alert, latency deltas, cost delta.
+5. If any of the following occur, automatically rollback the canary to previous adaptor version and create an incident:
+   - fidelity drop > 5 percentage points from baseline,
+   - adaptor-induced p95 latency increase > 15% relative to baseline,
+   - error rate > 0.5% absolute increase.
+6. If canary metrics are stable for 24h, promote to 20% for 12h, then to 100% with staged rollout.
+
+Safety: Sensitive-field handling
+
+Map rules for fields classified as sensitive by data-classifier: PII, auth_context, legal_flags. Mapping sensitive fields requires explicit allowlist entries in the adaptor manifest and a signed justification string. If a sensitive field is encountered but not allowlisted, the adaptor must return an error with code 422 and increment a "sensitive-field-block" metric.
+
+Testing matrix (required)
+
+- Unit tests: schema mappings, transform edge cases.
+- Integration tests: full request -> MAS -> model runtime -> response.
+- Performance tests: single-request p99 under load, concurrency shaping tests.
+- Security tests: ensure no header or token leakage, KMS signature verification.
+
+Example adaptor transform snippets
+
+1) Tokenization adapter (Python pseudocode):
+
+```
+def legacy_to_bpe(tokens, vocab_map):
+    # Map legacy token ids to BPE ids. Unknown tokens -> UNK
+    return [vocab_map.get(t, vocab_map['<unk>']) for t in tokens]
+```
+
+2) Response reshaper (YAML manifest fragment):
+
+```
+- path: response.choices[*].text
+  transform: ensure-structured-chat
+  params:
+    split_on: "\n\n"
+    preserve_metadata: true
+```
+
+Ownership and governance
+
+- Ownership: model-leads own the adaptor manifests for their models; SRE owns MAS runtime and rollout automation.
+- Governance: adaptors that modify behavior for customer-visible legal attributes require sign-off from Security and Legal.
+- Review cadence: quarterly adaptor inventory audit to remove orphaned adaptors.
+
+Metrics and dashboards (recommended)
+
+- Adaptor latency heatmap by model_family and adaptor_version.
+- Fidelity score trends (daily) per model.
+- Transform failure rate and sensitive-field-block rate.
+- Cost delta per million requests attributed to adaptors.
+
+Open questions and future work
+
+- Multi-adaptor pipelining: should we allow chained adaptors? Current recommendation: avoid chaining; prefer composing transforms in a single manifest to reduce tail latency.
+- Auto-synthesis of simple adaptors using example-driven mapping (machine-suggested manifests). Pilot recommended.
+
+Appendix: checklist for adding a new adaptor
+
+1. Create adaptor code + manifest in model-artifacts repository.
+2. Add unit and integration tests and golden prompt set.
+3. Sign manifest with KMS key and record checksum.
+4. Submit rollout PR; ensure contract-gatekeeper passes.
+5. Deploy to canary and monitor rollout metrics per playbook.
+6. Complete adaptor audit record entry and schedule retention.
+
+References
+
+- Canonical request schema and validation playbook (/confluence/architecture-and-standards/api-standards/canonical-request-schema-and-validation-playbook-2025).
+- Runtime cache invalidation and staleness mitigation playbook (/confluence/architecture-and-standards/model-serving-standards/runtime-cache-invalidation-and-staleness-mitigation-playbook-2026).
+- Contract-gatekeeper CI service runbook (/confluence/eng-platform/runbooks/contract-gatekeeper-runbook).

@@ -1,0 +1,131 @@
+developer-docs-api-contract-breach-runbook-and-canonical-fixes-2026
+
+Overview:
+This runbook describes detection, triage, and remediation steps for API contract breaches that surface in developer documentation, SDKs, and client integrations. It is intended for developer-experience engineers, SDK maintainers, docs owners, and on-call support engineers. The goal is to reduce time-to-repair, minimize customer impact, and provide reproducible canonical fixes and documentation patches.
+
+Scope:
+- Types of contract breaches covered: schema changes (required/optional fields), response shape regressions, header/case-sensitivity changes, streaming boundary changes, error-code changes, and semantics/enum value changes.
+- Triage targets: SDKs (all official languages), docs (docs site snippets, quickstarts), API examples, and sample apps.
+- Out of scope: backend-only bugfixes that do not change observable contract (handled by service oncall).
+
+Ownership and escalation:
+- Primary owner: eng-developer-experience (SDK/Docs team)
+- Secondary owner: eng-serving-runtime (if breach ties to runtime behavior)
+- Oncall escalation: follow standard oncall routing; if user-facing breaking change, escalate to oncall-sre and product manager within 60 minutes.
+
+Signals and detection:
+1) Automated signals (high-confidence):
+   - API contract diffs from nightly contract-checker CI job (contracts/redwood-openapi.yaml)
+   - SDK unit test failures flagged as contract mismatch (integration-tests/contracts-suite)
+   - Docs snippet test failures from docs-validator (snippet-runner v2)
+2) Support signals (customer reports):
+   - Support ticket category "SDK: response shape mismatch" or "Docs snippet failing"
+   - Slack mentions in #support-engineering or #devx-ops
+3) Telemetry signals:
+   - Spike in 400/422 errors for a client-request pattern (observability: per-route 4xx drift > 3x baseline for 15m)
+   - Increased parsing exceptions in SDK telemetry (sdk-errors.counter with tag=contract-mismatch)
+
+Immediate detection checklist (first 15 minutes):
+1) Confirm source: CI alert, customer report, or telemetry signal.
+2) Grab representative failing request/response pair. If customer provided, ask for raw HTTP log or curl -v output.
+3) Run local contract diff: tools/contract-diff --baseline=main --candidate=staging.
+4) Determine blast radius: which SDKs, docs snippets, endpoints, and customers are affected.
+5) Set incident channel: #incident-docs-contract-<YYYYMMDD> and add owners.
+
+Triage decision matrix:
+- Severity P1 (breaks >5% of production callers or business-critical endpoints): immediate rollback or emergency patch within 4 hours.
+- Severity P2 (narrow compatibility issue, limited to specific client versions): create targeted SDK hotfix and docs patch; rollout in 24–72 hours.
+- Severity P3 (minor docs mismatch or new optional field): schedule regular release cycle patch; add a note in docs changelog.
+
+Canonical fix patterns (examples and templates):
+1) Field removed from response but used by default SDK deserializer:
+   - Symptom: SDK throws KeyError/NullPointer while parsing model_name or id.
+   - Canonical fix: update SDK deserialization to tolerate missing fields and provide a clear deprecation fallback. Example (Python):
+
+   try:
+       name = resp_json["model_name"]
+   except KeyError:
+       # back-compat: older responses used `modelId`
+       name = resp_json.get("modelId") or "unknown"
+
+   - Docs fix: add note to API reference: "model_name field deprecated in 2026-03; clients should use modelId OR update to SDK >= v1.4.2"
+
+2) Enum value renamed (e.g., "fast" -> "latency-optimized"):
+   - Symptom: clients submit enum and get 422 or default fallback.
+   - Canonical fix (server): accept both values for 30 days, emit Deprecation header: X-Deprecation-Notice.
+   - Canonical fix (SDK): map legacy value to new value client-side and log telemetry.
+   - Docs patch: update examples, add migration snippet, and include a compatibility table.
+
+3) Streaming chunk boundary change (delimiter changed or added metadata frames):
+   - Symptom: local streaming clients hang or split tokens incorrectly.
+   - Canonical fix: update streaming client parser to support both framing modes, add unit tests with both chunk formats.
+
+Docs-site remediation steps (safe patch workflow):
+1) Branching: create branch docs/contract-fix-<ticket>-<short> from docs/main.
+2) Update snippets: edit snippet files under content/snippets/<language>/<endpoint>.md and run snippet-runner locally.
+3) Add a "Compatibility" callout at the top of the reference page with an explicit migration example.
+4) Create a small snippet-based smoke test that reproduces the failing request. Add to docs-validator tests with a @flaky tag if environment sensitive.
+5) Submit PR, request expedited review from reviewers listed in this doc. Add label: emergency-docs-fix.
+6) Merge and deploy via docs-site CI with canary (docs-canary) enabled for 10% of traffic, monitor errors for 30 minutes, then full rollout.
+7) If regression occurs: rollback docs deploy and reopen incident channel.
+
+SDK coordination and hotfix guidance:
+- Patch philosophy: prefer client-side tolerant parsing over immediate server rollback when safe. Document tradeoffs.
+- Versioning: follow semantic patch versioning and ship a patch release with the compatibility layer. Example release notes snippet: "v1.4.2 — tolerate missing response fields; map legacy enum names; back-compat for streaming framing."
+- Telemetry: increment sdk-migration-attempt counter and include client-version metadata.
+- Test matrix: run compatibility tests against the last three public server versions (vX-2..vX) and nightly staging.
+
+Developer experience checklist for release PRs (mandatory items):
+1) Reproduce failing curl request in developer VM.
+2) Add unit/integration test that would have caught the change.
+3) Update CHANGELOG.md with clear migration steps.
+4) Add docs snippet or update sample app.
+5) Add telemetry marker for migration success/failure.
+6) Obtain signoff from oncall-sre for major runtime changes.
+
+Example triage session (realistic timeline):
+- 00:00 Alert: docs-validator fails on snippet for /v1/predictions (CI).
+- 00:10 Channel created; owner assigned (Maya Chen).
+- 00:20 Representative failing request captured; contract-diff shows server removed "usage.tokens" field.
+- 00:40 Hotfix PR opened for SDK parsing fallback + docs note.
+- 01:30 SDK patch merged to release/v1 and docs PR merged to canary.
+- 02:15 Monitoring shows no new 4xx spikes; canary promoted.
+- 03:00 Incident closed, follow-up action: add contract regression test to nightly.
+
+Post-incident follow-up template (to be included in postmortem):
+- Summary (1–2 lines): what changed, who discovered it.
+- Impact: list customers, SDK versions, docs pages affected.
+- Root cause: single-line technical cause.
+- Timeline: bullet timeline of detection -> resolution -> follow-ups.
+- Action items: prioritized list with owners and due dates.
+
+Prevention and long-term mitigations:
+- Expand contract-checker: add schema evolution rules that flag removals of non-deprecated fields.
+- Snippet coverage: increase snippet-based tests for top-20 endpoints by traffic.
+- SDK fuzzing: add a contract-fuzzer harness to simulate missing/renamed fields and ensure SDKs tolerate.
+- Changelog automation: when API changes land, automatically create docs PR with a compatibility note placeholder.
+
+Quick reference (cheat sheet):
+- Key commands:
+  - contract-diff --baseline=main --candidate=changeset-123
+  - snippet-runner --file content/snippets/python/predictions.md --record
+  - ./tools/repro-curl.sh --host staging --path "/v1/predictions" --body payload.json
+- Severity mapping table (text):
+  - P1: immediate rollback or patch (SLO: 4 hours)
+  - P2: targeted hotfix (SLO: 72 hours)
+  - P3: scheduled fix (SLO: next minor release)
+
+Related pages:
+- eng-developer-experience/api-examples/sdk-local-cache-stub-and-graceful-degrade-playbook-2026
+- eng-developer-experience/docs-site/docs-site-ops-and-canonical-fixes-2025
+- eng-serving-runtime/runtime-architecture/contract-versioning-guidelines
+
+Appendix: sample email to customers for compatibility incident:
+Subject: Important compatibility note for Redwood API /v1/predictions
+Body:
+Hello {customer},
+We discovered a change in the /v1/predictions response that may affect SDK parsing in versions prior to v1.4.2. We have released SDK patch v1.4.2 and updated docs with migration steps. If you experience failures, please attach the raw HTTP request/response and we will prioritize support.
+
+Owner notes and contact:
+- Runbook owner: Maya Chen (maya@redwood.ai)
+- Pager/Oncall: eng-sre oncall (see internal rota)

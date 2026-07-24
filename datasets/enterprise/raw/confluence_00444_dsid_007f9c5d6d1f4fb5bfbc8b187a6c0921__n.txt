@@ -1,0 +1,297 @@
+Node Configuration Baseline: GPU Worker Nodes
+
+## Purpose
+This page defines the **baseline configuration** for Kubernetes GPU worker nodes used for Redwood Inference inference workloads (Hosted, Dedicated, and Private when running the Redwood-supported k8s topology).
+
+The goals of this baseline are:
+- Ensure nodes are **repeatable** across regions and GPU types.
+- Minimize post-provision break/fix by enforcing known-good settings.
+- Make node readiness **machine-verifiable** via automated validation gates (Provision-to-Ready).
+
+This baseline is implemented via:
+- **Golden GPU images** (drivers/CUDA/NCCL + OS hardening)
+- **Terraform/cluster bootstrap** (disk layout, instance metadata, tags)
+- **Node validation agent** (DaemonSet) + control-plane readiness state integration
+
+## Scope
+Applies to:
+- GPU worker nodes in Redwood-managed clusters used for inference serving.
+
+Out of scope:
+- Control plane nodes
+- Specialized research/training clusters
+- Major scheduler design changes
+
+## Ownership and change management
+**Owner:** Infra/Fleet
+
+Changes to this baseline require:
+1) Update to golden image pipeline and/or Helm values
+2) Validation rule updates (if applicable)
+3) Staged rollout by region/GPU type
+
+For any change that affects correctness or fleet stability, coordinate with SRE for alerting/rollback triggers.
+
+---
+
+## Baseline requirements (must-have)
+The following settings are **required**. Deviations require an approved exception.
+
+### 1) Operating system + kernel baseline
+**OS:** Ubuntu LTS (golden image pinned; see image channel policy)
+
+**Kernel:** Must meet the minimum supported version for the image channel. Do not mix kernel major versions within a pool during a staged rollout.
+
+**Kernel modules (required where applicable):**
+- `nvidia`, `nvidia_uvm`, `nvidia_peermem` (if RDMA/GPUDirect required)
+- Filesystem driver for chosen layout (ext4 or xfs)
+
+**Kernel parameters (GRUB / cmdline) (required):**
+- `cgroup_enable=memory` (if not default for distro)
+- `swapaccount=1` (if required by kubelet enforcement)
+- `transparent_hugepage=never` (preferred for latency stability)
+
+**Sysctl baseline (required):**
+- `vm.swappiness = 0`
+- `fs.file-max = 2097152`
+- `net.core.somaxconn = 65535`
+- `net.core.netdev_max_backlog = 16384`
+- `net.ipv4.tcp_max_syn_backlog = 16384`
+- `net.ipv4.ip_local_port_range = 10240 65535`
+- `net.netfilter.nf_conntrack_max = 1048576`
+
+**Swap:** must be disabled.
+
+Validation (automated):
+- Swap disabled
+- Kernel cmdline includes required flags
+- Sysctl values match baseline (within tolerance where indicated)
+
+### 2) Time synchronization
+Accurate time is required for:
+- TLS/auth token verification
+- Distributed tracing ordering
+- SLO/SLI calculations for time-to-ready
+
+**Required:**
+- `chrony` enabled and configured to use Redwood-approved NTP sources
+- NTP drift must be stable (no frequent step changes)
+
+**Acceptance thresholds:**
+- Clock offset <= **100ms** (steady-state)
+- `chronyc tracking` reports synchronized (`Leap status: Normal`)
+
+Validation (automated):
+- Chrony service running
+- Offset within threshold at validation time
+
+### 3) Container runtime configuration
+**Runtime:** containerd (Redwood-managed version pinned per image channel)
+
+**cgroup driver:** systemd
+
+**Required containerd configuration:**
+- `SystemdCgroup = true`
+- NVIDIA container runtime configured (e.g., `nvidia-container-toolkit`) such that GPU workloads can request devices via the device plugin
+- Image pull behavior aligned with fleet defaults (rate limiting + registry mirrors where configured)
+
+**Recommended (unless documented exception):**
+- Disable unbounded per-container log growth; configure log rotation at node level if runtime uses JSON-file logs
+
+Validation (automated):
+- containerd running and responding
+- NVIDIA runtime/toolkit present
+- Basic `nvidia-smi` works inside a GPU test container (smoke check)
+
+### 4) Kubernetes kubelet baseline
+**Kubelet must be configured via the cluster’s node bootstrap** (not manually edited post-join).
+
+Required kubelet characteristics:
+- **Container runtime endpoint** points to containerd socket
+- **Cgroup driver** matches runtime (systemd)
+- **CPU Manager policy:** `static` for deterministic CPU pinning on latency-sensitive pools (Dedicated inference)
+- **Topology Manager policy:** `restricted` (or per-pool override) to reduce cross-NUMA latency regressions
+- **Eviction thresholds:** configured to protect the node and avoid hard OOM cascades
+
+Baseline flags/settings (canonical; exact wiring may vary by distro/bootstrap):
+- `--cgroup-driver=systemd`
+- `--container-runtime-endpoint=unix:///run/containerd/containerd.sock`
+- `--fail-swap-on=true`
+- `--cpu-manager-policy=static`
+- `--topology-manager-policy=restricted`
+- `--kube-reserved` and `--system-reserved` set (see below)
+- `--eviction-hard` set (see below)
+
+Resource reservation defaults (per node; may be tuned by instance size):
+- `system-reserved`: 0.5 CPU, 1Gi memory
+- `kube-reserved`: 0.5 CPU, 1Gi memory
+
+Eviction hard defaults:
+- `memory.available < 500Mi`
+- `nodefs.available < 10%`
+- `imagefs.available < 10%`
+
+Node labels/taints (required):
+- GPU SKU label present (e.g., `redwood.ai/gpu-sku=A100-80GB` / `H100-80GB`)
+- Pool identifier label present (e.g., `redwood.ai/pool-id=<id>`)
+- Inference taint (where used) applied consistently to prevent non-serving workloads from landing on Dedicated pools
+
+Validation (automated):
+- Node joined cluster and reports Ready to Kubernetes
+- Kubelet flags/config match baseline expectations
+- Required labels/taints present
+
+### 5) GPU software stack
+**Driver/CUDA/NCCL versions must match the pool’s pinned image channel.** Mixed versions inside the same pool are not supported.
+
+Required:
+- NVIDIA driver installed and loaded; persistence mode enabled where supported
+- CUDA toolkit version aligned with runtime requirements
+- NCCL version aligned with fabric/network stack expectations
+
+GPU health signals (required for node admission):
+- No active GPU Xid errors at validation time
+- ECC error counters below quarantine thresholds (see Quarantine Policy)
+
+Validation (automated):
+- `nvidia-smi` reports expected driver version
+- GPU count matches expected for instance type
+- Health check passes (no critical Xid/ECC thresholds exceeded)
+
+### 6) Disk layout and mount options
+The node must provide **stable IO performance** for:
+- container image pulls/unpacks
+- `/var/lib/kubelet` and ephemeral workloads
+- logs and core dumps (where enabled)
+
+Baseline layout (typical for cloud instances; exact device names vary):
+- Root volume: OS + minimal runtime dependencies
+- Data volume(s):
+  - `/var/lib/containerd`
+  - `/var/lib/kubelet`
+  - `/var/log` (optional; may remain on root if sized accordingly)
+
+Required mount options (where applicable):
+- `noatime`
+- Ensure sufficient inode counts for imagefs
+
+Required sizing (defaults; may be tuned by pool type):
+- Root: >= 200Gi
+- Container/imagefs + kubelet: >= 500Gi combined for inference pools with frequent model/container churn
+
+Validation (automated):
+- Filesystems mounted at required paths
+- Minimum free space available at validation time
+- Basic write/read throughput check meets minimum (see validation thresholds)
+
+### 7) Ulimits and process limits
+Required ulimits (system-wide baseline):
+- `nofile` (open files): **>= 1048576** (soft/hard)
+- `nproc` (processes): **>= 131072**
+
+Rationale:
+- Prevent file descriptor exhaustion under high connection concurrency and agent sidecars.
+
+Validation (automated):
+- `ulimit -n` and `ulimit -u` meet baseline
+
+### 8) Networking baseline
+Required:
+- MTU consistent with region/VPC standard (avoid mixed MTU in a pool)
+- conntrack sized for high concurrency (see sysctl)
+- DNS resolution stable (node-local DNS if configured by cluster standard)
+
+If using high-performance networking (e.g., EFA/IB):
+- Required drivers installed and link state healthy
+- RDMA devices enumerated when applicable
+
+Validation (automated):
+- DNS resolution check
+- Basic egress check to required endpoints (registry, control-plane, telemetry)
+- Optional: intra-cluster bandwidth sanity test (pool-dependent)
+
+### 9) Security hardening baseline
+Required:
+- OS security updates applied per image channel policy (CVE patch cadence)
+- SSH configuration per Redwood baseline (no password auth; keys via fleet automation)
+- Host firewall rules as configured by cluster standard
+- Audit logging enabled per Security guidance (where required by compliance profile)
+
+Validation (automated):
+- Image provenance attestation present (build metadata)
+- Required security agents present and healthy (when applicable)
+
+---
+
+## What is validated automatically (Provision-to-Ready gates)
+Nodes are only eligible to join serving pools after automated validation passes.
+
+### Pre-flight checks (before node joins serving)
+Validated by the node validation agent and/or bootstrap scripts:
+- Swap disabled
+- Kernel cmdline + sysctl baseline
+- Time sync within threshold
+- containerd healthy + configured
+- Disk mounts present and writable
+- Required outbound connectivity (registry/control-plane)
+
+### Post-flight checks (after node joins cluster, before Ready-for-Serving)
+Validated after node is schedulable but before it can receive inference workloads:
+- GPU health + driver parity (expected version)
+- Kubelet configuration sanity (cgroup driver, reserved resources, eviction settings)
+- Device plugin functioning (GPU allocatable present)
+- NCCL/all-reduce smoke test (only for pools that require multi-GPU fabric validation)
+- Lightweight inference/perf canary (pool-dependent; detects obvious regressions)
+
+### Validation artifacts and failure reasons
+For each validation step, the system records:
+- Step name and duration
+- Pass/fail outcome
+- Pointer to logs/artifacts
+- Canonical failure reason code (used by dashboards and triage runbooks)
+
+---
+
+## Recommended (should-have) settings
+These are strongly recommended for fleet stability and performance; they may be enforced later.
+
+- Disable CPU frequency scaling where possible; use performance profile for latency-sensitive pools
+- IRQ balancing tuned for high-throughput networking + GPU workloads
+- Node-local caching for image pulls where supported by the environment
+- Log rotation and retention policy consistent with observability retention targets
+
+---
+
+## Exceptions policy
+Exceptions are allowed only when:
+- Required by a specific GPU type/region constraint
+- Required by a customer’s Private deployment constraints
+- Temporarily needed for incident mitigation
+
+Exception requests must include:
+- Pool(s) impacted and expected duration
+- Risk assessment (correctness/availability)
+- Rollback plan
+- Validation impact (what checks must be modified)
+
+---
+
+## Quick reference: baseline checklist
+Use this as a human-friendly summary; automated validation is authoritative.
+
+- [ ] Swap disabled
+- [ ] chrony synced (<= 100ms offset)
+- [ ] containerd healthy, systemd cgroups, NVIDIA runtime present
+- [ ] kubelet uses systemd cgroups, reserved resources set, eviction thresholds set
+- [ ] GPU driver/CUDA/NCCL match pinned image channel
+- [ ] `nofile >= 1048576`, `nproc >= 131072`
+- [ ] `/var/lib/containerd` and `/var/lib/kubelet` on correct disks with `noatime`
+- [ ] conntrack + network sysctls set
+- [ ] Required labels/taints applied
+
+## Support and escalation
+- Baseline ownership (Infra/Fleet): page the Fleet on-call for provisioning/validation failures.
+- If the readiness state machine/API is inconsistent or stuck: engage Platform Control Plane on-call.
+- For paging/alert thresholds or SLO concerns: engage SRE (Reliability Initiatives).
+
+For common failure modes and safe remediation steps, see the Provision-to-Ready failures triage runbook.

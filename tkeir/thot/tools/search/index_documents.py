@@ -36,6 +36,34 @@ LOGGER = logging.getLogger(__name__)
 _EMBED_LOCK = asyncio.Lock()
 
 
+def _lemmatize_document_fields(
+    document: dict[str, Any],
+) -> tuple[str, list[str]]:
+    """Normalize title and content via the shared TextNormalizer (index-time)."""
+    from thot.tools.search.text_normalizer import (
+        document_language,
+        normalize_document_fields,
+    )
+
+    language = document_language(document)
+    content = document.get("content") or []
+    if not isinstance(content, list):
+        content = [str(content)]
+    try:
+        return normalize_document_fields(
+            title=str(document.get("title") or ""),
+            content=content,
+            language=language,
+        )
+    except Exception as exc:  # noqa: BLE001
+        LOGGER.warning(
+            "TextNormalizer unavailable at index language=%s: %s",
+            language,
+            exc,
+        )
+        return "", ["" for _ in content]
+
+
 class EmbeddingProvider(Protocol):
     """Minimal embedding surface used while indexing into Vespa."""
 
@@ -93,12 +121,19 @@ def _load_pipeline_document(path: Path) -> dict[str, Any]:
     return document
 
 
-def _document_fields(document: dict[str, Any]) -> dict[str, Any]:
+def _document_fields(
+    document: dict[str, Any],
+    *,
+    title_lemmatized: str = "",
+    content_lemmatized: list[str] | None = None,
+) -> dict[str, Any]:
     """Map a pipeline document to Vespa parent-document field names.
 
     Args:
         document: Pipeline output containing ``source_doc_id``, ``title``,
             ``content``, and optional ``document_ontology``.
+        title_lemmatized: Normalized title (optional).
+        content_lemmatized: Normalized content segments (optional).
 
     Returns:
         Sanitized field dict ready for :meth:`VespaClient.upsert_document`.
@@ -122,6 +157,10 @@ def _document_fields(document: dict[str, Any]) -> dict[str, Any]:
         "source_doc_id": sanitize_vespa_string(document["source_doc_id"]),
         "title": sanitize_vespa_string(document.get("title") or ""),
         "content": sanitize_vespa_strings(document.get("content") or []),
+        "title_lemmatized": sanitize_vespa_string(title_lemmatized),
+        "content_lemmatized": sanitize_vespa_strings(
+            content_lemmatized or []
+        ),
         "json_ld": sanitize_vespa_string(json_ld),
         "shacl_status": sanitize_vespa_string(
             ontology.get("shacl_status", "")
@@ -158,10 +197,7 @@ async def _upsert_chunk_fields(
     fields = {
         "chunk_id": sanitize_vespa_string(chunk_id),
         "doc_ref": parent_ref,
-        "parent_title": sanitize_vespa_string(document.get("title") or ""),
-        "parent_content": sanitize_vespa_strings(
-            document.get("content") or []
-        ),
+        "source_doc_id": sanitize_vespa_string(document["source_doc_id"]),
         "text_raw": index_text,
         "chunk_embedding": build_chunk_tensor(
             chunk_embedding,
@@ -214,6 +250,56 @@ def _split_question_embeddings(
     return question_embeddings_by_chunk
 
 
+def _ensure_golden_chunks_for_index(document: dict[str, Any]) -> dict[str, Any]:
+    """Guarantee at least one indexable golden chunk (document + chunk schemas).
+
+    Dual-hybrid retrieval requires both ``tkeir_document`` and ``chunk``.
+    When NLP produced no chunks, synthesize one from content/title so the
+    parent upsert is never left without a chunk arm.
+
+    Args:
+        document: Pipeline document (mutated copy returned).
+
+    Returns:
+        Document with non-empty ``golden_chunks`` when text is available.
+    """
+    chunks = document.get("golden_chunks") or []
+    for chunk in chunks:
+        if chunk.get("chunk_id") and chunk_embedding_text(chunk):
+            return document
+
+    source_id = str(document.get("source_doc_id") or document.get("source") or "document")
+    content = document.get("content") or []
+    if isinstance(content, list):
+        text = " ".join(str(part) for part in content if part).strip()
+    else:
+        text = str(content or "").strip()
+    if not text:
+        text = (document.get("title") or "").strip()
+    if not text:
+        LOGGER.warning(
+            "No content/title to synthesize chunk for %s", source_id
+        )
+        return document
+
+    document = dict(document)
+    document["golden_chunks"] = [
+        {
+            "chunk_id": f"{source_id}#chunk-0-index",
+            "parent_doc_id": source_id,
+            "text_raw": text,
+            "search_vector_payload": text,
+            "synthetic_questions": [{"question_text": text[:180]}],
+            "metadata": {"source": "index_fallback"},
+        }
+    ]
+    LOGGER.info(
+        "Synthesized fallback golden chunk for %s (dual-schema index)",
+        source_id,
+    )
+    return document
+
+
 async def index_pipeline_document(
     document: dict[str, Any],
     *,
@@ -221,8 +307,9 @@ async def index_pipeline_document(
     llm: EmbeddingProvider,
     max_chunk_workers: int | None = None,
     user_space: str | None = None,
+    require_chunks: bool = True,
 ) -> tuple[int, int]:
-    """Index one pipeline document and its golden chunks into Vespa.
+    """Index one pipeline document into Vespa ``tkeir_document`` + ``chunk``.
 
     Embeddings are batched and serialized (safe for Ollama). Only Vespa
     chunk upserts may run concurrently (``vespa.concurrency.chunk_workers``).
@@ -233,10 +320,17 @@ async def index_pipeline_document(
         llm: Embedding provider used for chunk and question vectors.
         max_chunk_workers: Optional override for parallel chunk upserts.
         user_space: Streaming group (Keycloak principal); defaults to config.
+        require_chunks: When True (default), fail if no chunk was upserted
+            after the parent document (dual-hybrid needs both schemas).
 
     Returns:
-        Tuple ``(document_count, chunk_count)`` where ``document_count`` is
-        always ``1`` when indexing succeeds.
+        Tuple ``(document_count, chunk_count)`` — ``document_count`` is ``1``
+        when the parent upsert succeeds; ``chunk_count`` is the number of
+        chunk upserts.
+
+    Raises:
+        KeyError: Missing ``source_doc_id``.
+        RuntimeError: ``require_chunks`` and zero chunks were indexed.
 
     Example:
         >>> import asyncio
@@ -254,9 +348,17 @@ async def index_pipeline_document(
         )
     source_doc_id = str(source_doc_id)
     document["source_doc_id"] = source_doc_id
+    document = _ensure_golden_chunks_for_index(document)
     space = normalize_user_space(user_space or resolve_vespa_user_space(None))
+    title_lem, content_lem = _lemmatize_document_fields(document)
     await vespa.upsert_document(
-        _document_fields(document), source_doc_id, user_space=space
+        _document_fields(
+            document,
+            title_lemmatized=title_lem,
+            content_lemmatized=content_lem,
+        ),
+        source_doc_id,
+        user_space=space,
     )
     parent_ref = document_vespa_id(source_doc_id, user_space=space)
 
@@ -264,6 +366,14 @@ async def index_pipeline_document(
         document
     )
     if not ready_chunks:
+        if require_chunks:
+            raise RuntimeError(
+                f"Indexed tkeir_document but no chunks for {source_doc_id!r} "
+                "(dual-hybrid requires both document and chunk schemas)"
+            )
+        LOGGER.warning(
+            "Indexed tkeir_document only (0 chunks) for %s", source_doc_id
+        )
         return 1, 0
 
     chunk_embeddings = await _embed_batch_locked(llm, index_texts)
@@ -311,7 +421,18 @@ async def index_pipeline_document(
             )
         )
     )
-    return 1, sum(1 for ok in outcomes if ok)
+    chunk_count = sum(1 for ok in outcomes if ok)
+    if require_chunks and chunk_count == 0:
+        raise RuntimeError(
+            f"Indexed tkeir_document but 0/{len(ready_chunks)} chunks "
+            f"upserted for {source_doc_id!r}"
+        )
+    LOGGER.debug(
+        "Indexed %s → tkeir_document=1 chunk=%d",
+        source_doc_id,
+        chunk_count,
+    )
+    return 1, chunk_count
 
 
 async def index_directory(

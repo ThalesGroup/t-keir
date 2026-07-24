@@ -1,0 +1,236 @@
+# FiQA business ontology for dual-hybrid query expansion + overlap scoring.
+# Pass as `business_ontology` on search (BEIR smoke/eval load this file automatically).
+# version: 1.0.0
+concepts:
+  - concept_id: PERSONAL_FINANCE
+    preferred_label: personal finance
+    synonyms:
+      - money management
+      - household finance
+    surface_forms: []
+    broader: []
+    narrower:
+      - INVESTING
+      - BANKING
+      - CREDIT
+      - TAXATION
+      - BUSINESS_EXPENSE
+    related: []
+
+  - concept_id: INVESTING
+    preferred_label: investing
+    synonyms:
+      - investment
+      - invest
+      - portfolio
+    surface_forms: []
+    broader:
+      - PERSONAL_FINANCE
+    narrower:
+      - STOCKS
+      - FUNDS
+      - OPTIONS
+      - RETIREMENT
+    related:
+      - MARKET
+
+  - concept_id: STOCKS
+    preferred_label: stock
+    synonyms:
+      - stocks
+      - shares
+      - equity
+      - equities
+    surface_forms:
+      - share price
+    broader:
+      - INVESTING
+    narrower: []
+    related:
+      - MARKET
+      - COMPANY
+
+  - concept_id: FUNDS
+    preferred_label: fund
+    synonyms:
+      - funds
+      - mutual fund
+      - ETF
+      - index fund
+    surface_forms: []
+    broader:
+      - INVESTING
+    narrower: []
+    related:
+      - STOCKS
+
+  - concept_id: OPTIONS
+    preferred_label: options
+    synonyms:
+      - option
+      - call option
+      - put option
+      - derivatives
+    surface_forms: []
+    broader:
+      - INVESTING
+    narrower: []
+    related:
+      - STOCKS
+
+  - concept_id: RETIREMENT
+    preferred_label: retirement
+    synonyms:
+      - 401k
+      - IRA
+      - pension
+    surface_forms:
+      - retirement account
+    broader:
+      - INVESTING
+    narrower: []
+    related:
+      - TAXATION
+
+  - concept_id: MARKET
+    preferred_label: market
+    synonyms:
+      - stock market
+      - financial market
+    surface_forms:
+      - price
+    broader: []
+    narrower: []
+    related:
+      - STOCKS
+      - INVESTING
+
+  - concept_id: COMPANY
+    preferred_label: company
+    synonyms:
+      - corporation
+      - business
+      - firm
+    surface_forms: []
+    broader: []
+    narrower: []
+    related:
+      - STOCKS
+      - BUSINESS_EXPENSE
+
+  - concept_id: BANKING
+    preferred_label: bank
+    synonyms:
+      - banking
+      - banks
+      - checking account
+      - savings account
+    surface_forms:
+      - account
+    broader:
+      - PERSONAL_FINANCE
+    narrower:
+      - LOAN
+      - MORTGAGE
+      - INTEREST
+    related:
+      - CREDIT
+
+  - concept_id: LOAN
+    preferred_label: loan
+    synonyms:
+      - loans
+      - borrowing
+      - debt
+    surface_forms: []
+    broader:
+      - BANKING
+    narrower: []
+    related:
+      - INTEREST
+      - MORTGAGE
+
+  - concept_id: MORTGAGE
+    preferred_label: mortgage
+    synonyms:
+      - home loan
+      - mortgages
+    surface_forms: []
+    broader:
+      - BANKING
+    narrower: []
+    related:
+      - LOAN
+      - INTEREST
+
+  - concept_id: INTEREST
+    preferred_label: interest
+    synonyms:
+      - interest rate
+      - APR
+    surface_forms: []
+    broader:
+      - BANKING
+    narrower: []
+    related:
+      - LOAN
+      - CREDIT
+
+  - concept_id: CREDIT
+    preferred_label: credit
+    synonyms:
+      - credit card
+      - credit score
+      - credit rating
+    surface_forms:
+      - card
+    broader:
+      - PERSONAL_FINANCE
+    narrower: []
+    related:
+      - BANKING
+      - INTEREST
+
+  - concept_id: TAXATION
+    preferred_label: tax
+    synonyms:
+      - taxes
+      - taxation
+      - IRS
+      - income tax
+    surface_forms:
+      - deductible
+    broader:
+      - PERSONAL_FINANCE
+    narrower:
+      - BUSINESS_EXPENSE
+    related:
+      - INCOME
+
+  - concept_id: INCOME
+    preferred_label: income
+    synonyms:
+      - salary
+      - wages
+      - earnings
+    surface_forms:
+      - cash
+    broader: []
+    narrower: []
+    related:
+      - TAXATION
+
+  - concept_id: BUSINESS_EXPENSE
+    preferred_label: business expense
+    synonyms:
+      - expense
+      - expenses
+      - deductible expense
+      - business trip
+    surface_forms: []
+    broader:
+      - TAXATION
+    narrower: []
+    related:
+      - COMPANY
+      - PERSONAL_FINANCE

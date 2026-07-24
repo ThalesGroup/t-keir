@@ -27,7 +27,7 @@ For fast debug loops, stop both server and client on the first failed document:
 make ingest STOP_ON_FAILED=1
 
 # Terminal B
-make corpus-ingest STOP_ON_FAILED=1
+make datasets-ingest STOP_ON_FAILED=1
 ```
 
 - Server: `INGEST_STOP_ON_FAILED=1` exits the process when a job fails.
@@ -73,13 +73,13 @@ curl -X POST http://localhost:8091/ingest/document \
   }'
 ```
 
-`make corpus-ingest` reads local files via `--ontology-dir` / `CORPUS_ONTOLOGY_DIR`
+`make datasets-ingest` reads local files via `--ontology-dir` / `DATASETS_ONTOLOGY_DIR`
 on the **client** and uploads each file’s bytes with every OSINT document.
 
 Host ingest serializes the heavy NLP pipeline (`INGEST_MAX_CONCURRENCY=1` by
 default). Raising concurrency often OOMs a laptop process (SIGKILL / exit 137)
 because each job loads spaCy models. Prefer more upload workers only when the
-server has headroom, and keep `make corpus-ingest` at `INGEST_WORKERS=1`.
+server has headroom, and keep `make datasets-ingest` at `INGEST_WORKERS=1`.
 
 ## Idempotency
 

@@ -1,0 +1,163 @@
+Latency Sensitivity Classification and Graceful Migration Playbook
+
+Summary:
+This playbook defines a pragmatic classification for request latency sensitivity, maps scheduling and kernel strategies to each class, and prescribes a repeatable, observable migration procedure for moving traffic between kernel/runtime variants or GPU pools with minimal customer impact. It synthesizes runtime architecture considerations, kernel scheduling knobs, profiling steps, benchmark targets, runbook actions, and known failure modes.
+
+Why this exists:
+- We operate a heterogeneous serving fleet with multiple kernel variants and GPU shapes.
+- Some workloads are extremely latency-sensitive (user-facing chat), while others (batch embeddings, async jobs) favor throughput/cost.
+- Incorrect migration or mismatched scheduling leads to p99 spikes, ordering anomalies, and cache warm-up regressions.
+
+Intended audience:
+- Serving runtime engineers, SREs, platform engineers, and release owners performing model/kernel migrations or pool consolidations.
+
+1) Latency Sensitivity Classification (quick reference)
+
+- Class A - Interactive-critical:
+  - Target: client-facing features where p99 user-perceived latency must meet SLOs. Default SLO: p50 < 50ms, p95 < 120ms, p99 < 250ms.
+  - Typical workloads: real-time chat, API sync completions with tight SLAs.
+  - Scheduling strategy: strict prioritization, preemptible background throttling, smallest batch sizes, KV cache pinning.
+
+- Class B - Latency-aware background:
+  - Target: near-real-time pipelines where occasional p99 bursts are tolerable but median latency matters. SLO example: p50 < 150ms, p95 < 400ms.
+  - Typical workloads: autocomplete, user-notification generation.
+  - Scheduling: opportunistic batching, intermediate batch cap, allow limited co-tenancy with backpressure.
+
+- Class C - Throughput-first / best-effort:
+  - Target: optimize tokens/sec and unit cost. No strict user-facing latency constraints.
+  - Typical workloads: offline embeddings, large-batch reranking, async summarization.
+  - Scheduling: high batching, quantized kernels, pre-warmed large sequence kernels, deferred KV loads.
+
+2) Sensitivity Matrix (quick table)
+
+Columns: class | batch size cap | preemption | cache policy | default kernel | rollout risk
+- Class A | 1-8 | preemptible (high) | KV pin to hot shards | low-latency kernel (fp16/optimized attention) | medium
+- Class B | 8-64 | soft preemption | opportunistic cache | balanced kernel (small-opt batching) | low
+- Class C | 64-2048 | non-preemptible | deferred cache | throughput kernel (int8/quantized) | low (cost tradeoffs)
+
+3) Telemetry signals to evaluate sensitivity and migration health
+
+Primary signals (real-time):
+- p50/p95/p99 request latency per route/model variant
+- GPU active SM utilization and crate-level burst (1s and 1m)
+- Kernel queue length and average batch size (tokens/request)
+- KV cache hit ratio and warmed-frontier age
+- End-to-end tail error rate (5xx / model fallback count)
+
+Secondary signals (profiling):
+- Per-kernel microsecond latency histogram (attention, matmul, softmax)
+- Memory allocator success/failure / OOM attempts
+- PCIe saturation and inter-device memcpy spikes
+
+Synthetic indicators for migration safety check:
+- p99 delta on canary < 10% absolute or 15% relative (whichever is smaller)
+- GPU utilization delta not exceeding +12 percentage points for sustained 1 minute
+- KV hit ratio decline < 5 percentage points
+
+4) Profiling & Benchmark Steps (pre-migration)
+
+Required artifacts before migration begins:
+- Representative trace capture for 1 hour of production traffic (covering sequences and prompt lengths).
+- Microbenchmark suite run for the target model on both kernel variants: 10K requests, sequence lengths [32, 128, 512, 1024] with mixed batch sizes.
+- Cost model estimate: per-token ops and measured tokens/sec -> projected cost change.
+
+Commands/examples:
+- Capture live traces (agent CLI):
+  redwood-trace capture --service=serve-ingress --route=chat-completion --duration=3600 --out=chat-jan-trace.json
+
+- Run microbench (local GPU harness):
+  ./bench/run_microbench --model=redwood-xc-3b --kernel=lowlat --seqs=32,128,512,1024 --iters=10000 --out=bench-lowlat.json
+
+Interpreting results: look for kernel-level outliers where a specific op takes >35% of end-to-end compute time (indicates kernel specialization opportunity). If memory-copy time >10% of total on 1024 sequences, investigate PCIe/NUMA placement.
+
+5) Canary & Gradual Migration Plan (runbook)
+
+Preconditions:
+- Canary capacity reserved: 3% of total traffic or at least 2 GPUs identical in SKU to target pool.
+- Observability: dashboards for primary signals wired and alerting pages configured.
+- Rollback hooks present in rollout system with 5-minute circuit breaker.
+
+Step-by-step:
+1. Create canary deployment pinned to target kernel variant and attach the trace-capture hook.
+2. Inject 0.5% of traffic for 15 minutes. Monitor primary signals for 30 minutes after injection and ensure synthetic indicators pass.
+3. If pass, increase to 2% for 30 minutes. Re-run microbench on-canary for short sample.
+4. If still green, increase to 10% with automated progressive ramp (10 -> 25 -> 50) with 10 minute holds and a final 1-hour hold at 50% before full cut.
+5. During each hold evaluate: p99 delta, error rate delta, KV hit ratio, GPU utilization.
+6. If any alarm trips or synthetic indicator thresholds exceeded, immediately pause ramp and rollback to previous stable variant.
+
+Automations to enable:
+- Automatic rollback when p99 delta > 25ms absolute for Class A routes.
+- Autoscale target pool up by +15% if GPU utilization crosses 80% for >5 minutes during ramp.
+
+6) Rollback Criteria and Postmortem Checklist
+
+Immediate rollback triggers:
+- p99 delta > configured threshold (Class A: 25ms absolute)
+- Error rate increase > 2x baseline or > 0.5% absolute
+- OOM / kernel crash observed on canary instance
+
+Post-rollback actions:
+1. Lock the previous variant as the default; mark rollout as failed with a ticket.
+2. Capture full diagnostic bundle: kernel traces, dmesg, GPU metrics, allocator logs.
+3. Run focused microprofiles to reproduce the issue.
+4. Convene a triage meeting within 24 hours; assign owners, timeline, and hotfix plan.
+
+7) Known Interactions and Mitigations
+
+- KV cache warmup: moving to a different kernel shard topology can lower hit ratios for minutes to hours. Mitigation: stagger migrations by user cohort and pre-warm hot keys using synthetic requests.
+- NUMA/PCIe shifts: migrations that change device placement may cause memcpy bursts. Mitigation: run a 2-minute memcpy synthetic test preflight and schedule migrations in low-traffic windows.
+- Small-batch latency cliffs: some throughput kernels optimize large batch paths and disable small-batch fast-paths. Mitigation: force small-batch branch via a kernel flag: kernel_config.force_small_batch_fastpath=true.
+- Quantized-kernel numerical drift: for Class A routes require regression evals on canonical prompt-set with strict tolerance rules (see Quality Guardrails).
+
+8) Benchmarks to include in acceptance criteria
+
+- Stability run: 6 hours @ 50% traffic on target kernel with production sequence mix. Metrics: p99, error rate, memory headroom.
+- Cost run: measure tokens/sec and cost-per-1M-tokens comparison.
+- Regression eval: run 200 prompt-set against both kernels to ensure model output divergence < 0.3 BLEU-ish / heuristics defined per-model.
+
+9) Observability Dashboard templates (fields to include)
+
+- Top row: p50/p95/p99 latency, request rate, error rate.
+- Middle row: GPU utilization, avg batch size, kernel queue depth, KV hit ratio.
+- Bottom row: per-kernel hot op latency histograms, memcopy rate, per-instance OOM counters.
+
+10) Ownership, cadence, and archive
+
+- Migration owner: the engineer or oncall who initiates the rollout. Must be tagged in rollout plan and remain the escalation contact for 24 hours post full cut.
+- Required reviews: runtime platform peer review and SRE approval for Class A migrations.
+- Archive artifacts: attach bench outputs, trace captures, and final decision doc to rollout ticket. Keep for 180 days.
+
+Appendix A - Example YAML fragment for rollout policy (text):
+
+rolloutPolicy: |
+  name: 'kernel-variant-rollout'
+  targetRoutes: ['/v1/chat', '/v1/complete']
+  canary: 
+    initialPercent: 0.5
+    steps: [2, 10, 25, 50, 100]
+    holdMinutes: 10
+  alarms: 
+    p99DeltaMs: 25
+    errorRatePercent: 0.5
+
+Appendix B - Quick Troubleshooting Cheatsheet:
+- If p99 spikes but GPU utilization low: suspect KV-cache pressure or network jitter. Check kv.hit_ratio and p99 by shard.
+- If p99 and GPU utilization both increase: consider kernel path regression; run microprofile on representative sequences.
+- If errors increase only in one AZ: check device driver/version diffs and PCIe errors in system logs.
+
+Appendix C - Release note blurb (for runtime release notes):
+- Added 'Latency Sensitivity Classification' and an automated migration playbook that prescribes canary quotas, telemetry thresholds, and rollback criteria. This reduces Class A rollout incidents by targeting safe traffic ramps and automated circuit breakers.
+
+Owners and contacts:
+- Document owner: Priya Nair (runtime-platform)
+- SRE lead: Marco Alvarez
+- Applied ML reviewer: Jinsoo Park
+
+Revision history:
+- 2026-02-10 created by PN
+- 2026-02-18 added synthetic indicator thresholds and YAML fragment (reviewers: MA, JP)
+- 2026-03-01 clarified rollback deltas for Class A and added automation recommendations
+
+Related reading:
+- See request-multiplexing-backpressure-architecture-2026 for how routing interacts with scheduling.
+- See mixed-workload-slo-simulation-suite-2026 for simulation recipes to validate ramp policies.

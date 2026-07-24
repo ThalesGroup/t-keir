@@ -1,0 +1,237 @@
+Runbook: Runtime TP hang mitigation (multi-GPU replicas)
+
+## Purpose
+This runbook covers immediate, on-call mitigation for **tensor-parallel (TP) hangs/stalls** in multi-GPU replicas (Dedicated and high-throughput Hosted). It focuses on keeping customer traffic healthy while preserving enough signal for follow-up debugging.
+
+**Primary objectives (in order):**
+1) Stop user-visible timeouts / p99 blowups.
+2) Prevent a wedged TP replica from accumulating more load.
+3) Capture minimal, high-signal diagnostics.
+4) Escalate with a complete package to Runtime (Kernel/Scheduling) and SRE.
+
+---
+
+## Definitions
+- **TP hang / stall:** A replica continues to accept traffic but makes no forward progress on one or more TP ranks (often visible as a heartbeat gap, in-flight collectives stuck, or streaming decode never producing tokens).
+- **Replica drain:** Stop routing new requests to a replica, allow in-flight requests to complete (or fail fast), then restart/replace.
+- **Safe abort:** Controlled failure path for stuck TP steps that returns an actionable error and drains the replica (preferred over waiting indefinitely).
+
+---
+
+## Symptoms (what you’ll see)
+### Customer-facing
+- Elevated **request timeouts** (especially streaming) and rising p99/p999 latency.
+- “Hanging” streaming responses (connection open, no tokens).
+- Bursty error patterns as autoscaling adds replicas but load remains concentrated on wedged ones.
+
+### Platform signals
+Look for **correlated** signals on the TP dashboard:
+- **TP rank heartbeat gaps** for one or more ranks on a replica.
+- **In-flight collective counters** stuck (no increments over time).
+- Scheduler queue depth rising while GPU utilization is inconsistent (some ranks busy, some idle).
+- NCCL errors may be absent (“silent stall” cases are common).
+
+---
+
+## Preconditions / access
+You should have:
+- Access to the affected cluster (Hosted or the Dedicated customer cluster).
+- Ability to drain/replace replicas (runtime ops permissions) or coordinate with the on-call SRE who can.
+- Dashboard access: **TP Stall & Timeout Dashboard** (see related pages).
+
+---
+
+## Quick triage (target: 10 minutes)
+### Step 1 — Confirm it’s TP-related
+1) On the TP dashboard, identify:
+   - Affected **model route** and **cluster/account**.
+   - Top **replica IDs** with heartbeat gaps and highest timeout correlation.
+2) Confirm that timeouts are concentrated on a subset of replicas.
+
+**Rule of thumb:** If you see a heartbeat gap on any rank of a replica for >30s AND rising request timeouts for that replica, treat it as TP stall and proceed to mitigation.
+
+### Step 2 — Identify blast radius
+- Hosted: which region/cluster and what percent of traffic is impacted.
+- Dedicated: confirm the customer, deployment mode, and whether they are currently running at peak concurrency.
+
+### Step 3 — Decide: drain single replica vs. apply global caps
+- If the stall is isolated to **1–2 replicas**: drain/replace those first.
+- If stalls recur continuously across many replicas: apply **temporary concurrency/batch caps** (Mitigation B), then drain the worst offenders.
+
+---
+
+## Immediate mitigations (do these in order)
+### Mitigation A — Drain and replace wedged replicas (fastest impact)
+**When:** Heartbeat gap on a replica, streaming hangs, timeouts tied to specific replica IDs.
+
+1) **Drain** the replica (stop new routing).
+   - Preferred (runtime control):
+     - `rwctl runtime replica drain --cluster <cluster> --replica <replica_id> --reason "tp_stall" --timeout 5m`
+   - If routing control is unavailable, coordinate with SRE for the equivalent action (service mesh / routing layer).
+2) **Replace** the replica (restart pod/process).
+   - Kubernetes (if applicable):
+     - `kubectl -n runtime delete pod <pod_name>`
+   - Dedicated: follow the customer-specific change procedure if required; if unsure, page SRE.
+3) Watch for:
+   - Heartbeat resuming on all ranks.
+   - Timeout rate decreasing within 3–5 minutes.
+   - No sustained error spike after replacement.
+
+**Notes / cautions:**
+- If multiple replicas hang in the same node pool, consider node-level issues; loop in SRE to evaluate GPU/driver health.
+- Avoid repeated rapid restarts without caps—this can create churn and worsen tail latency.
+
+---
+
+### Mitigation B — Reduce concurrency and batch pressure (stabilize under load)
+**When:** Stalls cluster-wide or frequently recur under sustained throughput; queue depth grows; prefill-heavy mix.
+
+Apply one of the following (lowest-risk first):
+
+1) **Cap per-replica concurrency for TP routes** (temporary guardrail)
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.max_concurrency_per_replica --value "<N>"`
+- Starting point (typical): reduce by 25–50% from current.
+
+2) **Cap prefill batch size / tokens** (helps mixed prefill/decode)
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.max_prefill_tokens_per_batch --value "<tokens>"`
+- If you don’t know the current value, reduce conservatively to prevent severe throughput collapse.
+
+3) **Enable load-shed on TP stall signals** (prevents pile-on)
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.load_shed_on_stall --value "true"`
+
+**Verification:**
+- Scheduler queue depth stabilizes or drops.
+- New stalls stop appearing.
+- Timeouts trend down within 10 minutes.
+
+---
+
+### Mitigation C — Disable high-risk execution paths (only if stalls persist)
+**When:** Drain + caps do not stop new stalls, or stalls correlate strongly with a known risky path.
+
+1) **Disable CUDA graphs for TP (if enabled)**
+- Use if stalls correlate with graph capture constraints or post-deploy regressions.
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.cuda_graphs.enabled --value "false"`
+
+2) **Force conservative NCCL stream/event sync mode**
+- Use if stalls correlate with comms boundary ordering/synchronization issues.
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.nccl_stream_sync_hardening --value "true"`
+
+3) **Enable scheduler collective starvation guardrail**
+- Use if stalls correlate with prefill-heavy bursts and collectives not making progress.
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.collective_starvation_guardrail --value "true"`
+
+4) **KV cache compaction safe mode**
+- Use if stalls coincide with memory pressure/compaction events.
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.kv_compaction_safe_mode --value "true"`
+
+**Cautions:**
+- These flags can impact throughput. Always pair with a clear rollback plan and communicate in the incident channel.
+
+---
+
+### Mitigation D — Enable watchdog + safe abort (preferred long-term behavior; roll out carefully)
+**When:** You need a “fail fast + drain” behavior instead of indefinite hangs.
+
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.watchdog.enabled --value "true"`
+- `rwctl runtime config set --cluster <cluster> --key runtime.tp.watchdog.timeout_ms --value "<ms>"`
+
+**Recommended approach:**
+- Start with a **narrow scope** (one canary cluster / one Dedicated account) and monitor false positives.
+- If you don’t know safe defaults for the model/route, consult the release plan or page Runtime TL.
+
+**Expected behavior:**
+- Stuck TP step triggers a structured error, replica drains, traffic shifts to healthy replicas/regions.
+
+---
+
+## Incident communications (Dedicated vs Hosted)
+### Dedicated
+- Notify **Customer Success** owner for the account and the on-call SRE.
+- Share mitigations applied (caps/flags) and expected behavior changes (e.g., more 5xx but fewer hangs).
+- If the customer is on a change-controlled environment, confirm approval path before toggling flags.
+
+### Hosted
+- Coordinate in the on-call channel with SRE before broad flag changes.
+- Prefer **replica-level drain** and **route-level caps** before global feature toggles.
+
+---
+
+## Diagnostics to capture (timeboxed: 15 minutes)
+Capture enough data to support a follow-up fix without prolonging impact.
+
+### Minimum required
+1) Affected cluster/region, route/model version, runtime version.
+2) Time window (start of degradation) and top impacted replicas.
+3) Screenshots/links to:
+   - TP heartbeat gap panel
+   - Request timeout panel
+   - Stall reason counts (if present)
+4) Example request IDs (2–5) with timestamps.
+
+### If safe to collect (do not block mitigations)
+- Replica logs around stall window (include rank identifiers).
+- GPU health snapshot:
+  - `nvidia-smi -q -d UTILIZATION,TEMPERATURE,POWER,MEMORY`
+- NCCL environment and version (from runtime startup logs).
+
+### NCCL debug logging (only with SRE approval; short window)
+If instructed by SRE/Runtime and performance impact is acceptable:
+- Enable timeboxed NCCL debug:
+  - `NCCL_DEBUG=INFO`
+  - `NCCL_DEBUG_SUBSYS=COLL,INIT`
+- Limit duration (e.g., 20–30 minutes) and disable afterward.
+
+---
+
+## Escalation checklist
+Page/escalate when:
+- More than 2 replicas stall within 15 minutes on the same route/cluster, OR
+- Any enterprise Dedicated customer reports sustained timeouts >10 minutes, OR
+- You cannot restore healthy state with drain + caps.
+
+Escalate to:
+- **Runtime TL (Scheduling/Kernels):** Noah Patel (TL), Sofia Ivanova (Scheduling), Hiro Tanaka (Kernels)
+- **SRE:** Rafael Mendes (SRE lead) or the active SRE on-call
+
+Include in escalation message:
+- What mitigations you applied (drains, caps, flags) and timestamps.
+- Current state (timeouts/p99 trend, number of replicas draining/restarting).
+- Links: dashboard panels, logs, and any incident thread.
+
+---
+
+## Verification steps (don’t close the loop without these)
+After mitigations:
+1) **Timeout rate** returns to baseline (or within agreed incident threshold).
+2) **TP heartbeat** is continuous on all ranks for at least 15 minutes.
+3) No new replicas enter “stalled” state; drain events stop spiking.
+4) For streaming routes: verify token emission resumes on a canary request.
+
+Suggested canary checks:
+- Run a short streaming request and a long-context request (if applicable) from a safe internal client.
+- Confirm cancellation behavior does not wedge the replica (cancel a streaming request once; observe no persistent stall signals).
+
+---
+
+## Rollback / cleanup
+1) If you changed any config flags/caps, set a reminder to revert:
+   - Revert to previous values once stability holds for 30–60 minutes (or per release guidance).
+2) If NCCL debug logging was enabled, **disable immediately** after the timeboxed window.
+3) File/link a follow-up ticket (Linear) with:
+   - Incident summary
+   - Mitigations applied
+   - Diagnostics captured
+   - Impact assessment (Dedicated accounts, Hosted regions)
+
+---
+
+## Appendix: Common pitfalls
+- **Only restarting without caps:** If stalls are load-triggered, restarts alone may recur and create churn.
+- **Global flag flips without coordination:** Some flags materially change performance; coordinate with SRE for Hosted, and with CS/PM for Dedicated.
+- **Waiting for “self-recovery”:** TP stalls rarely self-heal; drain + replace is usually the correct first move.
+
+---
+
+## Owner / updates
+Owner team: **Eng Serving Runtime + SRE**. If you hit a gap in this runbook during an incident, post a note in the incident channel and file a doc update request assigned to Tomáš Novák.

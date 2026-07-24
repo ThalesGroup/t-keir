@@ -1,0 +1,291 @@
+Security review escalation and handoff (CS/Support playbook)
+
+## Purpose
+This playbook defines how Customer Success (CS) and Support partner with Sales, Solutions Engineering (SE), and Security/GRC during late-stage security reviews. It standardizes:
+- When and how to loop in Security/GRC
+- How to handle urgent deadlines and incomplete questionnaires
+- Escalation tiers, response SLAs, and handoff points
+- How we avoid unapproved claims and keep a clear audit trail
+
+This is an internal operating document. It references restricted evidence processes (e.g., SOC 2 report) but does not include restricted artifacts.
+
+---
+
+## When to use this playbook
+Use this playbook when any of the following occur:
+- A prospect/customer requests SOC 2 report, pen test summary, subprocessor list, or other formal evidence.
+- A prospect/customer sends a security questionnaire, RFP security section, or needs a security addendum.
+- Procurement/security introduces a hard deadline (\<= 5 business days) or threatens deal delay without answers.
+- The customer requires deployment-specific assurances (Dedicated vs Private vs Hosted) around data flows, retention, encryption, KMS, logging, SSO/RBAC, or incident notification.
+
+Not in scope:
+- Product roadmap commitments or “custom features” to satisfy a questionnaire. Use the Exceptions Policy for non-supported controls.
+
+---
+
+## Roles and responsibilities (who does what)
+### Primary owners
+- Sales / AE: owns customer timeline, coordinates meetings, maintains CRM notes, ensures customer has correct links.
+- Solutions Engineering (SE): owns technical narrative (deployment mode, architecture diagrams, controls explanations).
+- Security Engineering: validates technical claims, clarifies implementation details, reviews non-standard security language.
+- GRC (Governance, Risk, Compliance): owns audit/compliance language and evidence distribution process (SOC 2 under NDA, artifact lists, timelines).
+- Legal: owns contractual language (DPA, security addendum, breach notification terms).
+- CS / Support: owns the escalation workflow, ensures correct process is followed, prevents churn/relationship damage, and creates a clean handoff to post-close operations.
+
+### CS/Support “single-threaded owner” (STO)
+For any security review that is time-bound or involves evidence requests, CS/Support assigns a single-threaded owner who:
+- Creates/updates the tracking ticket(s)
+- Confirms next steps and internal owners
+- Drives SLA compliance and escalations
+- Ensures final approved language is used
+
+---
+
+## Golden rules (do / don’t)
+### Do
+- Use the published Security FAQ and standard answer blocks as the starting point.
+- Confirm the customer’s deployment mode (Hosted vs Dedicated vs Private) before answering.
+- Route formal evidence requests through the Evidence Request Playbook (NDA checks, controlled distribution).
+- Track all customer asks, versions, and approvals in a ticket and in CRM.
+
+### Don’t
+- Don’t claim certifications we do not have (e.g., “ISO 27001 certified”) or imply “compliant with X” unless approved.
+- Don’t promise data residency beyond what is available in the customer’s selected region/deployment mode.
+- Don’t share restricted evidence (SOC 2 report, pen test summary) over email or Slack without following the controlled process.
+- Don’t edit standard RFP/security language “just to make it fit.” Use the approval workflow.
+
+---
+
+## Intake checklist (required information before escalating)
+CS/Support STO should collect the following before pulling in Security/GRC:
+1) Account + deal context
+- Customer/prospect name, segment, region
+- Stage (evaluation, procurement, renewal, expansion)
+- Business impact and date the deal will stall without response
+
+2) Deployment mode and architecture
+- Hosted API / Dedicated / Private (VPC or on-prem)
+- Target cloud/region(s) and any data residency constraints
+- Any special requirements (HIPAA/BAA request, financial services controls, air-gapped constraints)
+
+3) Customer asks (exact wording)
+- Questionnaire/RFP sections pasted verbatim or attached
+- Specific artifacts requested (SOC 2, policies, subprocessor list, pen test summary)
+- Required response format and due date/time zone
+
+4) Constraints
+- NDA status (executed? pending? required?)
+- Customer’s requested response channel (portal, email, GRC tool)
+- Any customer “red lines” (e.g., retention must be configurable to X days)
+
+5) Internal context
+- Existing approved snippets used (link to FAQ section or RFP library block)
+- Any planned deviations from standard language (must be explicitly flagged)
+
+If any of the above is missing, proceed with escalation but mark as “incomplete intake” and request missing items in parallel.
+
+---
+
+## Escalation tiers and SLAs
+CS/Support uses the following tiers to set expectations and drive responsiveness.
+
+### P0 — Imminent deadline / deal-stopping within 24 hours
+Criteria:
+- Customer deadline in \<= 1 business day OR live procurement call requiring answers
+- Customer requires evidence distribution (SOC 2) to proceed immediately
+
+SLA targets:
+- Acknowledge internally within 30 minutes (business hours)
+- First response plan within 2 hours
+
+Approvals:
+- Any non-standard claim requires Security + GRC approval (and Legal if contractual)
+
+### P1 — Time-bound security review (2–5 business days)
+Criteria:
+- RFP/questionnaire due in 2–5 business days
+- Customer is blocked pending “security sign-off” meeting
+
+SLA targets:
+- Acknowledge internally within 4 business hours
+- Draft response/plan within 1 business day
+
+### P2 — Standard review (\>= 6 business days)
+Criteria:
+- No imminent risk; customer requests information for internal review
+
+SLA targets:
+- Acknowledge within 1 business day
+- Provide materials/plan within 3 business days
+
+Business hours assumption: Mon–Fri, local team coverage. If customer is in EMEA/APAC and timing is critical, treat as one tier higher to account for time zone compression.
+
+---
+
+## Step-by-step workflow (CS/Support STO)
+### Step 1 — Create a tracking ticket and identify the STO
+Create a ticket in the internal system of record (Support/Jira or the designated GTM intake queue) with:
+- Tier (P0/P1/P2)
+- Due date/time zone
+- Links/attachments to the questionnaire/RFP portal
+- Requested artifacts list
+- Deployment mode and region
+
+Add watchers:
+- AE + SE lead on the account
+- GRC on-call analyst (or team alias)
+- Security Engineering reviewer (if technical claims are involved)
+- Legal reviewer (if contract language requested)
+
+### Step 2 — Send the internal “first plan” message
+Within the SLA window, post a clear plan (in the ticket and in the designated internal channel):
+- What we will answer with standard language
+- What requires review/approval
+- What evidence requires NDA + controlled process
+- Who owns each workstream and deadlines
+
+### Step 3 — Separate “language” work from “evidence” work
+Run two tracks in parallel:
+A) Response language
+- Use the Security FAQ and Standard Answers as the baseline.
+- If the questionnaire asks for non-supported controls, use the Exceptions Policy to propose alternative language.
+- If the customer requires a custom architecture/security narrative, SE drafts and Security validates.
+
+B) Evidence requests
+- Follow the SOC 2 Customer Evidence Request Playbook.
+- Confirm NDA status before any restricted artifact is shared.
+- Log exactly which artifacts were shared, when, and via what method.
+
+### Step 4 — Run a time-boxed review cycle
+For P0/P1, use a single redline pass with explicit approvers:
+- Security Engineering: technical controls, logging, encryption, runtime behavior
+- GRC: compliance posture wording, audit periods, “report under NDA” phrasing
+- Legal: DPA/addendum terms, breach notification, liability language
+
+If edits exceed one pass or the customer changes scope, re-baseline and reset expectations with Sales.
+
+### Step 5 — Customer-facing delivery
+CS/Support STO ensures:
+- Final answers use approved language and correct deployment mode caveats
+- Restricted artifacts are delivered only via the approved method
+- The customer receives a concise “what we sent + how to follow up” summary
+
+Recommended customer email structure:
+- One-paragraph overview
+- Bullets of attached/linked documents
+- Evidence request steps (if applicable)
+- Offer a 30-minute security review call with Security/GRC if needed
+
+### Step 6 — Close the loop and create post-close handoff notes
+Once the security review is complete (or “good enough” for procurement), capture:
+- Final list of commitments made (e.g., log retention option selected, region selection)
+- Any exceptions granted and their approvers
+- Any open items that must be implemented/configured during onboarding
+
+Add the notes to CRM and to the account’s implementation plan.
+
+---
+
+## Common scenarios and how to handle them
+### Scenario A: “Send us your SOC 2 report today”
+1) Confirm whether NDA is executed.
+2) If NDA is not executed, coordinate with Legal/Sales immediately; do not share the report.
+3) Use the approved wording: “SOC 2 Type II report available under NDA upon request.”
+4) Open an evidence request per the playbook and track distribution.
+
+### Scenario B: Customer asks “Do you train on our data?”
+- Use the exact FAQ language and definitions (training vs transient processing; prompts/logs vs model weights).
+- Do not introduce new qualifiers. If customer asks for contract language, route to Legal.
+
+### Scenario C: EU data residency objection (must stay in EU)
+- Confirm which regions are available for the chosen deployment mode.
+- Use the approved residency language (no blanket promises). If constraints can only be met with Private, have SE present options.
+- Escalate to GRC/Security if the customer requests written guarantees beyond standard documentation.
+
+### Scenario D: Questionnaire asks for a control we do not support (e.g., specific IdP feature, custom audit event)
+- Do not answer “Yes” with future intent.
+- Use the Exceptions Policy to provide alternative language and document compensating controls.
+- If customer insists on a “must-have,” flag to Product Security PM for capability alignment (without committing roadmap).
+
+---
+
+## Communication channels and meeting guidance
+### Internal channels (recommended)
+- Use the designated security review intake channel and link the tracking ticket.
+- Keep decisions in the ticket. Slack is for coordination, not for the authoritative record.
+
+### Customer call structure (30–45 minutes)
+1) Confirm deployment mode + region + data flow expectations
+2) Walk through top 5 controls customer cares about (usually: data use, encryption, access controls, logging, retention)
+3) Evidence requests: explain NDA gating and timelines
+4) Capture remaining blockers and assign owners
+
+Avoid:
+- Live “off the cuff” answers to compliance/certification questions. Offer to follow up with approved language.
+
+---
+
+## Handback to CS/Support after close (operationalization)
+If any of the following were discussed, CS must validate configuration during onboarding:
+- Audit log export destination (SIEM/S3) and retention window
+- SSO/SAML and SCIM provisioning requirements
+- RBAC roles and least-privilege model for admins
+- Data retention/deletion configuration for the chosen deployment mode
+- Private deployment network boundaries (VPC peering, egress controls) and key management (KMS/HSM)
+
+Create an onboarding checklist item for each requirement and confirm acceptance criteria with the customer security contact.
+
+---
+
+## Templates
+### Internal escalation summary (paste into ticket)
+Account:
+Deployment mode:
+Region(s):
+Tier (P0/P1/P2):
+Customer deadline (date/time zone):
+Top asks (verbatim):
+Artifacts requested:
+NDA status:
+Draft response plan (what we can answer with standard language vs needs review):
+Owners:
+
+### Customer follow-up email (minimal)
+Subject: Redwood security review materials + next steps
+
+Hi <Name>,
+
+Sharing the requested security materials for your review:
+- <Doc link 1>
+- <Doc link 2>
+- <Audit logging / retention overview>
+
+For the SOC 2 Type II report (restricted), we can provide it under NDA via our controlled evidence request process. If you confirm NDA status, we will initiate distribution.
+
+Happy to schedule a 30-minute security review call to walk through data handling, encryption, access controls, and audit logging.
+
+Best,
+<Name>
+
+---
+
+## Metrics and continuous improvement
+CS/Support STO should log the following for quarterly review:
+- Time-to-acknowledge and time-to-first-draft by tier
+- # of evidence requests and average turnaround time
+- Top repeated questionnaire questions and where our standard language was insufficient
+- Any instances of “unapproved language” caught in review (and required remediation)
+
+Feedback loop:
+- If a question repeats \>= 3 times in a month, open a request to update the Security FAQ or RFP library rather than rewriting per deal.
+
+---
+
+## Ownership and review cadence
+Owner: Customer Success (CS sponsor), in partnership with Security/GRC.
+Review cadence: Quarterly, or immediately after any material change to security posture, evidence availability, or product behavior affecting common questionnaire answers.
+
+Last review highlights (2026-02-21):
+- Tightened P0/P1 SLA expectations and clarified NDA gating for evidence.
+- Standardized separation of “language” vs “evidence” workstreams.
+- Added explicit post-close operationalization checklist items (SSO/SCIM, audit logs, retention).

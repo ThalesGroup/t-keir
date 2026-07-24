@@ -1,0 +1,138 @@
+gpu-capacity-consolidation-backfill-and-safety-net-runbook
+
+Summary
+
+This runbook describes the playbook for planned capacity consolidation events on the GPU fleet and the automated human-in-the-loop backfill process we use to avoid customer impact. It covers preflight checks, traffic shaping and tenant draining procedures, automated backfill jobs, networking and egress considerations, Terraform/IaC change patterns, CI/CD gating, monitoring queries, rollback steps, and post-event validation. The goal is to reduce instance footprint while preserving latency SLOs and minimizing cost.
+
+Audience
+
+- Oncall SREs responsible for GPU fleet operations
+- Infra engineers performing IaC changes and capacity consolidation
+- Product/platform owners coordinating quota and customer notifications
+
+When to use this runbook
+
+- Scheduled consolidation of underutilized GPU pools (capacity reclamation)
+- Migration from older instance families to crushed-instance families or new accelerator types
+- Post-cost-optimization initiatives where we aim to reduce fleet size without degrading SLOs
+
+SLOs and safety thresholds
+
+- 99th percentile generation latency (per-model route): <= 250ms target, 400ms safety threshold
+- Request success rate (HTTP 200/stream-ok): >= 99.9% target, 99.5% safety threshold
+- Token-cost delta vs baseline: <= +5% (temporary degradation allowed for up to 2 hours)
+- Automated consolidation window must not reduce available capacity below 20% headroom for regional peak demand
+
+Preflight checklist (must be green before consolidation starts)
+
+1. Announce maintenance window in status page and to affected tenants (if >5% of customer traffic is impacted).
+2. Confirm fleet telemetry: Prometheus targets for GPU utilization, queue depth, host health.
+3. CI/CD: Validate Terraform plan artifact signed and stored in S3 (artifact tag: consolidation/${date}/${change-id}).
+4. Verify that model-variant fallback policies exist for all routes affected by instance family change.
+5. Ensure rolling image / kernel versions are identical across nodes targeted for consolidation (avoid mixed drivers).
+6. Canaries: schedule low-volume canary jobs to run for 60m prior to broad consolidation.
+
+Key dashboards and alerts
+
+- dashboards/gpu/region-capacity: region free GPUs, per-tenant allocations
+- dashboards/runtime/latency-per-route: 50/95/99p latency trends
+- alerts: GPU_POD_CPU_OVER_80 (severity P2), QUEUE_DEPTH_GROWTH_10m (P1), MODEL_INFER_ERRORS_5m (P1)
+
+Operational steps
+
+1) Prepare IaC and CI/CD
+
+- Author a Terraform change that de-registers or repurposes target node pools. Use the gpu_pool_consolidation module with the following pattern: set `retain_headroom_percent = 30` and create a `consolidation_signal` feature flag.
+- Run `terraform plan -out=plan.tfplan` in the consolidation CI pipeline. Attach plan artifact to the change ticket.
+- Create a CD release with a single feature flag switch to flip start of consolidation. This allows fast abort via flag rollback.
+
+2) Start canary phase (30–60 minutes)
+
+- Flip feature flag to enable consolidation for a single low-traffic tenant with `kubectl annotate namespace tenant-ctn consolidation=canary`.
+- Run heavy inference canary: `./scripts/canary/loadgen --model gpt-lite --qps 2 --duration 60m`.
+- Monitor latency and error-rate PromQL: 
+  `sum(rate(runtime_infer_errors_total[5m])) by (route)` and `histogram_quantile(0.99, sum(rate(runtime_latency_bucket[5m])) by (le, route))`
+- If 99p latency > 400ms or errors > 0.5% for the canary route, abort and rollback terraform plan; notify owners.
+
+3) Gradual drain + backfill loop
+
+- For each node-pool targeted for consolidation: 
+  a) Identify candidate nodes using label `consolidate=true` and annotate them `drain=planned`
+  b) Start tenant-aware drain: `python ops/drain_node.py --node-id <id> --max-concurrent-migrations 4 --preserve-cache=true`
+  c) The drain script triggers an internal scale-up job that provisions transient backfill pods in compatible pools using the backfill scheduler (component: backfill-controller). Backfill uses KV-cache warmup and prefix caching policies to avoid cold-start latency.
+
+- The backfill-controller behavior (configuration table):
+
+  | setting | meaning | recommended value |
+  |---|---:|---:|
+  | backfill_batch_size | number of pipelines migrated in parallel | 4 |
+  | kv_cache_warmup_seconds | delay to pre-populate KV cache | 120 |
+  | prefer_quantized_variants | whether to use quantized model variants for cost savings | true (if within QA) |
+
+- During each migration step: wait for health checks `runtime_probe` and model-score regression check (automated evals) to pass for 10 minutes. If any fail, the migration must be aborted for that node and marked for manual review.
+
+4) Network and egress considerations
+
+- Ensure cross-subnet MTU is consistent for migrated pods to avoid large-packet fragmentation. Run `ip route get 8.8.8.8` validation on target node before moving traffic.
+- If consolidation involves changing NAT gateway allocation, coordinate with cloud-accounts team to pre-allocate EIPs to avoid ephemeral IP churn. Keep at least 2 NAT IPs free in each availability zone during window.
+
+5) Terraform roll and safety switches
+
+- The Terraform change should be applied in two phases: `apply --target=module.backfill-controller` then `apply` for pool reconfiguration. This ensures backfill-controller is live before pools are reduced.
+- Maintain a fast rollback job: `terraform apply -var 'skip_consolidation=true'` is a guarded abort pattern. The deployment pipeline exposes an “abort” button to trigger this exact command.
+
+6) CI/CD gating and automation
+
+- All consolidation plans require a successful `consolidation-canary` pipeline run that contains: terraform plan artifact, canary loadgen results (pdf), and post-canary evals (pass/fail).
+- The main apply job is gated on oncall approval with a 2-minute auto-abort if not approved. Approval must reference ticket ID and plan SHA.
+
+Oncall runbook (P1 escalation)
+
+- If QUEUE_DEPTH_GROWTH_10m triggers or 99p latency breaches safety threshold: 
+  1. Set consolidation feature flag to `off` (fast revert).
+  2. Run `backfill-controller scale --auto-heal` to increase backfill capacity by 2x.
+  3. If traffic remains degraded after 10 minutes, increase dedicated pool capacity: `terraform apply -target=module.gpu_pool_adjustment -var='extra_nodes=10'`
+  4. If rollback fails or Terraform is blocked, open emergency ticket to cloud-accounts and network engineering and assign severity P0.
+
+Manual rollback steps (if automation fails)
+
+- Re-register drained nodes: `kubectl label node <node> consolidate=false` and `python ops/rejoin_node.py --node <id>`
+- Reprovision NAT/EIPs via cloud console if Terraform cannot apply. Document manual changes in the change ticket and trigger a reconciliation job later.
+
+Post-event validation and cleanup
+
+- Run a regression eval suite across the top 20 production routes and compare to baseline: allow <5% worsening in token-level metrics. The eval report should be attached to the consolidation ticket.
+- Run cost verification job: compare hourly token-cost pre/post for 72 hours. Flag anomalies > 10% for finance review.
+- Mark nodes fully decommissioned in asset inventory and update `gpu_inventory.csv` with disposition and tag `reclaimed`.
+
+Runbook ownership and contact list
+
+- Primary owner: eng-infra GPU team (oncall alias: eng-infra-gpu-oncall@redwood.example.com)
+- Escalation: Cloud Accounts (cloud-accounts@redwood.example.com), Network Eng (neteng@redwood.example.com)
+
+Postmortem guidance
+
+- If the consolidation causes a P1 incident, a postmortem is required within 72 hours. Include: timeline, preflight checklist state, decision author, rollbacks attempted, metrics (latency/error/queue depth), and a remediation plan to tighten preflight gating.
+
+Appendix: useful commands and PromQL snippets
+
+- List nodes marked for consolidation:
+```
+kubectl get nodes -l consolidate=true -o wide
+```
+- Drain one node safely with ops helper:
+```
+python ops/drain_node.py --node-id i-076abc34 --max-concurrent-migrations 3
+```
+- Query 99th percentile latency for route `/v1/generate` (last 15m):
+```
+histogram_quantile(0.99, sum(rate(runtime_latency_bucket{route="/v1/generate"}[15m])) by (le))
+```
+- Check queue growth over 5 minutes:
+```
+sum(increase(runtime_queue_length[5m]))
+```
+- Force feature flag off (fast abort):
+```
+./deploy/featureflagctl set consolidation false --env prod
+```

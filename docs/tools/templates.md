@@ -28,7 +28,7 @@ Slot types: `entity`, `svo_pattern`, `keyword`, `sparql`, `freeform_grounded`.
 Seed the fused knowledge graph with the NATO C2SIM ontologies from Zero-to-Hero §3.4:
 
 ```bash
-COMPOSE_TURTLE_DIR=workspace/corpus_nato/ontologies \
+COMPOSE_TURTLE_DIR=datasets/osint/ontologies \
 make compose TEMPLATE=nato_synthesis_note TOPIC="CWIX 2023"
 ```
 

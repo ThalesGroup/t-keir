@@ -1,0 +1,119 @@
+Failure-domain-aware capacity scheduling and SLO-safe deployments
+
+Overview:
+This playbook describes a failure-domain-aware approach to capacity scheduling and deployment gating designed to protect SLOs and preserve error budget during planned and unplanned failures. It combines quantitative headroom provisioning, progressive rollouts, and automated rollback/eviction rules that are failure-domain–sensitive (region / AZ / rack / GPU-pool / node). The goal is to keep user-visible SLOs stable while making predictable capacity changes for model serving and multi-tenant workloads.
+
+Scope:
+- Applies to all production inference pools managed by Redwood (hosted, dedicated, private control plane).
+- Primary targets: text generation, chat, and embedding routes where p95 latency and availability SLOs are observable.
+- Excludes: offline batch/ETL jobs (handled by batch capacity playbook).
+
+Key goals:
+- Ensure SLO preservation during single and multi-domain degradations.
+- Automate safe deployments with failure-domain affinity and rollback triggers.
+- Provide clear operator runbooks for emergency capacity actions and tenant prioritization.
+
+Definitions and failure domains:
+- Failure domain: a unit of correlated failure (examples: AZ, rack, host, GPU pool, model shard).
+- Primary domains used in scheduling: region > AZ > rack-group > gpu-pool > node.
+- Tenant priority: each tenant/service must be mapped to one of: critical (SLA-backed), standard, experimental. Priority informs eviction/soft-preemption.
+
+SLOs and headroom mapping (example):
+- Service SLO matrix (recommended mapping):
+
+  | Route class     | SLO (availability) | Headroom target (across domains) | Emergency threshold (error budget burn) |
+  |-----------------|--------------------|----------------------------------|-----------------------------------------|
+  | Critical (SLA)   | 99.95%             | 45% reserved across domains       | 5% in 1h                                  |
+  | Standard         | 99.9%              | 30% reserved                      | 10% in 1h                                 |
+  | Experimental     | 99.0%              | 10% reserved                      | 25% in 1h                                 |
+
+Capacity scheduling principles:
+1) Failure-aware headroom: always provision at least the mapped headroom distributed across at least 3 independent failure domains when possible.
+2) Gradual draining: when updating or draining capacity, prefer draining within a single failure domain and re-balance traffic before evicting additional domains.
+3) Priority-preserving eviction: eviction order honors tenant priority and pinned reservations.
+4) Observability-driven adjustments: automatically add temporary capacity when burn rate or p95 latency breaches thresholds (see automated triggers).
+
+Capacity calculation (operator quick formula):
+- Inputs: baseline_qps, p95_tokens_per_request, target_utilization (e.g., 60%), model_latency_ms (p95), domain_capacity_per_gpu (tokens/sec).
+- Estimate required_gpus = ceil( (baseline_qps * p95_tokens_per_request * model_latency_ms/1000) / (domain_capacity_per_gpu * target_utilization) )
+
+Example: baseline_qps=200, p95_tokens=120, p95_latency=450ms, domain_capacity_per_gpu=2500 tokens/sec, target_util=0.6
+- required_gpus = ceil((200*120*0.45)/(2500*0.6)) = ceil(10800/1500) = ceil(7.2) = 8 GPUs
+
+Automated triggers and thresholds:
+- Autoscale-up: triggered when rolling 10-minute p95 latency exceeds target by >15% OR sustained error-budget burn-rate > 3x for 30 minutes.
+- Canary abort / rollback: abort if canary error budget burn > 2% in 15 minutes OR canary p95 latency exceeds safe margin by 25%.
+- Cross-domain failover: if an entire AZ loses >= 40% of capacity, immediately route 50% of affected traffic to secondary AZs with priority-aware throttling.
+
+Deployment guardrails (pre-flight checks):
+- Tracklist to run before rollout (CI/CD hook):
+  1. Verify canary model artifact matches exact model hash and quantization profile.
+  2. Check global headroom >= headroom target for all priority classes.
+  3. Ensure telemetry pipelines (p95 latency, error rate, token counters) are green for last 60m.
+  4. Validate canary scheduling spans at least two failure domains (AZs/racks) to detect correlated failures.
+  5. Confirm rollback image and config pinned and accessible.
+
+Progressive rollout recipe (recommended):
+1. Launch canary in 2 small pools across distinct failure domains (2–3% of traffic).
+2. Monitor 10m and 1h windows for p95 latency, error budget burn, and CPU/GPU saturation.
+3. If canary metrics stable, step to 10–20% across 3 domains over 30–60 minutes.
+4. Final ramp to 100% in increments of 20% with 30–60m observation windows.
+5. If any threshold breach occurs, trigger automated rollback (see triggers above) and run immediate mitigation runbook.
+
+Runbook: immediate action for capacity loss in a single failure domain
+1. Detect: Alert fires: "domain_capacity_drop >= 30%". Pager to oncall.
+2. Triage (5 min): identify domain (AZ/rack) and affected pools; mark impacted tenants with priority.
+3. Contain (10 min): route traffic away from domain using routing policy: set routing weight to 0 for domain and enable fast cross-domain routing.
+4. Re-provision (15–30 min): if spare capacity exists, instantiate warm pools in alternate domains: rictl pool scale --pool <pool> --delta +N
+5. Throttle (ongoing): apply tenant-priority throttles for non-critical tenants until headroom restored.
+6. Post-incident: run capacity rebalancer and submit incident review within 48 hours.
+
+Runbook: emergency rollback during a rollout
+1. Immediately set rollout state: ABORT. Stop new traffic to canary.
+2. Roll back to previous pinned model/config: rictl deploy rollback --service <svc> --to-tag <previous-tag>
+3. If rollback fails, cut traffic to pre-specified safe model variant (fallback) and route to dedicated backup pool.
+4. Notify product & support with templated message (see "Incident comms" below).
+
+Telemetry and operational tooling requirements:
+- Mandatory dashboards: per-route p95 latency, p99, error-rate, token/sec, GPU utilization per pool, headroom ratio by priority.
+- Prometheus alerts (examples):
+  - name: CapacityDomainDrop
+    expr: (sum by(domain) (available_gpus{pool=~".*prod.*"}) / sum by(domain) (expected_gpus{pool=~".*prod.*"})) < 0.7
+    for: 5m
+  - name: CanarySloBreach
+    expr: increase(error_budget_burn[15m]) > 0.02
+
+- CLI examples:
+  - rictl pool scale --pool text-gen-east-1a --delta +4 --why "emergency absorb after AZ loss"
+  - rictl tenant throttle --tenant-id T-1234 --p=experimental --rate 0.5
+
+Incident review & continuous improvement:
+- Every capacity-impacting incident must include in the review:
+  - timeline (synchronized UTC), root cause hypothesis, evidence (telemetry links), actions taken, capacity decisions and headroom status at time of incident.
+  - Owner: the oncall who executed actions + service steward.
+  - Delivery: publish within 72 hours to the confluence incident folder and tag the capacity playbook.
+
+Appendix: example capacity allocation table (ASCII):
+  +----------------+-----------+-----------+----------+-----------+
+  | Domain         | Expected  | Available | Reserved | Headroom  |
+  |                | GPUs      | GPUs      | (critical)| (percent) |
+  +----------------+-----------+-----------+----------+-----------+
+  | us-east-1a     | 50        | 40        | 10       | 40%       |
+  | us-east-1b     | 50        | 48        | 12       | 42%       |
+  | us-west-2a     | 40        | 38        | 8        | 36%       |
+  +----------------+-----------+-----------+----------+-----------+
+
+Owners and escalation paths:
+- Capacity steward: Michael Chen (eng-sre) - primary for proactive scheduling and runway planning.
+- Runbook executor / oncall: SRE rotation per schedule.
+- Product escalation: Elena Rodriguez (product infra) for customer-impacting incidents.
+
+Related pages and references:
+- Capacity rehearsal drills and templates: ../reliability-initiatives/capacity-drills-and-slo-recovery-cadence-playbook-2027
+- Canary metrics and evaluation templates: ../operational-tooling/slo-observability-pipeline-design-and-validation-2025
+
+Change log:
+- 2024-11-03: Created initial draft.
+- 2025-02-10: Added automated triggers, expanded rollback recipe, clarified headroom mapping.
+
+Contact: Priya Natarajan (pri@redwood.ai) — reach out for clarifications or to request an addendum to tenant priority mapping.

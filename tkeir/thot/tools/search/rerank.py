@@ -1,6 +1,7 @@
 """Title: Rerank
 
-Rerank Vespa / retrieval hits via :class:`UnifiedLLMWrapper.rerank`.
+Rerank Vespa / retrieval hits with ``cross_encoder`` or ``embedding_cosine``.
+LLM / generative rerank is forbidden.
 
 Author: Eric Blaudez
 
@@ -15,6 +16,9 @@ from typing import Any, Protocol
 
 LOGGER = logging.getLogger(__name__)
 
+_ALLOWED_STRATEGIES = frozenset({"cross_encoder", "embedding_cosine"})
+_DEFAULT_STRATEGY = "cross_encoder"
+
 
 class RerankClient(Protocol):
     """Minimal async client used by :func:`rerank_scored_texts`."""
@@ -27,7 +31,7 @@ class RerankClient(Protocol):
         top_n: int | None = None,
         strategy: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Rerank documents for a query.
+        """Rerank documents for a query (cross-encoder or embedding cosine).
 
         Example:
             >>> import inspect
@@ -36,30 +40,30 @@ class RerankClient(Protocol):
         """
 
 
+def _resolve_strategy(strategy: str | None) -> str:
+    """Return an allowed rerank strategy (never LLM)."""
+    chosen = str(strategy or _DEFAULT_STRATEGY).strip().lower()
+    if chosen not in _ALLOWED_STRATEGIES:
+        return _DEFAULT_STRATEGY
+    return chosen
+
+
 def hit_text_for_rerank(fields: dict[str, Any]) -> str:
-    """Build the document string scored by the cross-encoder.
+    """Build the document string scored by the reranker.
 
-    Prefers chunk ``text_raw``, then joined ``parent_content``, then title.
-
-    Args:
-        fields: Vespa hit ``fields`` mapping.
-
-    Returns:
-        Non-empty text when available, else empty string.
-
-    Example:
-        >>> hit_text_for_rerank({"text_raw": "chunk", "parent_title": "T"})
-        'chunk'
+    Prefers chunk ``text_raw``, then joined ``content``, then ``title``.
     """
     text = str(fields.get("text_raw") or "").strip()
     if text:
         return text
-    parent = fields.get("parent_content") or []
-    if isinstance(parent, list):
-        joined = " ".join(str(part) for part in parent if part).strip()
+    content = fields.get("content") or fields.get("parent_content") or []
+    if isinstance(content, list):
+        joined = " ".join(str(part) for part in content if part).strip()
         if joined:
             return joined
-    return str(fields.get("parent_title") or "").strip()
+    return str(
+        fields.get("title") or fields.get("parent_title") or ""
+    ).strip()
 
 
 async def rerank_scored_texts(
@@ -70,33 +74,17 @@ async def rerank_scored_texts(
     top_n: int | None = None,
     strategy: str | None = None,
 ) -> list[tuple[str, float]]:
-    """Rerank ``(text, prior_score)`` pairs; preserve length order by relevance.
-
-    Args:
-        llm: Wrapper exposing ``rerank``.
-        query: User / claim query.
-        items: Candidate texts with first-stage scores.
-        top_n: Optional truncate after rerank.
-        strategy: Optional ``cross_encoder`` / ``embedding_cosine`` override.
-
-    Returns:
-        Reordered ``(text, rerank_score)`` list.
-
-    Example:
-        >>> import asyncio
-        >>> class _Stub:
-        ...     async def rerank(self, query, documents, *, top_n=None, strategy=None):
-        ...         return [{"index": 1, "relevance_score": 0.9},
-        ...                 {"index": 0, "relevance_score": 0.1}]
-        >>> asyncio.run(rerank_scored_texts(
-        ...     _Stub(), "q", [("a", 1.0), ("b", 0.5)], top_n=2,
-        ... ))
-        [('b', 0.9), ('a', 0.1)]
-    """
+    """Rerank ``(text, prior_score)`` pairs (cross-encoder or cosine)."""
     if not items:
         return []
+    chosen = _resolve_strategy(strategy)
     documents = [text for text, _ in items]
-    ranked = await llm.rerank(query, documents, top_n=top_n, strategy=strategy)
+    ranked = await llm.rerank(
+        query,
+        documents,
+        top_n=top_n,
+        strategy=chosen,
+    )
     out: list[tuple[str, float]] = []
     for entry in ranked:
         index = int(entry["index"])
@@ -116,30 +104,10 @@ async def rerank_vespa_children(
     top_n: int | None = None,
     strategy: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Reorder Vespa ``root.children`` using the configured reranker model.
-
-    Args:
-        llm: Wrapper exposing ``rerank``.
-        query: Query text for the cross-encoder / cosine scorer.
-        children: Vespa hit children.
-        top_n: Keep at most this many after rerank.
-        strategy: Optional ``cross_encoder`` / ``embedding_cosine`` override.
-
-    Returns:
-        Children with ``relevance`` replaced by rerank scores, sorted desc.
-
-    Example:
-        >>> import asyncio
-        >>> class _Stub:
-        ...     async def rerank(self, query, documents, *, top_n=None, strategy=None):
-        ...         return [{"index": 0, "relevance_score": 0.42}]
-        >>> kids = [{"fields": {"text_raw": "doc"}, "relevance": 1.0}]
-        >>> out = asyncio.run(rerank_vespa_children(_Stub(), "q", kids, top_n=1))
-        >>> out[0]["relevance"]
-        0.42
-    """
+    """Reorder Vespa ``root.children`` using the configured rerank strategy."""
     if not children:
         return []
+    chosen = _resolve_strategy(strategy)
     texts: list[str] = []
     usable: list[dict[str, Any]] = []
     for child in children:
@@ -153,7 +121,12 @@ async def rerank_vespa_children(
         LOGGER.warning("Rerank skipped: no hit text available")
         return children[:top_n] if top_n else children
 
-    ranked = await llm.rerank(query, texts, top_n=top_n, strategy=strategy)
+    ranked = await llm.rerank(
+        query,
+        texts,
+        top_n=top_n,
+        strategy=chosen,
+    )
     reordered: list[dict[str, Any]] = []
     for entry in ranked:
         index = int(entry["index"])
@@ -169,6 +142,6 @@ async def rerank_vespa_children(
         len(usable),
         len(children),
         len(reordered),
-        strategy or "default",
+        chosen,
     )
     return reordered

@@ -1,0 +1,146 @@
+Autoscaling Fidelity Marketplace PRD and Commercialization Playbook
+
+Overview
+
+This document defines the Product Requirements (PRD) and launch playbook for the Autoscaling Fidelity Marketplace — a product capability that automatically selects and scales response-fidelity variants (model variants, quantization levels, KV-cache profiles) against a commercial marketplace of fidelity SKUs. The feature couples runtime autoscaling decisions with commercial entitlements so customers can trade token-cost, latency, and quality dynamically.
+
+Audience
+- Product managers, commercial ops, pricing, engineering (serving runtime, platform), and solutions engineering.
+
+Goals
+- Provide a production-ready API and Console UX that allows tenants to:
+  - Opt into an autoscaling fidelity marketplace with guardrails.
+  - Define fidelity budgets and per-route fidelity SLAs.
+  - Observe fidelity-driven economics in near-real-time and receive recommendations.
+- Reduce average per-token cost for medium-to-high throughput tenants by 18–35% for conversational workloads without measurable quality regressions on customer-defined eval sets.
+- Ensure autoscaling decisions respect latency SLOs and tenant isolation (no cross-tenant leaking of cost/variants).
+
+Non-goals
+- Not intended to replace manual model-pinning for customers requiring deterministic outputs.
+- Not an open marketplace of third-party models in initial launch; variants are Redwood-verified and curated.
+
+Key persona scenarios
+1) SaaS product engineer: Wants to lower monthly inference bill while maintaining 95th percentile latency <= 250ms for interactive routes.
+2) Platform lead at enterprise: Needs per-route fidelity SLAs and the ability to cap upstream spend per team.
+3) Solutions engineer: Onboards customers to a fidelity budget and needs a reproducible rollout plan.
+
+Functional requirements
+- FR1: Autoscaler Policy Engine
+  - Accepts per-route policy with fields: budget (credits/min), latency_SLO_ms, min_fidelity_variant, max_fidelity_variant, fallthrough_strategy (pin|downgrade|queue).
+  - Computes per-request variant assignment and scaling action (promote/demote) in < 5ms on median decision path.
+- FR2: Marketplace Catalog
+  - Exposes curated fidelity SKUs with metadata: quality_score, expected_tokens_per_response_multiplier, average_latency_ms, quantization_level, recommended_use_cases.
+- FR3: Entitlement and Billing Hooks
+  - Integrates with billing to charge per-FU (fidelity unit) at time of request; supports committed and overage pricing.
+- FR4: Telemetry and Explainability
+  - Emit per-decision telemetry (variant_id, reason, pre/post estimated cost delta) to runtime telemetry stream and Console.
+- FR5: Eval and Regression Capture
+  - Shadow-eval mode captures outputs for a fraction of traffic for side-by-side quality checks; supports per-tenant promptsets.
+
+Non-functional requirements
+- NFR1: Isolation — decisions for one tenant must not use other tenants' telemetry as direct inputs (only aggregated market signals).
+- NFR2: Availability — autoscaler control-plane must meet 99.95% uptime and 99.9% for marketplace reads.
+- NFR3: Latency — additional decision latency must not increase tail response latency by more than 10ms p95 for interactive routes.
+- NFR4: Cost accuracy — billing exposures from autoscaling must reconcile within 1 hour with offline metering.
+
+Acceptance criteria
+- AC1: End-to-end demo where a test tenant reduces average cost-per-token by >= 20% while keeping specified eval metrics within +-2% of baseline.
+- AC2: Rollout automation (canary -> staged -> global) implemented in Console with rollback triggers: fidelity-regression-alert, cost-overrun-alert (>20% above budget), latency-SLO-breach (>5% violation).
+
+Telemetry and success metrics
+- Metrics to monitor (per-tenant and aggregated):
+  - Average FU per request, FU variance, tokens-per-request, cost-per-1000-tokens.
+  - Quality regression rate (eval set pass/fail), fidelity-promote/demote counts, decision latency distribution.
+  - Business KPIs: average customer spend reduction, churn correlation, activation rate of autoscaler.
+
+Console UX and admin flows
+- New page: "Fidelity Marketplace" under Tenant Settings.
+- Key screens:
+  - Setup wizard (select routes, upload eval promptset, choose budget template).
+  - Policy editor (JSON and guided form).
+  - Live insights (heatmaps of variant usage, per-route cost waterfall).
+  - Rollout control (canary %, rate, and automatic rollback toggles).
+
+API contract (example)
+- POST /v1/tenants/{tenant_id}/fidelity-policies
+- Request body (example):
+  {
+    "route_id": "chat.send",
+    "budget_credits_per_min": 1200,
+    "latency_slo_ms": 250,
+    "min_variant": "gpt-lite-q4",
+    "max_variant": "gpt-standard-fp16",
+    "fallthrough": "downgrade",
+    "canary": {"enabled": true, "initial_pct": 5}
+  }
+
+- Decision response sample (streamed to telemetry):
+  {
+    "request_id": "r_12345",
+    "variant_assigned": "gpt-lite-q4",
+    "reason": "budget_pressure",
+    "estimated_cost_delta": "-0.0025"
+  }
+
+Pricing and packaging model (commercial options)
+- Pricing design principles:
+  - Keep per-FU pricing transparent and additive to baseline per-token pricing.
+  - Offer committed FU bundles with sliding discounts and a preemptible warm-capacity option for batch-heavy workloads.
+
+- Example packages (table):
+  | SKU | Committed FUs / month | Typical target workload | Discount vs on-demand | Notes |
+  | --- | ---: | --- | ---: | --- |
+  | FM-Silver | 100k | Low-throughput dev & sandbox | 10% | On-demand overflow at standard FU price |
+  | FM-Gold | 1M | Production interactive apps, 10–50 qps | 22% | Includes 1 dev support review & monthly recommendation report |
+  | FM-Enterprise | 10M+ | High-throughput transactional apps | 35% | SLA-backed allocation & dedicated recommender hook |
+
+Billing hooks and exposure controls
+1) Per-route soft budget: automatic throttling and optional email alerts at 75/90/100% thresholds.
+2) Hard spend caps: enforced via request rejection with clear error codes and mitigation guidance.
+3) Reconciliation: daily FU usage rollups and an hourly delta stream for near-real-time charge surfaces.
+
+Rollout plan (engineering + go-to-market)
+1) Phase 0 (Q1) — Internal beta with Redwood teams: validate decision latency, billing reconciliation.
+2) Phase 1 (Q2) — Closed private preview with 3 pilot customers from different segments (SaaS, marketplace, enterprise).
+3) Phase 2 (Q3) — Public beta with Console UX and limited GA SKUs (Silver, Gold).
+4) Phase 3 (Q4) — GA launch: Enterprise SKU, SLA contracts, partner enablement and documented playbooks for migration.
+
+Launch playbook checklist (owner assignments included)
+1. Product: final PRD sign-off, pricing SKUs defined (owner: Maya Chen).
+2. Engineering: autoscaler policy engine implementation, telemetry pipeline, billing integration (owner: Rajesh Iyer).
+3. SRE: capacity planning and chaos-testing runbook (owner: Emily Rios).
+4. Solutions & SE: pilot onboarding templates, sample promptset evals (owner: Diego Alvarez).
+5. Commercial: legal terms, SLA addendum and negotiated pricing templates (owner: Priya Singh).
+
+Risks and mitigations
+- Risk: Quality regressions for long-tail prompts. Mitigation: mandatory shadow-eval capture and per-tenant rollback window; require quality pass before enterprise activation.
+- Risk: Unexpected billing spikes from misconfigured policies. Mitigation: default soft budgets and enforced hard caps for first 30 days of tenant activation.
+- Risk: Decision latency causing tail latency SLO breaches. Mitigation: fall back to pinned-variant path and provide telemetry-driven alerting.
+
+Open questions (for product & pricing committee)
+- Q1: Should committed FU bundles be refundable or transferable across routes?
+- Q2: What price elasticity targets should we bake into the recommender for the first 6 months?
+
+Ownership and next steps
+- Primary product owner: Maya Chen.
+- Engineering lead (serving/runtime): Rajesh Iyer.
+- Commercial/GTN lead: Priya Singh.
+
+Next immediate actions (within 2 weeks)
+1) Align on pricing floor and reimbursement policy (commercial).
+2) Finalize telemetry schema and event names (engineering + SRE).
+3) Prepare three pilot customer invitations and onboarding templates (solutions).
+
+Appendix: Example policy JSON (full schema)
+- See attached policy-schema.json in repo: git.redwood/inference/policies/schemas (link: git.redwood/internal/policies/schemas/policy-schema.json).
+
+References
+- Variant marketplace design (design-specs/variant-price-signal-orchestrator).
+- Fidelity staging SDK and eval playbook (requirements/prd-fidelity-staging-sdk-and-eval-playbook-2026-12-22).
+
+Document history
+- 2027-01-10: Drafted (Maya Chen).
+- 2027-03-18: Engineering feasibility review added (Rajesh Iyer).
+- 2027-07-22: Pricing committee notes incorporated (Priya Singh).
+- 2027-11-01: Updated rollout plan and packaging (Maya Chen).
+

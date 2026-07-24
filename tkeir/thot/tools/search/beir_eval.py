@@ -5,8 +5,9 @@ lexical (BM25), dense (SentenceTransformer), and the T-KEIR **retrieval**
 stack (NLP index + QueryAnalyzer + Vespa hybrid; **no answer generation**)
 at top-100, computes NDCG@10 / MAP@100 / Recall@100, performs error
 analysis, and always writes ``docs/evaluation_report.md`` (MkDocs). After
-each dataset, an intermediate report is also written under
-``results/beir/<dataset>/report.md`` and ``results/beir/report.md``.
+each dataset, the same cumulative report is copied to
+``reports/beir/report.md``, and a per-dataset snapshot to
+``reports/beir/<dataset>/report.md``.
 
 Author: Eric Blaudez
 
@@ -133,13 +134,16 @@ class Metrics:
 
 @dataclass
 class FailureCase:
-    """One qualitative retrieval failure instance."""
+    """One qualitative retrieval failure instance with per-case analysis."""
 
     kind: str
     query_id: str
     query_text: str
     detail: str
+    analysis: str = ""
     score: float | None = None
+    doc_id: str | None = None
+    rank: int | None = None
 
 
 @dataclass
@@ -485,6 +489,216 @@ def _truncate(text: str, limit: int = 160) -> str:
     return cleaned[: limit - 1] + "…"
 
 
+def _query_for_report(text: str, limit: int = 800) -> str:
+    """Normalize query text for report bodies (keep most of the query).
+
+    Args:
+        text: Raw query.
+        limit: Soft cap for very long ArguAna-style passages.
+
+    Returns:
+        Whitespace-collapsed query string.
+    """
+    return _truncate(text, limit=limit)
+
+
+def _token_set(text: str) -> set[str]:
+    """Return the set of alphanumeric tokens in ``text``."""
+    return set(tokenize(text))
+
+
+def _overlap_stats(query: str, doc: str) -> dict[str, Any]:
+    """Compute lexical overlap statistics between query and document.
+
+    Args:
+        query: Query text.
+        doc: Document text.
+
+    Returns:
+        Dict with shared tokens, missing query tokens, and coverage ratio.
+
+    Example:
+        >>> s = _overlap_stats("cat sat mat", "the cat sat")
+        >>> sorted(s["shared"])
+        ['cat', 'sat']
+        >>> round(s["coverage"], 2)
+        0.67
+    """
+    q_toks = _token_set(query)
+    d_toks = _token_set(doc)
+    if not q_toks:
+        return {
+            "shared": [],
+            "missing": [],
+            "coverage": 0.0,
+            "query_tokens": 0,
+            "doc_tokens": len(d_toks),
+        }
+    shared = sorted(q_toks & d_toks)
+    missing = sorted(q_toks - d_toks)
+    return {
+        "shared": shared,
+        "missing": missing,
+        "coverage": len(shared) / len(q_toks),
+        "query_tokens": len(q_toks),
+        "doc_tokens": len(d_toks),
+    }
+
+
+def _format_token_list(tokens: list[str], limit: int = 12) -> str:
+    """Format a token list for Markdown (capped)."""
+    if not tokens:
+        return "_(none)_"
+    shown = tokens[:limit]
+    extra = len(tokens) - len(shown)
+    body = ", ".join(f"`{t}`" for t in shown)
+    if extra > 0:
+        body += f" … (+{extra} more)"
+    return body
+
+
+def _best_gold_overlap(
+    query: str,
+    gold_ids: set[str],
+    corpus: dict[str, dict[str, str]],
+) -> tuple[str | None, dict[str, Any]]:
+    """Pick the gold document with highest query-token coverage.
+
+    Returns:
+        ``(gold_doc_id, overlap_stats)``; id may be ``None`` when empty.
+    """
+    best_id: str | None = None
+    best_stats: dict[str, Any] = {
+        "shared": [],
+        "missing": [],
+        "coverage": -1.0,
+        "query_tokens": 0,
+        "doc_tokens": 0,
+    }
+    for gdid in gold_ids:
+        stats = _overlap_stats(query, document_text(corpus.get(gdid, {})))
+        if float(stats["coverage"]) > float(best_stats["coverage"]):
+            best_id = gdid
+            best_stats = stats
+    return best_id, best_stats
+
+
+def _analyze_false_positive(
+    query: str,
+    bad_doc: str,
+    gold_ids: set[str],
+    corpus: dict[str, dict[str, str]],
+    rank: int,
+    score: float,
+) -> str:
+    """Explain why an irrelevant top hit likely ranked above gold."""
+    bad = _overlap_stats(query, bad_doc)
+    gold_id, gold = _best_gold_overlap(query, gold_ids, corpus)
+    lines = [
+        f"Irrelevant document ranked #{rank} (score={score:.4f}) despite "
+        f"not being in the qrels.",
+        f"Lexical coverage vs query: **{bad['coverage']:.0%}** "
+        f"({len(bad['shared'])}/{bad['query_tokens']} query tokens). "
+        f"Shared: {_format_token_list(bad['shared'])}. "
+        f"Query tokens absent from this hit: "
+        f"{_format_token_list(bad['missing'])}.",
+    ]
+    if gold_id is not None:
+        lines.append(
+            f"Best gold `{gold_id}` covers **{gold['coverage']:.0%}** of "
+            f"query tokens (shared: {_format_token_list(gold['shared'])}; "
+            f"missing on gold: {_format_token_list(gold['missing'])})."
+        )
+        if bad["coverage"] >= gold["coverage"]:
+            lines.append(
+                "The false positive matches the query surface form as well "
+                "as or better than the gold — ranking rewarded topical / "
+                "lexical similarity rather than labeled relevance "
+                "(paraphrase, stance, or answer-specific content)."
+            )
+        else:
+            lines.append(
+                "Gold has stronger query overlap than this hit, yet still "
+                "lost the top ranks — hybrid / dense scores or competing "
+                "near-duplicates likely dominated early retrieval."
+            )
+    else:
+        lines.append("No positive gold documents were available for contrast.")
+    return " ".join(lines)
+
+
+def _analyze_false_negative(
+    query: str,
+    gold_doc: str,
+    gold_id: str,
+    ranked: list[tuple[str, float]],
+    corpus: dict[str, dict[str, str]],
+) -> str:
+    """Explain why a gold document was missing from the top-K."""
+    gold = _overlap_stats(query, gold_doc)
+    top = ranked[:3]
+    top_bits: list[str] = []
+    for rank, (did, score) in enumerate(top, start=1):
+        ov = _overlap_stats(query, document_text(corpus.get(did, {})))
+        top_bits.append(
+            f"#{rank} `{did}` (score={score:.4f}, "
+            f"coverage={ov['coverage']:.0%})"
+        )
+    lines = [
+        f"Gold `{gold_id}` is absent from the top-{TOP_K} — a complete miss "
+        f"for this judgment.",
+        f"Gold lexical coverage vs query: **{gold['coverage']:.0%}** "
+        f"(shared: {_format_token_list(gold['shared'])}; "
+        f"missing on gold: {_format_token_list(gold['missing'])}).",
+    ]
+    if gold["coverage"] < 0.35:
+        lines.append(
+            "Low surface overlap suggests paraphrase, synonymy, or "
+            "specialized phrasing the retriever did not bridge."
+        )
+    elif gold["missing"]:
+        lines.append(
+            "Several distinctive query tokens never appear in the gold "
+            "text, so pure lexical matching under-weights the correct doc."
+        )
+    if top_bits:
+        lines.append("Top retrieved instead: " + "; ".join(top_bits) + ".")
+    return " ".join(lines)
+
+
+def _analyze_near_miss(
+    query: str,
+    gold_doc: str,
+    gold_id: str,
+    rank: int,
+    score: float | None,
+    ranked: list[tuple[str, float]],
+    corpus: dict[str, dict[str, str]],
+) -> str:
+    """Explain why gold was retrieved but outside NDCG@10."""
+    gold = _overlap_stats(query, gold_doc)
+    score_txt = f"{score:.4f}" if score is not None else "n/a"
+    competitor = ""
+    if ranked:
+        top_id, top_score = ranked[0]
+        top_ov = _overlap_stats(query, document_text(corpus.get(top_id, {})))
+        competitor = (
+            f" Rank-1 was `{top_id}` (score={top_score:.4f}, "
+            f"coverage={top_ov['coverage']:.0%} vs gold "
+            f"{gold['coverage']:.0%})."
+        )
+    return (
+        f"Gold `{gold_id}` retrieved at rank **{rank}**/100 "
+        f"(score={score_txt}) — counts for Recall@100 but not NDCG@10. "
+        f"Gold query-token coverage **{gold['coverage']:.0%}** "
+        f"(shared: {_format_token_list(gold['shared'])}; "
+        f"missing: {_format_token_list(gold['missing'])})."
+        f"{competitor} "
+        "The system found the right neighborhood but failed to promote "
+        "the labeled evidence into the top-10."
+    )
+
+
 def _first_false_positive(
     qid: str,
     qtext: str,
@@ -512,16 +726,21 @@ def _first_false_positive(
         if did in gold_ids:
             continue
         doc = corpus.get(did, {})
+        doc_text = document_text(doc)
         return FailureCase(
             kind="false_positive",
             query_id=qid,
-            query_text=_truncate(qtext),
+            query_text=_query_for_report(qtext),
             detail=(
-                f"Rank #{rank} doc `{did}` "
-                f"(score={score:.4f}) is not relevant. "
-                f"Snippet: {_truncate(document_text(doc), 120)}"
+                f"Rank #{rank} doc `{did}` (score={score:.4f}) is not "
+                f"relevant. Snippet: {_truncate(doc_text, 200)}"
+            ),
+            analysis=_analyze_false_positive(
+                qtext, doc_text, gold_ids, corpus, rank, score
             ),
             score=score,
+            doc_id=did,
+            rank=rank,
         )
     return None
 
@@ -530,7 +749,7 @@ def _gold_rank_failures(
     qid: str,
     qtext: str,
     gold_ids: set[str],
-    ranked_ids: list[str],
+    ranked: list[tuple[str, float]],
     results: dict[str, dict[str, float]],
     corpus: dict[str, dict[str, str]],
 ) -> tuple[FailureCase | None, FailureCase | None]:
@@ -540,7 +759,7 @@ def _gold_rank_failures(
         qid: Query identifier.
         qtext: Query text.
         gold_ids: Relevant document ids.
-        ranked_ids: Retrieved ids ordered by descending score.
+        ranked: Retrieved ``(doc_id, score)`` ordered by descending score.
         results: Full retriever scores for score lookup.
         corpus: Full corpus.
 
@@ -551,36 +770,46 @@ def _gold_rank_failures(
         >>> _gold_rank_failures("q", "x", set(), [], {}, {})
         (None, None)
     """
+    ranked_ids = [did for did, _ in ranked]
     false_neg: FailureCase | None = None
     near_miss: FailureCase | None = None
     for gdid in gold_ids:
+        gold_text = document_text(corpus.get(gdid, {}))
         if gdid not in ranked_ids:
             if false_neg is None:
                 false_neg = FailureCase(
                     kind="false_negative",
                     query_id=qid,
-                    query_text=_truncate(qtext),
+                    query_text=_query_for_report(qtext),
                     detail=(
                         f"Gold doc `{gdid}` completely missed "
                         f"(not in top-{TOP_K}). "
-                        f"Snippet: "
-                        f"{_truncate(document_text(corpus.get(gdid, {})), 120)}"
+                        f"Snippet: {_truncate(gold_text, 200)}"
                     ),
+                    analysis=_analyze_false_negative(
+                        qtext, gold_text, gdid, ranked, corpus
+                    ),
+                    doc_id=gdid,
                 )
             continue
         rank = ranked_ids.index(gdid) + 1
         if rank > 10 and near_miss is None:
+            score = results.get(qid, {}).get(gdid)
             near_miss = FailureCase(
                 kind="near_miss",
                 query_id=qid,
-                query_text=_truncate(qtext),
+                query_text=_query_for_report(qtext),
                 detail=(
                     f"Gold doc `{gdid}` retrieved at rank "
                     f"{rank}/100 (missed NDCG@10). "
-                    f"Snippet: "
-                    f"{_truncate(document_text(corpus.get(gdid, {})), 120)}"
+                    f"Snippet: {_truncate(gold_text, 200)}"
                 ),
-                score=results.get(qid, {}).get(gdid),
+                analysis=_analyze_near_miss(
+                    qtext, gold_text, gdid, rank, score, ranked, corpus
+                ),
+                score=score,
+                doc_id=gdid,
+                rank=rank,
             )
         if false_neg is not None and near_miss is not None:
             break
@@ -592,14 +821,17 @@ def analyze_failures(
     corpus: dict[str, dict[str, str]],
     qrels: dict[str, dict[str, int]],
     results: dict[str, dict[str, float]],
-    max_per_kind: int = 1,
+    max_per_kind: int = 3,
 ) -> list[FailureCase]:
     """Extract false positives, false negatives, and near-miss failures.
 
     Failure kinds:
-        * **false_positive** — irrelevant doc ranked in the top-3 with a high score
+        * **false_positive** — irrelevant doc ranked in the top-3
         * **false_negative** — gold doc completely absent from the top-100
         * **near_miss** — gold doc retrieved between ranks 11 and 100
+
+    Each case includes the query text and a per-failure analysis (lexical
+    coverage, missing tokens, contrast with gold / rank-1).
 
     Args:
         queries: Query id → text.
@@ -624,7 +856,6 @@ def analyze_failures(
         ranked = sorted(
             results.get(qid, {}).items(), key=lambda kv: kv[1], reverse=True
         )
-        ranked_ids = [did for did, _ in ranked]
         gold_ids = {did for did, rel in gold.items() if rel > 0}
         qtext = queries.get(qid, "")
 
@@ -635,7 +866,7 @@ def analyze_failures(
 
         if len(fns) < max_per_kind or len(near) < max_per_kind:
             fn, nm = _gold_rank_failures(
-                qid, qtext, gold_ids, ranked_ids, results, corpus
+                qid, qtext, gold_ids, ranked, results, corpus
             )
             if fn is not None and len(fns) < max_per_kind:
                 fns.append(fn)
@@ -650,6 +881,7 @@ def analyze_failures(
             break
 
     return fps + fns + near
+
 
 
 def _fmt(value: float | None, digits: int = 3) -> str:
@@ -732,17 +964,17 @@ def _gap_to_best(score: float | None, best: float) -> str:
     return _delta(score, best)
 
 
-def intermediate_results_dir() -> Path:
-    """Return ``results/beir`` under the repository root.
+def reports_beir_dir() -> Path:
+    """Return ``reports/beir`` under the repository root.
 
     Returns:
-        Absolute path to the BEIR intermediate results directory.
+        Absolute path to the BEIR reports directory (copy of docs report).
 
     Example:
-        >>> intermediate_results_dir().name
+        >>> reports_beir_dir().name
         'beir'
     """
-    return Path(repo_root()) / "results" / "beir"
+    return Path(repo_root()) / "reports" / "beir"
 
 
 def write_report_file(path: Path, markdown: str) -> None:
@@ -774,16 +1006,17 @@ def save_reports(
     latest_dataset: str | None = None,
     expected_total: int | None = None,
 ) -> None:
-    """Write docs report plus intermediate ``results/beir`` snapshots.
+    """Write the docs report and copy it under ``reports/beir/``.
 
-    Always updates ``docs_report`` and ``results/beir/report.md`` with the
-    cumulative runs. When ``latest_dataset`` is set, also writes
-    ``results/beir/<dataset>/report.md`` for that dataset alone.
+    Always updates ``docs_report`` (documentation directory) and copies the
+    cumulative Markdown to ``reports/beir/report.md``. When
+    ``latest_dataset`` is set, also writes
+    ``reports/beir/<dataset>/report.md`` for that dataset alone.
 
     Args:
         runs: Completed dataset runs (cumulative).
         dense_model: Dense embedding model name.
-        docs_report: MkDocs evaluation report path.
+        docs_report: MkDocs evaluation report path under ``docs/``.
         extra_report: Optional extra copy path (``--report``).
         latest_dataset: Dataset id just finished (per-dataset snapshot).
         expected_total: Total datasets in this CLI run (partial banner).
@@ -817,16 +1050,16 @@ def save_reports(
     write_report_file(docs_report, body)
     LOGGER.info("Wrote documentation report → %s", docs_report.resolve())
 
-    results_root = intermediate_results_dir()
-    cumulative = results_root / "report.md"
-    write_report_file(cumulative, body)
-    LOGGER.info("Wrote intermediate report → %s", cumulative.resolve())
+    reports_root = reports_beir_dir()
+    reports_copy = reports_root / "report.md"
+    write_report_file(reports_copy, body)
+    LOGGER.info("Copied report → %s", reports_copy.resolve())
 
     if latest_dataset:
         single = [run for run in runs if run.name == latest_dataset]
         if single:
             single_body = render_report(single, dense_model=dense_model)
-            dataset_path = results_root / latest_dataset / "report.md"
+            dataset_path = reports_root / latest_dataset / "report.md"
             write_report_file(dataset_path, single_body)
             LOGGER.info(
                 "Wrote per-dataset report → %s", dataset_path.resolve()
@@ -1075,9 +1308,10 @@ def render_report(runs: list[DatasetRun], dense_model: str) -> str:
             "NDCG@10. **Best published** = max of those three. "
             "**Gap to best** = system_score − best_score (negative = "
             "behind the leaderboard leader).",
-            "7. Failure types: false positives (top-3 irrelevant), false "
-            "negatives (gold missing from top-100), near misses "
-            "(gold ranked 11–100).",
+            "7. Failure analysis: up to three examples per kind "
+            "(false positive / false negative / near miss). Each case "
+            "reports the query, the offending or gold document, lexical "
+            "token coverage vs the query, and a short written analysis.",
             "",
         ]
     )
@@ -1085,7 +1319,7 @@ def render_report(runs: list[DatasetRun], dense_model: str) -> str:
 
 
 def _render_failures(failures: list[FailureCase]) -> list[str]:
-    """Format failure cases as Markdown bullets.
+    """Format failure cases as Markdown with query + analysis.
 
     Args:
         failures: Analyzed cases.
@@ -1105,12 +1339,19 @@ def _render_failures(failures: list[FailureCase]) -> list[str]:
         "near_miss": "Near miss",
     }
     out: list[str] = []
-    for case in failures:
+    for index, case in enumerate(failures, start=1):
         label = labels.get(case.kind, case.kind)
-        out.append(
-            f"- **{label}** — query `{case.query_id}`: «{case.query_text}»"
-        )
-        out.append(f"  - {case.detail}")
+        out.append(f"**{index}. {label}** — query id `{case.query_id}`")
+        out.append("")
+        out.append("**Query**")
+        out.append("")
+        out.append(f"> {case.query_text}")
+        out.append("")
+        out.append(f"**Observation:** {case.detail}")
+        out.append("")
+        if case.analysis:
+            out.append(f"**Analysis:** {case.analysis}")
+            out.append("")
     return out
 
 
@@ -1347,8 +1588,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help=(
             "Optional extra Markdown report path. The documentation report "
-            f"({evaluation_report_path()}) and intermediate "
-            "results/beir/report.md are always written after each dataset."
+            f"({evaluation_report_path()}) and a copy under "
+            "reports/beir/report.md are always written after each dataset."
         ),
     )
     parser.add_argument(

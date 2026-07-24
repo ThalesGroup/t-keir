@@ -389,10 +389,6 @@ def build_hybrid_yql(
     bm25_fields: list[str] = []
     if config.use_text_raw:
         bm25_fields.append("text_raw")
-    if config.use_parent_content:
-        bm25_fields.append("parent_content")
-    if config.use_parent_title:
-        bm25_fields.append("parent_title")
 
     if bm25_fields and analysis.search_terms:
         text_clause = build_multi_field_contains_or_clause(
@@ -1193,10 +1189,6 @@ class QueryAnalyzerTask:
                         self._config.weight_question_embedding
                     ),
                     "text_raw_bm25": self._config.weight_text_raw_bm25,
-                    "parent_content_bm25": (
-                        self._config.weight_parent_content_bm25
-                    ),
-                    "parent_title_bm25": self._config.weight_parent_title_bm25,
                 },
             },
         }

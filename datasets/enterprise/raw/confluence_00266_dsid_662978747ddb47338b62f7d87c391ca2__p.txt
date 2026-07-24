@@ -1,0 +1,272 @@
+Docs plan: Redwood Private offline bundles (signed) — public vs private docs, examples, and release alignment
+
+## Purpose
+This page defines the documentation plan for **Redwood Private offline bundles with cryptographic signing** (air-gapped / restricted networks). It clarifies:
+- What content belongs in **public docs** vs **private/customer docs**
+- The **minimum set of guides** required for pilots and GA
+- Canonical **CLI examples** (installer preflight, bundle inspection, signature verification)
+- How we keep docs **synchronized with shipped artifacts** (bundle layout, manifest schema, installer flags, error codes)
+
+This is a DevEx/Docs plan (not the spec). Technical source-of-truth is in the engineering design/ADR pages linked above.
+
+---
+
+## Audience
+Primary:
+- Customer platform operators installing Redwood Private in **air-gapped** or **egress-restricted** environments
+- Solutions Engineering / Professional Services supporting pilots
+- Support engineers triaging install failures
+
+Secondary:
+- Security reviewers evaluating Redwood’s supply-chain controls (artifact signing, provenance, auditability)
+
+---
+
+## Documentation surfaces & access model
+We will split content across three surfaces. The same content should not be duplicated unless required for access control; when duplicated, it must reference a single canonical source section.
+
+### 1) Public docs (docs.redwoodinference.com)
+**Goal:** Provide high-level understanding of offline install support and security posture without leaking customer-only operational details.
+Include:
+- One overview page: “Redwood Private deployment modes (Connected vs Offline/Air-gapped)”
+- A short security statement: “Signed offline bundles: integrity + provenance”
+- A minimal prerequisites list (high-level) and a pointer: “Contact Support/SE for the air-gapped install guide”
+
+Exclude (keep private):
+- Exact bundle directory layout, manifest schema details, and error-code taxonomy
+- Break-glass override instructions and approval workflow
+- Trust-store update procedures (key rotation) beyond a conceptual statement
+
+### 2) Private/customer docs (Customer portal / authenticated docs)
+**Goal:** Provide the step-by-step operational guide needed to install, upgrade, and troubleshoot offline.
+Include:
+- Full end-to-end air-gapped install and upgrade guides
+- Offline bundle verification and inspection commands with expected output
+- Troubleshooting (hash mismatch, unknown key, time skew) and log locations
+- Key rotation / trust store update procedure (customer action steps)
+- Support escalation and “what to collect” checklist
+
+### 3) Internal-only docs (Confluence + internal runbooks)
+**Goal:** Enable Support/SE/Engineering to execute pilots, triage incidents, and maintain release quality.
+Include:
+- Detailed runbooks and error taxonomy
+- Break-glass process (policy, approvals, audit markers)
+- Release checklist/gating and how docs are validated per release
+
+---
+
+## Information architecture (IA)
+### Private/customer docs pages (must-have for GA)
+1) **Overview: Offline bundles (signed) for Redwood Private**
+   - What’s inside a bundle (high level)
+   - What signing protects (manifest + referenced artifacts)
+   - What verification does and when it runs (preflight, install, upgrade)
+
+2) **Install: Air-gapped installation with signed bundles**
+   - Prereqs (Kubernetes version range, container runtime, storage, CPU/RAM, OS tooling)
+   - Transfer guidance (USB / secure media) and integrity preservation tips
+   - Step-by-step install
+
+3) **Preflight + Verify: Verify bundle signature and manifest before install**
+   - Mandatory verification flow
+   - Expected success output
+   - Common failure messages → next steps
+
+4) **Upgrade & rollback: Offline bundle upgrade flow**
+   - Supported upgrade paths
+   - Downgrade prevention behavior
+   - Rollback procedure (and what is / isn’t allowed offline)
+
+5) **Key rotation / Trust store updates (offline environments)**
+   - How Redwood rotates signing keys
+   - How customer updates the installer trust store offline
+   - What happens if trust store is not updated (unknown key failure)
+
+6) **Troubleshooting: Offline bundle verification failures**
+   - Hash mismatch
+   - Signature invalid/untrusted
+   - Not-yet-valid / expired due to time skew
+   - Bundle corruption due to unzip tooling or line ending conversion
+
+7) **FAQ & common errors**
+   - Error codes reference (stable identifiers)
+   - “What logs do I send Support?”
+
+### Public docs pages (minimal)
+- “Redwood Private: Offline / air-gapped deployments (overview)”
+- “Security: Signed offline bundles (integrity & provenance overview)”
+
+### Internal-only pages (examples)
+- “Support playbook: verification failures” (detailed triage + escalations)
+- “Release docs checklist: signed bundles” (gating, validation steps)
+- “Exception process: unsigned bundle hotfix (break-glass)”
+
+---
+
+## Canonical examples (CLI snippets)
+**Note:** Examples below use proposed/implemented CLI patterns from the installer workstream. Docs must match the currently shipped installer. If flags or subcommands differ for a given release, the release notes and versioned docs must call that out explicitly.
+
+### Bundle inspection (recommended first step)
+Use when validating transfer media or when opening a support ticket.
+
+Command:
+- `redwood-private-installer bundle inspect --bundle /mnt/media/redwood-private-offline-bundle-2026.01.0.tar.zst`
+
+Expected output (example):
+- Shows bundle version, build ID, manifest digest
+- Shows signature verification result and signing key ID
+- Prints a short artifact summary (charts/images/models/runtime)
+
+### Explicit signature verification (preflight mode)
+Command:
+- `redwood-private-installer preflight --airgap --bundle /mnt/media/bundle.tar.zst --verify-only`
+
+Expected behaviors:
+- Fails closed if signature is invalid, manifest hash mismatch, or key is untrusted
+- Prints remediation steps including log path
+
+### Verify using an updated trust store (after key rotation)
+Command:
+- `redwood-private-installer preflight --airgap --bundle /mnt/media/bundle.tar.zst --trust-store /etc/redwood/trust/keys.json`
+
+Docs must include:
+- Trust store file location options (embedded default vs customer-supplied path)
+- How to stage trust store updates offline
+
+### Time skew diagnostics (air-gapped clusters)
+When customer has inaccurate system time and signature validation fails due to validity window.
+
+Command (diagnostic only; do not recommend as a permanent configuration):
+- `redwood-private-installer preflight --airgap --bundle /mnt/media/bundle.tar.zst --time-override "2026-01-27T12:00:00Z"`
+
+Docs must:
+- Clearly label this as **diagnostic**
+- Provide guidance on fixing system time source and rerunning verification normally
+
+### Break-glass override (internal/private docs only)
+Break-glass must never appear in public docs. In private docs, it should be behind an “Emergency only” section and require explicit warnings.
+
+Command (example):
+- `redwood-private-installer install --airgap --bundle /mnt/media/bundle.tar.zst --break-glass-allow-unsigned`
+
+Docs requirements:
+- Must include the approval path and required audit annotations
+- Must state that Support may ask for additional evidence/logs and that the cluster may be marked “unsupported until remediated”
+
+---
+
+## Keeping docs aligned with release artifacts
+### Principle
+Docs should be treated as a **versioned interface** to a release artifact. If the installer behavior or bundle layout changes, docs must change in the same release train.
+
+### Source-of-truth mapping
+- Bundle layout + manifest fields: Engineering spec page (Confluence) and schema in repo
+- Verification behaviors + error codes: Installer repo + docs error reference page
+- Key rotation/trust store: Security/Release runbooks + customer-facing procedure
+
+### Versioning strategy
+- Customer docs should be **versioned by Redwood Private release** (e.g., 2026.01, 2026.02) when installer flags, manifests, or error codes change.
+- Always provide:
+  - “Latest” (default)
+  - A version selector (at least last 3 minor releases)
+
+### Release gating checklist (docs)
+For every Redwood Private release that includes offline bundles:
+1) Docs PR merged for:
+   - Install (offline)
+   - Verify/preflight
+   - Upgrade/rollback
+   - FAQ + error codes
+2) Commands and outputs validated against the **release candidate** bundle:
+   - Run `bundle inspect` against RC artifact and compare to docs
+   - Validate at least one failure mode screenshot/output (tampered bundle) to ensure messages match
+3) Confirm that the docs include the correct:
+   - Minimum installer version required
+   - Bundle version string format and build ID location
+   - Trust store update instructions (if new key introduced)
+
+Ownership:
+- Docs owner: DevEx Docs (Elliot Price / Kira Thompson)
+- Validation sign-off: Release Engineering (Connor O’Brien) + Installer Eng (Ethan Park)
+- Security wording review: Marcus Lin (esp. break-glass + trust root statements)
+
+### Automation (recommended)
+To prevent drift, we should generate docs fragments directly from build artifacts where feasible:
+- Auto-generate a “Bundle contents summary” table from the manifest (artifact names + versions)
+- Auto-sync error code reference from installer constants
+- Publish checksums/signature metadata (read-only) as an appendix section
+
+Implementation suggestions:
+- Add a CI job in `redwood-docs` that pulls the RC manifest (or a fixture manifest checked in per release) and validates:
+  - CLI snippets compile (command exists)
+  - Referenced flags exist
+  - Error codes referenced exist
+
+---
+
+## Content standards (tone, precision, and security)
+### Tone and clarity
+- Use direct, operator-focused language.
+- Prefer “Do X, then Y” procedures with expected output and next steps.
+
+### Security constraints
+- Do not publish:
+  - Internal key ceremony details
+  - Internal signing infrastructure identifiers
+  - Break-glass flags in public docs
+  - Any internal-only log redaction policies or SIEM exporter internals
+
+### Required doc elements for install/verify pages
+Each operational page must include:
+- Preconditions and “What you need on the air-gapped side”
+- A “Verify before install” step (signature + manifest)
+- Log locations
+- A “What to send Support” checklist
+
+---
+
+## Draft outline for the private/customer “Air-gapped install” page
+1) Overview
+2) Requirements
+3) Acquire the offline bundle (from Redwood)
+4) Transfer to secure media
+5) Verify bundle:
+   - `bundle inspect`
+   - `preflight --verify-only`
+6) Install
+7) Post-install validation
+8) Troubleshooting
+
+---
+
+## Open questions / follow-ups
+1) Finalize canonical command names and flags (installer): confirm `bundle inspect`, `preflight --verify-only`, trust store path flag.
+2) Decide where the trust store lives by default (embedded vs file) and document exactly one recommended path for customers.
+3) Confirm whether we expose signing key IDs / fingerprints in customer output and if yes, define the stable formatting (and redaction rules).
+4) Decide how we present downgrade prevention behavior in customer docs (what is blocked vs allowed rollback steps).
+
+Tracking:
+- Docs execution ticket: ENG-4850 (Docs and runbooks for offline bundle verification)
+- GA criteria: PM-894
+
+---
+
+## Appendix: quick reference tables
+### What goes where
+Public docs:
+- Conceptual overview of offline install support
+- High-level explanation of signed bundles
+
+Private/customer docs:
+- Step-by-step procedures, commands, expected output
+- Troubleshooting, error codes, trust store updates
+
+Internal Confluence:
+- Runbooks, break-glass policy, release gating checklist, internal triage
+
+### Definition of “aligned with release artifacts”
+Docs are considered aligned when:
+- Commands and flags match the shipped installer version
+- Bundle layout references match the actual bundle
+- Error codes/messages match installer output closely enough for Support scripts
+- Release notes mention any required doc-visible behavior changes (new trust root, verification behavior changes)

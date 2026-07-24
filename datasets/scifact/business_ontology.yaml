@@ -1,0 +1,240 @@
+# SciFact business ontology for dual-hybrid query expansion + overlap scoring.
+# Pass as `business_ontology` on search (BEIR smoke/eval load this file automatically).
+# version: 1.0.0
+concepts:
+  - concept_id: BIOMEDICINE
+    preferred_label: biomedicine
+    synonyms:
+      - biomedical
+      - life science
+    surface_forms: []
+    broader: []
+    narrower:
+      - CANCER
+      - CELL_BIOLOGY
+      - GENETICS
+      - INFECTIOUS_DISEASE
+      - THERAPEUTICS
+    related: []
+
+  - concept_id: CANCER
+    preferred_label: cancer
+    synonyms:
+      - tumor
+      - tumour
+      - malignancy
+      - oncology
+    surface_forms:
+      - carcinoma
+      - neoplasm
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - METASTASIS
+      - COLORECTAL_CANCER
+    related:
+      - CELL_BIOLOGY
+      - THERAPEUTICS
+
+  - concept_id: METASTASIS
+    preferred_label: metastasis
+    synonyms:
+      - metastatic
+      - metastases
+    surface_forms:
+      - secondary tumor
+    broader:
+      - CANCER
+    narrower: []
+    related:
+      - COLORECTAL_CANCER
+
+  - concept_id: COLORECTAL_CANCER
+    preferred_label: colorectal cancer
+    synonyms:
+      - colon cancer
+      - rectal cancer
+    surface_forms: []
+    broader:
+      - CANCER
+    narrower: []
+    related:
+      - METASTASIS
+
+  - concept_id: CELL_BIOLOGY
+    preferred_label: cell biology
+    synonyms:
+      - cellular
+      - cells
+    surface_forms:
+      - cell
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - STEM_CELL
+      - PROTEIN
+      - RECEPTOR
+      - FOXO
+      - MICROTUBULE
+    related:
+      - GENETICS
+
+  - concept_id: STEM_CELL
+    preferred_label: stem cell
+    synonyms:
+      - stem cells
+      - progenitor cell
+    surface_forms: []
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - PROTEIN
+
+  - concept_id: PROTEIN
+    preferred_label: protein
+    synonyms:
+      - proteins
+      - polypeptide
+    surface_forms: []
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - GENE_EXPRESSION
+      - RECEPTOR
+
+  - concept_id: RECEPTOR
+    preferred_label: receptor
+    synonyms:
+      - receptors
+      - ligand binding
+    surface_forms: []
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - PROTEIN
+
+  - concept_id: GENETICS
+    preferred_label: genetics
+    synonyms:
+      - genomic
+      - genome
+    surface_forms: []
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - GENE_EXPRESSION
+      - DNA
+    related:
+      - CELL_BIOLOGY
+
+  - concept_id: GENE_EXPRESSION
+    preferred_label: gene expression
+    synonyms:
+      - expression
+      - transcription
+      - upregulation
+      - downregulation
+    surface_forms: []
+    broader:
+      - GENETICS
+    narrower: []
+    related:
+      - PROTEIN
+      - DNA
+
+  - concept_id: DNA
+    preferred_label: DNA
+    synonyms:
+      - deoxyribonucleic acid
+      - nucleic acid
+    surface_forms: []
+    broader:
+      - GENETICS
+    narrower: []
+    related:
+      - GENE_EXPRESSION
+
+  - concept_id: INFECTIOUS_DISEASE
+    preferred_label: infectious disease
+    synonyms:
+      - infection
+      - pathogen
+    surface_forms: []
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - VIRUS
+    related:
+      - THERAPEUTICS
+
+  - concept_id: VIRUS
+    preferred_label: virus
+    synonyms:
+      - viral
+      - viruses
+    surface_forms: []
+    broader:
+      - INFECTIOUS_DISEASE
+    narrower: []
+    related: []
+
+  - concept_id: THERAPEUTICS
+    preferred_label: treatment
+    synonyms:
+      - therapy
+      - therapeutics
+      - drug
+    surface_forms:
+      - clinical trial
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - RISK_FACTOR
+    related:
+      - CANCER
+
+  - concept_id: RISK_FACTOR
+    preferred_label: risk
+    synonyms:
+      - risk factor
+      - increased risk
+    surface_forms: []
+    broader:
+      - THERAPEUTICS
+    narrower: []
+    related:
+      - CANCER
+
+  - concept_id: FOXO
+    preferred_label: FOXO
+    synonyms:
+      - FoxO3a
+      - FOXO3
+      - FoxO
+      - forkhead
+    surface_forms:
+      - FOXO transcription factor
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - PROTEIN
+      - GENE_EXPRESSION
+
+  - concept_id: MICROTUBULE
+    preferred_label: microtubule
+    synonyms:
+      - EB1
+      - p150
+      - p150n
+      - p150Glued
+      - dynactin
+    surface_forms: []
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - PROTEIN

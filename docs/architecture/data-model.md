@@ -177,12 +177,14 @@ Streaming mode collocates documents by `user_space` group.
 
 ```mermaid
 erDiagram
-  TKEIR_DOCUMENT ||--o{ CHUNK : "doc_ref / parent"
+  TKEIR_DOCUMENT ||--o{ CHUNK : "doc_ref / source_doc_id"
   TKEIR_DOCUMENT {
     string user_space PK
     string source_doc_id
     string title
     array_string content
+    string title_lemmatized
+    array_string content_lemmatized
     string json_ld
     string shacl_status
   }
@@ -190,13 +192,16 @@ erDiagram
     string user_space PK
     string chunk_id
     string doc_ref FK
-    string parent_title
-    array_string parent_content
+    string source_doc_id
     string text_raw
     tensor chunk_embedding
     tensor questions_embeddings
   }
 ```
+
+Parent denormalization (`parent_title` / `parent_content`) was removed; dual-hybrid
+retrieval queries both schemas and fuses ranks (see
+[dual-hybrid migration](../runbooks/dual-hybrid-migration.md)).
 
 Parent documents carry optional `document_ontology.json_ld` produced by
 `thot.tasks.document_ontology` (see [Document ontology](../tools/document_ontology.md)).

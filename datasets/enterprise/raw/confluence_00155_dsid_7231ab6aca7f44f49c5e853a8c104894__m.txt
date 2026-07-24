@@ -1,0 +1,134 @@
+Multimodal Long‑Context Probe Orchestration and Telemetry Guide
+
+Summary:
+This guide describes the probe orchestration and telemetry design for evaluating multimodal models on long‑context workloads. It covers synthetic probe generation, traffic stitching (real + synthetic), telemetry event schema, annotation guidance, privacy constraints, and a step-by-step orchestration playbook for staging -> shadow -> production evaluation. The goal is repeatable, auditable evals that reveal subtle long‑context regressions without significantly impacting production latency or costs.
+
+Scope and audience:
+- Audience: applied ML engineers, evaluation engineers, model onboarding owners, and SREs who run shadow/replica evals.
+- Scope: multimodal inputs (text + images, video frames, document pages), sequence lengths from 2k to 200k tokens/frames, and workloads that exercise cache/KV behavior and prefix reuse. Not a model training guide.
+
+Motivation and objectives:
+- Detect quality regressions that only appear with long coherent context or multimodal grounding (e.g., reference tracking across thousand‑token spans).
+- Measure worst‑case and average latency, KV cache miss effects, and token‑level fidelity for long context.
+- Provide reproducible telemetry that supports causal triage (see regression triage playbooks).
+
+Definitions:
+- Probe: an input (text + optional media) designed to exercise a specific failure mode (forgetting, hallucination, coherence loss, cache invalidation).
+- Stitch: the process of combining real customer traffic with synthetic probes in a way that preserves request distribution properties for evals.
+- Shadow run: live inference of candidate model behind production routing, with outputs logged but not surfaced to users.
+
+Probe generation pipeline (high level):
+1. Collection and slicing:
+   - Collect anonymized long‑context sessions from consenting customers or synthetic simulators.
+   - Slice sessions into anchors (prefixes) and probes (target continuations) with metadata: anchor_length, last_accessed_kv_size, media_count, modality_mix.
+2. Synthesis and augmentation:
+   - Generate synthetic continuations using calibrated LLMs with varying temperature and instruction templates to cover edge behaviors.
+   - Insert controlled perturbations: coreference swaps, repeated entity aliases, injected contradictions, and repeated image references.
+3. Prioritization and sampling:
+   - Score probes by risk (semantic drift probability), rarity (frequency in corpus), and resource impact (expected token cost).
+   - Create evaluation batches balancing high‑risk low‑frequency probes with representative samples.
+4. Annotation:
+   - Human labelers annotate ground truth for intent, expected entity continuity, acceptable tolerance windows, and failure tags (e.g., misattribution, drop-off, hallucination).
+
+Telemetry event schema (single flat JSON line per event):
+- event_id: string (UUID)
+- probe_id: string
+- session_anchor_hash: string (HMAC with eval key)
+- model_version: string
+- route: string (internal route id)
+- input_length_tokens: integer
+- input_media_count: integer
+- context_kv_size_bytes: integer
+- start_timestamp: ISO8601
+- end_timestamp: ISO8601
+- latency_ms: integer
+- tokens_generated: integer
+- cache_hit_ratio: float (0.0-1.0)
+- failure_tags: list[string] (may be empty)
+- output_digest: string (sha256 of normalized output)
+- annotation_verdict: string (match|partial|mismatch|not_applicable)
+- annotation_notes: string
+- cost_usd_estimate: float
+
+Table: recommended thresholds and alerting rules
+| Metric | Warning threshold | Critical threshold | Alert owner |
+| Latency 95th | > 1200 ms | > 2000 ms | eng-serving-runtime |
+| Cache hit ratio (median) | < 0.6 | < 0.4 | eng-serving-runtime |
+| Mismatch rate (slice) | > 3% | > 7% | applied-ml |
+| Token generation cost (avg) | > $0.015/token | > $0.03/token | finance-legal |
+
+Annotation and labeling guidelines:
+- Labelers must be provided the anchor, probe, and model output side‑by‑side.
+- Use the tolerance window concept: a model can satisfy a probe if the required entity/intent appears within N tokens/frames (N determined per probe type).
+- Assign failure_tags using the canonical taxonomy: {forgetting, misattribution, contradiction, hallucination, truncation, multimodal-mismatch}.
+- For multimodal references, require linkability: the output must reference the correct image/frame id from the anchor.
+
+Privacy and data handling:
+- All session_anchor_hash values must be HMACed with an evaluation key stored in the secrets manager; do not store raw PII.
+- Synthetic probe generation must not be seeded with customer‑owned textual content unless explicit consent exists.
+- Telemetry retention: raw events retained for 30 days in hot storage, 365 days in compressed audited archive. Access requires applied-ml-team role.
+
+Shadow orchestration playbook (stepwise):
+1. Prepare candidate probe set and priority lanes (critical, representative, low-risk).
+2. Create a shadow deployment: route 0.1-1% of mirrored traffic to shadow cluster for a 24‑48h smoke test.
+3. Run combined replay: for heavy long‑context probes, use replay worker to flood the shadow cluster with synthetic sequences at controlled throughput to exercise KV cold/warm states.
+4. Collect telemetry and annotations asynchronously; do not add blocking to live requests.
+5. Run automated checks: mismatch rate per slice, latency degradation per model_version, cache behavior drift.
+6. If checks pass, expand to 5–10% traffic with extended probes for 7–14 days.
+7. Final promotion gating: pass SLOs, reviewer signoff (applied‑ml + SRE), and privacy checklist.
+
+Traffic stitching and replay constraints:
+- Stitching must preserve inter‑arrival time distributions for representative lanes; synthetic bursts allowed for stress lanes but tagged as such.
+- Maintain separate telemetry tags: stitched=true|false, synthetic=true|false, stress_test=true|false.
+- Use replay windows to avoid violating customer rate limits or user‑facing SLAs.
+
+Quality gates and rollbacks:
+- Hard gates: 95p latency regression > 20% on representative lanes triggers immediate rollback.
+- Soft gates: mismatch rate increase > 0.5% triggers investigation workflow but may not auto-rollback.
+- Rollback procedure: revert route config, mark model_version as quarantined, create regression ticket with probe references and primary telemetry digests.
+
+Operational considerations and ownership:
+- Ownership: applied-ml owns probe catalog and annotation quality. eng-serving-runtime owns runtime telemetry and alerting. eng-sre coordinates shadow routing and safe rollout windows.
+- SLOs for eval infra: telemetry ingestion 99.9% within 30s, probe replay worker availability 99% monthly.
+
+Troubleshooting quick list:
+- If cache_hit_ratio drops unexpectedly: check KV eviction logs, recent infra changes, and quantized kernel rollouts.
+- If annotation backlog grows: spin up labeler elastic workers, throttle synthetic generation, and prioritize critical lanes.
+- If output_digest collision rate spikes: confirm normalization pipeline and dedup heuristics.
+
+Examples and snippets:
+- Telemetry ingestion CLI (example):
+  rinf telemetry ingest --source replay-worker --file probes_batch.json --env staging
+
+- Minimal synthetic probe JSON (single line example):
+  {"probe_id":"probe-20241115-001", "anchor":"[doc pages 1-14] ...", "continuation_instruction":"Answer with the list of referenced figures and their captions."}
+
+- Example analysis query (pseudo-SQL):
+  SELECT probe_id, model_version, AVG(latency_ms) as p95_latency, SUM(failure_tag='forgetting') as forgetting_count
+  FROM telemetry_events
+  WHERE stitched=false AND synthetic=false AND start_timestamp >= '2025-01-01'
+  GROUP BY probe_id, model_version
+
+Release notes and iteration plan:
+- v1.0 (2024-11): baseline probe types, telemetry schema, and shadow playbook.
+- v1.1 (2025-01): added multimodal linkability checks, cost_estimate fields, and privacy hardening.
+- Next: integrate automatic root cause attribution hooks with regression bisect tool.
+
+Appendix: canonical probe taxonomy (short):
+- Coherence-lapse: long-range entity consistency failures.
+- Multimodal-mismatch: incorrect image/frame grounding.
+- KV-thrash: performance and correctness failures caused by KV cache churn.
+- Intent-drift: model shifts intent interpretation mid-session.
+
+Contacts and escalation:
+- Applied ML oncall: applied-ml-oncall@redwood.ai
+- Eng serving runtime: runtime-ops@redwood.ai
+- Evaluation owner: Maya Thompson (maya@redwood.ai)
+
+Related documents and references:
+- See eval mesh and workload fingerprinting for scheduling ties.
+- See regression triage playbooks for incident investigation linkage.
+
+Document history:
+- 2024-11-15: created by Maya Thompson
+- 2025-01-08: expanded telemetry schema and added release notes

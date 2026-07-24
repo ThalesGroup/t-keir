@@ -1,0 +1,180 @@
+Forensic Playbook: Privileged Key Compromise in Dedicated Deployments
+
+Summary
+-------
+This playbook describes the detection, containment, evidence collection, legal-hold procedures, and post-incident validation steps for a confirmed or suspected compromise of privileged cryptographic keys (KMS/master keys, HSM-wrapped keys, or long-lived service credentials) that are used in Redwood Dedicated deployments. It covers tenant isolation and cross-region evidence preservation requirements, and provides concrete CLI/SQL/query examples for collecting admissible forensic artifacts.
+
+Intended audience
+------------------
+- Security on-call (SecOps) and Forensics engineers
+- Dedicated deployment SRE/Support leads
+- Legal (incident counsel) and Compliance owners
+- Product security and Platform engineering liaisons
+
+Scope and assumptions
+---------------------
+- Applies to compromised keys used by Dedicated (reserved capacity) customers, and keys used by private control planes associated with Dedicated clusters.
+- Includes KMS keys (cloud-managed), HSM-managed key material, and long-lived signing keys (e.g., model-signing, deployment-signing).
+- Does NOT replace tenant-specific legal obligations; when a customer requests additional controls, follow customer contract terms and involve Legal.
+
+Priority decision matrix
+------------------------
+1. Confirmed compromise of a customer-facing key (high): immediate containment and legal hold.
+2. Suspected compromise of internal service key (medium): rapid containment and evidence snapshotting.
+3. Compromise limited to ephemeral test key (low): local revocation and root-cause analysis.
+
+Ownership and contacts
+----------------------
+- Incident commander (IC): SecOps on-call (primary) -> contact via #secops-oncall and pager
+- Forensics lead: Platform forensics team (evan.zhao@redwood.ai)
+- Dedicated SRE contact: Dedicated oncall rotation (dedicated-oncall@redwood.ai)
+- Legal counsel (incident): Incident legal rotation; escalate via PagerDuty if PII/regulated data involved
+
+Detection and initial triage (0-30 minutes)
+-----------------------------------------
+1. Triage signals:
+   - Cloud KMS alerts (suspicious key usage outside normal time/region).
+   - Unexpected schedule-key-deletion or key-disable API calls.
+   - Alert from deployment telemetry: sudden token invalidations, deployment failures citing signing mismatch.
+   - Multiple failed signing attempts or JWTs signed by unknown key id.
+2. Quick checks (commands):
+   - AWS (CloudTrail event lookup):
+     aws cloudtrail lookup-events --lookup-attributes AttributeKey=ResourceName,AttributeValue=<key-id> --start-time "2028-01-11T00:00:00Z" --end-time "2028-01-11T23:59:59Z"
+
+   - GCP (Cloud Audit Logs via gcloud):
+     gcloud logging read "protoPayload.serviceData.policyDelta" --freshness=1d --limit=200 --format=json | jq '.[] | select(.resourceName|test("<key-name>"))'
+
+   - Snapshot KMS key metadata (AWS example):
+     aws kms get-key-rotation-status --key-id <key-arn>
+     aws kms describe-key --key-id <key-arn> --output json > /tmp/evidence/key-desc-<key-id>.json
+
+3. Initial containment decisions (within 30 min):
+   - If key is actively used for signing customer requests, consider immediate key disable/schedule-delete and failover to a rotated key.
+   - If disablement would cause customer outage, follow controlled failover: rotate signing endpoints to a pre-provisioned standby key and throttle traffic.
+
+Containment and mitigation (30-120 minutes)
+--------------------------------------------
+1. Short-term containment options (choose with Legal):
+   - Disable key (cloud KMS):
+     aws kms disable-key --key-id <key-arn>
+   - Schedule deletion (if irrevocable compromise confirmed):
+     aws kms schedule-key-deletion --key-id <key-arn> --pending-window-in-days 7
+   - For HSM keys: place the HSM slot into maintenance mode and freeze network access; take HSM management console snapshots.
+
+2. Tenant isolation checklist:
+   - Identify affected tenants by correlating API key usage with KMS usage events.
+   - Apply per-tenant network ACLs or security group ACLs if shared nodes are impacted.
+   - If Dedicated pool is multi-tenant, evict/unbind non-matching tenants and failover their workloads to isolated capacity.
+
+3. Communications (IC responsibility):
+   - Notify Legal and Customer Success for affected customers within SLA window.
+   - Post incident banner in status.redwood.ai if customer impact is >= partial outage.
+
+Evidence collection and preservation (most-critical section)
+-----------------------------------------------------------
+Guiding principle: collect immutable copies and preserve provenance. Capture system state, audit logs, configuration, and cryptographic artifacts. Use timeline stamps and manifest to record chain-of-custody.
+
+1. Evidence bundle structure (recommended naming):
+   - evidence/<incident-id>/manifest.txt
+   - evidence/<incident-id>/cloudtrail-raw.json.gz
+   - evidence/<incident-id>/kms-describe-json.txt
+   - evidence/<incident-id>/hsm-snapshots/*
+   - evidence/<incident-id>/network-captures/*
+
+2. Minimal artifact list (must capture all):
+   - Raw audit log slices (CloudTrail, Cloud Audit Logs) for start_time-48h .. end_time+24h
+   - KMS describe and policy documents (get-key-policy, key rotation status)
+   - Access control changes (IAM role changes, STS assume-role events)
+   - Service logs with signature failures or unexpected key-id headers
+   - Running container images and /proc/cmdline for impacted hosts (if safe to snapshot)
+   - Memory dump of signing process only when authorized by Legal and Forensics; capture using LiME/volatility guidance
+
+3. Example evidence collection commands
+   - CloudTrail (AWS):
+     aws s3 cp "s3://cloudtrail-logs/<bucket>/account/<account-id>/" /tmp/evidence/cloudtrail-raw --recursive --exclude "*" --include "*<YYYY-MM-DD>*"
+
+   - Export KMS key policy and aliases (AWS):
+     aws kms get-key-policy --key-id <key-arn> --policy-name default > /tmp/evidence/key-policy-<key-id>.json
+     aws kms list-aliases --key-id <key-arn> > /tmp/evidence/key-aliases-<key-id>.json
+
+   - Export rotation and grants:
+     aws kms get-key-rotation-status --key-id <key-arn> > /tmp/evidence/key-rotation-<key-id>.json
+     aws kms list-grants --key-id <key-arn> > /tmp/evidence/key-grants-<key-id>.json
+
+4. Audit log query examples (forensic-grade queries):
+   - Identify cross-region access:
+     SELECT eventTime, eventName, userIdentity, sourceIPAddress, awsRegion, requestParameters FROM cloudtrail_logs WHERE resource = '<key-arn>' AND eventTime BETWEEN '2028-01-09T00:00:00Z' AND '2028-01-11T23:59:59Z' ORDER BY eventTime DESC;
+
+   - Find STS tokens created using the key:
+     SELECT * FROM cloudtrail_logs WHERE eventName = 'AssumeRole' AND requestParameters LIKE '%<key-id>%';
+
+Chain-of-custody and manifest requirements
+-----------------------------------------
+- Manifest must contain: incident id, collector name, collection timestamps (UTC), checksums (SHA256) for each artifact, storage location (S3 path), encryption method for preserved copies, and who authorized collection.
+- Use stamped checksums: sha256sum artifact > artifact.sha256
+
+Legal hold and retention rules (contract-driven)
+-----------------------------------------------
+- Immediately notify Legal for any key compromise involving customer data or keys attached to customer tenancy.
+- Preserve originals for a minimum of 2 years for incidents involving regulated data, unless Legal instructs longer.
+- Evidence copies must be stored in an immutable bucket with versioning and MFA delete enabled where available.
+
+Special considerations for data residency and cross-border evidence
+-----------------------------------------------------------------
+- If evidence includes customer PII governed by residency clauses, consult Data Residency matrix and follow regional export rules before copying logs outside region. Mark artifacts with region tags in the manifest.
+- If required, perform remote analysis in-region and ship only derived metadata out-of-region; record the reasoning in the manifest.
+
+Forensics tooling and safe handling
+----------------------------------
+- Prefer read-only APIs and logging exports. Avoid running intrusive collection on production hosts unless forensics lead authorizes.
+- Recommended tooling: AWS CLI, gcloud, jq, tshark (for network pcap), LiME (for memory capture), volatility for analysis, and a documented VM for forensic analysis (offline).
+
+Restoration and system hardening (24-72 hours)
+---------------------------------------------
+1. Replace compromised key(s) across all consumers and rotate dependent skeleton keys.
+2. Re-issue short-lived credentials and rotate any static tokens.
+3. For Dedicated clusters, perform an image rebuild for signing services with new keys; ensure reproducible build artifacts with SBOM attached.
+4. Introduce additional policy guards: restrict key usage to explicit principals, add region constraints, and require context-based conditions (e.g., source VPC).
+
+Post-incident evidence pack and reporting (72 hours)
+--------------------------------------------------
+- Prepare an evidence pack for Legal and Compliance containing manifest, executive summary, timelines, root cause analysis, and mitigations applied.
+- SLO for the report: initial executive summary within 48 hours; full technical report within 14 business days.
+
+Metrics and detection improvements (closure)
+-------------------------------------------
+- Create/update detection rules for anomalous KMS usage patterns (international region jump, unusual principal).
+- Add a nightly job to verify key policy drift for production keys and alert on policy diffs.
+- Track post-incident metrics: mean time to contain (goal < 2 hours), evidence collection completeness (100% of required artifact set), and number of tenants affected.
+
+Runbook appendix (cheat sheet)
+-----------------------------
+1. Snapshot key metadata (AWS):
+   aws kms describe-key --key-id <key-arn> --output json > /tmp/evidence/key-desc.json
+   aws kms get-key-policy --key-id <key-arn> --policy-name default > /tmp/evidence/key-policy.json
+
+2. Disable key (if authorized):
+   aws kms disable-key --key-id <key-arn>
+
+3. Export CloudTrail slice (example):
+   aws cloudtrail lookup-events --lookup-attributes AttributeKey=ResourceName,AttributeValue=<key-id> --start-time "2027-11-01T00:00:00Z" --end-time "2027-11-02T23:59:59Z" --output json > /tmp/evidence/cloudtrail-slice.json
+
+4. Generate manifest entry (example):
+   echo "artifact: cloudtrail-slice.json
+sha256: $(sha256sum /tmp/evidence/cloudtrail-slice.json | awk '{print $1}')
+collected_by: $(whoami)
+collected_at: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/evidence/manifest.txt
+
+Related documents and references
+-------------------------------
+- Incident evidence coordination playbook (internal): /confluence/security-and-compliance/incident-response-security/incident-evidence-coordination-for-rbac-audit-and-retention-2026
+- Service identity rotation guide: /confluence/security-and-compliance/rbac-and-auth/service-identity-rotation-and-evidence-playbook-2026
+- Data residency decision matrix: /confluence/security-and-compliance/data-residency-and-retention/data-sovereignty-decision-matrix-and-audit-evidence-playbook-2026
+
+Notes and change log
+---------------------
+- 2027-11-02: Created by Asha Patel (initial draft).
+- 2027-12-15: Added cross-region evidence handling and manifest schema (review by Marisol Rivera).
+- 2028-01-11: Legal hold wording clarified; added CLI examples and retention guidance (review by Liam O'Connor).
+
+End of playbook

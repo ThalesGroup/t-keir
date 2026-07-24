@@ -1,0 +1,169 @@
+Regional capacity thaw/freeze and conservation runbook
+
+Summary:
+
+This runbook documents the operator-driven "thaw/freeze" procedures and the automated "conservation" mode we use to protect regional capacity during sudden demand spikes, cloud quota anomalies, or planned maintenance windows. It is intended for platform operators, SREs, and on-call leads. Follow the preflight checks and step sequences precisely; use the rollback section if a step produces unexpected customer impact.
+
+Scope:
+
+- Applies to all Redwood-managed inference capacity in a single region (hosted and dedicated pools).
+- Covers: manual thaw, manual freeze, automated conservation engagement, monitoring/dashboards, alert thresholds, and post-event retrospective template.
+- Excludes: private/on-prem regions under customer control; for those, use the private-deployments runbook.
+
+Motivation and goals:
+
+- Prevent catastrophic token-cost or latency regressions while preserving availability for high-priority tenants.
+- Provide deterministic operator actions during region-level capacity stress.
+- Ensure clear signals and automated safeties to avoid human error during manual interventions.
+
+Ownership:
+
+- Primary owner: Platform Capacity Team (eng-platform)
+- Runbook maintainers: Nadia Romero, Samir Gupta
+- On-call executor: Regional Platform Operator (level-2)
+- Escalation: SRE Lead -> Head of Platform -> Customer Success for impacted enterprise tenants
+
+Preflight checks (operator must verify before any manual thaw/freeze):
+
+| Item | How to verify | Pass/Fail criteria | Remediation if fail |
+|---|---|---|---|
+| Region health (control plane) | kubectl get nodes, platform-api healthcheck | All control-plane pods Ready; API latency < 500ms | Delay action; run control-plane runbook |
+| Active throttles | dashboards -> token-throttle view | No >10% sudden throttle bursts in last 5m except originating tenant | Identify tenant and throttle target |
+| Scheduled maintenance windows | pagerduty schedule + maintenance calendar | No conflicting maintenance for next 60m | Reschedule or coordinate |
+| Critical tenant list | enterprise SLA dashboard | Confirm list of tenants that must be preserved | Adjust conservation policies to exempt |
+
+Quick glossary:
+
+- Thaw: Increase capacity or relax conservative routing to allow batched/low-priority workloads to run. Typically used after region recovery.
+- Freeze: Immediate hardening to preserve capacity for high-priority tenants by rejecting or delaying non-critical workloads.
+- Conservation mode: Automated intermediate state where routing and cache policies tighten gradually based on observed signals.
+
+1) Manual Freeze (operator sequence)
+
+1.1 When to use: sudden / sustained SLO degradation (latency > 250ms p95 for 5m) and evidence of token surge or GPU exhaustion.
+1.2 Steps:
+
+1) Announce action: create a Slack incident thread with #platform-operators and tag on-call.
+2) Mark region as "freeze-in-progress" in the operator dashboard: POST /api/v1/regions/{region}/actions {"action":"freeze","owner":"<your-name>"}.
+3) Toggle routing policy: set tenant-priority-high for region via CLI: 
+   curl -X POST "$PLATFORM_API/regions/$REGION/policies" -H "Authorization: Bearer $OP_TOKEN" -d '{"policy":"freeze-default","effective_in":30}'
+4) Apply temporary reject rules for low-priority models: update OPA policy bundle or runbook helper script: bin/apply-rejects --region $REGION --labels low-priority --duration 30m
+5) Reduce batch size heuristics to favor tail latency: platform-cli set-batching --region $REGION --max-batch 8 --kv-ttl 60
+6) Engage conservation auto-scaler lock (prevents automatic thaw): platform-cli lock-autoscaler --region $REGION --reason "manual-freeze"
+7) Monitor key metrics for 10 minutes: p95 latency, queue length, GPU utilization, token rate.
+8) If no improvement after 15 minutes, escalate to SRE Lead. If improvement, maintain freeze for a minimum of 30 minutes before considering thaw.
+
+2) Manual Thaw (operator sequence)
+
+2.1 When to use: region stable (p95 latency within SLO for 30m, GPU utilization < 60%, token rate within expected baseline).
+2.2 Steps:
+
+1) Announce intent in Slack and update incident thread.
+2) Validate preflight checks again.
+3) Remove temporary reject rules: bin/remove-rejects --region $REGION
+4) Gradually relax routing policy: platform-api PATCH /regions/$REGION/policies {"target":"normal","ramp_duration":15}
+5) Increase batch size in two steps with 5–10 minute observation windows: platform-cli set-batching --region $REGION --max-batch 32 --step 16
+6) Unlock autoscaler if previously locked: platform-cli unlock-autoscaler --region $REGION
+7) Verify: observe p95, error-rate, and token-cost estimates for 30 minutes. Rollback (re-freeze) if any critical SLO fractures.
+
+3) Automated Conservation Mode (system behavior & parameters)
+
+- Triggering signals (any of): region token-rate > 2x baseline for 3m, p95 latency > 200ms for 3m, GPU queue length > 200 for 2m.
+- Actions taken automatically:
+  - Apply soft-throttle on low-priority tenants (reject with Retry-After 10s).
+  - Reduce default batch_max from 128 -> 32 in three steps.
+  - Raise KV cache TTL for session-affine workloads to 5m to favor cache hits.
+  - Emit high-urgency alerts to #platform-operators and open an incident ticket.
+
+Config snippet (conservation policy YAML):
+
+policy_name: regional_conservation
+triggers:
+  - name: token_spike
+    metric: token_rate
+    threshold: 2.0
+    window: 180
+  - name: tail_latency
+    metric: p95_latency_ms
+    threshold: 200
+    window: 180
+actions:
+  - apply: soft_throttle
+    scope: low_priority_tenants
+    retry_after: 10
+  - apply: batching_reduction
+    steps: [64,32,16]
+  - apply: kv_ttl_adjust
+    value_seconds: 300
+  - notify: platform-operators
+
+4) Dashboards and alerting (what to watch)
+
+Primary dashboards (operator quick-links):
+- Region Overview: p95 latency, p50, error-rate, GPU utilization, token-rate, queue depth.
+- Tenant Priority Heatmap: shows which tenants are consuming capacity and whether they've been throttled.
+- Cost-Attribution: rolling 24h token-cost projection vs. committed capacity.
+
+Critical alert thresholds (automated):
+- region.p95_latency_ms > 250 for 5m -> Sev-2 (notify #platform-operators + pager)
+- region.gpu_queue_length > 200 -> Sev-2
+- token_rate > 3x baseline -> Sev-2 and auto-conservation engage
+- autoscaler.locked and freeable_capacity < 5% -> Sev-3 (ops review)
+
+Alert context guidelines:
+- Always include: current p95, token-rate, top 5 tenants by token-rate, recent config changes in last 30 minutes, and operator who initiated any manual action.
+
+5) Incident runbook (short form)
+
+- Step 0: Triage in Slack. Quick checks: control plane readiness, scheduled changes, recent deploys.
+- Step 1: If automated conservation engaged, decide whether to let system continue for 15m.
+- Step 2: If manual freeze required follow Manual Freeze sequence above.
+- Step 3: If freeze did not stabilize region in 30m, escalate to SRE Lead.
+- Step 4: If there is a customer-impacting outage, follow standard incident postmortem and notify Customer Success.
+
+6) Rollback and safety checks
+
+- Rollback: To immediately undo a thaw or freeze, use: platform-cli rollback-action --region $REGION --action-id $ACTION_ID. This re-applies the previous policy snapshot.
+- Safety guardrails: all manual freezes/thaws must be recorded with an action-id and a reason. The system will auto-expire locks after 120 minutes unless renewed.
+
+7) Post-event retrospective template (to be filled within 72 hours)
+
+- Summary of event: timeline with timestamps.
+- Root cause hypothesis.
+- Steps taken (freeze/thaw/conservation) and timestamps.
+- Metrics before/during/after (p95, token-rate, GPU util).
+- What worked / what didn't.
+- Action items (owner, ETA).
+
+8) Runbook review cadence and testing
+
+- This runbook must be reviewed quarterly by the Platform Capacity Team.
+- Exercises: schedule a simulated conservation engagement in the lab environment every quarter. Use the synthetic-scenario orchestrator ticket template and include operator rotation.
+
+Appendix A: Useful commands and helpers
+
+- Check region overview: curl $PLATFORM_API/regions/$REGION/overview -H "Authorization: Bearer $OP_TOKEN"
+- Apply conservative policy (shortcut): bin/apply-conservation --region $REGION --duration 30m --reason "operator-quick"
+- Query top tenants: platform-cli top-tenants --region $REGION --limit 10 --format json
+
+Appendix B: Example alert payload (for runbook automation)
+
+{
+  "region": "us-west-2",
+  "metric": "p95_latency_ms",
+  "value": 312,
+  "baseline": 78,
+  "top_tenants": ["acme-inc", "redwood-test-1", "big-saas"]
+}
+
+Contact list:
+
+- Platform Capacity Oncall: #platform-operators (PagerDuty)
+- SRE Lead: Elena Park (elena@redwood.example)
+- Head of Platform: Marco Rivera (marco@redwood.example)
+
+Document history:
+
+- 2025-11-03: created by Nadia Romero (initial draft)
+- 2026-01-20: added automated conservation parameters and YAML sample (reviewer: Samir Gupta)
+- 2026-02-12: finalized thresholds and publication (reviewer: Elena Park)

@@ -1,0 +1,242 @@
+# Zero-to-Hero enterprise business ontology for dual-hybrid query expansion.
+# Pass as `business_ontology` on POST /search or /rag/query — not loaded server-side from disk.
+# version: 1.1.0
+concepts:
+  - concept_id: ACMESYSTEMS
+    preferred_label: AcmeSystems
+    synonyms:
+      - "Acme Systems"
+      - Acme
+    surface_forms: []
+    broader: []
+    narrower:
+      - PROJECTS
+      - ENGINEERING
+      - QUALITY
+      - HR
+      - FINANCE
+    related: []
+
+  - concept_id: PROJECTS
+    preferred_label: projects
+    synonyms:
+      - "program delivery"
+    surface_forms: []
+    broader:
+      - ACMESYSTEMS
+    narrower:
+      - PROJECT_ATLAS
+      - MEETING_MINUTES
+      - PROJECT_REPORT
+    related:
+      - ENGINEERING
+
+  - concept_id: PROJECT_ATLAS
+    preferred_label: "Project ATLAS"
+    synonyms:
+      - ATLAS
+      - "Project HERMES"
+      - "Project ORION"
+      - "Project ZENITH"
+    surface_forms:
+      - "Platform v3.0"
+    broader:
+      - PROJECTS
+    narrower: []
+    related:
+      - TECHNICAL_SPEC
+      - API_GATEWAY
+
+  - concept_id: MEETING_MINUTES
+    preferred_label: "meeting minutes"
+    synonyms:
+      - "steering meeting"
+      - minutes
+    surface_forms: []
+    broader:
+      - PROJECTS
+    narrower: []
+    related:
+      - PROJECT_REPORT
+
+  - concept_id: PROJECT_REPORT
+    preferred_label: "project report"
+    synonyms:
+      - "status report"
+      - "project status"
+    surface_forms: []
+    broader:
+      - PROJECTS
+    narrower: []
+    related:
+      - MEETING_MINUTES
+
+  - concept_id: ENGINEERING
+    preferred_label: engineering
+    synonyms:
+      - "R&D"
+      - "product engineering"
+    surface_forms: []
+    broader:
+      - ACMESYSTEMS
+    narrower:
+      - TECHNICAL_SPEC
+      - API_GATEWAY
+      - KB_ARTICLE
+    related:
+      - PROJECTS
+      - QUALITY
+
+  - concept_id: TECHNICAL_SPEC
+    preferred_label: "technical specification"
+    synonyms:
+      - "tech spec"
+      - specification
+    surface_forms: []
+    broader:
+      - ENGINEERING
+    narrower: []
+    related:
+      - API_GATEWAY
+      - PROJECT_ATLAS
+
+  - concept_id: API_GATEWAY
+    preferred_label: "API Gateway"
+    synonyms:
+      - "API Gateway Refactor"
+      - "service interface"
+    surface_forms:
+      - "API doc"
+    broader:
+      - ENGINEERING
+    narrower: []
+    related:
+      - TECHNICAL_SPEC
+
+  - concept_id: KB_ARTICLE
+    preferred_label: "knowledge base article"
+    synonyms:
+      - KB
+      - "runbook article"
+    surface_forms: []
+    broader:
+      - ENGINEERING
+    narrower: []
+    related:
+      - HR_POLICY
+
+  - concept_id: QUALITY
+    preferred_label: quality
+    synonyms:
+      - compliance
+      - assurance
+    surface_forms: []
+    broader:
+      - ACMESYSTEMS
+    narrower:
+      - ISO_27001
+      - SOC2
+      - GDPR
+    related:
+      - ENGINEERING
+
+  - concept_id: ISO_27001
+    preferred_label: "ISO 27001"
+    synonyms:
+      - ISO27001
+      - "information security management"
+    surface_forms:
+      - "ISO 27001 change procedure"
+    broader:
+      - QUALITY
+    narrower: []
+    related:
+      - SOC2
+      - GDPR
+
+  - concept_id: SOC2
+    preferred_label: "SOC 2"
+    synonyms:
+      - SOC2
+      - "SOC2 Audit"
+    surface_forms:
+      - "SOC2 Audit 2024"
+    broader:
+      - QUALITY
+    narrower: []
+    related:
+      - ISO_27001
+
+  - concept_id: GDPR
+    preferred_label: GDPR
+    synonyms:
+      - "General Data Protection Regulation"
+      - "GDPR Compliance"
+    surface_forms:
+      - "GDPR Compliance Sprint"
+    broader:
+      - QUALITY
+    narrower: []
+    related:
+      - ISO_27001
+      - HR_POLICY
+
+  - concept_id: HR
+    preferred_label: "human resources"
+    synonyms:
+      - HR
+      - "people ops"
+    surface_forms: []
+    broader:
+      - ACMESYSTEMS
+    narrower:
+      - HR_POLICY
+      - EMAIL_THREAD
+    related: []
+
+  - concept_id: HR_POLICY
+    preferred_label: "HR policy"
+    synonyms:
+      - "remote work policy"
+      - "people policy"
+    surface_forms: []
+    broader:
+      - HR
+    narrower: []
+    related:
+      - GDPR
+      - KB_ARTICLE
+
+  - concept_id: EMAIL_THREAD
+    preferred_label: "email thread"
+    synonyms:
+      - "integration decision email"
+    surface_forms: []
+    broader:
+      - HR
+    narrower: []
+    related:
+      - PROJECTS
+
+  - concept_id: FINANCE
+    preferred_label: finance
+    synonyms:
+      - accounting
+      - billing
+    surface_forms: []
+    broader:
+      - ACMESYSTEMS
+    narrower:
+      - INVOICE_SUMMARY
+    related: []
+
+  - concept_id: INVOICE_SUMMARY
+    preferred_label: "invoice summary"
+    synonyms:
+      - invoice
+      - "vendor invoice"
+    surface_forms: []
+    broader:
+      - FINANCE
+    narrower: []
+    related: []

@@ -1,0 +1,154 @@
+Compensation, Wellbeing & Onboarding Framework
+
+Overview
+
+Purpose:
+This document defines Redwood’s integrated approach to total compensation, wellbeing benefits, onboarding guarantees, and the critical internal tools and checkpoints that ensure new hires and role transitions succeed. It is a single-source reference for managers, people-ops partners, hiring teams, and new joiners.
+
+Scope:
+Applies to all US and EU employees, contractors on company payroll, and People Ops-managed contingent workers. For country-specific deviations (e.g., statutory leave differences), see the regional supplements linked in Related Pages.
+
+Principles
+
+- Predictable: employees and managers should be able to forecast total rewards and onboarding timelines.
+- Transparent: components of pay, equity, and benefits are documented and accessible.
+- Inclusive: wellbeing and perks are designed for diverse family and life needs.
+- Operational: onboarding and provisioning have measurable SLAs and clear owners.
+
+Total Compensation Components
+
+1) Base Salary
+- Paid semi-monthly in local currency.
+- Bands are published internally (People Ops maintains band matrix). Managers must consult compensation@redwood for off-band offers.
+
+2) Variable / Bonus
+- Individual performance-based bonus target for eligible roles. Paid annually after calibration.
+
+3) Equity
+- Standard grant sizes by level and role family. Vesting: 4 years, 1-year cliff unless otherwise negotiated.
+
+4) Benefits Allowances
+- Relocation: case-by-case; People Ops approval required.
+- Home office stipend: one-time $600 (USD) for new hires; recurring ergonomic stipend available upon manager sign-off.
+
+Health & Wellbeing
+
+- Medical/Dental/Vision: Core plans with options to upgrade. Enrollment window: first 30 days from start date.
+- Mental health: unlimited access to the Redwood EAP and up to 20 therapy sessions per calendar year reimbursed depending on region.
+- Parental leave: primary caregiver 20 weeks fully paid; secondary caregiver 8 weeks. Reduced schedules and phased returns encouraged.
+- Care and Family Support: backup care stipend and fertility benefits included in the benefits portal.
+
+Time Off & Flexible Work
+
+- PTO: flexible policy with expectation of at least 15 working days taken per year. Managers should approve plans to cover team deliverables.
+- Holidays: company-observed calendar published annually.
+- Sabbatical: eligibility after 5 years of tenure; see Sabbatical Policy for details.
+
+Perks & Stipends
+
+- Commuter/parking stipend where regionally appropriate.
+- Learning & development: $2,000 annual L&D allowance per employee.
+- Conference budget: separate manager-approved allocation for role-critical conferences.
+
+Career and Role Progression
+
+Role Ladder Summary (examples):
+| Level | Typical Title examples | Core expectations | Promotion cadence |
+|-------|------------------------|-------------------|-------------------|
+| L1 | Associate / Junior Eng | Execute well-defined tasks, pair frequently | 12-18 months based on proficiency |
+| L3 | Senior / Sr PM | Independent project leadership, mentoring | 12-24 months, evidence-based review |
+| L5 | Staff / Principal | Cross-team influence, architecture ownership | Promotion requires portfolio & last-12mo impact |
+
+Competencies evaluated for promotion: technical craft, product judgement (if applicable), cross-team collaboration, mentoring & coaching, and business impact. People Ops and managers jointly assemble promotion packets; calibration occurs quarterly.
+
+Hiring & Onboarding: Guaranteed Service Levels
+
+To reduce time-to-impact, Redwood guarantees the following operational SLAs for all new joiners unless explicitly stated in the offer letter:
+
+- Offer to Start Logistics: 3 business days for equipment approval and procurement initiation after signed offer.
+- Device Provisioning: 7 business days from procurement order to delivery for standard desktop/laptop models. For remote hires where shipping delays occur, a loaner device is provided within 48 hours.
+- Access & Accounts: 2 business days for core accounts (Google Workspace, Slack, HRIS). Additional services (cloud accounts, repo access) follow the checklist below.
+
+New Hire Onboarding Checklist (Manager-owned items in bold)
+
+1. Pre-start (People Ops / IT)
+  a. Send welcome packet and first-week schedule (People Ops).
+  b. Create core accounts and invite to team channels (IT/SRE).
+  c. Ship equipment and VPN onboarding instructions (IT).
+
+2. Day 0-3 (Manager + Buddy)
+  a. Welcome meeting and role context (Manager).
+  b. Buddy pairing established with 1:1 schedule for first 30 days (Manager).
+  c. Goals for first 30/60/90 days documented in Go-To-Market plan (Manager & new hire).
+
+3. Week 1 (Hiring Team)
+  a. Product, infra, and security orientation sessions scheduled.
+  b. Access requested for code repos, staging clusters, and internal dashboards.
+  c. First small production task assigned to validate end-to-end access.
+
+4. 30/60/90 Day Reviews
+  - 30-Day: operational readiness check (Manager + People Ops).
+  - 60-Day: feedback and training gap assessment.
+  - 90-Day: calibration meeting; confirm role ramp and any adjustments.
+
+Access Provisioning: Standard Request Template (for managers to paste into access tickets)
+
+Request: New joiner access for [Full Name], Role: [Role], Team: [Team], Start Date: [YYYY-MM-DD]
+Required items:
+- Google Workspace: standard
+- Slack: add to #team, #eng-all and #product-all
+- Okta: standard SSO groups
+- GitHub: team repo access: [repo-list]
+- Cloud: staging read, dev write; prod access on approval ticket ID [insert]
+- Datadog: readonly, expand after training
+
+Operational Owners & Escalation
+
+- People Ops: owner for benefits enrollment, offer execution, and onboarding cadence.
+- IT/Device Fleet: owner for procurement, loaner program, device retirements.
+- Security: owner for access approvals to production systems.
+- Manager: owner for role clarity, 30/60/90 planning, and performance check-ins.
+
+Escalation path (if SLAs breached):
+1) Submit a People Ops ticket (priority: onboarding-sla)
+2) If unresolved after SLA window, escalate to the People Ops lead: people-lead@redwood.com
+3) If still unresolved after 48 hours, escalate to Head of People Ops.
+
+Internal Tools & Tooling Guides
+
+Key tools used during first 90 days:
+- HRIS (Workday/WorkOS): benefits enrollment, time-off requests.
+- IT ticketing (Jira Service Desk): equipment and access requests.
+- Confluence: central internal docs (this page).
+- GitHub: code collaboration; temporary access policies described in Security onboarding.
+- Datadog / Ops dashboards: read-only for new hires; training course required before escalation.
+
+Quick CLI snippet: Requesting a loaner device (internal CLI called redwood-it)
+
+$ redwood-it request-device --type loaner --duration 30 --user "jane.doe@redwood.com" --reason "start delay"
+
+Manager Checklist for Role Changes & Promotions
+
+- Submit promotion packet at least 4 weeks before the intended promotion date. Packet must include role expectation, evidence of impact, and at least two peer endorsements.
+- People Ops will schedule calibration and notify payroll for compensation changes.
+
+Guidance for International Hires
+
+- Local statutory differences: time-off, parental leave, and taxes may differ. People Ops provides country supplements and local country managers should consult with payroll partners for specifics.
+- Onboarding SLAs may extend due to shipping or local banking setup. Loaner programs partially mitigate delays.
+
+Appendices & Links
+
+- Related pages: benefits-enrollment-portal, sabbatical-policy-2024, relocation-and-visa-process, promotion-and-calibration-guidelines-2025
+- Templates: offer-letter-appendix, 30-60-90-template, access-request-template
+
+Revision history
+
+- 2025-11-03: Created by Asha Venkataraman.
+- 2026-02-14: Updated to extend mental health coverage and adjust device provisioning SLA per ops retrospective.
+
+Owners
+
+People Ops (primary), IT/Device Fleet (secondary), Manager (operational).
+
+If you have questions or need an exception, file a People Ops ticket with category "comp-wellbeing-onboarding" or email people-ops@redwood.com.

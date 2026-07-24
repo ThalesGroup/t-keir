@@ -1,0 +1,8 @@
+# LOGSIT 00054 — Training Area 7
+
+LOGISTICS SITUATION REPORT
+Area: Training Area 7
+Fuel status: 65 percent
+Medical supplies: adequate
+Transport availability: mission capable
+Request: confirm resupply route security.

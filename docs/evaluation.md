@@ -1,14 +1,160 @@
 # Evaluation
 
 T-KEIR retrieval quality is measured with the [BEIR](https://github.com/beir-cellar/beir)
-benchmark suite via `make beir-eval`.
+benchmark suite. Use two harnesses:
+
+| Target | Audience | Runtime | Purpose |
+|--------|----------|---------|---------|
+| **`make beir-smoke`** | Day-to-day development | **&lt; 5 min** | Catch bottlenecks and rank-strategy failures fast |
+| **`make beir-eval`** | Full quality report | Hours | Full corpora, dense baseline, MkDocs report |
+
+Both evaluate **`scifact`**, **`fiqa`**, and **`arguana`** (override with
+`BEIR_DATASETS=…`). Data lives under `./datasets/` (downloaded on demand).
+
+---
+
+## Quick evaluation — `make beir-smoke`
+
+Development smoke test. Isolates **each** corpus, indexes a ranking-focused
+subset (gold + close distractors), measures **time + NDCG**, flags obvious
+ranking failures, then **wipes** the BEIR Vespa volume.
+
+### What it does (per corpus)
+
+1. Sample queries with gold answers (default **10** per dataset)
+2. For each query, index **gold docs** + **close distractors** (default **10**
+   lexically nearest non-gold docs) and pad so the pool has at least
+   **`--rank-docs`** candidates (default **10**)
+3. Score **BM25** and **T-KEIR dual-hybrid** at `top_k` (default **10**,
+   raised to match `--rank-docs` when needed). Each doc is written to both
+   Vespa schemas (`tkeir_document` + `chunk`). Dataset
+   `business_ontology.yaml` is used for query expansion and overlap scoring.
+4. Record stage timings: Vespa reset, index, retrieve, and avg dual-hybrid
+   stages (`expand`, `vespa_arms`, `rrf`, `ontology`, `cross_encoder`)
+5. Emit rank/strategy **alerts** when something looks broken
+6. After all corpora: cleanup Vespa (`reset_vespa_for_beir`)
+
+Dense SentenceTransformer baseline is **skipped** (too slow for a smoke loop).
+
+### Why a subset
+
+Full FiQA (~58k docs) is too large for a tight feedback loop. The smoke index
+keeps gold answers plus **close** hard negatives (not random noise), so ranking
+mistakes show up without a full reindex.
+
+ArguAna query documents that share an id with the query are excluded from the
+index (avoids trivial self-matches).
+
+### Run
+
+```bash
+# Default: 10 queries × (≥10 pool + 10 close), NLP chunking, top_k=10, cleanup
+make beir-smoke
+
+# Skip NLP (synthetic chunks only — faster, weaker ranking signal)
+make beir-smoke BEIR_SMOKE_INDEX_MODE=fast
+
+# Larger ranking pools / more queries
+make beir-smoke BEIR_SMOKE_QUERIES=15 BEIR_SMOKE_CLOSE=20 BEIR_SMOKE_RANK_DOCS=20
+
+# Single corpus
+make beir-smoke BEIR_DATASETS=scifact
+
+# Keep the Vespa index after the run
+make beir-smoke BEIR_SMOKE_EXTRA=--no-cleanup
+
+# BM25-only (no Vespa / T-KEIR) — subset + metrics only
+make beir-smoke BEIR_SMOKE_EXTRA=--skip-tkeir
+```
+
+| Make variable | Default | Meaning |
+|---------------|---------|---------|
+| `BEIR_DATASETS` | `scifact fiqa arguana` | Corpora to isolate |
+| `BEIR_SMOKE_QUERIES` | `10` | Queries per corpus |
+| `BEIR_SMOKE_CLOSE` | `10` | Close (hard-negative) docs **per query** |
+| `BEIR_SMOKE_RANK_DOCS` | `10` | Min documents in the indexed pool **per query** |
+| `BEIR_SMOKE_TOP_K` | `10` | Retrieval cutoff (docs scored/ranked per query) |
+| `BEIR_SMOKE_INDEX_MODE` | `chunking` | `fast` (no NLP) \| `chunking` (NLP) \| `full` |
+| `BEIR_SMOKE_EXTRA` | _(empty)_ | Extra CLI flags (`--no-cleanup`, `-v`, …) |
+| `BEIR_VESPA_NAME` / `BEIR_VESPA_VOLUME` | dedicated BEIR volume | Same isolation as full eval |
+
+CLI module: `thot.tools.search.beir_smoke`.
+
+### Alerts (rank / strategy / timing)
+
+Each alert is severity-ordered (`high` → `medium` → `low`) and carries a
+**Code focus** hint (module / config to change).
+
+| Code | Meaning |
+|------|---------|
+| `tkeir_ndcg_zero` | T-KEIR NDCG@10 is 0 while BM25 scores on the same subset |
+| `tkeir_behind_bm25` | T-KEIR NDCG@10 &lt; 50% of BM25 |
+| `empty_retrievals` | One or more queries returned zero hits |
+| `gold_miss_all` | Queries where no gold doc appeared in the top-k |
+| `tkeir_error` | Indexing / Vespa / dual-hybrid exception |
+| `slow_index` / `slow_retrieve` | Wall-clock bottleneck on index or retrieve |
+| `slow_stage_*` | Dual-hybrid stage over threshold (`cross_encoder`, `vespa_arms`, …) |
+
+If wall clock exceeds **5 minutes**, the harness logs a warning (shrink
+`--queries` / `--close-docs`; use `--index-mode fast` only when timing
+index path without NLP; ensure the embedder is warm).
+
+### Smoke reports (action-oriented)
+
+| Path | Contents |
+|------|----------|
+| `reports/beir/smoke/report.md` | Problems-first Markdown (see below) |
+| `reports/beir/smoke/report.json` | Same data + top-level `focus[]` for tooling |
+
+Report structure (designed to drive code changes):
+
+1. **Focus — problems to fix** — severity-ordered alerts with **Code focus**
+2. **Failure examples** — FP / FN with query text + analysis (reproduce locally)
+3. **Summary metrics** — NDCG@10 vs BM25, Δ, timings
+4. **Timings** — dual-hybrid stages sorted by cost
+
+Prerequisite: Vespa up (`make bootstrap`). Smoke uses the dedicated BEIR
+volume (`BEIR_VESPA_VOLUME`) so it does not wipe your primary demo index.
+
+---
+
+## Full evaluation — `make beir-eval`
+
+Full corpora, BM25 + dense + T-KEIR, error analysis, and the MkDocs quality
+report. Use after smoke is green, or for release evidence.
+
+```bash
+make beir-eval
+make beir-eval BEIR_DATASETS=scifact
+make beir-eval BEIR_DATASETS=scifact BEIR_EXTRA=--skip-dense
+```
+
+CLI: `thot.tools.search.beir_eval`. Indexes with the T-KEIR NLP pipeline into
+Vespa, retrieves with dual-hybrid (**no answer generation**), and compares
+against local BM25 / dense baselines plus published BEIR leaderboard numbers
+(BM25 / SPLADE / Contriever).
+
+**Error analysis** (up to three examples per failure kind) reports the full
+query, the offending or gold document, lexical token coverage, and a short
+written analysis of why ranking failed.
+
+### Full-eval reports
+
+After **each** dataset finishes:
+
+| Path | Contents |
+|------|----------|
+| `docs/evaluation_report.md` | Cumulative MkDocs report (always) |
+| `reports/beir/report.md` | Copy of the cumulative report |
+| `reports/beir/<dataset>/report.md` | That dataset alone |
+
+While more datasets remain, the cumulative files include an **Intermediate**
+banner (`N/M` completed). Override with `--report` / `BEIR_REPORT` for an
+extra copy. See [BEIR evaluation report](evaluation_report.md).
+
+---
 
 ## Datasets
-
-By default the harness evaluates three BEIR datasets
-(`DEFAULT_DATASETS` in `thot.tools.search.beir_eval`). They are small enough for
-repeated local runs, yet cover different retrieval failure modes that matter for
-T-KEIR’s NLP + hybrid Vespa path.
 
 | Id | Display name | Task | Domain | Corpus | Test queries | Avg. relevant / query |
 |----|--------------|------|--------|--------|--------------|------------------------|
@@ -16,8 +162,7 @@ T-KEIR’s NLP + hybrid Vespa path.
 | `fiqa` | FiQA-2018 | Question answering | Personal finance | 57,638 | 648 | ~2.6 |
 | `arguana` | ArguAna | Argument / counterargument | Debate essays | 8,674 | 1,406 | ~1.0 |
 
-Sizes follow the published BEIR table. Downloads land under `./datasets/` when
-missing. Published **NDCG@10** reference scores used in the report:
+Published **NDCG@10** reference scores (full eval report):
 
 | Dataset | BEIR BM25 | SPLADE | Contriever |
 |---------|----------:|-------:|-----------:|
@@ -70,44 +215,11 @@ query.
 > removes the query id from the candidate set at inference time. T-KEIR’s harness
 > uses the standard BEIR loaders for that behaviour.
 
-## How to run
-
-From the repository root:
-
-```bash
-# Default datasets: scifact fiqa arguana
-make beir-eval
-
-# One dataset
-make beir-eval BEIR_DATASETS=scifact
-
-# Skip local dense baseline (faster)
-make beir-eval BEIR_DATASETS=scifact BEIR_EXTRA=--skip-dense
-```
-
-The CLI module is `thot.tools.search.beir_eval`. It indexes with the T-KEIR
-NLP pipeline into Vespa, retrieves with `QueryAnalyzerTask` (no answer
-generation), and compares against local BM25 and dense baselines plus published
-BEIR leaderboard numbers (BM25 / SPLADE / Contriever).
-
-## Report location
-
-After **each** dataset finishes, the harness writes:
-
-| Path | Contents |
-|------|----------|
-| `docs/evaluation_report.md` | Cumulative MkDocs report (always) |
-| `results/beir/report.md` | Same cumulative snapshot (intermediate) |
-| `results/beir/<dataset>/report.md` | That dataset alone |
-
-While more datasets remain, the cumulative files include an **Intermediate**
-banner (`N/M` completed). The final write drops the banner.
-
-Override with `--report` / `BEIR_REPORT` for an extra copy; the paths above are
-still updated. See [BEIR evaluation report](evaluation_report.md).
+---
 
 ## Related docs
 
-- [BEIR evaluation report](evaluation_report.md) — latest measured metrics
+- [BEIR evaluation report](evaluation_report.md) — latest measured metrics (full eval)
 - [Vespa search and RAG](tools/vespa_rag.md) — indexing, search API, concurrency
 - [Dev container](devcontainer.md) — TLS / CA tips when downloading BEIR datasets
+- [Datasets](tools/datasets.md) — Zero-to-Hero OSINT / enterprise trees (separate from BEIR)

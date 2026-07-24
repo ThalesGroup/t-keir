@@ -1,13 +1,12 @@
-"""Title: T-KEIR full NLP pipeline + Vespa hybrid retrieval for BEIR evaluation.
+"""Title: T-KEIR full NLP pipeline + dual-hybrid Vespa retrieval for BEIR.
 
 Indexes each BEIR document through :class:`PipelineRunner` (tokenizer →
 chunking → structural question projections), embeds with the production
-provider, retrieves via :class:`QueryAnalyzerTask` (adaptive rank profile),
-and maps chunk hits back to BEIR document ids.
+provider, then retrieves with :class:`DualHybridPipeline` (chunk + document
+arms → RRF → HuggingFace cross-encoder). Maps hits back to BEIR document ids.
 
 **Retrieval only:** answer generation (``UnifiedLLMWrapper.generate`` / RAG
-prompting) is never invoked. LLM access is restricted to embeddings via
-:class:`RetrievalEmbeddingClient`.
+prompting) is never invoked. Rerank is cross-encoder only (no LLM scoring).
 
 Author: Eric Blaudez
 
@@ -30,9 +29,7 @@ from thot.core.TkeirPaths import configs_dir, vespa_dir
 from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
 from thot.tools.search.index_documents import index_pipeline_document
-from thot.tools.search.query_analyzer import QueryAnalyzerTask
 from thot.tools.search.rag_config import RagSearchConfig, load_rag_config
-from thot.tools.search.rerank import rerank_vespa_children
 from thot.tools.search.vespa_client import VespaClient
 
 LOGGER = logging.getLogger(__name__)
@@ -484,8 +481,6 @@ def tkeir_search_config(*, hits: int) -> RagSearchConfig:
         use_chunk_embedding=base.use_chunk_embedding,
         use_question_embedding=base.use_question_embedding,
         use_text_raw=base.use_text_raw,
-        use_parent_content=base.use_parent_content,
-        use_parent_title=base.use_parent_title,
         use_ner=base.use_ner,
         use_svo=base.use_svo,
         use_keywords=base.use_keywords,
@@ -496,8 +491,6 @@ def tkeir_search_config(*, hits: int) -> RagSearchConfig:
         weight_chunk_embedding=base.weight_chunk_embedding,
         weight_question_embedding=base.weight_question_embedding,
         weight_text_raw_bm25=base.weight_text_raw_bm25,
-        weight_parent_content_bm25=base.weight_parent_content_bm25,
-        weight_parent_title_bm25=base.weight_parent_title_bm25,
         rerank=base.rerank,
     )
 
@@ -552,6 +545,129 @@ def reset_vespa_for_beir(
     _wait_for_application(vespa_url, wait_seconds)
 
 
+def beir_business_ontology_path(
+    dataset: str,
+    datasets_dir: Path | str | None = None,
+) -> Path:
+    """Return ``datasets/<dataset>/business_ontology.yaml`` path."""
+    from thot.core.TkeirPaths import repo_root
+
+    root = Path(datasets_dir) if datasets_dir else Path(repo_root()) / "datasets"
+    return root / dataset / "business_ontology.yaml"
+
+
+def load_beir_business_ontology_payload(
+    dataset: str,
+    datasets_dir: Path | str | None = None,
+) -> dict[str, Any] | None:
+    """Load BEIR business ontology YAML as a dual-hybrid request payload.
+
+    Args:
+        dataset: BEIR corpus id (``scifact``, ``fiqa``, ``arguana``, …).
+        datasets_dir: Optional override of the datasets root.
+
+    Returns:
+        ``{concepts: [...]}`` or ``None`` when the file is missing.
+    """
+    import yaml
+
+    path = beir_business_ontology_path(dataset, datasets_dir)
+    if not path.is_file():
+        return None
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or not data.get("concepts"):
+        LOGGER.warning("Empty or invalid business ontology at %s", path)
+        return None
+    return data
+
+
+def annotate_document_with_business_ontology(
+    document: dict[str, Any],
+    ontology_payload: dict[str, Any],
+) -> dict[str, Any]:
+    """Tag ``document_ontology.json_ld`` with concepts whose labels appear in text.
+
+    Enables dual-hybrid ontology-overlap scoring on the ``tkeir_document``
+    arm. Matching is case-insensitive substring over preferred labels,
+    synonyms, and surface forms (min length 3).
+
+    Args:
+        document: Pipeline document (returned as a shallow copy when tagged).
+        ontology_payload: ``{concepts: [...]}`` from
+            :func:`load_beir_business_ontology_payload`.
+
+    Returns:
+        Document with ``document_ontology.json_ld`` set when matches exist.
+    """
+    import json
+    import re
+
+    concepts = ontology_payload.get("concepts") or []
+    if not concepts:
+        return document
+
+    title = str(document.get("title") or "")
+    content = document.get("content") or []
+    if isinstance(content, list):
+        body = " ".join(str(part) for part in content if part)
+    else:
+        body = str(content or "")
+    chunks = document.get("golden_chunks") or []
+    chunk_text = " ".join(
+        str(chunk.get("text_raw") or chunk.get("search_vector_payload") or "")
+        for chunk in chunks
+    )
+    haystack = f"{title} {body} {chunk_text}".lower()
+    if not haystack.strip():
+        return document
+
+    matched: list[dict[str, str]] = []
+    for raw in concepts:
+        if not isinstance(raw, dict):
+            continue
+        cid = str(raw.get("concept_id") or "").strip()
+        preferred = str(raw.get("preferred_label") or cid).strip()
+        if not cid or not preferred:
+            continue
+        labels = [preferred]
+        labels.extend(str(x) for x in (raw.get("synonyms") or []) if x)
+        labels.extend(str(x) for x in (raw.get("surface_forms") or []) if x)
+        hit = False
+        for label in labels:
+            label = label.strip()
+            if len(label) < 3:
+                continue
+            # Prefer word-ish boundaries for short tokens.
+            pattern = re.compile(
+                r"(?<![a-z0-9])" + re.escape(label.lower()) + r"(?![a-z0-9])"
+            )
+            if pattern.search(haystack):
+                hit = True
+                break
+        if hit:
+            matched.append(
+                {
+                    "@type": "DefinedTerm",
+                    "name": preferred,
+                    "identifier": cid,
+                    "preferred_label": preferred,
+                }
+            )
+
+    document = dict(document)
+    if matched:
+        document["document_ontology"] = {
+            "json_ld": json.dumps({"@graph": matched}, ensure_ascii=False),
+            "shacl_status": "beir-ontology",
+        }
+    else:
+        document.setdefault(
+            "document_ontology",
+            {"json_ld": "", "shacl_status": ""},
+        )
+    return document
+
+
 async def index_beir_corpus(
     dataset: str,
     corpus: dict[str, dict[str, str]],
@@ -566,7 +682,8 @@ async def index_beir_corpus(
 ) -> int:
     """Run NLP pipeline + Vespa indexing for every BEIR document.
 
-    Documents are processed **sequentially**. The shared
+    Each document is written to **both** Vespa schemas (``tkeir_document``
+    and ``chunk``). Documents are processed **sequentially**. The shared
     :class:`PipelineRunner` and local embedding providers (Ollama) do not
     tolerate concurrent NLP/embed load; parallel workers previously stalled
     long BEIR runs. ``max_workers`` is accepted for API compatibility and
@@ -584,7 +701,7 @@ async def index_beir_corpus(
         max_workers: Unused (sequential indexing); kept for callers.
 
     Returns:
-        Number of successfully indexed documents.
+        Number of successfully indexed documents (each with ≥1 chunk).
 
     Example:
         >>> asyncio.run(index_beir_corpus("scifact", {}, vespa=None, llm=None, runner=None))  # doctest: +SKIP
@@ -600,22 +717,55 @@ async def index_beir_corpus(
         )
 
     indexed = 0
+    chunks_indexed = 0
     total = len(corpus)
     started = time.perf_counter()
-    LOGGER.info(
-        "T-KEIR indexing %d docs for %s (mode=%s, sequential, retrieval-only)",
-        total,
-        dataset,
-        index_mode,
-    )
+    mode = (index_mode or "chunking").strip().lower()
+    ontology_payload = load_beir_business_ontology_payload(dataset)
+    if ontology_payload:
+        LOGGER.info(
+            "BEIR business ontology loaded for %s (%d concepts) — "
+            "will tag document json_ld + expand queries",
+            dataset,
+            len(ontology_payload.get("concepts") or []),
+        )
+    else:
+        LOGGER.warning(
+            "No datasets/%s/business_ontology.yaml — "
+            "dual-hybrid ontology expansion/overlap disabled",
+            dataset,
+        )
+    if mode == "fast":
+        LOGGER.info(
+            "T-KEIR indexing %d docs for %s "
+            "(mode=fast — synthetic chunk only, PipelineRunner skipped; "
+            "still writes tkeir_document + chunk)",
+            total,
+            dataset,
+        )
+    else:
+        LOGGER.info(
+            "T-KEIR indexing %d docs for %s "
+            "(mode=%s — PipelineRunner NLP + embed; "
+            "writes tkeir_document + chunk)",
+            total,
+            dataset,
+            mode,
+        )
     for position, (doc_id, doc) in enumerate(corpus.items(), start=1):
         doc_started = time.perf_counter()
         source_hint = f"beir:{dataset}:{doc_id}"
+        phase = (
+            "synthetic chunk + embed…"
+            if mode == "fast"
+            else f"NLP pipeline ({mode}) + embed…"
+        )
         LOGGER.info(
-            "T-KEIR doc %d / %d: %s (NLP + embed…)",
+            "T-KEIR doc %d / %d: %s (%s)",
             position,
             total,
             source_hint,
+            phase,
         )
         try:
             pipeline_doc = await asyncio.to_thread(
@@ -625,18 +775,36 @@ async def index_beir_corpus(
                 doc_id,
                 doc,
                 language=language,
-                index_mode=index_mode,
+                index_mode=mode,
             )
+            if ontology_payload:
+                pipeline_doc = annotate_document_with_business_ontology(
+                    pipeline_doc, ontology_payload
+                )
             chunk_count = len(pipeline_doc.get("golden_chunks") or [])
+            done_label = (
+                "synthetic ready"
+                if mode == "fast"
+                else "NLP done"
+            )
             LOGGER.info(
-                "T-KEIR doc %d / %d: %s NLP done (%d chunks, embedding…)",
+                "T-KEIR doc %d / %d: %s %s (%d chunks, embedding…)",
                 position,
                 total,
                 source_hint,
+                done_label,
                 chunk_count,
             )
-            await index_pipeline_document(pipeline_doc, vespa=vespa, llm=llm)
+            _docs, n_chunks = await index_pipeline_document(
+                pipeline_doc, vespa=vespa, llm=llm, require_chunks=True
+            )
+            if n_chunks < 1:
+                raise RuntimeError(
+                    f"dual-schema index failed for {source_hint}: "
+                    f"tkeir_document ok but chunk={n_chunks}"
+                )
             indexed += 1
+            chunks_indexed += n_chunks
         except asyncio.CancelledError:
             LOGGER.warning(
                 "T-KEIR indexing cancelled at doc %d / %d (%s)",
@@ -658,19 +826,22 @@ async def index_beir_corpus(
             eta_s = remaining / rate if rate > 0 else 0.0
             LOGGER.info(
                 "T-KEIR indexed %d / %d for %s "
-                "(last=%.1fs, %.2f docs/s, ETA ~%.0fs)",
+                "(chunks=%d, last=%.1fs, %.2f docs/s, ETA ~%.0fs)",
                 indexed,
                 total,
                 dataset,
+                chunks_indexed,
                 elapsed_doc,
                 rate,
                 eta_s,
             )
     LOGGER.info(
-        "T-KEIR indexing finished for %s: %d / %d in %.1fs",
+        "T-KEIR indexing finished for %s: %d / %d docs, %d chunks in %.1fs "
+        "(both tkeir_document + chunk schemas)",
         dataset,
         indexed,
         total,
+        chunks_indexed,
         time.perf_counter() - started,
     )
     return indexed
@@ -680,13 +851,13 @@ def _aggregate_hits_to_beir(
     search_response: dict[str, Any],
     dataset: str,
 ) -> dict[str, float]:
-    """Map Vespa chunk hits to BEIR document ids with multi-chunk boost.
+    """Map Vespa hits to BEIR document ids with multi-chunk boost.
 
-    Score = max(chunk relevance) + log1p(hit_count) * small bonus so
-    documents with several matching chunks rise without language heuristics.
+    Accepts chunk hits (``chunk_id``) or dual-hybrid document hits
+    (``source_doc_id``). Score = max(relevance) + log1p(hit_count) * bonus.
 
     Args:
-        search_response: Raw Vespa ``/search/`` JSON.
+        search_response: Raw Vespa ``/search/`` JSON (or dual-hybrid adapted).
         dataset: Active dataset (filters foreign hits).
 
     Returns:
@@ -708,7 +879,10 @@ def _aggregate_hits_to_beir(
     for child in children:
         fields = child.get("fields") or {}
         chunk_id = str(fields.get("chunk_id") or "")
-        beir_id = parse_beir_doc_id(chunk_id, dataset)
+        source_doc_id = str(fields.get("source_doc_id") or "")
+        beir_id = parse_beir_doc_id(chunk_id, dataset) or parse_beir_doc_id(
+            source_doc_id, dataset
+        )
         if beir_id is None:
             continue
         relevance = child.get("relevance")
@@ -719,10 +893,30 @@ def _aggregate_hits_to_beir(
         if previous is None or score > previous:
             best[beir_id] = score
         counts[beir_id] = counts.get(beir_id, 0) + 1
-    # Mild multi-evidence boost (programmatic, scale-free).
     for beir_id, score in list(best.items()):
         best[beir_id] = score + 0.05 * math.log1p(counts.get(beir_id, 1))
     return best
+
+
+def _dual_hits_to_beir(
+    hits: list[Any],
+    dataset: str,
+) -> dict[str, float]:
+    """Map :class:`DualHit` results to BEIR ``doc_id → score``."""
+    scores: dict[str, float] = {}
+    for hit in hits:
+        source = str(getattr(hit, "source_doc_id", "") or "")
+        chunk = str(getattr(hit, "chunk_id", "") or "")
+        beir_id = parse_beir_doc_id(source, dataset) or parse_beir_doc_id(
+            chunk, dataset
+        )
+        if beir_id is None:
+            continue
+        score = float(getattr(hit, "score", 0.0) or 0.0)
+        previous = scores.get(beir_id)
+        if previous is None or score > previous:
+            scores[beir_id] = score
+    return scores
 
 
 async def retrieve_with_tkeir(
@@ -731,76 +925,104 @@ async def retrieve_with_tkeir(
     *,
     vespa: VespaClient,
     llm: RetrievalEmbeddingClient | UnifiedLLMWrapper,
-    runner: PipelineRunner,
+    runner: PipelineRunner | None = None,
     language: str = "en",
     top_k: int = 100,
     max_workers: int | None = None,
 ) -> dict[str, dict[str, float]]:
-    """Run T-KEIR QueryAnalyzer + Vespa hybrid search for every query.
+    """Dual-hybrid retrieve: chunk + document → RRF → cross-encoder.
 
-    Retrieval only: NLP query analysis, embeddings, and Vespa search.
-    Queries run **sequentially** (shared pipeline + embedding provider).
-    ``max_workers`` is accepted for API compatibility; values > 1 log a
-    warning and are ignored.
+    Uses :class:`DualHybridPipeline` against both Vespa schemas. Rerank is
+    HuggingFace cross-encoder only (no LLM generation). ``runner`` is unused
+    (kept for API compatibility with indexing callers).
 
     Args:
         dataset: BEIR dataset name (for hit id filtering).
         queries: Query id → text.
         vespa: Vespa client.
-        llm: Embedding-only client used by the analyzer.
-        runner: Linguistic pipeline runner for query analysis.
-        language: Pipeline language code.
-        top_k: Hits requested from Vespa.
+        llm: Embedding + cross-encoder client.
+        runner: Unused (legacy QueryAnalyzer path removed for eval).
+        language: Language for TextNormalizer / spaCy model selection.
+        top_k: Hits returned after final fusion.
         max_workers: Unused (sequential retrieval); kept for callers.
 
     Returns:
         BEIR results dict ``{qid: {doc_id: score}}``.
 
     Example:
-        >>> asyncio.run(retrieve_with_tkeir("scifact", {}, vespa=None, llm=None, runner=None))  # doctest: +SKIP
+        >>> asyncio.run(retrieve_with_tkeir("scifact", {}, vespa=None, llm=None))  # doctest: +SKIP
         {}
     """
+    del runner  # dual-hybrid does not use QueryAnalyzer
     if max_workers is not None and max_workers > 1:
         LOGGER.warning(
             "BEIR retrieval is sequential (ignoring max_workers=%s)",
             max_workers,
         )
 
-    config = tkeir_search_config(hits=top_k)
-    analyzer = QueryAnalyzerTask(
-        runner,
-        llm,
-        config,
-        embedding_dim=vespa.config.embedding_dim,
-        timeout_seconds=vespa.config.timeout_seconds,
-        user_space=vespa.config.user_space,
+    from dataclasses import replace
+
+    from thot.tools.search.dual_retrieval import DualHybridPipeline
+
+    rag = load_rag_config()
+    dual_cfg = rag.dual_hybrid
+    # Eval always: both arms + RRF + cross-encoder, return top_k docs.
+    ce_top_m = max(dual_cfg.cross_encoder.top_m, min(top_k, 100))
+    dual_cfg = replace(
+        dual_cfg,
+        enabled=True,
+        cross_encoder=replace(
+            dual_cfg.cross_encoder,
+            enabled=True,
+            top_m=ce_top_m,
+        ),
+        final_fusion=replace(
+            dual_cfg.final_fusion, top_k_returned=max(1, top_k)
+        ),
+        rrf=replace(
+            dual_cfg.rrf,
+            top_n_after_fusion=max(
+                dual_cfg.rrf.top_n_after_fusion,
+                top_k,
+                ce_top_m,
+            ),
+        ),
     )
-    rerank_cfg = config.rerank
+    pipeline = DualHybridPipeline(dual_cfg, vespa, llm=llm)
+    ontology_payload = load_beir_business_ontology_payload(dataset)
+    if ontology_payload:
+        LOGGER.info(
+            "BEIR retrieval using business ontology (%d concepts) for %s",
+            len(ontology_payload.get("concepts") or []),
+            dataset,
+        )
+    LOGGER.info(
+        "BEIR retrieval strategy=dual_hybrid "
+        "(chunk+document RRF → ontology → cross-encoder) top_k=%d",
+        top_k,
+    )
+
     results: dict[str, dict[str, float]] = {}
     total = len(queries)
+    space = vespa.config.user_space
     for index, (qid, qtext) in enumerate(queries.items(), start=1):
         try:
-            analyzed = await analyzer.process(
-                qtext, language=language, hits=config.hits
+            emb = await llm.embed(qtext)
+            dual = await pipeline.search(
+                qtext,
+                user_space=space,
+                language=language,
+                q_chunk_emb=emb,
+                q_question_emb=emb,
+                top_k=top_k,
+                business_ontology=ontology_payload,
             )
-            response = await vespa.search(analyzed["payload"])
-            if rerank_cfg.enabled and hasattr(llm, "rerank"):
-                root = dict(response.get("root") or {})
-                children = list(root.get("children") or [])
-                candidate_n = min(len(children), rerank_cfg.candidates)
-                reranked = await rerank_vespa_children(
-                    llm,
-                    qtext,
-                    children[:candidate_n],
-                    top_n=top_k,
-                    strategy=rerank_cfg.strategy,
-                )
-                root["children"] = reranked
-                response = {**response, "root": root}
-            results[qid] = _aggregate_hits_to_beir(response, dataset)
+            results[qid] = _dual_hits_to_beir(dual.hits, dataset)
         except Exception:  # noqa: BLE001
             LOGGER.exception(
-                "T-KEIR retrieval failed for query %s on %s", qid, dataset
+                "T-KEIR dual-hybrid retrieval failed for query %s on %s",
+                qid,
+                dataset,
             )
             results[qid] = {}
         if index % 50 == 0 or index == total:
@@ -824,10 +1046,11 @@ async def run_tkeir_eval(
     index_mode: str = "chunking",
     max_docs: int | None = None,
 ) -> dict[str, dict[str, float]]:
-    """Index + adaptive hybrid retrieve for one BEIR dataset (retrieval only).
+    """Index + dual-hybrid retrieve for one BEIR dataset (retrieval only).
 
-    **Does not run T-KEIR answer generation.** NLP indexing, embeddings,
-    query analysis, and Vespa hybrid search only.
+    **Does not run T-KEIR answer generation.** Indexes documents + chunks,
+    then retrieves with chunk + document arms, RRF fusion, and cross-encoder
+    rerank.
 
     Args:
         dataset: BEIR dataset name.
@@ -865,6 +1088,7 @@ async def run_tkeir_eval(
         runner = await asyncio.to_thread(load_pipeline_runner)
     LOGGER.info(
         "T-KEIR BEIR eval retrieval-only index_mode=%s "
+        "strategy=dual_hybrid(RRF→cross-encoder) "
         "(answer generation disabled)",
         mode,
     )
@@ -872,7 +1096,7 @@ async def run_tkeir_eval(
         llm = RetrievalEmbeddingClient(llm_full)
         await llm.verify_provider(
             pull_missing=True,
-            include_reranker=load_rag_config().search.rerank.enabled,
+            include_reranker=True,
         )
         if not await vespa.health():
             raise RuntimeError(
@@ -892,14 +1116,11 @@ async def run_tkeir_eval(
             raise RuntimeError(
                 f"T-KEIR indexed 0/{len(corpus)} documents for {dataset}"
             )
-        if runner is None:
-            runner = await asyncio.to_thread(load_pipeline_runner)
         return await retrieve_with_tkeir(
             dataset,
             queries,
             vespa=vespa,
             llm=llm,
-            runner=runner,
             language=language,
             top_k=top_k,
         )

@@ -1,0 +1,491 @@
+Console UX Spec — Shadow Experiments (Shadow Traffic Quality Metrics)
+
+## 1. Overview
+Shadow Experiments let customers mirror a sampled subset of production requests to one or more “shadow” variants (candidate model/version/quantization/prompt/routing policy), score the shadow outputs asynchronously, and surface *quality deltas* alongside cost/latency/error metrics—without affecting the response returned to the end user.
+
+This document specifies the **Console UX** for:
+- Creating and managing Shadow Experiments
+- Viewing results (quality deltas, confidence intervals, segments)
+- Drilling into examples with safe data handling
+- Attaching quality signals to Rollouts/Canaries
+
+### 1.1 Goals
+- Make it safe and obvious that shadowing does **not** change user responses and is **fail-open**.
+- Help engineers answer: “Is the candidate variant materially worse/better on quality, and are we statistically confident?”
+- Provide clear integration with Rollouts so quality signals can be reviewed during canaries and (later) used for automated rollback.
+
+### 1.2 Non-goals (v1)
+- Full offline replay across arbitrary historical windows.
+- Customer-provided custom code execution inside Redwood.
+- Deep prompt editing / prompt version management (shadow experiments can reference prompt template IDs/versions, but prompt authoring lives elsewhere).
+
+### 1.3 Assumptions / dependencies
+- Shadow routing policy exists and is enforceable at the route/rollout level (sampling %, shadow targets, timeouts, fail-open).
+- Telemetry produces control+shadow paired events with bounded cardinality.
+- Scoring pipeline produces a metric bundle keyed by (experiment_id, variant_id, time_bucket, segment).
+- The “default metric bundle v1” is available (format adherence, refusal/safety, instruction-following rubric, basic heuristics). Additional bundles can be introduced via rubric versions.
+
+---
+
+## 2. Key concepts & terminology
+- **Control**: The variant serving the user response.
+- **Shadow target / Variant**: Candidate configuration receiving mirrored requests (does not serve user response).
+- **Shadow Experiment**: A named configuration that defines sampling, targets, metrics bundle, and retention settings.
+- **Run**: A time-bounded execution of an experiment (start/stop, config snapshot). In v1, we model “run” implicitly via an experiment’s active window + config revisions; UI will show “Runs” as ranges.
+- **Metric bundle**: Versioned set of quality metrics and scoring rubrics.
+- **Delta**: Shadow minus control for a metric (or ratio where relevant), with confidence interval.
+- **Segment**: Filterable breakdown dimension (e.g., region, request_type, route, model family bucket). Segment options are limited by cardinality rules.
+
+---
+
+## 3. Information architecture (IA)
+### 3.1 Navigation entry points
+1) **Console → Observability → Quality → Shadow Experiments**
+- Landing page lists experiments and recent regressions.
+
+2) **Console → Routes → [Route] → Quality (tab)**
+- “Start Shadow Experiment” CTA pre-fills the route and control variant.
+
+3) **Console → Rollouts → [Rollout] → Quality signals (panel)**
+- Inline panel showing attached experiment status and headline deltas.
+
+### 3.2 Pages (v1)
+- Shadow Experiments (list)
+- Create Shadow Experiment (wizard)
+- Shadow Experiment details
+  - Overview (status, config snapshot)
+  - Results (delta charts, segments)
+  - Examples (sampled, redacted)
+  - Activity/Audit (who changed what)
+
+---
+
+## 4. Permissions & access model
+Shadow Experiments touch production request/response artifacts and therefore require explicit RBAC handling.
+
+### 4.1 Roles (Console RBAC primitives)
+We map to existing org/project permissions; naming below reflects UI labels (final mapping owned by Console backend/RBAC).
+
+| Permission | Who typically has it | What it enables |
+|---|---|---|
+| View Experiments (metadata) | Project Viewer+ | List experiments, see metrics aggregates (no raw examples). |
+| Create/Modify Experiments | Project Admin, Route Editor | Create, start/stop, edit sampling/targets within guardrails. |
+| View Examples (redacted) | Project Admin by default; optionally enabled for specific groups | See redacted prompts/outputs and rubric breakdowns. |
+| Export Examples | Restricted; disabled by default in Dedicated/Private unless explicitly allowed | CSV/JSON export of sampled examples. |
+| Attach to Rollouts | Rollout Admin | Link an experiment to a rollout/canary step. |
+
+### 4.2 Data sensitivity guardrails (UX)
+- The UI must clearly label any table that includes request text as **“Sensitive (Redacted)”**.
+- For tenants with stricter settings (Dedicated/Private):
+  - Examples tab may be hidden entirely.
+  - Export controls may be disabled.
+  - Retention defaults are displayed and cannot be extended without explicit admin approval.
+
+### 4.3 Audit visibility
+All create/edit/start/stop actions show an “Audit” drawer with:
+- Actor
+- Timestamp
+- Fields changed
+- Config revision hash
+- Link to the global Audit Log entry
+
+---
+
+## 5. User flows
+
+### 5.1 Flow A — Create a shadow experiment (wizard)
+Entry points:
+- “Shadow Experiments” list → **Create experiment**
+- Route page → Quality tab → **Start shadow experiment**
+- Rollout page → Quality signals → **Attach new experiment**
+
+Wizard steps:
+1) **Basics**
+   - Name (required)
+   - Description (optional)
+   - Scope: Route (required) + Environment (prod/staging) (if applicable)
+   - Control variant (pre-filled from route; editable only if user has route edit permission)
+
+2) **Shadow targets**
+   - Add 1..N shadow variants
+   - Variant types (UI selection):
+     - Model version (e.g., “llama-3.1-70b@2026-01-10”)
+     - Quantization profile (e.g., “int8-kv-cache”) 
+     - Prompt template version (reference ID)
+     - Routing policy (pre-defined policy ID)
+   - Show estimated incremental cost per request (rough order) when available
+
+3) **Sampling & bucketing**
+   - Sampling rate (%), default 1%
+   - Bucketing mode (read-only in v1; shown for transparency): “Deterministic request fingerprinting (consistent across time)”
+   - Optional: “Exclude requests with these headers/attributes” (advanced; limited to safe low-cardinality fields)
+
+4) **Metrics & scoring**
+   - Metric bundle (default “Quality v1”) + version
+   - Scoring latency expectation (e.g., “Typically 2–10 minutes; may be longer under load”)
+   - Warning callout: “Quality metrics are asynchronous; use confidence intervals before making decisions.”
+
+5) **Data handling**
+   - Retention window (default: 24h for examples; aggregates 30d) — exact defaults are tenant-mode dependent
+   - Redaction mode (read-only default in v1; “Redact known sensitive patterns + truncate”) with link to policy
+   - Examples availability toggle (if tenant policy allows)
+
+6) **Review & start**
+   - Summary of config + guardrails
+   - “Start experiment” button
+   - “Start in paused state” (optional for admins; to validate config without producing data)
+
+Success state:
+- Redirect to experiment details (Overview → Results)
+- Show “Data will appear shortly” empty state with ETAs
+
+Failure states:
+- Validation error (e.g., sampling too high; unsupported variant type for route)
+- Policy denies (e.g., retention extension not allowed)
+- Partial success: experiment created but unable to start (data-plane rollout pending) → show remediation steps
+
+
+### 5.2 Flow B — View experiment results (decision-oriented)
+Primary questions:
+- Is the candidate variant’s quality statistically worse/better than control?
+- Are we segmenting by a factor that indicates localized regression?
+- Is scoring healthy (lag/backlog), or are results incomplete?
+
+Steps:
+1) Open experiment → Results tab
+2) Select a metric (left panel)
+3) Observe headline delta + CI and sample size
+4) Apply segment filter(s) to locate regressions
+5) Drill into Examples for representative failures
+
+
+### 5.3 Flow C — Attach quality signals to a rollout
+From Rollout detail page:
+- Quality signals panel shows:
+  - Attached experiment(s)
+  - Current status (Active/Paused/Stopped)
+  - Headline metrics (top 3) with deltas
+  - Scoring health (lag, completeness)
+
+Actions:
+- Attach existing experiment (must match route + environment)
+- Create new attached experiment (opens wizard pre-filled)
+- Define “Quality gate thresholds” (v1: advisory only)
+
+v1 behavior:
+- Quality gates generate **warnings** in the rollout timeline.
+- Rollout automation (auto-pause/rollback) remains manual in v1 (future flag).
+
+---
+
+## 6. UI specification by page
+
+### 6.1 Shadow Experiments — list page
+**Table columns**
+- Name
+- Route
+- Control variant
+- Shadow variants (count + chips)
+- Status (Active/Paused/Stopped)
+- Sampling rate
+- Last 24h headline: “Regressions detected” badge (if any)
+- Updated
+
+**Default sorting**: Updated desc
+
+**Filters**
+- Route
+- Status
+- Owner/creator
+- Time range (for headline signals)
+
+**Empty states**
+- No experiments: explanation + “Create experiment”
+- Permission-limited: show metadata only; hide CTAs requiring elevated roles
+
+
+### 6.2 Create Shadow Experiment — wizard
+**Design requirements**
+- Every step includes a “Why this matters” inline helper for first-time users.
+- Guardrails are shown as *constraints*, not as hidden errors:
+  - Sampling max (tenant/plan dependent)
+  - Shadow target concurrency max
+  - Max retained examples
+
+**Warning callouts (must-have)**
+- “Shadow traffic is mirrored; it does not change user responses.”
+- “Shadowing may increase compute and telemetry costs.”
+- “Shadow path is fail-open; if shadow targets fail, production responses continue normally.”
+
+
+### 6.3 Shadow Experiment — Overview tab
+**Header**
+- Experiment name
+- Status pill: Active / Paused / Stopped
+- Primary actions:
+  - Pause / Resume
+  - Stop
+  - Edit (creates a new config revision)
+
+**Overview cards**
+1) Config snapshot
+   - Route
+   - Control variant
+   - Shadow variants
+   - Sampling rate
+   - Metrics bundle + version
+   - Retention settings
+
+2) Health
+   - Shadow dispatch success rate (last 15m)
+   - Scoring lag (p50/p95)
+   - Data completeness: “% of mirrored pairs scored”
+
+3) Activity
+   - Recent config changes
+   - Linked rollout (if attached)
+
+
+### 6.4 Shadow Experiment — Results tab (core)
+The Results tab is split into three zones:
+- Left: Metric selector
+- Center: Chart + headline delta
+- Right: Filters and segments
+
+#### 6.4.1 Metric selector (left)
+Grouped sections:
+- Safety & refusal
+- Format adherence
+- Instruction following (rubric)
+- Heuristics
+
+Each metric row shows:
+- Metric name
+- Directionality indicator (higher is better / lower is better)
+- Latest delta mini-sparkline
+
+
+#### 6.4.2 Headline delta (top of center)
+Shows selected metric’s current evaluation window:
+- **Delta value** (Shadow – Control) with sign coloring
+- **95% confidence interval** (always shown; never optional)
+- Sample size: number of paired requests scored
+- “Data freshness” indicator: last scored timestamp
+
+Decision labels (display-only):
+- “Likely regression” if CI excludes 0 in the bad direction
+- “Likely improvement” if CI excludes 0 in good direction
+- “Inconclusive” otherwise
+
+Note: Labels are informational and do not imply causal proof.
+
+
+#### 6.4.3 Delta chart (center)
+Chart types:
+- **Time series delta** (default)
+  - X: time
+  - Y: delta
+  - Band: confidence interval
+- **Distribution comparison** (secondary)
+  - Control vs Shadow score distributions for the chosen window
+
+Chart requirements:
+- Confidence bands must be visually distinct and colorblind-safe.
+- Hover tooltip shows:
+  - Control metric value
+  - Shadow metric value
+  - Delta
+  - CI
+  - Sample size
+  - Scoring completion %
+
+Time range selector:
+- 1h, 6h, 24h, 7d (availability depends on retention)
+
+Annotations:
+- Config revision changes appear as vertical markers (“Sampling changed 1% → 2%”).
+- Rollout events (if attached) appear as markers (“Canary step 2 started”).
+
+
+#### 6.4.4 Segments & filters (right)
+Filters are limited to cardinality-safe dimensions.
+
+Default available segments (subject to telemetry policy):
+- Region
+- Request type (chat/completions/embeddings where applicable; shadow experiments focus on generation endpoints)
+- Model family bucket (high-level)
+- Token length bucket (short/medium/long)
+- HTTP status bucket (2xx/4xx/5xx)
+
+UI behavior:
+- Multi-select, with “Top N segments by volume” option.
+- When segmenting, show:
+  - Per-segment delta table with CI
+  - Small “volume share” bar
+  - Sort by worst regression first
+
+Guardrails:
+- Do not allow free-form labels.
+- If a user tries to segment by a disallowed dimension, show an explanation and link to the observability standard.
+
+
+### 6.5 Shadow Experiment — Examples tab
+Purpose: help debug *why* a metric changed, not serve as a data export feature.
+
+**Access**: gated by “View Examples (redacted)” permission.
+
+**Layout**
+- Top controls: time range, metric filter (optional), segment filter (optional)
+- Table/list of examples with:
+  - Timestamp
+  - Request fingerprint (hashed)
+  - Segment chips (safe)
+  - Control summary (short)
+  - Shadow summary (short)
+  - Metric outcomes (e.g., rubric score, refusal flag)
+
+**Example detail drawer**
+- Request (redacted + truncated)
+- Control output (redacted)
+- Shadow output (redacted)
+- Rubric breakdown (human-readable)
+- Links:
+  - “Open in trace” (if available)
+  - “Copy redacted payload” (copy only what’s displayed)
+
+**Safety requirements**
+- Never display raw identifiers (customer_id, user_id, email) even if present in prompt.
+- Prompts/outputs are truncated with a visible “truncated” indicator.
+- Provide “Report redaction miss” action (creates internal ticket; does not reveal raw text).
+
+**Export (v1)**
+- If enabled by tenant policy: export current filtered view up to N rows (default N=500).
+- Export includes only redacted fields and excludes any internal IDs except fingerprint.
+
+
+### 6.6 Shadow Experiment — Activity/Audit tab
+- Config revision history (diff view)
+- Start/stop/pause events
+- Attachment events (linked to rollout)
+- Links to Audit Log entries
+
+---
+
+## 7. Rollout integration UX
+### 7.1 Rollout page — Quality signals panel
+Panel placement: right rail (desktop), collapsible section (mobile).
+
+Panel shows:
+- Attached experiment (name + status)
+- Last 24h headline:
+  - 3 selected metrics (configurable; default: refusal rate, format adherence, instruction-following score)
+  - Each with delta + CI
+- Scoring health:
+  - Lag p95
+  - Completeness %
+
+Actions:
+- “View details” (opens experiment Results tab)
+- “Edit attachment” (change which experiment is attached)
+- “Configure quality gate” (v1: advisory)
+
+
+### 7.2 Rollout timeline annotations
+When attached, the rollout timeline includes:
+- Markers when the experiment starts/stops
+- Markers for detected likely regressions (advisory), e.g., “Refusal rate regression (CI excludes 0)”
+
+
+### 7.3 Quality gate configuration (v1)
+UI is present but clearly labeled “Advisory (no automated rollback in v1)”.
+
+Gate configuration fields:
+- Metric
+- Threshold type: absolute delta / relative % change
+- Direction: regression only / improvement only / both
+- Minimum sample size requirement
+- Required confidence (fixed at 95% in v1; displayed as non-editable)
+
+When gate triggers:
+- Add warning banner on rollout page
+- Add timeline event
+- Optional: send notification (Slack/email integration outside scope; UI shows “Notifications configured by org admins”)
+
+---
+
+## 8. System states & messaging
+
+### 8.1 Scoring lag / incomplete data
+If scoring is behind, Results tab shows:
+- Banner: “Scoring delayed—results may be incomplete.”
+- The headline area must include completeness % and last-scored timestamp.
+- Charts should visually gray out the most recent interval if completeness < X% (threshold defined by observability standard; propose X=80%).
+
+### 8.2 Shadow dispatch degradation (fail-open)
+If shadow target errors increase:
+- Overview Health card shows elevated error rate.
+- Show banner: “Shadow targets failing; production responses unaffected (fail-open).”
+- Provide link: “How to disable shadowing” (runbook).
+
+### 8.3 No data / low sample size
+- If sample size below minimum (propose <200 pairs): show “Inconclusive—insufficient samples” and nudge to:
+  - increase sampling (if allowed)
+  - extend time range
+  - reduce segments
+
+---
+
+## 9. Copy requirements (must-have strings)
+These strings are specifically called out to avoid ambiguity:
+- “Shadow traffic mirrors requests to candidate variants but always returns the control response to users.”
+- “Fail-open: if shadowing fails, production traffic continues normally.”
+- “Quality metrics are asynchronous and may lag by minutes.”
+- “Confidence intervals indicate uncertainty; avoid decisions on small samples.”
+- “Examples are redacted and truncated; do not use this view for data export unless explicitly enabled.”
+
+---
+
+## 10. Analytics & instrumentation (Console)
+Console events (for product understanding; not customer-facing):
+- shadow_experiments.create_started / create_completed
+- shadow_experiments.pause / resume / stop
+- shadow_experiments.metric_selected
+- shadow_experiments.segment_applied
+- shadow_experiments.example_opened
+- rollouts.quality_panel_opened
+
+Guardrails:
+- Do not include prompt text in Console analytics.
+
+---
+
+## 11. Open questions
+1) **Run modeling:** Do we explicitly create immutable “run” objects in the backend for every start/stop cycle, or infer runs from state transitions? UX can support either; preferred is explicit runs for clearer comparison.
+2) **Metric directionality:** For each v1 metric, confirm “higher is better” vs “lower is better” and standardize visual semantics.
+3) **Threshold defaults:** Should the UI suggest default gate thresholds per metric (e.g., +0.5% refusal) or keep entirely user-defined?
+4) **Segments availability by plan:** Confirm which segments are always allowed in Dedicated/Private and which are hosted-only.
+5) **Export policy:** Confirm defaults (off by default) and the approval mechanism to enable.
+
+---
+
+## 12. Acceptance criteria (UX)
+- A Project Admin can create an experiment from a Route page in <5 minutes without docs.
+- Results show delta + CI everywhere a delta is shown (no “naked deltas”).
+- Rollout page displays attached experiment headline signals and health.
+- Examples tab is permission-gated and clearly labeled redacted/truncated.
+- All error/empty states explain what is happening and how to recover (increase time range, sampling, remove segments, check scoring health).
+
+---
+
+## 13. Appendix — Proposed default metric tiles (v1)
+These appear in the “headline metrics” set on overview/rollout panels:
+- Refusal rate (lower is better)
+- Format adherence (higher is better)
+- Instruction-following rubric score (higher is better)
+
+Secondary (available in metric list):
+- Safety policy violation proxy (lower is better)
+- JSON/Schema validity (higher is better)
+- Verbosity drift (token length delta; interpret with caution)
+
+(Exact definitions live in Applied ML / Evals docs; UI displays names and short descriptions only.)

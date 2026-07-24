@@ -1,0 +1,8 @@
+# LOGSIT 00300 — Baltic Sea
+
+LOGISTICS SITUATION REPORT
+Area: Baltic Sea
+Fuel status: 75 percent
+Medical supplies: adequate
+Transport availability: mission capable
+Request: confirm resupply route security.

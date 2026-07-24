@@ -1,0 +1,149 @@
+Tenant segmentation and onboarding scenarios: consumption & fidelity paths
+
+Summary
+-------
+This document defines recommended tenant segmentation, onboarding scenarios, and the default consumption + fidelity paths we should present during self-serve and sales-assisted onboarding. It is intended for Product, Solutions Engineering, Sales Engineering, and Developer Success to standardize the first 30–90 days of a new customer with the goal of predictable cost-to-value, controlled SLAs, and measurable quality validation.
+
+Scope
+-----
+- Applies to hosted and dedicated customers onboarding to Redwood Inference.
+- Focuses on initial tenancy segmentation, recommended fidelity (model variant + quantization profile), quota and warm-capacity suggestions, and telemetry checkpoints.
+- Does not replace contract-level SLA negotiation for enterprise Dedicated/Private customers.
+
+Key definitions
+---------------
+- Tenant: a single billing/account entity in the Redwood platform.
+- Fidelity: tradeoffs in model family, variant, quantization, and runtime execution path that affect latency, cost, and output quality.
+- Consumption Path: a recommended default for tokens/embeddings/requests, warm capacity and fallback behaviors assigned during onboarding.
+
+Customer segments and onboarding personas
+---------------------------------------
+We group inbound customers into four operational personas. Each persona maps to a recommended onboarding flow and default fidelity/consumption path.
+
+1) Developer Sandbox (self-serve, exploratory)
+- Characteristics: Low sustained traffic, high experimentation, using free credits or small token budgets.
+- Goals: fast time-to-first-success, discoverability, low friction.
+- Recommended defaults: hosted API, low warm-capacity (on-demand), canonical small model variant (economy variant), 90% prefix caching enabled, sampling-friendly generation config.
+
+2) Product Pilot (PLG -> early production)
+- Characteristics: intermittent production traffic, product team trying feature in-app, cost sensitivity but needs predictable latency.
+- Goals: stable latency under light traffic, measurable quality.
+- Recommended defaults: hosted or Dedicated trial, modest warm-capacity reservation, medium-fidelity variant, KV caching enabled, 95th percentile latency target 300–500ms for short completions.
+
+3) Transactional Production (high-throughput, low-latency)
+- Characteristics: sustained traffic, strict latency SLAs, regulated data.
+- Goals: deterministic throughput, SLO-backed behavior, engineering-grade observability.
+- Recommended defaults: Dedicated or Private, reserved GPU pools, high-fidelity variant with conservative quantization, persistent KV cache, proactive batching settings, canary routing rules.
+
+4) Cost-sensitive Batch / Embeddings (analytics-heavy)
+- Characteristics: large offline/nearline workloads for embeddings or reranking, lower latency requirements but high throughput.
+- Goals: minimize $/embedding while preserving vector quality.
+- Recommended defaults: batch-oriented instance pools, aggressive quantization profiles validated by embedding-similarity tests, local prefetching of embeddings, bulk ingest telemetry.
+
+Onboarding flows (high level)
+----------------------------
+Each persona follows a 5-phase onboarding flow with explicit checkpoints.
+
+1. Intake & Segment assignment (0–2 days)
+  - SE/automation collects: primary use case, expected QPS, latency & cost targets, data residency needs, PII sensitivity.
+  - System maps tenant to persona and applies baseline profile.
+
+2. Baseline Configuration (day 0–3)
+  - Apply default model variant, quantization profile, warm-capacity, caching policy, and telemetry flags.
+  - Send welcome email with recommended SDK code snips and cost-estimator link.
+
+3. Instrumentation & Sanity Tests (day 1–7)
+  - Run a validated sample prompt set (provided by Redwood) to establish baseline quality metrics (BLEU/ROUGE/embedding cosine distributions and generation hallucination checks).
+  - Validate telemetry flows (token counts, latency percentiles, error rates).
+
+4. Optimization & Ramp (day 7–30)
+  - Apply suggested batching and cache tuning from Redwood Optimize; run quick quantization A/B tests with synthetic traffic.
+  - For Product Pilot -> encourage 2-week canary route to higher-fidelity variant if quality drift < configured threshold.
+
+5. Guardrail & SLA handoff (day 30–90)
+  - If tenant meets traffic and security thresholds, recommend Dedicated or lower-latency routing tiers; document SLO entitlements and expected cost delta.
+  - Sign-off checklist completed by Solutions Engineering.
+
+Default fidelity & consumption mapping (table)
+--------------------------------------------
+The table below is a condensed mapping of persona -> starter config. Use it as the default placement during self-serve or first SE contact.
+
+Persona | Default runtime | Model variant | Quantization | Warm capacity | SLO target (short) | Notes
+-------|-----------------|---------------|--------------|---------------|--------------------|------
+Developer Sandbox | Hosted (on-demand) | variant-econ-1 | 8-bit dynamic | 0 | best-effort | Fast iteration, enable dev credits
+Product Pilot | Hosted / Dedicated trial | variant-mid-1 | 8-bit mixed | small reserve (1–2 GPUs equiv) | p95 300–500ms | Enable KV cache, telemetry preflight
+Transactional Prod | Dedicated / Private | variant-high-1 | 16-bit or int8 conservative | reserved pools | p99 150–300ms | Canary routing, SLA negotiation
+Batch Embeddings | Dedicated batch nodes | emb-quant-2 | int8 aggressive | ephemeral pool | throughput-based | Bulk ingest tooling + drivers
+
+Technical integration checklist (for Solutions Engineering)
+----------------------------------------------------------
+1) API keys and RBAC: ensure tenant keys scoped to routes and quotas.
+2) Network & VPC (if Private): validate firewall rules, KMS integration, and egress policies.
+3) Telemetry hooks: verify token-level and route-level metrics stream to customer console and Redwood telemetry service.
+4) Prompt set & sample data: run Redwood baseline prompt set and capture gold/reference outputs.
+5) Cost estimator run: execute the cost estimation tool with expected QPS and sequence-length distribution.
+
+Example cost-estimator CLI invocation:
+$ redwood cost-estimate --qps 50 --avg-tokens 120 --model variant-mid-1 --duration 30d --output report.pdf
+
+SLA & pricing implications
+-------------------------
+- Starter profiles are priced at the hosted per-token rates with quota protections.
+- Transition to Dedicated increases predictability at the cost of reserved-CPU/GPU fees — map the step-up tiers in the onboarding wizard.
+- When moving from a low- to high-fidelity variant, present the estimated cost delta (per million tokens) plus expected latency improvements and a short A/B test plan.
+
+Telemetry & success metrics (30 / 60 / 90 day)
+--------------------------------------------
+- 30d: integration completed; telemetry coverage > 95% of routes; baseline quality metrics recorded.
+- 60d: cost vs baseline within expected envelope; p95 latency trending toward target; fewer than 5% regeneration requests.
+- 90d: decision milestone (stay hosted, purchase Dedicated, request Private). Customer success NPS check.
+
+Rollout plan & ownership
+------------------------
+- Product: maintain persona-to-profile mapping and UI for self-serve selection (owner: Product).
+- Solutions Engineering: own pilot validation and canary run books (owner: Solutions Eng).
+- Developer Success: monitor telemetry SLOs and close 30/60/90 checkpoints (owner: Dev Success).
+- Engineering: provide Optimize suggestions and telemetry endpoints (owner: Eng-Platform).
+
+Decision matrix: when to recommend Dedicated/Private
+---------------------------------------------------
+- Recommend Dedicated when: sustained QPS > 300, p99 latency requirement < 400ms, or tenant requests data isolation.
+- Recommend Private when: regulated data (PII/PHI), strict on-prem requirements, or contractual security needs.
+
+Appendix A: sample API request and preflight test
+------------------------------------------------
+- Sample generation request to validate latency and token accounting:
+POST https://api.redwood.ai/v1/generate
+Headers: Authorization: Bearer <TENANT_KEY>
+Body:
+{
+  "model": "variant-mid-1",
+  "input": "Summarize customer support thread and extract intent",
+  "max_tokens": 120,
+  "temperature": 0.2
+}
+- Preflight pass criteria:
+  1) Successful request within p95 latency target.
+  2) Token accounting matches estimator (+/- 5%).
+  3) Output quality above threshold on reference prompts.
+
+Appendix B: quick decision FAQ
+-----------------------------
+Q: If a tenant wants to reduce cost immediately, what do we do?
+A: Suggest enabling prefix caching and switching to an economy variant for non-critical routes. Run a 7-day A/B to validate quality delta.
+
+Q: How aggressive should quantization be for embeddings?
+A: Start with int8 mixed for pilots. For bulk ingestion, run a 2-week embedding-similarity validation against a held-out set and only move to int8 aggressive if cosine similarity degradation < 0.01.
+
+Related docs and artifacts
+--------------------------
+- Developer onboarding SDK snippets (link pinned in welcome email).
+- Cost estimator UI and backend (internal API ID: cost-est-2026).
+- Redwood baseline prompt set (rbw-baseline-prompts-v2).
+
+Ownership & next steps
+----------------------
+- Product to add persona selection into the new onboarding UI by 2027-03-14.
+- Solutions Engineering to produce three persona-specific onboarding templates by 2027-03-01.
+- Engineering to expose an API flag to auto-apply persona profiles (ticket: ENG-4268).
+

@@ -1,0 +1,264 @@
+ADR-018: Compliance Report Pack Export Format, Versioning, and Backwards Compatibility
+
+## Status
+Published.
+
+## Decision drivers
+Redwood Inference is productizing a baseline “Compliance Reporting Pack” that can be generated on-demand for customers and internal audits. This ADR defines:
+- A stable export package layout.
+- Supported output formats (JSON/CSV) and a PDF “stub” strategy for MVP.
+- A versioning and compatibility policy so downstream tooling (GRC workflows, SE playbooks, customer ingestion) does not break across releases.
+
+Key requirements:
+- Human-reviewable package (customers) and machine-consumable artifacts (internal + customer GRC ingestion).
+- Deterministic, time-windowed exports with clear provenance.
+- Ability to add new sections/fields without breaking older parsers.
+- Clear support story: what is guaranteed stable, what may change, how deprecations are handled.
+
+Non-goals (MVP):
+- A full custom report builder.
+- Deep “bring your own GRC” integrations beyond stable exports.
+- Long-term archival format commitments beyond what is described below.
+
+## Context
+The Compliance Reporting Pack is an assembled set of evidence artifacts sourced from:
+- Audit log exporter (time-windowed events with filters and templates).
+- Retention configuration export (policy + tier defaults + change history summary).
+- Data residency/region summary (where relevant for hosted/dedicated/private).
+- Access control/RBAC report (roles, permissions, admin actions).
+- Evidence checklist aligned to SOC 2/ISO-style expectations.
+
+Consumers:
+- Customers (security reviewers, internal auditors).
+- Redwood Security & Compliance (GRC), Sales Engineering, Customer Success.
+- Potential automated ingestion into customer GRC tooling.
+
+Constraints:
+- Some customers strongly prefer PDF, but our first iteration will be JSON/CSV-first for correctness and automation.
+- We must support both Hosted/Dedicated/Private contexts; some sections may be absent/not-applicable depending on tier and feature flags.
+
+## Decision
+We will ship the Compliance Reporting Pack as a versioned “export package” (ZIP) containing:
+1) A required machine-readable manifest (`manifest.json`) describing contents, provenance, and versions.
+2) A set of JSON artifacts (canonical format) for each report section.
+3) Optional CSV renditions for select tabular sections (e.g., audit events, RBAC listings).
+4) A PDF “stub” (`report.pdf`) for MVP that provides a human-friendly cover + index and references the included JSON/CSV artifacts. The PDF is not the source of truth.
+
+The canonical source of truth for report data is JSON (not PDF, not CSV).
+
+### Package layout (v1)
+The export package MUST follow this directory structure:
+
+- `/manifest.json` (required)
+- `/reports/` (required)
+  - `/reports/audit-log/`
+    - `events.json` (required)
+    - `events.csv` (optional)
+    - `README.txt` (optional)
+  - `/reports/retention/`
+    - `retention-config.json` (required)
+    - `retention-change-history.json` (optional; included when available)
+  - `/reports/residency/`
+    - `data-residency-summary.json` (optional; omitted if N/A)
+  - `/reports/access-control/`
+    - `rbac-summary.json` (required)
+    - `rbac-users.csv` (optional)
+    - `rbac-roles.csv` (optional)
+  - `/reports/evidence/`
+    - `evidence-checklist.json` (required)
+- `/rendered/` (optional)
+  - `/rendered/report.pdf` (MVP stub)
+  - `/rendered/index.html` (reserved; not shipped in MVP)
+- `/signatures/` (reserved)
+  - `/signatures/sha256sums.txt` (optional; see “Integrity”)
+
+Notes:
+- Reports are organized by “section slug” to allow adding new sections without impacting existing consumers.
+- File names are stable within a major version.
+- Optional files may be omitted; consumers must treat absent optional files as “not provided / not applicable.”
+
+### Manifest schema (required)
+`manifest.json` MUST include the following top-level keys (consumers should ignore unknown keys):
+
+- `export_format_version` (string; e.g., `"1.0"`) — version of the package layout/contract (this ADR).
+- `generated_at` (RFC3339 timestamp) — when the package was generated.
+- `generated_by` (object serialized as JSON string is NOT allowed; must be proper JSON, but note: this Confluence doc is descriptive; implementation will store proper JSON)
+  - Required subfields in implementation: generator service name + version + git SHA.
+- `tenant` — identifiers needed to associate evidence to a tenant/customer account.
+  - Must include at minimum: `tenant_id` and `deployment_mode` (`hosted|dedicated|private`).
+- `time_window` — `start` and `end` timestamps that define the evidence window for time-based exports.
+- `reports` — array of entries describing each included report artifact:
+  - `slug` (e.g., `audit-log`)
+  - `version` (string; report schema version; see “Report schema versioning”)
+  - `artifacts` (list of artifact paths + content types)
+  - `notices` (optional list; e.g., known gaps, partial coverage)
+- `data_residency` (optional summary) — included when known at generation time.
+- `integrity` (optional) — integrity metadata (checksums) if generated.
+
+Implementation note (contractual behavior):
+- `manifest.json` is the entry point for all consumers.
+- Consumers must NOT rely on scanning directories to discover contents; they must read `manifest.json`.
+
+### Canonical JSON format
+All JSON report artifacts MUST:
+- Be UTF-8 encoded.
+- Use a stable, documented schema per report type.
+- Include a `schema_version` field inside the JSON artifact.
+- Include a `generated_at` field inside the JSON artifact.
+- Include `tenant_id` and `time_window` when applicable.
+
+### CSV format rules (optional renditions)
+CSV is provided as an interoperability convenience for auditors and spreadsheet workflows.
+- CSV files MUST include a header row.
+- CSV column names must be stable within a major version.
+- CSV files MUST be derivable from the JSON (no extra facts only present in CSV).
+
+### PDF “stub” (MVP)
+For the MVP, we will ship a PDF that is:
+- A cover page + generation metadata.
+- A table of contents listing included sections.
+- A short “How to read this package” page pointing reviewers to the JSON/CSV artifacts.
+
+The PDF MUST NOT be used as the sole evidence artifact. Any future “full PDF rendering” must be treated as a derived view of the canonical JSON.
+
+## Report schema versioning
+We version at two levels:
+
+1) **Export package format version** (`export_format_version` in `manifest.json`)
+- Controls the ZIP layout, required files, and discovery mechanism.
+- Semantic versioning: `MAJOR.MINOR`.
+  - MAJOR increments for breaking changes to layout/required keys.
+  - MINOR increments for additive changes (new optional sections, new optional manifest keys).
+
+2) **Per-report schema version** (`version` in manifest report entry + `schema_version` in each JSON artifact)
+- Controls the schema for a specific report section (e.g., `audit-log` events schema).
+- Semantic versioning per report.
+- A per-report schema version may change without changing the package version if the change is additive and consumers can ignore unknown fields.
+
+Compatibility guarantees:
+- Within a given **export package MAJOR**, the following are stable:
+  - Presence and meaning of `manifest.json` required keys.
+  - Directory layout rules described above.
+  - File naming conventions for required artifacts.
+- Within a given **report schema MAJOR**, the following are stable:
+  - Required fields’ meaning.
+  - Field types for required fields.
+
+Additive changes policy (allowed without breaking consumers):
+- Adding new optional manifest keys.
+- Adding new optional report sections.
+- Adding new optional fields to existing JSON artifacts.
+- Adding new optional CSV files.
+
+Breaking changes policy:
+- Removing or renaming required manifest keys.
+- Removing required report artifacts.
+- Changing meaning or type of required fields.
+- Renaming report `slug` values.
+
+Deprecation policy:
+- Breaking changes require a MAJOR bump and at least one full minor release cycle of notice in:
+  - Release notes for the Compliance Reporting Pack.
+  - Security & Compliance enablement materials.
+- For customers relying on automated ingestion, we will support **N-1 export package MAJOR** for a minimum of 6 months after GA of the new MAJOR (subject to contractual terms for specific enterprise agreements).
+
+## Stable identifiers and determinism
+To support auditability and avoid confusion in reviews:
+- Every package includes a `package_id` (UUIDv4) in the manifest.
+- Each report artifact includes a `report_run_id` (UUIDv4) matching the manifest entry.
+- Audit log exports MUST be time-windowed and include the applied filters/templates.
+- Where feasible, exports SHOULD be deterministic for the same inputs (time window + filters + snapshot time). If determinism cannot be guaranteed due to eventual consistency, the manifest must include a notice.
+
+## Integrity and tamper-evidence (MVP stance)
+MVP integrity:
+- We will optionally generate `/signatures/sha256sums.txt` containing SHA-256 checksums for every artifact path listed in the manifest.
+- The manifest will include a pointer to the checksum file when present.
+
+Non-goal (MVP):
+- Cryptographic signing with a Redwood key and verifiable signature chain. This is reserved for a future ADR once customer demand is validated.
+
+## Alternatives considered
+### A) PDF-first reports (canonical PDF)
+Pros:
+- Matches many auditor expectations.
+Cons:
+- Hard to make stable, machine-readable, and diffable.
+- Difficult to ensure completeness and avoid formatting-driven churn.
+Decision: Rejected. PDF is a derived view only.
+
+### B) CSV-only exports
+Pros:
+- Simple and widely consumable.
+Cons:
+- Loses nested structure and metadata; schema evolution is fragile.
+Decision: Rejected. CSV is optional/derived.
+
+### C) Single monolithic JSON file
+Pros:
+- One artifact to download/ingest.
+Cons:
+- Large files; hard partial updates; complicates streaming/time-windowed exports.
+Decision: Rejected for now. We may add an optional `bundle.json` later as a derived artifact if demand emerges.
+
+### D) Unversioned “best effort” exports
+Pros:
+- Fastest.
+Cons:
+- Breaks customer automation and internal runbooks; increases SE/CS burden.
+Decision: Rejected.
+
+## Consequences
+Positive:
+- Clear contract for customers and internal tooling.
+- Enables incremental growth (new sections, new fields) without churn.
+- Supports both human review (PDF stub + CSV) and automation (JSON + manifest).
+
+Negative / tradeoffs:
+- Adds overhead: versioning discipline, schema documentation, compatibility testing.
+- Requires investment in validators and CI checks to prevent accidental breaking changes.
+
+## Implementation notes (non-normative)
+Owners:
+- Report generator service (Engineering, Platform): package assembly + manifest.
+- Security & Compliance (GRC): defines required sections and content expectations.
+
+Testing requirements:
+- Contract tests that validate:
+  - `manifest.json` required keys present.
+  - File paths listed in manifest exist in ZIP.
+  - JSON artifacts conform to expected schemas.
+  - Optional CSV files are consistent with JSON (row count and key columns).
+
+Operational guidance:
+- The generator should emit metrics tagged by `export_format_version` and section slug to track adoption and failures.
+- If a report section fails generation, the package generation MUST either:
+  - Fail fast (no package produced), OR
+  - Produce a package with explicit `notices` and omit the section. The chosen behavior must be consistent per section and documented in the baseline pack definition.
+
+## Example (illustrative)
+Example manifest fields (abbreviated for readability):
+- export_format_version: 1.0
+- generated_at: 2025-03-10T18:22:41Z
+- tenant_id: tnt_123
+- deployment_mode: dedicated
+- time_window: 2025-02-01T00:00:00Z .. 2025-03-01T00:00:00Z
+- reports:
+  - slug: audit-log
+    version: 1.1
+    artifacts:
+      - reports/audit-log/events.json (application/json)
+      - reports/audit-log/events.csv (text/csv)
+  - slug: retention
+    version: 1.0
+    artifacts:
+      - reports/retention/retention-config.json
+
+## Open questions
+- Do we need a standardized control-mapping section (SOC 2 CC-series / ISO 27001 Annex A) in v1, or keep mapping in the evidence checklist only?
+- Should we standardize a machine-readable “coverage summary” schema for audit log event types (present vs expected) to address questionnaire needs?
+- When we add cryptographic signing, do we sign the full ZIP, the manifest, or individual artifacts?
+
+## Changelog
+- 2025-03-10: Clarified canonical JSON vs derived CSV/PDF; added explicit package layout and N-1 support policy.
+- 2025-02-14: Added manifest discovery requirement and per-report schema versioning.
+- 2025-01-24: Initial draft.

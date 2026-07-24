@@ -1,0 +1,10 @@
+# LOGSIT 00483 — North Atlantic
+
+LOGISTICS SITUATION REPORT
+Area: North Atlantic
+Fuel status: 85 percent
+Medical supplies: adequate
+Transport availability: mission capable
+Request: confirm resupply route security.
+
+Note linguistique: diffusion de travail en français; situation opérationnelle stable.

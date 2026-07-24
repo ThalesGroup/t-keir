@@ -1,0 +1,182 @@
+Demo Security FAQ: Short Answers + Internal Links (SOC2, SSO/SAML, Audit Logs, Encryption, Retention/Residency)
+
+## Purpose
+This page is the demo-ready security FAQ for AEs/SEs. It provides **short, consistent answers** plus **internal links** to deeper references for follow-ups.
+
+**Scope:** Hosted API, Dedicated, and Private/VPC (narrative + screenshots). This is not a replacement for Security review.
+
+**Golden rule for demos:** the demo tenant contains **synthetic data only**. Do not enter customer data, keys, or confidential documents into the demo tenant.
+
+---
+
+## Safe-sharing rules (what you may show live)
+**OK to show live (default):**
+- Console screens that contain **synthetic demo activity only** (usage charts, latency/cost breakdowns, traces with synthetic payloads)
+- RBAC/role screens (tenant roles, project roles) as long as they show demo users only
+- Audit log UI **at a high level** (event types, timestamps, actor IDs) with demo users only
+- Architecture diagrams and product UI for SSO setup (no real IdP details)
+
+**Avoid live unless explicitly requested + you’ve prepped:**
+- Any document downloads (SOC 2 report, pen test letters) during a call
+- Anything containing internal hostnames, account IDs, or environment identifiers
+- Deep logs that could reveal internal infrastructure details (node IDs, IPs)
+
+**If asked for evidence:**
+- Offer to share the SOC 2 Type II report and security package **under NDA** via the approved process (see link below).
+
+**Escalate to Security/Compliance when:**
+- Prospect requires HIPAA/BAA, PCI, FedRAMP, or an “air-gapped” claim
+- They ask for “custom retention” or “no logging whatsoever” requirements
+- They request a sub-processor list, DPA redlines, or pen test reports
+
+Internal reference: CONFLUENCE:security-and-compliance/demo-safe-sharing-guidance
+
+---
+
+## Quick answers (demo-friendly)
+Below are the most common questions. Use the **Short answer** verbatim where possible.
+
+### 1) Compliance (SOC 2 / ISO / audits)
+**Q: Are you SOC 2 compliant?**
+- **Short answer:** Yes—Redwood maintains a **SOC 2 Type II** report covering our hosted production services. We can share the report under NDA.
+- **Good demo follow-up:** “We can provide the report and our security package after this call—what’s your timeline and which controls matter most (access control, logging, encryption, vendor risk)?”
+- **Internal link:** CONFLUENCE:security-and-compliance/soc2-overview-and-access
+
+**Q: Do you have ISO 27001?**
+- **Short answer:** Redwood’s primary compliance artifact for most prospects today is **SOC 2 Type II**; for ISO-specific requirements we align on control mapping during security review.
+- **Internal link:** CONFLUENCE:security-and-compliance/compliance-control-mapping-iso27001
+
+---
+
+### 2) Data usage, training, and isolation
+**Q: Do you train on our data?**
+- **Short answer:** No. Customer prompts and outputs are processed to provide the service and are **not used to train** Redwood or third-party foundation models.
+- **Clarifier:** “We can also discuss configuration options around logging/retention for your environment.”
+- **Internal link:** CONFLUENCE:security-and-compliance/customer-data-use-and-model-training-policy
+
+**Q: Is our data isolated from other customers?**
+- **Short answer:** Yes. Requests are logically isolated by tenant and project, and access is controlled via scoped API keys and RBAC. Dedicated and Private deployments add stronger isolation boundaries aligned to regulated requirements.
+- **Internal links:**
+  - CONFLUENCE:security-and-compliance/tenant-isolation-and-access-controls
+  - CONFLUENCE:architecture-and-standards/private-vpc-deployment-reference-architecture
+
+---
+
+### 3) Encryption and key management
+**Q: Is data encrypted in transit and at rest?**
+- **Short answer:** Yes. Traffic is encrypted **in transit (TLS)**, and data at rest is encrypted using industry-standard encryption.
+- **Internal link:** CONFLUENCE:security-and-compliance/encryption-in-transit-and-at-rest
+
+**Q: Do you support customer-managed keys (KMS/HSM)?**
+- **Short answer:** For enterprise deployments (especially Private/VPC), Redwood supports integrations with customer key management systems. The exact options depend on deployment mode and region.
+- **Demo tip:** Position as “we meet you where you are”—Hosted for speed, Private for strict controls.
+- **Internal link:** CONFLUENCE:security-and-compliance/kms-hsm-integrations-overview
+
+---
+
+### 4) Identity, SSO/SAML, and RBAC
+**Q: Do you support SSO/SAML?**
+- **Short answer:** Yes. Redwood supports SSO (SAML-based) for enterprise tenants, plus role-based access control.
+- **What to show:** SSO settings screen (no live IdP secrets), RBAC role list.
+- **Internal link:** CONFLUENCE:security-and-compliance/sso-saml-setup-and-security-controls
+
+**Q: What RBAC roles exist? Can we do least privilege?**
+- **Short answer:** Yes. Redwood provides tenant and project-level roles designed for least privilege, and we recommend separating admin, developer, and read-only access.
+- **Internal link:** CONFLUENCE:security-and-compliance/rbac-role-matrix
+
+**Q: Do you support SCIM?**
+- **Short answer:** SCIM support depends on the enterprise plan and deployment mode; we confirm requirements during onboarding/security review.
+- **Internal link:** CONFLUENCE:security-and-compliance/identity-provisioning-scim-status
+
+---
+
+### 5) Audit logs and monitoring
+**Q: Do you have audit logs? What’s captured?**
+- **Short answer:** Yes. Redwood provides audit logs for security-relevant events (auth changes, key creation/rotation, role changes, configuration updates), and supports exporting for SIEM workflows in enterprise plans.
+- **What to show:** Audit log UI with synthetic demo events (actor, action type, timestamp), not raw infrastructure logs.
+- **Internal link:** CONFLUENCE:security-and-compliance/audit-logging-product-overview
+
+**Q: Can we export logs to our SIEM (Splunk/Datadog/etc.)?**
+- **Short answer:** Yes—export options are available for enterprise customers. We align on destinations and event schemas during onboarding.
+- **Internal link:** CONFLUENCE:security-and-compliance/security-logging-and-siem-export
+
+---
+
+### 6) Data retention, deletion, and residency
+**Q: How long do you retain prompts/outputs/logs?**
+- **Short answer:** Retention depends on the data type and plan; enterprise customers can configure retention controls. For demos, all data is synthetic.
+- **Internal link:** CONFLUENCE:security-and-compliance/data-retention-and-deletion-policy
+
+**Q: Can we request deletion of our data?**
+- **Short answer:** Yes. Redwood supports deletion requests and plan-based retention controls; the process is documented and tracked.
+- **Internal link:** CONFLUENCE:security-and-compliance/data-deletion-request-process
+
+**Q: Do you support data residency (EU/US)?**
+- **Short answer:** Yes. Redwood supports region selection and, for Private/VPC, customer-controlled network boundaries. We align on residency requirements and any cross-region failover expectations during security review.
+- **Demo tip:** If residency is a hard requirement, pivot to Private/VPC architecture narrative.
+- **Internal link:** CONFLUENCE:security-and-compliance/data-residency-and-regional-controls
+
+---
+
+### 7) Private/VPC and on-prem
+**Q: Can we deploy in our VPC?**
+- **Short answer:** Yes. Redwood Private supports VPC deployments with customer-managed networking and security controls.
+- **Internal link:** CONFLUENCE:architecture-and-standards/private-vpc-deployment-reference-architecture
+
+**Q: Do you support on-prem / air-gapped?**
+- **Short answer:** Redwood has an on-prem option for regulated environments. Requirements vary (hardware, networking, upgrade cadence), and we scope this with Solutions Engineering and Security.
+- **Internal link:** CONFLUENCE:product-docs/private/onprem-packaging-and-requirements
+
+---
+
+### 8) Vulnerability management and incident response
+**Q: Do you run penetration tests / vulnerability scanning?**
+- **Short answer:** Yes. Redwood runs ongoing vulnerability management and coordinates third-party testing as part of our security program. Evidence is shared under NDA when required.
+- **Internal link:** CONFLUENCE:security-and-compliance/vulnerability-management-and-penetration-testing
+
+**Q: What’s your incident response process?**
+- **Short answer:** Redwood maintains an incident response program with defined severity levels, escalation, and customer communications for security-impacting events.
+- **Internal link:** CONFLUENCE:security-and-compliance/incident-response-overview
+
+---
+
+## Demo-tenant-specific statements (use verbatim)
+Use these lines to keep security discussions crisp during a live demo:
+- “This demo tenant uses **synthetic data only**—no customer prompts or datasets.”
+- “All keys we use in demos are **scoped and least-privilege**, and we rotate them regularly.”
+- “For enterprise controls like SSO, audit logs, retention controls, and VPC deployments, we can show the product surfaces and share detailed documentation in follow-up.”
+
+Internal references:
+- CONFLUENCE:eng-platform/runbooks/demo-tenant-reset-runbook
+- CONFLUENCE:eng-platform/how-tos/demo-tenant-provisioning-overview
+
+---
+
+## Evidence & follow-up package (internal process)
+If a prospect asks for formal security materials, do **not** attach directly from your laptop. Use the approved process.
+
+**Standard follow-up items (typical):**
+- SOC 2 Type II report (NDA required)
+- Security overview/whitepaper
+- Sub-processor list
+- DPA template + security addendum (via Legal)
+
+**How to request:**
+- Open a request in the Security evidence workflow: CONFLUENCE:security-and-compliance/evidence-request-workflow
+- Or ping #security-review with the prospect name, timeline, and required artifacts.
+
+---
+
+## Talk track tips (how to keep the demo moving)
+- If the question is “Do you have X?”: answer yes/no, then bridge to “**what do you need it for**?”
+- If the question is deep (residency edge cases, custom retention, audit export format): offer a follow-up session with Security/SE and continue the demo.
+- Keep the focus on Redwood’s value proposition: **production-grade inference** with **enterprise controls** and **flexible deployment modes**.
+
+---
+
+## Owner + updates
+**Owner:** Sales Enablement (Elliot Price) with Security/Compliance review (Naomi Feldman, Marcus Lin).
+
+**Update cadence:** Review quarterly and after any material change to SSO/audit logs/retention controls or compliance posture.
+
+**Report issues:** If you see inconsistencies in answers used in the field, file a task under “Demo enablement” and tag @Elliot Price + @Naomi Feldman.

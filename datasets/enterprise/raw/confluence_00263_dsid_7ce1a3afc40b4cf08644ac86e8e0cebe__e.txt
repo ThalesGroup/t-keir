@@ -1,0 +1,116 @@
+embedded-inference-positioning-and-ciso-seller-scripts-2026
+
+Embedded inference positioning & CISO seller scripts
+
+Overview
+This document provides a concise, reproducible sales enablement package tailored for deals where customers evaluate embedded or private inference (VPC, on-prem, or dedicated capacity). It includes: positioning statements, competitive brief, pricing guidance examples, concise pitch scripts for technical and security stakeholders (CTO, Platform Eng, CISO), demo checklist, a short anonymized case study, objection handling, and a focused security FAQ for prospects.
+
+Audience
+- Account executives (AE) and sales engineers (SE) running discovery and technical validation calls
+- Solutions architects preparing proposals for regulated or latency-sensitive customers
+- Enterprise sellers negotiating reserved capacity and private deployment contracts
+
+Key one-line messages (choose 1–2 per call)
+- For Platform/Infra leads: "Deploy predictable, low-latency LLM inference in your VPC or on-prem with the same API and rollout controls you already use in hosted mode."
+- For CTOs: "Reduce inference cost per meaningful token by combining quantization profiles, caching, and Redwood Optimize recommendations — without rebuilding your inference stack."
+- For CISOs: "Keep data inside your network, retain full audit trails, and use your KMS while leveraging Redwood’s runtime optimizations and canary rollout controls."
+
+Top value props (short bullets, use in sequence)*
+- Predictable economics: reserved capacity + Optimize recommendations -> typical 30–60% unit cost reduction vs unmanaged self-hosted stacks for production workloads.
+- Unified developer UX: same REST/SDK surface and rollout primitives across hosted, dedicated, and private.
+- Production SLOs: configurable latency SLAs (p50/p95 targets) and automatic model-fallback policies.
+- Security posture: customer-managed KMS/HSM, VPC peering/direct-connect support, detailed audit logs per token.
+
+Competitive brief (high-level, for SE prep)
+Use this at the start of technical calls to frame differentiation.
+| Capability | Redwood Inference | Large Cloud ML Endpoints | OSS self-hosting |
+| --- | --- | --- | --- |
+| Developer API parity (hosted/private) | Yes — identical API / SDKs | Partial — different endpoints | Varies; often custom wrappers |
+| Cost controls | Optimize toolkit + reserved pricing | Some discounts; limited optimizer | Full control but requires ops investment |
+| Latency SLOs & fallbacks | SLA-backed for Dedicated; smart routing | SLA varies by offering | Depends on team ops maturity |
+| Security & compliance | KMS/HSM integration, audit logs, VPC & on-prem | Strong cloud-native options, less turnkey on-prem | Needs heavy engineering, audit work |
+| Model catalog & profiling | Curated models + quantization profiles | Model marketplace, fewer curated perf guarantees | Model ops entirely internal |
+
+Pricing & packaging guidance (quick reference)
+- Hosted (self-serve): per-token generation + embedding units. Best for trials and fast time-to-value.
+- Dedicated (reserved capacity): monthly commitment; tiered pricing by GPU class and guaranteed throughput. Ideal when predictable latency and cost are required.
+- Private (VPC / on-prem license): platform fee + support; optional professional services for initial packaging and air-gapped installs.
+
+Illustrative pricing scenarios (do not share externally; use in negotiation)
+| Scenario | Baseline | Redwood outcome | Expected benefit |
+| --- | --- | --- | --- |
+| Customer X (SaaS search, 10M tokens/day) | Self-host (spot) 8x ops hours monthly | Dedicated g4dn-style reserved + caching | 35–50% lower TCO, 2x fewer incidents |
+| Enterprise Y (PII-sensitive, 5k QPS) | In-house LLM infra + ops team | Private deployment + KMS + 24/7 SRE | Predictable latency, compliance evidence for audit |
+
+Sample seller scripts (short, switchable snippets)
+- Opening (platform engineer): "We help you keep inference in your environment while giving your engineers the same API and rollout controls they use for other services. This reduces integration time and lets you govern model change through canary and A/B rollouts."
+- CTO (economics): "If your goal is predictable cost per request, Redwood’s Optimize recommendations — combined with dedicated pools and prefix caching — typically reduce per-token spend and smooth variance caused by dynamic batching at scale."
+- CISO (security): "You can run Redwood Private with your KMS/HSM, enable full audit logging by tenant and token, and require mutual TLS plus VPC peering. We also provide evidence packages for SOC2 and controlled data residency configurations."
+
+Objection handling cheat-sheet
+- "We can just host it ourselves" → "Yes, but build vs buy tradeoff: Redwood removes repeated optimizations (KV caching, quantization profiles, kernel selection) and provides operational SLAs — all of which materially lower ongoing MTTI and ops cost. We’ll quantify the delta in the pricing appendix."
+- "I’m worried about model drift and quality regressions" → "We surface per-prompt evals and regression alerts as part of Optimize; we can run initial guardrail evals on your production prompt set during a pilot."
+- "Your hosted offering might see spikes" → "Use Dedicated + smart routing to ensure predictable throughput and configure fallbacks to lower-cost variants during regional outages."
+
+Demo checklist (for SEs)
+1. Confirm network path: VPN/VPC peering details and IP allowlist.
+2. Validate auth flow: KMS key access patterns and service principal setup.
+3. Show identical API call in hosted vs private (curl example).
+4. Run a 1k-token workload to demonstrate p95 latency and KV caching impact.
+5. Show audit log entry for the request and where it appears in the Console.
+
+Quick curl example (for demo scripts)
+curl -X POST https://api.redwood.example/v1/generate \
+  -H "Authorization: Bearer $REDWOOD_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"rwd-2b-quant","input":"Summarize user intent for this query"}'
+
+Sample private config snippet (JSON, for solutions architects)
+{
+  "deploy_mode": "private",
+  "network": {"vpc_id": "vpc-012345", "subnet_ids": ["subnet-1","subnet-2"]},
+  "kms_key": "projects/myproj/locations/global/keyRings/kr/cryptoKeys/key1",
+  "audit": {"enabled": true, "retention_days": 365}
+}
+
+Short anonymized case study (e-commerce search, 3–4 bullets)
+- Situation: Large online retailer needed sub-50ms p95 product search reranking and to maintain customer PII entirely on-prem.
+- Solution: Redwood Private with quantized rwd-4b variant, prefix caching for top queries, and canary rollout for reranker updates.
+- Outcome: p95 latency reduced from 120ms to 42ms; per-request inference cost dropped ~40% after Optimize recommendations; audit package produced for PCI review.
+
+Security FAQ (focused for CISOs, concise answers)
+Q: Can we keep all inference data in our VPC?
+A: Yes. Redwood Private and Dedicated options support VPC-only deployment and peering. No training data or logs are transmitted to Redwood’s hosted control plane unless you enable that integration.
+
+Q: How does key management work?
+A: You provide the KMS/HSM keys. Redwood integrates with customer-managed KMS (AWS KMS, GCP KMS, Azure Key Vault) or brings-your-own-HSM for on-prem installs. Keys never leave customer control.
+
+Q: What does auditing and logging look like?
+A: Audit logs include request metadata, model version, and route. Logs are delivered to your logging endpoint (S3, GCS, or SIEM) and we support configurable retention and redaction policies.
+
+Q: Can you support air-gapped installations?
+A: Yes. We have a validated on-prem packaging process and an air-gapped deployment plan (see /confluence/eng-private-deployments/onprem-packaging). Professional services required for initial installation.
+
+Q: How do you prove compliance for sales cycles?
+A: We provide an evidence bundle: architecture diagrams, SOC2 summary, encryption and key management statements, network diagrams, and a deployment checklist used by our delivery team.
+
+Next steps & playbook for conversion (AE + SE)
+1. Discovery: confirm workloads (tokens/day, p95 requirement, data residency). Capture in the qualification checklist.
+2. POA: schedule an architecture review with eng-private-deployments and request a delivery estimate.
+3. Pilot: run a 2–4 week pilot using a dedicated pool with prefix caching enabled, collect latency and cost baselines.
+4. Close: present pricing appendix with reserved capacity options and agreed SLAs; provide delivery and support SLAs in contract.
+
+Owners and contacts
+- Sales enablement (owner): Aisha Patel — aisha.patel@redwood.example
+- Solution delivery: Daniel Wu — daniel.wu@redwood.example
+- Security & compliance advisory: Sofia Alvarez — sofia.alvarez@redwood.example
+
+Related resources
+- Internal: /confluence/eng-private-deployments/deployment-guides, /confluence/eng-serving-runtime/release-notes
+- External: Append detailed pricing spreadsheet and pilot acceptance criteria when engaging procurement.
+
+Revision history
+- 2026-02-14: Drafted by Aisha Patel
+- 2026-03-01: Updated with demo checklist and pricing scenario inputs (reviewers: Marcus Chen, Sofia Alvarez)
+
+*Use these scripts as starting points — adapt to customer language and discovery signals.

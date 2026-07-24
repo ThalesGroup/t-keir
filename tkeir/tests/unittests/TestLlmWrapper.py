@@ -268,30 +268,49 @@ def test_wrapper_config_env_overrides_file_models(monkeypatch):
     assert cfg.rerank_strategy == "embedding_cosine"
 
 
-def test_embedding_cosine_rerank():
-    client = AsyncMock()
+def test_rerank_embedding_cosine_uses_embeddings(monkeypatch):
     wrapper = UnifiedLLMWrapper(
         _config(Provider.OPENAI, rerank_strategy="embedding_cosine"),
-        client=client,
+        client=AsyncMock(),
     )
 
     async def _fake_embed_batch(texts: list[str]) -> list[list[float]]:
-        # query aligned with second document
-        mapping = {
-            "query": [1.0, 0.0, 0.0],
-            "a": [0.0, 1.0, 0.0],
-            "b": [1.0, 0.0, 0.0],
-        }
-        return [mapping[text] for text in texts]
+        # query closer to "b" than "a"
+        del texts
+        return [[1.0, 0.0], [0.0, 1.0], [0.9, 0.1]]
 
-    wrapper.embed_batch = _fake_embed_batch
+    monkeypatch.setattr(wrapper, "embed_batch", _fake_embed_batch)
 
     async def _run() -> list[dict]:
-        return await wrapper.rerank("query", ["a", "b"], top_n=2)
+        return await wrapper.rerank(
+            "query", ["a", "b"], top_n=2, strategy="embedding_cosine"
+        )
 
     ranked = asyncio.run(_run())
     assert ranked[0]["index"] == 1
-    assert ranked[0]["relevance_score"] == 1.0
+    assert ranked[0]["relevance_score"] > ranked[1]["relevance_score"]
+
+
+def test_rerank_rejects_llm_strategy(monkeypatch):
+    class _FakeEncoder:
+        def predict(self, pairs, show_progress_bar=False):
+            del show_progress_bar
+            return [0.1, 0.9]
+
+    wrapper = UnifiedLLMWrapper(
+        _config(Provider.OPENAI, rerank_strategy="cross_encoder"),
+        client=AsyncMock(),
+    )
+    wrapper._cross_encoder = _FakeEncoder()
+
+    async def _run() -> list[dict]:
+        return await wrapper.rerank(
+            "query", ["a", "b"], top_n=2, strategy="llm_judge"
+        )
+
+    ranked = asyncio.run(_run())
+    # Forbidden LLM strategy falls back to cross-encoder
+    assert ranked[0] == {"index": 1, "relevance_score": 0.9}
 
 
 def test_cross_encoder_rerank_uses_sentence_transformers(monkeypatch):

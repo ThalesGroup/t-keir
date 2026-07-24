@@ -1,0 +1,246 @@
+SLO Tier PromptSet Selection (Fast / Standard / Cost-Efficient)
+
+## Overview
+This page defines how Redwood selects and weights prompt sets used to validate the **Fast**, **Standard**, and **Cost-Efficient** latency SLO tiers for workload-aware batching defaults.
+
+The prompt sets here are used by the serving runtime perf suite and canary gates to answer:
+- Do the tiered batching profiles meet published latency targets (p95/p99 where applicable)?
+- Do we improve throughput and $/1K tokens without changing request semantics?
+- Do results generalize to real production traffic (within known limitations)?
+
+This doc is intentionally about **prompt selection/weighting** (task mix + length mix + streaming mix). For execution details (concurrency ramps, warmup, pass/fail gates), see the benchmark methodology page.
+
+## Scope
+In scope:
+- Prompt set taxonomy (chat vs summarization vs code, etc.)
+- Tier-specific weighting and why it differs by tier
+- Prompt-length distributions (prefill pressure) and output-length bands (decode pressure)
+- Streaming vs non-streaming coverage
+- Representativeness checks and refresh cadence
+- Known blind spots / non-goals
+
+Out of scope:
+- Per-tenant real-time auto-tuning and tenant-specific prompt sets
+- Quality evaluation thresholds (covered in the quality guardrails page)
+- Model-family specific kernel constraints (tracked in quantization/profile matrix and model catalog metadata)
+
+## Definitions (shared across perf suite)
+**PromptSet**: A versioned collection of prompts with metadata (task type, input token length bucket, target output length band, streaming flag). Stored in `benchmark-lab` as immutable snapshots.
+
+**Scenario**: A weighted combination of one or more PromptSets plus execution parameters (concurrency schedule, streaming mode, max output tokens). Scenarios are the unit of CI/perf-canary gating.
+
+**Length buckets (input/prefill)** (tokenized using Redwood’s tokenizer for the model family under test):
+- S: 0–256
+- M: 257–1,024
+- L: 1,025–4,096
+- XL: 4,097–8,192
+- XXL: 8,193–16,384
+
+**Output bands (decode)** (requested `max_output_tokens` and/or observed typical):
+- Short: 16–128
+- Medium: 129–512
+- Long: 513–1,024
+
+## Principles for prompt selection
+1) **Production resemblance over academic purity.** Prompts should match what customers do (chat, summarization, RAG-style Q&A, code assistance) rather than benchmark-only patterns.
+
+2) **No customer data by default.** Prompt sets are built from:
+- Public datasets with permissive licenses (summarization, QA)
+- Synthetic prompts (templated) with realistic structure
+- Redwood-internal “pseudo-production” prompts written by Applied ML and Solutions Engineering
+
+Customer-provided prompts may be used only when explicitly approved under an opt-in program and stored in a restricted location; they do not ship as default perf suite prompt sets.
+
+3) **Cover both scheduler stressors.** The tiered batching defaults are sensitive to:
+- Prefill cost (large inputs, prompt-length variance)
+- Decode dynamics (streaming vs non-streaming, output length)
+
+4) **Stability and reproducibility.** Prompt sets must be deterministic to run (no external tool calls, no web fetches). When quality guardrails need stable outputs, we run with `temperature=0` and fixed seeds where supported.
+
+5) **Avoid accidental foot-guns in the test itself.** Prompts are filtered to avoid:
+- PII or secrets
+- Extremely toxic content
+- Prompts that encourage disallowed output (we’re measuring performance, not safety policy coverage)
+
+## Prompt taxonomy
+We tag every prompt into one primary task type (and optional secondary tags).
+
+Primary task types:
+- **Chat (general assistant):** conversational Q&A, instruction following
+- **RAG-style Q&A:** question + provided context passages (simulated retrieval)
+- **Summarization:** summarize a provided document/passage
+- **Extraction / structured output:** produce JSON fields from a passage
+- **Code assistance:** code completion, bugfix, explanation
+
+Secondary tags (optional):
+- `streaming_candidate` (for endpoints commonly streamed)
+- `tool_like_json` (structured output constraints)
+- `long_context` (XL/XXL inputs)
+- `high_variance` (input length varies widely within the set)
+
+## Tier intent → what we weight
+The tiers differ in customer expectations and in which runtime behaviors are most important.
+
+### Fast tier intent (latency-protecting)
+- Typical customer: interactive chat/agent UX
+- Critical metrics: TTFT, p99 tail latency, queueing behavior under bursts
+- Scheduler risk: starvation of short requests behind long prefill; long-tail queue buildup; streaming chunk jitter
+
+### Standard tier intent (balanced)
+- Typical customer: mixed product traffic (interactive + background)
+- Critical metrics: p95 latency + steady throughput
+- Scheduler risk: mixed prompt lengths and mixed streaming causing unpredictable batching efficiency
+
+### Cost-Efficient tier intent (throughput-optimizing)
+- Typical customer: batch-ish workloads (summarization, extraction, offline processing) and cost-sensitive RAG
+- Critical metrics: tokens/sec, $/1K tokens, acceptable p95 (not necessarily tight p99)
+- Scheduler risk: queue blowups under overload; increased variance from aggressive batching; regression masked if we under-sample long inputs
+
+## Tier-specific weighting (task mix)
+Weights below define the default scenario mix for top model families. Each “scenario run” samples prompts according to these weights.
+
+Table: **Task mix weights by tier**
+
+| Task type | Fast | Standard | Cost-Efficient | Rationale |
+|---|---:|---:|---:|---|
+| Chat (general assistant) | 45% | 35% | 20% | Fast tier is dominated by interactive chat. Cost-efficient de-emphasizes pure chat. |
+| RAG-style Q&A | 25% | 25% | 30% | RAG is common and stresses prefill + attention. Cost-efficient often runs RAG at scale. |
+| Extraction / structured output (JSON) | 15% | 15% | 25% | Many “automation” workloads are structured; also catches streaming vs non-streaming differences in decoding patterns. |
+| Summarization | 10% | 15% | 20% | Often non-streaming and batch-friendly; increased weight in cost-efficient. |
+| Code assistance | 5% | 10% | 5% | Important for representativeness; not the primary workload for tiered batching defaults. |
+
+Notes:
+- Code prompts are included to detect regressions with code-focused model families and to ensure scheduler behavior isn’t tuned only to conversational shapes.
+- Tool calling is represented indirectly via **structured output** prompts (JSON constraints) to exercise “format rigidity” without relying on actual tool execution.
+
+## Tier-specific weighting (streaming vs non-streaming)
+We explicitly split scenarios into streaming and non-streaming because the scheduler and batching heuristics interact with:
+- **TTFT (time to first token)**
+- **inter-token latency/jitter** (streaming smoothness)
+- **decode-phase concurrency**
+
+Table: **Streaming share by tier**
+
+| Tier | Streaming share | Non-streaming share | Notes |
+|---|---:|---:|---|
+| Fast | 70% | 30% | Mirrors chat UX where streaming is common; streaming scenarios prioritize TTFT and p99. |
+| Standard | 50% | 50% | Balanced product mix. |
+| Cost-Efficient | 20% | 80% | Batch/bulk workloads typically do not stream; we still keep some streaming coverage to prevent regressions in mixed clusters. |
+
+Implementation detail (for perf suite):
+- “Streaming share” means the client consumes tokens incrementally and we measure TTFT + per-token timing.
+- “Non-streaming share” means we request full completion and measure end-to-end latency.
+
+## Tier-specific weighting (input length buckets)
+We tune the prompt-length distribution to mirror typical traffic per tier while maintaining enough coverage to catch failures.
+
+Table: **Input length distribution by tier**
+
+| Input bucket | Fast | Standard | Cost-Efficient |
+|---|---:|---:|---:|
+| S (0–256) | 35% | 25% | 15% |
+| M (257–1,024) | 40% | 35% | 25% |
+| L (1,025–4,096) | 20% | 30% | 35% |
+| XL (4,097–8,192) | 4% | 8% | 15% |
+| XXL (8,193–16,384) | 1% | 2% | 10% |
+
+Why XXL is higher in Cost-Efficient:
+- Long-context batch processing and large-document extraction are common in cost-sensitive workloads.
+- Aggressive batching + long prefill is where queue dynamics can become unstable; we want early detection.
+
+Guardrail:
+- XXL prompts are capped in scenario selection by model family max context and by the runtime’s configured context window. Prompts that exceed the tested model’s context are excluded (and logged as “excluded_out_of_context”).
+
+## Output length bands (decode pressure)
+We control decode pressure by selecting prompt subsets with typical requested outputs.
+
+Default output band weights (all tiers unless overridden by model family):
+- Short (16–128): 50%
+- Medium (129–512): 40%
+- Long (513–1,024): 10%
+
+Tier overrides:
+- Fast: increase Short to 60% (interactive answers)
+- Cost-Efficient: increase Medium/Long to 50%/15% (bulk summarization/extraction often needs longer outputs)
+
+## PromptSet composition (v1.0 baseline)
+The prompt sets are grouped into immutable sets. Scenarios draw from these sets based on the weights above.
+
+PromptSet v1.0 (initial shipping set for tiered batching defaults):
+- `ps_chat_interactive_v1`: short-to-medium chat prompts; many are streaming candidates
+- `ps_rag_qa_passages_v1`: question + 2–6 synthetic passages (1–4k tokens typical)
+- `ps_summarization_docs_v1`: summarization of multi-paragraph documents (non-streaming typical)
+- `ps_extraction_json_v1`: extract fields into strict JSON schema; includes edge cases (missing fields, ambiguous mentions)
+- `ps_code_assist_v1`: code completion + “fix this function” style prompts
+
+Each prompt record includes:
+- `prompt_id` (stable)
+- `task_type`
+- `input_bucket` (S/M/L/XL/XXL)
+- `output_band` (Short/Medium/Long)
+- `streaming_default` (true/false)
+- `notes` (freeform: e.g., “high variance”, “long context”, “strict json”)
+
+## Representativeness validation
+We do not assume prompt sets are representative by construction. We validate by comparing prompt-set distributions to aggregated production telemetry (no prompt text).
+
+Signals used (aggregated, privacy-preserving):
+- input tokens distribution by model family and route category
+- streaming fraction by route category
+- observed output tokens distribution
+- concurrency and burstiness proxies (requests/sec variance)
+
+Validation procedure (performed at each prompt set version bump):
+1) Compute distribution deltas between PromptSet mix and telemetry for each tier.
+2) Flag if any of these are exceeded:
+   - Input bucket delta > 10 percentage points for S/M/L
+   - XL+XXL delta > 5 percentage points
+   - Streaming share delta > 15 percentage points
+3) If flagged, adjust weights first; only adjust prompt content if the mismatch is structural (e.g., missing XXL prompts).
+
+Note: For the Fast tier, we intentionally overweight streaming relative to some customers because the batching defaults must be safe for worst-case interactive UX. This is considered an acceptable bias and is documented as such.
+
+## Refresh cadence and change control
+- Cadence: quarterly refresh for PromptSets; weights may be adjusted more frequently if production mix shifts.
+- Owners: Applied ML / Evals (primary), Serving Runtime perf suite (integration).
+- Approval:
+  - PromptSet content changes require review from Jonas Weber (Evals) and Sofia Ivanova (Scheduling) before landing.
+  - Weight changes require review from Hassan Mirza (unit economics) and Sean Gallagher (SLO risk).
+- Versioning:
+  - PromptSets are versioned as `vMAJOR.MINOR`.
+  - MAJOR increments when the set is not comparable (e.g., wholesale replacement).
+  - MINOR increments for additions/removals that preserve broad comparability.
+
+## Known blind spots / limitations
+These prompt sets are not comprehensive. Known gaps:
+- **Non-English and code-mixed language** coverage is limited (we currently treat this as out-of-scope for tier defaults gating; tracked separately).
+- **Very long context (>16k)** is underrepresented. We cap at 16k for baseline tiers to avoid coupling SLO gates to the extreme long-context tail; separate long-context stress runs exist.
+- **Multi-modal** prompts are excluded.
+- **Tool execution** is not covered end-to-end (we use structured output prompts as a proxy).
+- **Safety policy edge cases** are not the goal of these prompt sets.
+- **Tenant-specific prompt formats** (e.g., proprietary templates) are not included; Dedicated customers may have bespoke validation runs.
+
+Interpretation guidance:
+- Passing tier SLO gates means “safe defaults for common workloads,” not “optimal for every workload.”
+- If a model family shows tier-specific regressions, inspect the breakdown by input bucket and streaming mode before changing weights—often the issue is localized to XL/XXL prefill or streaming jitter.
+
+## Appendix A: Example prompt shapes (redacted)
+Chat (S/M, streaming):
+- “You are a helpful assistant. Explain the difference between optimistic and pessimistic locking. Provide a short example.”
+
+RAG Q&A (L/XL, streaming or non-streaming):
+- “Question: …\nContext: [Passage 1] … [Passage 2] …\nAnswer using only the context.”
+
+Extraction JSON (M/L, non-streaming):
+- “Extract {company_name, invoice_total, due_date}. Return ONLY valid JSON.”
+
+Summarization (XL/XXL, non-streaming):
+- “Summarize the following document into 6 bullet points and a 1-paragraph executive summary.”
+
+Code assist (S/M, non-streaming):
+- “Fix the bug in this function and explain the change: …”
+
+## Appendix B: Changelog
+- 2025-12-18: Initial publication (PromptSet v1.0 taxonomy, tier weights, length buckets).
+- 2026-01-24: Adjusted Cost-Efficient XL/XXL weighting upward after early batching experiments showed queue instability only at long-prefill.
+- 2026-02-07: Clarified representativeness validation thresholds and added structured output rationale for tier selection.

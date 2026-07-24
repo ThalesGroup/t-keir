@@ -1,0 +1,153 @@
+Embedded Playground: SDK Sandbox Starter Pack
+
+## Summary
+
+This page describes the "embedded playground" starter pack for SDK teams who want an in-product, lightweight sandbox runner that can be embedded in developer docs, support consoles, or internal demos. The pack includes: a minimal React frontend, a Node-based backend proxy that enforces rate limits and telemetry, and a recommended deployment pattern for staging and production.
+
+Use this when you need a reproducible, observable demo environment that mirrors production API behaviour without exposing raw credentials or unlimited quotas.
+
+---
+
+## Goals
+- Provide a secure, low-friction way to run SDK code snippets live in docs and support flows.
+- Ensure parity with production runtime behaviour (timeouts, retries, streaming) for meaningful developer experience.
+- Bake in telemetry and canonical error handling so support can reproduce customer issues reliably.
+
+## When to use this starter pack
+- Documentation pages that offer "Try it" interactive examples.
+- Internal training and onboarding sandboxes for new hires.
+- Support playbooks where agents need to reproduce a call quickly.
+- Feature demos that require predictable quotas and no risk of leaking keys.
+
+## What you get in the repo (files & roles)
+- README.md — setup and maintenance notes.
+- frontend/ — React app with an embedded code editor and result pane.
+- backend/ — Node Express proxy, request validation, rate-limiter hooks.
+- infra/ — Helm chart + k8s manifests for staging and prod.
+- telemetry/ — pre-configured OpenTelemetry YAML and sample dashboards.
+- templates/ — HTML snippet and SDK snippet templates for docs.
+
+## Quickstart: Local dev (10–15 minutes)
+1. Clone the starter pack: `git clone git@internal:redwood/playground-starter.git`
+2. Copy .env.example -> .env and set DEV_API_KEY to a scoped sandbox key (see Access below).
+3. Start the backend: 
+```bash
+cd backend
+npm install
+npm run dev
+```
+4. Start the frontend: 
+```bash
+cd frontend
+npm install
+npm run start
+```
+5. Open http://localhost:3000 and paste sample prompts from templates/example-prompts.md
+
+Notes: the backend will validate the sandbox key and attach `x-rd-playground=true` header to calls so telemetry and cost accounting are isolated.
+
+## Example: Embedded React snippet (copy into docs)
+This minimal snippet renders an editor and calls the sandbox endpoint. It is intentionally small and safe for public docs.
+
+```jsx
+import React, {useState} from 'react'
+
+export default function PlaygroundEmbed() {
+  const [prompt, setPrompt] = useState('Write a haiku about engineering')
+  const [out, setOut] = useState('')
+
+  async function run() {
+    const resp = await fetch('/api/playground/run', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({prompt})
+    })
+    const data = await resp.json()
+    setOut(data.result || data.error)
+  }
+
+  return (
+    <div>
+      <textarea value={prompt} onChange={e => setPrompt(e.target.value)} rows={6} />
+      <button onClick={run}>Run</button>
+      <pre>{out}</pre>
+    </div>
+  )
+}
+```
+
+## Backend: proxy responsibilities and pattern
+- Accept sandbox-scoped API key and map to an internal service token.
+- Enforce concurrency quota per user (default: 2 concurrent requests).
+- Attach diagnostic headers: `x-rd-playground`, `x-rd-demo-id`, `x-rd-env`.
+- Forward requests to the Redwood production API or a read-only mock depending on feature flag.
+- Sanitize outputs to strip any generated PII before rendering in shared demos.
+
+Proxy pseudocode (Node/Express):
+```js
+app.post('/api/playground/run', async (req, res) => {
+  validateSandboxKey(req.headers['authorization'])
+  rateLimiter.consume(req.userId)
+  const upstream = featureFlagUseMock(req.user) ? MOCK_URL : PROD_API_URL
+  const upstreamResp = await fetch(upstream, { method: 'POST', headers, body })
+  const json = await upstreamResp.json()
+  res.json(sanitizeForPublic(json))
+})
+```
+
+## Deployment pattern: staging vs production
+- Staging: install helm release `playground-staging` in dev cluster. Use mock upstream by default.
+- Production: `playground-prod` in a restricted namespace. Production demo keys map to low-cost campaign quotas.
+- Use canary rollout for infra changes: 5% -> 25% -> 100% over 24h.
+- Infra manifests include a horizontalPodAutoscaler (min 1 / max 4) and resource requests tuned for the proxy (cpu: 500m, mem: 512Mi).
+
+## Observability & SLOs
+- Metrics shipped to `observability.playgrounds` prefix. Key metrics: requests_total, request_errors, sandbox_quota_exhausted, latency_p50/p90/p99.
+- Traces: OpenTelemetry spans instrument backend boundary, outbound call, and sanitizer step. Tag traces with `demo_id`.
+- SLOs (applies to production demo namespace): 99.5% successful responses within 2s for sample payloads. Error budget owned by Eng DevX.
+- Dashboards: prebuilt Grafana dashboard `Playground - Health` and an alert: `playground_p99_latency > 2s for 10m` -> severity P2 (page to Eng DevX rotation).
+
+## Canonical support issues and fixes
+1. Symptom: Embedded example returns 401 from backend.
+   - Root cause: Using a user-scoped API key instead of a sandbox-scoped demo key.
+   - Fix: Request scoped key via `eng-devx-playgrounds@redwood.ai` or rotate keys from the Admin console. Update .env and redeploy.
+2. Symptom: Results truncated with "partial response" in the UI.
+   - Root cause: Proxy imposes a short `max_tokens` cap for demos (default 64).
+   - Fix: Increase demo max_tokens in `backend/config/demo.json` (owners: Eng DevX) and push a canary. If cost spike occurs, rollback.
+3. Symptom: Telemetry missing for some runs.
+   - Root cause: Frontend failing to include `x-demo-id` header when offline.
+   - Fix: Ensure frontend attaches `demoId` from server-rendered HTML via `window.__RD_DEMO__` and retries failed telemetry sends.
+4. Symptom: High error rate after an infra deploy.
+   - Root cause: CNB image was built without the sanitizer binary.
+   - Fix: Deploy patch image tagged `playground-prod:hotfix-<sha>` and run smoke test suite `npm run smoke` in infra pipeline.
+
+## Templates and example config (table)
+| file | purpose | owner | notes |
+|---|---|---:|---|
+| infra/values.staging.yaml | Helm values for staging | Eng DevX | uses MOCK_UPSTREAM=true |
+| infra/values.prod.yaml | Helm values for prod | Eng DevX | production quotas and RBAC |
+| backend/config/demo.json | demo runtime caps | Eng DevX | editable; keep token cap <= 256 |
+| templates/snippet.html | embed HTML for docs | Docs Site | small JS loader to mount iframe or inline widget |
+
+## Security & data handling checklist
+- Sandbox keys: limited scope, rotated every 90 days.
+- No persistent storage of full upstream responses in logging. Logs redact user input and generated outputs containing emails or phone numbers.
+- RBAC: only `eng-devx` and Support oncall have deploy rights to `playground-prod` namespace.
+
+## Maintenance & ownership
+- Owners: Eng DevX (primary), Docs Team (secondary).
+- Pager rotation: eng-devx-oncall@redwood.ai.
+- Quarterly tasks: rotate demo keys, validate telemetry dashboards, and run the demo smoke test suite.
+
+## How to request a new demo or quota increase
+1. Open a ticket in internal Jira: PROJ: PLAYGROUND (component: demos).
+2. Provide: purpose, estimated daily runs, expected payload size, whether streaming or not.
+3. Eng DevX will approve within 5 business days and provision a demo key and staging release.
+
+## Contacts & links
+- Repo: git@internal:redwood/playground-starter.git
+- Support: eng-devx-playgrounds@redwood.ai
+- Grafana dashboard: grafana.internal/redwood/d/playground-health
+- Owner: Asha Patel (eng-devx)
+
+-- End of document --

@@ -1,0 +1,131 @@
+Runbook Interoperability and Decision Exchange Retrospective
+
+Summary:
+
+This retrospective summarizes the 10-week program to standardize runbook formats, build a "Decision Exchange" API for cross-operator coordination, and validate machine-readable runbook execution in the operator UI. The goal was to reduce mean time to acknowledge (MTTA) for multi-service incidents and decrease cognitive overhead during cross-team escalations.
+
+Why we did this:
+- Repeated friction during cross-service incidents: multiple teams maintained incompatible runbook formats (Markdown, Google Docs, and ad-hoc checklists).
+- Operators spent an average of 12 minutes just locating the canonical remediation step during multi-tenant KV prefix cache incidents.
+- Lack of a standard resulted in inconsistent automation integration (PagerDuty, CLI, and operator UI).
+
+Timeline and scope:
+1. Week 1–2: discovery and inventory of 87 runbooks across platform services (allocator, prefetch, kv-cache, router).
+2. Week 3–4: design of runbook schema (YAML-first) and Decision Exchange API v0.1 (GET /decisions, POST /decisions).
+3. Week 5–7: prototype integration with Operator UI and PagerDuty webhook enrichment.
+4. Week 8–10: canary validation during two synthetic cross-region degradations and one real incident (prefetch feedback-loop regression 2026-11-28).
+
+Key artifacts produced:
+- runbook-schema-v1.yaml (YAML schema with fields: id, intent, preconditions, steps[], automated_actions[], rollback_steps[], runbook_owner, sla_impact_estimate).
+- decision-exchange-api.md (open API spec with example payloads).
+- operator-ui-integration.md (how-to for embedding machine steps into the UI).
+
+What we measured (metrics):
+- MTTA (multi-service incidents) dropped from 8.6 min -> 5.1 min (40% improvement).
+- Mean time to remediation (MTTR) for the prefetched cohort improved 18% in canary windows.
+- Number of manual copy-paste steps during operator handoff decreased from median 3 -> 0.
+- False-automation-trigger rate: 0.6% (target < 1%).
+
+Principal findings and root causes:
+- Fragmented formats: 52% of runbooks were not parsable without manual normalization (HTML exports, images-as-steps).
+- Missing preconditions: 34% lacked explicit guardrails; automated actions ran in unsafe states.
+- Ownership ambiguity: 9 runbooks pointed to deprecated pagerduty services causing stale escalation paths.
+- UI/automation mismatch: Operator UI displayed steps but had no canonical action IDs. That prevented safe idempotent automation.
+
+Decisions taken during the program:
+- Adopt YAML-first machine-readable runbook schema as the canonical repository format (human-authorable, machine-validated). Owner: eng-platform/runbooks team.
+- Introduce Decision Exchange API v1 with explicit decision objects that can be referenced in runbooks by ID. Owner: eng-platform/systems-and-services.
+- Deprecate Google Doc canonical runbooks by 2027-02-01; migrate to git-backed runbook repo with CI validation (see rollout steps).
+- All automated_actions must include a safety_check expression and a post-check step (schema mandatory fields).
+
+Rollout and migration plan (high-level):
+1. Create a git repo: git@internal:runbooks/canonical.git with a protected main branch and CI that lints runbook-schema-v1.yaml.
+2. Bulk normalization: scripts/normalize_runbooks.py converts Markdown/HTML to YAML and raises a migration ticket per runbook.
+3. Two-week canary: onboard allocator and router runbooks to Decision Exchange API (traffic routed to canary tenant IDs).
+4. Complete migration: all platform runbooks on canonical.git; deprecate older sources with redirect pages.
+
+Sample runbook schema (excerpt):
+```yaml
+id: runbook-alloc-prefetch-001
+intent: "Recover prefetch feedback loop when latency spike > 200ms for 3m"
+preconditions:
+  - metric: prefetch.latency_p50
+    operator: '>'
+    value: 200
+    window: 180
+steps:
+  - id: s1-check-queue-depth
+    description: "Confirm queue depth and correlate tenant traffic"
+    manual: true
+  - id: s2-disable-prefetch
+    description: "Toggle prefetch cohort to read-only"
+    automated_action: "/api/v1/operator/actions/disable-prefetch?cohort={{cohort}}"
+    safety_check: "prefetch.in_flight_tokens < 10000"
+rollback_steps:
+  - id: r1-reenable-prefetch
+    description: "Re-enable prefetch after metrics normalize"
+owner: team-sdk/allocator
+```
+
+Operator playbook changes (how-to snippets):
+- PagerDuty webhook enrichment: include decision_id and runbook_id in the incident payload. Example payload snippet: {"incident": {"id": "P12345", "runbook_id": "runbook-alloc-prefetch-001", "decision_ids": ["dec-20261128-01"]}}
+- CLI helper to fetch the latest runbook and render actionable steps: `ri runbook fetch runbook-alloc-prefetch-001 --format=tty`
+- Safe-automation invocation example: `ri runbook exec --action s2-disable-prefetch --dry-run`
+
+Compatibility matrix (summary text table):
+- Services tested: allocator, prefetch, kv-cache, router, regional-allocator.
+- Supported pipelines: operator-ui (v2.3+), pagerduty-enricher (v1.5+), cli-tooling (ri v0.9+).
+
+Lessons learned (opportunities and cautions):
+- Start with schema-first: earlier attempts to retrofit parsers were far more expensive than agreeing on a minimal schema.
+- Human readability matters: templates must include natural-language step descriptions, not just machine fields.
+- CI linting is critical: first week of migration caught 17 runbooks with missing safety_check fields.
+- Backwards compatibility: keep an adapter service for 6 months to translate old Google Doc links for on-call flows.
+
+Action items (owners and deadlines):
+- [eng-platform/runbooks] Create canonical.git and CI pipeline (owner: Jordan Li) — due 2026-12-20.
+- [eng-serving-runtime] Add safety_check telemetry and post-action assertions (owner: Priya Rao) — due 2027-01-10.
+- [eng-platform/systems-and-services] Ship Decision Exchange API v1 and documentation (owner: Miguel Torres) — due 2026-12-31.
+- [eng-platform/operator-tools] Add `ri` CLI runbook commands and dry-run support (owner: Ethan Brooks) — due 2027-01-15.
+- [platform-ops] Migrate top 20 high-frequency runbooks (allocator, router, kv-cache) and validate canary metrics (owner: Runbook Migration Squad) — due 2027-02-01.
+
+Risk register and mitigations:
+- Risk: Automated actions run during partial preconditions leading to degradation. Mitigation: Safety checks mandatory + CI enforcement + canary gating.
+- Risk: Team pushback on moving away from Google Docs. Mitigation: Provide a thin UI that renders YAML as a readable document and export back to PDF for stakeholders.
+
+Follow-up experiments (next 3 months):
+1. Decision Exchange subscription model: allow teams to subscribe to decisions for their services and auto-populate incident timelines. Metric: reduction of duplicate manual steps.
+2. Automated precondition simulator: a test harness that runs safety_check expressions in a sandbox against synthetic telemetry. Metric: percentage of false-positive safety checks detected.
+3. Runbook “confidence” scoring exposed as a dashboard panel in Platform SLOs (scale 0–100).
+
+Owner contacts and escalation map:
+- Program lead: Asha Patel (asha@redwood.ai)
+- API owner: Miguel Torres (miguel@redwood.ai)
+- Runbook CI: Jordan Li (jordan@redwood.ai)
+- Operator tooling: Ethan Brooks (ethan@redwood.ai)
+
+Appendix: sample Decision Exchange payloads and CI lint rules
+- Decision object example (JSON):
+```json
+{
+  "id": "dec-20261128-01",
+  "title": "Disable prefetch cohort B",
+  "rationale": "prefetch.latency_p50 > 200ms for 3m",
+  "actions": ["/api/v1/operator/actions/disable-prefetch?cohort=B"],
+  "author": "jordan@redwood.ai",
+  "timestamp": "2026-11-28T03:41:00Z"
+}
+```
+- CI lint checks (examples):
+  - schema:valid -> runbook must validate against runbook-schema-v1.yaml
+  - fields:owner -> owner must be a team alias in TEAM_ALIASES.yaml
+  - safety:present -> any automated_action must include a safety_check expression
+
+Conclusion:
+The runbook interoperability program achieved meaningful operator efficiency wins and created a repeatable pattern for machine-readable runbooks tied to a Decision Exchange. The next quarter focuses on completing migration, hardening safety checks, and exposing runbook confidence to platform dashboards so product teams can prioritize remediations that reduce operational toil.
+
+Related documents and links:
+- See runbook-schema-v1.yaml (attached in canonical.git)
+- Decision Exchange API spec: /internal-api/specs/decision-exchange-v1
+- Operator UI integration how-to: /confluence/eng-platform/how-tos/operator-ui-integration-guide-2026
+

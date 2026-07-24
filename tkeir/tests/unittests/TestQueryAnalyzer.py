@@ -116,7 +116,7 @@ def test_build_search_terms_prioritizes_entities_and_svo():
     assert "2026" in terms
 
 
-def test_build_hybrid_yql_targets_multiple_bm25_fields():
+def test_build_hybrid_yql_targets_text_raw_by_default():
     analysis = QueryAnalysis(
         raw_query="What did Microsoft acquire in 2026?",
         language="en",
@@ -126,15 +126,13 @@ def test_build_hybrid_yql_targets_multiple_bm25_fields():
         use_chunk_embedding=True,
         use_question_embedding=True,
         use_text_raw=True,
-        use_parent_content=True,
-        use_parent_title=True,
     )
     yql = build_hybrid_yql(analysis, config, hits=10)
     assert "nearestNeighbor(chunk_embedding, q_chunk_emb)" in yql
     assert "nearestNeighbor(questions_embeddings, q_question_emb)" in yql
     assert "text_raw contains" in yql
-    assert "parent_content contains" in yql
-    assert "parent_title contains" in yql
+    assert "parent_content" not in yql
+    assert "parent_title" not in yql
     assert "Microsoft" in yql
 
 
@@ -206,8 +204,6 @@ def test_query_analyzer_task_processes_complex_query():
         llm,
         RagSearchConfig(
             enabled=True,
-            use_parent_content=True,
-            use_parent_title=True,
         ),
         embedding_dim=384,
         timeout_seconds=30.0,

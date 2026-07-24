@@ -38,11 +38,10 @@ def test_load_rag_config_reads_min_keyword_length():
         "hybrid_lexical",
     }
     assert isinstance(config.search.rerank.enabled, bool)
+    assert isinstance(config.dual_hybrid.enabled, bool)
+    assert config.dual_hybrid.rrf.k >= 1
     assert config.search.rerank.candidates >= 1
-    assert config.search.rerank.strategy in {
-        "cross_encoder",
-        "embedding_cosine",
-    }
+    assert config.search.rerank.strategy == "cross_encoder"
     assert config.models.embedding_model
     assert config.models.reranker_model
     assert config.vespa.url.startswith("http")

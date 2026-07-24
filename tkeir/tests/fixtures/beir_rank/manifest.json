@@ -1,0 +1,7 @@
+{
+  "corpus_independent": true,
+  "source_patterns": "reports/beir/smoke/report.md",
+  "cases_file": "cases.yaml",
+  "perf_budgets": "perf_budgets.yaml",
+  "notes": "Synthetic ids/text only — does not require datasets/scifact|fiqa|arguana."
+}

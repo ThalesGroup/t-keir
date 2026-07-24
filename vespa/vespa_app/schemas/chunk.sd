@@ -1,3 +1,7 @@
+
+# Generated from tkeir/configs/rag.yaml via `make schemas`.
+# DO NOT hand-edit — change rag.yaml and regenerate.
+# Source: scripts/generate_vespa_schemas.py
 schema chunk {
     document chunk {
         field user_space type string {
@@ -6,19 +10,13 @@ schema chunk {
         field chunk_id type string {
             indexing: summary | attribute
         }
-        # Parent id string (same streaming group). Avoids global docs.
+        # Parent id string (same streaming group). Join key for document arm.
         field doc_ref type string {
             indexing: summary | attribute
         }
-        # Streaming mode: text fields used with bm25() must be index fields.
-        # Do not mix `attribute` on these — deploy rejects bm25() otherwise.
-        field parent_title type string {
-            indexing: summary | index
-            index: enable-bm25
-        }
-        field parent_content type array<string> {
-            indexing: summary | index
-            index: enable-bm25
+        # Denormalized parent key for RRF fusion without an extra fetch.
+        field source_doc_id type string {
+            indexing: summary | attribute
         }
         field text_raw type string {
             indexing: summary | index
@@ -36,37 +34,35 @@ schema chunk {
     }
 
     fieldset default {
-        fields: text_raw, parent_title, parent_content
+        fields: text_raw
     }
 
-    # Balanced hybrid (default). Dense slightly above classic BM25 to close
-    # BEIR gaps on paraphrase / counterargument / jargon mismatch.
+
+    # Balanced hybrid (default). Weights from rag.yaml rank_profiles.chunk.
     rank-profile hybrid_2_level {
         inputs {
             query(q_chunk_emb) tensor<float>(x[384])
             query(q_question_emb) tensor<float>(x[384])
         }
-        # Streaming has no corpus stats — set average lengths explicitly.
         rank-properties {
             bm25(text_raw).averageFieldLength: 180
-            bm25(parent_content).averageFieldLength: 400
-            bm25(parent_title).averageFieldLength: 12
         }
         first-phase {
             expression {
-                closeness(field, chunk_embedding) * 0.38 +
-                closeness(field, questions_embeddings) * 0.17 +
-                bm25(text_raw) * 0.28 +
-                bm25(parent_content) * 0.17
+                closeness(field, chunk_embedding) * 0.45 +
+                closeness(field, questions_embeddings) * 0.2 +
+                bm25(text_raw) * 0.35
             }
         }
         second-phase {
-            expression: firstPhase + 0.12 * bm25(parent_title)
+            expression: firstPhase
             rerank-count: 50
         }
     }
 
-    # Semantic-heavy: paraphrase / opposing-stance / jargon mismatch.
+
+
+    # Semantic-heavy profile.
     rank-profile hybrid_semantic {
         inputs {
             query(q_chunk_emb) tensor<float>(x[384])
@@ -74,24 +70,23 @@ schema chunk {
         }
         rank-properties {
             bm25(text_raw).averageFieldLength: 180
-            bm25(parent_content).averageFieldLength: 400
-            bm25(parent_title).averageFieldLength: 12
         }
         first-phase {
             expression {
-                closeness(field, chunk_embedding) * 0.52 +
-                closeness(field, questions_embeddings) * 0.23 +
-                bm25(text_raw) * 0.15 +
-                bm25(parent_content) * 0.10
+                closeness(field, chunk_embedding) * 0.6 +
+                closeness(field, questions_embeddings) * 0.25 +
+                bm25(text_raw) * 0.15
             }
         }
         second-phase {
-            expression: firstPhase + 0.05 * bm25(parent_title)
+            expression: firstPhase
             rerank-count: 50
         }
     }
 
-    # Lexical-heavy: entity/claim anchored short queries.
+
+
+    # Lexical-heavy profile.
     rank-profile hybrid_lexical {
         inputs {
             query(q_chunk_emb) tensor<float>(x[384])
@@ -99,20 +94,19 @@ schema chunk {
         }
         rank-properties {
             bm25(text_raw).averageFieldLength: 180
-            bm25(parent_content).averageFieldLength: 400
-            bm25(parent_title).averageFieldLength: 12
         }
         first-phase {
             expression {
-                closeness(field, chunk_embedding) * 0.18 +
-                closeness(field, questions_embeddings) * 0.07 +
-                bm25(text_raw) * 0.48 +
-                bm25(parent_content) * 0.27
+                closeness(field, chunk_embedding) * 0.22 +
+                closeness(field, questions_embeddings) * 0.08 +
+                bm25(text_raw) * 0.7
             }
         }
         second-phase {
-            expression: firstPhase + 0.20 * bm25(parent_title)
+            expression: firstPhase
             rerank-count: 50
         }
     }
+
+
 }

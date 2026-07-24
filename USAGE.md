@@ -36,7 +36,7 @@ REST `_svc.py` / `_client.py` services were removed.
 | `tkeir-hmi/` | Next.js Search / RAG / admin UI |
 | `deploy/` | Compose, Helm, Keycloak, SPIRE, images |
 | `datasets/` | BEIR downloads (`make beir-eval`) |
-| `results/beir/` | Intermediate BEIR reports (gitignored) |
+| `reports/beir/` | Copy of BEIR evaluation reports (gitignored) |
 
 ## Setup
 
@@ -115,8 +115,9 @@ make beir-eval                              # scifact fiqa arguana
 make beir-eval BEIR_DATASETS=scifact
 ```
 
-Writes `docs/evaluation_report.md` and intermediate
-`results/beir/<dataset>/report.md` after each dataset.
+Writes `docs/evaluation_report.md` and copies to
+`reports/beir/report.md` (plus `reports/beir/<dataset>/report.md`)
+after each dataset.
 See [Evaluation](docs/evaluation.md).
 
 ## Quality / docs

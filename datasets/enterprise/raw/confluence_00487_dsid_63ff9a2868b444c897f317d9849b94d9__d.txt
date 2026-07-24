@@ -1,0 +1,126 @@
+Deployment Surface, Consumption Mapping, and Pricing Implications
+
+Overview
+
+This document defines a unified view of the Redwood product deployment surface, maps technical consumption signals to billing primitives, and outlines product and go-to-market implications. It is intended for product, pricing, and platform stakeholders who must make consistent decisions about how features are exposed across Hosted API, Dedicated, and Private deployments and how those exposures translate into customer-facing billing and packaging.
+
+Goals
+- Reduce customer confusion by standardizing the mapping from technical metrics (tokens, requests, reserved GPU-hours) to billing units.
+- Ensure pricing captures meaningful unit economics differences across deployment modes (latency SLAs, reserved vs burst capacity, support tiers).
+- Provide a clear rollout plan to phase pricing changes with minimal disruption.
+
+Scope
+- In-scope: Hosted API, Redwood Dedicated, Redwood Private (VPC/on-prem). Includes generation, embeddings, streaming, and function/tool calling surfaces. Covers per-request/per-token pricing, reserved capacity contracts, and enterprise licensing models.
+- Out-of-scope: Third-party reseller billing, marketplace-specific adjustments that are handled by Cloud Partnerships.
+
+Background and motivation
+Over the past 18 months we've added features (streaming, KV-cache sharing, auto-batching cross-tenant pools) whose cost and performance characteristics differ materially by deployment mode. Sales and finance report frequent customer confusion about which features are free or billed and how to estimate monthly run rates. This doc aligns product exposure and pricing primitives to reduce churn and accelerate procurement.
+
+High-level mapping: technical signals -> billing primitives
+(ASCII table for quick reference)
+
+| Technical signal / feature | Hosted API billing primitive | Dedicated billing primitive | Private billing primitive | Notes |
+|---------------------------|-----------------------------|---------------------------|--------------------------|-------|
+| Raw tokens generated | per-token unit (generation/response) | included in reserved capacity; overage per-token at reduced rate | customer-specific (license + metered add-ons) | streaming counts as tokens as emitted |
+| Embedding vectors computed | per-embedding unit (per-vector) | included up to reservation; burst at per-vector rate | typically included in enterprise data packages |
+| KV/prefix cache hits | transparent to billing (performance optimization) | reserved capacity sizing guidance impacts price | considered in sizing for licensing (reduces required GPUs) | caching reduces effective tokens billed upstream; we credit customers via billing guidance |
+| Streaming sessions | same per-token math; additional small "session" fee for long-lived connections | session fees optional; consumed by reserved throughput | included as part of on-prem SLA or optional telemetry package | session fee covers connection infra costs and retention |
+| Model variant fallbacks | routed transparently; charged at chosen model rate | fallback to smaller pinned model counted at that model's token rate | customer-defined routing; billing mapped to selected variant | important for cost-aware SLOs |
+
+Requirements and acceptance criteria
+1) Product-level: A canonical mapping table (this doc) published and linked in all sales materials. Acceptance: Legal sign-off and one-pager billing FAQ created.
+2) Billing system: Instrumentation to produce monthly meter of effective billable tokens and embeddings per customer across deployment modes. Acceptance: daily ledger match within 0.5% against serving telemetry for a 7-day rolling window.
+3) UX: Console display of estimated monthly cost given workload profile (tokens/min, avg seq len, embeddings/month, cache hit%) for Hosted and Dedicated. Acceptance: cost estimator in Console returns a stable estimate within ±15% of the billing system forecast for the sample workloads.
+4) Pricing: Publish recommended reserved capacity commit bands for Dedicated with corresponding per-GPU/hour and per-token overage. Acceptance: internal pricing approved by Finance and Go-to-market.
+
+Design constraints and decisions
+- Single canonical meter: We will use "billable_tokens" as the primary unit for generation/streaming; embeddings remain a separate meter. This decision avoids double-counting across streaming events and partial retries.
+- Cache attribution: Cache hits are not billed; however, we will compute and report an "effective_tokens" metric which is billable_tokens adjusted by cache hit rate for modelling.
+- Reserved capacity math: Reserved capacity contracts are priced by committed GPU-hours plus a discounted per-token overage. We accept complexity in contracts to preserve predictable unit economics for large customers.
+- Private deployments: Pricing is negotiated (license + support + optional telemetry ingestion). We will provide a reference mapping and a standard worksheet to accelerate enterprise procurement.
+
+Pricing primitives and sample formulas
+- Hosted API: charge = base_per_token * billable_tokens + embedding_price * num_embeddings + session_fee * sessions
+- Dedicated: charge = committed_gpu_hours * reserved_gpu_hour_price + overage_per_token * max(0, billable_tokens - included_tokens) + premium_support_fee (if selected)
+- Private: charge = platform_license + optional telemetry_ingest_per_gb + professional_services for onprem_install + annual_support_tier
+
+Sample price table (reference, illustrative only)
+- base_per_token (hosted): $0.0009 per token for standard models, $0.0025 per token for large/LLM-XXL
+- embedding_price: $0.0001 per embedding vector
+- session_fee: $0.50 per long-lived session per month (threshold > 15 minutes continuous)
+- committed_gpu_hour_price (dedicated): $6.50 per GPU-hour for reserved A100-equivalent pool at 12mo commit
+- dedicated overage_per_token: $0.00045 per token (post-included tokens)
+- private: platform_license starting at $75k/year for small deployments; typical mid-market deals range $150k-$500k plus infra costs
+
+Example: estimating a conversational workload (monthly)
+- Workload: 200 reqs/min (steady), avg prompt+response 800 tokens, 30 days, no. of minutes per month = 43,200
+- billable_tokens = 200 * 800 * 43,200 / 60 = 115,200,000 tokens monthly (approx)
+- Hosted cost = 115.2M * $0.0009 = $103,680/month
+- Dedicated scenario: customer reserves 8 A100-equivalent GPUs (assume 1 GPU ~ 20k tokens/s average throughput for this model), reserved_gpu_hours = 8 * 24 * 30 = 5,760 GPU-hours
+  - reserved cost = 5,760 * $6.50 = $37,440/month
+  - included_tokens (profile) = 80% utilization equivalent ~ 80M tokens included; overage tokens = 35.2M * $0.00045 = $15,840; total = $53,280/month + optional support
+
+Operational requirements and telemetry
+- Telemetry signals to produce for billing: billable_tokens, embeddings_count, cache_hit_rate, streaming_sessions_open, average_seq_len, model_variant_id, region, customer_tier
+- SLOs (billing/data freshness): daily meter generation job must complete within 2 hours after UTC midnight; daily reconciliation test success rate >= 99.5%
+- Anomaly detection: alert if daily billed tokens delta > 10% vs 3-day rolling median or absolute increase > 10M tokens; ownership: Billing infra (eng-fin-billing) + Product pricing SME for escalations
+
+Console UX and estimator requirements
+- Inputs: expected qps, avg sequence length, percent cache hits, embeddings/month, expected streaming sessions
+- Outputs: monthly cost estimate (hosted vs dedicated entry), recommended reserved commitment band, sensitivity visualization (slider for cache hit % and avg seq len)
+- Acceptance: estimator must have API and SDK hooks for programmatic usage (Console, Sales quoting tool).
+
+Roadmap and rollout plan (Q3–Q4 2026)
+1) Q3 2026 (MVP) — publish canonical mapping and pricing primitive definitions; deliver Console estimator alpha; enable telemetry meters for billable_tokens and embeddings. Owners: Product (Priya Nair), Eng-Fin-Billing (Marco Ruiz), Console (Leah Park).
+2) Q4 2026 — roll out Dedicated recommended commit bands; publish dedicated overage math and sample worksheets for Sales; legal and finance approve contract templates. Owners: GTM (Sam Ortega), Finance (Nadia Singh).
+3) Q1 2027 — publish Private reference worksheet and standardized license tiers; integrate telemetry ingestion option into Private install docs. Owners: Private Deployments Team (Ravi Patel).
+
+Rollout communication and training
+- Sales enablement: 2x 1-hour trainings + one-pager cheat sheet + worksheet for customer estimates.
+- Support: runbook for common billing disputes (first look triage + reconciliation steps).
+- Customers: update public pricing pages and provide migration guide for customers affected by changed estimation logic.
+
+Migration and compatibility notes
+- Historical bills: we will not retroactively re-bill prior months but will re-run estimator for historical windows to show differences and explain driver (cache, batching improvements).
+- Customer notifications: any change that affects an active committed contract will be handled under contract terms; recommended changes to contracts will be presented as optional add-ons.
+
+Security, compliance, and privacy considerations
+- Metering pipeline must not leak PII. Tokenization and counters run on hashed customer IDs.
+- Telemetry ingestion for Private deployments is optional and requires customer consent and an agreed retention policy.
+
+Appendix A — sample Console estimator input (YAML)
+
+# sample_estimator_input.yaml
+workload_profile:
+  qps: 200
+  avg_sequence_length: 800
+  cache_hit_rate: 0.15
+  embeddings_per_minute: 50
+  streaming_sessions: 350
+
+# estimator output fields (example)
+estimated_monthly_tokens: 115200000
+estimated_hosted_cost_usd: 103680.00
+estimated_dedicated_commit_recommendation:
+  gpus: 8
+  expected_reserved_tokens: 80000000
+  projected_monthly_cost_usd: 53280.00
+
+Appendix B — standard worksheet fields (CSV columns)
+- customer_id, deployment_mode, avg_qps, avg_seq_len, cache_hit, embeddings_month, requested_commit_gpus, committed_duration_months, estimated_monthly_cost_usd
+
+Appendix C — contacts and owners
+- Product SME: Priya Nair (product@redwood.ai)
+- Pricing lead: Ethan Cole (pricing@redwood.ai)
+- Billing infra: Marco Ruiz (eng-fin-billing@redwood.ai)
+- Dedicated sales lead: Sam Ortega (sales@redwood.ai)
+
+Next actions
+1) Circulate this doc to Finance and Legal for comment (due by 2026-08-05).
+2) Console team to begin estimator API prototype (target: 2026-08-20).
+3) Billing infra to enable daily meter exports to a private S3 bucket for reconciliation (target: 2026-09-01).
+
+References
+- Runtime caching and batching design: /confluence/eng-serving-runtime/kernel-and-scheduling/cache-batching-2026
+- Dedicated capacity PRD: /confluence/product-docs/requirements/serving-surface-prd-packaging-and-release-plan-2026
+

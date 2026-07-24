@@ -1,0 +1,425 @@
+Perf Baseline Dashboards Spec (Q1 2026)
+
+## Overview
+This page specifies the Grafana (and optionally Looker) dashboards and alerting used to report and triage results from the Q1 2026 “Perf baseline & representative workload suite” project.
+
+The dashboards must support:
+- Baseline reporting for key metrics (TTFT/TPOT percentiles, throughput)
+- Root-cause oriented drilldowns (saturation, queueing, kernel selection, cache behavior)
+- Run-to-run comparison and regression attribution
+- Direct linking from dashboard → run manifest → traces/logs/artifacts
+
+This spec is intentionally prescriptive: consistent naming, tags, and panel layout are required so that engineers can move between runs, models, regions, and SKUs without relearning the UI.
+
+## Goals
+1) Provide a single “source of truth” view for a benchmark run (or run set) including:
+- TTFT p50/p95/p99
+- TPOT p50/p95/p99
+- Throughput (tokens/s, req/s) and concurrency
+- Saturation indicators (GPU utilization, KV cache pressure, queue wait)
+- Noise/variance indicators
+
+2) Enable regression triage in < 15 minutes for most cases by answering:
+- What changed? (runtime build, scheduler profile, kernel profile, driver/CUDA, workload seed)
+- Where did the time go? (queue wait vs prefill vs decode)
+- Is it capacity/saturation? (GPU busy %, SM occupancy proxy, memory BW proxy, KV cache hits/evictions)
+- Is it a kernel selection / fallback issue?
+
+3) Standardize drilldowns and links:
+- “Open run manifest”
+- “Open trace (Tempo)”
+- “Open logs (Loki)” and “Open scheduler debug bundle”
+
+## Non-goals
+- Customer-facing benchmark dashboards
+- Replacing perf-canary gating output (these dashboards complement gating, they do not define pass/fail)
+- Building a general-purpose production SLO dashboard (production SLO dashboards remain in eng-sre; this is for benchmark runs and canary runs)
+
+## Definitions (must match ADR-0172)
+All metric names and boundaries must match: confluence://architecture-and-standards/decision-records/adr-0172-benchmark-metrics-and-run-manifest-format
+
+- TTFT (time-to-first-token): server-side elapsed time from request accepted by Redwood ingress/runtime to first token emitted on the server response stream (“first token on wire” at the server). Excludes client read/backpressure.
+- TPOT (time-per-output-token): (server-side time between first token and end of generation) / (number of output tokens - 1). For non-streaming responses, measured from internal first-token event to internal last-token event.
+- Throughput:
+  - tokens/s: total output tokens / wall time, reported per replica and aggregated
+  - req/s: request completions / second (for embeddings and non-streaming)
+
+Cache state dimension:
+- cold: prefix/KV cache disabled or empty
+- warm: prefix/KV cache enabled and warmed per workload definition (see representative workload suite v1)
+
+## Data sources
+### 1) Bench results store (authoritative)
+- Storage: ClickHouse cluster “obs-analytics”
+- Database/table (canonical): bench_results.perf_metrics_v1
+- Grain: one row per run_id x metric x percentile x (optional) cohort
+- Key columns (expected):
+  - run_id, run_group
+  - created_at
+  - model_id, model_family
+  - workload_id, workload_family
+  - region, gpu_sku
+  - runtime_build (git SHA/tag), runtime_version
+  - scheduler_profile, kernel_profile
+  - cache_state, streaming_mode
+  - metric_name (ttft_ms, tpot_ms, tokens_per_s, req_per_s, queue_wait_ms, …)
+  - percentile (p50, p95, p99) or value_type (mean, max)
+  - value
+  - sample_size
+
+Note: Grafana queries should prefer ClickHouse for percentiles computed from raw samples when available. When only summarized percentiles are stored, clearly label as “reported percentile”.
+
+### 2) Prometheus for real-time canary runs
+- Primary: redwood-benchmark Prometheus job scraped from perf-canary and benchmark harness
+- Metrics prefix: redwood_bench_* and redwood_runtime_* (bench-tagged)
+- Use Prometheus only for “last N hours” canary visibility; use ClickHouse for historical baselines.
+
+### 3) Traces/logs/artifacts
+- Traces: Tempo, trace_id stored in ClickHouse as bench_trace_id where available
+- Logs: Loki (bench-tagged), run_id must be a log label
+- Artifacts: S3-compatible bucket “perf-artifacts” (internal), path includes run_id
+
+## Required tagging / dimensions (contract)
+Dashboards assume the following tags exist on every run. If a run is missing a dimension, panels may be incomplete; the run should be considered “invalid for baseline”.
+
+Required dimensions:
+- run_id (string, unique)
+- run_group (string; e.g., “q1-2026-baseline-freeze”, “nightly-main”, “release-branch-2026.02”)
+- model_id (string)
+- workload_id (string)
+- region (string; at least us-east, eu-west)
+- gpu_sku (string; e.g., H100-80GB, A100-80GB, L40S)
+- runtime_build (string; git SHA or release tag)
+- scheduler_profile (string)
+- kernel_profile (string)
+- cache_state (cold|warm)
+- streaming_mode (streaming|non_streaming)
+
+Strongly recommended dimensions (improve attribution):
+- driver_version, cuda_version
+- container_image (digest)
+- power_mode / clocks_locked (boolean)
+- instance_type
+- replica_count
+
+## Dashboard set (navigation)
+We will publish a small, consistent set of dashboards in Grafana folder:
+Folder: “Perf Baselines (Serving Runtime)”
+
+Dashboards:
+1) Perf Baseline — Overview
+2) Perf Baseline — Run Compare
+3) Perf Baseline — Saturation & Queueing
+4) Perf Baseline — Variance & Noise
+5) Perf Baseline — Kernel/Scheduler Attribution
+
+Looker (optional): “Perf Baseline — Executive Summary” (tables + trends; no deep triage)
+
+## Global dashboard variables (Grafana)
+All dashboards must expose the same variable names and defaults.
+
+Variables (type → source):
+- run_group (query → ClickHouse distinct run_group; default: q1-2026-baseline-freeze if present)
+- run_id (query → ClickHouse distinct run_id filtered by run_group; allow multi-select)
+- baseline_run_id (query → ClickHouse; single-select; default pinned to baseline anchor build)
+- candidate_run_id (query → ClickHouse; single-select)
+- model_id (query → distinct)
+- workload_id (query → distinct)
+- region (query → distinct)
+- gpu_sku (query → distinct)
+- cache_state (custom: cold,warm)
+- streaming_mode (custom: streaming,non_streaming)
+
+Conventions:
+- If a panel is meaningful only for streaming, it must explicitly filter streaming_mode=streaming.
+- For comparisons, always compute (candidate - baseline) and (candidate / baseline) where applicable.
+
+## Dashboard 1: Perf Baseline — Overview
+Purpose: one-page health view for a selected run_id (or run set), covering core metrics and quick links.
+
+Layout (top → bottom):
+
+### A) Run header (text panel)
+Must display:
+- run_id, run_group
+- model_id, workload_id
+- region, gpu_sku
+- runtime_build, container_image
+- scheduler_profile, kernel_profile
+- cache_state, streaming_mode
+- sample_size
+
+Also include:
+- Link: “Open run manifest”
+- Link: “Open traces (Tempo) filtered by run_id”
+- Link: “Open logs (Loki) filtered by run_id”
+- Link: “Open artifacts folder (S3 browser)”
+
+### B) Core latency percentiles (time series or stat grid)
+Panels (stat w/ sparkline where time window supports):
+- TTFT p50 (ms)
+- TTFT p95 (ms)
+- TTFT p99 (ms)
+- TPOT p50 (ms)
+- TPOT p95 (ms)
+- TPOT p99 (ms)
+
+Display requirements:
+- Units: milliseconds
+- Each stat must show last value + delta vs baseline_run_id when both baseline and candidate are selected
+- Include sample_size and run_count in tooltip
+
+### C) Throughput and completion
+Panels:
+- tokens/s (mean) and tokens/s (p95 of per-window)
+- req/s (for embeddings and non-streaming)
+- completed requests, error count, timeout count
+
+### D) Quick saturation indicators (single-value + threshold colors)
+Panels:
+- GPU busy % (if available; else “GPU time / wall time” proxy)
+- Avg batch size (decode) and avg batch size (prefill)
+- Queue wait p95 (ms)
+- KV cache hit rate (if enabled)
+- KV cache eviction rate (evictions/min)
+
+Color thresholds (initial; tune after variance calibration):
+- Queue wait p95: green < 5ms; yellow 5–20ms; red > 20ms
+- KV evictions: green < 10/min; yellow 10–100/min; red > 100/min
+
+### E) Top regressions within run set (table)
+If multi-select run_id is used, show a table sorted by worst TTFT p99 and worst TPOT p99, including:
+- run_id
+- ttft_p99_ms
+- tpot_p99_ms
+- tokens_per_s
+- queue_wait_p95_ms
+- kernel_fallback_rate
+
+## Dashboard 2: Perf Baseline — Run Compare
+Purpose: side-by-side comparison baseline_run_id vs candidate_run_id and clear deltas.
+
+### A) Summary delta table (table)
+Rows (metrics):
+- TTFT p50/p95/p99
+- TPOT p50/p95/p99
+- tokens/s
+- req/s (if relevant)
+- queue_wait p95
+- batch_assembly_ms p95
+- kernel_fallback_rate
+- kv_hit_rate
+
+Columns:
+- baseline value
+- candidate value
+- absolute delta
+- relative delta (%)
+- sample_size baseline/candidate
+
+Formatting:
+- Relative delta should be colored by perf-regression policy thresholds (see confluence://architecture-and-standards/performance-standards/perf-regression-policy-and-thresholds)
+
+### B) Percentile curves (if raw samples are available)
+Panels:
+- TTFT empirical CDF (baseline vs candidate)
+- TPOT empirical CDF (baseline vs candidate)
+
+If raw samples not available, show p50/p95/p99 only and label clearly.
+
+### C) Decomposition (stacked bar)
+Panels:
+- TTFT decomposition: queue_wait + batch_assembly + prefill_compute + first_token_emit_overhead
+- End-to-end generation decomposition: decode_compute + scheduling_overhead + streaming_overhead
+
+Note: decomposition requires benchmark instrumentation; if not present, panel should show “missing metric” state with a link to ENG-4826.
+
+## Dashboard 3: Perf Baseline — Saturation & Queueing
+Purpose: answer “is this a saturation/overload/queueing issue?”
+
+Panels:
+1) Concurrency over time (requested vs achieved)
+2) Queue depth (avg/max) and queue wait percentiles
+3) Batch assembly time percentiles
+4) Batch size distribution (histogram-like table)
+5) Backpressure/load shed counters:
+   - requests_throttled_total
+   - requests_dropped_total
+   - overload_mode_seconds
+6) GPU utilization proxies:
+   - gpu_busy_percent (preferred)
+   - sm_occupancy_proxy / kernel_active_ratio (fallback)
+   - hbm_bw_proxy (fallback)
+7) KV cache pressure:
+   - kv_cache_bytes_used
+   - kv_cache_bytes_free
+   - kv_cache_evictions_total
+
+Interpretation guidance (text panel at top):
+- Rising queue wait with flat GPU busy often indicates scheduler bottleneck, dispatch overhead, or batch assembly inefficiency.
+- Rising GPU busy with rising TTFT p99 indicates saturation; compare to batch size and backpressure.
+- High eviction rate combined with long-context prefill can produce TTFT tail spikes even if GPU busy is stable.
+
+## Dashboard 4: Perf Baseline — Variance & Noise
+Purpose: make noise visible and prevent overreacting to expected variance.
+
+Panels:
+1) Run-to-run variance (box plot) for TTFT p95/p99 by (model_id, workload_id, gpu_sku, region)
+2) Warmup effect:
+   - TTFT p95 over first N requests vs steady state
+   - tokens/s over time
+3) Host / placement indicators (if captured):
+   - CPU steal %
+   - NUMA remote memory ratio
+   - GPU clocks (min/avg/max) and clock throttling count
+4) Confidence / sample size panel:
+   - sample_size
+   - bootstrap CI width (if computed)
+
+Required annotation:
+- Every panel must support “show baseline freeze window” annotation (vertical region) when run_group=q1-2026-baseline-freeze.
+
+## Dashboard 5: Perf Baseline — Kernel/Scheduler Attribution
+Purpose: pinpoint regressions tied to kernel selection changes or scheduler behavior changes.
+
+Panels:
+1) Kernel selection breakdown (table):
+   - kernel_name
+   - selection_rate (%)
+   - fallback_reason (if any)
+   - associated sequence-length regime
+2) Kernel fallback rate over time
+3) Scheduler fairness/latency tradeoff indicators:
+   - per-tenant fairness index (if benchmark simulates tenants)
+   - queue discipline mode (label)
+4) Sequence length distributions (from workload definition + observed):
+   - prompt tokens histogram (bins)
+   - output tokens histogram (bins)
+5) Correlation panel:
+   - scatter: TTFT p99 vs kernel_fallback_rate
+   - scatter: TTFT p99 vs queue_wait_p95
+
+Drilldown links:
+- “Open kernel debug dump for run_id” (artifact path)
+- “Open scheduler debug dump for run_id” (artifact path)
+
+## Standard links and URL conventions
+### Run manifest
+- Stored at: s3://perf-artifacts/manifests/{run_id}/run-manifest.json
+- Grafana link label: “Run manifest”
+- If run manifest is mirrored into ClickHouse as JSON text, also provide “View manifest in table” link.
+
+### Traces
+- Tempo query must use:
+  - tag: run_id={run_id}
+  - optional: model_id, workload_id
+- Grafana link label: “Traces (Tempo)”
+
+### Logs
+- Loki query must use label selector:
+  - {run_id="{run_id}", app=~"bench-runner|redwood-runtime"}
+- Grafana link label: “Logs (Loki)”
+
+### Artifacts
+- Base path: s3://perf-artifacts/runs/{run_id}/
+- Expected artifacts:
+  - scheduler.jsonl
+  - kernel_selection.jsonl
+  - perfetto_trace.pb
+  - stdout.log, stderr.log
+  - results.json
+
+## Alerting spec (Grafana + perf-canary integration)
+Dashboards provide visibility; alerting drives action.
+
+### Alert categories
+1) Perf-canary regression alerts (nightly + release gating mode)
+2) Benchmark infrastructure health (missing metrics, run failures, unusually high variance)
+
+### Alert routing
+- “Perf Regression (page)” → on-call (eng-serving-runtime primary) when:
+  - run_group is a release gating group OR regression is severe
+  - AND metric breach meets “regression” threshold (not just noise)
+- “Perf Regression (triage)” → #eng-perf-triage (Slack) for non-gating nightly regressions
+- “Benchmark Infra” → #eng-benchmarking for harness/fleet issues
+
+### Initial alert thresholds (policy-aligned)
+Use confluence://architecture-and-standards/performance-standards/perf-regression-policy-and-thresholds as canonical. Until calibrated, implement conservative defaults:
+
+- TTFT p99 regression (streaming workloads):
+  - page if candidate/baseline ≥ 1.15 AND absolute delta ≥ 10ms
+  - triage if candidate/baseline ≥ 1.08 AND absolute delta ≥ 5ms
+- TPOT p99 regression:
+  - page if candidate/baseline ≥ 1.12 AND absolute delta ≥ 0.2ms
+  - triage if candidate/baseline ≥ 1.06 AND absolute delta ≥ 0.1ms
+- Throughput regression (tokens/s):
+  - page if candidate/baseline ≤ 0.90
+  - triage if candidate/baseline ≤ 0.95
+
+Noise guardrails:
+- Do not alert unless sample_size ≥ minimum configured per workload family
+- Suppress alerts when benchmark infra health indicates instability (e.g., GPU clocks unlocked + high throttling)
+
+### Alert annotations
+Every regression alert must include:
+- baseline_run_id, candidate_run_id
+- model_id, workload_id, region, gpu_sku
+- runtime_build(s), scheduler_profile(s), kernel_profile(s)
+- Links: Run Compare dashboard with variables set; run manifest; traces
+
+## Panel naming conventions
+- Prefix with metric family: “TTFT”, “TPOT”, “Throughput”, “Queueing”, “KV Cache”, “Kernel Selection”, “Infra/Noise”
+- Include percentile in title: e.g., “TTFT p99 (ms)”
+- Include cohort in title if filtered: e.g., “TTFT p99 (ms) — long-prefill”
+
+## Dashboard QA / acceptance criteria
+A dashboard release is acceptable when:
+1) Selecting any run_id from q1-2026-baseline-freeze produces non-empty values for core panels (TTFT/TPOT/throughput) and correct units.
+2) Drilldown links resolve correctly for at least 3 sample runs (manifest + traces + logs).
+3) Run Compare produces correct deltas and percent change formatting.
+4) At least one workload per family (chat streaming, long-context, embeddings) has meaningful saturation panels.
+5) No panel uses ambiguous metric definitions (must match ADR-0172).
+
+## Rollout plan
+- Phase 1 (Dec 2025): Publish dashboards with core metrics and run header + links. Validate tags and manifest linking.
+- Phase 2 (Jan 2026): Add saturation/queueing panels as scheduler instrumentation lands (ENG-4826, PR-21503).
+- Phase 3 (Feb 2026): Add kernel attribution panels as kernel debug dump ships (PR-21519).
+- Phase 4 (late Q1 2026): Turn on alerting for nightly; then gating mode after a 2-week dry run.
+
+## Ownership and change management
+- Dashboard owner (implementation): Sergio Costa
+- Standards owner (metrics + tagging): Allison Grant
+- Alert routing owner: Aisha Bello
+
+Changes to:
+- metric definitions → require ADR update or explicit sign-off in perf standards page
+- alert thresholds → require review by eng-sre + perf program owner (Jonas Weber)
+
+## Appendix: Example ClickHouse query templates (reference)
+Note: these are illustrative; actual queries live in Grafana panel definitions.
+
+A) Fetch TTFT percentiles for a run
+SELECT percentile, value
+FROM bench_results.perf_metrics_v1
+WHERE run_id = '${run_id}'
+  AND metric_name = 'ttft_ms'
+  AND percentile IN ('p50','p95','p99');
+
+B) Fetch baseline vs candidate for delta table
+SELECT
+  metric_name,
+  percentile,
+  anyIf(value, run_id='${baseline_run_id}') AS baseline_value,
+  anyIf(value, run_id='${candidate_run_id}') AS candidate_value,
+  (candidate_value - baseline_value) AS abs_delta,
+  (candidate_value / baseline_value) AS rel_ratio
+FROM bench_results.perf_metrics_v1
+WHERE run_id IN ('${baseline_run_id}','${candidate_run_id}')
+  AND metric_name IN ('ttft_ms','tpot_ms','tokens_per_s','queue_wait_ms')
+  AND percentile IN ('p50','p95','p99')
+GROUP BY metric_name, percentile;
+
+## Appendix: Known gaps (as of last_updated)
+- Not all runs have trace_id populated; until then, the “Traces (Tempo)” link should fall back to a query by run_id label.
+- KV cache metrics are incomplete for some SKUs; panels must tolerate missing fields.
+- Some embeddings workloads do not emit tokens/s; throughput panel must switch to req/s when workload_family=embeddings.

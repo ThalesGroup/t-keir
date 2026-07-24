@@ -1,0 +1,22 @@
+# Timing budgets distilled from smoke report medium/low alerts
+# Use with a mocked DualHybridPipeline (no live Vespa/HF in CI).
+source_report: reports/beir/smoke/report.md
+budgets:
+  - id: perf-cross-encoder-budget
+    issue: slow_stage_cross_encoder
+    severity: medium
+    symptom: CE avg 2.7–3.5s/query in smoke
+    code_focus:
+      - dual_retrieval.py cross_encoder stage
+      - configs/rag.yaml dual_hybrid.cross_encoder.top_m
+    assert: cross_encoder_ms_per_query < 1500 on fixture pool size<=20
+    notes: Use embedding_cosine or top_m=5 in unit/perf harness; do not load full HF model in CI.
+  - id: perf-ontology-budget
+    issue: slow_stage_ontology
+    severity: low
+    symptom: Ontology stage ~400–500ms/query
+    code_focus:
+      - ontology_scorer.py
+      - query_expander.py max_terms_per_relation
+    assert: ontology_ms_per_query < 400 with <=20 docs and small ontology
+    notes: "Fixture: tiny ontology (5 concepts) + 10 docs with json_ld; measure scorer only."

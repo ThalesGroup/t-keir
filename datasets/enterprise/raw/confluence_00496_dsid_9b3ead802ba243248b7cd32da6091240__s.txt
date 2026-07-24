@@ -1,0 +1,187 @@
+Stakeholder synthesis playbook for long-tail regressions
+
+Summary:
+
+This playbook defines a lightweight but rigorous process for identifying, containing, and synthesizing stakeholder-facing artifacts for long-tail regressions — recurring, low-to-medium impact SLO regressions that surface intermittently across tenants or routes and persist for days to weeks. These regressions are often noisy, hard to reproduce, and frequently involve multi-component interactions (routing, cache, model variants, autoscaling). The goal is to shorten MTTI (mean time to identify), standardize evidence packaging for product and customer stakeholders, and create a repeatable operational cadence to remove ambiguity from customer communications and postmortems.
+
+Sections:
+1) Detection & classification
+2) Immediate containment runbook (first 30 minutes)
+3) Evidence pack: what to collect and how to store it
+4) Stakeholder synthesis and messaging templates
+5) Longer-term remediation and game-day plan
+6) Ownership, rotation tweaks, and success metrics
+
+---
+
+## 1) Detection & classification
+
+Short intro: Long-tail regressions differ from high-severity outages. They often present as subtle SLO drift, tenant-specific p99 spikes, or periodic increases in error rate for a subset of routes. Classify the event quickly to size the response.
+
+Classification matrix (use this to choose containment actions):
+
+| Class | Symptoms | Initial priority | Typical owners | Example threshold |
+|---|---|---:|---|---:|
+| L1 — transient noise | single-region p95 latency +10% for <2 hours | low | service owner + oncall | p95 > baseline*1.1 for <2h |
+| L2 — long-tail regression | repeated tenant p99 spikes, elevated error % for multiple days | medium | service owner + infra + product | p99 > baseline*1.25 across 6+ occurrences in 48h |
+| L3 — emerging systemic pattern | multiple services or regions show drifting SLOs | high | cross-functional page + incident lead | global p95/p99 degradation > 20% or sustained for 4+h |
+
+Notes: baseline = rolling 30-day median for that route/tenant. Use alert aggregation to group correlated signals across tenants and models.
+
+## 2) Immediate containment runbook (first 30 minutes)
+
+Objective: reduce customer-visible impact while preserving evidence for root-cause analysis.
+
+Step-by-step:
+1. Acknowledge and classify the signal in the alerting system (PagerDuty). Tag event with "long-tail" and affected tenant(s).
+2. Triage owner (oncall) runs quick query to scope: top 10 affected tenant IDs, affected routes, model version, and regions (commands below).
+3. If tenant-impacted, engage tenant success/customer success per comms matrix.
+4. Apply non-invasive mitigations first: widen autoscaler min capacity by +10%, apply temporary rate-limit backfill, enable prefix cache bypass for suspect model variants. Document each action in the incident chat.
+5. If mitigation resolves visible symptoms within 15 minutes, continue monitoring for 2h and begin evidence pack assembly; otherwise escalate to L2 and run the escalation checklist.
+
+Useful queries (examples):
+- kubectl logs -l app=redwood-serving --since=30m | grep <tenant-id> | head -n 200
+- curl "https://ops-api.redwood/v1/metrics?route=<route>&window=60m" | jq
+- SELECT tenant_id, p99_latency FROM metrics.route_aggregates WHERE window='60m' ORDER BY p99_latency DESC LIMIT 20;
+
+Escalation: If >10% of a service's tenants are impacted or the mitigation increases error rate elsewhere, invoke cross-functional page and attach the quick-scope output.
+
+## 3) Evidence pack: what to collect and how to store it
+
+Purpose: Provide a consistent bundle for postmortem analysis and for customer-facing summaries (helps legal, compliance, and CS). Store the evidence pack as an artifact in the incident S3 bucket: s3://incidents/long-tail/YYYYMMDD-<incident-id>/evidence.zip
+
+Minimum evidence checklist:
+- Incident metadata file (incident-id, owner, start/end timestamps, classification)
+- Top 100 request IDs (with timestamps) and full request/response traces (Jaeger links or trace blobs)
+- Request payload examples for each affected tenant/route (sanitized)
+- Model version and model routing policy snapshot (models.json)
+- KV/prefix cache hit/miss snapshot and eviction logs for the window
+- Autoscaler events (scale-up/scale-down) and GPU utilization graphs (CSV)
+- Representative logs from: serving runtime, router/proxy, autoscaler, and model loader (last 24h)
+- Alert and notification timeline (raw PagerDuty/Slack messages)
+- A short reproduction attempt log: commands tried and their outcomes
+- Temporary mitigation actions applied and timestamps (who applied them)
+
+Metadata file example (plain text, one line per key):
+incident_id: LT-20260301-42
+classification: L2
+start_ts: 2026-02-26T14:05:00Z
+detected_by: anomaly-detector-v2
+owner: ashapatel@redwood.ai
+affected_tenants: [tenant-671, tenant-254, tenant-194]
+
+Retention: evidence packs for long-tail regressions are retained for 540 days. Mark packs required by legal as restricted in the index.
+
+## 4) Stakeholder synthesis and messaging templates
+
+Purpose: Rapidly produce clear, non-technical and technical messages for customers and internal stakeholders. The synthesis has two parallel outputs: (A) Customer brief (concise), (B) Internal synthesis (technical + evidence pack link). Both must be produced within 48 hours for L2 events.
+
+Customer brief template (use for affected tenants only):
+Subject: Brief update — intermittent increase in latency for [service/route]
+Hello <CustomerName>,
+
+Summary: Between <start_ts> and ongoing, we observed intermittent increases in latency for <route> which may have affected some requests. We have applied temporary mitigations and continue monitoring. We have not detected data loss.
+
+What we did: temporarily increased capacity and adjusted routing to reduce impact.
+
+What we're doing next: collecting traces and running a targeted game-day to reproduce and fix the root cause. We will share a technical summary within 5 business days and a final postmortem within 21 days.
+
+Who to contact: <CS rep name> (cc) — for urgent concerns reply to this message.
+
+Internal synthesis template (deliver to product, infra, security):
+Title: LT-<id> synthesis — short description
+Owner: <owner team/email>
+Start: <start_ts> — Observed by <detector/alert>
+Scope: top affected tenants, routes, model variants, regions (attach evidence pack link)
+Immediate mitigations: list of actions + timestamps
+Initial hypothesis: succinct bullet list of working theories
+Next steps: planned deep-dive, responsible owners, timeline
+Impact summary: measurable customer impact (requests failed, latency deltas, affected SLAs)
+
+Always attach: evidence pack S3 link, top 10 traces, and relevant dashboards. For any L3 escalation, use the full incident comm template in the incident-runbook index.
+
+## 5) Longer-term remediation and game-day plan
+
+If a long-tail regression cannot be eliminated within 72 hours, schedule a dedicated remediation sprint with the following cadence:
+- Day 0–3: triage and reproduce attempts; expand evidence pack if needed
+- Day 4: postmortem skeleton and product sync — 1 hour cross-team meeting
+- Day 5–14: remediation sprint (2-week window recommended) with weekly syncs
+- Post-sprint: full postmortem and follow-ups tracked as ACTION items in the RCA board
+
+Game-day scenario (run quarterly for long-tail readiness):
+Objective: practice diagnosing tenant-scoped latency regressions with noisy autoscaler and cache churn.
+
+Setup checklist:
+- Choose two teams: Incident Response (oncall + infra) and Stakeholder Comms (CS + Product).
+- Seed synthetic tenants with malformed model routing metadata that triggers a slow fallback path (test cluster only).
+- Configure alert nebulizer to send intermittent p99 spikes for the seeded tenants.
+
+Exercise flow (3 hours):
+1. Detect — alert triggers for seeded tenants; oncall triages and applies standard containment actions.
+2. Evidence pack — participants practice assembling required artifacts within 45 minutes.
+3. Stakeholder synthesis — craft customer brief and internal synthesis within 60 minutes.
+4. Debrief — 45-minute retro. Record observations as runbook updates and add checklist items to the runbook.
+
+Success criteria: evidence pack completeness >= 90%, customer brief accuracy (validated by CS), and reproduction attempt documented.
+
+## 6) Ownership, rotation tweaks, and success metrics
+
+Who owns this playbook: Eng: Incident Response Working Group (alias: ir-wg@redwood.ai).
+
+Oncall rotation tweak suggestions for long-tail sensitivity:
+- Add a 24-h "long-tail shadow" to each weekly rotation: a secondary oncall who reviews longer-running anomalies mid-shift.
+- The long-tail shadow rotates weekly and is responsible for ensuring evidence packs are assembled for any L2s detected on their watch.
+
+Success metrics (tracked quarterly):
+- Mean time to evidence pack (MTTEP) — goal <= 48 hours for L2 (current baseline: 96h)
+- Fraction of L2 events with customer brief delivered within 48h — goal 90%
+- Reduction in repeat regressions caused by the same root cause within 90 days — goal 50% reduction
+
+Appendices:
+A) Quick escalation checklist (one-line actions):
+- Acknowledge -> run quick-scope -> apply non-invasive mitigation -> collect traces -> open incident artifact -> notify CS -> escalate if unresolved
+
+B) Postmortem skeleton (to paste into the incident tracker):
+- Title:
+- Incident id:
+- Timeline (concise):
+- Impact (customers, SLOs, duration):
+- Root cause (hypothesis + evidence):
+- Contributing factors:
+- Resolution steps:
+- Action items (owner + due date):
+- Evidence pack link:
+
+C) Customer comm template (full sample):
+Subject: Intermittent latency affecting requests to <route> — update
+Hello Acme Team,
+
+We wanted to inform you that we observed intermittent latency increases for requests routed to <route> between <start_ts> and <end_ts/ongoing>. Our monitoring indicates ~X% of requests for your tenant experienced p99 latency above our typical threshold. We do not believe any persisted data was lost.
+
+Immediate actions we took:
+- Increased temporary capacity for the serving pool
+- Adjusted routing to prefer the latest model variant with healthy cache behavior
+- Increased diagnostic tracing for your traffic
+
+Next steps:
+- We're collecting traces and will share an initial technical summary within 5 business days and a final report within 21 days.
+
+If you need a meeting sooner, your CS rep <name> is available to coordinate.
+
+Thanks for your patience,
+The Redwood Inference Ops Team
+
+D) Evidence storage and index naming conventions (reference):
+- Path: s3://incidents/long-tail/YYYYMMDD-LT-<seq>/evidence.zip
+- Index entry format: <incident_id> | <start_ts> | <classification> | <owner> | <s3_path>
+
+E) Runbook edit checklist (for playbook maintainers):
+- Verify queries work against staging/production telemetry (update if schema changed)
+- Confirm evidence S3 policy is valid and access audit logged
+- Update customer brief language with legal/CS once per quarter
+
+Related pages and references:
+- incident-comm-and-postmortem-framework (for full postmortem templates)
+- observer-lifecycle-and-incident-runloop-for-llm-serving (tracing & observability guidance)
+
+End of document.

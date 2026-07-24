@@ -1,0 +1,303 @@
+# Corpus-independent ranking regression fixtures.
+# Patterns distilled from reports/beir/smoke/report.md — no BEIR download required.
+# Each case is a self-contained mini-corpus (synthetic ids + text).
+cases:
+  - id: syn_fn_alias_gene
+    issue: false_negative
+    pattern: scientific_alias
+    severity: high
+    assert: gold_in_top_k
+    top_k: 3
+    query:
+      id: q-foxo
+      text: "FoxO3a activation in neuronal death is mediated by reactive oxygen species (ROS)."
+    qrels:
+      gold-foxo: 1
+    documents:
+      - _id: gold-foxo
+        role: gold
+        title: "SIRT1 regulates FOXO transcription factors under oxidative stress"
+        text: >
+          SIRT1 and the FOXO transcription factor FOXO3 formed a complex in cells
+          in response to oxidative stress. SIRT1 deacetylated FOXO3 and modulated
+          neuronal survival pathways linked to reactive oxygen species.
+      - _id: neg-ros-cancer
+        role: hard_negative
+        title: "ROS accumulation in cancer cells after apoptotic insult"
+        text: >
+          Increases in reactive oxygen species (ROS) following an apoptotic insult
+          lead to oxidation of cytochrome c in cancer cells and neurons.
+      - _id: neg-generic-death
+        role: hard_negative
+        title: "Programmed cell death pathways"
+        text: >
+          Autophagy and apoptosis regulate cell survival during starvation without
+          naming forkhead transcription factors.
+
+  - id: syn_fn_morphology_complex
+    issue: false_negative
+    pattern: morphological_alias
+    severity: high
+    assert: gold_in_top_k
+    top_k: 3
+    query:
+      id: q-p150
+      text: "Arginine 90 in p150n is important for interaction with EB1."
+    qrels:
+      gold-eb1: 1
+    documents:
+      - _id: gold-eb1
+        role: gold
+        title: "Structural basis for EB1 and p150Glued microtubule assembly"
+        text: >
+          Plus-end tracking proteins such as EB1 and the dynein/dynactin complex
+          component p150Glued regulate microtubule dynamics. Residues in p150
+          mediate the interaction with EB1.
+      - _id: neg-microtubule
+        role: hard_negative
+        title: "Microtubule dynamics in mitosis"
+        text: >
+          Microtubule assembly during mitosis depends on multiple motors but not
+          specifically on the EB1-p150 interface described in the query.
+      - _id: neg-arginine-generic
+        role: hard_negative
+        title: "Arginine methylation in signaling"
+        text: >
+          Arginine residues are frequently modified in signaling proteins without
+          reference to dynactin or EB1.
+
+  - id: syn_fp_shared_topic_tokens
+    issue: false_positive
+    pattern: stopword_topic_bleed
+    severity: high
+    assert: gold_ranks_above_hard_negative
+    top_k: 3
+    query:
+      id: q-copeptin
+      text: "High levels of copeptin decrease risk of diabetes."
+    qrels:
+      gold-copeptin: 1
+    documents:
+      - _id: gold-copeptin
+        role: gold
+        title: "Copeptin predicts diabetes risk in prospective cohorts"
+        text: >
+          Elevated plasma copeptin was associated with decreased risk of incident
+          diabetes after adjustment for metabolic covariates.
+      - _id: neg-resistin
+        role: hard_negative
+        title: "Resistin, albuminuria and diabetes risk in hypertension"
+        text: >
+          High levels of resistin were variably associated with diabetes risk and
+          glomerular filtration rate in hypertensive adults without reference to
+          the peptide named in the query.
+
+  - id: syn_fp_generic_factor_words
+    issue: false_positive
+    pattern: stopword_topic_bleed
+    severity: high
+    assert: gold_ranks_above_hard_negative
+    top_k: 3
+    query:
+      id: q-tetraspanin
+      text: "Tetraspanin-3 is a causative factor in the development of acute myelogenous leukemia"
+    qrels:
+      gold-tetraspanin: 1
+    documents:
+      - _id: gold-tetraspanin
+        role: gold
+        title: "Tetraspanin-3 drives acute myelogenous leukemia progression"
+        text: >
+          Tetraspanin-3 (TSPAN3) is a causative factor in the development of acute
+          myelogenous leukemia in patient-derived models.
+      - _id: neg-klf2
+        role: hard_negative
+        title: "The role of transcription factor KLF2 in vascular development"
+        text: >
+          The zinc-finger transcription factor KLF2 is a factor in the development
+          of vascular disease and is not linked to tetraspanin or leukemia.
+
+  - id: syn_fn_short_answer
+    issue: false_negative
+    pattern: short_gold_answer
+    severity: high
+    assert: gold_in_top_k
+    top_k: 3
+    query:
+      id: q-emergency-fund
+      text: "Should market based health insurance premiums be factored into 6 months emergency fund savings?"
+    qrels:
+      gold-short: 1
+    documents:
+      - _id: gold-short
+        role: gold
+        title: ""
+        text: >
+          Yes, it should be. Where one has insurance, it is an expense one would
+          expect to continue in a budgetary emergency.
+      - _id: neg-long-budget
+        role: hard_negative
+        title: "Building a six month emergency fund"
+        text: >
+          An emergency fund of 3-6 months of expenses should include rent, food,
+          and utilities. Market based health insurance premiums are often forgotten
+          but this article focuses on housing costs instead of insurance math.
+      - _id: neg-investing
+        role: hard_negative
+        title: "Investing surplus cash after savings"
+        text: >
+          Once the emergency fund is full, surplus cash can go into index funds
+          rather than insurance products.
+
+  - id: syn_fn_paraphrase_private_stock
+    issue: false_negative
+    pattern: paraphrase
+    severity: high
+    assert: gold_in_top_k
+    top_k: 3
+    query:
+      id: q-private-stock
+      text: "How would I go about selling the stock of a privately held company?"
+    qrels:
+      gold-secondmarket: 1
+    documents:
+      - _id: gold-secondmarket
+        role: gold
+        title: ""
+        text: >
+          SecondMarket attempts to add liquidity to privately held companies.
+          You may find a buyer there, but shares remain illiquid due to
+          accredited investor rules.
+      - _id: neg-ipo
+        role: hard_negative
+        title: "Raising money by going public"
+        text: >
+          Most businesses want to grow and may raise money on public markets by
+          issuing shares after an IPO, which is not a private secondary sale.
+      - _id: neg-broker
+        role: hard_negative
+        title: "Finding other shareholders"
+        text: >
+          Ask the company to connect you to other shareholders who might buy
+          privately held stock, though this is still a slow process.
+
+  - id: syn_fp_mortgage_bleed
+    issue: false_positive
+    pattern: stopword_topic_bleed
+    severity: high
+    assert: gold_ranks_above_hard_negative
+    top_k: 3
+    query:
+      id: q-advisor-mortgage
+      text: "Do financial advisors get better deals on mortgages?"
+    qrels:
+      gold-advisor: 1
+    documents:
+      - _id: gold-advisor
+        role: gold
+        title: ""
+        text: >
+          Financial advisors sometimes negotiate preferred mortgage rates through
+          partner lenders, but the deal depends on the advisor's network rather
+          than a universal discount.
+      - _id: neg-residential
+        role: hard_negative
+        title: ""
+        text: >
+          The simple answer is to get a residential mortgage first. The bank only
+          cares about risk on the day of closing, not whether advisors get deals.
+
+  - id: syn_near_miss_promote
+    issue: near_miss
+    pattern: weak_surface_gold
+    severity: medium
+    assert: gold_rank_le_top_k
+    top_k: 2
+    query:
+      id: q-colchicine
+      text: "The benefits of colchicine were achieved with high-dose statins for secondary prevention."
+    qrels:
+      gold-colchicine: 1
+    documents:
+      - _id: gold-colchicine
+        role: gold
+        title: "Colchicine and statin secondary prevention outcomes"
+        text: >
+          Benefits of colchicine in secondary prevention were observed among
+          patients already on high-dose statins after atherothrombotic events.
+      - _id: neg-cv-risk
+        role: hard_negative
+        title: "Cardiovascular event rates in stable outpatients"
+        text: >
+          Clinicians struggle to identify which outpatients are at high risk of
+          cardiovascular events over four years without mentioning colchicine.
+      - _id: neg-prevention-generic
+        role: hard_negative
+        title: "Secondary prevention strategies overview"
+        text: >
+          Secondary prevention strategies such as lifestyle change and antiplatelet
+          therapy reduce recurrent events; high-dose strategies are discussed broadly.
+
+  - id: syn_fp_near_copy_query
+    issue: false_positive
+    pattern: query_near_copy
+    severity: high
+    assert: gold_ranks_above_hard_negative
+    top_k: 2
+    query:
+      id: q-austerity
+      text: >
+        The current austerity measures are not working. The austerity measures
+        put in place by the ECB, IMF and European Commission have led to misery
+        for the Greek people.
+    qrels:
+      gold-counter: 1
+    documents:
+      - _id: gold-counter
+        role: gold
+        title: "Counter: austerity stabilized Greek finances"
+        text: >
+          Although painful, the ECB and IMF programme reduced the Greek deficit
+          and restored market access; misery alone does not prove the measures
+          failed on fiscal metrics.
+      - _id: neg-near-copy
+        role: hard_negative
+        title: "politics europe austerity"
+        text: >
+          The current austerity measures are not working. The austerity measures
+          put in place by the ECB, IMF and European Commission have led to misery
+          for the Greek people.
+
+  - id: syn_fn_related_pair_low_overlap
+    issue: false_negative
+    pattern: related_pair
+    severity: high
+    assert: gold_in_top_k
+    top_k: 3
+    query:
+      id: q-450ppm
+      text: >
+        450 PPM The IPCC report says atmospheric GHG emissions need to stabilize
+        at 450ppm to avoid more than 2C of warming.
+    qrels:
+      gold-fossil: 1
+    documents:
+      - _id: gold-fossil
+        role: gold
+        title: "Fossil fuels and late climate action"
+        text: >
+          The fossil fuels which account for the majority of GHG emissions are
+          finite. Stabilizing near 450 ppm still requires rapid displacement of
+          coal and oil even if some warming is already locked in.
+      - _id: neg-biodiversity
+        role: hard_negative
+        title: "Biodiversity loss unrelated to ppm targets"
+        text: >
+          Species extinction and habitat loss continue for reasons beyond
+          atmospheric concentration targets discussed by the IPCC.
+      - _id: neg-ppm-noise
+        role: hard_negative
+        title: "Local air quality ppm readings"
+        text: >
+          Indoor CO2 ppm readings above 1000 indicate poor ventilation and are
+          unrelated to IPCC 450ppm climate stabilization pathways.

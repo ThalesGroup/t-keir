@@ -1,0 +1,105 @@
+Multi-region GPU preemption mitigation and network failover playbook
+
+Operational runbook for detecting, mitigating, and recovering from GPU node preemption events and associated cross-region network failures. Covers detection rules, automated mitigations, manual fallback steps, Terraform/IaC rollback patterns, CI/CD rebuild guidance, and post-incident analysis checklist.
+Oncall SREs, Infra Engineers, Platform Engineers supporting GPU inference pools, and Runbook responders.
+Applies to all production GPU inference pools (named: gpu-inference-pool-{region}), cross-region routing (cross-region-router), and private VPC peering connections used by Redwood Dedicated and Private customers. Not for single-node dev clusters.
+Primary: infra-sre (pager: #infra-sre on PagerDuty). Secondary: platform-gpu (slack: #platform-gpu). Key on-call engineers: Maya Chen (author), Omar Patel. Emergency escalation: Eng SRE manager - Lena Novak.
+1) Alerts: node-preempt-count > 3 within 10m for any region -> Severity P1.
+2) Cross-region packet-loss > 2% for 5m -> Severity P1.
+3) API error rate for "gpu-inference" route > 1.5% above baseline for 10m AND latency tail (p95) increase > 2x -> Severity P1.
+4) Alerting sources: Prometheus rules (gpu_node_preempt_events_total), Cloud provider preemption notifications, Route healthchecks (cross-region-router-health), and Redwood console per-route SLA dashboards.
+5) Runbook trigger: Any P1 alert related to preemption+network triggers this playbook.
+- Enable graceful eviction hooks in node-manager: ensure podCheckpointing = true and kv-cache persisted to external store.
+- Pre-warm reserve capacity: terraform module variable reserve_gpu_count per region (default 2).
+- Autoscale policy: maintain min_replicas >= floor(0.2 * requested_capacity) during business hours.
+- Use preemption-aware instance types where possible (spot fallback via on-demand burst).
+- Batching policy: reduce preferred_batch_size to lower p99 tail during degraded network.
+- Cache policy: enable prefix-KV caching and set cache_ttl=300s for non-critical models.
+Step 0: Announce incident in #incidents with summary and RFC ID.
+Step 1: Verify Affected Regions: run: 
+  - kubectl --context=prod-<region> get nodes -l accelerator=nvidia -o wide
+  - ./infra/tools/check-preemptions.sh --since 10m
+Step 2: If preemptions concentrated in one region, trigger cross-region-router failover: 
+  - Open Redwood Console -> Routing -> cross-region-router -> set policy to 'manual-failover' -> route primary -> secondary (region B).
+Step 3: Scale up reserve in target region (region B) using Terraform apply (short window): 
+  - cd infra/terraform/modules/gpu-pool; terraform plan -var='region=region-b' -var='reserve_gpu_count=3'
+  - terraform apply -auto-approve -target=module.gpu_pool["region-b"].reserved_instances
+Step 4: Drain affected nodes gracefully: 
+  - kubectl drain <node> --ignore-daemonsets --delete-local-data --grace-period=120
+  - Verify persisted KV-caches are recovered on new pods.
+Step 5: If network (VPC peering/TGW) shows packet loss, enable regional egress routing via backup transit gateway: terraform apply -var='enable_backup_tgw=true' -target=module.network_transit["region-b"]
+Step 6: If CI/CD deploys are failing post-failover, rollback last deployment using release tag: 
+  - ./ci/release rollback --service gpu-inference --tag v2025.01.03
+Step 7: Communicate: update customers on status page and affected quotas.
+
+1) Validate BGP/peering state: aws ec2 describe-transit-gateway-attachments (or gcloud equivalent).
+2) Switch to backup route table: aws ec2 replace-route-table-association --association-id <assoc> --route-table-id <backup-rtb>.
+3) Reconfigure NLB health check thresholds to 2 consecutive successes / 10s during failover for quicker recovery.
+4) If DNS-based routing used, reduce TTL to 60 and update CNAME to point to regional endpoint.
+4a) Example: aws route53 change-resource-record-sets --change-batch file://failover-dns.json.
+5) Verify egress to S3/Artifact storage over backup path: curl -v https://s3.amazonaws.com/redwood-artifacts/healthcheck.txt
+- Always use -target for emergency short-lived changes to limit blast radius.
+- Use terraform workspace per-region (workspace: prod-region-a).
+- For reserve capacity changes, prefer module input changes over resource creation. Example variable override: reserve_gpu_count.
+- Patch flow: create PR in infra/terraform with plan output, set tag 'emergency' for oncall review.
+- Reconciliation: after incident, convert -target changes into full planned PR to be merged and applied in normal cadence.
+- Example snippet: 
+  module "gpu_pool" {
+    source = "git::ssh://git@repo/infra/modules//gpu-pool?ref=v1.9.0"
+    region = var.region
+    reserve_gpu_count = var.reserve_gpu_count
+  }
+- If nodes come back with different GPU drivers, rebuild golden image: trigger pipeline gpu-image-build (Jenkins job: infra/gpu-image-build).
+- Quick rebuild command: ci/pipelines/trigger.sh --job gpu-image-build --ref release/gpu-driver-540
+Post-incident checklist: 
+1) Reconcile terraform emergency changes into mainline PR.
+2) Audit metrics: preemptions, p95 latency, packet loss, and per-route error rates.
+3) Run regression evals against production prompt-sets for impacted models.
+4) Update runbook with timeline and root cause hypothesis.
+5) Schedule blameless postmortem and assign action items (owner and due dates).
+6) Verify SLA credits and billing adjustments if customer-impacting.
+7) Update capacity models and adjust reserve_gpu_count if needed.
+Metric | Threshold | Immediate action
+-----|-----|-----
+node_preemptions/min | >3 in 10m | Trigger P1 playbook and reserve scale-up
+cross_region_packet_loss | >2% for 5m | Route failover to backup TGW and enable backup NLB
+gpu_inference_error_rate | +1.5% over baseline for 10m | Investigate model-level fallbacks and rollback last deploy
+region_capacity_utilization | >85% sustained for 15m | Autoscale reserve + alert to capacity planning
+NLB_unhealthy_hosts | >1 per AZ | Increase health check sensitivity and bring reserve instances online
+-- Check preemptions: ./infra/tools/check-preemptions.sh --region region-a --since 10m
+-- Terraform reserve increase (targeted): terraform apply -auto-approve -target=module.gpu_pool["region-b"].reserved_instances -var='reserve_gpu_count=3'
+-- Drain node: kubectl drain ip-10-0-45-12.us-west-2.compute.internal --ignore-daemonsets --delete-local-data --grace-period=120
+-- Route53 DNS failover change batch (failover-dns.json): {
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "gpu.redwood.ai.",
+        "Type": "CNAME",
+        "TTL": 60,
+        "ResourceRecords": [{
+          "Value": "gpu-b.region-b.redwood.ai"
+        }]
+      }
+    }
+  ]
+}
+-- CI rollback: ./ci/release rollback --service gpu-inference --tag v2025.01.03
+Dashboards: infra/gpu-preemption-overview, infra/cross-region-latency, console/per-route-slo. Important panels: preempt_count (by region), node_restarts, cross_region_packet_loss, gpu_utilization_by_pool.
+Alert runbook links embedded on dashboards for one-click incident creation.
+Title: Multi-region preemption + network failover YYYY-MM-DD
+Summary: <one-line summary>
+Impact: <customer-facing impact and duration>
+Timeline: <HH:MM - events>
+Root cause: <hypothesis>
+Mitigations performed: <actions>
+Service impact: <routes, models, customers>
+Action items: <list with owners and due dates>
+Attachments: plan outputs, terraform diffs, logs, traces (links)
+- infra/terraform/modules/gpu-pool README
+- infra/tools/check-preemptions.sh
+- consoles: Redwood Console -> Routing -> cross-region-router
+- Dashboards: infra/gpu-preemption-overview
+- CI jobs: infra/gpu-image-build (Jenkins)
+
+This playbook emphasizes minimizing customer impact by combining automated defensive controls (reserve capacity, graceful eviction) with targeted Terraform interventions and safe CI/CD rollbacks. After any use of -target or emergency var overrides, make a full reconciled PR to ensure state drift is eliminated.

@@ -1,0 +1,7 @@
+# AAR 00180 — Sector Bravo
+
+AFTER ACTION REVIEW
+Exercise location: Sector Bravo
+Observation: common operational picture updates were timely.
+Lesson: verify data provenance before dissemination.
+Action: improve liaison reporting cadence.

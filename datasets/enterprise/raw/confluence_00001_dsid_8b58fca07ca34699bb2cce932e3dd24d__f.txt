@@ -1,0 +1,157 @@
+Forensic-ready Compliance Playbook for Emergency Deployments
+
+Overview
+
+Purpose:
+This playbook describes the combined technical and procedural controls required to remain forensically and legally compliant when performing emergency or out-of-band deployments, regional failovers, or temporary entitlement exceptions that cross normal RBAC, data residency, and SDLC boundaries. It prescribes: who may authorize an emergency deployment, what audit evidence must be captured, how to preserve data residency guarantees, and how to assemble a compliance evidence package suitable for regulators and internal audit.
+
+Scope:
+- Applies to hosted, dedicated, and private (VPC/on-prem) Redwood deployments.
+- Covers emergency code releases, rollback operations, region-to-region failover, and temporary role escalations lasting <= 72 hours.
+- Excludes planned maintenance with advance approval from Change Control.
+
+Key Principles:
+1) Forensic readiness: any emergency action must be captured end-to-end with immutable audit records, cryptographic verification where applicable, and a minimal evidence manifest.
+2) Least privilege + compensating controls: temporary exceptions must be timeboxed, scoped, and paired with increased telemetry and monitoring.
+3) Data locality preservation: customer residency SLAs must be honored or explicitly waived and logged in the evidence bundle.
+4) Post-fact governance: all emergency actions require retrospective review, remediation, and either a permanent policy change or revocation.
+
+Roles & Ownership:
+- Incident Commander (IC): Security & Compliance oncall (sec-oncall). Authorizes emergency exception and certifies the evidence bundle.
+- Deployment Lead: Eng-Platform owner of the deployment-pipeline service (service: deployment-gate). Executes the emergency deploy.
+- Auth Owner: Eng-Auth (service: authz-service). Applies temporary role grants and records RBAC deltas.
+- Audit Custodian: Eng-SRE (service: audit-collector + evidence-orchestrator). Ensures immutable storage and artifact packaging.
+- Legal/Privacy Reviewer: Legal team. Consulted when cross-border data movement occurs.
+
+Pre-deployment Checklist (must be completed before executing emergency action):
+- IC approval recorded in the incident ticket (Jira ID required).
+- Timebox declared (default: 72 hours).
+- Affected customers/tenants enumerated and residency requirements noted.
+- RBAC deltas planned and scoped. Use short-lived groups (prefix: emergency-YYYYMMDD).
+- Audit pipeline health check: audit-collector retention tier \u003e= 30 days and append-only store reachable.
+- Snapshot: automated snapshot of configuration and model artifacts stored with SHA256 checksums in artifacts-bucket (kms-integrator).
+
+Emergency Exception Workflow (step-by-step):
+1) Request & Approval
+   - Requester opens incident ticket and selects template: Emergency Deployment – Compliance Evidence.
+   - IC confirms necessity on #sec-incident and records explicit authorization: UTC timestamp, approver, reason, scope.
+2) Scoped RBAC Grant
+   - Auth Owner creates temporary role in authz-service with TTL <= declared timebox. Naming: emergency-grant-<ticket>.
+   - All role creations/assignments must include originator, justification, and correlating ticket id.
+3) Audit Hardening
+   - Turn on verbose auditing for involved services: deployment-gate, model-serving, data-proxy.
+   - Increase retention for the incident partition to legal_hold by toggling retention-tag via audit-collector API.
+4) Deployment & Data Controls
+   - Deployment Lead performs deploy through deployment-gate using --evidence-manifest flag.
+   - If cross-region movement occurs, data-residency waiver must be recorded and signed-off by Legal.
+5) Evidence Packaging (see Evidence Collection section).
+6) Revoke & Remediate
+   - Immediately after stabilized: revoke emergency roles, rotate affected keys, revert any temporary config flags that broaden access.
+   - Open a post-incident CR for permanent remediation if needed.
+
+Evidence Collection (minimum artifact set):
+- Immutable audit log slice (start_ts..end_ts) for: authz-service, deployment-gate, audit-collector, data-proxy, model-serving-runtime. Format: JSONL, signed at storage by evidence-orchestrator.
+- RBAC delta manifest: CSV listing grants, principal, scope, TTL, created_by, created_at.
+- Deployment manifest: git SHA, image digests, environment variables with redaction markers for secrets, and operation transcript.
+- Data residency waiver (if applicable): PDF signed by Legal with timestamp and list of affected tenant IDs.
+- Snapshot of configuration plus SHA256 of model artifacts and schema versions.
+- Incident ticket & approver log (Jira export).
+- Chain-of-custody log for any data extracts (who accessed, purpose, retention).
+
+Audit Logging Configuration (operational details):
+- Required fields: timestamp (ISO8601), service, operation, principal_id, request_id, correlation_id, before/state deltas, after/state deltas, outcome, region, retention_tag.
+- SLOs: audit ingestion 99.99% availability; mean ingestion latency \u003c= 2s; immutable store replication across 2 regions for hosted deployments.
+- Retention mapping: default customer-audit: 1 year; legal_hold: 7 years; ephemeral_debug: 30 days.
+- Immutable storage: evidence-orchestrator writes a signed bundle to s3://evidence-locked/{ticket}/bundle-{timestamp}.tar.gz with kms-integrator envelope encryption.
+
+RBAC Adjustments & Controls:
+- All emergency grants must be implemented via authz-service API with the header X-Incident-ID set. Ad-hoc console grants are forbidden.
+- Short-lived credentials must be provisioned via the service-token-exchange (max TTL 8 hours).
+- Deprovisioning hook: revocation events are automatically recorded and a revocation-proof object is attached to the evidence bundle.
+
+Data Residency and Retention Considerations:
+- If data must cross jurisdictional boundaries during failover, the Legal/Privacy Reviewer must approve and sign a waiver before the action proceeds. The waiver must state the minimal subset of affected data and retention/erasure commitments.
+- For private deployments, customers must be notified within SLA windows specified in their contract (default: 24 hours). Notification artifacts are included in the evidence bundle.
+- All temporary copies created for forensic or rollback purposes must be tagged with retention_tag=ephemeral_debug and auto-deleted after 30 days unless escalated to legal_hold.
+
+SDLC Gating and Emergency Releases:
+- Deployment-gate has two distinct flows: normal (CI->canary->gradual) and emergency (IC-authorized single-step). Emergency runs must still produce the same artifacts as the normal flow (build manifest, test run ids) and include rationale for bypassing gates.
+- Code review exemptions are conditional: emergency PRs must be triaged and tagged emergency-pr and undergo retrospective code review within 5 business days.
+
+Evidence Packaging & Submission (artifact manifest format):
+- evidence-manifest.yaml (top level):
+  - ticket_id: STRING
+  - ic_approver: STRING
+  - start_ts: ISO8601
+  - end_ts: ISO8601
+  - artifacts: [list of artifact filenames]
+  - retention_policy_applied: STRING
+
+Example evidence-manifest.yaml snippet:
+
+```yaml
+ticket_id: INC-2025-1234
+ic_approver: a.kapoor@redwood.com
+start_ts: 2025-09-12T14:03:21Z
+end_ts: 2025-09-12T14:21:09Z
+artifacts:
+  - audit-slice-authz-20250912.jsonl
+  - rbac-delta-INC-2025-1234.csv
+  - deployment-manifest-20250912.json
+retention_policy_applied: legal_hold
+```
+
+Evidence submission process:
+1) Audit Custodian runs evidence-orchestrator --package --ticket INC-2025-1234.
+2) The orchestrator validates signatures, computes checksums, uploads to s3://evidence-locked/ and writes a pointer to the internal evidence index (immutable).
+3) Notification sent to Legal + Compliance channel with secure link (signed URL TTL: 7 days).
+
+Post-incident Review & Remediation:
+- Conduct a Post-Incident Compliance Review (PICR) within 10 business days. Required attendees: IC, Deployment Lead, Auth Owner, Audit Custodian, Legal Reviewer, and the affected product owner.
+- Deliverables: updated incident timeline, lessons learned, concrete remediation tickets, confirmation of role/secret rotation, and closure of temporary artifacts or escalation to legal_hold.
+
+Escalation & Exceptions Register (risk and exceptions):
+- Any emergency action that increases cross-border data exposure beyond the approved waiver must be escalated immediately to the Head of Security and the Chief Privacy Officer.
+- Maintain an Exceptions Register (sheet-id: protect://exceptions/registry) that captures: ticket, approver, business rationale, risk_assessment_score (1-100), expiration, and artifacts. Entries are audited quarterly.
+
+Operational Runbook Snippets (CLI examples):
+- Create a timeboxed role (Auth Owner):
+
+```bash
+curl -X POST https://authz.internal.redwood/v1/roles \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -d '{"name":"emergency-grant-INC-2025-1234","ttl_seconds":259200,"scopes":["deploy:execute","config:write"] ,"metadata":{"incident_id":"INC-2025-1234","created_by":"deployment-lead@redwood.com"}}'
+```
+
+- Package evidence (Audit Custodian):
+
+```bash
+evidence-orchestrator package --ticket INC-2025-1234 --output /tmp/INC-2025-1234-bundle.tar.gz \
+  --sign-key /var/secrets/evidence-signing-key.pem --upload-bucket evidence-locked
+```
+
+Appendix A — Artifact retention table:
+| artifact_type | default_retention | legal_hold_retention | storage_location | notes |
+|---------------|-------------------|----------------------|------------------|-------|
+| audit-jsonl | 1 year | 7 years | s3://audit-archive/{region}/ | signed by evidence-orchestrator |
+| rbac-deltas | 1 year | 7 years | s3://audit-archive/{region}/rbac/ | CSV with principal hashes |
+| deployment-manifest | 90 days | 7 years | s3://artifacts/ | digest-signed |
+| waiver-pdf | 90 days | 7 years | s3://legal/waivers/ | must include Legal signature |
+
+Appendix B — Quick decision checklist (for IC):
+- Is emergency action the only viable path to meet customer SLAs or safety?
+- Has Legal been contacted for cross-jurisdictional data movement?
+- Are audit pipelines green and archivable?
+- Is there a clear rollback plan and timebox?
+
+References & Links:
+- deployment-gate README: internal link /confluence/eng-platform/deployment-gate/README
+- authz-service API spec: /confluence/eng-infra/authz-service/api-spec
+- audit schema & ingestion runbook: /confluence/security-and-compliance/audit-logging/event-schema-contract-and-retention-runbook-2025
+
+Revision History:
+- 2025-09-12: Created by Aisha Kapoor.
+- 2025-10-01: Added data-residency waiver template (Legal review).
+- 2026-02-01: Clarified RBAC delta manifest format and added evidence-orchestrator CLI examples.
+
+Contact: sec-oncall@redwood.com (for IC handover)

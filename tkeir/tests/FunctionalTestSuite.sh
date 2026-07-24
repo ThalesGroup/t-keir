@@ -5,6 +5,7 @@ cd "$script_path"
 
 ACTIVE_FUNCTIONAL_TESTS=(
     functional_tests/TestPipeline.py
+    functional_tests/TestOkfWorkflow.py
 )
 
 uv run --python 3.11 pytest "${ACTIVE_FUNCTIONAL_TESTS[@]}" -q "$@"

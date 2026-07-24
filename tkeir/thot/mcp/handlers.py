@@ -81,6 +81,18 @@ class McpBackend(Protocol):
     ) -> dict[str, Any]:
         """Build ontology summary from docs in ``user_space``."""
 
+    async def okf_bundle_list(self, *, user_space: str) -> dict[str, Any]:
+        """List OKF bundles for ``user_space``."""
+
+    async def okf_bundle_get(
+        self,
+        *,
+        user_space: str,
+        bundle_id: str,
+        concept_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Fetch OKF index / concept markdown for ``user_space``."""
+
 
 class VespaMcpBackend:
     """Default backend using :class:`VespaClient` (+ optional RAG HTTP)."""
@@ -304,6 +316,39 @@ class VespaMcpBackend:
             "triple_count": len(graph),
         }
 
+    async def okf_bundle_list(self, *, user_space: str) -> dict[str, Any]:
+        from thot.okf.store import OkfBundleStore
+
+        space = normalize_user_space(user_space)
+        store = OkfBundleStore()
+        bundles = store.list_bundles(space)
+        return {
+            "user_space": space,
+            "bundles": [b.model_dump(mode="json") for b in bundles],
+        }
+
+    async def okf_bundle_get(
+        self,
+        *,
+        user_space: str,
+        bundle_id: str,
+        concept_id: str | None = None,
+    ) -> dict[str, Any]:
+        from thot.okf.store import OkfBundleStore
+
+        space = normalize_user_space(user_space)
+        store = OkfBundleStore()
+        payload = store.bundle_payload(
+            bundle_id, space, concept_id=concept_id
+        )
+        if payload is None:
+            return {
+                "user_space": space,
+                "bundle_id": bundle_id,
+                "error": "bundle not found or access denied",
+            }
+        return payload
+
 
 class McpHandlers:
     """Dispatch MCP tools with forced ``user_space`` and metrics."""
@@ -333,6 +378,10 @@ class McpHandlers:
             ...         return {"user_space": kw["user_space"], "fields": {}}
             ...     async def ontology_from_query(self, query, **kw):
             ...         return {"user_space": kw["user_space"], "summary": ""}
+            ...     async def okf_bundle_list(self, **kw):
+            ...         return {"user_space": kw["user_space"], "bundles": []}
+            ...     async def okf_bundle_get(self, **kw):
+            ...         return {"user_space": kw["user_space"], "bundle_id": kw["bundle_id"]}
             >>> h = McpHandlers(backend=_Stub())
             >>> out = asyncio.run(h.invoke(
             ...     "search",
@@ -379,5 +428,13 @@ class McpHandlers:
                 user_space=space,
                 source_doc_id=args.get("source_doc_id"),
                 doc_ref=args.get("doc_ref"),
+            )
+        if tool_name == "okf_bundle_list":
+            return await self.backend.okf_bundle_list(user_space=space)
+        if tool_name == "okf_bundle_get":
+            return await self.backend.okf_bundle_get(
+                user_space=space,
+                bundle_id=str(args.get("bundle_id") or ""),
+                concept_id=args.get("concept_id"),
             )
         raise KeyError(f"unknown tool handler: {tool_name}")

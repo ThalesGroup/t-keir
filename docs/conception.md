@@ -498,7 +498,7 @@ Deliverables can be composed through ontology-driven templates and published
 only through the governor ApprovalQueue (in enforce mode).
 
 Deep dive: [Agents](tools/agents.md) · [Templates](tools/templates.md) ·
-[ADR-0005](adr/0005-agent-architecture.md).
+.
 
 | | |
 |--|--|
@@ -519,7 +519,7 @@ Deep dive: [Agents](tools/agents.md) · [Templates](tools/templates.md) ·
 4. **Untrusted tool content** — observations wrapped in `<untrusted>`;
    injection / escalation heuristics in `safety.py`.
 5. **Governed** — kill scope `agents`, per-run budgets, ActionRecords with
-   `actor.spiffe_id` ([ADR-0008](adr/0008-spire-agent-identity.md);
+   `actor.spiffe_id` (
    [SPIRE / SPIFFE](deployment/spire.md)).
 
 #### Agent YAML (`configs/agents/`)
@@ -584,10 +584,10 @@ runs `thot.compose` for the deliverable. Status lifecycle:
 
 ```text
 AGENT_ROOT/runs/{run_id}/
-  run.manifest.json   # RunState
+  run.manifest.json # RunState
   blackboard.json
-  steps/NNN.json      # StepRecord
-jobs/  dlq/  publishes/
+  steps/NNN.json # StepRecord
+jobs/ dlq/ publishes/
 ```
 
 #### Custom algorithms / policies (T-KEIR)

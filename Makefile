@@ -1066,6 +1066,32 @@ compose: ## Ontology template compose (TEMPLATE=synthesis_note TOPIC=Acme)
 compose-list: ## List ontology-driven templates
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.compose --list
 
+OKF_URL ?= http://localhost:8094
+OKF_ROOT ?= $(CURDIR)/.tkeir-okf
+OKF_QUERY ?=
+OKF_MAX_DOCS ?= 50
+USER_SPACE ?= dev@tkeir
+
+okf: ## Start OKF server (port 8094)
+	cd $(TKEIR_DIR) && OKF_ROOT="$(OKF_ROOT)" \
+		$(UV) run --python $(PYTHON) python -m thot.okf.server
+
+okf-export: ## CLI export: make okf-export QUERY="..." USER_SPACE=dev@tkeir
+	cd $(TKEIR_DIR) && OKF_ROOT="$(OKF_ROOT)" \
+		$(UV) run --python $(PYTHON) python -m thot.okf.exporter \
+		--user-space "$(USER_SPACE)" \
+		--max-docs "$(OKF_MAX_DOCS)" \
+		$(if $(strip $(OKF_QUERY)$(QUERY)),--query "$(or $(OKF_QUERY),$(QUERY))",) \
+		$(if $(strip $(OUTPUT)),--output "$(OUTPUT)",)
+
+okf-workflow: check-curl check-jq ## Run okf_wiki_brief: make okf-workflow GOAL="..." TOPIC="..."
+	$(MAKE) workflow-run WORKFLOW=okf_wiki_brief \
+		GOAL="$(or $(GOAL),Produce an OKF knowledge brief)" \
+		TOPIC="$(or $(TOPIC),Objective ALPHA)"
+
+okf-bundle-ls: check-curl check-jq ## List bundles for USER_SPACE
+	curl -fsS "$(OKF_URL)/okf/bundles" | jq .
+
 # ---------------------------------------------------------------------------
 # Multi-thematic corpus: NATO OSINT + Enterprise (Zero-to-Hero §3.4 + §5.5)
 # ---------------------------------------------------------------------------

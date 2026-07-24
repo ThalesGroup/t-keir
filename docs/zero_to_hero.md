@@ -9,7 +9,7 @@ you know you succeeded before moving on.
 | [1](#1-what-you-will-build) | — | Map the journey | 2 min |
 | [2](#2-prerequisites) | — | Tools on the host | 10–20 min |
 | [3](#3-p0-dev-local--first-pipeline) | **P0** | Pipeline on fixtures | 15–40 min |
-| [4](#4-p0-vespa-rag--hmi--agents) | **P0** | Search + HMI + **agents** on demo corpora | 25–55 min |
+| [4](#4-p0-vespa-rag--hmi--agents) | **P0** | Search + HMI + **agents** + **OKF** on demo corpora | 30–65 min |
 | [5](#5-p1-docker-compose-full-demo) | **P1** | Auth + audit + observability + per-user agents | 25–50 min |
 | [6](#6-p2-kubernetes-dev-k3d) | **P2** | Helm umbrella on k3d | 30–60 min |
 | [7](#7-p3-secure-cluster) | **P3** | Enforce + hardened path + SPIFFE agents | 45–90 min |
@@ -28,9 +28,9 @@ T-KEIR turns documents into searchable, attributable knowledge:
 
 ```text
 Documents → pipeline (NLP) → Vespa (streaming, per-user group) → RAG API → HMI
-                ↓                                      ↓
+                ↓ ↓
          ActionRecords → audit (hot + WORM) → governor (kill / budgets)
-                ↓                                      ↓
+                ↓ ↓
               Keycloak (OIDC intents → Vespa user_space)
                                                        ↓
               MCP tools ←→ Agents / workflows → templates → publish (approved)
@@ -38,14 +38,15 @@ Documents → pipeline (NLP) → Vespa (streaming, per-user group) → RAG API �
 
 Agents are a first-class feature: YAML roles, multi-agent workflows, ontology-driven
 templates, and an MCP server — see [Agents](tools/agents.md), [MCP](tools/mcp.md),
-[Templates](tools/templates.md).
+[Templates](tools/templates.md). OKF exports the indexed corpus as Markdown
+bundles — see [OKF](tools/okf.md) and [§4.5](#45-okf-export-and-wiki-brief-p0).
 
 **Progressive maturity**
 
-- **P0** — you develop and demo NLP + RAG + **agents** on your machine. Vespa
-  is the only container; T-KEIR tools (`pipeline`, `ingest`, `rag`, `agent`,
-  HMI) run on the host. Streaming group **`dev@tkeir`** (no Keycloak
-  required) — both OSINT and enterprise demo docs share that space.
+- **P0** — you develop and demo NLP + RAG + **agents** + **OKF** on your
+  machine. Vespa is the only container; T-KEIR tools (`pipeline`, `ingest`,
+  `rag`, `agent`, `okf`, HMI) run on the host. Streaming group **`dev@tkeir`**
+  (no Keycloak required) — both OSINT and enterprise demo docs share that space.
 - **P1** — you demo the full stack in Compose (local image registry `local/…`,
   Keycloak, ingest, audit, Grafana, optional `mcp` / `agents`). Each Keycloak
   user gets an isolated Vespa corpus; agents search only that user’s space
@@ -53,7 +54,7 @@ templates, and an MCP server — see [Agents](tools/agents.md), [MCP](tools/mcp.
 - **P2** — you install the same stack with Helm on a local Kubernetes (k3d),
   including optional agent / MCP charts when enabled in values.
 - **P3** — you harden (auth on, governor enforce, network policies). Agent
-  workloads use SPIFFE ([ADR-0008](adr/0008-spire-agent-identity.md)); enable
+  workloads use SPIFFE; enable
   Compose profile `spire` with `agents`.
 - **P4** — you add Kubeflow lineage and automated compliance evidence.
 
@@ -198,7 +199,7 @@ Copy/paste (two terminals):
 ```bash
 # Terminal A — Vespa + host ingest API (:8091)
 make bootstrap
-make ingest          # serializes NLP (INGEST_MAX_CONCURRENCY=1); avoid OOM
+make ingest # serializes NLP (INGEST_MAX_CONCURRENCY=1); avoid OOM
 
 # Terminal B — push both corpora into dev@tkeir (1 worker by default)
 make corpus-ingest
@@ -233,7 +234,7 @@ You can also pass `INGEST_FLAGS='--stop-on-failed'`.
 One-shot after corpora exist (ingest must already be listening on `:8091`):
 
 ```bash
-make corpus-demo   # generate (if needed) + ingest
+make corpus-demo # generate (if needed) + ingest
 ```
 
 If `:8091` is down, `make corpus-ingest` **fails fast**. Start `make ingest`
@@ -261,11 +262,11 @@ After [§4.2](#42-start-the-rag-api):
 
 ## 4. P0 — Vespa RAG + HMI + agents
 
-Still **host-native** for T-KEIR: `make rag`, `make agent`, and `cd tkeir-hmi
-&& npm run dev`. Vespa runs in Docker (`make bootstrap`). Streaming mode:
-documents live in a *user space* (Vespa group). Without Keycloak, everything
-uses the fixed principal **`dev@tkeir`** — so OSINT and enterprise demo data
-are both visible to RAG and agents in P0.
+Still **host-native** for T-KEIR: `make rag`, `make agent`, `make okf`, and
+`cd tkeir-hmi && npm run dev`. Vespa runs in Docker (`make bootstrap`).
+Streaming mode: documents live in a *user space* (Vespa group). Without
+Keycloak, everything uses the fixed principal **`dev@tkeir`** — so OSINT and
+enterprise demo data are both visible to RAG, agents, and OKF in P0.
 
 | Mode | Vespa `user_space` / `streaming.groupname` |
 |------|--------------------------------------------|
@@ -280,9 +281,9 @@ Details: [Vespa RAG — user space](tools/vespa_rag.md#user-space-streaming-grou
 # Optional: explicit local space (default is already dev@tkeir)
 export VESPA_USER_SPACE=dev@tkeir
 
-make bootstrap      # start Vespa + deploy streaming schemas
+make bootstrap # start Vespa + deploy streaming schemas
 make index-fixtures # build pipeline JSON under tkeir/tests/indexing/output if needed
-make index          # feed into g=dev@tkeir
+make index # feed into g=dev@tkeir
 ```
 
 **Checkpoint:** Vespa responds on `http://localhost:8080` (config on `19071`).
@@ -306,11 +307,11 @@ For the richer demo corpus ([§3.4](#34-generate-the-demo-corpora) /
 
 ```bash
 make bootstrap
-make ingest                                      # terminal A — :8091
+make ingest # terminal A — :8091
 # other terminal:
-make corpus-demo                                 # generate + ingest (P0)
-make rag                                         # :8090
-make rag-query RAG_QUERY="SITREP Objective ALPHA"   # OSINT hits
+make corpus-demo # generate + ingest (P0)
+make rag # :8090
+make rag-query RAG_QUERY="SITREP Objective ALPHA" # OSINT hits
 make rag-query RAG_QUERY="AcmeSystems Project ATLAS" # Enterprise hits (same space in P0)
 ```
 
@@ -394,7 +395,7 @@ make workflow-run \
 ```bash
 export AGENT_URL=http://localhost:8092
 # with tkeir-hmi already running (§4.3)
-open http://localhost:3000/agents   # or browse manually
+open http://localhost:3000/agents # or browse manually
 ```
 
 Start `content_brief` from the UI, poll handoffs / compose preview, and (when
@@ -406,6 +407,68 @@ Workflow runs return `handoffs` + `compose_result`. In P0 both themes hit the
 same streaming group; isolation comes in [§5.5](#55-per-user-and-per-topic-corpus-segregation-p1) /
 [§5.6](#56-agents-on-osint-vs-enterprise-p1).
 
+### 4.5 OKF export and wiki brief (P0)
+
+OKF (Open Knowledge Format) turns the indexed `dev@tkeir` corpus into a
+**directory of Markdown concepts** you can browse, download, or enrich with
+agents. In P0 everything stays host-native — no Compose `okf` profile required.
+Details: [OKF](tools/okf.md).
+
+**Prerequisites:** corpora ingested ([§3.5](#35-ingest-the-corpora-p0--host-tools)),
+`make rag` on **:8090** ([§4.2](#42-start-the-rag-api)). For the wiki-brief
+workflow, also run `make agent` ([§4.4](#44-agents-on-osint-and-enterprise-demo-data-p0)).
+
+**1. Query-scoped export (CLI)** — RAG selects the documents; T-KEIR writes a
+bundle under `.tkeir-okf/`:
+
+```bash
+# Terminal A — RAG must be up
+make rag
+
+# Terminal B — scoped OKF export from the OSINT theme
+make okf-export \
+  USER_SPACE=dev@tkeir \
+  QUERY="SITREP Objective ALPHA"
+
+# Or a static walk of the first N parent docs (no query)
+make okf-export USER_SPACE=dev@tkeir OKF_MAX_DOCS=20
+```
+
+**Checkpoint:** `.tkeir-okf/<bundle_id>/index.md` exists. A scoped export also
+has `query_context.md` with the query and linked concepts. Open a concept file
+under `concepts/` — frontmatter includes `type` plus T-KEIR `tkeir_*` fields.
+
+**2. HTTP API + HMI browser** — optional when you want list/download from the UI:
+
+```bash
+# Terminal C — OKF service (:8094); keep RAG on :8090
+make okf
+
+# List bundles for the default caller space
+make okf-bundle-ls
+
+# With HMI already running (§4.3)
+open http://localhost:3000/okf
+```
+
+From `/okf`, trigger a query-scoped export, open `index.md` / concepts, or
+download the `.tar.gz`.
+
+**3. Curated wiki brief** — `okf_wiki_brief` scopes a bundle, runs
+`okf_curator` enrichments, then composes a `synthesis_note`:
+
+```bash
+# RAG (:8090) + agent (:8092) already up from §4.4
+make okf-workflow \
+  GOAL="Produce an OKF knowledge brief on Objective ALPHA" \
+  TOPIC="Objective ALPHA"
+```
+
+**Checkpoint:** the workflow run reaches `status=succeeded` with
+`compose_result`; the curated bundle under `.tkeir-okf/` shows enrichments in
+concept notes / `log.md`. Enterprise theme works the same with
+`TOPIC="Project ATLAS"` and a matching `GOAL`.
+
 ---
 
 ## 5. P1 Docker Compose — full demo
@@ -416,7 +479,7 @@ before the first `compose-up` (Compose will not pull from GHCR unless you set
 `IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir`).
 
 ```bash
-cp deploy/compose/.env.example deploy/compose/.env   # IMAGE_REGISTRY=local
+cp deploy/compose/.env.example deploy/compose/.env # IMAGE_REGISTRY=local
 make images
 ```
 
@@ -427,8 +490,8 @@ With **`auth`**, each Keycloak user owns a separate Vespa streaming group
 
 ```bash
 cp deploy/compose/.env.example deploy/compose/.env
-# IMAGE_REGISTRY=local          # default — local Docker daemon tags
-# VESPA_USER_SPACE=dev@tkeir    # CLI / auth-off fallback only
+# IMAGE_REGISTRY=local # default — local Docker daemon tags
+# VESPA_USER_SPACE=dev@tkeir # CLI / auth-off fallback only
 # edit secrets if you expose the stack beyond localhost
 ```
 
@@ -648,7 +711,7 @@ make k3d-up
 make helm-deps
 make cluster-install PROFILE=k8s-dev
 # or:
-make cluster-plan   # detect what the cluster already has
+make cluster-plan # detect what the cluster already has
 ```
 
 Values: `deploy/charts/tkeir/values-dev.yaml`.  
@@ -686,7 +749,7 @@ run against the in-cluster `tkeir-agent` Service succeed.
 ## 7. P3 Secure cluster
 
 P3 turns on **governor enforce**, **audit**, and **auth**. When agents are
-enabled, SPIRE/SPIFFE identity is required for mastering (ADR-0008).
+enabled, SPIRE/SPIFFE identity is required for mastering.
 
 ### Path A — Linux / cloud K3s
 
@@ -695,9 +758,9 @@ enabled, SPIRE/SPIFFE identity is required for mastering (ADR-0008).
 bash deploy/k3s/install-server.sh
 # on agents
 bash deploy/k3s/install-agent.sh
-make cilium-install   # when ready for eBPF networking
+make cilium-install # when ready for eBPF networking
 make cluster-install PROFILE=k8s-secure
-make k3s-check        # kube-bench style checks when available
+make k3s-check # kube-bench style checks when available
 ```
 
 ### Path B — macOS via Lima
@@ -734,12 +797,12 @@ cleanly by budget / kill / approval.
 
 ```bash
 make cluster-install PROFILE=platform
-make kubeflow-install          # when cluster ready
-make kubeflow-register-models  # stub registry entries
+make kubeflow-install # when cluster ready
+make kubeflow-register-models # stub registry entries
 make lineage-report DOC=<sha256>
 make annex-iv
 make audit-evidence
-make audit-compliance          # OPA EU article audit → reports/compliance/eu-audit/
+make audit-compliance # OPA EU article audit → reports/compliance/eu-audit/
 ```
 
 Compliance mappings (engineering, **not legal advice**):
@@ -809,9 +872,9 @@ make docs-build
 Regenerate the dashboard after any refactoring or coverage pass:
 
 ```bash
-make coverage       # refreshes reports/quality/coverage_*.*
-make quality-docs   # writes docs/quality/index.md from latest reports
-make docs-build     # rebuilds the full MkDocs site
+make coverage # refreshes reports/quality/coverage_*.*
+make quality-docs # writes docs/quality/index.md from latest reports
+make docs-build # rebuilds the full MkDocs site
 ```
 
 ---
@@ -824,14 +887,13 @@ make docs-build     # rebuilds the full MkDocs site
 | Code quality (coverage + CC + licences) | [Quality dashboard](quality/index.md) |
 | Pipeline stages | [Tools overview](tools/tools_overview.md) |
 | Vespa schema / RAG | [Vespa RAG](tools/vespa_rag.md) |
-| MCP / agents / templates | [MCP](tools/mcp.md), [Agents](tools/agents.md), [Templates](tools/templates.md) |
+| MCP / agents / templates / OKF | [MCP](tools/mcp.md), [Agents](tools/agents.md), [Templates](tools/templates.md), [OKF](tools/okf.md) |
 | Ingest API | [Ingestion](deployment/ingest.md) |
 | Audit / WORM | [Audit store](deployment/audit.md) |
 | Governor | [Governor](deployment/governor.md) |
 | Security model | [Security](security.md) |
 | EU compliance OPA | [EU Compliance OPA Audit](compliance/eu-audit.md) |
-| Design decisions | [ADRs](adr/index.md) |
 
 ```bash
-make help   # every Make target with a one-line description
+make help # every Make target with a one-line description
 ```

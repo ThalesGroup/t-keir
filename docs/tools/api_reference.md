@@ -135,7 +135,7 @@ HTTP: `POST /rag/ontology/query` — examples in [Vespa RAG](vespa_rag.md).
 | `run_id` | `str` | ULID |
 | `agent` / `workflow` | `str` | Spec names |
 | `user_space` | `str` | Vespa streaming group |
-| `spiffe_id` | `str \| None` | Workload SPIFFE ID (ADR-0008) |
+| `spiffe_id` | `str \| None` | Workload SPIFFE ID |
 | `status` | Literal | `queued`…`killed` |
 | `budgets` / `usage` | models | Token / tool / wall limits |
 

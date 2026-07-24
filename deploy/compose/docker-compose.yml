@@ -166,6 +166,7 @@ services:
       TKEIR_SERVICE: tkeir-hmi
       API_URL: http://tkeir-api:8090
       AGENT_URL: ${AGENT_URL:-http://tkeir-agent:8092}
+      OKF_URL: ${OKF_URL:-http://tkeir-okf:8094}
       API_PROXY_TIMEOUT_MS: ${API_PROXY_TIMEOUT_MS:-300000}
       AUTH_ENABLED: ${AUTH_ENABLED:-true}
       AUTH_SECRET: ${AUTH_SECRET:-dev-auth-secret-change-me-in-production-32b}
@@ -584,6 +585,41 @@ services:
         required: false
     networks: [tkeir]
 
+  tkeir-okf:
+    profiles: ["okf"]
+    image: ${IMAGE_REGISTRY:-local}/tkeir-okf:${IMAGE_TAG:-dev}
+    build:
+      context: ../..
+      dockerfile: deploy/images/Dockerfile.tkeir-okf
+      <<: *tkeir-from-lib
+      args:
+        <<: *tkeir-build-args
+    container_name: tkeir-okf
+    environment:
+      TKEIR_SERVICE: tkeir-okf
+      TKEIR_ENV: ${TKEIR_ENV:-dev}
+      OKF_HOST: "0.0.0.0"
+      OKF_PORT: "8094"
+      OKF_ROOT: /var/tkeir/okf
+      VESPA_URL: http://vespa:8080
+      VESPA_CONFIG_URL: http://vespa:19071
+      VESPA_USER_SPACE: ${VESPA_USER_SPACE:-dev@tkeir}
+      MCP_RAG_URL: ${MCP_RAG_URL:-http://tkeir-api:8090}
+      GOVERNOR_MODE: ${GOVERNOR_MODE:-observe}
+      GOVERNOR_STATE_ROOT: /var/tkeir/governor
+      GOVERNOR_URL: ${GOVERNOR_URL:-http://tkeir-governor:8094}
+      AUTH_ENABLED: ${AUTH_ENABLED:-false}
+    ports:
+      - "8094:8094"
+    volumes:
+      - okf_data:/var/tkeir/okf
+      - governor_state:/var/tkeir/governor
+    depends_on:
+      vespa:
+        condition: service_healthy
+        required: false
+    networks: [tkeir]
+
   spire-server:
     profiles: ["spire"]
     image: ghcr.io/spiffe/spire-server:${SPIRE_TAG:-1.15.2}
@@ -635,6 +671,7 @@ volumes:
   audit_worm:
   governor_state:
   agent_data:
+  okf_data:
   minio_data:
   prometheus_data:
   loki_data:

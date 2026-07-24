@@ -12,7 +12,7 @@ Remove or supersede a published agent deliverable (`origin=agent-generated`).
 
 1. Deny further publishes for the run (ApprovalQueue deny if pending).
 2. Prefer **supersede** with a corrected document or empty tombstone via the
-   ingest supersede path (ADR-0002):
+   ingest supersede path:
 
 ```bash
 # Example — re-ingest a replacement that supersedes the prior doc_id
@@ -36,6 +36,5 @@ curl -X POST http://localhost:8091/ingest/document \
 
 ## Related
 
-- ADR-0002, ADR-0007
 - [Ingest deployment](../deployment/ingest.md)
 - [Kill switch](kill-switch.md)

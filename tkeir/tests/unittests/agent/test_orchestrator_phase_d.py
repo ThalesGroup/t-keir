@@ -90,14 +90,30 @@ class RecordingBackend:
             "triple_count": 1,
         }
 
+    async def okf_bundle_list(self, *, user_space):
+        self.spaces.append(user_space)
+        return {"user_space": user_space, "bundles": []}
+
+    async def okf_bundle_get(self, *, user_space, bundle_id, concept_id=None):
+        self.spaces.append(user_space)
+        return {
+            "user_space": user_space,
+            "bundle_id": bundle_id,
+            "concepts": [],
+        }
+
 
 def test_workflow_registry():
     assert "content_brief" in list_workflow_names()
+    assert "okf_wiki_brief" in list_workflow_names()
     wf = load_workflow("content_brief")
     assert len(wf.steps) >= 3
     assert any(s.agent == "researcher" for s in wf.steps)
     assert any(s.compose is not None for s in wf.steps)
     assert "echo_cite" in wf.external_tools
+    okf = load_workflow("okf_wiki_brief")
+    assert okf.steps[0].builtin == "okf_scoped_export"
+    assert any(s.agent == "okf_curator" for s in okf.steps)
 
 
 def test_egress_policy_enforces():

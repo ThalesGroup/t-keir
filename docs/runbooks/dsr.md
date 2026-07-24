@@ -15,4 +15,4 @@ hash-valid while the subject becomes unreadable (GDPR erasure hook).
 3. Confirm subsequent reports no longer resolve the subject.
 4. Record the DSR as an ActionRecord / ops ticket (do not store raw PII).
 
-See [GDPR mapping](../compliance/gdpr.md) and ADR-0003.
+See [GDPR mapping](../compliance/gdpr.md).

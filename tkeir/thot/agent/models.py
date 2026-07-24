@@ -69,6 +69,28 @@ class GroundedFindings(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class OkfEnrichmentFindingModel(BaseModel):
+    """One ``okf_enrichment_v1`` finding (mirrors thot.okf.models)."""
+
+    concept_id: str
+    claim: str = ""
+    enrichments: dict[str, Any] = Field(default_factory=dict)
+    chunk_ids: list[str] = Field(default_factory=list)
+    document_ids: list[str] = Field(default_factory=list)
+    confidence: float = 0.0
+
+
+class OkfEnrichmentResult(BaseModel):
+    """OKF curator output contract."""
+
+    schema_: str = Field(default="okf_enrichment_v1", alias="schema")
+    findings: list[OkfEnrichmentFindingModel] = Field(default_factory=list)
+    unfilled: list[str] = Field(default_factory=list)
+    notes: str = ""
+
+    model_config = {"populate_by_name": True}
+
+
 class ToolCall(BaseModel):
     """Parsed tool invocation from the LLM."""
 
@@ -143,7 +165,7 @@ class WorkflowComposeStep(BaseModel):
 
 
 class WorkflowStep(BaseModel):
-    """Workflow step: either an agent phase or a compose phase."""
+    """Workflow step: agent, compose, or builtin (e.g. OKF scoped export)."""
 
     id: str = ""
     agent: str | None = None
@@ -151,6 +173,9 @@ class WorkflowStep(BaseModel):
     tools: list[str] | None = None
     max_steps: int | None = None
     compose: WorkflowComposeStep | None = None
+    builtin: str | None = None
+    params_from: list[str] = Field(default_factory=list)
+    output_key: str | None = None
 
 
 class WorkflowSpec(BaseModel):

@@ -13,7 +13,6 @@ nav:
         - Overview & service topology: 'architecture/index.md'
         - Data flows & sequences: 'architecture/sequences.md'
         - Data model & schemas: 'architecture/data-model.md'
-        - Decision log (ADRs): 'architecture/decisions.md'
     - Conception: 'conception.md'
     - Installation: 'installation.md'
     - Dev Container: 'devcontainer.md'
@@ -38,6 +37,7 @@ nav:
         - Vespa RAG: 'tools/vespa_rag.md'
         - MCP server: 'tools/mcp.md'
         - Agents: 'tools/agents.md'
+        - OKF export: 'tools/okf.md'
         - Templates: 'tools/templates.md'
         - Corpus & Ontologies: 'tools/corpus.md'
         - HMI: 'hmi.md'
@@ -74,16 +74,6 @@ nav:
         - Incident: 'runbooks/incident.md'
         - Rollback: 'runbooks/rollback.md'
         - DSR (forget): 'runbooks/dsr.md'
-    - ADR:
-        - Index: 'adr/index.md'
-        - 0001 Platform operations architecture: 'adr/0001-platform-architecture.md'
-        - 0002 Ingest supersede and rollback: 'adr/0002-ingest-supersede.md'
-        - 0003 Two-tier audit store + WORM: 'adr/0003-audit-store-worm.md'
-        - 0004 Defer SPIRE / SPIFFE (superseded): 'adr/0004-defer-spire.md'
-        - 0005 Agent architecture: 'adr/0005-agent-architecture.md'
-        - 0006 Per-tenant fused KG: 'adr/0006-kg-store.md'
-        - 0007 Agent-generated content: 'adr/0007-generated-content.md'
-        - 0008 SPIRE agent identity: 'adr/0008-spire-agent-identity.md'
     - Security: 'security.md'
     - Operation and Management: 'oam.md'
     - About: 'about.md'
@@ -101,8 +91,11 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 
 # Article tables are snippet sources only (included into regulation pages).
+# ADRs stay in the repo for engineering but are not published until 2.0.0.
 exclude_docs: |
   compliance/generated/**
+  adr/**
+  architecture/decisions.md
 
 # Repository
 repo_name: 'ThalesGroup/t-keir'

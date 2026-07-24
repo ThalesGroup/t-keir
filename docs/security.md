@@ -80,5 +80,4 @@ evidence.
 ## Related
 
 - [Deployment profiles](deployment/index.md)
-- [ADR-0001](adr/0001-platform-architecture.md)
 - Root `SECURITY.md` (vulnerability disclosure)

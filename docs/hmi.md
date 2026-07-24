@@ -24,7 +24,7 @@ navigator, and admin/agent run monitors.
 ```bash
 cd tkeir-hmi
 npm install
-cp .env.local.example .env.local   # optional — defaults work for local dev
+cp .env.local.example .env.local # optional — defaults work for local dev
 ```
 
 ## Development
@@ -115,7 +115,7 @@ Toggle the same entity/keyword again to clear the filter.
 
 `/agents` starts workflows against `tkeir-agent`, polls
 `GET /agent/runs/{id}`, and offers **Publish** (ApprovalQueue-gated in enforce
-mode). See [Agents](tools/agents.md) and ADR-0007.
+mode). See [Agents](tools/agents.md).
 
 ## Correlation ID
 

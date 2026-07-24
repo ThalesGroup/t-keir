@@ -33,4 +33,3 @@ curl -X POST "http://localhost:8092/agent/runs/${RUN_ID}/cancel"
 
 - [Kill switch](kill-switch.md)
 - [Agents](../tools/agents.md)
-- ADR-0005

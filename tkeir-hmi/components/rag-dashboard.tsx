@@ -121,6 +121,12 @@ export function RagDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <a
+              href="/okf"
+              className="hidden text-sm text-muted-foreground underline-offset-2 hover:underline sm:inline"
+            >
+              OKF Bundles
+            </a>
+            <a
               href="/agents"
               className="hidden text-sm text-muted-foreground underline-offset-2 hover:underline sm:inline"
             >

@@ -86,6 +86,8 @@ tkeir-beir-eval = "thot.tools.search.beir_eval:main"
 tkeir-mcp = "thot.mcp.server:main"
 tkeir-agent = "thot.agent.service:main"
 tkeir-compose = "thot.compose.__main__:main"
+tkeir-okf = "thot.okf.server:main"
+tkeir-okf-export = "thot.okf.exporter:cli_main"
 
 [dependency-groups]
 dev = [
@@ -146,6 +148,7 @@ include = [
     "*/thot/ingest/*",
     "*/thot/audit/*",
     "*/thot/governor/*",
+    "*/thot/okf/*",
     "*/thot/tasks/*Configuration.py",
     "*/thot/tasks/converters/*",
     "*/thot/tasks/keywords/*",

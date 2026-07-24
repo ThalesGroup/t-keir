@@ -13,7 +13,7 @@ Variable reference: [Environment variables](environment.md).
 
 ```bash
 # Build images into the local Docker daemon (not GHCR)
-make images            # tags: local/tkeir-*:$IMAGE_TAG
+make images # tags: local/tkeir-*:$IMAGE_TAG
 # or: make image-api image-hmi …
 
 # Start core + Keycloak
@@ -58,7 +58,7 @@ Example full demo stack:
 make compose-up PROFILES=core,auth,ingest,audit,governor,observability,objectstore,agents,spire
 ```
 
-Agent SPIFFE: [SPIRE / SPIFFE](spire.md) · ADR-0008.
+Agent SPIFFE: [SPIRE / SPIFFE](spire.md).
 
 After `make compose-up`, run `make compose-smoke` to verify health endpoints
 (including Grafana/MinIO when those profiles are up).

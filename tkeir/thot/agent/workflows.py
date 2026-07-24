@@ -54,7 +54,10 @@ def load_workflow(name: str, *, directory: Path | None = None) -> WorkflowSpec:
         if not isinstance(item, dict):
             raise ValueError(f"workflow step {index} must be a mapping")
         step = dict(item)
-        step.setdefault("id", step.get("agent") or f"step-{index}")
+        step.setdefault(
+            "id",
+            step.get("agent") or step.get("builtin") or f"step-{index}",
+        )
         if "compose" in step and isinstance(step["compose"], dict):
             compose = dict(step["compose"])
             compose.setdefault("id", step.get("id") or "compose")

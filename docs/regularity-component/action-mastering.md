@@ -19,7 +19,7 @@ technical hooks (kill switch, `/admin` panel, approval queue).
    effective &lt; 2 s. **Agent workloads** carry a SPIFFE ID on every
    ActionRecord (`spiffe://{trust}/agent/{name}`); governor enforce denies
    agent intents without an allow-listed ID
-   ([ADR-0008](../adr/0008-spire-agent-identity.md)).
+   .
 2. **Intent–action alignment** — OAuth client scopes
    (`intent:search|ingest|index|delete|audit.read|admin.override`) mapped by
    the governor; Policy-as-Code (OPA/Rego in `deploy/policies/app/`). Mismatch →

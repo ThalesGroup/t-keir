@@ -89,7 +89,14 @@ def _ensure_app_state(app: FastAPI) -> AppState:
 async def lifespan(app: FastAPI):
     """Initialize store layout and optional Vespa client."""
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-ingest"))
-    state = _ensure_app_state(app)
+    # Always rebuild AppState so INGEST_ROOT / settings changes take effect
+    # (TestClient runs lifespan per session; reusing a prior state points at
+    # a deleted temp root and makes status lookups 404).
+    state = AppState()
+    state.store.ensure_layout()
+    if state.vespa is None:
+        state.vespa = VespaClient()
+    app.state.ingest = state
     try:
         yield
     finally:

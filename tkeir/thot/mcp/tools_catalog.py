@@ -157,6 +157,45 @@ TOOLS: tuple[ToolSpec, ...] = (
             "additionalProperties": False,
         },
     ),
+    ToolSpec(
+        name="okf_bundle_list",
+        description=(
+            "List OKF knowledge bundles available in the caller's user_space."
+        ),
+        intent="search",
+        handler="okf_bundle_list",
+        input_schema={
+            "type": "object",
+            "properties": {},
+            "additionalProperties": False,
+        },
+    ),
+    ToolSpec(
+        name="okf_bundle_get",
+        description=(
+            "Return the OKF index.md and concept list for a bundle. "
+            "When concept_id is set, return that concept's full markdown."
+        ),
+        intent="search",
+        handler="okf_bundle_get",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "bundle_id": {
+                    "type": "string",
+                    "description": "OKF bundle identifier",
+                },
+                "concept_id": {
+                    "type": "string",
+                    "description": (
+                        "Optional bundle-relative concept path without .md"
+                    ),
+                },
+            },
+            "required": ["bundle_id"],
+            "additionalProperties": False,
+        },
+    ),
 )
 
 

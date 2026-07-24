@@ -52,6 +52,7 @@ _PATH_INTENT = {
     "/audit/report": "audit.read",
     "/audit/verify": "audit.read",
     "/audit/archive": "audit.read",
+    "/okf/export": "okf.export",
 }
 
 

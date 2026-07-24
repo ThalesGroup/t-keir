@@ -43,7 +43,14 @@ ACTIVE_TESTS=(
     unittests/TestLlmWrapper.py
     unittests/TestConfigurationUtils.py
     unittests/TestQueryAnalyzer.py
+    unittests/TestOkfModels.py
+    unittests/TestOkfExporter.py
+    unittests/TestOkfApplicator.py
+    unittests/TestOkfMcpTools.py
+    unittests/TestOkfServer.py
+    unittests/TestOkfExtra.py
     functional_tests/TestPipeline.py
+    functional_tests/TestOkfWorkflow.py
 )
 
 uv run --python 3.11 pytest "${ACTIVE_TESTS[@]}" -q "$@"

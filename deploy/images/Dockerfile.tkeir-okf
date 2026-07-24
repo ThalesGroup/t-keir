@@ -1,0 +1,33 @@
+# Thin image on shared tkeir-lib (bake/compose named context).
+# syntax=docker/dockerfile:1.4
+FROM tkeir-lib
+
+ARG VERSION=0.0.0-dev
+ARG GIT_COMMIT=unknown
+ARG BUILD_DATE=unknown
+
+USER root
+ENV TKEIR_SERVICE=tkeir-okf \
+    OKF_HOST=0.0.0.0 \
+    OKF_PORT=8094 \
+    OKF_ROOT=/var/tkeir/okf
+
+RUN mkdir -p /var/tkeir/okf /var/tkeir/governor \
+    && chown -R 10001:10001 /var/tkeir
+
+USER 10001
+EXPOSE 8094
+
+LABEL org.opencontainers.image.title="tkeir-okf" \
+      org.opencontainers.image.description="T-KEIR OKF bundle export service" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${GIT_COMMIT}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.source="https://github.com/ThalesGroup/t-keir" \
+      org.opencontainers.image.vendor="Thales Group" \
+      org.opencontainers.image.licenses="MIT"
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${OKF_PORT}/health" || exit 1
+
+ENTRYPOINT ["tkeir-okf"]

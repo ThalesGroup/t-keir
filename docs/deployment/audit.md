@@ -2,7 +2,7 @@
 
 Two-tier **ActionRecord** storage for identity and compliance: a **hot** query
 store (hash-chained, append-only) and a **WORM** archive (immutable segments,
-optional object-lock mirror). Design decision: [ADR-0003](../adr/0003-audit-store-worm.md).
+optional object-lock mirror).
 ActionRecord shape and correlation: [Identity of Action](../regularity-component/action-identiy.md).
 
 Engineering documentation only — **not legal advice**.
@@ -157,10 +157,10 @@ Entry point: `tkeir-audit` (requires `AUDIT_HOT_STORE_URL` or exits 1).
 ## Make targets
 
 ```bash
-make audit-report CID=<correlation-id>          # FORMAT=json|html
+make audit-report CID=<correlation-id> # FORMAT=json|html
 make audit-verify AUDIT_HOT_STORE_URL=sqlite:////tmp/audit.db
 make audit-archive
-make audit-evidence                             # compliance evidence pack
+make audit-evidence # compliance evidence pack
 ```
 
 ## Compose
@@ -191,7 +191,6 @@ run `audit` and `mcp` profiles on the same host without remapping one port.
 ## Related
 
 - [Environment variables](environment.md)
-- [ADR-0003](../adr/0003-audit-store-worm.md)
 - [Identity of Action](../regularity-component/action-identiy.md)
 - [Governor](governor.md)
 - [SPIRE / SPIFFE](spire.md) (agent `actor.spiffe_id` on records)

@@ -75,6 +75,14 @@ class RecordingBackend:
             "triple_count": 0,
         }
 
+    async def okf_bundle_list(self, *, user_space):
+        self.spaces.append(user_space)
+        return {"user_space": user_space, "bundles": []}
+
+    async def okf_bundle_get(self, *, user_space, bundle_id, concept_id=None):
+        self.spaces.append(user_space)
+        return {"user_space": user_space, "bundle_id": bundle_id}
+
 
 def _spec(**kwargs: object) -> AgentSpec:
     base: dict[str, object] = {

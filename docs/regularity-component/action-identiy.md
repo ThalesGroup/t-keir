@@ -10,7 +10,7 @@ Every query, ingest, index, delete, admin override, auth lifecycle event, and
 Keycloak `sub`, service client, or **agent SPIFFE ID**) and joinable through a
 **Correlation ID** (W3C trace-id).
 
-Agent workloads obtain SPIFFE IDs via SPIRE ([ADR-0008](../adr/0008-spire-agent-identity.md);
+Agent workloads obtain SPIFFE IDs via SPIRE (
 Compose profile `spire`). Non-agent services may still omit `spiffe_id` until
 mesh expansion.
 
@@ -49,7 +49,7 @@ Verification: `tkeir-audit verify` re-hashes hot chain and cross-checks WORM
 segments. GDPR: pseudonymize subjects; crypto-shred keys outside WORM
 (`tkeir-audit forget`). Query text off by default (`request_hash` only).
 
-Detailed choice: [ADR-0003](../adr/0003-audit-store-worm.md). Ops:
+Ops:
 [Audit store](../deployment/audit.md) (Phase 4).
 
 ## Maturity mapping
@@ -57,7 +57,7 @@ Detailed choice: [ADR-0003](../adr/0003-audit-store-worm.md). Ops:
 | Level | Profile | Guarantees |
 |-------|---------|------------|
 | **M1** | P2+ | Correlated records, signed images, audit reports |
-| **M2** | P3 | Keycloak actors, token-exchange delegation, OPA SHA, hash chain + WORM + anchors; **agent SPIFFE** (ADR-0008) |
+| **M2** | P3 | Keycloak actors, token-exchange delegation, OPA SHA, hash chain + WORM + anchors; **agent SPIFFE** |
 | **M3** | P4 (partial) | Instant revocation, proof-cost telemetry; adaptive policies = future |
 
 ## Emission points (target)
@@ -71,5 +71,4 @@ HMI admin ops; Keycloak auth events.
 - [Mastering of Action](action-mastering.md)
 - [Audit store](../deployment/audit.md)
 - [SPIRE / SPIFFE](../deployment/spire.md)
-- [ADR-0001](../adr/0001-platform-architecture.md)
 - [GDPR mapping](../compliance/gdpr.md) (Phase 9)

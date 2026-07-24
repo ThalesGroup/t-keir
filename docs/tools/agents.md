@@ -13,10 +13,6 @@ LLM is `UnifiedLLMWrapper` (Ollama / OpenAI / vLLM). Tools reuse the same MCP
 **external** MCP clients. Agents call `McpHandlers` in-process against Vespa /
 RAG — see [MCP — Who uses it](mcp.md#who-uses-it-external-vs-agents).
 
-> Design: [ADR-0005](../adr/0005-agent-architecture.md),
-> [ADR-0006](../adr/0006-kg-store.md) (templates / fused KG),
-> [ADR-0007](../adr/0007-generated-content.md) (publish),
-> [ADR-0008](../adr/0008-spire-agent-identity.md).  
 > Related: [MCP](mcp.md), [Templates](templates.md),
 > [Zero to Hero §4.4](../zero_to_hero.md#44-agents-on-osint-and-enterprise-demo-data-p0).
 
@@ -25,10 +21,10 @@ RAG — see [MCP — Who uses it](mcp.md#who-uses-it-external-vs-agents).
 ## Architecture
 
 ```text
-POST /agent/runs  { agent | workflow, goal, params }
+POST /agent/runs { agent | workflow, goal, params }
         │
         ▼
-   RunStore  (.tkeir-agent/runs/{id}/)
+   RunStore (.tkeir-agent/runs/{id}/)
         │
    ┌────┴────────────────────────────┐
    │ single agent          workflow  │
@@ -207,10 +203,10 @@ Workflows are **sequential supervisor plans** (no parallel fan-out). Loaded by
 - id: research
   agent: researcher
   goal_template: "Research the corpus for: {goal}"
-  tools:                    # optional override of agent YAML tools
+  tools: # optional override of agent YAML tools
     - search
     - rag_query
-  max_steps: 8              # optional override of stop.max_steps
+  max_steps: 8 # optional override of stop.max_steps
 ```
 
 `goal_template` may use `{goal}` and any key from `params` (e.g. `{topic}`).
@@ -221,7 +217,7 @@ Workflows are **sequential supervisor plans** (no parallel fan-out). Loaded by
 - id: deliverable
   compose:
     template: synthesis_note
-    topic_from: topic       # reads params.topic (fallback: goal)
+    topic_from: topic # reads params.topic (fallback: goal)
 ```
 
 Compose uses `thot.compose` over the tenant fused KG (`UserSpaceKG`) plus
@@ -343,12 +339,12 @@ Root: `AGENT_ROOT` (Make: `.tkeir-agent/`).
 ```text
 .tkeir-agent/
   runs/{run_id}/
-    run.manifest.json     # RunState
-    blackboard.json       # append-only handoff / findings log
-    steps/000.json …      # StepRecord per loop iteration
-  jobs/{run_id}.json      # lightweight status index
-  dlq/{run_id}.json       # crashed runs
-  publishes/{run_id}/     # staged markdown (after publish)
+    run.manifest.json # RunState
+    blackboard.json # append-only handoff / findings log
+    steps/000.json … # StepRecord per loop iteration
+  jobs/{run_id}.json # lightweight status index
+  dlq/{run_id}.json # crashed runs
+  publishes/{run_id}/ # staged markdown (after publish)
 ```
 
 ---

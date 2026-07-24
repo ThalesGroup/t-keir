@@ -19,4 +19,3 @@ Bulk index/delete went wrong, or a governed rollback was requested.
    make smoke-test
    ```
 
-See ADR-0002 for supersede strategy.

@@ -1,7 +1,7 @@
 # Secure Kubernetes (P3)
 
 > **Status:** Progressive hardening — SPIRE for **agents**
-> ([ADR-0008](../adr/0008-spire-agent-identity.md)); JWT + correlation for
+>; JWT + correlation for
 > RAG/ingest until mesh expansion.
 
 P3 adds stricter **values presets** and optional cluster controls. Human
@@ -22,7 +22,7 @@ identity uses Keycloak JWTs; agent workloads carry SPIFFE IDs for mastering.
 
 | Item | Reason |
 |------|--------|
-| Full-mesh SPIFFE for every service | Agent path first (ADR-0008); RAG/ingest later |
+| Full-mesh SPIFFE for every service | Agent path first; RAG/ingest later |
 | Full default-deny NetworkPolicy mesh | Needs per-service allow rules; tracked separately |
 | cert-manager / sealed-secrets | Installer detection (Phase 7) |
 
@@ -31,15 +31,15 @@ identity uses Keycloak JWTs; agent workloads carry SPIFFE IDs for mastering.
 ```bash
 make k3d-up
 make cluster-install PROFILE=k8s-secure
-make smoke-test SMOKE_TARGET_URL=http://localhost:8090   # port-forward api first
+make smoke-test SMOKE_TARGET_URL=http://localhost:8090 # port-forward api first
 ```
 
 Linux hardened path (future):
 
 ```bash
-make k3s-server          # Linux
-make lima-k3s-up         # macOS → Lima VM → K3s + Cilium
-make k3s-check           # kube-bench (digest-pinned image)
+make k3s-server # Linux
+make lima-k3s-up # macOS → Lima VM → K3s + Cilium
+make k3s-check # kube-bench (digest-pinned image)
 ```
 
 See [macOS notes](macos.md) for Cilium / Lima and flannel fallback.
@@ -48,5 +48,4 @@ See [macOS notes](macos.md) for Cilium / Lima and flannel fallback.
 
 - [Deployment profiles](index.md)
 - [SPIRE / SPIFFE](spire.md)
-- [ADR-0008 — SPIRE agent identity](../adr/0008-spire-agent-identity.md)
 - [Governor](governor.md)

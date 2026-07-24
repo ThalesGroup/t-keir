@@ -40,6 +40,6 @@ attestation block under `dora.attestation`.
 
 - [EU Compliance OPA Audit](eu-audit.md)
 - [Latest audit results](latest-results.md)
-- ADR-0002 (ingest supersede / rollback)
-- ADR-0003 (audit + WORM)
+- 
+- 
 - [Governor](../deployment/governor.md)

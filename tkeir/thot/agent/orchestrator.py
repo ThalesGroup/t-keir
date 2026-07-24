@@ -1,7 +1,8 @@
 """Title: Multi-agent orchestrator from scratch (Phase D) — sequential only.
 
 Supervisor plan comes from ``WorkflowSpec`` YAML. Each agent phase runs the
-existing :class:`AgentLoop`; compose phases use ``thot.compose``. Explicit
+existing :class:`AgentLoop`; compose phases use ``thot.compose``. Builtin
+steps (e.g. OKF scoped export) run in-process helpers. Explicit
 :class:`Handoff` records and an append-only blackboard carry provenance.
 
 Author: Eric Blaudez
@@ -12,10 +13,13 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
 from thot.action.models import utc_now_rfc3339
+from thot.action.sink import default_action_sink
 from thot.agent.guard import AgentGuard
 from thot.agent.loop import AgentLoop, LlmClient
 from thot.agent.models import (
@@ -36,6 +40,9 @@ from thot.compose.writers import DeterministicWriter
 from thot.core.ThotMetrics import ThotMetrics
 from thot.mcp.client import OutboundMcpClient, default_outbound_client
 from thot.mcp.handlers import McpHandlers
+from thot.okf.applicator import OkfEnrichmentApplicator, enrichments_from_grounded
+from thot.okf.exporter import default_okf_root, export_scoped
+from thot.okf.models import OkfExportRequest
 
 LOGGER = logging.getLogger(__name__)
 
@@ -139,6 +146,18 @@ class Orchestrator:
                 state = self._run_compose(state, workflow, wf_step)
                 return state
 
+            if wf_step.builtin:
+                state = await self._run_builtin_step(
+                    state,
+                    workflow,
+                    wf_step,
+                    previous_agent=previous_agent,
+                )
+                if state.status in {"failed", "blocked", "killed", "cancelled"}:
+                    return state
+                previous_agent = f"builtin:{wf_step.builtin}"
+                continue
+
             if not wf_step.agent:
                 state.status = "failed"
                 state.error = f"workflow step {wf_step.id!r} missing agent"
@@ -157,6 +176,9 @@ class Orchestrator:
             if state.status in {"failed", "blocked", "killed", "cancelled"}:
                 return state
 
+            if wf_step.agent == "okf_curator":
+                self._apply_okf_enrichments(state)
+
             step_offset = state.steps_completed
             previous_agent = wf_step.agent
 
@@ -164,6 +186,145 @@ class Orchestrator:
         state.ended_at = utc_now_rfc3339()
         self.store.write_state(state)
         return state
+
+    async def _run_builtin_step(
+        self,
+        state: RunState,
+        workflow: WorkflowSpec,
+        wf_step: WorkflowStep,
+        *,
+        previous_agent: str,
+    ) -> RunState:
+        assert wf_step.builtin is not None
+        handoff = Handoff(
+            from_agent=previous_agent,
+            to_agent=f"builtin:{wf_step.builtin}",
+            reason=f"workflow:{workflow.name}:{wf_step.id}",
+            payload_summary=wf_step.builtin,
+            chunk_ids=_chunk_ids_from_state(state),
+        )
+        state.handoffs.append(handoff)
+        state.delegation_chain = list(
+            dict.fromkeys(
+                [*state.delegation_chain, f"builtin:{wf_step.builtin}"]
+            )
+        )
+        self.store.append_blackboard(
+            state.run_id,
+            {
+                "kind": "handoff",
+                "from": handoff.from_agent,
+                "to": handoff.to_agent,
+                "reason": handoff.reason,
+                "chunk_ids": handoff.chunk_ids,
+                "provenance": "orchestrator",
+                "builtin": wf_step.builtin,
+            },
+        )
+        self.guard.emit(
+            kind="agent.handoff",
+            state=state,
+            intent="agent.run",
+            ext={
+                "from_agent": handoff.from_agent,
+                "to_agent": handoff.to_agent,
+                "handoff_id": handoff.handoff_id,
+                "builtin": wf_step.builtin,
+            },
+            chunk_ids=handoff.chunk_ids,
+        )
+
+        if wf_step.builtin == "okf_scoped_export":
+            state = await self._run_okf_scoped_export(state, wf_step)
+        else:
+            state.status = "failed"
+            state.error = f"unknown builtin step: {wf_step.builtin!r}"
+            state.ended_at = utc_now_rfc3339()
+            self.store.write_state(state)
+        return state
+
+    async def _run_okf_scoped_export(
+        self, state: RunState, wf_step: WorkflowStep
+    ) -> RunState:
+        params = dict(state.params or {})
+        for key in wf_step.params_from:
+            if key not in params and key == "query":
+                params["query"] = state.goal
+            if key not in params and key == "topic":
+                params["topic"] = params.get("topic") or state.goal
+        query = str(params.get("query") or params.get("topic") or state.goal)
+        request = OkfExportRequest(
+            user_space=state.user_space,
+            query=query,
+            max_docs=int(params.get("max_docs") or 50),
+            output_dir=None,
+        )
+        try:
+            result = await export_scoped(
+                request, action_sink=default_action_sink()
+            )
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.exception("okf_scoped_export failed")
+            state.status = "failed"
+            state.error = f"okf_scoped_export: {exc}"
+            state.ended_at = utc_now_rfc3339()
+            self.store.write_state(state)
+            return state
+        out_key = wf_step.output_key or "bundle_id"
+        state.params = {**params, out_key: result.bundle.bundle_id}
+        self.store.append_blackboard(
+            state.run_id,
+            {
+                "kind": "builtin",
+                "builtin": "okf_scoped_export",
+                "bundle_id": result.bundle.bundle_id,
+                "path": result.bundle.path,
+                "concept_count": result.bundle.concept_count,
+                "provenance": "orchestrator",
+            },
+        )
+        self.guard.emit(
+            kind="okf.export.scoped",
+            state=state,
+            intent="okf.export",
+            ext={
+                "bundle_id": result.bundle.bundle_id,
+                "path": result.bundle.path,
+            },
+        )
+        self.store.write_state(state)
+        return state
+
+    def _apply_okf_enrichments(self, state: RunState) -> None:
+        bundle_id = str((state.params or {}).get("bundle_id") or "")
+        if not bundle_id or state.result is None:
+            return
+        root = default_okf_root() / bundle_id
+        if not root.is_dir():
+            bb = self.store.blackboard_path(state.run_id)
+            if bb.is_file():
+                data = json.loads(bb.read_text(encoding="utf-8"))
+                for entry in data.get("entries") or []:
+                    if (
+                        entry.get("bundle_id") == bundle_id
+                        and entry.get("path")
+                    ):
+                        root = Path(str(entry["path"]))
+                        break
+        if not root.is_dir():
+            LOGGER.warning("okf applicator: bundle root missing %s", root)
+            return
+        enrichment = enrichments_from_grounded(state.result)
+        summary = OkfEnrichmentApplicator(root).apply(enrichment)
+        self.store.append_blackboard(
+            state.run_id,
+            {
+                "kind": "okf_enrichment",
+                "bundle_id": bundle_id,
+                "summary": summary,
+                "provenance": "orchestrator",
+            },
+        )
 
     async def _run_agent_step(
         self,
@@ -277,7 +438,6 @@ class Orchestrator:
         )
         kg = UserSpaceKG(state.user_space, use_process_cache=False)
         kg.load(demo_turtles(), document_ids=["doc_a"])
-        # Prefer topic entity label when goal is long
         short_topic = str(state.params.get("topic") or topic.split()[-1])
         result = compose(
             str(template),

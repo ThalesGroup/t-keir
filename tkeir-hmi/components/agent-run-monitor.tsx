@@ -16,6 +16,7 @@ type RunPayload = {
     error?: string | null;
     correlation_id?: string;
     usage?: Record<string, number>;
+    params?: Record<string, unknown>;
   };
   steps?: Array<{
     step_index: number;
@@ -284,6 +285,19 @@ export function AgentRunMonitor() {
               <dt className="text-muted-foreground">Goal</dt>
               <dd>{payload?.run?.goal ?? goal}</dd>
             </div>
+            {typeof payload?.run?.params?.bundle_id === "string" ? (
+              <div className="sm:col-span-2">
+                <dt className="text-muted-foreground">OKF bundle_id</dt>
+                <dd className="font-mono text-xs">
+                  <Link
+                    href="/okf"
+                    className="underline underline-offset-2"
+                  >
+                    {payload.run.params.bundle_id}
+                  </Link>
+                </dd>
+              </div>
+            ) : null}
             {payload?.run?.error ? (
               <div className="sm:col-span-2 text-destructive">
                 {payload.run.error}

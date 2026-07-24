@@ -141,5 +141,4 @@ Chart: `deploy/charts/tkeir-ingest` (PVC for `/var/tkeir/ingest`).
 
 ## Related
 
-- [ADR-0002: Ingest supersede strategy](../adr/0002-ingest-supersede.md)
 - [Compose profile](compose.md)

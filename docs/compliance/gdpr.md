@@ -49,5 +49,5 @@ Items marked **Legal / reviewer (not code)** need human/legal sign-off in
 - [Latest audit results](latest-results.md)
 - [Legal / reviewer checklist](legal-review-checklist.md)
 - [Security](../security.md)
-- ADR-0003 (audit + WORM)
+- 
 - [DSR runbook](../runbooks/dsr.md)

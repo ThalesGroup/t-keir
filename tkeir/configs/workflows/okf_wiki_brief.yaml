@@ -1,0 +1,32 @@
+name: okf_wiki_brief
+version: 1
+description: >
+  Query → scoped OKF bundle → enrich → compose synthesis.
+  Produces a grounded OKF bundle + a synthesis_note for the query topic.
+template: synthesis_note
+budgets:
+  llm_tokens: 80000
+  tool_calls: 60
+  wall_seconds: 900
+steps:
+  - id: scope_bundle
+    builtin: okf_scoped_export
+    params_from: [query, topic]
+    output_key: bundle_id
+
+  - id: curate
+    agent: okf_curator
+    goal_template: >
+      Enrich the OKF knowledge bundle {bundle_id} for the topic: {topic}.
+      Use the bundle as your knowledge base. Ground every claim in chunk_ids.
+    tools:
+      - search
+      - rag_query
+      - ontology_query
+      - okf_bundle_get
+    max_steps: 12
+
+  - id: deliverable
+    compose:
+      template: synthesis_note
+      topic_from: topic

@@ -27,4 +27,3 @@ outputs and may have influenced an agent.
 ## Related
 
 - [Agents](../tools/agents.md) — safety envelopes
-- ADR-0005

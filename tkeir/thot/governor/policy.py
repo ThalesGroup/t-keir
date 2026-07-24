@@ -27,6 +27,7 @@ INTENT_SCOPE = {
     "agent.run": "intent:agent.run",
     "generate": "intent:generate",
     "tool.invoke": "intent:tool.invoke",
+    "okf.export": "intent:okf.export",
 }
 
 INTENT_KILL_SCOPE: dict[str, KillScope | None] = {
@@ -38,9 +39,10 @@ INTENT_KILL_SCOPE: dict[str, KillScope | None] = {
     "agent.run": "agents",
     "generate": "agents",
     "tool.invoke": "agents",
+    "okf.export": "inference",
 }
 
-WRITE_INTENTS = frozenset({"ingest", "index", "delete"})
+WRITE_INTENTS = frozenset({"ingest", "index", "delete", "okf.export"})
 
 
 def _payload_has_scope(payload: dict, scope: str) -> bool:

@@ -2,7 +2,7 @@
 
 Agent workloads carry a **SPIFFE ID** on every ActionRecord so mastering can
 attribute the *machine* actor, not only the human `user_space` tenant
-([ADR-0008](../adr/0008-spire-agent-identity.md)). Non-agent services (RAG,
+. Non-agent services (RAG,
 ingest, indexer) remain JWT + correlation based until mesh expansion.
 
 Engineering documentation only — **not legal advice**.
@@ -103,7 +103,7 @@ before SPIRE registration completes.
 
 ```bash
 export SPIFFE_MODE=dev
-export SPIFFE_ENFORCE=false   # or true once testing mastering
+export SPIFFE_ENFORCE=false # or true once testing mastering
 make agent
 # IDs become spiffe://tkeir.local/agent/<agent_yaml_name>
 ```
@@ -174,7 +174,7 @@ Deployment and set `SPIFFE_MODE=workload` (+ enforce as needed).
 ## Related
 
 - [Environment variables](environment.md)
-- [ADR-0008](../adr/0008-spire-agent-identity.md) (supersedes ADR-0004 deferral)
+- 
 - [Agents](../tools/agents.md)
 - [Governor](governor.md)
 - [Audit](audit.md)

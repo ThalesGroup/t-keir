@@ -11,7 +11,7 @@ charts/Compose services with stricter value presets.
 | **P0** `dev-local` | `uv` + Docker (+ [devcontainer](../devcontainer.md)) | `make setup` → `bootstrap` → `index` → `rag` + HMI; Vespa streaming group **`dev@tkeir`** |
 | **P1** `compose` | Docker Compose | Full stack + Keycloak (`auth`); JWT → per-user Vespa space — [Compose](compose.md) |
 | **P2** `k8s-dev` | k3d / any cluster | Umbrella Helm, permissive security — [Kubernetes (dev)](k8s.md) |
-| **P3** `k8s-secure` | Hardened K3s | Governor enforce, audit, auth on; agent SPIFFE via SPIRE — [Secure cluster](k8s-secure.md) (ADR-0008) |
+| **P3** `k8s-secure` | Hardened K3s | Governor enforce, audit, auth on; agent SPIFFE via SPIRE — [Secure cluster](k8s-secure.md) |
 | **P4** `platform` | P3 + platform add-ons | Kubeflow Pipelines standalone + Model Registry, governor enforced, WORM retention, evidence automation |
 
 ## Rules
@@ -21,7 +21,7 @@ charts/Compose services with stricter value presets.
   needs Linux eBPF) or accept the flannel maturity downgrade.
 - **On-demand install:** the installer (Phase 7) detects existing Prometheus,
   cert-manager, IdP, GPU, object-lock buckets, etc., and only deploys missing
-  pieces. **SPIRE** is required for the **agents** path (ADR-0008); optional
+  pieces. **SPIRE** is required for the **agents** path; optional
   for RAG-only deployments.
 - **Pins:** `deploy/versions.lock.yaml`.
 
@@ -37,10 +37,6 @@ charts/Compose services with stricter value presets.
 
 ## Related design
 
-- [ADR-0001](../adr/0001-platform-architecture.md)
-- [ADR-0002](../adr/0002-ingest-supersede.md)
-- [ADR-0003](../adr/0003-audit-store-worm.md)
-- [ADR-0008](../adr/0008-spire-agent-identity.md)
 - [Identity of Action](../regularity-component/action-identiy.md)
 - [Mastering of Action](../regularity-component/action-mastering.md)
 - [Security](../security.md)

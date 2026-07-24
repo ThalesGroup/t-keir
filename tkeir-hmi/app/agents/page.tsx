@@ -21,12 +21,33 @@ export default function AgentsPage() {
 
       <AgentRunMonitor />
 
+      <div className="rounded-xl border bg-card p-4 text-sm shadow-sm">
+        <h2 className="font-semibold">Workflow cards</h2>
+        <ul className="mt-2 space-y-2 text-muted-foreground">
+          <li>
+            <span className="font-medium text-foreground">content_brief</span> —
+            researcher → analyst → synthesis_note
+          </li>
+          <li>
+            <span className="font-medium text-foreground">okf_wiki_brief</span> —
+            scoped OKF export → okf_curator → synthesis_note (shows{" "}
+            <code>bundle_id</code> when present)
+          </li>
+        </ul>
+      </div>
+
       <div className="flex gap-4 text-sm">
         <Link
           href="/"
           className="text-primary underline-offset-2 hover:underline"
         >
           ← Search
+        </Link>
+        <Link
+          href="/okf"
+          className="text-primary underline-offset-2 hover:underline"
+        >
+          OKF Bundles
         </Link>
         <Link
           href="/admin"

@@ -38,8 +38,8 @@ def test_load_rag_config_includes_dual_hybrid():
     assert config.dual_hybrid.business_ontology.index_enabled is True
     assert config.dual_hybrid.business_ontology.search_enabled is True
     assert "workspace" in config.dual_hybrid.index_dump.path
-    assert config.dual_hybrid.query_expansion.enabled is True
-    assert config.dual_hybrid.ontology_scoring.enabled is True
+    assert config.dual_hybrid.query_expansion.enabled is False
+    assert config.dual_hybrid.ontology_scoring.enabled is False
     assert config.dual_hybrid.ontology_scoring.rescore_weight > 0
     assert config.dual_hybrid.final_fusion.top_k_returned >= 1
 

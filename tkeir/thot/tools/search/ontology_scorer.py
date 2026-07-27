@@ -183,7 +183,7 @@ class OntologyScorer:
 class OntologyRescorer:
     """Blend first-stage ranks with ontology overlap (optional Graph-RAG stage).
 
-    Controlled by ``dual_hybrid.ontology_scoring.enabled`` (default true).
+    Controlled by ``dual_hybrid.ontology_scoring.enabled`` (default false).
     """
 
     def __init__(

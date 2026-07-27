@@ -23,7 +23,7 @@ endif
 	deps-check deps-update deps-update-safe verify-lockfile tag changelog \
 	bom sbom aibom trivy owasp-dependency-check security-report \
 	docs docs-build docs-pdf pipeline quickstart ci-deps ci pre-commit clean devcontainer \
-	sync pull-models pull-bge-model start init bootstrap vespa-check test-vespa test-vespa-py \
+	sync pull-models pull-bge-model pull-vespa start init bootstrap vespa-check test-vespa test-vespa-py \
 	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
 	beir-eval beir-smoke eval eval-smoke clean-db vespa-clean logs \
 	images images-push images-sign \
@@ -67,6 +67,8 @@ BUILD_DATE  := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 TKEIR_DIR := $(ROOT)/tkeir
 HMI_DIR := $(ROOT)/tkeir-hmi
 VESPA_DIR := $(ROOT)/vespa
+# Host P0 Vespa image (matches vespa/start_vespa.sh and deploy/versions.lock.yaml).
+VESPA_IMAGE ?= vespaengine/vespa
 TESTS_DIR := $(TKEIR_DIR)/tests
 CONFIGS_DIR := $(TKEIR_DIR)/configs
 SCRIPTS_DIR := $(ROOT)/scripts
@@ -271,17 +273,18 @@ init-models: install ## Build tkeir_mwe.pkl from annotation resources (skip if p
 			--output resources/modeling/tokenizer/en/tkeir_mwe.pkl; \
 	fi
 
-setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3)
+setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3 → Vespa image)
 	$(MAKE) install
 	$(MAKE) install-spacy-models
 	$(MAKE) install-tesseract
 	$(MAKE) init-models
 	$(MAKE) pull-bge-model
+	$(MAKE) pull-vespa
 	$(Q)echo ""
 	$(Q)echo "Setup complete."
 	$(Q)echo "  Run pipeline: make pipeline"
 	$(Q)echo "  Or demo:      make quickstart"
-	$(Q)echo "  Vespa:        make bootstrap"
+	$(Q)echo "  Vespa:        make bootstrap   # start container + deploy schemas"
 	$(Q)echo "  Index:        make index          # thot.tools.ingest"
 	$(Q)echo "  Search/RAG:   make rag            # thot.tools.search"
 	$(Q)echo "  Eval smoke:   make eval-smoke     # thot.tools.eval"
@@ -928,8 +931,12 @@ pull-models: install ## Ensure local BGE-M3 under resources/modeling/net + optio
 		$(UV) run --python $(PYTHON) python -m thot.tools.search.pull_models \
 			$(if $(filter 1,$(FORCE_BGE)),--force-bge,)
 
+pull-vespa: check-docker ## Pull Vespa Docker image (VESPA_IMAGE=$(VESPA_IMAGE))
+	$(Q)echo "Pulling $(VESPA_IMAGE)…"
+	docker pull "$(VESPA_IMAGE)"
+
 start: check-docker ## Start Vespa Docker container
-	cd $(VESPA_DIR) && ./start_vespa.sh
+	cd $(VESPA_DIR) && VESPA_IMAGE="$(VESPA_IMAGE)" ./start_vespa.sh
 
 init: install ## Deploy Vespa schemas (container must be running)
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.search.init_vespa --skip-start

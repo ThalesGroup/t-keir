@@ -141,7 +141,7 @@ dual_hybrid:
     # Resolve query (+ NLP seeds when nlp_seed_expansion applies) against the
     # per-request business ontology; expand synonym / narrower / broader /
     # related / paraphrase for BM25 probe + ontology_concepts.
-    enabled: true
+    enabled: false
     max_terms_per_relation: 5
     weights:
       original: 1.0
@@ -151,7 +151,7 @@ dual_hybrid:
       related: 0.2
       paraphrase: 0.85
     nlp_seed_expansion:
-      enabled: true
+      enabled: false
       min_tokens: 32
       # Also trigger on multi-sentence queries (even if under min_tokens).
       min_sentences: 2
@@ -164,7 +164,7 @@ dual_hybrid:
     top_n_after_fusion: 120
   ontology_scoring:
     # Optional OntologyRescorer after first-stage ranks (before ColBERT).
-    enabled: true
+    enabled: false
     rescore_weight: 0.13
     match_weights:
       exact: 1.0

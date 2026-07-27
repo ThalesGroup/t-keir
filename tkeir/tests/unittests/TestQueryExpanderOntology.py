@@ -174,8 +174,16 @@ def test_nlp_seed_expansion_config_loaded():
     from thot.tools.search.rag_config import load_rag_config
 
     cfg = load_rag_config().dual_hybrid.query_expansion.nlp_seed_expansion
-    assert cfg.enabled is True
+    assert cfg.enabled is False
     assert cfg.min_tokens >= 1
+
+
+def test_ontology_scoring_config_loaded():
+    from thot.tools.search.rag_config import load_rag_config
+
+    cfg = load_rag_config().dual_hybrid.ontology_scoring
+    assert cfg.enabled is False
+    assert float(cfg.rescore_weight) > 0.0
 
 
 def test_ontology_scorer_exact_and_neutral():
@@ -234,14 +242,6 @@ def test_ontology_rescorer_disabled_keeps_first_stage():
         [("a", 0.2, ["ML"]), ("b", 0.9, [])],
     )
     assert [doc for doc, _ in ranked] == ["b", "a"]
-
-
-def test_ontology_scoring_config_enabled():
-    from thot.tools.search.rag_config import load_rag_config
-
-    cfg = load_rag_config().dual_hybrid.ontology_scoring
-    assert cfg.enabled is True
-    assert float(cfg.rescore_weight) > 0.0
 
 
 def test_ontology_scorer_extracts_json_ld_labels():

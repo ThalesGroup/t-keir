@@ -1,6 +1,6 @@
 # BEIR Retrieval Evaluation Report
 
-_Generated 2026-07-27 05:36 UTC_
+_Generated 2026-07-27 09:42 UTC_
 
 ## Overview
 
@@ -20,7 +20,7 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 | Dataset | Best published | Best score | **T-KEIR** | Gap T-KEIR → best | Local BM25 | Gap BM25 → best | Local Dense | Gap Dense → best |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| ArguAna | SPLADE | 0.472 | 0.455 | -0.017 | 0.384 | -0.088 | 0.529 | +0.057 |
+| ArguAna | SPLADE | 0.472 | 0.465 | -0.007 | 0.384 | -0.088 | 0.529 | +0.057 |
 
 ### Published baselines (reference)
 
@@ -32,7 +32,7 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 | Dataset | Best system | Best NDCG@10 | T-KEIR gap | Local BM25 gap | Local Dense gap | T-KEIR vs BM25 | T-KEIR vs SPLADE | T-KEIR vs Contriever |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| ArguAna | SPLADE | 0.472 | -0.017 | -0.088 | +0.057 | +0.058 | -0.017 | +0.020 |
+| ArguAna | SPLADE | 0.472 | -0.007 | -0.088 | +0.057 | +0.068 | -0.007 | +0.030 |
 
 ## Per-dataset metrics
 
@@ -43,14 +43,14 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 - BGE-M3 dense+sparse baseline: `bge-m3` (local `resources/modeling/net/bge-m3`)
 - **Best published system:** `SPLADE` (NDCG@10 = 0.472)
 - T-KEIR status: **ok** (`hybrid_retrieve.retrieve_hybrid`)
-- **T-KEIR gap to best (SPLADE):** `-0.017` (T-KEIR 0.455 − 0.472)
+- **T-KEIR gap to best (SPLADE):** `-0.007` (T-KEIR 0.465 − 0.472)
 - Local BM25 gap to best: `-0.088`
 - Local Dense gap to best: `+0.057`
 
 | Metric | T-KEIR | Local BM25 | Local Dense |
 |---|---:|---:|---:|
-| NDCG@10 | 0.455 | 0.384 | 0.529 |
-| MAP@100 | 0.383 | 0.320 | 0.443 |
+| NDCG@10 | 0.465 | 0.384 | 0.529 |
+| MAP@100 | 0.395 | 0.320 | 0.443 |
 | Recall@100 | 0.980 | 0.841 | 0.984 |
 
 #### Error analysis (T-KEIR)
@@ -61,9 +61,9 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 > Being vegetarian helps the environment Becoming a vegetarian is an environmentally friendly thing to do. Modern farming is one of the main sources of pollution in our rivers. Beef farming is one of the main causes of deforestation, and as long as people continue to buy fast food in their billions, there will be a financial incentive to continue cutting down trees to make room for cattle. Because of our desire to eat fish, our rivers and seas are being emptied of fish and many species are facing extinction. Energy resources are used up much more greedily by meat farming than my farming cereals, pulses etc. Eating meat and fish not only causes cruelty to animals, it causes serious harm to the environment and to biodiversity. For example consider Meat production related pollution and defores…
 
-**Observation:** Rank #2 doc `test-international-sepiahbaaw-pro02a` (score=0.8319) is not relevant. Snippet: ss economic policy international africa house believes africans are worse Environmental Damage Both licit and illicit resource extraction have caused ecological and environmental damage in Africa. Th…
+**Observation:** Rank #2 doc `test-international-sepiahbaaw-pro02a` (score=0.8682) is not relevant. Snippet: ss economic policy international africa house believes africans are worse Environmental Damage Both licit and illicit resource extraction have caused ecological and environmental damage in Africa. Th…
 
-**Analysis:** Irrelevant document ranked #2 (score=0.8319) despite not being in the qrels. Lexical coverage vs query: **13%** (44/332 query tokens). Shared: `1`, `2`, `3`, `4`, `a`, `agriculture`, `and`, `are`, `as`, `august`, `being`, `but` … (+32 more). Query tokens absent from this hit: `000`, `10`, `100`, `13`, `17`, `18`, `1992`, `1997`, `2003`, `2004`, `2006`, `2008` … (+276 more). Best gold `test-environment-aeghhgwpe-pro02b` covers **25%** of query tokens (shared: `1`, `18`, `2`, `2008`, `4`, `5`, `a`, `about`, `all`, `an`, `and`, `animals` … (+70 more); missing on gold: `000`, `10`, `100`, `13`, `17`, `1992`, `1997`, `2003`, `2004`, `2006`, `2009`, `21st` … (+238 more)). Gold has stronger query overlap than this hit, yet still lost the top ranks — hybrid / dense scores or competing near-duplicates likely dominated early retrieval.
+**Analysis:** Irrelevant document ranked #2 (score=0.8682) despite not being in the qrels. Lexical coverage vs query: **13%** (44/332 query tokens). Shared: `1`, `2`, `3`, `4`, `a`, `agriculture`, `and`, `are`, `as`, `august`, `being`, `but` … (+32 more). Query tokens absent from this hit: `000`, `10`, `100`, `13`, `17`, `18`, `1992`, `1997`, `2003`, `2004`, `2006`, `2008` … (+276 more). Best gold `test-environment-aeghhgwpe-pro02b` covers **25%** of query tokens (shared: `1`, `18`, `2`, `2008`, `4`, `5`, `a`, `about`, `all`, `an`, `and`, `animals` … (+70 more); missing on gold: `000`, `10`, `100`, `13`, `17`, `1992`, `1997`, `2003`, `2004`, `2006`, `2009`, `21st` … (+238 more)). Gold has stronger query overlap than this hit, yet still lost the top ranks — hybrid / dense scores or competing near-duplicates likely dominated early retrieval.
 
 **2. False positive** — query id `test-environment-aeghhgwpe-pro01a`
 
@@ -71,9 +71,9 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 > It is immoral to kill animals As evolved human beings it is our moral duty to inflict as little pain as possible for our survival. So if we do not need to inflict pain to animals in order to survive, we should not do it. Farm animals such as chickens, pigs, sheep, and cows are sentient living beings like us - they are our evolutionary cousins and like us they can feel pleasure and pain. The 18th century utilitarian philosopher Jeremy Bentham even believed that animal suffering was just as serious as human suffering and likened the idea of human superiority to racism. It is wrong to farm and kill these animals for food when we do not need to do so. The methods of farming and slaughter of these animals are often barbaric and cruel - even on supposedly 'free range' farms. [1] Ten billion ani…
 
-**Observation:** Rank #2 doc `training-environment-ahwbsawhnbsf-pro02a` (score=0.8644) is not relevant. Snippet: We should treat animals well It is important to treat animals as kindly as we can. Not causing harm to others is among the basic human rights. Although these rights cannot be said to apply directly t…
+**Observation:** Rank #2 doc `training-environment-assghbansb-pro02a` (score=0.8728) is not relevant. Snippet: Harming animals for entertainment is immoral If a creature suffers then there can be no moral justification for refusing to take that suffering into consideration. All animals are sentient beings tha…
 
-**Analysis:** Irrelevant document ranked #2 (score=0.8644) despite not being in the qrels. Lexical coverage vs query: **24%** (53/218 query tokens). Shared: `1`, `2`, `a`, `all`, `an`, `and`, `animal`, `animals`, `are`, `as`, `at`, `be` … (+41 more). Query tokens absent from this hit: `18th`, `1989`, `2008`, `30`, `adulterated`, `ago`, `analogy`, `another`, `antibiotics`, `any`, `around`, `barbaric` … (+153 more). Best gold `test-environment-aeghhgwpe-pro01b` covers **25%** of query tokens (shared: `a`, `all`, `an`, `and`, `animal`, `animals`, `are`, `around`, `be`, `beings`, `but`, `by` … (+42 more); missing on gold: `1`, `18th`, `1989`, `2`, `2008`, `30`, `adulterated`, `ago`, `analogy`, `another`, `antibiotics`, `any` … (+152 more)). Gold has stronger query overlap than this hit, yet still lost the top ranks — hybrid / dense scores or competing near-duplicates likely dominated early retrieval.
+**Analysis:** Irrelevant document ranked #2 (score=0.8728) despite not being in the qrels. Lexical coverage vs query: **30%** (65/218 query tokens). Shared: `a`, `all`, `an`, `and`, `animal`, `animals`, `any`, `are`, `as`, `barbaric`, `be`, `because` … (+53 more). Query tokens absent from this hit: `1`, `18th`, `1989`, `2`, `2008`, `30`, `adulterated`, `ago`, `analogy`, `another`, `antibiotics`, `around` … (+141 more). Best gold `test-environment-aeghhgwpe-pro01b` covers **25%** of query tokens (shared: `a`, `all`, `an`, `and`, `animal`, `animals`, `are`, `around`, `be`, `beings`, `but`, `by` … (+42 more); missing on gold: `1`, `18th`, `1989`, `2`, `2008`, `30`, `adulterated`, `ago`, `analogy`, `another`, `antibiotics`, `any` … (+152 more)). The false positive matches the query surface form as well as or better than the gold — ranking rewarded topical / lexical similarity rather than labeled relevance (paraphrase, stance, or answer-specific content).
 
 **3. False positive** — query id `test-environment-aeghhgwpe-pro03a`
 
@@ -81,9 +81,9 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 > Vegetarianism is healthier There are significant health benefits to 'going veggie'; a vegetarian diet contains high quantities of fibre, vitamins, and minerals, and is low in fat. (A vegan diet is even better since eggs and dairy products are high in cholesterol.) The risk of contracting many forms of cancer is increased by eating meat: in 1996 the American Cancer Society recommended that red meat should be excluded from the diet entirely. Eating meat also increases the risk of heart disease - vegetables contain no cholesterol, which can build up to cause blocked arteries in meat-eaters. An American study found out that: “that men in the highest quintile of red-meat consumption — those who ate about 5 oz. of red meat a day, roughly the equivalent of a small steak had a 31% higher risk of …
 
-**Observation:** Rank #2 doc `test-environment-aeghhgwpe-pro04b` (score=0.8423) is not relevant. Snippet: animals environment general health health general weight philosophy ethics Food safety and hygiene are very important for everyone, and governments should act to ensure that high standards are in pla…
+**Observation:** Rank #2 doc `test-environment-aeghhgwpe-pro04b` (score=0.8609) is not relevant. Snippet: animals environment general health health general weight philosophy ethics Food safety and hygiene are very important for everyone, and governments should act to ensure that high standards are in pla…
 
-**Analysis:** Irrelevant document ranked #2 (score=0.8423) despite not being in the qrels. Lexical coverage vs query: **23%** (34/147 query tokens). Shared: `1`, `10`, `2009`, `a`, `about`, `and`, `are`, `as`, `be`, `by`, `can`, `diet` … (+22 more). Query tokens absent from this hit: `1996`, `23rd`, `31`, `5`, `against`, `also`, `american`, `an`, `approximately`, `arteries`, `ate`, `bean` … (+101 more). Best gold `test-environment-aeghhgwpe-pro03b` covers **27%** of query tokens (shared: `1`, `5`, `a`, `also`, `and`, `are`, `as`, `be`, `benefits`, `by`, `can`, `cholesterol` … (+28 more); missing on gold: `10`, `1996`, `2009`, `23rd`, `31`, `about`, `against`, `american`, `an`, `approximately`, `arteries`, `ate` … (+95 more)). Gold has stronger query overlap than this hit, yet still lost the top ranks — hybrid / dense scores or competing near-duplicates likely dominated early retrieval.
+**Analysis:** Irrelevant document ranked #2 (score=0.8609) despite not being in the qrels. Lexical coverage vs query: **23%** (34/147 query tokens). Shared: `1`, `10`, `2009`, `a`, `about`, `and`, `are`, `as`, `be`, `by`, `can`, `diet` … (+22 more). Query tokens absent from this hit: `1996`, `23rd`, `31`, `5`, `against`, `also`, `american`, `an`, `approximately`, `arteries`, `ate`, `bean` … (+101 more). Best gold `test-environment-aeghhgwpe-pro03b` covers **27%** of query tokens (shared: `1`, `5`, `a`, `also`, `and`, `are`, `as`, `be`, `benefits`, `by`, `can`, `cholesterol` … (+28 more); missing on gold: `10`, `1996`, `2009`, `23rd`, `31`, `about`, `against`, `american`, `an`, `approximately`, `arteries`, `ate` … (+95 more)). Gold has stronger query overlap than this hit, yet still lost the top ranks — hybrid / dense scores or competing near-duplicates likely dominated early retrieval.
 
 **4. False negative** — query id `test-sport-otshwbe2uuyt-pro01a`
 
@@ -93,7 +93,7 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 **Observation:** Gold doc `test-sport-otshwbe2uuyt-pro01b` completely missed (not in top-100). Snippet: olympics team sports house would boycott euro 2012 ukraine unless yulia timoshenko Attending football matches is not giving approval to a country’s government. Leaders when attending international fo…
 
-**Analysis:** Gold `test-sport-otshwbe2uuyt-pro01b` is absent from the top-100 — a complete miss for this judgment. Gold lexical coverage vs query: **14%** (shared: `2012`, `a`, `and`, `approval`, `are`, `as`, `back`, `country`, `for`, `house`, `international`, `is` … (+11 more); missing on gold: `1`, `11`, `118th`, `130th`, `152nd`, `16`, `2`, `2007`, `2010`, `2011`, `3`, `4` … (+130 more)). Low surface overlap suggests paraphrase, synonymy, or specialized phrasing the retriever did not bridge. Top retrieved instead: #1 `test-sport-otshwbe2uuyt-pro02a` (score=0.8409, coverage=33%); #2 `test-sport-otshwbe2uuyt-con05a` (score=0.8315, coverage=24%); #3 `test-international-emephsate-con02b` (score=0.8156, coverage=35%).
+**Analysis:** Gold `test-sport-otshwbe2uuyt-pro01b` is absent from the top-100 — a complete miss for this judgment. Gold lexical coverage vs query: **14%** (shared: `2012`, `a`, `and`, `approval`, `are`, `as`, `back`, `country`, `for`, `house`, `international`, `is` … (+11 more); missing on gold: `1`, `11`, `118th`, `130th`, `152nd`, `16`, `2`, `2007`, `2010`, `2011`, `3`, `4` … (+130 more)). Low surface overlap suggests paraphrase, synonymy, or specialized phrasing the retriever did not bridge. Top retrieved instead: #1 `test-sport-otshwbe2uuyt-pro02a` (score=0.8571, coverage=33%); #2 `test-sport-otshwbe2uuyt-con05a` (score=0.8503, coverage=24%); #3 `test-sport-otshwbe2uuyt-con02a` (score=0.8245, coverage=25%).
 
 **5. False negative** — query id `test-free-speech-debate-nshbbsbfb-pro04a`
 
@@ -103,7 +103,7 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 **Observation:** Gold doc `test-free-speech-debate-nshbbsbfb-pro04b` completely missed (not in top-100). Snippet: nothing sacred house believes bbc should be free blaspheme There is clearly a different threshold between the questions “do I like soap operas?” and “do I appreciate having my beliefs excoriated on n…
 
-**Analysis:** Gold `test-free-speech-debate-nshbbsbfb-pro04b` is absent from the top-100 — a complete miss for this judgment. Gold lexical coverage vs query: **16%** (shared: `a`, `as`, `bbc`, `be`, `here`, `i`, `is`, `like`, `offence`, `on`, `programme`, `should` … (+5 more); missing on gold: `able`, `allow`, `already`, `although`, `an`, `appears`, `assume`, `assumption`, `at`, `avoiding`, `basic`, `become` … (+76 more)). Low surface overlap suggests paraphrase, synonymy, or specialized phrasing the retriever did not bridge. Top retrieved instead: #1 `test-free-speech-debate-nshbbsbfb-pro02a` (score=0.8774, coverage=36%); #2 `test-free-speech-debate-nshbbsbfb-con03a` (score=0.8604, coverage=33%); #3 `test-free-speech-debate-nshbbsbfb-pro03a` (score=0.8408, coverage=33%).
+**Analysis:** Gold `test-free-speech-debate-nshbbsbfb-pro04b` is absent from the top-100 — a complete miss for this judgment. Gold lexical coverage vs query: **16%** (shared: `a`, `as`, `bbc`, `be`, `here`, `i`, `is`, `like`, `offence`, `on`, `programme`, `should` … (+5 more); missing on gold: `able`, `allow`, `already`, `although`, `an`, `appears`, `assume`, `assumption`, `at`, `avoiding`, `basic`, `become` … (+76 more)). Low surface overlap suggests paraphrase, synonymy, or specialized phrasing the retriever did not bridge. Top retrieved instead: #1 `test-free-speech-debate-nshbbsbfb-pro02a` (score=0.8939, coverage=36%); #2 `test-free-speech-debate-nshbbsbfb-con03a` (score=0.8774, coverage=33%); #3 `test-free-speech-debate-nshbbsbfb-pro03a` (score=0.8544, coverage=33%).
 
 **6. False negative** — query id `test-free-speech-debate-yfsdfkhbwu-con02a`
 
@@ -113,7 +113,7 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 **Observation:** Gold doc `test-free-speech-debate-yfsdfkhbwu-con02b` completely missed (not in top-100). Snippet: y free speech debate free know house believes western universities Singapore in this particular instance is securing far more than a ‘service provider’ from a university whose foundation precedes tha…
 
-**Analysis:** Gold `test-free-speech-debate-yfsdfkhbwu-con02b` is absent from the top-100 — a complete miss for this judgment. Gold lexical coverage vs query: **15%** (shared: `a`, `an`, `and`, `argue`, `as`, `be`, `benefit`, `by`, `for`, `free`, `from`, `here` … (+14 more); missing on gold: `15`, `2009`, `academics`, `accept`, `adopt`, `announced`, `appears`, `apply`, `approach`, `are`, `arrangement`, `asian` … (+138 more)). Low surface overlap suggests paraphrase, synonymy, or specialized phrasing the retriever did not bridge. Top retrieved instead: #1 `test-free-speech-debate-yfsdfkhbwu-con03a` (score=0.8447, coverage=25%); #2 `training-digital-freedoms-pidfakhwcs-pro01a` (score=0.8109, coverage=24%); #3 `test-education-udfakusma-pro02a` (score=0.7957, coverage=24%).
+**Analysis:** Gold `test-free-speech-debate-yfsdfkhbwu-con02b` is absent from the top-100 — a complete miss for this judgment. Gold lexical coverage vs query: **15%** (shared: `a`, `an`, `and`, `argue`, `as`, `be`, `benefit`, `by`, `for`, `free`, `from`, `here` … (+14 more); missing on gold: `15`, `2009`, `academics`, `accept`, `adopt`, `announced`, `appears`, `apply`, `approach`, `are`, `arrangement`, `asian` … (+138 more)). Low surface overlap suggests paraphrase, synonymy, or specialized phrasing the retriever did not bridge. Top retrieved instead: #1 `test-free-speech-debate-yfsdfkhbwu-con03a` (score=0.8725, coverage=25%); #2 `training-digital-freedoms-pidfakhwcs-pro01a` (score=0.8388, coverage=24%); #3 `test-education-udfakusma-pro02a` (score=0.8251, coverage=24%).
 
 **7. Near miss** — query id `test-environment-assgbatj-pro05a`
 
@@ -121,9 +121,9 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 > It would send out a consistent message Most countries have animal welfare laws to prevent animal cruelty but have laws like the UK’s Animals (Scientific Procedures) Act 1986, [10] that stop animal testing being a crime. This makes means some people can do things to animals, but not others. If the government are serious about animal abuse, why allow anyone to do it?
 
-**Observation:** Gold doc `test-environment-assgbatj-pro05b` retrieved at rank 25/100 (missed NDCG@10). Snippet: animals science science general ban animal testing junior There is a moral difference between harm for the sake of harming an animal and harm in order to save lives. Lifesaving drugs is a very differ…
+**Observation:** Gold doc `test-environment-assgbatj-pro05b` retrieved at rank 22/100 (missed NDCG@10). Snippet: animals science science general ban animal testing junior There is a moral difference between harm for the sake of harming an animal and harm in order to save lives. Lifesaving drugs is a very differ…
 
-**Analysis:** Gold `test-environment-assgbatj-pro05b` retrieved at rank **25**/100 (score=0.6467) — counts for Recall@100 but not NDCG@10. Gold query-token coverage **20%** (shared: `a`, `animal`, `animals`, `are`, `laws`, `testing`, `that`, `the`, `to`, `welfare`; missing: `10`, `1986`, `about`, `abuse`, `act`, `allow`, `anyone`, `being`, `but`, `can`, `consistent`, `countries` … (+29 more)). Rank-1 was `test-philosophy-apessghwba-pro05a` (score=0.9250, coverage=55% vs gold 20%). The system found the right neighborhood but failed to promote the labeled evidence into the top-10.
+**Analysis:** Gold `test-environment-assgbatj-pro05b` retrieved at rank **22**/100 (score=0.6901) — counts for Recall@100 but not NDCG@10. Gold query-token coverage **20%** (shared: `a`, `animal`, `animals`, `are`, `laws`, `testing`, `that`, `the`, `to`, `welfare`; missing: `10`, `1986`, `about`, `abuse`, `act`, `allow`, `anyone`, `being`, `but`, `can`, `consistent`, `countries` … (+29 more)). Rank-1 was `test-philosophy-apessghwba-pro05a` (score=0.9233, coverage=55% vs gold 20%). The system found the right neighborhood but failed to promote the labeled evidence into the top-10.
 
 **8. Near miss** — query id `test-environment-assgbatj-pro04a`
 
@@ -133,7 +133,7 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 **Observation:** Gold doc `test-environment-assgbatj-pro04b` retrieved at rank 19/100 (missed NDCG@10). Snippet: animals science science general ban animal testing junior The decision to test is not based upon the capacity to suffer. But it should be remembered that the individual being tested would not be the …
 
-**Analysis:** Gold `test-environment-assgbatj-pro04b` retrieved at rank **19**/100 (score=0.6333) — counts for Recall@100 but not NDCG@10. Gold query-token coverage **23%** (shared: `animals`, `but`, `disabled`, `for`, `is`, `it`, `not`, `one`, `suffer`, `that`, `the`, `to` … (+1 more); missing: `9`, `a`, `allow`, `both`, `can`, `consistent`, `could`, `disabilities`, `do`, `either`, `experiment`, `go` … (+31 more)). Rank-1 was `test-philosophy-apessghwba-pro04a` (score=0.9378, coverage=66% vs gold 23%). The system found the right neighborhood but failed to promote the labeled evidence into the top-10.
+**Analysis:** Gold `test-environment-assgbatj-pro04b` retrieved at rank **19**/100 (score=0.6900) — counts for Recall@100 but not NDCG@10. Gold query-token coverage **23%** (shared: `animals`, `but`, `disabled`, `for`, `is`, `it`, `not`, `one`, `suffer`, `that`, `the`, `to` … (+1 more); missing: `9`, `a`, `allow`, `both`, `can`, `consistent`, `could`, `disabilities`, `do`, `either`, `experiment`, `go` … (+31 more)). Rank-1 was `test-philosophy-apessghwba-pro04a` (score=0.9313, coverage=66% vs gold 23%). The system found the right neighborhood but failed to promote the labeled evidence into the top-10.
 
 **9. Near miss** — query id `test-environment-assgbatj-con05a`
 
@@ -141,9 +141,9 @@ Gap = system NDCG@10 − **best published** NDCG@10 on that dataset (among BEIR 
 
 > Research animals are well treated Animals used in research generally don’t suffer. While they may be in pain, they are generally given pain killers, and when they are put down this is done humanely. [16] They are looked after, as healthy animals mean better experimental results. These animals live better lives than they would in the wild. As long as animals are treated well there shouldn’t be a moral objection to animal research. This is exactly the same as with raising animals that will be used for meat.
 
-**Observation:** Gold doc `test-environment-assgbatj-con05b` retrieved at rank 21/100 (missed NDCG@10). Snippet: animals science science general ban animal testing junior Just because an animal is treated well as it is brought up doesn’t stop the very real suffering during testing. Stricter rules and painkiller…
+**Observation:** Gold doc `test-environment-assgbatj-con05b` retrieved at rank 20/100 (missed NDCG@10). Snippet: animals science science general ban animal testing junior Just because an animal is treated well as it is brought up doesn’t stop the very real suffering during testing. Stricter rules and painkiller…
 
-**Analysis:** Gold `test-environment-assgbatj-con05b` retrieved at rank **21**/100 (score=0.6663) — counts for Recall@100 but not NDCG@10. Gold query-token coverage **21%** (shared: `and`, `animal`, `animals`, `as`, `be`, `don`, `is`, `t`, `the`, `treated`, `well`, `would`; missing: `16`, `a`, `after`, `are`, `better`, `done`, `down`, `exactly`, `experimental`, `for`, `generally`, `given` … (+34 more)). Rank-1 was `test-philosophy-apessghwba-con05a` (score=0.9510, coverage=71% vs gold 21%). The system found the right neighborhood but failed to promote the labeled evidence into the top-10.
+**Analysis:** Gold `test-environment-assgbatj-con05b` retrieved at rank **20**/100 (score=0.7167) — counts for Recall@100 but not NDCG@10. Gold query-token coverage **21%** (shared: `and`, `animal`, `animals`, `as`, `be`, `don`, `is`, `t`, `the`, `treated`, `well`, `would`; missing: `16`, `a`, `after`, `are`, `better`, `done`, `down`, `exactly`, `experimental`, `for`, `generally`, `given` … (+34 more)). Rank-1 was `test-philosophy-apessghwba-con05a` (score=0.9423, coverage=71% vs gold 21%). The system found the right neighborhood but failed to promote the labeled evidence into the top-10.
 
 
 #### Error analysis (Local BM25)

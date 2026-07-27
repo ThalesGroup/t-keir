@@ -29,9 +29,11 @@ REST `_svc.py` / `_client.py` services were removed.
 |------|------|
 | `docs/` | MkDocs site (`make docs`) |
 | `tkeir/thot/` | Core NLP, RAG, ingest, audit, governor, agents, MCP |
-| `tkeir/thot/tools/` | CLIs: pipeline, Vespa indexer, RAG API, BEIR eval |
+| `tkeir/thot/tools/ingest/` | Fetch/stage + Vespa passage indexing |
+| `tkeir/thot/tools/search/` | Retrieval / RAG API (`PassageRetrievalPipeline`) |
+| `tkeir/thot/tools/eval/` | BEIR smoke + full eval |
 | `tkeir/configs/` | Pipeline, taggers, RAG, agents, workflows, templates |
-| `tkeir/resources/` | Lexicons, MWE trie, modeling assets |
+| `tkeir/resources/` | Lexicons, MWE trie, `modeling/net/bge-m3` |
 | `vespa/` | Vespa schemas / Docker helpers |
 | `tkeir-hmi/` | Next.js Search / RAG / admin UI |
 | `deploy/` | Compose, Helm, Keycloak, SPIRE, images |
@@ -41,8 +43,8 @@ REST `_svc.py` / `_client.py` services were removed.
 ## Setup
 
 ```bash
-make setup          # uv sync, spaCy models, Tesseract check
-make init-models    # annotation pickle only (optional MWE)
+make setup          # uv sync, spaCy, Tesseract, MWE, BGE-M3 → resources/modeling/net
+make init-models    # annotation pickle only (optional MWE; skipped if present)
 ```
 
 Dev container: `make devcontainer` or **Dev Containers: Reopen in Container**.
@@ -71,20 +73,20 @@ default; pass `--use-mwe` only when needed.
 
 ## Vespa indexing and RAG
 
-Streaming mode. Without Keycloak, group is **`dev@tkeir`** (`VESPA_USER_SPACE`).
-Signed-in users get a JWT-scoped group — see [Vespa RAG](docs/tools/vespa_rag.md).
+Schemas: **`global`** (shared catalog) + **`user`** (streaming per tenant).
+Without Keycloak, user group is **`dev@tkeir`** (`VESPA_USER_SPACE`).
+See [Vespa RAG](docs/tools/vespa_rag.md).
 
 ```bash
 export VESPA_USER_SPACE=dev@tkeir   # optional; already the default
 make bootstrap
 make index-fixtures                # build fixture *.pipeline.json if needed
-make index
+make index                         # thot.tools.ingest.index_documents
 make rag                           # FastAPI :8090
 make rag-query RAG_QUERY="your question"
 ```
 
-After switching indexed → streaming, wipe Vespa (`bash vespa/clean_db.sh`), then
-re-bootstrap and re-index.
+After schema changes, wipe Vespa (`make clean-db`), then re-bootstrap and re-index.
 
 ## HMI
 
@@ -111,7 +113,8 @@ Docs: [Agents](docs/tools/agents.md), [MCP](docs/tools/mcp.md),
 ## Evaluation (BEIR)
 
 ```bash
-make beir-eval                              # scifact fiqa arguana
+make eval                                   # alias: beir-eval (scifact fiqa arguana)
+make eval-smoke                             # alias: beir-smoke (< 5 min)
 make beir-eval BEIR_DATASETS=scifact
 ```
 

@@ -201,102 +201,55 @@ def normalize_user_space(user_space: str | None = None) -> str:
     return re.sub(r"[^A-Za-z0-9._@+-]+", "_", value)[:200]
 
 
+def global_vespa_id(passage_id: str) -> str:
+    """Build Vespa id for schema ``global`` (index mode, no streaming group).
+
+    Args:
+        passage_id: Stable passage key (e.g. ``beir:scifact:42#chunk-0``).
+
+    Returns:
+        ``id:default:global::…`` document reference.
+    """
+    digest = hashlib.sha256(passage_id.encode("utf-8")).hexdigest()[:40]
+    return f"id:default:global::{digest}"
+
+
+def user_vespa_id(passage_id: str, *, user_space: str | None = None) -> str:
+    """Build Vespa id for schema ``user`` (streaming mode with group).
+
+    Args:
+        passage_id: Stable passage key.
+        user_space: Streaming group (``streaming.groupname``).
+
+    Returns:
+        ``id:default:user:g=<space>:…`` document reference.
+    """
+    group = normalize_user_space(user_space)
+    digest = hashlib.sha256(passage_id.encode("utf-8")).hexdigest()[:40]
+    return f"id:default:user:g={group}:{digest}"
+
+
 def document_vespa_id(
     source_doc_id: str, *, user_space: str | None = None
 ) -> str:
-    """Build the Vespa document reference for a parent document.
-
-    Streaming mode requires a group (``g=<user_space>``) so each user's
-    corpus is co-located and searched via ``streaming.groupname``.
-
-    Args:
-        source_doc_id: Pipeline ``source_doc_id`` value.
-        user_space: Streaming group; defaults to ``VESPA_USER_SPACE`` / default.
-
-    Returns:
-        Vespa id string for schema ``tkeir_document``.
-
-    Example:
-        >>> from thot.tools.search.vespa_client import document_vespa_id
-        >>> document_vespa_id("file://doc.pdf", user_space="demo").startswith(
-        ...     "id:default:tkeir_document:g=demo:"
-        ... )
-        True
-    """
-    group = normalize_user_space(user_space)
-    return (
-        f"id:default:tkeir_document:g={group}:"
-        f"{stable_document_key(source_doc_id)}"
-    )
+    """Compatibility alias → :func:`user_vespa_id` (streaming user schema)."""
+    return user_vespa_id(source_doc_id, user_space=user_space)
 
 
 def chunk_vespa_id(chunk_id: str, *, user_space: str | None = None) -> str:
-    """Build the Vespa document reference for a chunk.
-
-    Args:
-        chunk_id: Golden chunk identifier.
-        user_space: Streaming group; defaults to ``VESPA_USER_SPACE`` / default.
-
-    Returns:
-        Vespa id string for schema ``chunk``.
-
-    Example:
-        >>> from thot.tools.search.vespa_client import chunk_vespa_id
-        >>> chunk_vespa_id("doc.pdf#chunk-0", user_space="demo").startswith(
-        ...     "id:default:chunk:g=demo:"
-        ... )
-        True
-    """
-    group = normalize_user_space(user_space)
-    digest = hashlib.sha256(chunk_id.encode("utf-8")).hexdigest()[:32]
-    return f"id:default:chunk:g={group}:{digest}"
-
-
-def build_questions_tensor(
-    embeddings: list[list[float]],
-    embedding_dim: int = 384,
-) -> dict[str, list[float]]:
-    """Format question embeddings for Vespa mapped tensor input.
-
-    Args:
-        embeddings: Batch of embedding vectors.
-        embedding_dim: Target dimensionality (truncates longer vectors).
-
-    Returns:
-        Dict keyed by string indices for Vespa ``questions_embeddings``.
-
-    Example:
-        >>> from thot.tools.search.vespa_client import build_questions_tensor
-        >>> build_questions_tensor([[0.1, 0.2]], embedding_dim=2)
-        {'0': [0.1, 0.2]}
-    """
-    if not embeddings:
-        return {}
-    return {
-        str(index): vector[:embedding_dim]
-        for index, vector in enumerate(embeddings)
-    }
+    """Compatibility alias → :func:`user_vespa_id`."""
+    return user_vespa_id(chunk_id, user_space=user_space)
 
 
 def build_chunk_tensor(
     embedding: list[float],
-    embedding_dim: int = 384,
+    embedding_dim: int = 1024,
 ) -> list[float]:
-    """Truncate a chunk embedding vector to the schema dimension.
-
-    Args:
-        embedding: Raw embedding vector from the LLM provider.
-        embedding_dim: Vespa tensor width.
-
-    Returns:
-        Truncated float list.
-
-    Example:
-        >>> from thot.tools.search.vespa_client import build_chunk_tensor
-        >>> build_chunk_tensor([1.0, 2.0, 3.0], embedding_dim=2)
-        [1.0, 2.0]
-    """
-    return embedding[:embedding_dim]
+    """Truncate a dense embedding to the schema dimension."""
+    values = [float(x) for x in embedding[:embedding_dim]]
+    if len(values) < embedding_dim:
+        values.extend([0.0] * (embedding_dim - len(values)))
+    return values[:embedding_dim]
 
 
 def escape_yql_literal(value: str) -> str:
@@ -617,27 +570,31 @@ class VespaClient:
         fields: dict[str, Any],
         *,
         user_space: str | None = None,
+        streaming: bool = True,
     ) -> None:
-        """POST document fields to the Vespa document API (streaming group).
+        """POST document fields to the Vespa document API.
 
         Args:
             namespace: Vespa namespace (for example ``default``).
-            document_type: Schema name (for example ``chunk``).
+            document_type: Schema name (``global`` or ``user``).
             document_key: Stable document key within the schema.
             fields: Field payload indexed by Vespa.
-            user_space: Streaming group; defaults to client config.
-
-        Example:
-            >>> import asyncio
-            >>> from thot.tools.search.vespa_client import VespaClient
-            >>> asyncio.run(VespaClient()._upsert_fields("default", "chunk", "k", {}))  # doctest: +SKIP
+            user_space: Streaming group (required when ``streaming``).
+            streaming: When True, use ``…/group/<space>/<key>`` (user schema).
+                When False, use ``…/docid/<key>`` (global index schema).
         """
-        group = normalize_user_space(user_space or self._config.user_space)
-        url = (
-            f"{self._config.document_api_url}/{namespace}/{document_type}/"
-            f"group/{quote(group, safe='')}/"
-            f"{quote(document_key, safe='')}"
-        )
+        if streaming:
+            group = normalize_user_space(user_space or self._config.user_space)
+            url = (
+                f"{self._config.document_api_url}/{namespace}/{document_type}/"
+                f"group/{quote(group, safe='')}/"
+                f"{quote(document_key, safe='')}"
+            )
+        else:
+            url = (
+                f"{self._config.document_api_url}/{namespace}/{document_type}/"
+                f"docid/{quote(document_key, safe='')}"
+            )
         response = await self._client.post(url, json={"fields": fields})
         if response.is_error:
             detail = response.text.strip()
@@ -647,6 +604,35 @@ class VespaClient:
                 response=response,
             )
 
+    async def upsert_global_passage(
+        self,
+        fields: dict[str, Any],
+        passage_id: str,
+    ) -> None:
+        """Create or update a ``global`` (index-mode) passage."""
+        _, _, _group, key = _parse_vespa_id(global_vespa_id(passage_id))
+        await self._upsert_fields(
+            "default", "global", key, fields, streaming=False
+        )
+
+    async def upsert_user_passage(
+        self,
+        fields: dict[str, Any],
+        passage_id: str,
+        *,
+        user_space: str | None = None,
+    ) -> None:
+        """Create or update a ``user`` (streaming) passage."""
+        space = normalize_user_space(user_space or self._config.user_space)
+        payload = dict(fields)
+        payload.setdefault("userspace_id", space)
+        _, _, _group, key = _parse_vespa_id(
+            user_vespa_id(passage_id, user_space=space)
+        )
+        await self._upsert_fields(
+            "default", "user", key, payload, user_space=space
+        )
+
     async def upsert_document(
         self,
         fields: dict[str, Any],
@@ -654,27 +640,9 @@ class VespaClient:
         *,
         user_space: str | None = None,
     ) -> None:
-        """Create or update a parent ``tkeir_document`` record.
-
-        Args:
-            fields: Sanitized parent document fields.
-            source_doc_id: Pipeline ``source_doc_id`` used to derive the key.
-            user_space: Streaming group for this user's corpus.
-
-        Example:
-            >>> import asyncio
-            >>> from thot.tools.search.vespa_client import VespaClient
-            >>> asyncio.run(VespaClient().upsert_document({"title": "Doc"}, "doc.pdf"))  # doctest: +SKIP
-        """
-        space = normalize_user_space(user_space or self._config.user_space)
-        payload = dict(fields)
-        payload.setdefault("user_space", space)
-        await self._upsert_fields(
-            "default",
-            "tkeir_document",
-            stable_document_key(source_doc_id),
-            payload,
-            user_space=space,
+        """Compatibility shim → :meth:`upsert_user_passage` (no parent schema)."""
+        await self.upsert_user_passage(
+            fields, source_doc_id, user_space=user_space
         )
 
     async def upsert_chunk(
@@ -684,52 +652,23 @@ class VespaClient:
         *,
         user_space: str | None = None,
     ) -> None:
-        """Create or update a ``chunk`` record linked to a parent document.
-
-        Args:
-            fields: Sanitized chunk fields including embeddings.
-            chunk_id: Golden chunk identifier.
-            user_space: Streaming group (must match the parent document).
-
-        Example:
-            >>> import asyncio
-            >>> from thot.tools.search.vespa_client import VespaClient
-            >>> asyncio.run(VespaClient().upsert_chunk({"text_raw": "hi"}, "c1"))  # doctest: +SKIP
-        """
-        space = normalize_user_space(user_space or self._config.user_space)
-        _, _, _group, key = _parse_vespa_id(
-            chunk_vespa_id(chunk_id, user_space=space)
-        )
-        payload = dict(fields)
-        payload.setdefault("user_space", space)
-        await self._upsert_fields(
-            "default", "chunk", key, payload, user_space=space
+        """Compatibility shim → :meth:`upsert_user_passage`."""
+        await self.upsert_user_passage(
+            fields, chunk_id, user_space=user_space
         )
 
     async def get_document_by_ref(self, doc_ref: str) -> dict[str, Any]:
-        """Fetch parent document fields by Vespa document reference.
-
-        Args:
-            doc_ref: Full Vespa id for schema ``tkeir_document``.
-
-        Returns:
-            Document ``fields`` dict from the Vespa API response.
-
-        Example:
-            >>> import asyncio
-            >>> from thot.tools.search.vespa_client import VespaClient, document_vespa_id
-            >>> ref = document_vespa_id("file://doc.pdf")
-            >>> asyncio.run(VespaClient().get_document_by_ref(ref))  # doctest: +SKIP
-        """
-        namespace, _schema, group, key = _parse_vespa_id(doc_ref)
+        """Fetch passage fields by Vespa document reference (global or user)."""
+        namespace, schema, group, key = _parse_vespa_id(doc_ref)
+        schema = schema or "global"
         if group:
             url = (
-                f"{self._config.document_api_url}/{namespace}/tkeir_document/"
+                f"{self._config.document_api_url}/{namespace}/{schema}/"
                 f"group/{quote(group, safe='')}/{quote(key, safe='')}"
             )
         else:
             url = (
-                f"{self._config.document_api_url}/{namespace}/tkeir_document/"
+                f"{self._config.document_api_url}/{namespace}/{schema}/"
                 f"docid/{quote(key, safe='')}"
             )
         response = await self._client.get(url)
@@ -751,82 +690,58 @@ class VespaClient:
     def build_hybrid_search_payload(
         self,
         query_text: str,
-        q_chunk_emb: list[float],
-        q_question_emb: list[float],
+        q_dense: list[float],
         *,
         hits: int = 20,
         user_space: str | None = None,
+        schema: str = "user",
     ) -> dict[str, Any]:
-        """Build the Vespa hybrid search HTTP payload without executing it.
+        """Build a hybrid search payload for ``global`` or ``user`` schema.
 
-        Example:
-            >>> from thot.tools.search.vespa_client import VespaClient
-            >>> payload = VespaClient().build_hybrid_search_payload(
-            ...     "hello", [0.0] * 384, [0.0] * 384, user_space="demo"
-            ... )
-            >>> payload["ranking.profile"]
-            'hybrid_2_level'
-            >>> payload["streaming.groupname"]
-            'demo'
+        Prefer :class:`~thot.tools.search.passage_retrieval.PassageRetrievalPipeline`
+        for production search.
         """
-        text_clause = build_text_raw_contains_or_clause(query_text)
+        text_clause = build_field_contains_or_clause("chunk_text", query_text)
         yql_parts = [
-            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(chunk_embedding, q_chunk_emb))',
-            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(questions_embeddings, q_question_emb))',
+            f'([{{"targetNumHits": {hits}}}]nearestNeighbor(dense_vector, q_dense))',
         ]
         if text_clause:
             yql_parts.append(text_clause)
-        yql = "select * from chunk where " + " or ".join(yql_parts)
-        space = normalize_user_space(user_space or self._config.user_space)
-        return {
+        yql = f"select * from {schema} where " + " or ".join(yql_parts)
+        payload: dict[str, Any] = {
             "yql": yql,
             "hits": hits,
             "timeout": f"{int(self._config.timeout_seconds)}s",
-            "ranking.profile": "hybrid_2_level",
-            "streaming.groupname": space,
-            "input.query(q_chunk_emb)": q_chunk_emb[
-                : self._config.embedding_dim
-            ],
-            "input.query(q_question_emb)": q_question_emb[
-                : self._config.embedding_dim
-            ],
+            "ranking.profile": "hybrid",
+            "input.query(q_dense)": build_chunk_tensor(
+                q_dense, embedding_dim=self._config.embedding_dim
+            ),
         }
+        if schema == "user":
+            space = normalize_user_space(user_space or self._config.user_space)
+            payload["streaming.groupname"] = space
+        return payload
 
     async def hybrid_search(
         self,
         query_text: str,
-        q_chunk_emb: list[float],
-        q_question_emb: list[float],
+        q_dense: list[float],
         *,
         hits: int = 20,
         user_space: str | None = None,
+        schema: str = "user",
     ) -> dict[str, Any]:
-        """Run hybrid vector and keyword search over chunk documents.
-
-        Args:
-            query_text: User query matched against ``text_raw``.
-            q_chunk_emb: Query embedding for ``chunk_embedding`` NN search.
-            q_question_emb: Query embedding for ``questions_embeddings`` NN search.
-            hits: Maximum number of hits to request.
-            user_space: Streaming group to search (required for isolation).
-
-        Returns:
-            Parsed JSON response from the Vespa search API.
-
-        Example:
-            >>> import asyncio
-            >>> from thot.tools.search.vespa_client import VespaClient
-            >>> asyncio.run(VespaClient().hybrid_search("hello", [0.0]*384, [0.0]*384))  # doctest: +SKIP
-        """
+        """Run hybrid dense + BM25 search over ``global`` or ``user``."""
         payload = self.build_hybrid_search_payload(
             query_text,
-            q_chunk_emb,
-            q_question_emb,
+            q_dense,
             hits=hits,
             user_space=user_space,
+            schema=schema,
         )
         ThotLogger.info(
             f"Vespa hybrid search query={query_text!r} "
+            f"schema={schema!r} "
             f"group={payload.get('streaming.groupname')!r} yql={payload['yql']}"
         )
         response = await self._client.post(
@@ -842,7 +757,7 @@ class VespaClient:
         Example:
             >>> import asyncio
             >>> from thot.tools.search.vespa_client import VespaClient
-            >>> asyncio.run(VespaClient().search({"yql": "select * from chunk where true"}))  # doctest: +SKIP
+            >>> asyncio.run(VespaClient().search({"yql": "select * from global where true"}))  # doctest: +SKIP
         """
         response = await self._client.post(
             self._config.search_api_url,
@@ -872,8 +787,8 @@ def _parse_vespa_id(doc_id: str) -> tuple[str, str, str | None, str]:
 
     Example:
         >>> from thot.tools.search.vespa_client import _parse_vespa_id
-        >>> _parse_vespa_id("id:default:tkeir_document:g=demo:abc123")
-        ('default', 'tkeir_document', 'demo', 'abc123')
+        >>> _parse_vespa_id("id:default:user:g=demo:abc123")
+        ('default', 'user', 'demo', 'abc123')
         >>> _parse_vespa_id("id:default:chunk::legacy")
         ('default', 'chunk', None, 'legacy')
     """

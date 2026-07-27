@@ -1,7 +1,16 @@
-# Dual-hybrid schema migration (parent_* removal)
+# Passage schema migration (`doc_base` / `global` / `user`)
 
-Removing `parent_title` / `parent_content` from `chunk.sd` is a **breaking**
-Vespa schema change. Streaming corpora must be fully reindexed.
+T-KEIR no longer uses separate `tkeir_document` + `chunk` Vespa schemas.
+Passages share **`doc_base`** (text / sparse / ontology) plus per-schema
+`dense_vector` (HNSW on `global`, attribute-only on `user`) and are stored in:
+
+| Schema | Mode | Role |
+|--------|------|------|
+| `global` | index (HNSW) | Shared catalog (BEIR, public corpora) |
+| `user` | streaming | Per-tenant passages (`userspace_id`) |
+
+Parent denormalization (`parent_title` / `parent_content`) and question
+tensors (`questions_embeddings`) are gone.
 
 ## Prerequisites
 
@@ -12,64 +21,52 @@ Vespa schema change. Streaming corpora must be fully reindexed.
    make schemas-check
    ```
 
-2. Deploy schemas (`make init` or Compose bootstrap).
+2. Wipe and redeploy Vespa (streaming / schema changes are breaking):
 
-3. Lemmatized fields use `stemming: none` / `normalizing: none` and live in
-   fieldset `lemmatized` (not `default`) so Vespa does not warn about
-   inconsistent linguistics vs raw `title`/`content`. If Vespa rejects those
-   attributes, remove them from the Jinja templates, regenerate, and redeploy.
-   Document the fallback in the templates' comments (default Vespa linguistics
-   then apply on already-normalized text).
+   ```bash
+   make clean-db
+   make bootstrap
+   ```
 
-## Reindex order
+3. Ensure BGE-M3 weights are local (not Hugging Face hub cache):
 
-1. **Documents first** (`tkeir_document`) so the document arm and
-   `json_ld` are populated before dual-hybrid fusion relies on them.
-2. **Chunks second** (`chunk`) without parent denormalization; each chunk
-   must carry `doc_ref` and `source_doc_id`.
+   ```bash
+   make pull-bge-model   # → tkeir/resources/modeling/net/bge-m3
+   ```
 
-Typical host path:
+## Reindex
 
-```bash
-make init
-make index   # indexes documents then chunks per pipeline JSON
-```
-
-For Compose / cluster, rebuild images that bake schemas, redeploy the
-Vespa app package, then re-run the indexer job against the ingest store.
-
-## Config knobs
-
-All ranking weights live under `dual_hybrid:` in `tkeir/configs/rag.yaml`.
-Business ontology concepts are passed **per query** via
-`business_ontology` on `/search` and `/rag/query` (not loaded from disk).
-Zero-to-Hero payloads: `datasets/osint/business_ontology.yaml` and
-`datasets/enterprise/business_ontology.yaml`.
-SpaCy models are selected by request/document language from
-`preprocessing.spacy_models` (mandatory `default` entry).
-Asciifold after lemmatization is controlled by `preprocessing.asciifold`
-(default `true`).
-
-Estimate real `averageFieldLength` values:
+Index **passages** (NLP `golden_chunks`) into `global` and/or `user`:
 
 ```bash
-python scripts/measure_field_lengths.py -i workspace/tmp/pipeline-out
-make schemas
+make index-fixtures   # optional: PDF → *.pipeline.json
+make index            # thot.tools.ingest.index_documents → index_passages
 ```
+
+BEIR smoke/eval force **`global` only**. Live RAG defaults to
+`dual_hybrid.search_mode: auto` (`global` | `user` | `both`).
+
+## Config
+
+Ranking / fusion live under `dual_hybrid:` in `tkeir/configs/rag.yaml`
+(block name is historical; runtime is
+`PassageRetrievalPipeline`). Full reference:
+[Configuration → rag.yaml](../configuration/rag.yaml.md).
+
+Business ontology: `datasets/<name>/business_ontology.yaml` when
+`business_ontology.index_enabled` / `search_enabled` are true.
 
 ## Rollback
 
-1. Set `dual_hybrid.enabled: false` in `rag.yaml` to restore the legacy
-   QueryAnalyzer single-arm path (still without parent BM25 unless you
-   restore the old schema).
-2. To restore parent denormalization, check out the previous `chunk.sd`,
-   redeploy, and reindex chunks with the old `_chunk_fields` mapping.
-3. Keep a backup of the prior Vespa application package / volume snapshot
-   before schema deploy if you need a fast binary rollback.
+1. Set `dual_hybrid.enabled: false` to use the legacy QueryAnalyzer
+   single-arm path against the **`user`** schema (still no old
+   `tkeir_document` / `chunk` schemas).
+2. Keep a Vespa volume / application package backup before schema deploy
+   if you need a binary rollback.
 
 ## Verification
 
-- Chunk hits no longer expose `parent_title` / `parent_content`.
-- Document hits include `title_lemmatized` / `content_lemmatized`.
-- `/search` response `query_analysis.dual_hybrid` lists active / degraded
-  signals and per-stage timings when dual hybrid is enabled.
+- Document API paths use `global` / `user` (not `chunk` / `tkeir_document`).
+- Hits expose `source_ref`, `chunk_text`, `ontology_concepts`, dense/sparse.
+- `/search` uses `PassageRetrievalPipeline` when `dual_hybrid.enabled: true`;
+  check `query_analysis` timings for Vespa arms.

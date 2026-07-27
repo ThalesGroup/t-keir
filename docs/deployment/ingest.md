@@ -100,7 +100,7 @@ ${INGEST_ROOT}/
   idempotency.json
 ```
 
-Manifest schema: `thot/ingest/schemas/ingest.manifest.v1.json`.
+Manifest schema: `thot/tools/ingest/schemas/ingest.manifest.v1.json`.
 
 ## Auth and user space
 

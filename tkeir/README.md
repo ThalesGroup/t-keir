@@ -58,7 +58,10 @@ Published HTML (when available): [ThalesGroup.github.io/t-keir](https://thalesgr
 | `../docs` | MkDocs documentation (repository root) |
 | `resources` | Lexical resources and tagger rules |
 | `thot` | Python package (core NLP + tools) |
-| `thot/tools` | CLIs: pipeline, Vespa search/RAG, annotation |
+| `thot/tools/ingest` | Passage indexing into Vespa |
+| `thot/tools/search` | Retrieval / RAG API |
+| `thot/tools/eval` | BEIR smoke + full evaluation |
+| `resources/modeling/net` | Local neural weights (BGE-M3 via `make pull-bge-model`) |
 
 ## Installation
 

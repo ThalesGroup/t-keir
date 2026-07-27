@@ -240,18 +240,18 @@ def test_vespa_okf_backend_list():
             "root": {
                 "children": [
                     {
-                        "id": "id:default:tkeir_document:g=dev@tkeir:k1",
+                        "id": "id:default:user:g=dev@tkeir:k1",
                         "fields": {
-                            "user_space": "dev@tkeir",
-                            "source_doc_id": "doc-1",
-                            "title": "T",
+                            "userspace_id": "dev@tkeir",
+                            "source_ref": "doc-1",
+                            "chunk_text": "T",
                         },
                     },
                     {
-                        "id": "id:default:tkeir_document:g=other:k2",
+                        "id": "id:default:user:g=other:k2",
                         "fields": {
-                            "user_space": "other",
-                            "source_doc_id": "doc-2",
+                            "userspace_id": "other",
+                            "source_ref": "doc-2",
                         },
                     },
                 ]
@@ -273,12 +273,9 @@ def test_vespa_okf_backend_list():
                     "children": [
                         {
                             "fields": {
-                                "user_space": "dev@tkeir",
-                                "chunk_id": "c1",
-                                "doc_ref": (
-                                    "id:default:tkeir_document:g=dev@tkeir:k1"
-                                ),
-                                "text_raw": "hello world",
+                                "userspace_id": "dev@tkeir",
+                                "source_ref": "doc-1",
+                                "chunk_text": "hello world",
                             }
                         }
                     ]
@@ -287,9 +284,10 @@ def test_vespa_okf_backend_list():
         )
         chunks = await backend.list_chunk_ids_for_parent(
             user_space="dev@tkeir",
-            doc_ref="id:default:tkeir_document:g=dev@tkeir:k1",
+            doc_ref="id:default:user:g=dev@tkeir:k1",
             parent_source_id="doc-1",
         )
-        assert chunks[0]["chunk_id"] == "c1"
+        assert chunks[0]["chunk_id"] == "doc-1"
+        assert chunks[0]["text_raw"] == "hello world"
 
     asyncio.run(_run())

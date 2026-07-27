@@ -16,6 +16,11 @@ nav:
     - Conception: 'conception.md'
     - Installation: 'installation.md'
     - Dev Container: 'devcontainer.md'
+    - Configuration:
+        - Overview: 'configuration/index.md'
+        - rag.yaml (passage retrieval): 'configuration/rag.yaml.md'
+        - pipeline.yaml: 'configuration/pipeline.yaml.md'
+        - mcp.yaml: 'configuration/mcp.yaml.md'
     - Deployment:
         - Profiles: 'deployment/index.md'
         - Environment variables: 'deployment/environment.md'

@@ -691,7 +691,7 @@ def make_fallback(
                             python,
                             "python",
                             "-m",
-                            "thot.tools.search.index_documents",
+                            "thot.tools.ingest.index_documents",
                             "-i",
                             str(output),
                         ],

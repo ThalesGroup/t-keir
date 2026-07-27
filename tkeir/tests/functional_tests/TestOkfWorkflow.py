@@ -37,7 +37,7 @@ class _FixtureVespa:
                 "json_ld": '[{"@type":"Mission","rdfs:label":"ALPHA"}]',
                 "title_keywords": ["ALPHA"],
                 "user_space": user_space,
-                "_vespa_id": f"id:default:tkeir_document:g={user_space}:fixture-alpha",
+                "_vespa_id": f"id:default:user:g={user_space}:fixture-alpha",
             },
             {
                 "source_doc_id": "fixture-beta",
@@ -45,7 +45,7 @@ class _FixtureVespa:
                 "content": ["Beta note."],
                 "json_ld": '[{"@type":"Note","rdfs:label":"Beta"}]',
                 "user_space": user_space,
-                "_vespa_id": f"id:default:tkeir_document:g={user_space}:fixture-beta",
+                "_vespa_id": f"id:default:user:g={user_space}:fixture-beta",
             },
         ]
         if doc_ids:

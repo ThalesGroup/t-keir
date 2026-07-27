@@ -229,7 +229,7 @@ paths (missing → `false`, never `null`):
 | `kill_switch_runbook_present` | `docs/runbooks/kill-switch.md` |
 | `hmi_admin_page_present` | `tkeir-hmi/app/admin/page.tsx` |
 | `privacy_py_present` | `tkeir/thot/audit/privacy.py` |
-| `ingest_manifest_schema` | `tkeir/thot/ingest/schemas/ingest.manifest.v1.json` |
+| `ingest_manifest_schema` | `tkeir/thot/tools/ingest/schemas/ingest.manifest.v1.json` |
 | `audit_worm_retention_set` | `AUDIT_WORM_RETENTION_DAYS` in `deploy/compose/.env.example` |
 | `incident_runbook_present` | `docs/runbooks/incident.md` |
 | `networkpolicy_template` | `deploy/charts/tkeir/templates/networkpolicy.yaml` |

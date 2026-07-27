@@ -2,17 +2,18 @@
 set -euo pipefail
 
 VESPA_URL="${VESPA_URL:-http://localhost:8080}"
+USER_SPACE="${VESPA_USER_SPACE:-dev@tkeir}"
 
 echo "[+] Vespa smoke test against ${VESPA_URL}"
 
 curl -fsS "${VESPA_URL}/search/" \
   -H "Content-Type: application/json" \
-  -d '{"yql":"select source_doc_id, title from tkeir_document where true limit 3","hits":3}' \
+  -d '{"yql":"select source_ref, chunk_text from global where true limit 3","hits":3,"ranking.profile":"unranked"}' \
   | jq .
 
 curl -fsS "${VESPA_URL}/search/" \
   -H "Content-Type: application/json" \
-  -d '{"yql":"select chunk_id, text_raw from chunk where true limit 3","hits":3}' \
+  -d "{\"yql\":\"select source_ref, chunk_text from user where true limit 3\",\"hits\":3,\"ranking.profile\":\"unranked\",\"streaming.groupname\":\"${USER_SPACE}\"}" \
   | jq .
 
-echo "[✓] document + chunk schemas are queryable"
+echo "[✓] global + user schemas are queryable"

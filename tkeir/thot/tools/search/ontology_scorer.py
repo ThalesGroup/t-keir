@@ -1,4 +1,7 @@
-"""Title: Ontology overlap scoring (query concepts × document json_ld).
+"""Title: Ontology overlap scoring (query concepts × document / chunk concepts).
+
+Prefers indexed chunk ``concept_ids`` / ``linked_concept_ids`` (Graph-RAG);
+falls back to document ``json_ld`` extraction.
 
 Author: Eric Blaudez
 
@@ -18,7 +21,7 @@ from thot.tools.search.business_ontology import BusinessOntology
 from thot.tools.search.text_normalizer import TextNormalizer
 
 LOGGER = logging.getLogger(__name__)
-_WORD_RE = re.compile(r"[A-Za-z0-9_]{2,}")
+_WORD_RE = re.compile(r"[^\W\d_][\w]{1,}", re.UNICODE)
 
 
 @dataclass(frozen=True)
@@ -72,17 +75,23 @@ class OntologyScorer:
                 ]
         else:
             data = json_ld
-        labels = _collect_labels(data)
         concepts: list[str] = []
-        for label in labels:
+        seen: set[str] = set()
+        for label in _collect_labels(data):
             cid = self.ontology.resolve(label, self.normalizer)
             if cid:
-                if cid not in concepts:
+                if cid not in seen:
+                    seen.add(cid)
                     concepts.append(cid)
-            else:
-                normalized = self.normalizer.normalize(label)
-                if normalized and normalized not in concepts:
-                    concepts.append(normalized)
+                continue
+            normalized = self.normalizer.normalize(label)
+            if normalized and normalized not in seen:
+                seen.add(normalized)
+                concepts.append(normalized)
+        for cid in _collect_identifiers(data):
+            if cid not in seen:
+                seen.add(cid)
+                concepts.append(cid)
         return concepts
 
     def concepts_for_document(
@@ -95,6 +104,36 @@ class OntologyScorer:
         concepts = self.extract_document_concepts(json_ld)
         self._doc_cache[source_doc_id] = concepts
         return concepts
+
+    def concepts_for_hit(
+        self,
+        source_doc_id: str,
+        *,
+        json_ld: str = "",
+        concept_ids: list[str] | None = None,
+        linked_concept_ids: list[str] | None = None,
+    ) -> list[str]:
+        """Prefer indexed chunk concept fields; else document json_ld."""
+        indexed: list[str] = []
+        seen: set[str] = set()
+        for raw in list(concept_ids or []) + list(linked_concept_ids or []):
+            cid = str(raw or "").strip()
+            if not cid:
+                continue
+            key = cid.casefold()
+            if key in seen:
+                continue
+            seen.add(key)
+            indexed.append(cid)
+            # Also resolve labels through the external ontology when present.
+            resolved = self.ontology.resolve(cid, self.normalizer)
+            if resolved and resolved.casefold() not in seen:
+                seen.add(resolved.casefold())
+                indexed.append(resolved)
+        if indexed:
+            self._doc_cache[source_doc_id] = indexed
+            return indexed
+        return self.concepts_for_document(source_doc_id, json_ld)
 
     def score(
         self,
@@ -117,9 +156,14 @@ class OntologyScorer:
             "broader": weights.broader,
             "shared_parent": weights.shared_parent,
         }
+        # Casefold map for document-native exact matches without external graph.
+        doc_fold = {str(d).casefold(): str(d) for d in document_concepts}
         total = 0.0
         for q_cid in query_concept_ids:
             best = 0.0
+            q_fold = str(q_cid).casefold()
+            if q_fold in doc_fold:
+                best = max(best, weights.exact)
             for d_cid in document_concepts:
                 if q_cid == d_cid:
                     best = max(best, weights.exact)
@@ -129,17 +173,84 @@ class OntologyScorer:
                 )
                 if relation:
                     best = max(best, weight_map.get(relation, 0.0))
-                elif (
-                    isinstance(d_cid, str)
-                    and " " not in d_cid
-                    and q_cid == d_cid
-                ):
-                    best = max(best, weights.exact)
             total += best
 
         if self.config.normalize_by_query_concepts:
             return total / max(len(query_concept_ids), 1)
         return min(1.0, total)
+
+
+class OntologyRescorer:
+    """Blend first-stage ranks with ontology overlap (optional Graph-RAG stage).
+
+    Controlled by ``dual_hybrid.ontology_scoring.enabled`` (default true).
+    """
+
+    def __init__(
+        self,
+        scorer: OntologyScorer,
+        *,
+        weight: float = 0.13,
+    ) -> None:
+        self.scorer = scorer
+        self.weight = max(0.0, min(1.0, float(weight)))
+
+    def rescore(
+        self,
+        query_concept_ids: list[str],
+        hits: list[tuple[str, float, list[str]]],
+    ) -> list[tuple[str, float]]:
+        """Rescore ``(doc_id, first_stage_score, ontology_concepts)`` rows.
+
+        Returns:
+            ``(doc_id, blended_score)`` best first. When disabled / no query
+            concepts / weight=0, returns first-stage order unchanged.
+        """
+        if (
+            not self.scorer.config.enabled
+            or self.weight <= 0.0
+            or not query_concept_ids
+            or not hits
+        ):
+            ranked = sorted(hits, key=lambda row: row[1], reverse=True)
+            return [(doc_id, float(score)) for doc_id, score, _ in ranked]
+
+        first = {doc_id: float(score) for doc_id, score, _ in hits}
+        lo = min(first.values()) if first else 0.0
+        hi = max(first.values()) if first else 0.0
+        span = hi - lo
+        blended: dict[str, float] = {}
+        for doc_id, score, doc_concepts in hits:
+            first_n = ((score - lo) / span) if span > 0 else 0.0
+            ont = self.scorer.score(
+                query_concept_ids,
+                list(doc_concepts or []),
+            )
+            blended[doc_id] = (1.0 - self.weight) * first_n + self.weight * float(
+                ont
+            )
+        return sorted(blended.items(), key=lambda item: item[1], reverse=True)
+
+
+def _collect_identifiers(node: Any, out: list[str] | None = None) -> list[str]:
+    """Collect identifier / @id / concept_id strings from JSON-LD."""
+    if out is None:
+        out = []
+    if isinstance(node, dict):
+        for key in ("identifier", "@id", "concept_id", "id"):
+            val = node.get(key)
+            if isinstance(val, str) and val.strip():
+                cid = val.strip()
+                if "://" in cid:
+                    cid = cid.rstrip("/").rsplit("/", 1)[-1]
+                if cid and len(cid) < 120:
+                    out.append(cid)
+        for value in node.values():
+            _collect_identifiers(value, out)
+    elif isinstance(node, list):
+        for item in node:
+            _collect_identifiers(item, out)
+    return out
 
 
 def _collect_labels(node: Any, out: list[str] | None = None) -> list[str]:

@@ -13,7 +13,7 @@ Full documentation: [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io
 - **Document conversion** — plain text, PDF, Office, HTML, email (MarkItDown + optional OCR)
 - **NLP pipeline** — language detection, tokenizer, morphosyntax, NER, syntax, keywords
 - **Ontology export** — entity/keyword graphs for RAG and the HMI
-- **Vespa RAG** — two-level document/chunk indexing, hybrid retrieval, LLM answers
+- **Vespa RAG** — passage schemas (`global` + `user`), BGE-M3 hybrid retrieval, LLM answers
 - **MCP server** — scoped corpus tools for external MCP clients (`tkeir-mcp`)
 - **Agents & workflows** — configurable researchers/analysts/writers, multi-agent
   plans, grounded template composition, approval-gated publish (`tkeir-agent`)
@@ -56,7 +56,7 @@ make devcontainer
 Inside the container (`/workspace`):
 
 ```bash
-make setup          # Python deps, spaCy models, Tesseract check
+make setup          # Python deps, spaCy, Tesseract, MWE pickle, BGE-M3
 ```
 
 If `uv sync` fails because of a host-built `tkeir/.venv`, run
@@ -88,7 +88,7 @@ make bootstrap         # start Vespa + deploy schemas
 # Build pipeline JSON from example PDFs (if output/ is empty)
 make index-fixtures    # tkeir/tests/indexing/input → output/
 
-# Index into Vespa (embeddings + chunking)
+# Index passages into Vespa (BGE-M3 dense+sparse from resources/modeling/net)
 export PROVIDER=ollama
 export EMBEDDING_MODEL=bge-m3
 export LLM_MODEL=mistral-nemo
@@ -191,7 +191,7 @@ setup, pipeline, tests, docs, Vespa, indexing, and RAG.
 | Target | Description |
 |---|---|
 | `make help` | List common targets and variables |
-| `make setup` | Full local setup: `install` + spaCy models + Tesseract + `init-models` |
+| `make setup` | Full local setup: `install` + spaCy + Tesseract + `init-models` + BGE-M3 download |
 | `make install` | `uv sync` in `tkeir/` (dev dependency group) |
 | `make install-spacy-models` | Download spaCy language models used by the pipeline |
 | `make install-tesseract` | Install Tesseract OCR (PDF image text) |
@@ -211,7 +211,7 @@ setup, pipeline, tests, docs, Vespa, indexing, and RAG.
 | `PIPELINE_OUTPUT` | `/tmp/tkeir-pipeline-out` | Output directory for JSON |
 | `PIPELINE_TYPE` | `auto` | Input type: `auto`, `raw`, `pdf`, … |
 | `PIPELINE_CONFIG` | `tkeir/configs/pipeline.yaml` | Pipeline configuration |
-| `TRANSFORMERS_CACHE` | `.cache/models` | Hugging Face / model cache |
+| `TRANSFORMERS_CACHE` | `.cache/models` | Hugging Face hub cache (rerankers, etc.; **not** BGE-M3) |
 
 Example:
 
@@ -247,7 +247,9 @@ make pipeline \
 
 | Target | Description |
 |---|---|
-| `make pull-models` | Pull Ollama embedding + LLM models |
+| `make pull-bge-model` | Download `BAAI/bge-m3` into `tkeir/resources/modeling/net/bge-m3` (skip if ready; `FORCE_BGE=1` to refresh) |
+| `make pull-models` | Download BGE-M3 + pull Ollama embedding/LLM models |
+| `make eval` / `make eval-smoke` | Aliases for `beir-eval` / `beir-smoke` |
 | `make start` | Start Vespa Docker container |
 | `make init` | Deploy schemas (Vespa must already be running) |
 | `make bootstrap` | `start` + deploy schemas |

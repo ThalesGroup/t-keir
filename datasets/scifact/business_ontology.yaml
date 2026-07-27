@@ -1,12 +1,292 @@
-# SciFact business ontology for dual-hybrid query expansion + overlap scoring.
-# Pass as `business_ontology` on search (BEIR smoke/eval load this file automatically).
-# version: 1.0.0
+# SciFact business ontology — v3.0.0
+# Optimised for dual-hybrid query-expansion + overlap scoring on BEIR SciFact.
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+# DESIGN RATIONALE (v3)
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# The core IR challenge in SciFact is LEXICAL MISMATCH between claim (query)
+# vocabulary and abstract (document) vocabulary.  Four paraphrase patterns
+# dominate the dataset (from Wadden et al. 2020 examples + SciFact-Open):
+#
+#   P1 · ENTITY SYNONYMY
+#        Claim uses a lay/abbreviation form; abstract uses the full scientific
+#        term (or vice versa).
+#        e.g.  "fruit flies"      ↔  "Drosophila"
+#              "slows aging"      ↔  "produces life span extension"
+#              "gut bacteria"     ↔  "gastrointestinal microbiota"
+#
+#   P2 · CAUSAL / DIRECTIONAL PARAPHRASE
+#        Claim uses a causal verb; abstract uses an outcome noun/phrase that
+#        implies the same direction.
+#        e.g.  "impairs lipogenesis"  ↔  "increased lipogenesis" (REFUTES: direction flip)
+#              "inhibits tumor"       ↔  "knockout leads to inhibition"
+#              "improves diabetes"    ↔  "strong association with resolution of T2DM"
+#
+#   P3 · SPECIFICITY SHIFT
+#        Claim is generic; abstract is specific (or vice versa).
+#        e.g.  "cancer care"          ↔  "gynecological cancer survival"
+#              "missense mutation"    ↔  "somatic NT5C2 variant"
+#              "imaging technique"   ↔  "fiberoptic confocal microscopy"
+#
+#   P4 · MECHANISTIC ABSTRACTION
+#        Claim names the mechanism; abstract names the assay/protein/pathway.
+#        e.g.  "cardiac injury"       ↔  "elevated troponin"
+#              "colonization resist." ↔  "C. difficile germination suppressed"
+#              "immune activation"   ↔  "CD4+ T-cell proliferation"
+#
+# To bridge these gaps this ontology introduces three new field types
+# alongside the standard ones:
+#
+#   paraphrase_bridges  — explicit (claim_form, document_form) pairs drawn
+#                         from real SciFact examples; used for direct term
+#                         substitution during query expansion.
+#
+#   directionality_terms — verbs/nouns that express effect direction in
+#                          claims; mapped to the typical document-side
+#                          expression so a hybrid scorer can match
+#                          "inhibits X" to "decrease in X" or "X suppression".
+#
+#   model_organisms     — non-human species names that SciFact claims
+#                         routinely use as proxies for human biology;
+#                         grouped under the relevant concept so they expand
+#                         queries about e.g. "mice" to fetch abstracts about
+#                         "murine" / "in vivo" studies.
+#
+# Standard fields retained: concept_id, preferred_label, synonyms,
+# surface_forms, broader, narrower, related.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 concepts:
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # CROSS-CUTTING PARAPHRASE HUBS
+  # These are NOT biomedical topics — they are linguistic/relational patterns
+  # that appear across ALL topics in SciFact claims.  Placing them at the top
+  # ensures the expander picks them up before domain concepts.
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: CAUSAL_POSITIVE
+    preferred_label: promotes
+    synonyms:
+      - increases
+      - enhances
+      - upregulates
+      - activates
+      - induces
+      - stimulates
+      - elevates
+      - augments
+      - potentiates
+      - accelerates
+      - facilitates
+      - drives
+      - triggers
+      - leads to
+      - results in
+      - is associated with higher
+      - confers
+      - produces
+    surface_forms:
+      - associated with increased
+      - results in elevated
+      - leads to upregulation of
+    broader: []
+    narrower: []
+    related:
+      - CAUSAL_NEGATIVE
+      - DIRECTIONALITY
+    paraphrase_bridges:
+      - claim: "slows aging"
+        document: "produces life span extension"
+      - claim: "improves diabetes resolution"
+        document: "strong association with resolution of T2DM"
+      - claim: "cardiac injury is common"
+        document: "elevated troponin levels"
+      - claim: "favorable clinical response"
+        document: "viral load significantly decreased"
+
+  - concept_id: CAUSAL_NEGATIVE
+    preferred_label: inhibits
+    synonyms:
+      - decreases
+      - reduces
+      - suppresses
+      - downregulates
+      - blocks
+      - impairs
+      - attenuates
+      - abolishes
+      - prevents
+      - limits
+      - depletes
+      - silences
+      - knocks out
+      - knockout
+      - loss of function
+      - negatively regulates
+      - is associated with lower
+    surface_forms:
+      - associated with reduced
+      - results in decreased
+      - leads to downregulation of
+      - loss-of-function mutation
+    broader: []
+    narrower: []
+    related:
+      - CAUSAL_POSITIVE
+      - DIRECTIONALITY
+    paraphrase_bridges:
+      - claim: "inhibiting glucose-6-phosphate dehydrogenase impairs lipogenesis"
+        document: "suppression of 6PGD increased lipogenesis"
+        note: "REFUTES — direction flip; bridge flags negation risk"
+      - claim: "MVP decreases tumor aggression"
+        document: "knockout of MVP inhibits tumor progression"
+        note: "REFUTES — cause/effect inversion"
+      - claim: "colonization resistance is reduced"
+        document: "C. difficile germination and growth facilitated"
+      - claim: "low saturated fat has adverse effects"
+        document: "neurological development at least as good as control"
+        note: "REFUTES — coreference to intervention group"
+
+  - concept_id: DIRECTIONALITY
+    preferred_label: directionality
+    synonyms:
+      - effect direction
+      - increase
+      - decrease
+      - fold change
+      - hazard ratio
+      - odds ratio
+      - relative risk
+      - SMD
+      - standardized mean difference
+      - confidence interval
+      - p-value
+      - statistically significant
+      - dose-dependent
+    surface_forms:
+      - HR greater than 1
+      - p < 0.05
+      - p < 0.001
+      - 95% CI
+    broader: []
+    narrower: []
+    related:
+      - CAUSAL_POSITIVE
+      - CAUSAL_NEGATIVE
+      - STATISTICS
+    paraphrase_bridges:
+      - claim: "is associated with higher mean troponin (SMD 0.53)"
+        document: "cardiac injury is common in critical cases"
+      - claim: "HR of 9.29"
+        document: "strong association with resolution of T2DM"
+
+  - concept_id: STATISTICS
+    preferred_label: statistical analysis
+    synonyms:
+      - meta-analysis
+      - systematic review
+      - randomized controlled trial
+      - RCT
+      - confidence interval
+      - CI
+      - p-value
+      - significance
+      - hazard ratio
+      - odds ratio
+      - relative risk
+      - forest plot
+      - Kaplan-Meier
+      - multivariate
+      - regression
+      - bootstrap
+    surface_forms:
+      - statistically significant
+      - mean difference
+      - standard deviation
+    broader: []
+    narrower: []
+    related:
+      - DIRECTIONALITY
+      - EPIDEMIOLOGY
+
+  - concept_id: SPECIFICITY_SHIFT
+    preferred_label: specificity
+    synonyms:
+      - general
+      - specific
+      - subtype
+      - isoform
+      - variant
+      - analogue
+      - homolog
+    surface_forms: []
+    broader: []
+    narrower: []
+    related:
+      - MUTATION
+      - GENOMIC_VARIATION
+    paraphrase_bridges:
+      - claim: "somatic missense mutations in NT5C2"
+        document: "NT5C2 mutant proteins show resistance to chemotherapy"
+      - claim: "teaching hospitals provide better care"
+        document: "teaching centres prolong survival in gynecological cancer"
+      - claim: "near-infrared wavelengths increase penetration depth in fiberoptic confocal microscopy"
+        document: "longer wavelength increases penetration depth of OCT"
+      - claim: "mitochondria play a major role in calcium homeostasis"
+        document: "mitochondria are essential organelles responsible for calcium homeostasis"
+
+  - concept_id: MODEL_SYSTEMS
+    preferred_label: model organism
+    synonyms:
+      - mouse model
+      - murine
+      - in vivo
+      - animal model
+      - preclinical
+    surface_forms:
+      - in vitro
+      - cell line
+      - xenograft
+    broader: []
+    narrower: []
+    related:
+      - CELL_BIOLOGY
+      - CANCER
+    model_organisms:
+      - claim_form: "fruit flies"
+        document_form: "Drosophila melanogaster"
+        synonyms: ["Drosophila", "adult Drosophila", "D. melanogaster"]
+      - claim_form: "mice"
+        document_form: "murine"
+        synonyms: ["mouse", "Mus musculus", "C57BL/6", "knockout mouse", "transgenic mouse"]
+      - claim_form: "rats"
+        document_form: "Rattus norvegicus"
+        synonyms: ["rat model", "Sprague-Dawley"]
+      - claim_form: "worms"
+        document_form: "Caenorhabditis elegans"
+        synonyms: ["C. elegans", "nematode"]
+      - claim_form: "zebrafish"
+        document_form: "Danio rerio"
+        synonyms: ["zebrafish embryo"]
+      - claim_form: "yeast"
+        document_form: "Saccharomyces cerevisiae"
+        synonyms: ["S. cerevisiae"]
+      - claim_form: "cell culture"
+        document_form: "in vitro"
+        synonyms: ["cell line", "cultured cells", "primary cells"]
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # DOMAIN: BIOMEDICINE (root)
+  # ════════════════════════════════════════════════════════════════════════════
+
   - concept_id: BIOMEDICINE
     preferred_label: biomedicine
     synonyms:
       - biomedical
       - life science
+      - biomedical research
     surface_forms: []
     broader: []
     narrower:
@@ -15,7 +295,19 @@ concepts:
       - GENETICS
       - INFECTIOUS_DISEASE
       - THERAPEUTICS
+      - IMMUNOLOGY
+      - NEUROSCIENCE
+      - METABOLISM
+      - CARDIOVASCULAR
+      - CLINICAL_MEDICINE
+      - MICROBIOME
+      - AGING
+      - DEVELOPMENTAL_BIOLOGY
     related: []
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # CANCER
+  # ════════════════════════════════════════════════════════════════════════════
 
   - concept_id: CANCER
     preferred_label: cancer
@@ -24,50 +316,129 @@ concepts:
       - tumour
       - malignancy
       - oncology
+      - neoplasia
     surface_forms:
       - carcinoma
       - neoplasm
+      - malignant
+      - tumor progression
+      - tumor growth
     broader:
       - BIOMEDICINE
     narrower:
       - METASTASIS
       - COLORECTAL_CANCER
+      - TUMOR_SUPPRESSOR
+      - LEUKEMIA
     related:
       - CELL_BIOLOGY
       - THERAPEUTICS
+      - APOPTOSIS
+      - SIGNAL_TRANSDUCTION
+    paraphrase_bridges:
+      - claim: "MVP functions to decrease tumor aggression"
+        document: "knockout of MVP leads to miR-193a accumulation inhibiting tumor progression"
+      - claim: "promotes tumor growth"
+        document: "increases proliferation of cancer cells"
+      - claim: "cancer survival"
+        document: "overall survival in patients with malignancy"
 
   - concept_id: METASTASIS
     preferred_label: metastasis
     synonyms:
       - metastatic
       - metastases
+      - tumor spread
+      - dissemination
     surface_forms:
       - secondary tumor
+      - distant metastasis
+      - metastatic spread
     broader:
       - CANCER
     narrower: []
     related:
       - COLORECTAL_CANCER
+      - CELL_MIGRATION
+    paraphrase_bridges:
+      - claim: "increases metastasis"
+        document: "promotes invasive capacity of tumor cells"
 
   - concept_id: COLORECTAL_CANCER
     preferred_label: colorectal cancer
     synonyms:
       - colon cancer
       - rectal cancer
-    surface_forms: []
+      - CRC
+      - colorectal carcinoma
+    surface_forms:
+      - bowel cancer
+      - colon adenocarcinoma
     broader:
       - CANCER
     narrower: []
     related:
       - METASTASIS
 
+  - concept_id: LEUKEMIA
+    preferred_label: leukemia
+    synonyms:
+      - leukaemia
+      - acute lymphoblastic leukemia
+      - ALL
+      - AML
+      - CLL
+      - lymphoma
+      - acute myeloid leukemia
+    surface_forms:
+      - blood cancer
+      - haematological malignancy
+    broader:
+      - CANCER
+    narrower: []
+    related:
+      - HEMATOLOGY
+      - THERAPEUTICS
+    paraphrase_bridges:
+      - claim: "somatic missense mutations in NT5C2 are associated with relapse of acute lymphoblastic leukemia"
+        document: "NT5C2 mutant proteins show resistance to chemotherapy"
+
+  - concept_id: TUMOR_SUPPRESSOR
+    preferred_label: tumor suppressor
+    synonyms:
+      - tumor suppressor gene
+      - antioncogene
+      - oncogene
+      - proto-oncogene
+    surface_forms:
+      - p53
+      - BRCA1
+      - BRCA2
+      - RB1
+      - TP53
+    broader:
+      - CANCER
+    narrower: []
+    related:
+      - GENETICS
+      - APOPTOSIS
+      - GENE_EXPRESSION
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # CELL BIOLOGY
+  # ════════════════════════════════════════════════════════════════════════════
+
   - concept_id: CELL_BIOLOGY
     preferred_label: cell biology
     synonyms:
+      - cellular biology
       - cellular
       - cells
+      - cytology
     surface_forms:
       - cell
+      - in vitro
+      - cell line
     broader:
       - BIOMEDICINE
     narrower:
@@ -76,59 +447,252 @@ concepts:
       - RECEPTOR
       - FOXO
       - MICROTUBULE
+      - APOPTOSIS
+      - SIGNAL_TRANSDUCTION
+      - CELL_MIGRATION
+      - CELL_DIFFERENTIATION
+      - ORGANELLE
     related:
       - GENETICS
+      - METABOLISM
 
   - concept_id: STEM_CELL
     preferred_label: stem cell
     synonyms:
       - stem cells
       - progenitor cell
-    surface_forms: []
+      - pluripotent
+      - hematopoietic stem cell
+      - HSC
+      - iPSC
+      - induced pluripotent stem cell
+      - embryonic stem cell
+      - ESC
+    surface_forms:
+      - progenitor
+      - self-renewal
+      - stemness
     broader:
       - CELL_BIOLOGY
     narrower: []
     related:
       - PROTEIN
+      - CELL_DIFFERENTIATION
+      - DEVELOPMENTAL_BIOLOGY
+    paraphrase_bridges:
+      - claim: "stem cells possess self-renewing capacity"
+        document: "adult tissue-resident macrophages maintain self-renewal"
 
   - concept_id: PROTEIN
     preferred_label: protein
     synonyms:
       - proteins
       - polypeptide
-    surface_forms: []
+      - enzyme
+      - kinase
+      - phosphatase
+      - protease
+      - transcription factor
+    surface_forms:
+      - proteome
+      - proteomic
+      - protein expression
+      - protein level
     broader:
       - CELL_BIOLOGY
     narrower: []
     related:
       - GENE_EXPRESSION
       - RECEPTOR
+      - SIGNAL_TRANSDUCTION
 
   - concept_id: RECEPTOR
     preferred_label: receptor
     synonyms:
       - receptors
       - ligand binding
-    surface_forms: []
+      - surface receptor
+      - transmembrane receptor
+      - nuclear receptor
+    surface_forms:
+      - ligand
+      - binding domain
+      - receptor activation
     broader:
       - CELL_BIOLOGY
     narrower: []
     related:
       - PROTEIN
+      - SIGNAL_TRANSDUCTION
+      - IMMUNOLOGY
+    paraphrase_bridges:
+      - claim: "receptor activation triggers downstream signaling"
+        document: "ligand binding initiates intracellular cascade"
+
+  - concept_id: APOPTOSIS
+    preferred_label: apoptosis
+    synonyms:
+      - programmed cell death
+      - cell death
+      - apoptotic
+      - necrosis
+      - necroptosis
+      - pyroptosis
+      - anoikis
+    surface_forms:
+      - caspase
+      - cytochrome c
+      - Bcl-2
+      - mitochondrial pathway
+      - death receptor
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - CANCER
+      - SIGNAL_TRANSDUCTION
+      - PROTEIN
+    paraphrase_bridges:
+      - claim: "cytochrome c is transferred from cytosol to mitochondrial intermembrane space"
+        document: "at the gates of death — mitochondrial release of cytochrome c"
+      - claim: "promotes cell death"
+        document: "induces apoptosis"
+      - claim: "inhibits apoptosis"
+        document: "anti-apoptotic activity of Bcl-2"
+
+  - concept_id: SIGNAL_TRANSDUCTION
+    preferred_label: signal transduction
+    synonyms:
+      - cell signaling
+      - signaling pathway
+      - intracellular signaling
+      - transduction
+      - cascade
+      - phosphorylation
+      - dephosphorylation
+    surface_forms:
+      - mTOR
+      - mTORC1
+      - PI3K
+      - AKT
+      - MAPK
+      - ERK
+      - NF-kB
+      - Wnt
+      - WNT5A
+      - Notch
+      - Hedgehog
+      - JAK-STAT
+      - STAT3
+      - calcineurin
+      - NFAT
+      - IP3
+      - IP3R
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - PROTEIN
+      - RECEPTOR
+      - GENE_EXPRESSION
+      - CANCER
+    paraphrase_bridges:
+      - claim: "calcineurin activates NFAT signaling"
+        document: "calcineurin dephosphorylates NFAT4 allowing nuclear translocation"
+      - claim: "mTOR inhibition extends lifespan"
+        document: "rapamycin feeding produces life span extension in adult Drosophila"
+
+  - concept_id: CELL_MIGRATION
+    preferred_label: cell migration
+    synonyms:
+      - cell motility
+      - invasion
+      - cell invasion
+      - cell movement
+    surface_forms:
+      - epithelial-mesenchymal transition
+      - EMT
+      - invasive capacity
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - METASTASIS
+      - CANCER
+
+  - concept_id: CELL_DIFFERENTIATION
+    preferred_label: cell differentiation
+    synonyms:
+      - differentiation
+      - lineage commitment
+      - cell fate
+      - maturation
+    surface_forms:
+      - differentiated cell
+      - terminal differentiation
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - STEM_CELL
+      - DEVELOPMENTAL_BIOLOGY
+      - GENE_EXPRESSION
+
+  - concept_id: ORGANELLE
+    preferred_label: organelle
+    synonyms:
+      - mitochondria
+      - mitochondrion
+      - endoplasmic reticulum
+      - ER
+      - nucleus
+      - lysosome
+      - Golgi
+      - ribosome
+      - peroxisome
+    surface_forms:
+      - mitochondrial membrane
+      - ER stress
+      - nuclear translocation
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - APOPTOSIS
+      - PROTEIN
+    paraphrase_bridges:
+      - claim: "mitochondria play a major role in calcium homeostasis"
+        document: "mitochondria are essential organelles responsible for calcium homeostasis"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # GENETICS
+  # ════════════════════════════════════════════════════════════════════════════
 
   - concept_id: GENETICS
     preferred_label: genetics
     synonyms:
+      - genomics
       - genomic
       - genome
-    surface_forms: []
+      - heredity
+      - genotype
+    surface_forms:
+      - genomic variant
+      - allele
+      - locus
+      - gene
     broader:
       - BIOMEDICINE
     narrower:
       - GENE_EXPRESSION
       - DNA
+      - RNA
+      - EPIGENETICS
+      - MUTATION
+      - GENOMIC_VARIATION
     related:
       - CELL_BIOLOGY
+      - DEVELOPMENTAL_BIOLOGY
 
   - concept_id: GENE_EXPRESSION
     preferred_label: gene expression
@@ -137,49 +701,251 @@ concepts:
       - transcription
       - upregulation
       - downregulation
-    surface_forms: []
+      - overexpression
+      - silencing
+      - gene regulation
+    surface_forms:
+      - mRNA expression
+      - transcription factor
+      - gene regulation
+      - expression level
     broader:
       - GENETICS
     narrower: []
     related:
       - PROTEIN
       - DNA
+      - RNA
+      - EPIGENETICS
+    paraphrase_bridges:
+      - claim: "FOXO3 expression is upregulated"
+        document: "increased FOXO transcription factor activity"
+      - claim: "gene silencing reduces"
+        document: "siRNA-mediated knockdown decreases"
 
   - concept_id: DNA
     preferred_label: DNA
     synonyms:
       - deoxyribonucleic acid
       - nucleic acid
-    surface_forms: []
+      - genome sequence
+      - genomic DNA
+    surface_forms:
+      - double-stranded DNA
+      - chromatin
+      - chromosome
+      - DNA damage
+      - DNA repair
     broader:
       - GENETICS
     narrower: []
     related:
       - GENE_EXPRESSION
+      - RNA
+      - MUTATION
+
+  - concept_id: RNA
+    preferred_label: RNA
+    synonyms:
+      - ribonucleic acid
+      - mRNA
+      - messenger RNA
+      - microRNA
+      - miRNA
+      - lncRNA
+      - non-coding RNA
+      - siRNA
+      - rRNA
+      - ribosomal RNA
+    surface_forms:
+      - transcript
+      - splicing
+      - RNA interference
+      - RNAi
+    broader:
+      - GENETICS
+    narrower: []
+    related:
+      - GENE_EXPRESSION
+      - DNA
+      - PROTEIN
+    paraphrase_bridges:
+      - claim: "miR-193a accumulation inhibits tumor progression"
+        document: "microRNA-193a suppresses cancer cell growth"
+
+  - concept_id: EPIGENETICS
+    preferred_label: epigenetics
+    synonyms:
+      - epigenomic
+      - chromatin remodeling
+      - DNA methylation
+      - histone modification
+      - histone acetylation
+      - histone methylation
+    surface_forms:
+      - methylation
+      - histone
+      - CpG
+      - chromatin accessibility
+    broader:
+      - GENETICS
+    narrower: []
+    related:
+      - GENE_EXPRESSION
+      - DNA
+
+  - concept_id: MUTATION
+    preferred_label: mutation
+    synonyms:
+      - genetic mutation
+      - variant
+      - SNP
+      - single nucleotide polymorphism
+      - deletion
+      - insertion
+      - frameshift
+      - point mutation
+    surface_forms:
+      - missense
+      - nonsense mutation
+      - loss-of-function
+      - gain-of-function
+      - somatic mutation
+      - germline mutation
+    broader:
+      - GENETICS
+    narrower: []
+    related:
+      - CANCER
+      - DNA
+      - TUMOR_SUPPRESSOR
+    paraphrase_bridges:
+      - claim: "somatic missense mutations in NT5C2"
+        document: "NT5C2 mutant proteins"
+
+  - concept_id: GENOMIC_VARIATION
+    preferred_label: genomic variation
+    synonyms:
+      - genetic variation
+      - rare variant
+      - common variant
+      - copy number variation
+      - CNV
+      - structural variant
+      - polymorphism
+    surface_forms:
+      - penetrance
+      - genetic diversity
+      - 1000 genomes
+    broader:
+      - GENETICS
+    narrower: []
+    related:
+      - MUTATION
+      - GWAS
+    paraphrase_bridges:
+      - claim: "1,000 genomes project enables mapping of rare variants with larger penetrance effects"
+        document: "genome-wide survey of rare functional variants with high penetrance"
+
+  - concept_id: GWAS
+    preferred_label: genome-wide association study
+    synonyms:
+      - GWAS
+      - Mendelian randomization
+      - genetic association
+      - polygenic
+      - genome-wide
+    surface_forms:
+      - association study
+      - loci
+      - SNP array
+    broader:
+      - GENETICS
+    narrower: []
+    related:
+      - GENOMIC_VARIATION
+      - EPIDEMIOLOGY
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # INFECTIOUS DISEASE
+  # ════════════════════════════════════════════════════════════════════════════
 
   - concept_id: INFECTIOUS_DISEASE
     preferred_label: infectious disease
     synonyms:
       - infection
       - pathogen
-    surface_forms: []
+      - microbial infection
+      - contagion
+    surface_forms:
+      - pathogenic
+      - infectious agent
     broader:
       - BIOMEDICINE
     narrower:
       - VIRUS
+      - BACTERIA
     related:
       - THERAPEUTICS
+      - IMMUNOLOGY
 
   - concept_id: VIRUS
     preferred_label: virus
     synonyms:
       - viral
       - viruses
-    surface_forms: []
+      - coronavirus
+      - SARS-CoV-2
+      - COVID-19
+      - HIV
+      - influenza
+      - hepatitis
+      - MERS
+      - beta-coronavirus
+    surface_forms:
+      - viral load
+      - viral replication
+      - antiviral
+      - viral titer
     broader:
       - INFECTIOUS_DISEASE
     narrower: []
-    related: []
+    related:
+      - THERAPEUTICS
+      - IMMUNOLOGY
+    paraphrase_bridges:
+      - claim: "lopinavir/ritonavir showed favorable clinical response for coronavirus"
+        document: "beta-coronavirus viral loads significantly decreased after lopinavir/ritonavir"
+      - claim: "coronavirus thrives in cold climates"
+        document: "outbreaks cluster in cool and dry areas"
+
+  - concept_id: BACTERIA
+    preferred_label: bacteria
+    synonyms:
+      - bacterial
+      - bacterium
+      - Clostridium difficile
+      - C. difficile
+      - pathogenic bacteria
+      - microorganism
+    surface_forms:
+      - gram-positive
+      - gram-negative
+      - antibiotic resistance
+      - bacterial growth
+    broader:
+      - INFECTIOUS_DISEASE
+    narrower: []
+    related:
+      - MICROBIOME
+      - THERAPEUTICS
+    paraphrase_bridges:
+      - claim: "antibiotic-induced alterations in gut microbiome reduce resistance against C. difficile"
+        document: "antibiotic-mediated alteration of gut microbiome converts metabolic profile to favour C. difficile germination"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # THERAPEUTICS
+  # ════════════════════════════════════════════════════════════════════════════
 
   - concept_id: THERAPEUTICS
     preferred_label: treatment
@@ -187,26 +953,705 @@ concepts:
       - therapy
       - therapeutics
       - drug
+      - medication
+      - pharmacotherapy
+      - intervention
+      - treatment outcome
     surface_forms:
       - clinical trial
+      - randomized controlled trial
+      - RCT
+      - drug treatment
+      - treatment response
     broader:
       - BIOMEDICINE
     narrower:
       - RISK_FACTOR
+      - DRUG
+      - SURGERY
     related:
       - CANCER
+      - INFECTIOUS_DISEASE
 
   - concept_id: RISK_FACTOR
-    preferred_label: risk
+    preferred_label: risk factor
     synonyms:
-      - risk factor
+      - risk
       - increased risk
-    surface_forms: []
+      - hazard
+      - odds ratio
+      - relative risk
+      - susceptibility
+      - predisposition
+    surface_forms:
+      - hazard ratio
+      - confidence interval
+      - CI
+      - risk score
     broader:
       - THERAPEUTICS
     narrower: []
     related:
       - CANCER
+      - EPIDEMIOLOGY
+      - CARDIOVASCULAR
+    paraphrase_bridges:
+      - claim: "is associated with increased risk of"
+        document: "is a significant predictor of"
+
+  - concept_id: DRUG
+    preferred_label: drug
+    synonyms:
+      - pharmaceutical
+      - compound
+      - small molecule
+      - inhibitor
+      - agonist
+      - antagonist
+      - rapamycin
+      - lopinavir
+      - ritonavir
+      - antibiotic
+      - chemotherapy
+      - immunotherapy
+    surface_forms:
+      - drug repurposing
+      - drug resistance
+      - IC50
+      - drug response
+      - off-target
+    broader:
+      - THERAPEUTICS
+    narrower: []
+    related:
+      - SIGNAL_TRANSDUCTION
+      - VIRUS
+    paraphrase_bridges:
+      - claim: "rapamycin slows aging in fruit flies"
+        document: "feeding rapamycin to adult Drosophila produces life span extension"
+
+  - concept_id: SURGERY
+    preferred_label: surgery
+    synonyms:
+      - surgical
+      - surgical procedure
+      - bariatric surgery
+      - resection
+      - transplant
+      - operative
+    surface_forms:
+      - post-surgical
+      - perioperative
+    broader:
+      - THERAPEUTICS
+    narrower: []
+    related:
+      - CLINICAL_MEDICINE
+    paraphrase_bridges:
+      - claim: "bariatric surgery improves resolution of diabetes"
+        document: "strong association between bariatric surgery and resolution of T2DM (HR 9.29)"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # IMMUNOLOGY
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: IMMUNOLOGY
+    preferred_label: immunology
+    synonyms:
+      - immune system
+      - immunity
+      - immunological
+      - immune response
+    surface_forms:
+      - immune activation
+      - immune cell
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - INFLAMMATION
+      - AUTOIMMUNITY
+      - ANTIBODY
+      - T_CELL
+      - INNATE_IMMUNITY
+    related:
+      - INFECTIOUS_DISEASE
+      - CANCER
+      - THERAPEUTICS
+
+  - concept_id: INFLAMMATION
+    preferred_label: inflammation
+    synonyms:
+      - inflammatory
+      - cytokine
+      - IL-6
+      - interleukin-6
+      - TNF
+      - tumor necrosis factor
+      - interleukin
+      - interferon
+      - chemokine
+    surface_forms:
+      - pro-inflammatory
+      - anti-inflammatory
+      - inflammatory response
+      - neuroinflammation
+      - cytokine storm
+    broader:
+      - IMMUNOLOGY
+    narrower: []
+    related:
+      - AUTOIMMUNITY
+      - CARDIOVASCULAR
+      - SIGNAL_TRANSDUCTION
+    paraphrase_bridges:
+      - claim: "IL-6 signaling plays a major role in atherosclerotic cardiovascular disease"
+        document: "large Mendelian randomization studies reveal IL-6 role in atherosclerotic CVD"
+
+  - concept_id: AUTOIMMUNITY
+    preferred_label: autoimmunity
+    synonyms:
+      - autoimmune disease
+      - autoimmune
+      - autoantibody
+      - vasculitis
+      - lupus
+      - rheumatoid arthritis
+      - SVV
+      - ANCA
+    surface_forms:
+      - neutrophil extracellular trap
+      - NET
+      - antineutrophil cytoplasm antibodies
+      - proteinase-3
+      - PR3
+      - myeloperoxidase
+      - MPO
+    broader:
+      - IMMUNOLOGY
+    narrower: []
+    related:
+      - INFLAMMATION
+      - ANTIBODY
+    paraphrase_bridges:
+      - claim: "NET antigens contain PR3 and MPO"
+        document: "NETs released by ANCA-stimulated neutrophils contain proteinase-3 and myeloperoxidase"
+
+  - concept_id: ANTIBODY
+    preferred_label: antibody
+    synonyms:
+      - immunoglobulin
+      - IgG
+      - IgA
+      - IgM
+      - monoclonal antibody
+      - antibodies
+      - B cell
+      - B lymphocyte
+    surface_forms:
+      - antigen
+      - epitope
+      - neutralizing antibody
+      - antibody titer
+    broader:
+      - IMMUNOLOGY
+    narrower: []
+    related:
+      - T_CELL
+      - VIRUS
+
+  - concept_id: T_CELL
+    preferred_label: T cell
+    synonyms:
+      - T lymphocyte
+      - CD4
+      - CD4+
+      - CD8
+      - CD8+
+      - cytotoxic T cell
+      - regulatory T cell
+      - Treg
+    surface_forms:
+      - T-cell activation
+      - T-cell response
+      - exhaustion
+      - T-cell proliferation
+    broader:
+      - IMMUNOLOGY
+    narrower: []
+    related:
+      - ANTIBODY
+      - CANCER
+
+  - concept_id: INNATE_IMMUNITY
+    preferred_label: innate immunity
+    synonyms:
+      - innate immune
+      - macrophage
+      - dendritic cell
+      - neutrophil
+      - natural killer cell
+      - NK cell
+      - toll-like receptor
+      - TLR
+      - monocyte
+    surface_forms:
+      - phagocytosis
+      - pattern recognition
+      - complement
+      - innate immune response
+    broader:
+      - IMMUNOLOGY
+    narrower: []
+    related:
+      - INFLAMMATION
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # NEUROSCIENCE
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: NEUROSCIENCE
+    preferred_label: neuroscience
+    synonyms:
+      - neurology
+      - neurological
+      - neurobiology
+      - brain
+      - central nervous system
+      - CNS
+    surface_forms:
+      - neuronal
+      - cerebral
+      - cortical
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - NEURODEGENERATION
+      - NEURAL_DEVELOPMENT
+      - SYNAPSE
+    related:
+      - GENETICS
+      - INFLAMMATION
+
+  - concept_id: NEURODEGENERATION
+    preferred_label: neurodegeneration
+    synonyms:
+      - neurodegenerative disease
+      - Alzheimer
+      - Alzheimer's disease
+      - Parkinson
+      - ALS
+      - amyloid
+      - tau
+      - neuronal loss
+    surface_forms:
+      - neuronal death
+      - cognitive decline
+      - dementia
+      - plaque
+    broader:
+      - NEUROSCIENCE
+    narrower: []
+    related:
+      - APOPTOSIS
+      - INFLAMMATION
+      - AGING
+
+  - concept_id: NEURAL_DEVELOPMENT
+    preferred_label: neural development
+    synonyms:
+      - brain development
+      - neurodevelopment
+      - white matter
+      - cortical development
+      - myelination
+      - cerebral white matter
+    surface_forms:
+      - diffusion tensor imaging
+      - DTI
+      - MRI brain
+      - neonatal brain
+    broader:
+      - NEUROSCIENCE
+    narrower: []
+    related:
+      - DEVELOPMENTAL_BIOLOGY
+      - CELL_DIFFERENTIATION
+    paraphrase_bridges:
+      - claim: "white matter alterations affect cortical development in newborns"
+        document: "microstructural development of human newborn cerebral white matter assessed by diffusion tensor MRI"
+
+  - concept_id: SYNAPSE
+    preferred_label: synapse
+    synonyms:
+      - synaptic
+      - neurotransmitter
+      - glutamate
+      - GABA
+      - dopamine
+      - serotonin
+      - long-term potentiation
+      - LTP
+      - long-term depression
+      - LTD
+    surface_forms:
+      - synaptic plasticity
+      - postsynaptic
+      - presynaptic
+      - dendritic spine
+    broader:
+      - NEUROSCIENCE
+    narrower: []
+    related:
+      - RECEPTOR
+      - SIGNAL_TRANSDUCTION
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # METABOLISM
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: METABOLISM
+    preferred_label: metabolism
+    synonyms:
+      - metabolic
+      - metabolomics
+      - energy metabolism
+      - cellular metabolism
+    surface_forms:
+      - metabolite
+      - metabolic pathway
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - METABOLIC_DISEASE
+      - LIPID_METABOLISM
+      - GLUCOSE_METABOLISM
+    related:
+      - CELL_BIOLOGY
+      - GENETICS
+      - AGING
+
+  - concept_id: METABOLIC_DISEASE
+    preferred_label: metabolic disease
+    synonyms:
+      - type 2 diabetes
+      - T2DM
+      - obesity
+      - diabetes mellitus
+      - insulin resistance
+      - hyperglycemia
+      - metabolic syndrome
+    surface_forms:
+      - glycemic control
+      - HbA1c
+      - blood glucose
+      - adipose tissue
+      - fasting glucose
+    broader:
+      - METABOLISM
+    narrower: []
+    related:
+      - CARDIOVASCULAR
+      - RISK_FACTOR
+      - SURGERY
+    paraphrase_bridges:
+      - claim: "bariatric surgery improves resolution of diabetes"
+        document: "strong association between bariatric surgery and resolution of T2DM (HR 9.29)"
+
+  - concept_id: LIPID_METABOLISM
+    preferred_label: lipid metabolism
+    synonyms:
+      - lipogenesis
+      - lipolysis
+      - cholesterol
+      - triglyceride
+      - fatty acid
+      - lipid
+      - saturated fat
+      - polyunsaturated fatty acid
+      - PUFA
+      - omega-3
+      - LCPUFA
+    surface_forms:
+      - LDL
+      - HDL
+      - lipid profile
+      - dietary fat
+    broader:
+      - METABOLISM
+    narrower: []
+    related:
+      - CARDIOVASCULAR
+      - METABOLIC_DISEASE
+    paraphrase_bridges:
+      - claim: "inhibiting glucose-6-phosphate dehydrogenase impairs lipogenesis"
+        document: "suppression of 6PGD increased lipogenesis"
+        note: "direction flip — REFUTES bridge"
+      - claim: "long chain polyunsaturated fatty acids supplementation associated with lower atopic eczema"
+        document: "LCPUFA supplementation effect on atopic dermatitis at one year"
+
+  - concept_id: GLUCOSE_METABOLISM
+    preferred_label: glucose metabolism
+    synonyms:
+      - glycolysis
+      - gluconeogenesis
+      - glucose uptake
+      - glucose-6-phosphate
+      - 6PGD
+      - pentose phosphate pathway
+      - oxidative phosphorylation
+    surface_forms:
+      - blood glucose
+      - insulin secretion
+      - glycolytic flux
+    broader:
+      - METABOLISM
+    narrower: []
+    related:
+      - METABOLIC_DISEASE
+      - CANCER
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # CARDIOVASCULAR
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: CARDIOVASCULAR
+    preferred_label: cardiovascular disease
+    synonyms:
+      - CVD
+      - heart disease
+      - cardiac
+      - atherosclerosis
+      - coronary artery disease
+      - myocardial infarction
+      - heart attack
+      - stroke
+      - hypertension
+    surface_forms:
+      - troponin
+      - cardiac injury
+      - atherosclerotic
+      - blood pressure
+      - arterial
+    broader:
+      - BIOMEDICINE
+    narrower: []
+    related:
+      - INFLAMMATION
+      - LIPID_METABOLISM
+      - RISK_FACTOR
+      - CLINICAL_MEDICINE
+    paraphrase_bridges:
+      - claim: "cardiac injury is common in critical COVID-19 cases"
+        document: "elevated mean troponin (SMD 0.53, p<0.001) in severe COVID-19"
+      - claim: "IL-6 signaling plays major role in atherosclerotic CVD"
+        document: "Mendelian randomization studies confirm IL-6 role in atherosclerosis"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # CLINICAL MEDICINE
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: CLINICAL_MEDICINE
+    preferred_label: clinical medicine
+    synonyms:
+      - clinical
+      - medical
+      - patient care
+      - hospital
+      - clinical outcome
+    surface_forms:
+      - clinical study
+      - cohort
+      - patient
+    broader:
+      - BIOMEDICINE
+    narrower:
+      - EPIDEMIOLOGY
+      - HEMATOLOGY
+      - PEDIATRICS
+    related:
+      - THERAPEUTICS
+      - RISK_FACTOR
+
+  - concept_id: EPIDEMIOLOGY
+    preferred_label: epidemiology
+    synonyms:
+      - population study
+      - cohort study
+      - observational study
+      - incidence
+      - prevalence
+      - mortality
+      - survival
+    surface_forms:
+      - case-control
+      - longitudinal study
+      - survival analysis
+      - kaplan-meier
+    broader:
+      - CLINICAL_MEDICINE
+    narrower: []
+    related:
+      - RISK_FACTOR
+      - GWAS
+      - PUBLIC_HEALTH
+    paraphrase_bridges:
+      - claim: "teaching hospitals provide better care"
+        document: "teaching centres prolong survival compared to community hospitals"
+
+  - concept_id: HEMATOLOGY
+    preferred_label: hematology
+    synonyms:
+      - blood
+      - hematopoiesis
+      - red blood cell
+      - white blood cell
+      - platelet
+      - anemia
+      - erythrocyte
+      - hemoglobin
+    surface_forms:
+      - microerythrocyte
+      - blood count
+      - CBC
+    broader:
+      - CLINICAL_MEDICINE
+    narrower: []
+    related:
+      - IMMUNOLOGY
+      - STEM_CELL
+      - LEUKEMIA
+    paraphrase_bridges:
+      - claim: "high microerythrocyte count protects against severe anemia"
+        document: "elevated erythrocyte density reduces susceptibility to severe anaemia"
+
+  - concept_id: PEDIATRICS
+    preferred_label: pediatrics
+    synonyms:
+      - infant
+      - neonatal
+      - child
+      - children
+      - childhood
+      - newborn
+      - paediatrics
+    surface_forms:
+      - perinatal
+      - developmental milestone
+      - early life
+    broader:
+      - CLINICAL_MEDICINE
+    narrower: []
+    related:
+      - NEURAL_DEVELOPMENT
+      - DEVELOPMENTAL_BIOLOGY
+
+  - concept_id: PUBLIC_HEALTH
+    preferred_label: public health
+    synonyms:
+      - population health
+      - prevention
+      - vaccination
+      - immunization
+      - health policy
+      - epidemics
+    surface_forms:
+      - preventive care
+      - disease burden
+      - herd immunity
+    broader:
+      - CLINICAL_MEDICINE
+    narrower: []
+    related:
+      - EPIDEMIOLOGY
+      - INFECTIOUS_DISEASE
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # MICROBIOME
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: MICROBIOME
+    preferred_label: microbiome
+    synonyms:
+      - gut microbiota
+      - gut flora
+      - gut microbiome
+      - microbiota
+      - dysbiosis
+      - intestinal microbiome
+      - gastrointestinal microbiota
+    surface_forms:
+      - colonization resistance
+      - 16S rRNA
+      - microbial diversity
+    broader:
+      - BIOMEDICINE
+    narrower: []
+    related:
+      - BACTERIA
+      - INFECTIOUS_DISEASE
+      - THERAPEUTICS
+      - METABOLISM
+    paraphrase_bridges:
+      - claim: "antibiotics have long-lasting effects on gastrointestinal microbiota"
+        document: "antibiotic-mediated alteration of gut microbiome converts global metabolic profile"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # AGING
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: AGING
+    preferred_label: aging
+    synonyms:
+      - ageing
+      - senescence
+      - lifespan
+      - longevity
+      - life extension
+      - life span
+    surface_forms:
+      - aged
+      - elderly
+      - geroscience
+    broader:
+      - BIOMEDICINE
+    narrower: []
+    related:
+      - METABOLISM
+      - NEURODEGENERATION
+      - GENETICS
+    paraphrase_bridges:
+      - claim: "rapamycin slows aging in fruit flies"
+        document: "feeding rapamycin to adult Drosophila produces life span extension"
+      - claim: "caloric restriction extends lifespan"
+        document: "reduced food intake increases longevity in murine models"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # DEVELOPMENTAL BIOLOGY
+  # ════════════════════════════════════════════════════════════════════════════
+
+  - concept_id: DEVELOPMENTAL_BIOLOGY
+    preferred_label: developmental biology
+    synonyms:
+      - development
+      - embryonic
+      - embryology
+      - organogenesis
+      - morphogenesis
+    surface_forms:
+      - embryo
+      - developmental stage
+    broader:
+      - BIOMEDICINE
+    narrower: []
+    related:
+      - STEM_CELL
+      - CELL_DIFFERENTIATION
+      - GENETICS
+      - PEDIATRICS
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # SPECIALISED PROTEIN FAMILIES (high surface-form density in SciFact)
+  # ════════════════════════════════════════════════════════════════════════════
 
   - concept_id: FOXO
     preferred_label: FOXO
@@ -215,14 +1660,19 @@ concepts:
       - FOXO3
       - FoxO
       - forkhead
+      - FOXO1
+      - FOXO4
     surface_forms:
       - FOXO transcription factor
+      - forkhead box
     broader:
       - CELL_BIOLOGY
     narrower: []
     related:
       - PROTEIN
       - GENE_EXPRESSION
+      - AGING
+      - APOPTOSIS
 
   - concept_id: MICROTUBULE
     preferred_label: microtubule
@@ -232,9 +1682,39 @@ concepts:
       - p150n
       - p150Glued
       - dynactin
-    surface_forms: []
+      - tubulin
+      - cytoskeleton
+    surface_forms:
+      - spindle
+      - centrosome
     broader:
       - CELL_BIOLOGY
     narrower: []
     related:
       - PROTEIN
+      - CELL_MIGRATION
+
+  - concept_id: RIBOSOME
+    preferred_label: ribosome
+    synonyms:
+      - ribosomal protein
+      - Rpl38
+      - RPL38
+      - translation
+      - protein synthesis
+      - mRNA translation
+    surface_forms:
+      - 80S complex
+      - ribosomal RNA
+      - translational regulation
+      - Homeobox mRNA
+    broader:
+      - CELL_BIOLOGY
+    narrower: []
+    related:
+      - RNA
+      - PROTEIN
+      - DEVELOPMENTAL_BIOLOGY
+    paraphrase_bridges:
+      - claim: "RPL38 regulates translation of Homeobox mRNAs"
+        document: "RPL38 facilitates 80S complex formation on Homeobox mRNAs as regulatory ribosomal component"

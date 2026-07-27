@@ -31,13 +31,15 @@ make datasets-clean
 ```
 
 
-## Versioned business ontologies (dual-hybrid)
+## Versioned business ontologies (passage retrieval)
 
 Each Zero-to-Hero dataset ships a committed `VERSION`, `CHECKSUMS.sha256`,
 `business_ontology.yaml`, and `corpus.jsonl` under `datasets/osint/` and
 `datasets/enterprise/`. Pass the business YAML contents as `business_ontology`
 on `/search` or `/rag/query` (query expansion is per-request; the RAG server
-does not load these from disk).
+does not load these from disk). Index-time concepts use
+`dual_hybrid.business_ontology.index_enabled` when present on disk under
+`datasets/<name>/`.
 
 ```bash
 # Example: expand an OSINT query with the versioned ontology

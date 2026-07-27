@@ -1,6 +1,9 @@
 """Title: search package init
 
-Vespa indexing and RAG search tools.
+Vespa retrieval and RAG search tools (not indexing or evaluation).
+
+Indexing: ``thot.tools.ingest``  
+Evaluation: ``thot.tools.eval``
 
 Author: Eric Blaudez
 

@@ -59,7 +59,8 @@ def main(args: list[str] | None = None) -> None:
     )
 
     parsed = parser.parse_args(args)
-    logging.basicConfig(level=logging.INFO)
+    from thot.core.StructuredLogging import configure_text_logging
+    configure_text_logging(level=logging.INFO, force=True)
     settings = audit_settings()
     hot = open_hot_store(settings.hot_store_url)
     if hot is None:

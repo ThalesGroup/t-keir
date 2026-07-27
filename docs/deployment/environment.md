@@ -36,7 +36,8 @@ to `deploy/compose/.env` (never commit secrets). Deep tables also live on
 | `VESPA_USER_SPACE` | `dev@tkeir` | Streaming group when auth is off / CLI |
 | `GOVERNOR_MODE` | `observe` | `off` \| `observe` \| `enforce` (all services) |
 | `PROVIDER` | `ollama` | `ollama` \| `openai` \| `vllm` |
-| `TRANSFORMERS_CACHE` | Make: `.cache/models` | Hugging Face / model cache |
+| `TRANSFORMERS_CACHE` | Make: `.cache/models` | Hugging Face hub cache (rerankers, etc.; **not** BGE-M3) |
+| `FORCE_BGE` | unset | Set `1` to re-download BGE into `tkeir/resources/modeling/net/bge-m3` |
 | `WORKSPACE` | repo `workspace/` | Host Make workspace root |
 
 ### CORS
@@ -70,9 +71,9 @@ Resolved by `UnifiedLLMWrapper` (`PROVIDER` → provider-specific defaults).
 | `PROVIDER` | `ollama` | Backend selector |
 | `EMBEDDING_MODEL` | ollama: `bge-m3`; openai: `text-embedding-3-small`; vllm: `bge-small-en-v1.5` | Embedding model id |
 | `LLM_MODEL` | ollama/vllm: `mistral-nemo`; openai: `gpt-4o` | Chat / generation |
-| `EMBEDDING_DIM` | `384` | Must match Vespa schema |
+| `EMBEDDING_DIM` | `1024` | Must match Vespa `dense_vector` dim (BGE-M3) |
 | `RERANKER_MODEL` | `BAAI/bge-reranker-v2-m3` | Cross-encoder |
-| `RERANK_STRATEGY` | `cross_encoder` | Rerank mode |
+| `RERANK_STRATEGY` | `embedding_cosine` (see `rag.yaml`) | `cross_encoder` \| `embedding_cosine` |
 | `HTTP_TIMEOUT_SECONDS` | `120` | Provider HTTP timeout |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` (Compose often `http://host.docker.internal:11434`) | Ollama |
 | `OPENAI_API_KEY` | unset | OpenAI / compatible key |

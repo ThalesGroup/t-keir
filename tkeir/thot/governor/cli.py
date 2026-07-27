@@ -42,7 +42,8 @@ def main(args: list[str] | None = None) -> None:
     budgets.add_argument("--actor", default="anonymous")
 
     parsed = parser.parse_args(args)
-    logging.basicConfig(level=logging.INFO)
+    from thot.core.StructuredLogging import configure_text_logging
+    configure_text_logging(level=logging.INFO, force=True)
     settings = governor_settings()
     flags = RuntimeFlagsStore(settings.flags_path)
     budgets_store = BudgetStore(settings.budget_db_path, settings)

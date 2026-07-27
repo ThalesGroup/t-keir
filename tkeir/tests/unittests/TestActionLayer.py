@@ -183,6 +183,9 @@ def test_json_log_formatter_fields():
     assert payload["msg"] == "hello"
     assert payload["service"] == "unit"
     assert payload["correlation_id"] == "c" * 32
+    assert payload["file"]
+    assert payload["function"]
+    assert payload["line"] == 1
     assert "ts" in payload
     assert "level" in payload
 

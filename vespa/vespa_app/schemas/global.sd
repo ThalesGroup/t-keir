@@ -1,0 +1,48 @@
+# Generated from tkeir/configs/rag.yaml via `make schemas`.
+# DO NOT hand-edit — change rag.yaml and regenerate.
+# Source: scripts/generate_vespa_schemas.py
+
+schema global inherits doc_base {
+    document global inherits doc_base {
+        # Dense BGE-M3 with HNSW (declared here — cannot override doc_base fields).
+        field dense_vector type tensor<float>(x[1024]) {
+            indexing: attribute | index
+            attribute {
+                distance-metric: angular
+            }
+            index {
+                hnsw {
+                    max-links-per-node: 16
+                    neighbors-to-explore-at-insert: 200
+                }
+            }
+        }
+    }
+
+    fieldset default {
+        fields: chunk_text
+    }
+
+    rank-profile hybrid {
+        inputs {
+            query(q_dense) tensor<float>(x[1024])
+            query(q_sparse) tensor<float>(token{})
+        }
+        first-phase {
+            expression {
+                closeness(field, dense_vector) * 0.7 +
+                sum(query(q_sparse) * attribute(sparse_vector)) * 0.2 +
+                bm25(chunk_text) * 0.1
+            }
+        }
+    }
+
+    rank-profile dense_only {
+        inputs {
+            query(q_dense) tensor<float>(x[1024])
+        }
+        first-phase {
+            expression: closeness(field, dense_vector)
+        }
+    }
+}

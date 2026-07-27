@@ -85,7 +85,7 @@ class OkfVespaClient(Protocol):
 
 
 class VespaOkfBackend:
-    """Default backend: YQL over ``tkeir_document`` / ``chunk`` schemas."""
+    """Default backend: YQL over ``user`` (streaming) passages."""
 
     def __init__(self, vespa: VespaClient | None = None) -> None:
         self._vespa = vespa or VespaClient()
@@ -98,15 +98,16 @@ class VespaOkfBackend:
         doc_ids: list[str] | None = None,
     ) -> list[dict[str, Any]]:
         space = normalize_user_space(user_space)
-        wanted = {normalize_user_space(d) for d in (doc_ids or [])} if doc_ids else None
-        # Prefer source_doc_id match when callers pass logical ids.
-        hits = max(1, min(int(max_docs), 400))
+        wanted = (
+            {normalize_user_space(d) for d in (doc_ids or [])}
+            if doc_ids
+            else None
+        )
+        hits = max(1, min(int(max_docs) * 4, 400))
         payload: dict[str, Any] = {
-            "yql": (
-                "select * from tkeir_document where true "
-                f"limit {hits}"
-            ),
+            "yql": f"select * from user where true limit {hits}",
             "hits": hits,
+            "ranking.profile": "unranked",
             "streaming.groupname": space,
         }
         response = await self._vespa.search(payload)
@@ -116,25 +117,43 @@ class VespaOkfBackend:
             else None
         ) or []
         out: list[dict[str, Any]] = []
+        seen_refs: set[str] = set()
         for child in children:
             fields = dict((child or {}).get("fields") or {})
             fields["_vespa_id"] = str((child or {}).get("id") or "")
             doc_space = normalize_user_space(
-                str(fields.get("user_space") or space)
+                str(fields.get("userspace_id") or fields.get("user_space") or space)
             )
             if doc_space != space:
                 continue
-            source = str(fields.get("source_doc_id") or "")
+            source = str(
+                fields.get("source_ref") or fields.get("source_doc_id") or ""
+            )
+            if source and source in seen_refs:
+                continue
             if wanted is not None:
                 key = source or fields.get("_vespa_id") or ""
                 if source not in wanted and key not in wanted:
-                    # also allow stable key / basename matches
                     if not any(
                         w in source or source.endswith(w) or w == key
                         for w in wanted
                     ):
                         continue
-            out.append(fields)
+            # Map passage fields to the parent-shaped dict OKF expects.
+            mapped = dict(fields)
+            mapped.setdefault("source_doc_id", source)
+            mapped.setdefault(
+                "title",
+                (str(fields.get("chunk_text") or "")[:80] or source),
+            )
+            mapped.setdefault(
+                "content",
+                [str(fields.get("chunk_text") or "")],
+            )
+            mapped.setdefault("user_space", doc_space)
+            if source:
+                seen_refs.add(source)
+            out.append(mapped)
             if len(out) >= max_docs:
                 break
         return out
@@ -147,24 +166,26 @@ class VespaOkfBackend:
         parent_source_id: str,
     ) -> list[dict[str, Any]]:
         space = normalize_user_space(user_space)
-        # Match by doc_ref attribute when possible; fall back to parent title search.
+        needle = parent_source_id or doc_ref
+        lit = _yql_escape(needle)
         yql = (
-            f'select * from chunk where doc_ref contains '
-            f'"{_yql_escape(doc_ref)}" limit 200'
+            f'select * from user where source_ref contains "{lit}" '
+            f"limit 200"
         )
         payload: dict[str, Any] = {
             "yql": yql,
             "hits": 200,
+            "ranking.profile": "unranked",
             "streaming.groupname": space,
         }
         try:
             response = await self._vespa.search(payload)
         except Exception:  # noqa: BLE001
             LOGGER.warning(
-                "chunk lookup failed for doc_ref=%s; retrying broad query",
-                doc_ref,
+                "passage lookup failed for source_ref=%s; retrying broad query",
+                needle,
             )
-            payload["yql"] = "select * from chunk where true limit 200"
+            payload["yql"] = "select * from user where true limit 200"
             response = await self._vespa.search(payload)
         children = (
             ((response.get("root") or {}).get("children"))
@@ -175,20 +196,28 @@ class VespaOkfBackend:
         for child in children:
             fields = (child or {}).get("fields") or {}
             chunk_space = normalize_user_space(
-                str(fields.get("user_space") or space)
+                str(fields.get("userspace_id") or fields.get("user_space") or space)
             )
             if chunk_space != space:
                 continue
-            ref = str(fields.get("doc_ref") or "")
-            if doc_ref and doc_ref not in ref and parent_source_id not in ref:
-                continue
-            cid = str(fields.get("chunk_id") or "").strip()
+            ref = str(fields.get("source_ref") or fields.get("doc_ref") or "")
+            if needle and needle not in ref and parent_source_id not in ref:
+                if doc_ref and doc_ref not in ref:
+                    continue
+            cid = str(
+                fields.get("chunk_id")
+                or fields.get("source_ref")
+                or (child or {}).get("id")
+                or ""
+            ).strip()
             if not cid:
                 continue
             out.append(
                 {
                     "chunk_id": cid,
-                    "text_raw": str(fields.get("text_raw") or "")[:240],
+                    "text_raw": str(
+                        fields.get("chunk_text") or fields.get("text_raw") or ""
+                    )[:240],
                 }
             )
         return out

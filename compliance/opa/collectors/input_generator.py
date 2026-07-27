@@ -145,7 +145,7 @@ def collect_evidence(root: Path) -> dict[str, bool]:
         # GDPR / audit
         "privacy_py_present": _exists(root, "tkeir/thot/audit/privacy.py"),
         "ingest_manifest_schema": _exists(
-            root, "tkeir/thot/ingest/schemas/ingest.manifest.v1.json"
+            root, "tkeir/thot/tools/ingest/schemas/ingest.manifest.v1.json"
         ),
         "audit_worm_retention_set": _file_contains(
             root, "deploy/compose/.env.example", r"AUDIT_WORM_RETENTION_DAYS"

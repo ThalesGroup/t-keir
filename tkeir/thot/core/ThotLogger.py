@@ -13,7 +13,15 @@ import sys
 from time import gmtime, strftime
 
 from thot.core.LoggerConfiguration import LoggerConfiguration
+from thot.core.StructuredLogging import CorrelationIdFilter, TkeirTextFormatter
 from thot.core.ThotMetrics import ThotMetrics
+
+try:
+    from thot.action.correlation import current_correlation_id
+except Exception:  # noqa: BLE001 — keep logger usable before action package
+
+    def current_correlation_id() -> str | None:  # type: ignore[misc]
+        return None
 
 
 class LogUserContext(dict):
@@ -70,6 +78,8 @@ class ThotLogger:
     "logger": {
         "logging-level":"notset | critical" | "error" | "warning" | "info" | "debug"
     }
+
+    Display format includes filename, function, line number, and correlation-id.
     """
 
     logger = None
@@ -104,11 +114,10 @@ class ThotLogger:
                 ]
             ]
         )
+        ThotLogger.logger.handlers.clear()
         screen_handler = logging.StreamHandler(sys.stdout)
-        screen_formatter = logging.Formatter(
-            "[%(levelname)s][%(name)s][%(asctime)s][%(filename)s:%(lineno)s - %(funcName)20s()][PID(%(process)d)] %(message)s"
-        )
-        screen_handler.setFormatter(screen_formatter)
+        screen_handler.addFilter(CorrelationIdFilter())
+        screen_handler.setFormatter(TkeirTextFormatter())
         ThotLogger.logger.addHandler(screen_handler)
 
     @staticmethod
@@ -151,6 +160,39 @@ class ThotLogger:
         if trace:
             log_ctx = log_ctx + "[trace:" + trace + "]"
         return log_ctx
+
+    @staticmethod
+    def _correlation_extra(context: dict | None = None) -> dict[str, str]:
+        """Build ``extra`` so formatters can print correlation-id."""
+        if context and context.get("correlation-id"):
+            return {"correlation_id": str(context["correlation-id"])}
+        bound = current_correlation_id()
+        return {"correlation_id": bound if bound else "-"}
+
+    @staticmethod
+    def _emit(
+        level: str,
+        text: str,
+        *,
+        trace=None,
+        context=None,
+        count_error: bool = False,
+    ) -> None:
+        if not ThotLogger.logger:
+            ThotLogger._default_load()
+        assert ThotLogger.logger is not None
+        msg = (
+            ThotLogger._aggregate_context(trace=trace, context=context)
+            + " "
+            + text
+        )
+        if count_error:
+            ThotMetrics.increment_counter(
+                short_name="logger_errors", path="/", method="error"
+            )
+        log_fn = getattr(ThotLogger.logger, level)
+        # stacklevel=3 → real caller (info/error → _emit → logging).
+        log_fn(msg, extra=ThotLogger._correlation_extra(context), stacklevel=3)
 
     @staticmethod
     def load(config_f, logger_name: str = "default", path: list = []):
@@ -200,18 +242,9 @@ class ThotLogger:
             >>> from thot.core.ThotLogger import ThotLogger
             >>> ThotLogger.critical("failure")  # doctest: +SKIP
         """
-        if not ThotLogger.logger:
-            ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
+        ThotLogger._emit(
+            "critical", text, trace=trace, context=context, count_error=True
         )
-        ThotMetrics.increment_counter(
-            short_name="logger_errors", path="/", method="error"
-        )
-        ThotLogger.logger.critical(msg)
 
     @staticmethod
     def error(text: str, trace=None, context=None):
@@ -226,18 +259,9 @@ class ThotLogger:
             >>> from thot.core.ThotLogger import ThotLogger
             >>> ThotLogger.error("failure")  # doctest: +SKIP
         """
-        if not ThotLogger.logger:
-            ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
+        ThotLogger._emit(
+            "error", text, trace=trace, context=context, count_error=True
         )
-        ThotMetrics.increment_counter(
-            short_name="logger_errors", path="/", method="error"
-        )
-        ThotLogger.logger.error(msg)
 
     @staticmethod
     def warning(text: str, trace=None, context=None):
@@ -252,15 +276,7 @@ class ThotLogger:
             >>> from thot.core.ThotLogger import ThotLogger
             >>> ThotLogger.warning("careful")  # doctest: +SKIP
         """
-        if not ThotLogger.logger:
-            ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
-        )
-        ThotLogger.logger.warning(msg)
+        ThotLogger._emit("warning", text, trace=trace, context=context)
 
     @staticmethod
     def info(text: str, trace=None, context=None):
@@ -275,15 +291,7 @@ class ThotLogger:
             >>> from thot.core.ThotLogger import ThotLogger
             >>> ThotLogger.info("started")  # doctest: +SKIP
         """
-        if not ThotLogger.logger:
-            ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
-        )
-        ThotLogger.logger.info(msg)
+        ThotLogger._emit("info", text, trace=trace, context=context)
 
     @staticmethod
     def debug(text: str, trace=None, context=None):
@@ -298,15 +306,7 @@ class ThotLogger:
             >>> from thot.core.ThotLogger import ThotLogger
             >>> ThotLogger.debug("details")  # doctest: +SKIP
         """
-        if not ThotLogger.logger:
-            ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
-        )
-        ThotLogger.logger.debug(msg)
+        ThotLogger._emit("debug", text, trace=trace, context=context)
 
     @staticmethod
     def shutdown():

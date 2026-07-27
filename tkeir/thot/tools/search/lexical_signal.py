@@ -19,7 +19,8 @@ import re
 from typing import Iterable
 
 # Unicode letter/digit tokens (any script); no language word lists.
-_TOKEN_RE = re.compile(r"[^\W\d_][\w\-]*", re.UNICODE)
+# Digit-led tokens (e.g. 2000, 1000) matter for SciFact-style claims.
+_TOKEN_RE = re.compile(r"[\w][\w\-]*", re.UNICODE)
 # Queries longer than this are treated as document-as-query (e.g. ArguAna).
 _LONG_QUERY_TOKENS = 32
 _MIN_TOKEN_LEN = 3
@@ -186,17 +187,49 @@ def near_copy_penalty(
     """
     if not is_long_query(query):
         return 1.0
-    thresh = threshold if threshold is not None else 0.72
+    thresh = threshold if threshold is not None else 0.55
     jac = jaccard_tokens(query, doc_text)
     contain = max(
         containment_ratio(query, doc_text),
         containment_ratio(doc_text, query),
     )
-    if jac >= thresh or contain >= 0.90:
-        return 0.05
-    if jac >= thresh - 0.10 or contain >= 0.80:
-        return 0.35
+    if jac >= thresh or contain >= 0.85:
+        return 0.04
+    if jac >= thresh - 0.12 or contain >= 0.70:
+        return 0.25
+    if jac >= 0.35:
+        return 0.55
     return 1.0
+
+
+def rare_token_multipliers(
+    query: str,
+    documents: dict[str, tuple[str, str]],
+) -> dict[str, float]:
+    """Relative rare-token gates (boost hits; demote misses only if some hit).
+
+    When no candidate covers any long query token (typical paraphrase pools),
+    return identity multipliers so semantic recall is not buried.
+    """
+    rare = [tok for tok in distinctive_tokens(query) if len(tok) >= 6]
+    if not rare or not documents:
+        return {doc_id: 1.0 for doc_id in documents}
+    hit_counts: dict[str, int] = {}
+    for doc_id, (title, body) in documents.items():
+        doc = _doc_token_index(f"{title} {body}")
+        hit_counts[doc_id] = sum(
+            1 for tok in rare if _stems_match(tok, doc)
+        )
+    if not any(hit_counts.values()):
+        return {doc_id: 1.0 for doc_id in documents}
+    out: dict[str, float] = {}
+    for doc_id, hits in hit_counts.items():
+        if hits == 0:
+            # Stronger demote for lookalikes that miss distinctive claim tokens.
+            out[doc_id] = 0.55
+        else:
+            out[doc_id] = 1.0 + 0.55 * (hits / len(rare))
+    return out
 
 
 def rare_token_multiplier(
@@ -205,18 +238,8 @@ def rare_token_multiplier(
     title: str = "",
     body: str = "",
 ) -> float:
-    """Boost docs that hit long query tokens; demote if they miss all.
-
-    Length ≥ 8 is a language-agnostic proxy for rare identifiers / entities.
-    """
-    rare = [tok for tok in distinctive_tokens(query) if len(tok) >= 8]
-    if not rare:
-        return 1.0
-    doc = _doc_token_index(f"{title} {body}")
-    hits = sum(1 for tok in rare if _stems_match(tok, doc))
-    if hits == 0:
-        return 0.65
-    return 1.0 + 0.40 * (hits / len(rare))
+    """Single-doc rare-token factor (see :func:`rare_token_multipliers`)."""
+    return rare_token_multipliers(query, {"_": (title, body)}).get("_", 1.0)
 
 
 def score_documents(
@@ -226,15 +249,20 @@ def score_documents(
     apply_near_copy_penalty: bool = True,
 ) -> dict[str, float]:
     """Score a list of ``{_id, title?, text?}`` dicts for fusion."""
-    scores: dict[str, float] = {}
-    for doc in documents:
+    rows = list(documents)
+    bodies: dict[str, tuple[str, str]] = {}
+    for doc in rows:
         doc_id = str(doc.get("_id") or doc.get("source_doc_id") or "")
         if not doc_id:
             continue
         title = str(doc.get("title") or "")
         body = str(doc.get("text") or doc.get("best_chunk_text") or "")
+        bodies[doc_id] = (title, body)
+    rare_factors = rare_token_multipliers(query, bodies)
+    scores: dict[str, float] = {}
+    for doc_id, (title, body) in bodies.items():
         score = lexical_overlap_score(query, title=title, body=body)
-        score *= rare_token_multiplier(query, title=title, body=body)
+        score *= rare_factors.get(doc_id, 1.0)
         if apply_near_copy_penalty:
             score *= near_copy_penalty(query, f"{title} {body}".strip())
         scores[doc_id] = score

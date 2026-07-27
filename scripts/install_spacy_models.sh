@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Install spaCy language models (wheel download with spacy download fallback).
+# Skips download when all required models are already importable.
 
 set -euo pipefail
 
@@ -8,10 +9,47 @@ TKEIR_DIR="${ROOT}/tkeir"
 UV="${UV:-uv}"
 PYTHON="${PYTHON:-3.11}"
 MAX_ATTEMPTS="${MAX_ATTEMPTS:-3}"
+FORCE_SPACY_MODELS="${FORCE_SPACY_MODELS:-0}"
 
 if ! command -v "${UV}" >/dev/null 2>&1; then
     echo "uv is required: https://docs.astral.sh/uv/getting-started/installation/" >&2
     exit 1
+fi
+
+SPACY_MODELS=(
+    en_core_web_sm
+    en_core_web_md
+    fr_core_news_sm
+    fr_core_news_md
+    xx_ent_wiki_sm
+)
+
+models_already_present() {
+    cd "${TKEIR_DIR}"
+    "${UV}" run --no-sync --python "${PYTHON}" python - <<'PY'
+import importlib.util
+import sys
+
+models = [
+    "en_core_web_sm",
+    "en_core_web_md",
+    "fr_core_news_sm",
+    "fr_core_news_md",
+    "xx_ent_wiki_sm",
+]
+missing = [m for m in models if importlib.util.find_spec(m) is None]
+if missing:
+    print("missing:" + ",".join(missing), flush=True)
+    sys.exit(1)
+print("present:" + ",".join(models), flush=True)
+sys.exit(0)
+PY
+}
+
+if [ "${FORCE_SPACY_MODELS}" != "1" ] && models_already_present; then
+    echo "WARN: spaCy language models already installed — skipping download."
+    echo "      Set FORCE_SPACY_MODELS=1 to reinstall."
+    exit 0
 fi
 
 install_with_uv() {

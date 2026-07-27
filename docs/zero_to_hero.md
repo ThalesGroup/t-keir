@@ -27,7 +27,7 @@ is the narrative glue.
 T-KEIR turns documents into searchable, attributable knowledge:
 
 ```text
-Documents → pipeline (NLP) → Vespa (streaming, per-user group) → RAG API → HMI
+Documents → pipeline (NLP) → Vespa (global + user passages) → RAG API → HMI
                 ↓ ↓
          ActionRecords → audit (hot + WORM) → governor (kill / budgets)
                 ↓ ↓
@@ -35,7 +35,6 @@ Documents → pipeline (NLP) → Vespa (streaming, per-user group) → RAG API �
                                                        ↓
               MCP tools ←→ Agents / workflows → templates → publish (approved)
 ```
-
 Agents are a first-class feature: YAML roles, multi-agent workflows, ontology-driven
 templates, and an MCP server — see [Agents](tools/agents.md), [MCP](tools/mcp.md),
 [Templates](tools/templates.md). OKF exports the indexed corpus as Markdown
@@ -107,15 +106,16 @@ From the **repository root**:
 make setup
 ```
 
-This creates the `tkeir` uv environment (Python 3.11), installs the package, and
-pulls spaCy models used by the pipeline.
+This creates the `tkeir` uv environment (Python 3.11), installs the package,
+pulls spaCy models, builds the MWE trie if missing, and downloads BGE-M3 into
+`tkeir/resources/modeling/net/bge-m3` (skipped when already present).
 
 **Checkpoint:**
 
 ```bash
 cd tkeir && uv run --python 3.11 python -c "import thot; print(thot.__version__)"
+ls resources/modeling/net/bge-m3/config.json
 ```
-
 ### 3.2 Run the bundled quickstart
 
 ```bash
@@ -224,9 +224,10 @@ After [§4.2](#42-start-the-rag-api):
 
 Still **host-native** for T-KEIR: `make rag`, `make agent`, `make okf`, and
 `cd tkeir-hmi && npm run dev`. Vespa runs in Docker (`make bootstrap`).
-Streaming mode: documents live in a *user space* (Vespa group). Without
-Keycloak, everything uses the fixed principal **`dev@tkeir`** — so OSINT and
-enterprise demo data are both visible to RAG, agents, and OKF in P0.
+Passages live in **`global`** (shared catalog) and/or **`user`** (streaming
+tenant group). Without Keycloak, user feeds use the fixed principal
+**`dev@tkeir`** — so OSINT and enterprise demo data are both visible to RAG,
+agents, and OKF in P0.
 
 | Mode | Vespa `user_space` / `streaming.groupname` |
 |------|--------------------------------------------|
@@ -241,9 +242,9 @@ Details: [Vespa RAG — user space](tools/vespa_rag.md#user-space-streaming-grou
 # Optional: explicit local space (default is already dev@tkeir)
 export VESPA_USER_SPACE=dev@tkeir
 
-make bootstrap # start Vespa + deploy streaming schemas
+make bootstrap # start Vespa + deploy doc_base / global / user schemas
 make index-fixtures # build pipeline JSON under tkeir/tests/indexing/output if needed
-make index # feed into g=dev@tkeir
+make index # feed passages (user group = VESPA_USER_SPACE)
 ```
 
 **Checkpoint:** Vespa responds on `http://localhost:8080` (config on `19071`).

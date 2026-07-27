@@ -49,6 +49,7 @@ dependencies = [
     "pyyaml>=6.0",
     "nltk>=3.10.0",
     "sentence-transformers>=3.0.0",
+    "FlagEmbedding>=1.2.10",
 ]
 
 [project.optional-dependencies]
@@ -75,14 +76,14 @@ Releases = "https://github.com/ThalesGroup/t-keir/releases"
 
 [project.scripts]
 tkeir-pipeline = "thot.tools.pipeline:main"
-tkeir-index-documents = "thot.tools.search.index_documents:main"
+tkeir-index-documents = "thot.tools.ingest.index_documents:main"
 tkeir-rag = "thot.tools.search.app:main"
-tkeir-ingest = "thot.ingest.app:main"
+tkeir-ingest = "thot.tools.ingest.app:main"
 tkeir-audit = "thot.audit.app:main"
 tkeir-governor = "thot.governor.app:main"
 tkeir-init-vespa = "thot.tools.search.init_vespa:main"
 tkeir-create-annotation-resource = "thot.tools.annotation.create_annotation_resource:main"
-tkeir-beir-eval = "thot.tools.search.beir_eval:main"
+tkeir-beir-eval = "thot.tools.eval.beir_eval:main"
 tkeir-mcp = "thot.mcp.server:main"
 tkeir-agent = "thot.agent.service:main"
 tkeir-compose = "thot.compose.__main__:main"
@@ -135,7 +136,7 @@ packages = ["thot"]
 "configs" = "tkeir/configs"
 "resources" = "tkeir/resources"
 "thot/action/schemas" = "thot/action/schemas"
-"thot/ingest/schemas" = "thot/ingest/schemas"
+"thot/tools/ingest/schemas" = "thot/tools/ingest/schemas"
 
 [tool.coverage.run]
 source = ["thot"]
@@ -145,7 +146,7 @@ branch = false
 include = [
     "*/thot/core/*",
     "*/thot/action/*",
-    "*/thot/ingest/*",
+    "*/thot/tools/ingest/*",
     "*/thot/audit/*",
     "*/thot/governor/*",
     "*/thot/okf/*",

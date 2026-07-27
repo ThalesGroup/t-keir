@@ -158,11 +158,16 @@ PDFs and `tests/indexing/output` pipeline JSON).
 
 | Variable | Default in devcontainer | Purpose |
 |---|---|---|
-| `TRANSFORMERS_CACHE` | `/workspace/.cache/models` | Hugging Face / model cache |
+| `TRANSFORMERS_CACHE` | `/workspace/.cache/models` | Hugging Face hub cache (not BGE-M3) |
 | `PROVIDER` | `ollama` | LLM/embeddings provider for indexing and RAG |
 | `OLLAMA_BASE_URL` | `http://host.docker.internal:11434` | Ollama on the **host** (not container `localhost`) |
 | `VESPA_URL` | `http://host.docker.internal:8080` | Vespa document/search API (ports published by Docker on host) |
 | `VESPA_CONFIG_URL` | `http://host.docker.internal:19071` | Vespa config server |
+
+BGE-M3 for FlagEmbedding is downloaded by `make setup` /
+`make pull-bge-model` into `tkeir/resources/modeling/net/bge-m3`
+(shared with the host mount). Ollama’s `bge-m3` pull is separate and only
+needed when `PROVIDER=ollama` uses the Ollama embedding backend.
 
 Ollama must run on the **host** when using `PROVIDER=ollama`:
 

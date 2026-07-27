@@ -1,18 +1,18 @@
 # Timing budgets distilled from smoke report medium/low alerts
-# Use with a mocked DualHybridPipeline (no live Vespa/HF in CI).
+# Use with a mocked PassageRetrievalPipeline (no live Vespa/HF in CI).
 source_report: reports/beir/smoke/report.md
 budgets:
-  - id: perf-cross-encoder-budget
-    issue: slow_stage_cross_encoder
+  - id: perf-colbert-budget
+    issue: slow_stage_colbert
     severity: medium
-    symptom: CE avg 2.1–2.6s/query in smoke at top_m=20×512
+    symptom: ColBERT MaxSim avg >1.5s/query in smoke at top_m=40
     code_focus:
-      - dual_retrieval.py cross_encoder stage
-      - configs/rag.yaml dual_hybrid.cross_encoder.top_m
-    assert: cross_encoder_ms_per_query < 1500 on fixture pool size<=20
+      - search/rerank.py ColBERT (1q×N) / eval/hybrid_retrieve.py batch
+      - configs/rag.yaml dual_hybrid.colbert.top_m
+    assert: colbert_ms_per_query < 1500 on fixture pool size<=20
     notes: >
-      Defaults are top_m=8 / max_length=256; long queries use embedding_cosine.
-      Do not load full HF CrossEncoder in CI unit tests.
+      Defaults are top_m=40 / blend 0.55+0.45; ColBERT is query-time only.
+      Do not load full FlagEmbedding ColBERT encode in CI unit tests.
   - id: perf-ontology-budget
     issue: slow_stage_ontology
     severity: low

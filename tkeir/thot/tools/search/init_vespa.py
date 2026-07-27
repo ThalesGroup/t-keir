@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Title: Init vespa
 
-Initialize Vespa Docker container and deploy 2-level schemas.
+Initialize Vespa Docker container and deploy passage schemas
+(doc_base / global / user).
 
 Author: Eric Blaudez
 
@@ -190,7 +191,7 @@ def main() -> int:
 
     _run(INIT_SCRIPT)
     _wait_for_application(args.vespa_url, args.wait_seconds)
-    print("[✓] Vespa 2-level schemas deployed (document + chunk).")
+    print("[✓] Vespa passage schemas deployed (doc_base / global / user).")
     return 0
 
 

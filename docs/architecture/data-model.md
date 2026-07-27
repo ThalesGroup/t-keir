@@ -113,7 +113,7 @@ classDiagram
 
 ## Ingest models
 
-Source: `thot/ingest/models.py`, schema `thot/ingest/schemas/ingest.manifest.v1.json`.
+Source: `thot/tools/ingest/models.py`, schema `thot/tools/ingest/schemas/ingest.manifest.v1.json`.
 
 ```mermaid
 classDiagram
@@ -172,36 +172,35 @@ classDiagram
 
 ## Vespa storage ERD
 
-Schemas: `vespa/vespa_app/schemas/tkeir_document.sd`, `chunk.sd`.
-Streaming mode collocates documents by `user_space` group.
+Schemas: `vespa/vespa_app/schemas/doc_base.sd`, `global.sd`, `user.sd`.
+`user` uses streaming groups (`userspace_id` / `streaming.groupname`);
+`global` is index-mode (shared catalog).
 
 ```mermaid
 erDiagram
-  TKEIR_DOCUMENT ||--o{ CHUNK : "doc_ref / source_doc_id"
-  TKEIR_DOCUMENT {
-    string user_space PK
-    string source_doc_id
-    string title
-    array_string content
-    string title_lemmatized
-    array_string content_lemmatized
-    string json_ld
-    string shacl_status
+  DOC_BASE ||--|| GLOBAL : inherits
+  DOC_BASE ||--|| USER : inherits
+  DOC_BASE {
+    string source_ref
+    string chunk_text
+    tensor sparse_vector
+    array_string ontology_concepts
   }
-  CHUNK {
-    string user_space PK
-    string chunk_id
-    string doc_ref FK
-    string source_doc_id
-    string text_raw
-    tensor chunk_embedding
-    tensor questions_embeddings
+  GLOBAL {
+    tensor dense_vector_hnsw
+  }
+  USER {
+    string userspace_id
+    tensor dense_vector
   }
 ```
 
-Parent denormalization (`parent_title` / `parent_content`) was removed; dual-hybrid
-retrieval queries both schemas and fuses ranks (see
-[dual-hybrid migration](../runbooks/dual-hybrid-migration.md)).
+`dense_vector` is declared on each child (not in `doc_base`): Vespa forbids
+overriding parent fields, and `global` needs HNSW while `user` needs
+attribute-only streaming NN.
+
+Passages are indexed by `thot.tools.ingest.index_passages` (BGE-M3 dense + sparse). Retrieval is
+`PassageRetrievalPipeline` (`global` / `user` / `both` / `auto`).
 
 Parent documents carry optional `document_ontology.json_ld` produced by
 `thot.tasks.document_ontology` (see [Document ontology](../tools/document_ontology.md)).

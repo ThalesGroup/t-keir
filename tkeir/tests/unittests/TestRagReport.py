@@ -91,10 +91,10 @@ def test_assemble_report_markdown_excludes_vespa_query():
         chunks=[],
         ontology={"entities": [], "keywords": []},
         vespa_hits=3,
-        vespa_query='{"yql": "select * from chunk where true", "hits": 3}',
+        vespa_query='{"yql": "select * from global where true", "hits": 3}',
     )
     assert "## Vespa Search Query" not in report
-    assert "select * from chunk where true" not in report
+    assert "select * from global where true" not in report
     assert "## Question" in report
     assert "Abbey Road" in report
 

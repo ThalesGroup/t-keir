@@ -16,11 +16,12 @@ templates).
 6. **Syntax** — dependencies and Subject–Verb–Object triples
 7. **Keywords** — RAKE-style extraction
 
-Optional RAG path: chunking / questions → embed → Vespa streaming
-(`tkeir_document` + `chunk`, group = Keycloak principal or `dev@tkeir`) →
-hybrid retrieval → FastAPI RAG (`tkeir-rag`).
+Optional RAG path: NLP golden chunks → BGE-M3 embed
+(`tkeir/resources/modeling/net/bge-m3`) → Vespa `global` / `user`
+(group = Keycloak principal or `dev@tkeir`) →
+`PassageRetrievalPipeline` → FastAPI RAG (`tkeir-rag`).
 
-T-KEIR uses spaCy, NLTK, and Hugging Face models where configured.
+T-KEIR uses spaCy, NLTK, and local FlagEmbedding / Hugging Face models where configured.
 
 ## Agentic layer
 
@@ -42,14 +43,15 @@ generated content is approval-gated (`origin=agent-generated`).
 | Component | Entry point | Module |
 |---|---|---|
 | Document pipeline | `tkeir-pipeline` | `thot.tools.pipeline` |
-| Vespa indexing | `tkeir-index-documents` | `thot.tools.search.index_documents` |
+| Vespa indexing | `tkeir-index-documents` | `thot.tools.ingest.index_documents` |
 | Vespa RAG API | `tkeir-rag` | `thot.tools.search.app` |
 | Vespa bootstrap | `tkeir-init-vespa` | `thot.tools.search.init_vespa` |
+| BEIR eval / smoke | `make eval` / `make eval-smoke` | `thot.tools.eval.beir_*` |
 | Annotation MWE trie | `tkeir-create-annotation-resource` | `thot.tools.annotation.create_annotation_resource` |
 | MCP server | `tkeir-mcp` | `thot.mcp.server` |
 | Agent / workflow service | `tkeir-agent` | `thot.agent.service` |
 | Template compose CLI | `tkeir-compose` / `python -m thot.compose` | `thot.compose` |
 
-The root `Makefile` invokes search modules as `python -m thot.tools.search.*`
-and agentic targets (`make mcp`, `make agent`, `make workflow-run`,
-`make compose`). Run `make help` from the repository root for all targets.
+Python packages under `thot/tools/`: **`ingest/`** (index), **`search/`**
+(retrieval / RAG), **`eval/`** (BEIR). The root `Makefile` tags targets
+`[ingest]` / `[search]` / `[eval]`. Run `make help` for all targets.

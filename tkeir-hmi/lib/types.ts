@@ -120,6 +120,18 @@ export interface SearchDocumentHit {
   hit_count: number;
 }
 
+export interface SearchTimings {
+  nlp_ms: number;
+  vespa_ms?: number;
+  vespa_chunk_ms: number;
+  vespa_document_ms: number;
+  rrf_ms: number;
+  rerank_ms: number;
+  ontology_ms?: number;
+  lexical_ms?: number;
+  total_ms?: number;
+}
+
 export interface SearchResponse {
   query: string;
   chunks: SearchChunkHit[];
@@ -127,6 +139,7 @@ export interface SearchResponse {
   vespa_hits: number;
   ranking_profile?: string | null;
   ontology?: FusedOntology | null;
+  timings?: SearchTimings | null;
 }
 
 export type WorkspaceMode = "search" | "rag" | "agent";

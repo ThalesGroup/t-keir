@@ -84,7 +84,7 @@ flowchart LR
 |---|---|---|
 | Short Answer | `answer` | Concise 1–3 sentence synthesis |
 | Detailed Report | `report_markdown`, `highlight_entities`, `highlight_keywords` | HTML markdown view with entity/keyword highlights and `.md` download |
-| Main results | `chunks[]` | Grouped by `parent_doc_id`; chunk text highlighted with top ontology labels |
+| Main results | `chunks[]` | Grouped by parent / `source_ref`; passage text highlighted with top ontology labels |
 | Ontology sidebar | `ontology.entities`, `ontology.keywords` | Tabs by type; click maps `chunk_ids` → highlight/filter chunks |
 
 ### Ontology cross-referencing

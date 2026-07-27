@@ -271,6 +271,23 @@ export function SearchPanel({
               : ""}
             {submitted ? ` for “${submitted}”` : ""}
           </p>
+          {response.timings && (
+            <p className="mb-4 font-mono text-xs text-muted-foreground">
+              timings: nlp {response.timings.nlp_ms.toFixed(0)}ms · vespa{" "}
+              {(
+                response.timings.vespa_ms ??
+                response.timings.vespa_chunk_ms +
+                  response.timings.vespa_document_ms
+              ).toFixed(0)}
+              ms (chunk {response.timings.vespa_chunk_ms.toFixed(0)} · doc{" "}
+              {response.timings.vespa_document_ms.toFixed(0)}) · rrf{" "}
+              {response.timings.rrf_ms.toFixed(0)}ms · rerank{" "}
+              {response.timings.rerank_ms.toFixed(0)}ms
+              {response.timings.total_ms != null
+                ? ` · total ${response.timings.total_ms.toFixed(0)}ms`
+                : ""}
+            </p>
+          )}
 
           {documents.length === 0 ? (
             <p className="text-sm text-muted-foreground">No documents matched.</p>

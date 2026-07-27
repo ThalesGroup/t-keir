@@ -138,7 +138,7 @@ flowchart TB
   agent[thot.agent]
   audit[thot.audit]
   governor[thot.governor]
-  ingest[thot.ingest]
+  ingest[thot.tools.ingest]
   mcp[thot.mcp]
   compose[thot.compose]
   core[thot.core]

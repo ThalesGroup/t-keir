@@ -10,7 +10,6 @@ Licensed under the MIT License.
 
 from thot.tools.search.vespa_client import (
     build_chunk_tensor,
-    build_questions_tensor,
     build_text_raw_contains_or_clause,
     chunk_embedding_text,
     escape_yql_literal,
@@ -29,11 +28,6 @@ def test_build_chunk_tensor_returns_plain_vector():
         2.0,
         3.0,
     ]
-
-
-def test_build_questions_tensor_uses_mapped_keys():
-    tensor = build_questions_tensor([[0.1, 0.2], [0.3, 0.4]], embedding_dim=2)
-    assert tensor == {"0": [0.1, 0.2], "1": [0.3, 0.4]}
 
 
 def test_strip_search_vector_payload_removes_context_tags():
@@ -90,17 +84,24 @@ def test_normalize_user_space_and_streaming_ids():
         _parse_vespa_id,
         chunk_vespa_id,
         document_vespa_id,
+        global_vespa_id,
         normalize_user_space,
+        user_vespa_id,
     )
 
     assert normalize_user_space("bad:group") == "bad_group"
     doc_id = document_vespa_id("file://a.pdf", user_space="alice")
-    assert doc_id.startswith("id:default:tkeir_document:g=alice:")
+    assert doc_id.startswith("id:default:user:g=alice:")
     ns, schema, group, key = _parse_vespa_id(doc_id)
-    assert (ns, schema, group) == ("default", "tkeir_document", "alice")
-    assert len(key) == 32
+    assert (ns, schema, group) == ("default", "user", "alice")
+    assert len(key) == 40
     chunk_id = chunk_vespa_id("c1", user_space="alice")
+    assert _parse_vespa_id(chunk_id)[1] == "user"
     assert _parse_vespa_id(chunk_id)[2] == "alice"
+    assert global_vespa_id("p1").startswith("id:default:global::")
+    assert user_vespa_id("p1", user_space="alice").startswith(
+        "id:default:user:g=alice:"
+    )
 
 
 def test_build_hybrid_search_payload_sets_streaming_group():
@@ -112,14 +113,17 @@ def test_build_hybrid_search_payload_sets_streaming_group():
             search_api_url="http://localhost:8080/search/",
             config_server_url_base="http://localhost:19071",
             timeout_seconds=60.0,
-            embedding_dim=384,
+            embedding_dim=1024,
             user_space="default",
         )
     )
     payload = client.build_hybrid_search_payload(
-        "hello", [0.0] * 384, [0.0] * 384, user_space="tenant-1"
+        "hello", [0.0] * 1024, user_space="tenant-1"
     )
     assert payload["streaming.groupname"] == "tenant-1"
+    assert payload["ranking.profile"] == "hybrid"
+    assert "from user where" in payload["yql"]
+    assert "input.query(q_dense)" in payload
 
 
 def test_build_text_raw_contains_or_clause_empty():

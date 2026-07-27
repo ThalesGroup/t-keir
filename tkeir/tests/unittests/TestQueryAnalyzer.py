@@ -116,7 +116,7 @@ def test_build_search_terms_prioritizes_entities_and_svo():
     assert "2026" in terms
 
 
-def test_build_hybrid_yql_targets_text_raw_by_default():
+def test_build_hybrid_yql_targets_chunk_text_by_default():
     analysis = QueryAnalysis(
         raw_query="What did Microsoft acquire in 2026?",
         language="en",
@@ -124,15 +124,12 @@ def test_build_hybrid_yql_targets_text_raw_by_default():
     )
     config = RagSearchConfig(
         use_chunk_embedding=True,
-        use_question_embedding=True,
         use_text_raw=True,
     )
     yql = build_hybrid_yql(analysis, config, hits=10)
-    assert "nearestNeighbor(chunk_embedding, q_chunk_emb)" in yql
-    assert "nearestNeighbor(questions_embeddings, q_question_emb)" in yql
-    assert "text_raw contains" in yql
-    assert "parent_content" not in yql
-    assert "parent_title" not in yql
+    assert "nearestNeighbor(dense_vector, q_dense)" in yql
+    assert "chunk_text contains" in yql
+    assert "from user where" in yql
     assert "Microsoft" in yql
 
 
@@ -163,20 +160,14 @@ def test_build_vespa_payload_includes_tensors_and_ranking():
     payload = build_vespa_search_payload(
         analysis,
         RagSearchConfig(),
-        q_chunk_emb=[0.1] * 384,
-        q_question_emb=[0.2] * 384,
+        q_dense=[0.1] * 1024,
         hits=15,
         timeout_seconds=45.0,
-        embedding_dim=384,
+        embedding_dim=1024,
     )
     assert payload["hits"] == 15
-    assert payload["ranking.profile"] in {
-        "hybrid_2_level",
-        "hybrid_semantic",
-        "hybrid_lexical",
-    }
-    assert len(payload["input.query(q_chunk_emb)"]) == 384
-    assert len(payload["input.query(q_question_emb)"]) == 384
+    assert payload["ranking.profile"] == "hybrid"
+    assert len(payload["input.query(q_dense)"]) == 1024
     assert "ranking.weights" not in payload
 
 
@@ -237,7 +228,7 @@ def test_query_analyzer_task_sync_wrapper():
 
 
 def test_format_query_analysis_for_prompt_includes_entities():
-    from thot.tools.search.query_analyzer import (
+    from thot.tools.search.generation_prompt import (
         format_query_analysis_for_prompt,
     )
 
@@ -258,7 +249,7 @@ def test_format_query_analysis_for_prompt_includes_entities():
 
 
 def test_build_focus_query_text_uses_focal_entity_for_reports():
-    from thot.tools.search.query_analyzer import build_focus_query_text
+    from thot.tools.search.generation_prompt import build_focus_query_text
 
     focus = build_focus_query_text(
         raw_query="Generate a report about Claudio Miranda",
@@ -270,7 +261,7 @@ def test_build_focus_query_text_uses_focal_entity_for_reports():
 
 
 def test_build_focus_query_text_includes_entities():
-    from thot.tools.search.query_analyzer import build_focus_query_text
+    from thot.tools.search.generation_prompt import build_focus_query_text
 
     focus = build_focus_query_text(
         raw_query="Who interpret the album Abbey Road",
@@ -285,7 +276,7 @@ def test_build_focus_query_text_includes_entities():
 
 
 def test_detect_generation_intent_entity_report():
-    from thot.tools.search.query_analyzer import (
+    from thot.tools.search.generation_prompt import (
         detect_generation_intent,
         format_generation_guidance,
         is_entity_report_query,
@@ -338,8 +329,8 @@ def test_format_vespa_query_json():
 
     rendered = format_vespa_query_json(
         {
-            "yql": "select * from chunk where true",
-            "input.query(q_chunk_emb)": [0.1] * 384,
+            "yql": "select * from user where true",
+            "input.query(q_dense)": [0.1] * 1024,
         }
     )
     assert '"yql"' in rendered
@@ -369,7 +360,7 @@ def test_chunk_embedding_uses_raw_query():
     )
 
 
-def test_select_ranking_profile_entity_anchored_is_lexical():
+def test_select_ranking_profile_entity_anchored_is_hybrid():
     analysis = QueryAnalysis(
         raw_query="Microsoft GitHub deal",
         language="en",
@@ -380,14 +371,14 @@ def test_select_ranking_profile_entity_anchored_is_lexical():
         lemmas=["Microsoft", "GitHub", "deal"],
         search_terms=["Microsoft", "GitHub", "deal"],
     )
-    assert select_ranking_profile(analysis) == "hybrid_lexical"
+    assert select_ranking_profile(analysis) == "hybrid"
 
 
-def test_select_ranking_profile_sparse_terms_is_semantic():
+def test_select_ranking_profile_sparse_terms_is_hybrid():
     analysis = QueryAnalysis(
         raw_query="a b c d e f",
         language="en",
         search_terms=["a", "b"],
         lemmas=["a"],
     )
-    assert select_ranking_profile(analysis) == "hybrid_semantic"
+    assert select_ranking_profile(analysis) == "hybrid"

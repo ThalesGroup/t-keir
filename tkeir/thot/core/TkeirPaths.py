@@ -66,6 +66,24 @@ def resources_dir(language: str = "en") -> str:
     )
 
 
+def net_models_dir() -> str:
+    """Return the local neural model directory (not Hugging Face hub cache).
+
+    Returns:
+        Absolute path to ``resources/modeling/net``.
+    """
+    return os.path.join(package_root(), "resources", "modeling", "net")
+
+
+def bge_m3_model_dir() -> str:
+    """Return the on-disk BGE-M3 directory under ``resources/modeling/net``.
+
+    Returns:
+        Absolute path to ``resources/modeling/net/bge-m3``.
+    """
+    return os.path.join(net_models_dir(), "bge-m3")
+
+
 def ontologies_dir() -> str:
     """Return the bundled generic ontologies directory.
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Render Vespa .sd files from rag.yaml dual_hybrid rank-profile weights.
+"""Render Vespa .sd files for doc_base / global / user from rag.yaml.
 
 Usage:
     python scripts/generate_vespa_schemas.py
-    python scripts/generate_vespa_schemas.py --check   # exit 1 if stale
+    python scripts/generate_vespa_schemas.py --check
 """
 
 from __future__ import annotations
@@ -20,33 +20,23 @@ CONFIG_PATH = ROOT / "tkeir" / "configs" / "rag.yaml"
 TEMPLATE_DIR = ROOT / "vespa" / "vespa_app" / "schemas" / "templates"
 OUTPUT_DIR = ROOT / "vespa" / "vespa_app" / "schemas"
 
+# BGE-M3 native dense size; sparse is mapped tensor (token{}).
+DEFAULT_EMBEDDING_DIM = 1024
+
 
 def _load_context() -> dict:
     payload = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8")) or {}
-    dual = payload.get("dual_hybrid") or {}
     models = payload.get("models") or {}
-    ranks = dual.get("rank_profiles") or {}
-    avg = dual.get("average_field_length") or {}
-    chunk_avg = avg.get("chunk") or {}
-    doc_avg = avg.get("document") or {}
-    chunk_profiles = ranks.get("chunk") or {}
-    doc_profiles = ranks.get("document") or {}
-    doc_profile = doc_profiles.get("document_bm25") or {
-        "bm25_title": 0.30,
-        "bm25_title_lemmatized": 0.20,
-        "bm25_content": 0.30,
-        "bm25_content_lemmatized": 0.20,
-    }
+    dual = payload.get("dual_hybrid") or {}
+    ranks = (dual.get("rank_profiles") or {}).get("passage") or {}
+    hybrid = ranks.get("hybrid") or {}
+    dim = int(models.get("embedding_dim", DEFAULT_EMBEDDING_DIM))
     return {
         "config_path": "tkeir/configs/rag.yaml",
-        "embedding_dim": int(models.get("embedding_dim", 384)),
-        "chunk_profiles": chunk_profiles,
-        "avg_text_raw": int(chunk_avg.get("text_raw", 180)),
-        "avg_title": int(doc_avg.get("title", 12)),
-        "avg_title_lemmatized": int(doc_avg.get("title_lemmatized", 7)),
-        "avg_content": int(doc_avg.get("content", 800)),
-        "avg_content_lemmatized": int(doc_avg.get("content_lemmatized", 420)),
-        "doc_profile": doc_profile,
+        "embedding_dim": dim,
+        "w_dense": float(hybrid.get("dense", 0.55)),
+        "w_sparse": float(hybrid.get("sparse", 0.30)),
+        "w_bm25": float(hybrid.get("bm25", 0.15)),
     }
 
 
@@ -57,11 +47,15 @@ def render_all() -> dict[str, str]:
         keep_trailing_newline=True,
     )
     ctx = _load_context()
+    header = (
+        f"# Generated from {ctx['config_path']} via `make schemas`.\n"
+        f"# DO NOT hand-edit — change rag.yaml and regenerate.\n"
+        f"# Source: scripts/generate_vespa_schemas.py\n"
+    )
     return {
-        "chunk.sd": env.get_template("chunk.sd.j2").render(**ctx),
-        "tkeir_document.sd": env.get_template("tkeir_document.sd.j2").render(
-            **ctx
-        ),
+        "doc_base.sd": header + env.get_template("doc_base.sd.j2").render(**ctx),
+        "global.sd": header + env.get_template("global.sd.j2").render(**ctx),
+        "user.sd": header + env.get_template("user.sd.j2").render(**ctx),
     }
 
 
@@ -80,9 +74,14 @@ def check_stale(rendered: dict[str, str]) -> int:
             print(f"MISSING {path}", file=sys.stderr)
             stale = True
             continue
-        current = path.read_text(encoding="utf-8")
-        if current != body:
-            print(f"STALE {path} — run `make schemas`", file=sys.stderr)
+        if path.read_text(encoding="utf-8") != body:
+            print(f"STALE {path}", file=sys.stderr)
+            stale = True
+    # Legacy dual-hybrid schemas must be gone.
+    for legacy in ("chunk.sd", "tkeir_document.sd"):
+        legacy_path = OUTPUT_DIR / legacy
+        if legacy_path.is_file():
+            print(f"LEGACY schema still present: {legacy_path}", file=sys.stderr)
             stale = True
     return 1 if stale else 0
 
@@ -92,19 +91,19 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="Fail if committed schemas differ from templates+config",
+        help="Exit 1 if committed schemas are stale",
     )
     args = parser.parse_args()
-    if not CONFIG_PATH.is_file():
-        print(f"Missing config: {CONFIG_PATH}", file=sys.stderr)
-        return 1
-    if not TEMPLATE_DIR.is_dir():
-        print(f"Missing templates: {TEMPLATE_DIR}", file=sys.stderr)
-        return 1
     rendered = render_all()
     if args.check:
         return check_stale(rendered)
     write_schemas(rendered)
+    # Remove legacy dual-hybrid schemas if still present.
+    for legacy in ("chunk.sd", "tkeir_document.sd"):
+        path = OUTPUT_DIR / legacy
+        if path.is_file():
+            path.unlink()
+            print(f"Removed legacy {path}")
     return 0
 
 

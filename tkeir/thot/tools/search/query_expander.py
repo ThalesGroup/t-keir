@@ -1,5 +1,9 @@
 """Title: Query expansion via the in-memory business ontology.
 
+Resolve query / NLP seeds (NER, keywords, SVO) to concept ids, then expand
+with synonyms, narrower, broader, related, and paraphrase bridges so Vespa
+``ontology_concepts`` and BM25 probes share semantically close terms.
+
 Author: Eric Blaudez
 
 Copyright (c) 2026 Thales
@@ -11,10 +15,13 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
-from thot.tools.search.business_ontology import BusinessOntology
+from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
 from thot.tools.search.text_normalizer import TextNormalizer
 
 LOGGER = logging.getLogger(__name__)
+
+# Cap concept ids sent to Vespa ``ontology_concepts contains`` OR clauses.
+DEFAULT_MAX_CONCEPT_IDS = 16
 
 
 @dataclass(frozen=True)
@@ -26,6 +33,7 @@ class ExpansionWeights:
     narrower: float = 0.6
     broader: float = 0.3
     related: float = 0.2
+    paraphrase: float = 0.85
 
 
 @dataclass
@@ -41,7 +49,7 @@ class ExpandedTerm:
 
 @dataclass
 class QueryExpansionResult:
-    """Expanded query terms + resolved concept ids."""
+    """Expanded query terms + resolved / graph-expanded concept ids."""
 
     terms: list[ExpandedTerm]
     concept_ids: list[str]
@@ -60,21 +68,33 @@ class QueryExpander:
         weights: ExpansionWeights,
         max_terms_per_relation: int = 5,
         enabled: bool = True,
+        max_concept_ids: int = DEFAULT_MAX_CONCEPT_IDS,
     ) -> None:
         self.ontology = ontology
         self.normalizer = normalizer
         self.weights = weights
         self.max_terms_per_relation = max_terms_per_relation
         self.enabled = enabled
+        self.max_concept_ids = max(1, int(max_concept_ids))
 
-    def expand(self, query: str) -> QueryExpansionResult:
-        """Return weighted terms for Vespa YQL construction.
+    def expand(
+        self,
+        query: str,
+        *,
+        seed_labels: list[str] | None = None,
+    ) -> QueryExpansionResult:
+        """Resolve + expand query (and optional NLP seeds) for retrieval.
 
         Args:
             query: Raw user query.
+            seed_labels: Extra labels from the NLP pipeline (NER, keywords,
+                SVO subject/verb/object, lemmas). Each is resolved against the
+                ontology; hits expand with synonyms / narrower / broader /
+                related concept ids and labels.
 
         Returns:
-            Expansion result (always includes the original query term).
+            Expansion result: BM25 terms + concept ids for Vespa
+            ``ontology_concepts``.
         """
         normalized = self.normalizer.normalize(query)
         terms = [
@@ -90,7 +110,10 @@ class QueryExpander:
         from thot.tools.search.lexical_signal import tokenize, token_stems
 
         seen_lower = {query.strip().casefold()}
+        stem_budget = 12
         for tok in tokenize(query):
+            if stem_budget <= 0:
+                break
             for stem in token_stems(tok):
                 if stem in seen_lower or len(stem) < 3:
                     continue
@@ -103,6 +126,9 @@ class QueryExpander:
                         normalized_text=self.normalizer.normalize(stem),
                     )
                 )
+                stem_budget -= 1
+                if stem_budget <= 0:
+                    break
 
         concept_ids: list[str] = []
         if not self.enabled or not self.ontology.concepts:
@@ -113,21 +139,11 @@ class QueryExpander:
                 normalized_query=normalized,
             )
 
-        # Resolve concepts from normalized query tokens / stems / whole string.
-        candidates = [normalized] + normalized.split()
-        for tok in tokenize(query):
-            for stem in token_stems(tok):
-                candidates.append(self.normalizer.normalize(stem))
-        resolved: list[str] = []
-        for cand in candidates:
-            if not cand:
-                continue
-            cid = self.ontology.resolve_normalized(cand)
-            if cid and cid not in resolved:
-                resolved.append(cid)
-        concept_ids = resolved
+        resolved = self._resolve_concepts(query, normalized, seed_labels)
+        # Graph expansion: add semantically close concept ids (not only labels).
+        concept_ids = self._expand_concept_neighborhood(resolved)
 
-        for cid in concept_ids:
+        for cid in list(concept_ids):
             concept = self.ontology.concepts.get(cid)
             if concept is None:
                 continue
@@ -150,10 +166,21 @@ class QueryExpander:
             self._add_group(
                 terms, related_labels, self.weights.related, "related", cid
             )
+            self._add_paraphrase_bridges(terms, concept, normalized, cid)
+
+        # Seed labels that did not resolve still help the BM25 probe.
+        for label in seed_labels or []:
+            text = (label or "").strip()
+            if not text:
+                continue
+            if self.ontology.resolve(text, self.normalizer):
+                continue
+            self._add_group(terms, [text], 0.85, "nlp_seed", "")
 
         LOGGER.debug(
-            "query expansion concepts=%s terms=%d",
+            "query expansion concepts=%s (seeds=%d) terms=%d",
             concept_ids,
+            len(seed_labels or []),
             len(terms),
         )
         return QueryExpansionResult(
@@ -162,6 +189,145 @@ class QueryExpander:
             raw_query=query,
             normalized_query=normalized,
         )
+
+    def _resolve_concepts(
+        self,
+        query: str,
+        normalized: str,
+        seed_labels: list[str] | None,
+    ) -> list[str]:
+        """Resolve query tokens + NLP seed labels to ontology concept ids."""
+        from thot.tools.search.lexical_signal import tokenize, token_stems
+
+        candidates: list[str] = [normalized] + normalized.split()
+        for tok in tokenize(query):
+            for stem in token_stems(tok):
+                candidates.append(self.normalizer.normalize(stem))
+        for label in seed_labels or []:
+            lab = (label or "").strip()
+            if not lab:
+                continue
+            candidates.append(self.normalizer.normalize(lab))
+            for tok in tokenize(lab):
+                candidates.append(self.normalizer.normalize(tok))
+                for stem in token_stems(tok):
+                    candidates.append(self.normalizer.normalize(stem))
+
+        resolved: list[str] = []
+        for cand in candidates:
+            if not cand:
+                continue
+            cid = self.ontology.resolve_normalized(cand)
+            if cid and cid not in resolved:
+                resolved.append(cid)
+
+        # Multi-word labels and paraphrase bridges (substring in query / seeds).
+        haystacks = [normalized]
+        for label in seed_labels or []:
+            n = self.normalizer.normalize(label)
+            if n:
+                haystacks.append(n)
+        for concept in self.ontology.concepts.values():
+            if concept.concept_id in resolved:
+                continue
+            phrases: list[str] = []
+            for lab in (
+                [concept.preferred_label]
+                + list(concept.synonyms)
+                + list(concept.surface_forms)
+            ):
+                if " " in (lab or "").strip():
+                    phrases.append(lab)
+            for bridge in concept.paraphrase_bridges:
+                phrases.append(bridge.claim)
+                phrases.append(bridge.document)
+            for phrase in phrases:
+                pn = self.normalizer.normalize(phrase)
+                if len(pn) < 5:
+                    continue
+                if any(pn in hay or hay in pn for hay in haystacks if hay):
+                    resolved.append(concept.concept_id)
+                    break
+        return resolved
+
+    def _expand_concept_neighborhood(self, seed_ids: list[str]) -> list[str]:
+        """Add narrower / broader / related concept ids around resolved seeds.
+
+        Order: direct hits first, then narrower, related, broader (semantic
+        closeness preference). Synonyms share the same concept id already.
+        """
+        out: list[str] = []
+        seen: set[str] = set()
+
+        def _add(cid: str) -> bool:
+            key = (cid or "").strip()
+            if not key or key in seen:
+                return False
+            if key not in self.ontology.concepts:
+                return False
+            seen.add(key)
+            out.append(key)
+            return len(out) >= self.max_concept_ids
+
+        for cid in seed_ids:
+            if _add(cid):
+                return out
+
+        # Pass 1: narrower (more specific → usually better for retrieval).
+        for cid in seed_ids:
+            concept = self.ontology.concepts.get(cid)
+            if concept is None:
+                continue
+            for other in concept.narrower:
+                if _add(other):
+                    return out
+
+        # Pass 2: related.
+        for cid in seed_ids:
+            concept = self.ontology.concepts.get(cid)
+            if concept is None:
+                continue
+            for other in concept.related:
+                if _add(other):
+                    return out
+
+        # Pass 3: broader (more generic — keep last / capped).
+        for cid in seed_ids:
+            concept = self.ontology.concepts.get(cid)
+            if concept is None:
+                continue
+            for other in concept.broader:
+                if _add(other):
+                    return out
+        return out
+
+    def _add_paraphrase_bridges(
+        self,
+        terms: list[ExpandedTerm],
+        concept: BusinessConcept,
+        normalized_query: str,
+        concept_id: str,
+    ) -> None:
+        """Add document-side forms when the claim side matches the query."""
+        bridges = concept.paraphrase_bridges or []
+        if not bridges:
+            return
+        weight = float(self.weights.paraphrase)
+        targets: list[str] = []
+        for bridge in bridges:
+            claim_n = self.normalizer.normalize(bridge.claim)
+            doc_n = self.normalizer.normalize(bridge.document)
+            if not claim_n or not doc_n:
+                continue
+            # Bidirectional: claim→document (SciFact) and document→claim.
+            if claim_n in normalized_query or normalized_query in claim_n:
+                targets.append(bridge.document)
+            elif doc_n in normalized_query or normalized_query in doc_n:
+                targets.append(bridge.claim)
+        if targets:
+            self._add_group(
+                terms, targets, weight, "paraphrase", concept_id
+            )
 
     def _labels_for_ids(self, concept_ids: list[str]) -> list[str]:
         labels: list[str] = []
@@ -192,7 +358,7 @@ class QueryExpander:
                     text=text,
                     weight=weight,
                     relation=relation,
-                    concept_id=concept_id,
+                    concept_id=concept_id or None,
                     normalized_text=self.normalizer.normalize(text),
                 )
             )

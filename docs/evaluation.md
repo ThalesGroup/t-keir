@@ -25,12 +25,14 @@ ranking failures, then **wipes** the BEIR Vespa volume.
 2. For each query, index **gold docs** + **close distractors** (default **10**
    lexically nearest non-gold docs) and pad so the pool has at least
    **`--rank-docs`** candidates (default **10**)
-3. Score **BM25** and **T-KEIR dual-hybrid** at `top_k` (default **10**,
-   raised to match `--rank-docs` when needed). Each doc is written to both
-   Vespa schemas (`tkeir_document` + `chunk`). Dataset
+3. Score **BM25** and **T-KEIR passage retrieval** at `top_k` (default **10**,
+   raised to match `--rank-docs` when needed). Passages are indexed into the
+   Vespa **`global`** schema only (BEIR never uses `user`). Dataset
    `business_ontology.yaml` is used for query expansion and overlap scoring.
-4. Record stage timings: Vespa reset, index, retrieve, and avg dual-hybrid
-   stages (`expand`, `vespa_arms`, `rrf`, `ontology`, `cross_encoder`)
+4. Record stage timings: Vespa reset, index, retrieve, and avg pipeline
+   stages (`nlp`, `expand`, `embed`, `vespa_global`, `rrf`, `ontology`,
+   `cross_encoder`, …). Query **`nlp`** is the T-KEIR linguistic pipeline
+   on each query (`search.enabled` in `rag.yaml`).
 5. Emit rank/strategy **alerts** when something looks broken
 6. After all corpora: cleanup Vespa (`reset_vespa_for_beir`)
 
@@ -78,7 +80,7 @@ make beir-smoke BEIR_SMOKE_EXTRA=--skip-tkeir
 | `BEIR_SMOKE_EXTRA` | _(empty)_ | Extra CLI flags (`--no-cleanup`, `-v`, …) |
 | `BEIR_VESPA_NAME` / `BEIR_VESPA_VOLUME` | dedicated BEIR volume | Same isolation as full eval |
 
-CLI module: `thot.tools.search.beir_smoke`.
+CLI module: `thot.tools.eval.beir_smoke`.
 
 ### Alerts (rank / strategy / timing)
 
@@ -91,9 +93,9 @@ Each alert is severity-ordered (`high` → `medium` → `low`) and carries a
 | `tkeir_behind_bm25` | T-KEIR NDCG@10 &lt; 50% of BM25 |
 | `empty_retrievals` | One or more queries returned zero hits |
 | `gold_miss_all` | Queries where no gold doc appeared in the top-k |
-| `tkeir_error` | Indexing / Vespa / dual-hybrid exception |
+| `tkeir_error` | Indexing / Vespa / retrieval exception |
 | `slow_index` / `slow_retrieve` | Wall-clock bottleneck on index or retrieve |
-| `slow_stage_*` | Dual-hybrid stage over threshold (`cross_encoder`, `vespa_arms`, …) |
+| `slow_stage_*` | Pipeline stage over threshold (`cross_encoder`, `vespa_global`, …) |
 
 If wall clock exceeds **5 minutes**, the harness logs a warning (shrink
 `--queries` / `--close-docs`; use `--index-mode fast` only when timing
@@ -114,17 +116,20 @@ Report structure (designed to drive code changes):
 2. **Focus — problems to fix** — severity-ordered alerts with **Code focus**
 3. **Failure examples** — FP / FN with query text + analysis (reproduce locally)
 4. **Summary metrics** — NDCG@10 vs BM25, Δ, timings (NDCG cell notes vs prev)
-5. **Timings** — dual-hybrid stages sorted by cost
+5. **Timings** — retrieval stages sorted by cost
 
 Prerequisite: Vespa up (`make bootstrap`). Smoke uses the dedicated BEIR
 volume (`BEIR_VESPA_VOLUME`) so it does not wipe your primary demo index.
+
+Aliases: `make eval-smoke` → `beir-smoke`; `make eval` → `beir-eval`.
 
 ---
 
 ## Full evaluation — `make beir-eval`
 
-Full corpora, BM25 + dense + T-KEIR, error analysis, and the MkDocs quality
-report. Use after smoke is green, or for release evidence.
+Full corpora, BM25 + **BGE-M3 dense+sparse** (`resources/modeling/net/bge-m3`,
+same FlagEmbedding path as `beir-smoke`) + T-KEIR, error analysis, and the
+MkDocs quality report. Use after smoke is green, or for release evidence.
 
 ```bash
 make beir-eval
@@ -132,10 +137,12 @@ make beir-eval BEIR_DATASETS=scifact
 make beir-eval BEIR_DATASETS=scifact BEIR_EXTRA=--skip-dense
 ```
 
-CLI: `thot.tools.search.beir_eval`. Indexes with the T-KEIR NLP pipeline into
-Vespa, retrieves with dual-hybrid (**no answer generation**), and compares
-against local BM25 / dense baselines plus published BEIR leaderboard numbers
-(BM25 / SPLADE / Contriever).
+CLI: `thot.tools.eval.beir_eval`. Indexes with the T-KEIR NLP pipeline into
+Vespa **`global`**, retrieves with `PassageRetrievalPipeline` (**no answer
+generation**), and compares against local BM25 / **BGE-M3 dense** baselines
+plus published BEIR leaderboard numbers (BM25 / SPLADE / Contriever).
+Override dense model only with BGE-M3 (`BEIR_DENSE_MODEL=bge-m3`, default);
+MiniLM is rejected.
 
 **Error analysis** (up to three examples per failure kind) reports the full
 query, the offending or gold document, lexical token coverage, and a short

@@ -26,13 +26,22 @@ from thot.tools.search.text_normalizer import TextNormalizer
 def test_load_rag_config_includes_dual_hybrid():
     config = load_rag_config()
     assert config.dual_hybrid.rrf.k >= 1
-    assert "chunk" in config.dual_hybrid.rrf.arm_weights
-    assert config.dual_hybrid.retrieval.chunk.profile
-    assert config.dual_hybrid.average_field_length
+    assert "global" in config.dual_hybrid.rrf.arm_weights or "chunk" in config.dual_hybrid.rrf.arm_weights
+    assert config.dual_hybrid.retrieval.hits >= 1
+    assert config.dual_hybrid.retrieval.ranking_profile
+    assert config.dual_hybrid.search_mode in {"auto", "global", "user", "both"}
     assert "default" in config.dual_hybrid.preprocessing.spacy_models
     assert config.dual_hybrid.preprocessing.asciifold is True
     assert not hasattr(config.search, "use_parent_content")
     assert not hasattr(config.search, "use_parent_title")
+    assert not hasattr(config.dual_hybrid, "query_routing")
+    assert config.dual_hybrid.business_ontology.index_enabled is True
+    assert config.dual_hybrid.business_ontology.search_enabled is True
+    assert "workspace" in config.dual_hybrid.index_dump.path
+    assert config.dual_hybrid.query_expansion.enabled is True
+    assert config.dual_hybrid.ontology_scoring.enabled is True
+    assert config.dual_hybrid.ontology_scoring.rescore_weight > 0
+    assert config.dual_hybrid.final_fusion.top_k_returned >= 1
 
 
 def test_spacy_model_resolves_by_language():
@@ -69,21 +78,35 @@ def test_spacy_models_require_default():
         )
 
 
+def test_index_dump_from_mapping():
+    cfg = dual_hybrid_from_mapping(
+        {
+            "index_dump": {
+                "enabled": False,
+                "path": "/tmp/tkeir-dumps",
+                "save_document": False,
+            }
+        }
+    )
+    assert cfg.index_dump.enabled is False
+    assert cfg.index_dump.path == "/tmp/tkeir-dumps"
+    assert cfg.index_dump.save_document is False
+    default = dual_hybrid_from_mapping({})
+    assert default.index_dump.enabled is True
+    assert default.index_dump.path == "workspace/index-dumps"
+    assert default.index_dump.save_document is True
+
+
 def test_dual_hybrid_from_mapping_warns_but_loads(caplog):
     cfg = dual_hybrid_from_mapping(
         {
             "enabled": True,
-            "rrf": {"arm_weights": {"chunk": 0.9, "document": 0.9}},
-            "final_fusion": {
-                "weights": {
-                    "rrf": 1.0,
-                    "ontology_overlap": 1.0,
-                    "cross_encoder": 1.0,
-                }
-            },
+            "rrf": {"arm_weights": {"global": 0.9, "user": 0.9}},
+            "final_fusion": {"top_k_returned": 5},
         }
     )
     assert cfg.enabled is True
+    assert cfg.final_fusion.top_k_returned == 5
     assert "Weight group" in caplog.text or True
 
 

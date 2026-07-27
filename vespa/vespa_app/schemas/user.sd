@@ -1,0 +1,46 @@
+# Generated from tkeir/configs/rag.yaml via `make schemas`.
+# DO NOT hand-edit — change rag.yaml and regenerate.
+# Source: scripts/generate_vespa_schemas.py
+
+schema user inherits doc_base {
+    document user inherits doc_base {
+        # Streaming group / Keycloak principal (must match streaming.groupname).
+        field userspace_id type string {
+            indexing: summary | attribute
+        }
+        # Dense BGE-M3 attribute-only (exact nearestNeighbor; no HNSW in streaming).
+        field dense_vector type tensor<float>(x[1024]) {
+            indexing: attribute
+            attribute {
+                distance-metric: angular
+            }
+        }
+    }
+
+    fieldset default {
+        fields: chunk_text
+    }
+
+    rank-profile hybrid {
+        inputs {
+            query(q_dense) tensor<float>(x[1024])
+            query(q_sparse) tensor<float>(token{})
+        }
+        first-phase {
+            expression {
+                closeness(field, dense_vector) * 0.7 +
+                sum(query(q_sparse) * attribute(sparse_vector)) * 0.2 +
+                bm25(chunk_text) * 0.1
+            }
+        }
+    }
+
+    rank-profile dense_only {
+        inputs {
+            query(q_dense) tensor<float>(x[1024])
+        }
+        first-phase {
+            expression: closeness(field, dense_vector)
+        }
+    }
+}

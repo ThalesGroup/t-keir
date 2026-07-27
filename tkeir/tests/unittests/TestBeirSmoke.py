@@ -10,17 +10,19 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-from thot.tools.search.beir_eval import Metrics
-from thot.tools.search.beir_smoke import (
+from thot.tools.eval.beir_eval import Metrics
+from thot.tools.eval.beir_smoke import (
     build_smoke_subset,
     detect_rank_alerts,
     pick_close_docs,
 )
-from thot.tools.search.beir_tkeir import (
-    annotate_document_with_business_ontology,
+from thot.tools.eval.beir_tkeir import (
     load_beir_business_ontology_payload,
 )
-from thot.tools.search.index_documents import _ensure_golden_chunks_for_index
+from thot.tools.ingest.index_documents import _ensure_golden_chunks_for_index
+from thot.tools.search.business_ontology import (
+    annotate_document_with_business_ontology,
+)
 
 
 def test_ensure_golden_chunks_for_index_synthesizes_when_missing():
@@ -37,11 +39,53 @@ def test_ensure_golden_chunks_for_index_synthesizes_when_missing():
 
 
 def test_load_beir_business_ontologies():
-    for name in ("scifact", "fiqa", "arguana"):
+    for name in ("scifact", "fiqa", "arguana", "osint", "enterprise"):
         payload = load_beir_business_ontology_payload(name)
         assert payload is not None, name
         assert payload.get("concepts"), name
         assert all(c.get("concept_id") for c in payload["concepts"])
+
+
+def test_require_beir_business_ontology_and_force_stages():
+    from thot.tools.eval.beir_tkeir import (
+        beir_ontology_for_index,
+        beir_ontology_for_search,
+        require_beir_business_ontology,
+    )
+    from thot.tools.search.dual_hybrid_config import BusinessOntologyConfig
+    from thot.tools.search.rag_config import load_rag_config
+
+    payload = require_beir_business_ontology("scifact")
+    assert payload is not None
+    assert payload.get("concepts")
+
+    dual = load_rag_config().dual_hybrid
+    assert dual.business_ontology.index_enabled is True
+    assert dual.business_ontology.search_enabled is True
+    assert beir_ontology_for_index("scifact", dual_cfg=dual) is not None
+    assert beir_ontology_for_search("scifact", dual_cfg=dual) is not None
+
+    from dataclasses import replace
+
+    dual_off = replace(
+        dual,
+        business_ontology=BusinessOntologyConfig(
+            index_enabled=False,
+            search_enabled=False,
+        ),
+    )
+    assert beir_ontology_for_index("scifact", dual_cfg=dual_off) is None
+    assert beir_ontology_for_search("scifact", dual_cfg=dual_off) is None
+
+
+def test_index_resolves_dataset_business_ontology_from_source_id():
+    from thot.tools.search.business_ontology import resolve_index_ontology_payload
+
+    doc = {"source_doc_id": "beir:scifact:42", "title": "x", "content": []}
+    payload, name = resolve_index_ontology_payload(doc)
+    assert name == "scifact"
+    assert payload is not None
+    assert payload.get("concepts")
 
 
 def test_annotate_document_with_business_ontology_tags_json_ld():
@@ -51,6 +95,14 @@ def test_annotate_document_with_business_ontology_tags_json_ld():
         "source_doc_id": "beir:scifact:9",
         "title": "Tumor study",
         "content": ["Cancer cells show increased gene expression."],
+        "kg": [
+            {
+                "subject": {"content": "cells"},
+                "property": {"content": "show"},
+                "value": {"content": "expression"},
+                "field_type": "content",
+            }
+        ],
         "golden_chunks": [
             {
                 "chunk_id": "beir:scifact:9#0",
@@ -62,6 +114,37 @@ def test_annotate_document_with_business_ontology_tags_json_ld():
     json_ld = (tagged.get("document_ontology") or {}).get("json_ld") or ""
     assert "CANCER" in json_ld or "cancer" in json_ld.lower()
     assert "DefinedTerm" in json_ld
+    assert '"provenance": "external"' in json_ld or "'provenance': 'external'" in json_ld
+    # Document-side triple gets provenance=document; external triples added.
+    provenances = {t.get("provenance") for t in tagged.get("kg") or []}
+    assert "document" in provenances
+    assert "external" in provenances
+    assert tagged.get("core_concepts")
+    assert any(
+        row.get("role") == "cluster_center"
+        for row in tagged["core_concepts"]
+        if isinstance(row, dict)
+    )
+
+
+def test_select_core_concepts_near_cluster_center():
+    from thot.tools.search.business_ontology import select_core_concepts
+
+    cores = select_core_concepts(
+        [
+            "cancer",
+            "tumor",
+            "neoplasm",
+            "gene expression",
+            "transcription",
+        ],
+        concept_ids=["CANCER", "TUMOR", "NEOPLASM", "GENE_EXPR", "TXN"],
+        max_core=4,
+        min_cluster_size=2,
+    )
+    assert cores
+    assert all(row.get("role") == "cluster_center" for row in cores)
+    assert len(cores) <= 4
 
 
 def test_pick_close_docs_prefers_overlap():
@@ -75,6 +158,49 @@ def test_pick_close_docs_prefers_overlap():
     )
     assert close[0] == "near"
     assert "far" not in close[:1]
+
+
+def test_build_smoke_subset_prefers_eval_report_focus():
+    corpus = {
+        f"d{i}": {"title": "", "text": f"token{i} evidence abstract text"}
+        for i in range(1, 20)
+    }
+    queries = {
+        "1": "token1 claim",
+        "3": "token3 claim",
+        "99": "token5 claim",
+        "100": "token6 claim",
+    }
+    qrels = {
+        "1": {"d1": 1},
+        "3": {"d3": 1},
+        "99": {"d5": 1},
+        "100": {"d6": 1},
+    }
+    _subset, sq, _sr, stats = build_smoke_subset(
+        corpus,
+        queries,
+        qrels,
+        n_queries=2,
+        n_close=2,
+        rank_docs=3,
+        seed=0,
+        focus_query_ids=["3", "1", "missing"],
+    )
+    assert list(sq.keys()) == ["3", "1"]
+    assert stats["focused_selected"] == ["3", "1"]
+    assert "missing" in stats["focus_missing"]
+
+
+def test_resolve_focus_query_ids_scifact_defaults():
+    from thot.tools.eval.beir_smoke import resolve_focus_query_ids
+
+    ids = resolve_focus_query_ids("scifact")
+    assert ids[:3] == ["1", "3", "5"]
+    assert resolve_focus_query_ids("scifact", focus_eval_report=False) == []
+    assert resolve_focus_query_ids(
+        "scifact", query_ids=["42", "7"]
+    ) == ["42", "7"]
 
 
 def test_build_smoke_subset_gold_and_close_per_query():
@@ -164,8 +290,8 @@ def test_detect_rank_alerts_tkeir_collapse():
     assert all(a.focus for a in alerts)
 
 
-def test_detect_timing_alerts_cross_encoder():
-    from thot.tools.search.beir_smoke import (
+def test_detect_timing_alerts_colbert():
+    from thot.tools.eval.beir_smoke import (
         StageTimings,
         detect_timing_alerts,
     )
@@ -174,15 +300,15 @@ def test_detect_timing_alerts_cross_encoder():
         queries=2,
         docs_indexed=10,
         retrieve_ms=100.0,
-        dual_avg_ms={"cross_encoder": 2000.0, "vespa_arms": 50.0},
+        dual_avg_ms={"colbert": 2000.0, "vespa_arms": 50.0},
     )
     alerts = detect_timing_alerts(timings)
-    assert any(a.code == "slow_stage_cross_encoder" for a in alerts)
+    assert any(a.code == "slow_stage_colbert" for a in alerts)
     assert all(a.focus for a in alerts)
 
 
 def test_render_smoke_report_leads_with_focus():
-    from thot.tools.search.beir_smoke import (
+    from thot.tools.eval.beir_smoke import (
         RankAlert,
         SmokeRun,
         StageTimings,
@@ -251,7 +377,7 @@ def test_render_smoke_report_leads_with_focus():
 
 
 def test_compare_smoke_to_previous_verdicts():
-    from thot.tools.search.beir_smoke import (
+    from thot.tools.eval.beir_smoke import (
         RankAlert,
         SmokeRun,
         StageTimings,

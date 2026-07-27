@@ -1,0 +1,24 @@
+{# Base document fields shared by global (index) and user (streaming). #}
+{# dense_vector is declared per child: Vespa forbids overriding parent fields, #}
+{# and global needs HNSW while user needs attribute-only (streaming). #}
+schema doc_base {
+    document doc_base {
+        # Stable id / parent reference (e.g. beir:scifact:42 or ingest digest).
+        field source_ref type string {
+            indexing: summary | attribute
+        }
+        # Passage text (chunk body) for BM25.
+        field chunk_text type string {
+            indexing: summary | index
+            index: enable-bm25
+        }
+        # Sparse / lexical BGE-M3 weights (token id → weight).
+        field sparse_vector type tensor<float>(token{}) {
+            indexing: summary | attribute
+        }
+        # Ontology / SVO-derived concept ids (Graph-RAG style).
+        field ontology_concepts type array<string> {
+            indexing: summary | attribute
+        }
+    }
+}

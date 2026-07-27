@@ -1,207 +1,1185 @@
 # ArguAna business ontology for dual-hybrid query expansion + overlap scoring.
 # Pass as `business_ontology` on search (BEIR smoke/eval load this file automatically).
-# version: 1.0.0
+# version: 2.0.0
+#
+# Expansion rationale (v1 → v2):
+#   - Added 36 new concepts (14 → 50 total) across 9 missing debate domains:
+#       CRIMINAL_JUSTICE, TECHNOLOGY, ECONOMY, RELIGION, GENDER,
+#       SECURITY, DRUGS, MEDIA, DEMOCRACY
+#   - Added ARGUMENTATION sub-tree for cross-domain rhetorical values:
+#       FREEDOM, HARM, EQUALITY, JUSTICE, EVIDENCE, RESPONSIBILITY
+#   - Enriched synonymy on all v1 nodes (total 369 synonyms, was ~30)
+#   - Added 135 multi-word surface_forms for BM25 phrase matching
+#   - Fixed PEOPLE as orphan: anchored under DEBATE, added SOCIETY child
+#   - Expanded EDUCATION with HIGHER_EDUCATION and CURRICULUM children
+#   - All 110 'related' edges are symmetric (auto-enforced)
+
 concepts:
-  - concept_id: DEBATE
-    preferred_label: debate
-    synonyms:
-      - argument
-      - argumentation
-      - counterargument
-    surface_forms: []
-    broader: []
-    narrower:
-      - ENVIRONMENT
-      - ETHICS
-      - POLITICS
-      - HEALTH
-      - EDUCATION
-    related: []
-
-  - concept_id: ENVIRONMENT
-    preferred_label: environment
-    synonyms:
-      - environmental
-      - ecology
-      - climate
-    surface_forms:
-      - greenhouse gas
-      - deforestation
-    broader:
-      - DEBATE
-    narrower:
-      - VEGETARIANISM
-      - POLLUTION
-      - BIODIVERSITY
-    related:
-      - ETHICS
-
-  - concept_id: VEGETARIANISM
-    preferred_label: vegetarian
-    synonyms:
-      - vegetarianism
-      - vegan
-      - veganism
-      - plant-based
-    surface_forms:
-      - meat production
-      - livestock
-    broader:
-      - ENVIRONMENT
-    narrower: []
-    related:
-      - ANIMAL_WELFARE
-      - HEALTH
-
-  - concept_id: POLLUTION
-    preferred_label: pollution
-    synonyms:
-      - emissions
-      - greenhouse
-    surface_forms:
-      - carbon
-    broader:
-      - ENVIRONMENT
-    narrower: []
-    related:
-      - BIODIVERSITY
-
-  - concept_id: BIODIVERSITY
-    preferred_label: biodiversity
-    synonyms:
-      - species
-      - extinction
-      - wildlife
-    surface_forms: []
-    broader:
-      - ENVIRONMENT
-    narrower: []
-    related:
-      - POLLUTION
-
-  - concept_id: ETHICS
-    preferred_label: ethics
-    synonyms:
-      - moral
-      - morality
-      - immoral
-    surface_forms: []
-    broader:
-      - DEBATE
-    narrower:
-      - ANIMAL_WELFARE
-      - HUMAN_RIGHTS
-    related:
-      - ENVIRONMENT
-
-  - concept_id: ANIMAL_WELFARE
-    preferred_label: animal welfare
-    synonyms:
-      - animal rights
-      - cruelty
-      - sentient
-    surface_forms:
-      - farm animals
-    broader:
-      - ETHICS
-    narrower: []
-    related:
-      - VEGETARIANISM
-
-  - concept_id: HUMAN_RIGHTS
-    preferred_label: human rights
-    synonyms:
-      - rights
-      - civil rights
-    surface_forms: []
-    broader:
-      - ETHICS
-    narrower: []
-    related:
-      - POLITICS
-      - INTERNATIONAL
-
-  - concept_id: POLITICS
-    preferred_label: government
-    synonyms:
-      - politics
-      - state
-      - states
-      - policy
-    surface_forms: []
-    broader:
-      - DEBATE
-    narrower:
-      - INTERNATIONAL
-    related:
-      - HUMAN_RIGHTS
-
-  - concept_id: INTERNATIONAL
-    preferred_label: international
-    synonyms:
-      - worldwide
-      - global
-      - countries
-      - nations
-    surface_forms: []
-    broader:
-      - POLITICS
-    narrower: []
-    related:
-      - HUMAN_RIGHTS
-
-  - concept_id: HEALTH
-    preferred_label: health
-    synonyms:
-      - healthy
-      - disease
-      - medical
-    surface_forms:
-      - cancer risk
-      - heart disease
-    broader:
-      - DEBATE
-    narrower:
-      - DIET
-    related:
-      - VEGETARIANISM
-
-  - concept_id: DIET
-    preferred_label: diet
-    synonyms:
-      - nutrition
-      - food
-      - eating
-    surface_forms:
-      - red meat
-    broader:
-      - HEALTH
-    narrower: []
-    related:
-      - VEGETARIANISM
-
-  - concept_id: EDUCATION
-    preferred_label: education
-    synonyms:
-      - school
-      - university
-      - students
-    surface_forms: []
-    broader:
-      - DEBATE
-    narrower: []
-    related:
-      - POLITICS
-
-  - concept_id: PEOPLE
-    preferred_label: people
-    synonyms:
-      - population
-      - society
-      - public
-    surface_forms: []
-    broader: []
-    narrower: []
-    related:
-      - POLITICS
-      - HEALTH
+- concept_id: DEBATE
+  preferred_label: debate
+  synonyms:
+  - argument
+  - argumentation
+  - counterargument
+  - rebuttal
+  - contention
+  - stance
+  - position
+  - claim
+  - proposition
+  - motion
+  surface_forms:
+  - this house believes
+  - on balance
+  - in favour of
+  broader: []
+  narrower:
+  - ENVIRONMENT
+  - ETHICS
+  - POLITICS
+  - HEALTH
+  - EDUCATION
+  - CRIMINAL_JUSTICE
+  - TECHNOLOGY
+  - ECONOMY
+  - RELIGION
+  - GENDER
+  - SECURITY
+  - DRUGS
+  - MEDIA
+  - DEMOCRACY
+  related:
+  - ARGUMENTATION
+- concept_id: ARGUMENTATION
+  preferred_label: argumentation
+  synonyms:
+  - reasoning
+  - logic
+  - rhetoric
+  - persuasion
+  - justification
+  - rationale
+  surface_forms: []
+  broader: []
+  narrower:
+  - FREEDOM
+  - HARM
+  - EQUALITY
+  - JUSTICE
+  - EVIDENCE
+  - RESPONSIBILITY
+  related:
+  - DEBATE
+- concept_id: FREEDOM
+  preferred_label: freedom
+  synonyms:
+  - liberty
+  - autonomy
+  - free will
+  - self-determination
+  - individual rights
+  - choice
+  - consent
+  surface_forms:
+  - right to choose
+  - personal freedom
+  broader:
+  - ARGUMENTATION
+  narrower: []
+  related:
+  - HUMAN_RIGHTS
+  - DEMOCRACY
+  - GENDER
+  - BIOETHICS
+  - DRUG_POLICY_CRIMINAL
+  - DRUGS
+  - FREE_SPEECH
+  - PRIVACY
+- concept_id: HARM
+  preferred_label: harm
+  synonyms:
+  - damage
+  - injury
+  - risk
+  - danger
+  - suffering
+  - negative consequence
+  - side effect
+  surface_forms:
+  - cause harm
+  - harmful effects
+  broader:
+  - ARGUMENTATION
+  narrower: []
+  related:
+  - HEALTH
+  - CRIMINAL_JUSTICE
+  - DRUGS
+- concept_id: EQUALITY
+  preferred_label: equality
+  synonyms:
+  - equal
+  - inequality
+  - fairness
+  - discrimination
+  - bias
+  - equity
+  - representation
+  surface_forms:
+  - equal rights
+  - gender pay gap
+  broader:
+  - ARGUMENTATION
+  narrower: []
+  related:
+  - GENDER
+  - HUMAN_RIGHTS
+  - DEMOCRACY
+  - HIGHER_EDUCATION
+  - LABOUR
+  - TAXATION
+  - FEMINISM
+  - PEOPLE
+  - SOCIETY
+- concept_id: JUSTICE
+  preferred_label: justice
+  synonyms:
+  - injustice
+  - fairness
+  - accountability
+  - punishment
+  - retribution
+  - rehabilitation
+  surface_forms:
+  - criminal justice
+  - social justice
+  broader:
+  - ARGUMENTATION
+  narrower: []
+  related:
+  - CRIMINAL_JUSTICE
+  - HUMAN_RIGHTS
+  - DEATH_PENALTY
+- concept_id: EVIDENCE
+  preferred_label: evidence
+  synonyms:
+  - data
+  - research
+  - study
+  - statistics
+  - proof
+  - empirical
+  - scientific consensus
+  surface_forms:
+  - peer-reviewed
+  - clinical trial
+  broader:
+  - ARGUMENTATION
+  narrower: []
+  related:
+  - HEALTH
+  - TECHNOLOGY
+- concept_id: RESPONSIBILITY
+  preferred_label: responsibility
+  synonyms:
+  - duty
+  - obligation
+  - accountability
+  - culpability
+  - negligence
+  surface_forms: []
+  broader:
+  - ARGUMENTATION
+  narrower: []
+  related:
+  - ETHICS
+  - CRIMINAL_JUSTICE
+- concept_id: ENVIRONMENT
+  preferred_label: environment
+  synonyms:
+  - environmental
+  - ecology
+  - climate
+  - nature
+  - sustainability
+  - renewable
+  - fossil fuels
+  - net zero
+  surface_forms:
+  - greenhouse gas
+  - deforestation
+  - climate change
+  - global warming
+  - carbon footprint
+  - Paris Agreement
+  broader:
+  - DEBATE
+  narrower:
+  - VEGETARIANISM
+  - POLLUTION
+  - BIODIVERSITY
+  - CLIMATE_POLICY
+  related:
+  - ETHICS
+  - ECONOMY
+  - TRADE
+- concept_id: VEGETARIANISM
+  preferred_label: vegetarian
+  synonyms:
+  - vegetarianism
+  - vegan
+  - veganism
+  - plant-based
+  - flexitarian
+  surface_forms:
+  - meat production
+  - livestock farming
+  - factory farming
+  - meat consumption
+  broader:
+  - ENVIRONMENT
+  narrower: []
+  related:
+  - ANIMAL_WELFARE
+  - HEALTH
+  - DIET
+  - BIODIVERSITY
+- concept_id: POLLUTION
+  preferred_label: pollution
+  synonyms:
+  - emissions
+  - greenhouse
+  - contamination
+  - toxic
+  - air quality
+  - water pollution
+  surface_forms:
+  - carbon dioxide
+  - CO2
+  - particulate matter
+  broader:
+  - ENVIRONMENT
+  narrower: []
+  related:
+  - BIODIVERSITY
+  - HEALTH
+  - DIET
+- concept_id: BIODIVERSITY
+  preferred_label: biodiversity
+  synonyms:
+  - species
+  - extinction
+  - wildlife
+  - ecosystem
+  - habitat
+  - endangered
+  surface_forms:
+  - species loss
+  - habitat destruction
+  broader:
+  - ENVIRONMENT
+  narrower: []
+  related:
+  - POLLUTION
+  - VEGETARIANISM
+  - ANIMAL_WELFARE
+- concept_id: CLIMATE_POLICY
+  preferred_label: climate policy
+  synonyms:
+  - carbon tax
+  - cap and trade
+  - emissions trading
+  - green deal
+  - climate legislation
+  - net zero target
+  surface_forms:
+  - carbon pricing
+  - emissions reduction
+  broader:
+  - ENVIRONMENT
+  narrower: []
+  related:
+  - POLITICS
+  - ECONOMY
+  - INTERNATIONAL
+- concept_id: ETHICS
+  preferred_label: ethics
+  synonyms:
+  - moral
+  - morality
+  - immoral
+  - virtue
+  - ethical
+  - unethical
+  - values
+  - conscience
+  surface_forms: []
+  broader:
+  - DEBATE
+  narrower:
+  - ANIMAL_WELFARE
+  - HUMAN_RIGHTS
+  - BIOETHICS
+  related:
+  - ENVIRONMENT
+  - RELIGION
+  - RESPONSIBILITY
+  - CRIMINAL_JUSTICE
+  - DEATH_PENALTY
+  - ARTIFICIAL_INTELLIGENCE
+  - WAR
+- concept_id: ANIMAL_WELFARE
+  preferred_label: animal welfare
+  synonyms:
+  - animal rights
+  - cruelty
+  - sentient
+  - speciesism
+  - vivisection
+  - experimentation
+  surface_forms:
+  - farm animals
+  - animal testing
+  - fur trade
+  broader:
+  - ETHICS
+  narrower: []
+  related:
+  - VEGETARIANISM
+  - BIODIVERSITY
+- concept_id: HUMAN_RIGHTS
+  preferred_label: human rights
+  synonyms:
+  - rights
+  - civil rights
+  - fundamental rights
+  - universal rights
+  - constitutional rights
+  - dignity
+  surface_forms:
+  - freedom of speech
+  - right to life
+  broader:
+  - ETHICS
+  narrower: []
+  related:
+  - POLITICS
+  - INTERNATIONAL
+  - FREEDOM
+  - EQUALITY
+  - JUSTICE
+  - DEMOCRACY
+  - CRIMINAL_JUSTICE
+  - DEATH_PENALTY
+  - SURVEILLANCE
+  - GENDER
+  - WAR
+  - FREE_SPEECH
+  - PRIVACY
+- concept_id: BIOETHICS
+  preferred_label: bioethics
+  synonyms:
+  - medical ethics
+  - end of life
+  - euthanasia
+  - abortion
+  - cloning
+  - embryo
+  - reproductive rights
+  surface_forms:
+  - assisted dying
+  - right to die
+  - pro-choice
+  - pro-life
+  broader:
+  - ETHICS
+  narrower: []
+  related:
+  - HEALTH
+  - RELIGION
+  - FREEDOM
+  - FEMINISM
+- concept_id: POLITICS
+  preferred_label: government
+  synonyms:
+  - politics
+  - state
+  - policy
+  - legislation
+  - regulation
+  - governance
+  - parliament
+  - congress
+  - administration
+  - ban
+  - law
+  surface_forms:
+  - public policy
+  - government intervention
+  - political party
+  broader:
+  - DEBATE
+  narrower:
+  - INTERNATIONAL
+  - DEMOCRACY
+  related:
+  - HUMAN_RIGHTS
+  - ECONOMY
+  - EDUCATION
+  - CLIMATE_POLICY
+  - HEALTHCARE_SYSTEMS
+  - TAXATION
+  - RELIGION
+  - FEMINISM
+  - SECURITY
+  - MEDIA
+  - PEOPLE
+  - SOCIETY
+- concept_id: INTERNATIONAL
+  preferred_label: international
+  synonyms:
+  - worldwide
+  - global
+  - countries
+  - nations
+  - multilateral
+  - bilateral
+  - foreign
+  - diplomacy
+  - UN
+  - NATO
+  surface_forms:
+  - United Nations
+  - international law
+  - foreign policy
+  broader:
+  - POLITICS
+  narrower: []
+  related:
+  - HUMAN_RIGHTS
+  - ECONOMY
+  - SECURITY
+  - CLIMATE_POLICY
+  - HEALTHCARE_SYSTEMS
+  - TRADE
+  - WAR
+- concept_id: DEMOCRACY
+  preferred_label: democracy
+  synonyms:
+  - democratic
+  - authoritarianism
+  - autocracy
+  - dictatorship
+  - election
+  - voting
+  - referendum
+  - populism
+  - sovereignty
+  surface_forms:
+  - free elections
+  - rule of law
+  - separation of powers
+  broader:
+  - POLITICS
+  narrower: []
+  related:
+  - HUMAN_RIGHTS
+  - FREEDOM
+  - EQUALITY
+  - MEDIA
+  - SOCIAL_MEDIA
+  - FREE_SPEECH
+- concept_id: HEALTH
+  preferred_label: health
+  synonyms:
+  - healthy
+  - disease
+  - medical
+  - healthcare
+  - wellbeing
+  - public health
+  - mental health
+  - treatment
+  - prevention
+  surface_forms:
+  - cancer risk
+  - heart disease
+  - NHS
+  - universal healthcare
+  - mental illness
+  broader:
+  - DEBATE
+  narrower:
+  - DIET
+  - MENTAL_HEALTH
+  - HEALTHCARE_SYSTEMS
+  related:
+  - VEGETARIANISM
+  - DRUGS
+  - BIOETHICS
+  - HARM
+  - EVIDENCE
+  - POLLUTION
+  - DRUG_POLICY_CRIMINAL
+  - PEOPLE
+- concept_id: DIET
+  preferred_label: diet
+  synonyms:
+  - nutrition
+  - food
+  - eating
+  - obesity
+  - calorie
+  - junk food
+  - processed food
+  - sugar
+  surface_forms:
+  - red meat
+  - fast food
+  - sugar tax
+  - food labelling
+  broader:
+  - HEALTH
+  narrower: []
+  related:
+  - VEGETARIANISM
+  - POLLUTION
+- concept_id: MENTAL_HEALTH
+  preferred_label: mental health
+  synonyms:
+  - depression
+  - anxiety
+  - psychiatric
+  - psychology
+  - wellbeing
+  - suicide
+  - stigma
+  surface_forms:
+  - mental illness
+  - mental disorder
+  broader:
+  - HEALTH
+  narrower: []
+  related:
+  - DRUGS
+  - EDUCATION
+  - MEDIA
+  - SOCIAL_MEDIA
+- concept_id: HEALTHCARE_SYSTEMS
+  preferred_label: healthcare system
+  synonyms:
+  - NHS
+  - universal health coverage
+  - privatisation
+  - insurance
+  - pharmaceutical
+  - drug pricing
+  - vaccination
+  surface_forms:
+  - universal healthcare
+  - private healthcare
+  - health insurance
+  broader:
+  - HEALTH
+  narrower: []
+  related:
+  - ECONOMY
+  - POLITICS
+  - INTERNATIONAL
+  - TAXATION
+- concept_id: EDUCATION
+  preferred_label: education
+  synonyms:
+  - school
+  - university
+  - students
+  - teaching
+  - learning
+  - academic
+  - curriculum
+  - literacy
+  - tuition
+  surface_forms:
+  - school curriculum
+  - university fees
+  - tuition fees
+  - standardised testing
+  broader:
+  - DEBATE
+  narrower:
+  - HIGHER_EDUCATION
+  - CURRICULUM
+  related:
+  - POLITICS
+  - TECHNOLOGY
+  - GENDER
+  - MENTAL_HEALTH
+- concept_id: HIGHER_EDUCATION
+  preferred_label: higher education
+  synonyms:
+  - university
+  - college
+  - tuition fees
+  - student debt
+  - scholarship
+  - graduate
+  - academic freedom
+  surface_forms:
+  - student loan
+  - free university
+  broader:
+  - EDUCATION
+  narrower: []
+  related:
+  - ECONOMY
+  - EQUALITY
+- concept_id: CURRICULUM
+  preferred_label: curriculum
+  synonyms:
+  - syllabus
+  - sex education
+  - religious education
+  - censorship in schools
+  - compulsory
+  - elective
+  surface_forms:
+  - school syllabus
+  - compulsory subject
+  broader:
+  - EDUCATION
+  narrower: []
+  related:
+  - RELIGION
+  - MEDIA
+  - GENDER
+- concept_id: CRIMINAL_JUSTICE
+  preferred_label: criminal justice
+  synonyms:
+  - crime
+  - punishment
+  - prison
+  - incarceration
+  - sentencing
+  - rehabilitation
+  - recidivism
+  - policing
+  - law enforcement
+  surface_forms:
+  - death penalty
+  - capital punishment
+  - mandatory sentencing
+  - mass incarceration
+  - restorative justice
+  broader:
+  - DEBATE
+  narrower:
+  - DEATH_PENALTY
+  - DRUG_POLICY_CRIMINAL
+  related:
+  - ETHICS
+  - DRUGS
+  - JUSTICE
+  - HUMAN_RIGHTS
+  - HARM
+  - RESPONSIBILITY
+  - TERRORISM
+- concept_id: DEATH_PENALTY
+  preferred_label: death penalty
+  synonyms:
+  - capital punishment
+  - execution
+  - lethal injection
+  - abolition
+  surface_forms:
+  - death row
+  - state execution
+  broader:
+  - CRIMINAL_JUSTICE
+  narrower: []
+  related:
+  - HUMAN_RIGHTS
+  - JUSTICE
+  - ETHICS
+- concept_id: DRUG_POLICY_CRIMINAL
+  preferred_label: drug policy
+  synonyms:
+  - decriminalisation
+  - legalisation
+  - drug offence
+  - possession
+  - trafficking
+  surface_forms:
+  - war on drugs
+  - drug offender
+  broader:
+  - CRIMINAL_JUSTICE
+  narrower: []
+  related:
+  - DRUGS
+  - HEALTH
+  - FREEDOM
+- concept_id: TECHNOLOGY
+  preferred_label: technology
+  synonyms:
+  - tech
+  - digital
+  - innovation
+  - automation
+  - software
+  - internet
+  - data
+  - algorithm
+  surface_forms:
+  - artificial intelligence
+  - social media
+  - big data
+  - machine learning
+  broader:
+  - DEBATE
+  narrower:
+  - ARTIFICIAL_INTELLIGENCE
+  - SURVEILLANCE
+  - SOCIAL_MEDIA
+  related:
+  - ECONOMY
+  - PRIVACY
+  - EDUCATION
+  - EVIDENCE
+  - LABOUR
+- concept_id: ARTIFICIAL_INTELLIGENCE
+  preferred_label: artificial intelligence
+  synonyms:
+  - AI
+  - machine learning
+  - deep learning
+  - automation
+  - robot
+  - autonomous systems
+  - generative AI
+  - large language model
+  surface_forms:
+  - self-driving car
+  - facial recognition
+  - AI regulation
+  broader:
+  - TECHNOLOGY
+  narrower: []
+  related:
+  - SURVEILLANCE
+  - ECONOMY
+  - ETHICS
+  - LABOUR
+- concept_id: SURVEILLANCE
+  preferred_label: surveillance
+  synonyms:
+  - privacy
+  - data collection
+  - tracking
+  - monitoring
+  - CCTV
+  - biometrics
+  - facial recognition
+  - mass surveillance
+  surface_forms:
+  - right to privacy
+  - data protection
+  - GDPR
+  broader:
+  - TECHNOLOGY
+  narrower: []
+  related:
+  - PRIVACY
+  - HUMAN_RIGHTS
+  - SECURITY
+  - ARTIFICIAL_INTELLIGENCE
+  - TERRORISM
+- concept_id: SOCIAL_MEDIA
+  preferred_label: social media
+  synonyms:
+  - online platform
+  - influencer
+  - content moderation
+  - misinformation
+  - disinformation
+  - fake news
+  - algorithm
+  - echo chamber
+  surface_forms:
+  - social network
+  - online speech
+  - platform regulation
+  broader:
+  - TECHNOLOGY
+  narrower: []
+  related:
+  - MEDIA
+  - DEMOCRACY
+  - MENTAL_HEALTH
+- concept_id: ECONOMY
+  preferred_label: economy
+  synonyms:
+  - economic
+  - market
+  - trade
+  - capitalism
+  - socialism
+  - inequality
+  - poverty
+  - wealth
+  - tax
+  - austerity
+  - GDP
+  surface_forms:
+  - free market
+  - minimum wage
+  - universal basic income
+  - income inequality
+  - welfare state
+  broader:
+  - DEBATE
+  narrower:
+  - TRADE
+  - LABOUR
+  - TAXATION
+  related:
+  - POLITICS
+  - TECHNOLOGY
+  - ENVIRONMENT
+  - CLIMATE_POLICY
+  - INTERNATIONAL
+  - HEALTHCARE_SYSTEMS
+  - HIGHER_EDUCATION
+  - ARTIFICIAL_INTELLIGENCE
+- concept_id: TRADE
+  preferred_label: trade
+  synonyms:
+  - free trade
+  - protectionism
+  - tariff
+  - globalisation
+  - outsourcing
+  - import
+  - export
+  surface_forms:
+  - trade deal
+  - trade war
+  - WTO
+  broader:
+  - ECONOMY
+  narrower: []
+  related:
+  - INTERNATIONAL
+  - ENVIRONMENT
+  - LABOUR
+- concept_id: LABOUR
+  preferred_label: labour
+  synonyms:
+  - work
+  - employment
+  - unemployment
+  - worker
+  - wages
+  - union
+  - gig economy
+  - automation
+  surface_forms:
+  - minimum wage
+  - workers rights
+  - zero-hours contract
+  broader:
+  - ECONOMY
+  narrower: []
+  related:
+  - EQUALITY
+  - TECHNOLOGY
+  - ARTIFICIAL_INTELLIGENCE
+  - TRADE
+- concept_id: TAXATION
+  preferred_label: taxation
+  synonyms:
+  - tax
+  - tax avoidance
+  - wealth tax
+  - corporation tax
+  - redistribution
+  - fiscal policy
+  surface_forms:
+  - tax the rich
+  - progressive tax
+  broader:
+  - ECONOMY
+  narrower: []
+  related:
+  - EQUALITY
+  - HEALTHCARE_SYSTEMS
+  - POLITICS
+- concept_id: RELIGION
+  preferred_label: religion
+  synonyms:
+  - faith
+  - belief
+  - church
+  - mosque
+  - secularism
+  - atheism
+  - blasphemy
+  - scripture
+  - creationism
+  surface_forms:
+  - freedom of religion
+  - state and religion
+  - separation of church and state
+  broader:
+  - DEBATE
+  narrower: []
+  related:
+  - ETHICS
+  - POLITICS
+  - CURRICULUM
+  - BIOETHICS
+  - TERRORISM
+  - SOCIETY
+- concept_id: GENDER
+  preferred_label: gender
+  synonyms:
+  - feminism
+  - sexism
+  - misogyny
+  - patriarchy
+  - transgender
+  - non-binary
+  - gender identity
+  - women
+  - female
+  surface_forms:
+  - gender equality
+  - gender pay gap
+  - gender-based violence
+  - glass ceiling
+  broader:
+  - DEBATE
+  narrower:
+  - FEMINISM
+  related:
+  - EQUALITY
+  - HUMAN_RIGHTS
+  - EDUCATION
+  - FREEDOM
+  - CURRICULUM
+  - SOCIETY
+- concept_id: FEMINISM
+  preferred_label: feminism
+  synonyms:
+  - feminist
+  - women's rights
+  - suffrage
+  - reproductive rights
+  - maternity leave
+  - gender quota
+  surface_forms:
+  - womens rights
+  - gender quota
+  broader:
+  - GENDER
+  narrower: []
+  related:
+  - BIOETHICS
+  - EQUALITY
+  - POLITICS
+- concept_id: SECURITY
+  preferred_label: security
+  synonyms:
+  - national security
+  - terrorism
+  - war
+  - military
+  - defence
+  - conflict
+  - nuclear
+  - weapons
+  - peacekeeping
+  surface_forms:
+  - war on terror
+  - nuclear deterrence
+  - arms race
+  - regime change
+  broader:
+  - DEBATE
+  narrower:
+  - WAR
+  - TERRORISM
+  related:
+  - INTERNATIONAL
+  - POLITICS
+  - SURVEILLANCE
+- concept_id: WAR
+  preferred_label: war
+  synonyms:
+  - armed conflict
+  - military intervention
+  - invasion
+  - occupation
+  - ceasefire
+  - warfare
+  - humanitarian intervention
+  surface_forms:
+  - just war
+  - military force
+  broader:
+  - SECURITY
+  narrower: []
+  related:
+  - INTERNATIONAL
+  - HUMAN_RIGHTS
+  - ETHICS
+- concept_id: TERRORISM
+  preferred_label: terrorism
+  synonyms:
+  - terrorist
+  - extremism
+  - radicalisation
+  - jihad
+  - insurgency
+  - counter-terrorism
+  surface_forms:
+  - terrorist attack
+  - counter-terrorism
+  broader:
+  - SECURITY
+  narrower: []
+  related:
+  - SURVEILLANCE
+  - CRIMINAL_JUSTICE
+  - RELIGION
+- concept_id: DRUGS
+  preferred_label: drugs
+  synonyms:
+  - narcotics
+  - substance abuse
+  - addiction
+  - cannabis
+  - marijuana
+  - alcohol
+  - tobacco
+  - prescription drugs
+  surface_forms:
+  - drug legalisation
+  - recreational drug
+  - harm reduction
+  broader:
+  - DEBATE
+  narrower: []
+  related:
+  - HEALTH
+  - CRIMINAL_JUSTICE
+  - FREEDOM
+  - DRUG_POLICY_CRIMINAL
+  - HARM
+  - MENTAL_HEALTH
+- concept_id: MEDIA
+  preferred_label: media
+  synonyms:
+  - journalism
+  - press
+  - news
+  - broadcasting
+  - censorship
+  - propaganda
+  - free press
+  - freedom of expression
+  - hate speech
+  surface_forms:
+  - freedom of the press
+  - media bias
+  - press freedom
+  broader:
+  - DEBATE
+  narrower:
+  - FREE_SPEECH
+  related:
+  - POLITICS
+  - DEMOCRACY
+  - SOCIAL_MEDIA
+  - MENTAL_HEALTH
+  - CURRICULUM
+- concept_id: FREE_SPEECH
+  preferred_label: free speech
+  synonyms:
+  - freedom of expression
+  - censorship
+  - hate speech
+  - no-platforming
+  - deplatforming
+  - cancel culture
+  - blasphemy
+  surface_forms:
+  - freedom of speech
+  - right to free speech
+  broader:
+  - MEDIA
+  narrower: []
+  related:
+  - DEMOCRACY
+  - HUMAN_RIGHTS
+  - FREEDOM
+- concept_id: PEOPLE
+  preferred_label: people
+  synonyms:
+  - population
+  - society
+  - public
+  - community
+  - citizen
+  - individual
+  - human
+  surface_forms: []
+  broader:
+  - DEBATE
+  narrower:
+  - SOCIETY
+  related:
+  - POLITICS
+  - HEALTH
+  - EQUALITY
+- concept_id: SOCIETY
+  preferred_label: society
+  synonyms:
+  - social
+  - community
+  - culture
+  - norms
+  - values
+  - cohesion
+  - integration
+  - immigration
+  - multiculturalism
+  surface_forms:
+  - social cohesion
+  - cultural values
+  broader:
+  - PEOPLE
+  narrower: []
+  related:
+  - POLITICS
+  - RELIGION
+  - GENDER
+  - EQUALITY
+- concept_id: PRIVACY
+  preferred_label: privacy
+  synonyms:
+  - data privacy
+  - personal data
+  - anonymity
+  - confidentiality
+  - right to be forgotten
+  surface_forms:
+  - data protection
+  - right to privacy
+  - GDPR
+  broader: []
+  narrower: []
+  related:
+  - SURVEILLANCE
+  - TECHNOLOGY
+  - HUMAN_RIGHTS
+  - FREEDOM

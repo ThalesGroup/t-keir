@@ -1,7 +1,7 @@
 # Tools API reference
 
 Public helpers in `thot/tools/`, `thot/core/`, and the **ops layer**
-(`thot/action/`, `thot/audit/`, `thot/governor/`, `thot/ingest/`) use Google-style
+(`thot/action/`, `thot/audit/`, `thot/governor/`, `thot/tools/ingest/`) use Google-style
 docstrings. Each documented **Example** section is executed in CI via
 `tests/unittests/TestAllDocExamples.py`.
 
@@ -74,7 +74,6 @@ uv run pytest tests/unittests/TestDocExampleCoverage.py tests/unittests/TestAllD
 | `chunk_vespa_id(chunk_id, user_space=…)` | Chunk id with streaming group |
 | `normalize_user_space(…)` | Sanitize `VESPA_USER_SPACE` / group name |
 | `build_chunk_tensor(vector, dim)` | Truncate embedding for schema |
-| `build_questions_tensor(vectors, dim)` | Mapped tensor for question embeddings |
 | `escape_yql_literal(query)` | Escape user text for YQL |
 
 ## Ontology utilities (`thot.tools.search.ontology_utils`)
@@ -165,7 +164,7 @@ Example (from docstring CI):
 
 See [Document ontology](document_ontology.md) and [Architecture data model](../architecture/data-model.md).
 
-## Ingest API (`thot.ingest.app`) — CLI `tkeir-ingest`
+## Ingest API (`thot.tools.ingest.app`) — CLI `tkeir-ingest`
 
 | Endpoint | Purpose |
 |---|---|
@@ -173,7 +172,7 @@ See [Document ontology](document_ontology.md) and [Architecture data model](../a
 | `POST /ingest/batch` | Accept batch |
 | `GET /ingest/status/{ingest_id}` | Job status |
 
-### Key classes (`thot.ingest.models`)
+### Key classes (`thot.tools.ingest.models`)
 
 | Class | Notable fields |
 |---|---|

@@ -25,6 +25,7 @@ from pydantic import BaseModel, Field
 from rdflib import Graph
 
 from thot import __version__ as TKEIR_VERSION
+from thot.action.correlation import current_correlation_id
 from thot.action.middleware import ActionCorrelationMiddleware
 from thot.action.readiness import readiness_report
 from thot.core.LlmWrapper import UnifiedLLMWrapper
@@ -52,14 +53,16 @@ from thot.tools.search.ontology_utils import (
     summarize_graph_for_prompt,
     truncate_for_prompt,
 )
-from thot.tools.search.query_analyzer import (
-    QueryAnalyzerTask,
+from thot.tools.search.generation_prompt import (
     build_focus_query_text,
-    build_svo_match_query,
     format_generation_guidance,
     format_query_analysis_for_prompt,
-    format_vespa_query_json,
     is_entity_report_query,
+)
+from thot.tools.search.query_analyzer import (
+    QueryAnalyzerTask,
+    build_svo_match_query,
+    format_vespa_query_json,
 )
 from thot.tools.search.query_refiner import refine_search_query_text
 from thot.tools.search.rag_config import (
@@ -191,6 +194,20 @@ class FusedOntology(BaseModel):
     document_ids: list[str] = Field(default_factory=list)
 
 
+class SearchTimings(BaseModel):
+    """Per-query retrieval stage timings in milliseconds."""
+
+    nlp_ms: float = 0.0
+    vespa_ms: float = 0.0
+    vespa_chunk_ms: float = 0.0
+    vespa_document_ms: float = 0.0
+    rrf_ms: float = 0.0
+    rerank_ms: float = 0.0
+    ontology_ms: float = 0.0
+    lexical_ms: float = 0.0
+    total_ms: float = 0.0
+
+
 class SearchResponse(BaseModel):
     """Reranked chunks and documents for a search query."""
 
@@ -200,6 +217,7 @@ class SearchResponse(BaseModel):
     vespa_hits: int
     ranking_profile: str | None = None
     ontology: FusedOntology | None = None
+    timings: SearchTimings | None = None
 
 
 class QueryResponse(BaseModel):
@@ -354,6 +372,69 @@ def _no_chunks_message(prompt_cfg: dict[str, Any]) -> str:
 
 _DEFAULT_MAX_TRIPLES_FOR_PROMPT = 25
 _PIPELINE_PRELOAD_LANGUAGES = ("en", "fr")
+
+
+def _timings_from_dual_ms(
+    raw: dict[str, float] | None,
+    *,
+    embed_ms: float = 0.0,
+    total_ms: float | None = None,
+) -> SearchTimings:
+    """Map dual-hybrid ``timings_ms`` (+ optional embed) to SearchTimings."""
+    data = dict(raw or {})
+    nlp = float(data.get("nlp") or data.get("expand") or 0.0) + float(embed_ms)
+    vespa_chunk = float(data.get("vespa_chunk") or 0.0)
+    vespa_document = float(data.get("vespa_document") or 0.0)
+    if not vespa_chunk and not vespa_document and data.get("vespa_arms"):
+        # Legacy single bucket.
+        vespa_chunk = float(data["vespa_arms"])
+    rrf = float(data.get("rrf") or 0.0)
+    rerank = float(data.get("rerank") or data.get("cross_encoder") or 0.0)
+    ontology = float(data.get("ontology") or 0.0)
+    lexical = float(data.get("lexical") or 0.0)
+    computed_total = (
+        nlp + vespa_chunk + vespa_document + rrf + rerank + ontology + lexical
+    )
+    vespa = vespa_chunk + vespa_document
+    return SearchTimings(
+        nlp_ms=round(nlp, 3),
+        vespa_ms=round(vespa, 3),
+        vespa_chunk_ms=round(vespa_chunk, 3),
+        vespa_document_ms=round(vespa_document, 3),
+        rrf_ms=round(rrf, 3),
+        rerank_ms=round(rerank, 3),
+        ontology_ms=round(ontology, 3),
+        lexical_ms=round(lexical, 3),
+        total_ms=round(
+            float(total_ms) if total_ms is not None else computed_total, 3
+        ),
+    )
+
+
+def _log_search_timings(
+    timings: SearchTimings,
+    *,
+    query: str,
+    ranking_profile: str | None,
+) -> None:
+    """Log per-query stage timings with correlation id."""
+    cid = current_correlation_id() or ""
+    qpreview = " ".join(str(query).split())
+    if len(qpreview) > 80:
+        qpreview = qpreview[:79] + "…"
+    ThotLogger.info(
+        "Search timings "
+        f"correlation_id={cid} "
+        f"nlp_ms={timings.nlp_ms:.1f} "
+        f"vespa_ms={timings.vespa_ms:.1f} "
+        f"(chunk={timings.vespa_chunk_ms:.1f} "
+        f"document={timings.vespa_document_ms:.1f}) "
+        f"rrf_ms={timings.rrf_ms:.1f} "
+        f"rerank_ms={timings.rerank_ms:.1f} "
+        f"total_ms={timings.total_ms:.1f} "
+        f"ranking_profile={ranking_profile or '-'} "
+        f"query={qpreview!r}"
+    )
 
 
 def _log_rag_step(step: str, start: float, **details: Any) -> None:
@@ -647,9 +728,8 @@ async def _retrieve_and_rerank(
 ) -> tuple[dict[str, Any], dict[str, Any] | None, dict[str, Any] | None, str]:
     """Run query analysis, Vespa search, and optional second-stage rerank.
 
-    When ``dual_hybrid.enabled`` is true, runs :class:`DualHybridPipeline`
-    (chunk + document arms, RRF, ontology, cross-encoder) instead of the
-    legacy single-arm QueryAnalyzer path.
+    When ``dual_hybrid.enabled`` is true, runs :class:`PassageRetrievalPipeline`
+    (global / user / both modes with BGE-M3 dense+sparse).
 
     Returns:
         ``(search_response, vespa_payload, query_analysis, search_query_text)``.
@@ -657,47 +737,59 @@ async def _retrieve_and_rerank(
     assert state.vespa is not None
     space = user_space or state.vespa.config.user_space
     dual_cfg = state.rag_config.dual_hybrid
-    if dual_cfg.enabled and state.llm is not None:
-        from thot.tools.search.dual_retrieval import (
-            DualHybridPipeline,
-            dual_hits_to_vespa_response,
-        )
+    if dual_cfg.enabled:
+        from thot.tools.search.passage_retrieval import PassageRetrievalPipeline
 
-        if state.dual_pipeline is None:
-            state.dual_pipeline = DualHybridPipeline(
-                dual_cfg, state.vespa, llm=state.llm
-            )
-        pipeline = state.dual_pipeline
-        q_emb = await state.llm.embed(query_text)
+        pipeline = PassageRetrievalPipeline(
+            dual_cfg,
+            state.vespa,
+            pipeline_runner=_pipeline_runner_for_language(state, language),
+        )
         result = await pipeline.search(
             query_text,
             user_space=space,
             language=language,
             business_ontology=business_ontology,
-            q_chunk_emb=q_emb,
-            q_question_emb=q_emb,
+            mode=None,
+            top_k=hits,
         )
-        top = result.hits[:hits]
-        search_response = dual_hits_to_vespa_response(top)
+        # Shape as Vespa-like response for downstream enrichers.
+        children = []
+        for hit in result.hits[:hits]:
+            children.append(
+                {
+                    "id": hit.passage_id,
+                    "relevance": hit.score,
+                    "fields": {
+                        "source_ref": hit.source_ref,
+                        "source_doc_id": hit.source_ref,
+                        "chunk_text": hit.chunk_text,
+                        "text_raw": hit.chunk_text,
+                        "ontology_concepts": hit.ontology_concepts,
+                        "schema": hit.schema,
+                    },
+                }
+            )
+        search_response = {"root": {"children": children}}
+        timings_ms = dict(result.timings_ms or {})
         query_analysis = {
             "raw_query": query_text,
-            "lexical_query": (
-                result.expansion.normalized_query
-                if result.expansion
-                else query_text
-            ),
-            "ranking_profile": (
-                f"dual_hybrid/{dual_cfg.retrieval.chunk.profile}"
-            ),
+            "lexical_query": " ".join(result.expansion_terms[:12]) or query_text,
+            "ranking_profile": f"passage/{result.mode}",
             "dual_hybrid": {
-                "timings_ms": result.timings_ms,
-                "active_signals": result.active_signals,
-                "degraded": result.degraded,
-                "scores": {
-                    hit.source_doc_id: hit.scores for hit in top
-                },
+                "timings_ms": timings_ms,
+                "mode": result.mode,
+                "expansion_terms": result.expansion_terms,
             },
+            "timings_ms": timings_ms,
         }
+        if result.query_analysis:
+            query_analysis.update(result.query_analysis)
+            query_analysis["dual_hybrid"] = {
+                "timings_ms": timings_ms,
+                "mode": result.mode,
+                "expansion_terms": result.expansion_terms,
+            }
         return search_response, None, query_analysis, query_text
 
     pipeline_runner = _pipeline_runner_for_language(state, language)
@@ -746,7 +838,6 @@ async def _retrieve_and_rerank(
             )
         vespa_payload = state.vespa.build_hybrid_search_payload(
             search_query_text,
-            query_embedding,
             query_embedding,
             hits=first_stage_hits,
             user_space=space,
@@ -1059,6 +1150,7 @@ def _assemble_search_response(
     parsed_hits: list[tuple[dict[str, Any], float | None]],
     ranking_profile: str | None,
     ontology: FusedOntology,
+    timings: SearchTimings | None = None,
 ) -> SearchResponse:
     """Aggregate chunks into documents and build SearchResponse."""
     aggregated = aggregate_chunks_to_documents(
@@ -1088,6 +1180,7 @@ def _assemble_search_response(
         vespa_hits=len(parsed_hits),
         ranking_profile=ranking_profile,
         ontology=ontology,
+        timings=timings,
     )
 
 
@@ -1152,14 +1245,31 @@ async def search(
         min_keyword_length=state.rag_config.ontology.min_keyword_length,
     )
     ontology = FusedOntology.model_validate(hmi_ontology)
+    dual_timings = None
+    if isinstance(query_analysis, dict):
+        dual = query_analysis.get("dual_hybrid") or {}
+        if isinstance(dual, dict):
+            dual_timings = dual.get("timings_ms")
+    timings = _timings_from_dual_ms(
+        dual_timings if isinstance(dual_timings, dict) else None,
+        total_ms=(time.perf_counter() - request_started) * 1000,
+    )
     response = _assemble_search_response(
         query_text=query_text,
         search_chunks=search_chunks,
         parsed_hits=parsed_hits,
         ranking_profile=ranking_profile,
         ontology=ontology,
+        timings=timings,
     )
 
+    # Passage retrieval already logs stage timings inside PassageRetrievalPipeline.
+    if not (isinstance(dual_timings, dict) and dual_timings):
+        _log_search_timings(
+            timings,
+            query=query_text,
+            ranking_profile=ranking_profile,
+        )
     _log_rag_step(
         "search-total",
         request_started,
@@ -1167,6 +1277,7 @@ async def search(
         chunks=len(response.chunks),
         documents=len(response.documents),
         ontology_triples=ontology.triple_count,
+        correlation_id=current_correlation_id() or "",
     )
     return response
 
@@ -1726,7 +1837,8 @@ def main() -> None:
     """
     import uvicorn
 
-    logging.basicConfig(level=logging.INFO)
+    from thot.core.StructuredLogging import configure_text_logging
+    configure_text_logging(level=logging.INFO, force=True)
     uvicorn.run(
         "thot.tools.search.app:app",
         host=os.getenv("RAG_HOST", "0.0.0.0"),

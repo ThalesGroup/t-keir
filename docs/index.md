@@ -11,8 +11,8 @@ tool-using research, ontology-driven document composition, and governed publicat
 - **Morphosyntax, NER, syntax** — spaCy-based tagging and knowledge-graph triples
 - **Keywords** — RAKE extraction
 - **Ontology export** — RDF graphs and HMI-friendly entity/keyword views
-- **Vespa RAG** — streaming-mode document/chunk indexing, per-user spaces
-  (Keycloak / `dev@tkeir`), and FastAPI query API
+- **Vespa RAG** — passage schemas (`global` index + `user` streaming),
+  per-user spaces (Keycloak / `dev@tkeir`), and FastAPI query API
 - **MCP server** — read-only corpus tools (`search`, `rag_query`,
   `ontology_query`, `document_get`) for external MCP clients
 - **Agents & workflows** — from-scratch single- and multi-agent runtime
@@ -30,6 +30,7 @@ tool-using research, ontology-driven document composition, and governed publicat
 | NLP (pipeline quickstart) | [ready_to_run.md](ready_to_run.md) |
 | Installation | [installation.md](installation.md) |
 | Dev container | [devcontainer.md](devcontainer.md) |
+| **Configuration (all YAML)** | [configuration/index.md](configuration/index.md) |
 | Deployment profiles | [deployment/index.md](deployment/index.md) |
 | Pipeline tools | [tools/tools_overview.md](tools/tools_overview.md) |
 | Vespa RAG | [tools/vespa_rag.md](tools/vespa_rag.md) |

@@ -41,7 +41,7 @@ class FakeVespa:
                 ),
                 "title_keywords": ["ALPHA", "mission"],
                 "user_space": user_space,
-                "_vespa_id": f"id:default:tkeir_document:g={user_space}:doc-alpha",
+                "_vespa_id": f"id:default:user:g={user_space}:doc-alpha",
             },
             {
                 "source_doc_id": "doc-beta",
@@ -49,7 +49,7 @@ class FakeVespa:
                 "content": ["Beta has no ontology yet."],
                 "json_ld": "",
                 "user_space": user_space,
-                "_vespa_id": f"id:default:tkeir_document:g={user_space}:doc-beta",
+                "_vespa_id": f"id:default:user:g={user_space}:doc-beta",
             },
         ]
         if doc_ids:

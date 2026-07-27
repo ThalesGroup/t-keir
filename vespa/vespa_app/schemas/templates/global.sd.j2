@@ -1,0 +1,45 @@
+{# Global catalog — Vespa index mode (HNSW dense + sparse + BM25). #}
+schema global inherits doc_base {
+    document global inherits doc_base {
+        # Dense BGE-M3 with HNSW (declared here — cannot override doc_base fields).
+        field dense_vector type tensor<float>(x[{{ embedding_dim }}]) {
+            indexing: attribute | index
+            attribute {
+                distance-metric: angular
+            }
+            index {
+                hnsw {
+                    max-links-per-node: 16
+                    neighbors-to-explore-at-insert: 200
+                }
+            }
+        }
+    }
+
+    fieldset default {
+        fields: chunk_text
+    }
+
+    rank-profile hybrid {
+        inputs {
+            query(q_dense) tensor<float>(x[{{ embedding_dim }}])
+            query(q_sparse) tensor<float>(token{})
+        }
+        first-phase {
+            expression {
+                closeness(field, dense_vector) * {{ w_dense }} +
+                sum(query(q_sparse) * attribute(sparse_vector)) * {{ w_sparse }} +
+                bm25(chunk_text) * {{ w_bm25 }}
+            }
+        }
+    }
+
+    rank-profile dense_only {
+        inputs {
+            query(q_dense) tensor<float>(x[{{ embedding_dim }}])
+        }
+        first-phase {
+            expression: closeness(field, dense_vector)
+        }
+    }
+}

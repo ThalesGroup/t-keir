@@ -12,6 +12,6 @@ Those must be uploaded by the ingest **client** with each document
 (`ontology_file` multipart or JSON `content_base64`); the server stages
 them under `INGEST_ROOT` and never discovers them from the workspace.
 
-Business ontologies for dual-hybrid query expansion are request payloads
+Business ontologies for passage-retrieval query expansion are request payloads
 (`business_ontology` on `/search` / `/rag/query`), sourced from
 `datasets/{osint,enterprise}/business_ontology.yaml`.

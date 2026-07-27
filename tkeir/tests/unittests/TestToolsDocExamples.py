@@ -39,7 +39,6 @@ from thot.tools.search.ontology_utils import (
 )
 from thot.tools.search.vespa_client import (
     build_chunk_tensor,
-    build_questions_tensor,
     chunk_embedding_text,
     chunk_vespa_id,
     document_vespa_id,
@@ -125,17 +124,12 @@ class TestVespaClientDocExamples:
     def test_document_vespa_id_example(self):
         assert document_vespa_id(
             "file://doc.pdf", user_space="demo"
-        ).startswith("id:default:tkeir_document:g=demo:")
+        ).startswith("id:default:user:g=demo:")
 
     def test_chunk_vespa_id_example(self):
         assert chunk_vespa_id("doc.pdf#chunk-0", user_space="demo").startswith(
-            "id:default:chunk:g=demo:"
+            "id:default:user:g=demo:"
         )
-
-    def test_build_questions_tensor_example(self):
-        assert build_questions_tensor([[0.1, 0.2]], embedding_dim=2) == {
-            "0": [0.1, 0.2]
-        }
 
     def test_build_chunk_tensor_example(self):
         assert build_chunk_tensor([1.0, 2.0, 3.0], embedding_dim=2) == [

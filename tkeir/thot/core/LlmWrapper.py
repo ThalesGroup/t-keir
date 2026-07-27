@@ -36,7 +36,7 @@ class RerankStrategy(str, Enum):
     EMBEDDING_COSINE = "embedding_cosine"
 
 
-DEFAULT_EMBEDDING_DIM = 384
+DEFAULT_EMBEDDING_DIM = 1024
 DEFAULT_EMBEDDING_MODELS = {
     Provider.OPENAI: "text-embedding-3-small",
     Provider.OLLAMA: "bge-m3",
@@ -468,7 +468,11 @@ class UnifiedLLMWrapper:
         *,
         include_reranker: bool = False,
     ) -> None:
-        """Pull configured Ollama embedding / LLM models when missing.
+        """Pull configured Ollama **chat** models when missing.
+
+        Embedding models configured as FlagEmbedding / HF hub ids
+        (e.g. ``BAAI/bge-m3`` → ``resources/modeling/net/bge-m3``) are
+        **not** pulled through Ollama.
 
         Args:
             include_reranker: Ignored — rerankers use sentence-transformers /
@@ -481,8 +485,34 @@ class UnifiedLLMWrapper:
         del include_reranker
         if self._config.provider is not Provider.OLLAMA:
             return
-        for name in (self._config.embedding_model, self._config.llm_model):
-            await self._ollama_pull_if_missing(name)
+        file_cfg = _load_file_model_overrides()
+        backend = str(
+            file_cfg.get("embedding_backend")
+            or os.getenv("EMBEDDING_BACKEND")
+            or ""
+        ).strip().lower()
+        names: list[str] = [self._config.llm_model]
+        if backend not in {
+            "flagembedding",
+            "flag_embedding",
+            "local",
+            "bge",
+            "bge-m3",
+        }:
+            # Legacy: embeddings also served by Ollama (e.g. model ``bge-m3``).
+            names.insert(0, self._config.embedding_model)
+        for name in names:
+            cleaned = (name or "").strip()
+            if not cleaned:
+                continue
+            # Hugging Face hub ids are never valid Ollama pull names.
+            if "/" in cleaned and not cleaned.startswith("http"):
+                ThotLogger.info(
+                    f"Skipping Ollama pull for non-Ollama model id {cleaned} "
+                    "(use FlagEmbedding / local net/ for BGE-M3)"
+                )
+                continue
+            await self._ollama_pull_if_missing(cleaned)
 
     async def _ollama_local_model_names(self) -> set[str]:
         """Return installed Ollama model names (including tags).

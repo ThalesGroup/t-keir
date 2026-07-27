@@ -49,9 +49,10 @@ make setup
 This runs, in order:
 
 1. `uv sync` (dev dependencies into `tkeir/.venv`)
-2. spaCy language models
+2. spaCy language models (skips if already importable; `FORCE_SPACY_MODELS=1` to force)
 3. Tesseract OCR check / install helper
-4. tokenizer MWE resource (`tkeir_mwe.pkl`)
+4. tokenizer MWE resource (`tkeir_mwe.pkl`; skips if present)
+5. BGE-M3 into `tkeir/resources/modeling/net/bge-m3` (skips if ready; `FORCE_BGE=1` to refresh)
 
 Verify:
 
@@ -102,14 +103,16 @@ Prefer **Option A** (`make setup`) for development. Models: `make init-models`
 | `tkeir/configs/` | Pipeline and task YAML (`pipeline.yaml`, taggers, `rag.yaml`, …) |
 | `tkeir/resources/modeling/tokenizer/<lang>/` | Lexicons, rules, `annotation-resources.json` |
 | `tkeir/resources/modeling/tokenizer/en/tkeir_mwe.pkl` | Compiled MWE trie (`make init-models`) |
+| `tkeir/resources/modeling/net/bge-m3/` | Local BGE-M3 weights (`make pull-bge-model` / `make setup`) |
 
 Resource paths inside configs are resolved relative to the `tkeir/` package root.
-Override Hugging Face / transformer downloads with:
+BGE-M3 is **not** loaded from the Hugging Face hub cache; FlagEmbedding reads
+only `resources/modeling/net/bge-m3`. Other HF artifacts (e.g. cross-encoders)
+may still use:
 
 ```bash
 export TRANSFORMERS_CACHE=$PWD/.cache/models
 ```
-
 ## 4. What to run next
 
 | Goal | Command |

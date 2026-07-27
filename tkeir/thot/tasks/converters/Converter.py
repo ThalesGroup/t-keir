@@ -327,6 +327,7 @@ class Converter:
                     "automatically_fill": True,
                     "confidence": 1.0,
                     "field_type": "keywords",
+                    "provenance": "document",
                     "property": {
                         "content": "rel:is_a",
                         "label_content": "",

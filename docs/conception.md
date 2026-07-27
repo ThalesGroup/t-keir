@@ -403,7 +403,7 @@ index into Vespa, persist jobs/manifests/DLQ.
 
 | | |
 |--|--|
-| **Modules** | `thot.ingest.app`, `worker`, `store`, `manifest`, `fetch`, `ontology_upload`, `shutdown` |
+| **Modules** | `thot.tools.ingest.app`, `worker`, `store`, `manifest`, `fetch`, `ontology_upload`, `shutdown` |
 | **Libraries** | **FastAPI**, **uvicorn**, **python-multipart**, **httpx** (Vespa) |
 | **Config** | Environment (`INGEST_ROOT`, `INGEST_STOP_ON_FAILED`, auth, …) |
 
@@ -420,22 +420,21 @@ index into Vespa, persist jobs/manifests/DLQ.
 
 ### 4.2 Search / RAG API (`tkeir-rag`)
 
-**Purpose.** Hybrid retrieval and grounded answers over Vespa streaming groups.
+**Purpose.** Hybrid retrieval and grounded answers over Vespa `global` /
+`user` passages.
 
 | | |
 |--|--|
-| **Modules** | `thot.tools.search.app`, `vespa_client`, `index_documents`, `query_analyzer`, `rerank`, `rag_report`, `ontology_utils` |
-| **Libraries** | **FastAPI**, Vespa HTTP API, **rdflib**, **sentence-transformers** / **torch** (rerank/embeddings), **httpx**, `UnifiedLLMWrapper` (Ollama / OpenAI / vLLM) |
-| **Config** | `configs/rag.yaml`, `rag-prompts.yaml` |
+| **Modules** | `thot.tools.search.app`, `passage_retrieval`, `vespa_client`, `query_analyzer`, `bge_m3`, `generation_prompt`, `rag_report`; indexing in `thot.tools.ingest.index_passages` |
+| **Libraries** | **FastAPI**, Vespa HTTP API, **FlagEmbedding** (local `net/bge-m3`), **rdflib**, **sentence-transformers** / **torch** (optional CE), **httpx**, `UnifiedLLMWrapper` (Ollama / OpenAI / vLLM) |
+| **Config** | `configs/rag.yaml` (`dual_hybrid:` block), `rag-prompts.yaml` |
 
 **Custom logic**
 
-- Index pipeline JSON → parent document + golden chunks with embeddings.
-- **QueryAnalyzerTask** — run NLP on the query; choose ranking profile
-  (`hybrid_semantic` / `hybrid_lexical` / `hybrid_2_level`) and multi-field YQL.
-- Aggregate chunks to documents; optional rerank.
-- **SVO-ontology prompting** — KEY PASSAGES + deduped triples rather than raw
-  dumps.
+- Index NLP `golden_chunks` → passages on `global` and/or `user` (dense 1024-d + sparse + BM25 + `ontology_concepts`).
+- **`PassageRetrievalPipeline`** when `dual_hybrid.enabled` — modes `global` / `user` / `both` / `auto`; RRF + lexical + ontology + rerank fusion.
+- **QueryAnalyzerTask** — NLP → YQL payload only (legacy single-arm when dual-hybrid off).
+- **Generation prompts** — `generation_prompt` for KEY PASSAGES / SVO guidance.
 - Tenant **`user_space`** from JWT / `dev@tkeir`.
 
 ---

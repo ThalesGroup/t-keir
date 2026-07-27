@@ -16,8 +16,10 @@ This file is the **root pointer** to the canonical guides.
 **Canonical docs:** [docs/deployment/](docs/deployment/index.md) (MkDocs: Deployment).
 
 **P0 stays the same Makefile path** (`setup` → `bootstrap` → `index` → `rag`).
-Vespa is streaming-mode with local group **`dev@tkeir`**; Keycloak isolation
-starts at P1 — see [Zero to Hero §4–5](docs/zero_to_hero.md#4-p0--vespa-rag--hmi).
+Vespa uses **`global`** (shared) + **`user`** (streaming) with local group
+**`dev@tkeir`**; Keycloak isolation starts at P1 — see
+[Zero to Hero §4–5](docs/zero_to_hero.md#4-p0--vespa-rag--hmi).
+`make setup` also places BGE-M3 under `tkeir/resources/modeling/net/bge-m3`.
 Keep using the [dev container](docs/devcontainer.md) when you prefer that.
 
 Version pins for third-party images and charts live in

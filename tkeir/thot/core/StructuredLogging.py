@@ -1,6 +1,6 @@
 """Title: Structured Logging
 
-Structured JSON logging helpers for platform services.
+Structured JSON and text logging helpers for platform services.
 
 Author: Eric Blaudez
 
@@ -20,6 +20,14 @@ from typing import Any
 from thot import __version__ as TKEIR_VERSION
 from thot.action.correlation import current_action_id, current_correlation_id
 
+# Shared text line format for CLI / ThotLogger / eval.
+TEXT_LOG_FORMAT = (
+    "%(asctime)s [%(levelname)s] %(name)s "
+    "%(filename)s:%(funcName)s:%(lineno)d "
+    "[correlation-id:%(correlation_id)s] %(message)s"
+)
+TEXT_LOG_DATEFMT = "%H:%M:%S"
+
 
 def _utc_ts() -> str:
     return (
@@ -27,6 +35,34 @@ def _utc_ts() -> str:
         .isoformat(timespec="milliseconds")
         .replace("+00:00", "Z")
     )
+
+
+def _record_correlation_id(record: logging.LogRecord) -> str:
+    """Resolve correlation id for a log record (explicit → context → ``-``)."""
+    explicit = getattr(record, "correlation_id", None)
+    if explicit not in (None, ""):
+        return str(explicit)
+    bound = current_correlation_id()
+    return bound if bound else "-"
+
+
+class CorrelationIdFilter(logging.Filter):
+    """Ensure every record has ``correlation_id`` for formatters."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        record.correlation_id = _record_correlation_id(record)
+        return True
+
+
+class TkeirTextFormatter(logging.Formatter):
+    """Human-readable logs with file, function, line, and correlation-id."""
+
+    def __init__(self) -> None:
+        super().__init__(fmt=TEXT_LOG_FORMAT, datefmt=TEXT_LOG_DATEFMT)
+
+    def format(self, record: logging.LogRecord) -> str:
+        record.correlation_id = _record_correlation_id(record)
+        return super().format(record)
 
 
 class JsonLogFormatter(logging.Formatter):
@@ -51,23 +87,48 @@ class JsonLogFormatter(logging.Formatter):
                 or os.getenv("TKEIR_SERVICE", "tkeir")
             ),
             "version": getattr(record, "version", None) or TKEIR_VERSION,
-            "correlation_id": (
-                getattr(record, "correlation_id", None)
-                or current_correlation_id()
-                or ""
-            ),
+            "correlation_id": _record_correlation_id(record),
             "action_id": (
                 getattr(record, "action_id", None) or current_action_id() or ""
             ),
             "actor": getattr(record, "actor", None) or "",
+            "file": record.filename,
+            "function": record.funcName,
+            "line": record.lineno,
+            "logger": record.name,
             "msg": record.getMessage(),
         }
-        for key in ("http_status", "path", "logger"):
+        for key in ("http_status", "path"):
             if hasattr(record, key):
                 payload[key] = getattr(record, key)
         if record.exc_info:
             payload["exc_info"] = self.formatException(record.exc_info)
         return json.dumps(payload, ensure_ascii=False)
+
+
+def configure_text_logging(
+    *,
+    level: int = logging.INFO,
+    force: bool = True,
+) -> None:
+    """Configure root logging with file/function/line/correlation-id.
+
+    Example:
+        >>> configure_text_logging(level=logging.INFO)
+    """
+    root = logging.getLogger()
+    if force:
+        for handler in list(root.handlers):
+            root.removeHandler(handler)
+    elif root.handlers:
+        root.setLevel(level)
+        return
+    root.setLevel(level)
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setLevel(level)
+    handler.addFilter(CorrelationIdFilter())
+    handler.setFormatter(TkeirTextFormatter())
+    root.addHandler(handler)
 
 
 def configure_json_logging(
@@ -93,6 +154,7 @@ def configure_json_logging(
         if getattr(handler, "_tkeir_marker", None) == marker:
             logger.removeHandler(handler)
     handler = logging.StreamHandler(sys.stdout)
+    handler.addFilter(CorrelationIdFilter())
     handler.setFormatter(JsonLogFormatter())
     handler._tkeir_marker = marker  # type: ignore[attr-defined]
     logger.addHandler(handler)

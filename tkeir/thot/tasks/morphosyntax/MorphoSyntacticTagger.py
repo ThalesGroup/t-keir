@@ -121,6 +121,7 @@ class MorphoSyntacticTagger:
             "confidence": 0.0,
             "weight": 0.0,
             "field_type": "concept",
+            "provenance": "document",
         }
 
     def _token_assignment(self, tok_i):

@@ -11,14 +11,24 @@
     </http>
   </container>
 
-  <!-- Streaming mode: per-user (group) document spaces.
-       Document ids MUST use g=<user_space>:… and queries MUST set
-       streaming.groupname. See docs/tools/vespa_rag.md. -->
-  <content id="content" version="1.0">
+  <!-- Catalog: HNSW index mode (schema global inherits doc_base). -->
+  <content id="global" version="1.0">
     <redundancy>1</redundancy>
     <documents>
-      <document type="tkeir_document" mode="streaming" />
-      <document type="chunk" mode="streaming" />
+      <document type="global" mode="index" />
+    </documents>
+    <nodes>
+      <node distribution-key="0" hostalias="node1" />
+    </nodes>
+  </content>
+
+  <!-- Per-user streaming (schema user inherits doc_base).
+       Document ids MUST use g=<user_space>:… and queries MUST set
+       streaming.groupname. -->
+  <content id="user" version="1.0">
+    <redundancy>1</redundancy>
+    <documents>
+      <document type="user" mode="streaming" />
     </documents>
     <nodes>
       <node distribution-key="0" hostalias="node1" />

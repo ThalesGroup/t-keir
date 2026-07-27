@@ -23,8 +23,9 @@ endif
 	deps-check deps-update deps-update-safe verify-lockfile tag changelog \
 	bom sbom aibom trivy owasp-dependency-check security-report \
 	docs docs-build docs-pdf pipeline quickstart ci-deps ci pre-commit clean devcontainer \
-	sync pull-models start init bootstrap vespa-check test-vespa test-vespa-py \
-	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test beir-eval beir-smoke clean-db vespa-clean logs \
+	sync pull-models pull-bge-model start init bootstrap vespa-check test-vespa test-vespa-py \
+	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
+	beir-eval beir-smoke eval eval-smoke clean-db vespa-clean logs \
 	images images-push images-sign \
 	compose-up compose-down compose-bootstrap compose-logs compose-smoke audit-report audit-verify audit-archive \
 	governor-flags governor-kill rollback-index check-secrets-staged \
@@ -81,6 +82,11 @@ PIPELINE_INPUT ?= $(TKEIR_DIR)/tests/fixtures/test-raw/raw
 PIPELINE_OUTPUT ?= $(WORKSPACE)/tmp/pipeline-out
 PIPELINE_TYPE ?= auto
 TRANSFORMERS_CACHE ?= $(ROOT)/.cache/models
+# spaCy / misc transformers cache (not used for BGE-M3 — that lives under resources/modeling/net).
+HF_HOME ?= $(TRANSFORMERS_CACHE)
+HUGGINGFACE_HUB_CACHE ?= $(TRANSFORMERS_CACHE)/hub
+BGE_MODEL ?= BAAI/bge-m3
+FORCE_BGE ?= 0
 DOCS_PORT ?= 8000
 DOCS_PDF_OUTPUT ?= $(ROOT)/output/docs/tkeir-docs.pdf
 
@@ -96,7 +102,7 @@ BEIR_REPORT ?=
 # Space-separated BEIR dataset names. One dataset example:
 #   make beir-eval BEIR_DATASETS=scifact
 BEIR_DATASETS ?= scifact fiqa arguana
-BEIR_DENSE_MODEL ?= sentence-transformers/all-MiniLM-L6-v2
+BEIR_DENSE_MODEL ?= bge-m3
 # Dedicated Vespa volume so BEIR reindex does not wipe the primary corpus.
 BEIR_VESPA_NAME ?= vespa
 BEIR_VESPA_VOLUME ?= beir_eval_data:/opt/vespa/var
@@ -153,7 +159,7 @@ QUICKSTART_OUTPUT ?= $(ROOT)/output/quickstart
 export UV PYTHON COMPOSE TRIVY_IMAGE OWASP_DC_IMAGE OWASP_DC_FAIL_CVSS TRIVY_SEVERITY
 export BOM_SPEC_VERSION BOM_REPORT_DIR BOM_CONFIG BOM_PYTHON
 export PIPELINE_CONFIG PIPELINE_INPUT PIPELINE_OUTPUT PIPELINE_TYPE
-export TRANSFORMERS_CACHE WORKSPACE DOCS_PORT
+export TRANSFORMERS_CACHE HF_HOME HUGGINGFACE_HUB_CACHE WORKSPACE DOCS_PORT
 export COVERAGE_FAIL_UNDER SECURITY_REPORT_DIR
 export VERSION GIT_COMMIT GIT_BRANCH BUILD_DATE
 export VERBOSE
@@ -171,6 +177,7 @@ help: ## Show available targets (VERBOSE=1 prints recipes)
 		| awk 'BEGIN {FS = ":.*?##[[:space:]]*"}; {printf "  \033[36mmake %-28s\033[0m %s\n", $$1, $$2}' \
 		| sort
 	$(Q)printf '%s\n' ""
+	$(Q)printf '%s\n' "Python packages: thot.tools.ingest | thot.tools.search | thot.tools.eval"
 	$(Q)printf '%s\n' "Common vars: PIPELINE_* INDEX_INPUT RAG_QUERY BEIR_* COVERAGE_FAIL_UNDER VERSION WORKSPACE VERBOSE"
 	$(Q)printf '%s\n' "Image vars:  IMAGE_REGISTRY IMAGE_TAG PLATFORMS MODEL_MODE"
 	$(Q)printf '%s\n' "Compose:     PROFILES=$(PROFILES) (core,auth,ingest,audit,governor,observability,objectstore,mcp,agents,spire)"
@@ -242,7 +249,7 @@ verify-lockfile: check-uv ## Fail if uv.lock is out of sync with pyproject.toml
 hmi-install: ## Install HMI dependencies from package-lock.json
 	cd $(HMI_DIR) && npm ci
 
-install-spacy-models: check-uv ## Install spaCy language models
+install-spacy-models: check-uv ## Install spaCy language models (skip if present; FORCE_SPACY_MODELS=1)
 	$(Q)chmod +x "$(SCRIPTS_DIR)/install_spacy_models.sh"
 	$(Q)bash "$(SCRIPTS_DIR)/install_spacy_models.sh"
 
@@ -250,24 +257,35 @@ install-tesseract: ## Install Tesseract OCR via helper script
 	$(Q)chmod +x "$(SCRIPTS_DIR)/install_tesseract.sh"
 	$(Q)bash "$(SCRIPTS_DIR)/install_tesseract.sh"
 
-init-models: install ## Build tkeir_mwe.pkl from annotation resources
+init-models: install ## Build tkeir_mwe.pkl from annotation resources (skip if present)
 	$(Q)mkdir -p "$(TRANSFORMERS_CACHE)"
-	cd $(TKEIR_DIR) && TRANSFORMERS_CACHE="$(TRANSFORMERS_CACHE)" \
-		$(UV) run --no-sync --python $(PYTHON) \
-		tkeir-create-annotation-resource \
-		--entries-file resources/modeling/tokenizer/en/annotation-resources.json \
-		--output resources/modeling/tokenizer/en/tkeir_mwe.pkl
+	$(Q)out="$(TKEIR_DIR)/resources/modeling/tokenizer/en/tkeir_mwe.pkl"; \
+	if [ -f "$$out" ]; then \
+		echo "WARN: annotation model already exists — skipping: $$out"; \
+		echo "      Delete it and re-run 'make init-models' to regenerate."; \
+	else \
+		cd $(TKEIR_DIR) && TRANSFORMERS_CACHE="$(TRANSFORMERS_CACHE)" \
+			$(UV) run --no-sync --python $(PYTHON) \
+			tkeir-create-annotation-resource \
+			--entries-file resources/modeling/tokenizer/en/annotation-resources.json \
+			--output resources/modeling/tokenizer/en/tkeir_mwe.pkl; \
+	fi
 
-setup: ## Full local setup (install → spaCy → Tesseract → models)
+setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3)
 	$(MAKE) install
 	$(MAKE) install-spacy-models
 	$(MAKE) install-tesseract
 	$(MAKE) init-models
+	$(MAKE) pull-bge-model
 	$(Q)echo ""
 	$(Q)echo "Setup complete."
 	$(Q)echo "  Run pipeline: make pipeline"
 	$(Q)echo "  Or demo:      make quickstart"
-	$(Q)echo "  Vespa RAG:    make bootstrap && make index && make rag"
+	$(Q)echo "  Vespa:        make bootstrap"
+	$(Q)echo "  Index:        make index          # thot.tools.ingest"
+	$(Q)echo "  Search/RAG:   make rag            # thot.tools.search"
+	$(Q)echo "  Eval smoke:   make eval-smoke     # thot.tools.eval"
+	$(Q)echo "  Ollama LLM:   make pull-models    # optional host Ollama models"
 
 # ---------------------------------------------------------------------------
 # Wheel build (state file — rebuild only when sources change)
@@ -886,10 +904,10 @@ audit-evidence: ## Build evidence pack under reports/evidence/<version>/
 annex-iv: ## Generate Annex IV technical pack under reports/compliance/annex-iv/
 	VERSION="$(VERSION)" bash "$(SCRIPTS_DIR)/compliance/annex-iv.sh"
 # ---------------------------------------------------------------------------
-# Vespa / search / RAG
+# Vespa infrastructure
 # ---------------------------------------------------------------------------
 
-schemas: ## Generate Vespa .sd files from rag.yaml dual_hybrid weights
+schemas: ## Generate Vespa .sd files (doc_base / global / user) from rag.yaml
 	$(Q)$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) python \
 		$(SCRIPTS_DIR)/generate_vespa_schemas.py
 
@@ -897,8 +915,18 @@ schemas-check: ## Fail if committed Vespa schemas are stale vs rag.yaml
 	$(Q)$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) python \
 		$(SCRIPTS_DIR)/generate_vespa_schemas.py --check
 
-pull-models: install ## Pull Ollama embedding + LLM models
-	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.search.pull_models
+pull-bge-model: install ## Download BGE-M3 into resources/modeling/net/bge-m3 (FORCE_BGE=1 refresh)
+	$(Q)mkdir -p "$(TKEIR_DIR)/resources/modeling/net"
+	cd $(TKEIR_DIR) && \
+		$(UV) run --python $(PYTHON) python -m thot.tools.search.pull_models \
+			--bge-only --bge-model "$(BGE_MODEL)" \
+			$(if $(filter 1,$(FORCE_BGE)),--force-bge,)
+
+pull-models: install ## Ensure local BGE-M3 under resources/modeling/net + optional Ollama pulls
+	$(Q)mkdir -p "$(TKEIR_DIR)/resources/modeling/net"
+	cd $(TKEIR_DIR) && \
+		$(UV) run --python $(PYTHON) python -m thot.tools.search.pull_models \
+			$(if $(filter 1,$(FORCE_BGE)),--force-bge,)
 
 start: check-docker ## Start Vespa Docker container
 	cd $(VESPA_DIR) && ./start_vespa.sh
@@ -919,7 +947,11 @@ test-vespa-py: install ## Python unit tests for Vespa client / ontology utils
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) pytest \
 		tests/unittests/TestVespaClient.py tests/unittests/TestOntologyUtils.py -q
 
-index-fixtures: ## Build indexing fixtures (PDF → *.pipeline.json)
+# ---------------------------------------------------------------------------
+# Ingest / index — thot.tools.ingest
+# ---------------------------------------------------------------------------
+
+index-fixtures: ## [ingest] Build indexing fixtures (PDF → *.pipeline.json)
 	$(MAKE) pipeline \
 		PIPELINE_INPUT=$(INDEX_FIXTURES_INPUT) \
 		PIPELINE_OUTPUT=$(INDEX_INPUT) \
@@ -932,7 +964,7 @@ index-fixtures: ## Build indexing fixtures (PDF → *.pipeline.json)
 		exit 1; \
 	}
 
-index: install init ## Embed + index pipeline JSON into Vespa
+index: install init ## [ingest] Embed + index pipeline JSON (thot.tools.ingest.index_documents)
 	$(Q)test -d "$(INDEX_INPUT)" || { \
 		echo "Missing indexing fixtures: $(INDEX_INPUT)"; \
 		echo "Run: make index-fixtures"; \
@@ -945,22 +977,17 @@ index: install init ## Embed + index pipeline JSON into Vespa
 		echo "Run: make index-fixtures"; \
 		exit 1; \
 	}
-	$(Q)echo "Indexing from $(INDEX_INPUT)"
-	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.search.index_documents -i "$(INDEX_INPUT)"
+	$(Q)echo "Indexing from $(INDEX_INPUT) via thot.tools.ingest.index_documents"
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.ingest.index_documents -i "$(INDEX_INPUT)"
 
 GOVERNOR_STATE_ROOT ?= $(WORKSPACE)/governor
-
-rag: install install-spacy-models ## Start FastAPI RAG API on the host (:8090) — P0, no container
-	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)"
-	cd $(TKEIR_DIR) && GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
-		$(UV) run --python $(PYTHON) python -m thot.tools.search.app
 
 INGEST_ROOT_HOST ?= $(WORKSPACE)/ingest
 # STOP_ON_FAILED=1 → ingest server exits on first failed job; datasets client
 # also aborts and calls POST /ingest/stop (fast debug loop).
 STOP_ON_FAILED ?= 0
 
-ingest: install install-spacy-models ## Start tkeir-ingest on the host (:8091) — P0, no container
+ingest: install install-spacy-models ## [ingest] Start tkeir-ingest API on host (:8091)
 	$(Q)mkdir -p "$(INGEST_ROOT_HOST)" "$(GOVERNOR_STATE_ROOT)"
 	cd $(TKEIR_DIR) && \
 		INGEST_ROOT="$(INGEST_ROOT_HOST)" \
@@ -972,13 +999,22 @@ ingest: install install-spacy-models ## Start tkeir-ingest on the host (:8091) �
 		TKEIR_REPO_ROOT="$(ROOT)" \
 		$(UV) run --python $(PYTHON) tkeir-ingest
 
-rag-query: check-curl check-jq ## Sample curl against RAG API (/rag/query)
+# ---------------------------------------------------------------------------
+# Search / RAG — thot.tools.search
+# ---------------------------------------------------------------------------
+
+rag: install install-spacy-models ## [search] Start FastAPI RAG API on host (:8090)
+	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)"
+	cd $(TKEIR_DIR) && GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		$(UV) run --python $(PYTHON) python -m thot.tools.search.app
+
+rag-query: check-curl check-jq ## [search] Sample curl against RAG API (/rag/query)
 	curl -fsS "$(RAG_URL)/rag/query" \
 		-H "Content-Type: application/json" \
 		-d "$$(jq -nc --arg query "$(RAG_QUERY)" --arg language "$(RAG_LANGUAGE)" --argjson hits $(RAG_HITS) '{query:$$query,language:$$language,hits:$$hits}')" \
 		| jq .
 
-search-query: check-curl check-jq ## Sample curl against search API (/search)
+search-query: check-curl check-jq ## [search] Sample curl against search API (/search)
 	curl -fsS "$(RAG_URL)/search" \
 		-H "Content-Type: application/json" \
 		-d "$$(jq -nc --arg query "$(RAG_QUERY)" --arg language "$(RAG_LANGUAGE)" --argjson hits $(RAG_HITS) '{query:$$query,language:$$language,hits:$$hits}')" \
@@ -1261,23 +1297,16 @@ smoke-test: check-curl check-jq ## Post-deploy RAG /health check (SMOKE_TARGET_U
 		echo "FAIL: unexpected status ($$status)"; exit 1; \
 	fi
 
-beir-eval: ## BEIR IR eval → docs/evaluation_report.md + reports/beir/ (BEIR_DATASETS=scifact for one)
-	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python $(PYTHON)
-	cd $(TKEIR_DIR) && \
-		VESPA_NAME="$(BEIR_VESPA_NAME)" \
-		VESPA_VOLUME="$(BEIR_VESPA_VOLUME)" \
-		$(UV) run --python $(PYTHON) --group beir --group models \
-		python -m thot.tools.search.beir_eval \
-		--datasets $(BEIR_DATASETS) \
-		--datasets-dir "$(BEIR_DATASETS_DIR)" \
-		--dense-model "$(BEIR_DENSE_MODEL)" \
-		$(if $(strip $(BEIR_REPORT)),--report "$(BEIR_REPORT)",) \
-		$(BEIR_EXTRA)
-
-# BEIR smoke: gold + close distractors; NLP chunking by default; cleanup.
-# Defaults: 10 queries, 10 close/query, >=10 pool/query, top_k=10, index=chunking.
+# ---------------------------------------------------------------------------
+# Eval / BEIR — thot.tools.eval
+# ---------------------------------------------------------------------------
+# Optional extra report copy; docs report is always written by beir_eval.
+# Prefers hard-failure query ids from docs/evaluation_report.md
+# (beir_smoke.EVAL_REPORT_FOCUS_QUERIES). Disable:
+#   BEIR_SMOKE_EXTRA=--no-focus-eval-report
 # Override: BEIR_SMOKE_QUERIES=12 BEIR_SMOKE_CLOSE=15 BEIR_SMOKE_RANK_DOCS=20
 # Speed-only (skip NLP): BEIR_SMOKE_INDEX_MODE=fast
+
 BEIR_SMOKE_QUERIES ?= 10
 BEIR_SMOKE_CLOSE   ?= 10
 BEIR_SMOKE_RANK_DOCS ?= 10
@@ -1285,13 +1314,26 @@ BEIR_SMOKE_TOP_K   ?= 10
 BEIR_SMOKE_INDEX_MODE ?= chunking
 BEIR_SMOKE_EXTRA   ?=
 
-beir-smoke: ## Fast BEIR smoke (<5 min): isolate corpora, time+NDCG, cleanup Vespa
+beir-eval: ## [eval] Full BEIR IR eval (thot.tools.eval.beir_eval); BEIR_DATASETS=scifact
 	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python $(PYTHON)
 	cd $(TKEIR_DIR) && \
 		VESPA_NAME="$(BEIR_VESPA_NAME)" \
 		VESPA_VOLUME="$(BEIR_VESPA_VOLUME)" \
 		$(UV) run --python $(PYTHON) --group beir --group models \
-		python -m thot.tools.search.beir_smoke \
+		python -m thot.tools.eval.beir_eval \
+		--datasets $(BEIR_DATASETS) \
+		--datasets-dir "$(BEIR_DATASETS_DIR)" \
+		--dense-model "$(BEIR_DENSE_MODEL)" \
+		$(if $(strip $(BEIR_REPORT)),--report "$(BEIR_REPORT)",) \
+		$(BEIR_EXTRA)
+
+beir-smoke: ## [eval] Fast BEIR smoke (thot.tools.eval.beir_smoke)
+	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python $(PYTHON)
+	cd $(TKEIR_DIR) && \
+		VESPA_NAME="$(BEIR_VESPA_NAME)" \
+		VESPA_VOLUME="$(BEIR_VESPA_VOLUME)" \
+		$(UV) run --python $(PYTHON) --group beir --group models \
+		python -m thot.tools.eval.beir_smoke \
 		--datasets $(BEIR_DATASETS) \
 		--datasets-dir "$(BEIR_DATASETS_DIR)" \
 		--queries $(BEIR_SMOKE_QUERIES) \
@@ -1300,6 +1342,9 @@ beir-smoke: ## Fast BEIR smoke (<5 min): isolate corpora, time+NDCG, cleanup Ves
 		--top-k $(BEIR_SMOKE_TOP_K) \
 		--index-mode $(BEIR_SMOKE_INDEX_MODE) \
 		$(BEIR_SMOKE_EXTRA)
+
+eval: beir-eval ## [eval] Alias for beir-eval
+eval-smoke: beir-smoke ## [eval] Alias for beir-smoke
 
 clean-db: ## Wipe Vespa data volume
 	cd $(VESPA_DIR) && ./clean_db.sh

@@ -18,22 +18,22 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from thot.ingest.config import ingest_settings
-from thot.ingest.fetch import doc_id_from_content, fetch_bytes
-from thot.ingest.manifest import (
+from thot.tools.ingest.config import ingest_settings
+from thot.tools.ingest.fetch import doc_id_from_content, fetch_bytes
+from thot.tools.ingest.manifest import (
     embedder_fingerprint,
     idempotency_key,
     pipeline_config_sha256,
 )
-from thot.ingest.models import (
+from thot.tools.ingest.models import (
     EmbedderInfo,
     IngestJob,
     IngestJobStatus,
     IngestManifest,
     SourceInfo,
 )
-from thot.ingest.store import IngestStore
-from thot.ingest.worker import IngestWorker
+from thot.tools.ingest.store import IngestStore
+from thot.tools.ingest.worker import IngestWorker
 
 
 @pytest.fixture
@@ -59,7 +59,7 @@ def ingest_root(monkeypatch):
 
 
 def test_document_extras_from_metadata_promotes_nato_paths():
-    from thot.ingest.worker import document_extras_from_metadata
+    from thot.tools.ingest.worker import document_extras_from_metadata
 
     # Server only stamps already-staged absolute paths (from uploaded bytes).
     extras = document_extras_from_metadata(
@@ -88,7 +88,7 @@ def test_ontology_upload_decode_rejects_path_strings():
     import tempfile
     from pathlib import Path
 
-    from thot.ingest.ontology_upload import (
+    from thot.tools.ingest.ontology_upload import (
         decode_ontology_uploads,
         stage_ontology_bytes,
     )
@@ -156,7 +156,7 @@ def test_ontology_lexicon_phrase_match():
 
 
 def test_request_ingest_shutdown_is_idempotent(monkeypatch):
-    from thot.ingest import shutdown as shutdown_mod
+    from thot.tools.ingest import shutdown as shutdown_mod
 
     calls: list[tuple[int, int]] = []
 
@@ -173,7 +173,7 @@ def test_request_ingest_shutdown_is_idempotent(monkeypatch):
 
 
 def test_ensure_source_doc_id_for_corpus_json():
-    from thot.ingest.worker import ensure_source_doc_id
+    from thot.tools.ingest.worker import ensure_source_doc_id
 
     doc = {"title": "SALUTE", "content": ["body text"]}
     out = ensure_source_doc_id(
@@ -299,7 +299,7 @@ def test_worker_writes_dlq_on_pipeline_failure(ingest_root):
 
 def test_api_health_and_ingest(ingest_root, monkeypatch):
     ingest_settings.cache_clear()
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     async def fake_process(*_args, **_kwargs):
         return IngestJob(
@@ -347,7 +347,7 @@ def test_api_health_and_ingest(ingest_root, monkeypatch):
 
 def test_api_status_not_found(ingest_root):
     ingest_settings.cache_clear()
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     with (
         patch.object(
@@ -371,7 +371,7 @@ def test_auth_dev_token_required(ingest_root, monkeypatch):
     monkeypatch.setenv("INGEST_AUTH_ENABLED", "true")
     monkeypatch.setenv("INGEST_DEV_TOKEN", "secret-token")
     ingest_settings.cache_clear()
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     with (
         patch.object(
@@ -426,7 +426,7 @@ def test_auth_jwt_prefers_preferred_username(ingest_root, monkeypatch):
     ingest_settings.cache_clear()
     monkeypatch.setenv("INGEST_AUTH_ENABLED", "true")
     ingest_settings.cache_clear()
-    from thot.ingest.auth import verify_ingest_authorization
+    from thot.tools.ingest.auth import verify_ingest_authorization
 
     payload = (
         base64.urlsafe_b64encode(
@@ -451,7 +451,7 @@ def test_auth_disabled_uses_dev_user_space(ingest_root, monkeypatch):
     monkeypatch.delenv("VESPA_USER_SPACE", raising=False)
     monkeypatch.setenv("INGEST_AUTH_ENABLED", "false")
     ingest_settings.cache_clear()
-    from thot.ingest.auth import verify_ingest_authorization
+    from thot.tools.ingest.auth import verify_ingest_authorization
 
     assert verify_ingest_authorization(None) == "dev@tkeir"
 
@@ -463,7 +463,7 @@ def test_auth_resource_access_role(ingest_root, monkeypatch):
     ingest_settings.cache_clear()
     monkeypatch.setenv("INGEST_AUTH_ENABLED", "true")
     ingest_settings.cache_clear()
-    from thot.ingest.auth import verify_ingest_authorization
+    from thot.tools.ingest.auth import verify_ingest_authorization
 
     payload = (
         base64.urlsafe_b64encode(
@@ -490,7 +490,7 @@ def test_auth_rejects_missing_scope(ingest_root, monkeypatch):
     ingest_settings.cache_clear()
     from fastapi import HTTPException
 
-    from thot.ingest.auth import verify_ingest_authorization
+    from thot.tools.ingest.auth import verify_ingest_authorization
 
     payload = (
         base64.urlsafe_b64encode(
@@ -507,7 +507,7 @@ def test_auth_rejects_missing_scope(ingest_root, monkeypatch):
 
 def test_api_batch_ingest(ingest_root):
     ingest_settings.cache_clear()
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     async def fake_process(*_args, **_kwargs):
         return IngestJob(
@@ -550,7 +550,7 @@ def test_api_batch_ingest(ingest_root):
 
 def test_api_ready_and_metrics(ingest_root):
     ingest_settings.cache_clear()
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     with (
         patch.object(
@@ -564,7 +564,7 @@ def test_api_ready_and_metrics(ingest_root):
             new=AsyncMock(),
         ),
         patch(
-            "thot.ingest.app.readiness_report",
+            "thot.tools.ingest.app.readiness_report",
             new=AsyncMock(
                 return_value={"status": "ready", "checks": {}},
             ),
@@ -608,7 +608,7 @@ def test_cli_retry_from_dlq(ingest_root, monkeypatch):
     store.stage_bytes("n" * 64, b"bytes", filename="doc.txt")
     store.write_dlq("L" * 26, job=job, manifest=manifest, reason="fail")
 
-    from thot.ingest import cli as ingest_cli
+    from thot.tools.ingest import cli as ingest_cli
 
     async def fake_retry(_self, ingest_id: str):
         assert ingest_id == "L" * 26
@@ -721,7 +721,7 @@ def test_worker_fetch_failure(ingest_root):
 
 def test_api_ingest_status_ok(ingest_root):
     ingest_settings.cache_clear()
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     now = "2026-01-01T00:00:00.000Z"
     job = IngestJob(
@@ -757,14 +757,14 @@ def test_api_ingest_status_ok(ingest_root):
 def test_app_main_dispatches_retry(monkeypatch):
     import sys
 
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     called = {"cli": False}
 
     def fake_cli_main(args=None):
         called["cli"] = True
 
-    monkeypatch.setattr("thot.ingest.cli.main", fake_cli_main)
+    monkeypatch.setattr("thot.tools.ingest.cli.main", fake_cli_main)
     monkeypatch.setattr(
         sys,
         "argv",
@@ -776,7 +776,7 @@ def test_app_main_dispatches_retry(monkeypatch):
 
 def test_cli_retry_missing_dlq(ingest_root, monkeypatch, capsys):
     ingest_settings.cache_clear()
-    from thot.ingest import cli as ingest_cli
+    from thot.tools.ingest import cli as ingest_cli
 
     with pytest.raises(SystemExit) as exc:
         ingest_cli.main(["retry", "--from-dlq", "--ingest-id", "Z" * 26])
@@ -789,7 +789,7 @@ def test_auth_invalid_jwt(ingest_root, monkeypatch):
     ingest_settings.cache_clear()
     from fastapi import HTTPException
 
-    from thot.ingest.auth import verify_ingest_authorization
+    from thot.tools.ingest.auth import verify_ingest_authorization
 
     with pytest.raises(HTTPException) as exc:
         verify_ingest_authorization("Bearer not-a-jwt")
@@ -798,7 +798,7 @@ def test_auth_invalid_jwt(ingest_root, monkeypatch):
 
 def test_api_ready_not_ready(ingest_root):
     ingest_settings.cache_clear()
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     with (
         patch.object(
@@ -812,7 +812,7 @@ def test_api_ready_not_ready(ingest_root):
             new=AsyncMock(),
         ),
         patch(
-            "thot.ingest.app.readiness_report",
+            "thot.tools.ingest.app.readiness_report",
             new=AsyncMock(return_value={"status": "not_ready", "checks": {}}),
         ),
     ):
@@ -822,14 +822,14 @@ def test_api_ready_not_ready(ingest_root):
 
 
 def test_fetch_unsupported_scheme():
-    from thot.ingest.fetch import FetchError
+    from thot.tools.ingest.fetch import FetchError
 
     with pytest.raises(FetchError):
         asyncio.run(fetch_bytes("ftp://example.com/x"))
 
 
 def test_fetch_file_missing():
-    from thot.ingest.fetch import FetchError
+    from thot.tools.ingest.fetch import FetchError
 
     with pytest.raises(FetchError):
         asyncio.run(fetch_bytes("file:///no/such/file.bin"))
@@ -837,7 +837,7 @@ def test_fetch_file_missing():
 
 def test_api_health_vespa_down(ingest_root):
     ingest_settings.cache_clear()
-    from thot.ingest import app as ingest_app
+    from thot.tools.ingest import app as ingest_app
 
     with (
         patch.object(
@@ -851,7 +851,7 @@ def test_api_health_vespa_down(ingest_root):
             new=AsyncMock(),
         ),
         patch(
-            "thot.ingest.app.readiness_report",
+            "thot.tools.ingest.app.readiness_report",
             new=AsyncMock(
                 return_value={"status": "not_ready", "vespa": False}
             ),
@@ -869,7 +869,7 @@ def test_auth_missing_bearer(ingest_root, monkeypatch):
     ingest_settings.cache_clear()
     from fastapi import HTTPException
 
-    from thot.ingest.auth import verify_ingest_authorization
+    from thot.tools.ingest.auth import verify_ingest_authorization
 
     with pytest.raises(HTTPException) as exc:
         verify_ingest_authorization(None)

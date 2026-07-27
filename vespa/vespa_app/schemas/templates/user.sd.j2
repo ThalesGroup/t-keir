@@ -1,0 +1,43 @@
+{# Per-user / folder space — Vespa streaming mode (exact NN, no HNSW). #}
+schema user inherits doc_base {
+    document user inherits doc_base {
+        # Streaming group / Keycloak principal (must match streaming.groupname).
+        field userspace_id type string {
+            indexing: summary | attribute
+        }
+        # Dense BGE-M3 attribute-only (exact nearestNeighbor; no HNSW in streaming).
+        field dense_vector type tensor<float>(x[{{ embedding_dim }}]) {
+            indexing: attribute
+            attribute {
+                distance-metric: angular
+            }
+        }
+    }
+
+    fieldset default {
+        fields: chunk_text
+    }
+
+    rank-profile hybrid {
+        inputs {
+            query(q_dense) tensor<float>(x[{{ embedding_dim }}])
+            query(q_sparse) tensor<float>(token{})
+        }
+        first-phase {
+            expression {
+                closeness(field, dense_vector) * {{ w_dense }} +
+                sum(query(q_sparse) * attribute(sparse_vector)) * {{ w_sparse }} +
+                bm25(chunk_text) * {{ w_bm25 }}
+            }
+        }
+    }
+
+    rank-profile dense_only {
+        inputs {
+            query(q_dense) tensor<float>(x[{{ embedding_dim }}])
+        }
+        first-phase {
+            expression: closeness(field, dense_vector)
+        }
+    }
+}

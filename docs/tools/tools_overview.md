@@ -77,3 +77,7 @@ python3 -m thot.tools.annotation.create_annotation_resource \
 ### Per-task configuration
 
 `pipeline.yaml` references individual task configs under `tkeir/configs/` (converter, tokenizer, mstagger, nertagger, syntactic-tagger, keywords). See the tool-specific pages for configuration field descriptions.
+
+**Catalog of all config files:** [Configuration overview](../configuration/index.md).  
+**RAG / passage retrieval (exhaustive):** [rag.yaml reference](../configuration/rag.yaml.md).
+Packages: `thot.tools.ingest` (index), `thot.tools.search` (RAG), `thot.tools.eval` (BEIR).

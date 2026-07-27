@@ -57,19 +57,13 @@ _FORBIDDEN_LLM_RERANK_STRATEGIES = frozenset(
 _DEFAULT_VESPA_URL = "http://localhost:8080"
 _DEFAULT_VESPA_CONFIG_URL = "http://localhost:19071"
 _DEFAULT_VESPA_TIMEOUT_SECONDS = 60.0
-_DEFAULT_INDEX_WORKERS = 2
-_DEFAULT_CHUNK_WORKERS = 4
-_DEFAULT_QUERY_WORKERS = 1
 _DEFAULT_ENRICH_WORKERS = 8
 
 
 @dataclass(frozen=True)
 class RagVespaConcurrency:
-    """Worker pools for indexing, querying, and hit enrichment."""
+    """Worker pools for hit enrichment after search."""
 
-    index_workers: int = _DEFAULT_INDEX_WORKERS
-    chunk_workers: int = _DEFAULT_CHUNK_WORKERS
-    query_workers: int = _DEFAULT_QUERY_WORKERS
     enrich_workers: int = _DEFAULT_ENRICH_WORKERS
 
 
@@ -112,7 +106,6 @@ class RagSearchConfig:
 
     enabled: bool = False
     use_chunk_embedding: bool = True
-    use_question_embedding: bool = True
     use_text_raw: bool = True
     use_ner: bool = True
     use_svo: bool = True
@@ -122,7 +115,6 @@ class RagSearchConfig:
     hits: int = 20
     max_yql_terms: int = 48
     weight_chunk_embedding: float = 0.38
-    weight_question_embedding: float = 0.17
     weight_text_raw_bm25: float = 0.28
     rerank: RagRerankConfig = RagRerankConfig()
 
@@ -347,12 +339,12 @@ def _vespa_config_from_mapping(
 
     Example:
         >>> cfg = _vespa_config_from_mapping(
-        ...     {"url": "http://vespa:8080", "concurrency": {"index_workers": 2}}
+        ...     {"url": "http://vespa:8080", "concurrency": {"enrich_workers": 4}}
         ... )
         >>> cfg.url
         'http://vespa:8080'
-        >>> cfg.concurrency.index_workers
-        2
+        >>> cfg.concurrency.enrich_workers
+        4
     """
     cfg = mapping if isinstance(mapping, dict) else {}
     concurrency_raw = cfg.get("concurrency") or {}
@@ -370,30 +362,6 @@ def _vespa_config_from_mapping(
         user_space=str(cfg.get("user_space") or "dev@tkeir").strip()
         or "dev@tkeir",
         concurrency=RagVespaConcurrency(
-            index_workers=max(
-                1,
-                int(
-                    concurrency_raw.get(
-                        "index_workers", _DEFAULT_INDEX_WORKERS
-                    )
-                ),
-            ),
-            chunk_workers=max(
-                1,
-                int(
-                    concurrency_raw.get(
-                        "chunk_workers", _DEFAULT_CHUNK_WORKERS
-                    )
-                ),
-            ),
-            query_workers=max(
-                1,
-                int(
-                    concurrency_raw.get(
-                        "query_workers", _DEFAULT_QUERY_WORKERS
-                    )
-                ),
-            ),
             enrich_workers=max(
                 1,
                 int(
@@ -459,9 +427,6 @@ def _search_config_from_mapping(
     return RagSearchConfig(
         enabled=_as_bool(cfg.get("enabled"), False),
         use_chunk_embedding=_as_bool(cfg.get("use_chunk_embedding"), True),
-        use_question_embedding=_as_bool(
-            cfg.get("use_question_embedding"), True
-        ),
         use_text_raw=_as_bool(cfg.get("use_text_raw"), True),
         use_ner=_as_bool(cfg.get("use_ner"), True),
         use_svo=_as_bool(cfg.get("use_svo"), True),
@@ -471,9 +436,6 @@ def _search_config_from_mapping(
         hits=max(1, int(cfg.get("hits", 20))),
         max_yql_terms=max(1, int(cfg.get("max_yql_terms", 32))),
         weight_chunk_embedding=float(cfg.get("weight_chunk_embedding", 0.30)),
-        weight_question_embedding=float(
-            cfg.get("weight_question_embedding", 0.10)
-        ),
         weight_text_raw_bm25=float(cfg.get("weight_text_raw_bm25", 0.40)),
         rerank=_rerank_config_from_mapping(cfg.get("rerank")),
     )

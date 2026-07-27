@@ -34,5 +34,5 @@ cd tkeir && uv run pytest tests/unittests/TestBeirRankFixtures.py -q
 ```
 
 The unit test ranks each case with `lexical_signal.score_documents` (no Vespa).
-Production dual-hybrid now fuses the same signal (`configs/rag.yaml`
+Production passage retrieval fuses the same signal (`configs/rag.yaml`
 `final_fusion.weights.lexical_overlap`).

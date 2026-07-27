@@ -2,7 +2,9 @@
 
 Subpackages:
 - ``pipeline`` — document analysis pipeline CLI
-- ``search`` — Vespa indexing and RAG
+- ``search`` — Vespa retrieval and RAG
+- ``ingest`` — document fetch, staging, and Vespa indexing
+- ``eval`` — BEIR / retrieval evaluation (smoke + full metrics)
 - ``annotation`` — MWE / annotation resource compilation
 
 Author: Eric Blaudez

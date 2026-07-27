@@ -151,18 +151,36 @@ def test_near_copy_and_projection_are_corpus_independent():
         "Elevated plasma copeptin was associated with decreased risk of "
         "incident diabetes after adjustment.",
     ) == 1.0
+    # Missing long tokens alone → identity (relative gate needs a hit somewhere).
     rare = rare_token_multiplier(
         short_q,
         title="Statins in primary prevention",
         body="Statins lower CVD risk without naming the peptide.",
     )
-    assert rare < 1.0
+    assert rare == 1.0
     rare_hit = rare_token_multiplier(
         short_q,
         title="Copeptin predicts diabetes",
         body="Elevated copeptin associated with diabetes risk.",
     )
     assert rare_hit > 1.0
+    from thot.tools.search.lexical_signal import rare_token_multipliers
+
+    relative = rare_token_multipliers(
+        short_q,
+        {
+            "gold": (
+                "Copeptin predicts diabetes",
+                "Elevated copeptin associated with diabetes risk.",
+            ),
+            "neg": (
+                "Statins in primary prevention",
+                "Statins lower CVD risk without naming the peptide.",
+            ),
+        },
+    )
+    assert relative["gold"] > 1.0
+    assert relative["neg"] < 1.0
 
 
 def test_lexical_ranking_satisfies_fixture_asserts():
@@ -179,5 +197,5 @@ def test_perf_budgets_fixture():
     path = FIXTURE_DIR / "perf_budgets.yaml"
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     codes = {row["issue"] for row in data["budgets"]}
-    assert "slow_stage_cross_encoder" in codes
+    assert "slow_stage_colbert" in codes
     assert "slow_stage_ontology" in codes

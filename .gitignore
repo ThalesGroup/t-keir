@@ -18,6 +18,10 @@ tkeir/site
 site/
 .venv
 .cache/
+# Large local neural weights (downloaded by `make pull-bge-model`)
+tkeir/resources/modeling/net/**
+!tkeir/resources/modeling/net/README.md
+!tkeir/resources/modeling/net/.gitkeep
 .pytest_cache/
 reports/
 results/

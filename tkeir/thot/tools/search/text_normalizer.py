@@ -173,7 +173,7 @@ def document_language(document: dict[str, Any] | None) -> str:
 def normalizer_for_language(language: str | None) -> TextNormalizer:
     """Shared factory: load preprocessing from ``rag.yaml`` and resolve model.
 
-    Used by indexing and by DualHybridPipeline query path.
+    Used by indexing and by PassageRetrievalPipeline query path.
     """
     from thot.tools.search.rag_config import load_rag_config
 

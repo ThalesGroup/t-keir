@@ -22,12 +22,13 @@ Output: `output/quickstart/`.
 
 ## Analyse your documents
 
-Set a model cache if you use Hugging Face / transformer-backed steps:
+Set a model cache if you use Hugging Face / transformer-backed steps
+(not required for BGE-M3 — that lives under
+`tkeir/resources/modeling/net/bge-m3` after `make setup`):
 
 ```bash
 export TRANSFORMERS_CACHE=$PWD/.cache/models
 ```
-
 Use **`-t auto`** for mixed or binary inputs (PDF, Office). Use **`-t raw`** for plain
 text only.
 

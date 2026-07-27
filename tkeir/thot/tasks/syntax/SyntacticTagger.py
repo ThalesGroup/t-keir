@@ -589,6 +589,7 @@ class SyntacticTagger:
                 "confidence": 0.0,
                 "weight": 0.0,
                 "field_type": field,
+                "provenance": "document",
             }
         )
 

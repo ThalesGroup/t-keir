@@ -26,8 +26,8 @@ sequenceDiagram
   API->>MW: ensure correlation_id
   Note over API: resolve_vespa_user_space from JWT
   API->>LLM: embed / generate as configured
-  API->>Vespa: hybrid_search with user_space group
-  Vespa-->>API: chunk hits
+  API->>Vespa: PassageRetrievalPipeline (global/user)
+  Vespa-->>API: passage hits
   API-->>HMI: QueryResponse + X-Correlation-Id
   HMI-->>User: results UI
 ```
@@ -37,7 +37,7 @@ Checkpoint: with `make rag` and indexed docs, `POST http://localhost:8090/rag/qu
 ## Primary write path — ingest → index
 
 Triggered by `POST /ingest/document` or `POST /ingest/batch` on
-`tkeir-ingest` (`thot.ingest.app`), or by CLI `tkeir-pipeline` +
+`tkeir-ingest` (`thot.tools.ingest.app`), or by CLI `tkeir-pipeline` +
 `tkeir-index-documents`. Idempotency uses
 `(doc_id, pipeline_config_sha256, embedder.sha256)`.
 
@@ -55,8 +55,8 @@ sequenceDiagram
   Note over Ingest: noop if digests unchanged
   Ingest-->>Client: IngestAcceptedResponse
   Ingest->>Pipe: run NLP pipeline on content
-  Pipe->>Index: upsert document + chunks
-  Index->>Vespa: document API with user_space group
+  Pipe->>Index: upsert passages
+  Index->>Vespa: document API (global and/or user group)
   Client->>Ingest: GET /ingest/status/ingest_id
   Ingest-->>Client: IngestStatusResponse
 ```
@@ -167,7 +167,7 @@ sequenceDiagram
   participant Runner as AgentLoop
 
   Cron->>Index: scan pipeline output dir
-  Index->>Vespa: upsert_document / upsert_chunk
+  Index->>Vespa: upsert passages (global / user)
   Note over Agent: POST /agent/runs schedules asyncio task
   Agent->>Runner: background run
   Runner-->>Agent: persist RunState under AGENT_ROOT

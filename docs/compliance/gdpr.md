@@ -32,6 +32,13 @@ deployment boundary — call this out in DPIA templates for regulated deployment
 
 --8<-- "./docs/compliance/generated/gdpr_articles.md"
 
+## Exact legal text (EUR-Lex)
+
+Official English excerpts for each catalogue citation. Links in the table above
+jump here.
+
+--8<-- "./docs/compliance/generated/gdpr_article_texts.md"
+
 ## Latest audit results
 
 --8<-- "./docs/compliance/generated/gdpr_results.md"

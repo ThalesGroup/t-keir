@@ -1,0 +1,564 @@
+regulation: CRA
+key: cra
+celex: 32024R2847
+source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2847
+language: en
+fetched_at: '2026-07-27T12:50:41Z'
+disclaimer: 'Official EU legal text sourced via Publications Office Cellar (English). Not legal advice.
+  Attribution: © European Union, https://eur-lex.europa.eu/'
+articles:
+  AnnexI.PartI.1(a):
+    title: Annex I Part I
+    text: (a) be made available on the market without known exploitable vulnerabilities;
+    status: annex_point
+  AnnexI.PartI.1(b):
+    title: Annex I Part I
+    text: (b) be made available on the market with a secure by default configuration, unless otherwise
+      agreed between manufacturer and business user in relation to a tailor-made product with digital
+      elements, including the possibility to reset the product to its original state;
+    status: annex_point
+  AnnexI.PartI.1(c):
+    title: Annex I Part I
+    text: (c) ensure that vulnerabilities can be addressed through security updates, including, where
+      applicable, through automatic security updates that are installed within an appropriate timeframe
+      enabled as a default setting, with a clear and easy-to-use opt-out mechanism, through the notification
+      of available updates to users, and the option to temporarily postpone them;
+    status: annex_point
+  AnnexI.PartI.1(d):
+    title: Annex I Part I
+    text: (d) ensure protection from unauthorised access by appropriate control mechanisms, including
+      but not limited to authentication, identity or access management systems, and report on possible
+      unauthorised access;
+    status: annex_point
+  AnnexI.PartI.1(e):
+    title: Annex I Part I
+    text: (e) protect the confidentiality of stored, transmitted or otherwise processed data, personal
+      or other, such as by encrypting relevant data at rest or in transit by state of the art mechanisms,
+      and by using other technical means;
+    status: annex_point
+  AnnexI.PartI.1(f):
+    title: Annex I Part I
+    text: (f) protect the integrity of stored, transmitted or otherwise processed data, personal or other,
+      commands, programs and configuration against any manipulation or modification not authorised by
+      the user, and report on corruptions;
+    status: annex_point
+  AnnexI.PartI.1(g):
+    title: Annex I Part I
+    text: (g) process only data, personal or other, that are adequate, relevant and limited to what is
+      necessary in relation to the intended purpose of the product with digital elements (data minimisation);
+    status: annex_point
+  AnnexI.PartI.1(h):
+    title: Annex I Part I
+    text: (h) protect the availability of essential and basic functions, also after an incident, including
+      through resilience and mitigation measures against denial-of-service attacks;
+    status: annex_point
+  AnnexI.PartI.1(i):
+    title: Annex I Part I
+    text: (i) minimise the negative impact by the products themselves or connected devices on the availability
+      of services provided by other devices or networks;
+    status: annex_point
+  AnnexI.PartI.1(j):
+    title: Annex I Part I
+    text: (j) be designed, developed and produced to limit attack surfaces, including external interfaces;
+    status: annex_point
+  AnnexI.PartI.1(k):
+    title: Annex I Part I
+    text: (k) be designed, developed and produced to reduce the impact of an incident using appropriate
+      exploitation mitigation mechanisms and techniques;
+    status: annex_point
+  AnnexI.PartI.1(l):
+    title: Annex I Part I
+    text: (l) provide security related information by recording and monitoring relevant internal activity,
+      including the access to or modification of data, services or functions, with an opt-out mechanism
+      for the user;
+    status: annex_point
+  AnnexI.PartI.1(m):
+    title: Annex I Part I
+    text: (m) provide the possibility for users to securely and easily remove on a permanent basis all
+      data and settings and, where such data can be transferred to other products or systems, ensure that
+      this is done in a secure manner.
+    status: annex_point
+  AnnexI.PartI.1(n):
+    title: Annex I Part I
+    text: "(1)\n\n Products with digital elements shall be designed, developed and produced in such a\
+      \ way that they ensure an appropriate level of cybersecurity based on the risks.\n\n (2)\n\n On\
+      \ the basis of the cybersecurity risk assessment referred to in Article 13(2) and where applicable,\
+      \ products with digital elements shall:\n\n (a)\n\n be made available on the market without known\
+      \ exploitable vulnerabilities;\n\n (b)\n\n be made available on the market with a secure by default\
+      \ configuration, unless otherwise agreed between manufacturer and business user in relation to a\
+      \ tailor-made product with digital elements, including the possibility to reset the product to its\
+      \ original state;\n\n (c)\n\n ensure that vulnerabilities can be addressed through security updates,\
+      \ including, where applicable, through automatic security updates that are installed within an appropriate\
+      \ timeframe enabled as a default setting, with a clear and easy-to-use opt-out mechanism, through\
+      \ the notification of available updates to users, and the option to temporarily postpone them;\n\
+      \n (d)\n\n ensure protection from unauthorised access by appropriate control mechanisms, including\
+      \ but not limited to authentication, identity or access management systems, and report on possible\
+      \ unauthorised access;\n\n (e)\n\n protect the confidentiality of stored, transmitted or otherwise\
+      \ processed data, personal or other, such as by encrypting relevant data at rest or in transit by\
+      \ state of the art mechanisms, and by using other technical means;\n\n (f)\n\n protect the integrity\
+      \ of stored, transmitted or otherwise processed data, personal or other, commands, programs and\
+      \ configuration against any manipulation or modification not authorised by the user, and report\
+      \ on corruptions;\n\n (g)\n\n process only data, personal or other, that are adequate, relevant\
+      \ and limited to what is necessary in relation to the intended purpose of the product with digital\
+      \ elements (data minimisation);\n\n (h)\n\n protect the availability of essential and basic functions,\
+      \ also after an incident, including through resilience and mitigation measures against denial-of-service\
+      \ attacks;\n\n (i)\n\n minimise the negative impact by the products themselves or connected devices\
+      \ on the availability of services provided by other devices or networks;\n\n (j)\n\n be designed,\
+      \ developed and produced to limit attack surfaces, including external interfaces;\n\n (k)\n\n be\
+      \ designed, developed and produced to reduce the impact of an incident using appropriate exploitation\
+      \ mitigation mechanisms and techniques;\n\n (l)\n\n provide security related information by recording\
+      \ and monitoring relevant internal activity, including the access to or modification of data, services\
+      \ or functions, with an opt-out mechanism for the user;\n\n (m)\n\n provide the possibility for\
+      \ users to securely and easily remove on a permanent basis all data and settings and, where such\
+      \ data can be transferred to other products or systems, ensure that this is done in a secure manner."
+    status: annex_part_fallback
+    note: Point (n) not isolated; full Part I shown.
+  AnnexI.PartI.1(o):
+    title: Annex I Part I
+    text: "(1)\n\n Products with digital elements shall be designed, developed and produced in such a\
+      \ way that they ensure an appropriate level of cybersecurity based on the risks.\n\n (2)\n\n On\
+      \ the basis of the cybersecurity risk assessment referred to in Article 13(2) and where applicable,\
+      \ products with digital elements shall:\n\n (a)\n\n be made available on the market without known\
+      \ exploitable vulnerabilities;\n\n (b)\n\n be made available on the market with a secure by default\
+      \ configuration, unless otherwise agreed between manufacturer and business user in relation to a\
+      \ tailor-made product with digital elements, including the possibility to reset the product to its\
+      \ original state;\n\n (c)\n\n ensure that vulnerabilities can be addressed through security updates,\
+      \ including, where applicable, through automatic security updates that are installed within an appropriate\
+      \ timeframe enabled as a default setting, with a clear and easy-to-use opt-out mechanism, through\
+      \ the notification of available updates to users, and the option to temporarily postpone them;\n\
+      \n (d)\n\n ensure protection from unauthorised access by appropriate control mechanisms, including\
+      \ but not limited to authentication, identity or access management systems, and report on possible\
+      \ unauthorised access;\n\n (e)\n\n protect the confidentiality of stored, transmitted or otherwise\
+      \ processed data, personal or other, such as by encrypting relevant data at rest or in transit by\
+      \ state of the art mechanisms, and by using other technical means;\n\n (f)\n\n protect the integrity\
+      \ of stored, transmitted or otherwise processed data, personal or other, commands, programs and\
+      \ configuration against any manipulation or modification not authorised by the user, and report\
+      \ on corruptions;\n\n (g)\n\n process only data, personal or other, that are adequate, relevant\
+      \ and limited to what is necessary in relation to the intended purpose of the product with digital\
+      \ elements (data minimisation);\n\n (h)\n\n protect the availability of essential and basic functions,\
+      \ also after an incident, including through resilience and mitigation measures against denial-of-service\
+      \ attacks;\n\n (i)\n\n minimise the negative impact by the products themselves or connected devices\
+      \ on the availability of services provided by other devices or networks;\n\n (j)\n\n be designed,\
+      \ developed and produced to limit attack surfaces, including external interfaces;\n\n (k)\n\n be\
+      \ designed, developed and produced to reduce the impact of an incident using appropriate exploitation\
+      \ mitigation mechanisms and techniques;\n\n (l)\n\n provide security related information by recording\
+      \ and monitoring relevant internal activity, including the access to or modification of data, services\
+      \ or functions, with an opt-out mechanism for the user;\n\n (m)\n\n provide the possibility for\
+      \ users to securely and easily remove on a permanent basis all data and settings and, where such\
+      \ data can be transferred to other products or systems, ensure that this is done in a secure manner."
+    status: annex_part_fallback
+    note: Point (o) not isolated; full Part I shown.
+  AnnexI.PartI.1(p):
+    title: Annex I Part I
+    text: "(1)\n\n Products with digital elements shall be designed, developed and produced in such a\
+      \ way that they ensure an appropriate level of cybersecurity based on the risks.\n\n (2)\n\n On\
+      \ the basis of the cybersecurity risk assessment referred to in Article 13(2) and where applicable,\
+      \ products with digital elements shall:\n\n (a)\n\n be made available on the market without known\
+      \ exploitable vulnerabilities;\n\n (b)\n\n be made available on the market with a secure by default\
+      \ configuration, unless otherwise agreed between manufacturer and business user in relation to a\
+      \ tailor-made product with digital elements, including the possibility to reset the product to its\
+      \ original state;\n\n (c)\n\n ensure that vulnerabilities can be addressed through security updates,\
+      \ including, where applicable, through automatic security updates that are installed within an appropriate\
+      \ timeframe enabled as a default setting, with a clear and easy-to-use opt-out mechanism, through\
+      \ the notification of available updates to users, and the option to temporarily postpone them;\n\
+      \n (d)\n\n ensure protection from unauthorised access by appropriate control mechanisms, including\
+      \ but not limited to authentication, identity or access management systems, and report on possible\
+      \ unauthorised access;\n\n (e)\n\n protect the confidentiality of stored, transmitted or otherwise\
+      \ processed data, personal or other, such as by encrypting relevant data at rest or in transit by\
+      \ state of the art mechanisms, and by using other technical means;\n\n (f)\n\n protect the integrity\
+      \ of stored, transmitted or otherwise processed data, personal or other, commands, programs and\
+      \ configuration against any manipulation or modification not authorised by the user, and report\
+      \ on corruptions;\n\n (g)\n\n process only data, personal or other, that are adequate, relevant\
+      \ and limited to what is necessary in relation to the intended purpose of the product with digital\
+      \ elements (data minimisation);\n\n (h)\n\n protect the availability of essential and basic functions,\
+      \ also after an incident, including through resilience and mitigation measures against denial-of-service\
+      \ attacks;\n\n (i)\n\n minimise the negative impact by the products themselves or connected devices\
+      \ on the availability of services provided by other devices or networks;\n\n (j)\n\n be designed,\
+      \ developed and produced to limit attack surfaces, including external interfaces;\n\n (k)\n\n be\
+      \ designed, developed and produced to reduce the impact of an incident using appropriate exploitation\
+      \ mitigation mechanisms and techniques;\n\n (l)\n\n provide security related information by recording\
+      \ and monitoring relevant internal activity, including the access to or modification of data, services\
+      \ or functions, with an opt-out mechanism for the user;\n\n (m)\n\n provide the possibility for\
+      \ users to securely and easily remove on a permanent basis all data and settings and, where such\
+      \ data can be transferred to other products or systems, ensure that this is done in a secure manner."
+    status: annex_part_fallback
+    note: Point (p) not isolated; full Part I shown.
+  AnnexI.PartI.1(q):
+    title: Annex I Part I
+    text: "(1)\n\n Products with digital elements shall be designed, developed and produced in such a\
+      \ way that they ensure an appropriate level of cybersecurity based on the risks.\n\n (2)\n\n On\
+      \ the basis of the cybersecurity risk assessment referred to in Article 13(2) and where applicable,\
+      \ products with digital elements shall:\n\n (a)\n\n be made available on the market without known\
+      \ exploitable vulnerabilities;\n\n (b)\n\n be made available on the market with a secure by default\
+      \ configuration, unless otherwise agreed between manufacturer and business user in relation to a\
+      \ tailor-made product with digital elements, including the possibility to reset the product to its\
+      \ original state;\n\n (c)\n\n ensure that vulnerabilities can be addressed through security updates,\
+      \ including, where applicable, through automatic security updates that are installed within an appropriate\
+      \ timeframe enabled as a default setting, with a clear and easy-to-use opt-out mechanism, through\
+      \ the notification of available updates to users, and the option to temporarily postpone them;\n\
+      \n (d)\n\n ensure protection from unauthorised access by appropriate control mechanisms, including\
+      \ but not limited to authentication, identity or access management systems, and report on possible\
+      \ unauthorised access;\n\n (e)\n\n protect the confidentiality of stored, transmitted or otherwise\
+      \ processed data, personal or other, such as by encrypting relevant data at rest or in transit by\
+      \ state of the art mechanisms, and by using other technical means;\n\n (f)\n\n protect the integrity\
+      \ of stored, transmitted or otherwise processed data, personal or other, commands, programs and\
+      \ configuration against any manipulation or modification not authorised by the user, and report\
+      \ on corruptions;\n\n (g)\n\n process only data, personal or other, that are adequate, relevant\
+      \ and limited to what is necessary in relation to the intended purpose of the product with digital\
+      \ elements (data minimisation);\n\n (h)\n\n protect the availability of essential and basic functions,\
+      \ also after an incident, including through resilience and mitigation measures against denial-of-service\
+      \ attacks;\n\n (i)\n\n minimise the negative impact by the products themselves or connected devices\
+      \ on the availability of services provided by other devices or networks;\n\n (j)\n\n be designed,\
+      \ developed and produced to limit attack surfaces, including external interfaces;\n\n (k)\n\n be\
+      \ designed, developed and produced to reduce the impact of an incident using appropriate exploitation\
+      \ mitigation mechanisms and techniques;\n\n (l)\n\n provide security related information by recording\
+      \ and monitoring relevant internal activity, including the access to or modification of data, services\
+      \ or functions, with an opt-out mechanism for the user;\n\n (m)\n\n provide the possibility for\
+      \ users to securely and easily remove on a permanent basis all data and settings and, where such\
+      \ data can be transferred to other products or systems, ensure that this is done in a secure manner."
+    status: annex_part_fallback
+    note: Point (q) not isolated; full Part I shown.
+  AnnexI.PartI.1(r):
+    title: Annex I Part I
+    text: "(1)\n\n Products with digital elements shall be designed, developed and produced in such a\
+      \ way that they ensure an appropriate level of cybersecurity based on the risks.\n\n (2)\n\n On\
+      \ the basis of the cybersecurity risk assessment referred to in Article 13(2) and where applicable,\
+      \ products with digital elements shall:\n\n (a)\n\n be made available on the market without known\
+      \ exploitable vulnerabilities;\n\n (b)\n\n be made available on the market with a secure by default\
+      \ configuration, unless otherwise agreed between manufacturer and business user in relation to a\
+      \ tailor-made product with digital elements, including the possibility to reset the product to its\
+      \ original state;\n\n (c)\n\n ensure that vulnerabilities can be addressed through security updates,\
+      \ including, where applicable, through automatic security updates that are installed within an appropriate\
+      \ timeframe enabled as a default setting, with a clear and easy-to-use opt-out mechanism, through\
+      \ the notification of available updates to users, and the option to temporarily postpone them;\n\
+      \n (d)\n\n ensure protection from unauthorised access by appropriate control mechanisms, including\
+      \ but not limited to authentication, identity or access management systems, and report on possible\
+      \ unauthorised access;\n\n (e)\n\n protect the confidentiality of stored, transmitted or otherwise\
+      \ processed data, personal or other, such as by encrypting relevant data at rest or in transit by\
+      \ state of the art mechanisms, and by using other technical means;\n\n (f)\n\n protect the integrity\
+      \ of stored, transmitted or otherwise processed data, personal or other, commands, programs and\
+      \ configuration against any manipulation or modification not authorised by the user, and report\
+      \ on corruptions;\n\n (g)\n\n process only data, personal or other, that are adequate, relevant\
+      \ and limited to what is necessary in relation to the intended purpose of the product with digital\
+      \ elements (data minimisation);\n\n (h)\n\n protect the availability of essential and basic functions,\
+      \ also after an incident, including through resilience and mitigation measures against denial-of-service\
+      \ attacks;\n\n (i)\n\n minimise the negative impact by the products themselves or connected devices\
+      \ on the availability of services provided by other devices or networks;\n\n (j)\n\n be designed,\
+      \ developed and produced to limit attack surfaces, including external interfaces;\n\n (k)\n\n be\
+      \ designed, developed and produced to reduce the impact of an incident using appropriate exploitation\
+      \ mitigation mechanisms and techniques;\n\n (l)\n\n provide security related information by recording\
+      \ and monitoring relevant internal activity, including the access to or modification of data, services\
+      \ or functions, with an opt-out mechanism for the user;\n\n (m)\n\n provide the possibility for\
+      \ users to securely and easily remove on a permanent basis all data and settings and, where such\
+      \ data can be transferred to other products or systems, ensure that this is done in a secure manner."
+    status: annex_part_fallback
+    note: Point (r) not isolated; full Part I shown.
+  AnnexI.PartII.1:
+    title: Annex I Part II
+    text: (1) identify and document vulnerabilities and components contained in products with digital
+      elements, including by drawing up a software bill of materials in a commonly used and machine-readable
+      format covering at the very least the top-level dependencies of the products;
+    status: annex_paragraph
+  AnnexI.PartII.2:
+    title: Annex I Part II
+    text: (2) in relation to the risks posed to products with digital elements, address and remediate
+      vulnerabilities without delay, including by providing security updates; where technically feasible,
+      new security updates shall be provided separately from functionality updates;
+    status: annex_paragraph
+  AnnexI.PartII.3:
+    title: Annex I Part II
+    text: (3) apply effective and regular tests and reviews of the security of the product with digital
+      elements;
+    status: annex_paragraph
+  AnnexI.PartII.4:
+    title: Annex I Part II
+    text: (4) once a security update has been made available, share and publicly disclose information
+      about fixed vulnerabilities, including a description of the vulnerabilities, information allowing
+      users to identify the product with digital elements affected, the impacts of the vulnerabilities,
+      their severity and clear and accessible information helping users to remediate the vulnerabilities;
+      in duly justified cases, where manufacturers consider the security risks of publication to outweigh
+      the security benefits, they may delay making public information regarding a fixed vulnerability
+      until after users have been given the possibility to apply the relevant patch;
+    status: annex_paragraph
+  AnnexI.PartII.5:
+    title: Annex I Part II
+    text: (5) put in place and enforce a policy on coordinated vulnerability disclosure;
+    status: annex_paragraph
+  AnnexI.PartII.6:
+    title: Annex I Part II
+    text: (6) take measures to facilitate the sharing of information about potential vulnerabilities in
+      their product with digital elements as well as in third-party components contained in that product,
+      including by providing a contact address for the reporting of the vulnerabilities discovered in
+      the product with digital elements;
+    status: annex_paragraph
+  AnnexI.PartII.7:
+    title: Annex I Part II
+    text: (7) provide for mechanisms to securely distribute updates for products with digital elements
+      to ensure that vulnerabilities are fixed or mitigated in a timely manner and, where applicable for
+      security updates, in an automatic manner;
+    status: annex_paragraph
+  Art.6(1):
+    title: Requirements for products with digital elements
+    text: "Products with digital elements shall be made available on the market only where:\n\n (a)\n\n\
+      \ they meet the essential cybersecurity requirements set out in Part I of Annex I, provided that\
+      \ they are properly installed, maintained, used for their intended purpose or under conditions which\
+      \ can reasonably be foreseen, and, where applicable, the necessary security updates have been installed;\
+      \ and\n\n (b)\n\n the processes put in place by the manufacturer comply with the essential cybersecurity\
+      \ requirements set out in Part II of Annex I."
+    status: article_fallback
+    note: Paragraph 1 boundaries not detected; full Article 6 shown.
+  Art.6(2):
+    title: Requirements for products with digital elements
+    text: "Products with digital elements shall be made available on the market only where:\n\n (a)\n\n\
+      \ they meet the essential cybersecurity requirements set out in Part I of Annex I, provided that\
+      \ they are properly installed, maintained, used for their intended purpose or under conditions which\
+      \ can reasonably be foreseen, and, where applicable, the necessary security updates have been installed;\
+      \ and\n\n (b)\n\n the processes put in place by the manufacturer comply with the essential cybersecurity\
+      \ requirements set out in Part II of Annex I."
+    status: article_fallback
+    note: Paragraph 2 boundaries not detected; full Article 6 shown.
+  Art.6(3):
+    title: Requirements for products with digital elements
+    text: "Products with digital elements shall be made available on the market only where:\n\n (a)\n\n\
+      \ they meet the essential cybersecurity requirements set out in Part I of Annex I, provided that\
+      \ they are properly installed, maintained, used for their intended purpose or under conditions which\
+      \ can reasonably be foreseen, and, where applicable, the necessary security updates have been installed;\
+      \ and\n\n (b)\n\n the processes put in place by the manufacturer comply with the essential cybersecurity\
+      \ requirements set out in Part II of Annex I."
+    status: article_fallback
+    note: Paragraph 3 boundaries not detected; full Article 6 shown.
+  Art.13(1):
+    title: Obligations of manufacturers
+    text: 1. When placing a product with digital elements on the market, manufacturers shall ensure that
+      it has been designed, developed and produced in accordance with the essential cybersecurity requirements
+      set out in Part I of Annex I.
+    status: paragraph
+  Art.13(2):
+    title: Obligations of manufacturers
+    text: 2. For the purpose of complying with paragraph 1, manufacturers shall undertake an assessment
+      of the cybersecurity risks associated with a product with digital elements and take the outcome
+      of that assessment into account during the planning, design, development, production, delivery and
+      maintenance phases of the product with digital elements with a view to minimising cybersecurity
+      risks, preventing incidents and minimising their impact, including in relation to the health and
+      safety of users.
+    status: paragraph
+  Art.13(3):
+    title: Obligations of manufacturers
+    text: 3. The cybersecurity risk assessment shall be documented and updated as appropriate during a
+      support period to be determined in accordance with paragraph 8 of this Article. That cybersecurity
+      risk assessment shall comprise at least an analysis of cybersecurity risks based on the intended
+      purpose and reasonably foreseeable use, as well as the conditions of use, of the product with digital
+      elements, such as the operational environment or the assets to be protected, taking into account
+      the length of time the product is expected to be in use. The cybersecurity risk assessment shall
+      indicate whether and, if so in what manner, the security requirements set out in Part I, point (2),
+      of Annex I are applicable to the relevant product with digital elements and how those requirements
+      are implemented as informed by the cybersecurity risk assessment. It shall also indicate how the
+      manufacturer is to apply Part I, point (1), of Annex I and the vulnerability handling requirements
+      set out in Part II of Annex I.
+    status: paragraph
+  Art.13(4):
+    title: Obligations of manufacturers
+    text: 4. When placing a product with digital elements on the market, the manufacturer shall include
+      the cybersecurity risk assessment referred to in paragraph 3 of this Article in the technical documentation
+      required pursuant to Article 31 and Annex VII. For products with digital elements as referred to
+      in Article 12, which are also subject to other Union legal acts, the cybersecurity risk assessment
+      may be part of the risk assessment required by those Union legal acts. Where certain essential cybersecurity
+      requirements are not applicable to the product with digital elements, the manufacturer shall include
+      a clear justification to that effect in that technical documentation.
+    status: paragraph
+  Art.13(5):
+    title: Obligations of manufacturers
+    text: 5. For the purpose of complying with paragraph 1, manufacturers shall exercise due diligence
+      when integrating components sourced from third parties so that those components do not compromise
+      the cybersecurity of the product with digital elements, including when integrating components of
+      free and open-source software that have not been made available on the market in the course of a
+      commercial activity.
+    status: paragraph
+  Art.13(6):
+    title: Obligations of manufacturers
+    text: 6. Manufacturers shall, upon identifying a vulnerability in a component, including in an open
+      source-component, which is integrated in the product with digital elements report the vulnerability
+      to the person or entity manufacturing or maintaining the component, and address and remediate the
+      vulnerability in accordance with the vulnerability handling requirements set out in Part II of Annex
+      I. Where manufacturers have developed a software or hardware modification to address the vulnerability
+      in that component, they shall share the relevant code or documentation with the person or entity
+      manufacturing or maintaining the component, where appropriate in a machine-readable format.
+    status: paragraph
+  Art.13(7):
+    title: Obligations of manufacturers
+    text: 7. The manufacturers shall systematically document, in a manner that is proportionate to the
+      nature and the cybersecurity risks, relevant cybersecurity aspects concerning the products with
+      digital elements, including vulnerabilities of which they become aware and any relevant information
+      provided by third parties, and shall, where applicable, update the cybersecurity risk assessment
+      of the products.
+    status: paragraph
+  Art.13(8):
+    title: Obligations of manufacturers
+    text: "8. Manufacturers shall ensure, when placing a product with digital elements on the market,\
+      \ and for the support period, that vulnerabilities of that product, including its components, are\
+      \ handled effectively and in accordance with the essential cybersecurity requirements set out in\
+      \ Part II of Annex I.\n\n Manufacturers shall determine the support period so that it reflects the\
+      \ length of time during which the product is expected to be in use, taking into account, in particular,\
+      \ reasonable user expectations, the nature of the product, including its intended purpose, as well\
+      \ as relevant Union law determining the lifetime of products with digital elements. When determining\
+      \ the support period, manufacturers may also take into account the support periods of products with\
+      \ digital elements offering a similar functionality placed on the market by other manufacturers,\
+      \ the availability of the operating environment, the support periods of integrated components that\
+      \ provide core functions and are sourced from third parties as well as relevant guidance provided\
+      \ by the dedicated administrative cooperation group (ADCO) established pursuant to Article 52(15)\
+      \ and the Commission. The matters to be taken into account in order to determine the support period\
+      \ shall be considered in a manner that ensures proportionality.\n\n Without prejudice to the second\
+      \ subparagraph, the support period shall be at least five years. Where the product with digital\
+      \ elements is expected to be in use for less than five years, the support period shall correspond\
+      \ to the expected use time.\n\n Taking into account ADCO recommendations as referred to in Article\
+      \ 52(16), the Commission may adopt delegated acts in accordance with Article 61 to supplement this\
+      \ Regulation by specifying the minimum support period for specific product categories where the\
+      \ market surveillance data suggests inadequate support periods.\n\n Manufacturers shall include\
+      \ the information that was taken into account to determine the support period of a product with\
+      \ digital elements in the technical documentation as set out in Annex VII.\n\n Manufacturers shall\
+      \ have appropriate policies and procedures, including coordinated vulnerability disclosure policies,\
+      \ referred to in Part II, point (5), of Annex I to process and remediate potential vulnerabilities\
+      \ in the product with digital elements reported from internal or external sources."
+    status: paragraph
+  Art.13(9):
+    title: Obligations of manufacturers
+    text: 9. Manufacturers shall ensure that each security update, as referred to in Part II, point (8),
+      of Annex I, which has been made available to users during the support period, remains available
+      after it has been issued for a minimum of 10 years or for the remainder of the support period, whichever
+      is longer.
+    status: paragraph
+  Art.13(10):
+    title: Obligations of manufacturers
+    text: 10. Where a manufacturer has placed subsequent substantially modified versions of a software
+      product on the market, that manufacturer may ensure compliance with the essential cybersecurity
+      requirement set out in Part II, point (2), of Annex I only for the version that it has last placed
+      on the market, provided that the users of the versions that were previously placed on the market
+      have access to the version last placed on the market free of charge and do not incur additional
+      costs to adjust the hardware and software environment in which they use the original version of
+      that product.
+    status: paragraph
+  Art.13(11):
+    title: Obligations of manufacturers
+    text: 11. Manufacturers may maintain public software archives enhancing user access to historical
+      versions. In those cases, users shall be clearly informed in an easily accessible manner about risks
+      associated with using unsupported software.
+    status: paragraph
+  Art.13(12):
+    title: Obligations of manufacturers
+    text: 12. Before placing a product with digital elements on the market, manufacturers shall draw up
+      the technical documentation referred to in Article
+    status: paragraph
+  Art.14(1):
+    title: Reporting obligations of manufacturers
+    text: 1. A manufacturer shall notify any actively exploited vulnerability contained in the product
+      with digital elements that it becomes aware of simultaneously to the CSIRT designated as coordinator,
+      in accordance with paragraph 7 of this Article, and to ENISA. The manufacturer shall notify that
+      actively exploited vulnerability via the single reporting platform established pursuant to Article
+    status: paragraph
+  Art.14(2):
+    title: Reporting obligations of manufacturers
+    text: "2. For the purposes of the notification referred to in paragraph 1, the manufacturer shall\
+      \ submit:\n\n (a)\n\n an early warning notification of an actively exploited vulnerability, without\
+      \ undue delay and in any event within 24 hours of the manufacturer becoming aware of it, indicating,\
+      \ where applicable, the Member States on the territory of which the manufacturer is aware that their\
+      \ product with digital elements has been made available;\n\n (b)\n\n unless the relevant information\
+      \ has already been provided, a vulnerability notification, without undue delay and in any event\
+      \ within 72 hours of the manufacturer becoming aware of the actively exploited vulnerability, which\
+      \ shall provide general information, as available, about the product with digital elements concerned,\
+      \ the general nature of the exploit and of the vulnerability concerned as well as any corrective\
+      \ or mitigating measures taken, and corrective or mitigating measures that users can take, and which\
+      \ shall also indicate, where applicable, how sensitive the manufacturer considers the notified information\
+      \ to be;\n\n (c)\n\n unless the relevant information has already been provided, a final report,\
+      \ no later than 14 days after a corrective or mitigating measure is available, including at least\
+      \ the following:\n\n (i)\n\n a description of the vulnerability, including its severity and impact;\n\
+      \n (ii)\n\n where available, information concerning any malicious actor that has exploited or that\
+      \ is exploiting the vulnerability;\n\n (iii)\n\n details about the security update or other corrective\
+      \ measures that have been made available to remedy the vulnerability."
+    status: paragraph
+  Art.14(3):
+    title: Reporting obligations of manufacturers
+    text: 3. A manufacturer shall notify any severe incident having an impact on the security of the product
+      with digital elements that it becomes aware of simultaneously to the CSIRT designated as coordinator,
+      in accordance with paragraph 7 of this Article, and to ENISA. The manufacturer shall notify that
+      incident via the single reporting platform established pursuant to Article
+    status: paragraph
+  Art.14(4):
+    title: Reporting obligations of manufacturers
+    text: "4. For the purposes of the notification referred to in paragraph 3, the manufacturer shall\
+      \ submit:\n\n (a)\n\n an early warning notification of a severe incident having an impact on the\
+      \ security of the product with digital elements, without undue delay and in any event within 24\
+      \ hours of the manufacturer becoming aware of it, including at least whether the incident is suspected\
+      \ of being caused by unlawful or malicious acts, which shall also indicate, where applicable, the\
+      \ Member States on the territory of which the manufacturer is aware that their product with digital\
+      \ elements has been made available;\n\n (b)\n\n unless the relevant information has already been\
+      \ provided, an incident notification, without undue delay and in any event within 72 hours of the\
+      \ manufacturer becoming aware of the incident, which shall provide general information, where available,\
+      \ about the nature of the incident, an initial assessment of the incident, as well as any corrective\
+      \ or mitigating measures taken, and corrective or mitigating measures that users can take, and which\
+      \ shall also indicate, where applicable, how sensitive the manufacturer considers the notified information\
+      \ to be;\n\n (c)\n\n unless the relevant information has already been provided, a final report,\
+      \ within one month after the submission of the incident notification under point (b), including\
+      \ at least the following:\n\n (i)\n\n a detailed description of the incident, including its severity\
+      \ and impact;\n\n (ii)\n\n the type of threat or root cause that is likely to have triggered the\
+      \ incident;\n\n (iii)\n\n applied and ongoing mitigation measures."
+    status: paragraph
+  Art.20:
+    title: Obligations of distributors
+    text: "1. When making a product with digital elements available on the market, distributors shall\
+      \ act with due care in relation to the requirements set out in this Regulation.\n\n 2. Before making\
+      \ a product with digital elements available on the market, distributors shall verify that:\n\n (a)\n\
+      \n the product with digital elements bears the CE marking;\n\n (b)\n\n the manufacturer and the\
+      \ importer have complied with the obligations set out in Article 13(15), (16), (18), (19) and (20)\
+      \ and Article 19(4), and have provided all necessary documents to the distributor.\n\n 3. Where\
+      \ a distributor considers or has reason to believe, on the basis of information in its possession,\
+      \ that a product with digital elements or the processes put in place by the manufacturer are not\
+      \ in conformity with the essential cybersecurity requirements set out in Annex I, the distributor\
+      \ shall not make the product with digital elements available on the market until that product or\
+      \ the processes put in place by the manufacturer have been brought into conformity with this Regulation.\
+      \ Furthermore, where the product with digital elements poses a significant cybersecurity risk, the\
+      \ distributor shall inform, without undue delay, the manufacturer and the market surveillance authorities\
+      \ to that effect.\n\n 4. Distributors who know or have reason to believe, on the basis of information\
+      \ in their possession, that a product with digital elements, which they have made available on the\
+      \ market, or the processes put in place by its manufacturer are not in conformity with this Regulation\
+      \ shall make sure that the corrective measures necessary to bring that product with digital elements\
+      \ or the processes put in place by its manufacturer into conformity, or to withdraw or recall the\
+      \ product, if appropriate, are taken.\n\n Upon becoming aware of a vulnerability in the product\
+      \ with digital elements, distributors shall inform the manufacturer without undue delay about that\
+      \ vulnerability. Furthermore, where the product with digital elements presents a significant cybersecurity\
+      \ risk, distributors shall immediately inform the market surveillance authorities of the Member\
+      \ States in which they have made the product with digital elements available on the market to that\
+      \ effect, giving details, in particular, of the non-compliance and of any corrective measures taken.\n\
+      \n 5. Distributors shall, further to a reasoned request from a market surveillance authority, provide\
+      \ all the information and documentation, in paper or electronic form, necessary to demonstrate the\
+      \ conformity of the product with digital elements and the processes put in place by its manufacturer\
+      \ with this Regulation in a language that can be easily understood by that authority. They shall\
+      \ cooperate with that authority, at its request, on any measures taken to eliminate the cybersecurity\
+      \ risks posed by a product with digital elements which they have made available on the market.\n\
+      \n 6. Where the distributor of a product with digital elements becomes aware, on the basis of information\
+      \ in its possession, that the manufacturer of that product has ceased its operations and, as result,\
+      \ is not able to comply with the obligations laid down in this Regulation, the distributor shall\
+      \ inform, without undue delay, the relevant market surveillance authorities about this situation,\
+      \ as well as, by any means available and to the extent possible, the users of the products with\
+      \ digital elements placed on the market."
+    status: article
+  Art.21:
+    title: Cases in which obligations of manufacturers apply to importers and distributors
+    text: An importer or distributor shall be considered to be a manufacturer for the purposes of this
+      Regulation and shall be subject to Articles 13 and 14, where that importer or distributor places
+      a product with digital elements on the market under its name or trademark or carries out a substantial
+      modification of a product with digital elements already placed on the market.
+    status: article
+  Art.22:
+    title: Other cases in which obligations of manufacturers apply
+    text: "1. A natural or legal person, other than the manufacturer, the importer or the distributor,\
+      \ that carries out a substantial modification of a product with digital elements and makes that\
+      \ product available on the market, shall be considered to be a manufacturer for the purposes of\
+      \ this Regulation.\n\n 2. The person referred to in paragraph 1 of this Article shall be subject\
+      \ to the obligations set out in Articles 13 and 14 for the part of the product with digital elements\
+      \ that is affected by the substantial modification or, if the substantial modification has an impact\
+      \ on the cybersecurity of the product with digital elements as a whole, for the entire product."
+    status: article
+stats:
+  catalogue_ids: 47
+  with_text: 47
+  missing: []

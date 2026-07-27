@@ -24,7 +24,8 @@ deployment context or AI Act category, the policy emits a structured
 Shared helpers: `compliance/opa/policies/lib/common.rego` (`violation`, `pass`,
 `not_mandatory`, `score`).
 
-Per-regulation article tables (gates + evidence anchors):
+Per-regulation article tables (gates + evidence anchors) and exact EUR-Lex
+text for each citation:
 
 - [AI Act](ai-act.md)
 - [CRA](cra.md)
@@ -270,14 +271,19 @@ gaps, `UNACCEPTABLE` / Art.5, and `GPAI_SYSTEMIC`.
 
 ## Regenerating article tables in MkDocs
 
-Article tables embedded via snippets under `docs/compliance/generated/`
-are produced from the Rego catalogues:
+Article tables and **exact EUR-Lex legal excerpts** under
+`docs/compliance/generated/` are produced from the Rego catalogues plus
+`compliance/opa/legal/*.yaml`:
 
 ```bash
-python3 compliance/opa/scripts/gen_doc_tables.py
-# or: make compliance-doc-tables
+# Refresh official texts from Publications Office Cellar (optional)
+make compliance-legal-texts
+
+# Rebuild MkDocs snippets (*_articles.md + *_article_texts.md)
+make compliance-doc-tables
 ```
 
+Catalogue table rows link to the matching legal excerpt on the same page.
 Re-run after editing any `*.rego` catalogue so documentation stays aligned with
 the policies.
 

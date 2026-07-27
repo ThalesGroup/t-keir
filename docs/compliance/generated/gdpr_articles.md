@@ -4,46 +4,46 @@
 
 | Article | Fix by | Applicability gate | OPA check | Requirement |
 |---|---|---|---|---|
-| `Art.5(1)(a)` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.lawfulness_fairness_transparency` | Lawfulness, fairness, transparency. |
-| `Art.5(1)(b)` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.purpose_limitation` | Purpose limitation. |
-| `Art.5(1)(c)` | Engineering / automatic | Always evaluated | `evidence.action_schema_present` | Data minimisation (request_hash only). |
-| `Art.5(1)(d)` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.accuracy` | Accuracy. |
-| `Art.5(1)(e)` | Engineering / automatic | Always evaluated | `evidence.audit_worm_retention_set` | Storage limitation (retention configured). |
-| `Art.5(1)(f)` | Engineering or legal attestation | Always evaluated | `evidence.privacy_py_present`, `attestation.audit_worm_retention_set` | Integrity and confidentiality. |
-| `Art.5(2)` | Engineering / automatic | Always evaluated | `evidence.audit_evidence_dir_non_empty` | Accountability demonstrated. |
-| `Art.6` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.legal_basis_documented` | Legal basis for processing documented. |
-| `Art.9(1)` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.special_categories_basis` | Special categories not processed without Art.9(2) basis. |
-| `Art.12` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.transparent_communication` | Transparent communication to data subjects. |
-| `Art.13` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.information_at_collection` | Information provided at collection. |
-| `Art.14` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.information_not_from_subject` | Information where data not collected from subject. |
-| `Art.15` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_of_access` | Right of access implemented. |
-| `Art.16` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_to_rectification` | Right to rectification. |
-| `Art.17` | Engineering / automatic | Always evaluated | `evidence.privacy_py_present` | Right to erasure — crypto-shredding. |
-| `Art.18` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_to_restriction` | Right to restriction of processing. |
-| `Art.19` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.notification_on_erasure` | Notification obligation on erasure/restriction. |
-| `Art.20` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_to_portability` | Right to data portability. |
-| `Art.21` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_to_object` | Right to object. |
-| `Art.22` | Engineering or legal attestation | Always evaluated | `evidence.governor_approvals_present`, `attestation.automated_decision_safeguards` | Automated decision-making safeguards / human approval. |
-| `Art.24` | Engineering or legal attestation | Always evaluated | `evidence.audit_evidence_dir_non_empty`, `attestation.compliance_gdpr_doc` | Controller responsibility and accountability. |
-| `Art.25` | Engineering or legal attestation | Always evaluated | `evidence.privacy_py_present`, `attestation.action_schema_present` | Data protection by design and by default. |
-| `Art.26` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.joint_controller_agreement` | Joint controller agreement. |
-| `Art.27` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.representative_in_eu` | Representative in EU designated. |
-| `Art.28` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.processor_agreement` | Processor agreement in place. |
-| `Art.29` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.processing_under_authority_only` | Processing under controller/processor authority only. |
-| `Art.30` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.records_of_processing` | Records of processing activities (RoPA). |
-| `Art.31` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.cooperation_supervisory_authority` | Cooperation with supervisory authority. |
-| `Art.32(1)(a)` | Engineering / automatic | Always evaluated | `evidence.privacy_py_present` | Pseudonymisation and encryption. |
-| `Art.32(1)(b)` | Engineering / automatic | Always evaluated | `evidence.audit_worm_retention_set` | Ongoing confidentiality, integrity, availability. |
-| `Art.32(1)(c)` | Engineering or legal attestation | Always evaluated | `evidence.rollback_target_in_makefile`, `attestation.audit_verify_target` | Ability to restore data after incident. |
-| `Art.32(1)(d)` | Engineering or legal attestation | Always evaluated | `evidence.audit_verify_target`, `attestation.security_report_target` | Process for regular testing. |
-| `Art.33` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.breach_notification_72h` | Data breach notification to SA ≤72h. |
-| `Art.34` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.communicate_to_subjects` | Communication to data subjects. |
-| `Art.35` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.dpia` | Data protection impact assessment (DPIA). |
-| `Art.36` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.prior_consultation` | Prior consultation with supervisory authority. |
-| `Art.37` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.dpo_designated` | DPO designated where required. |
-| `Art.38` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.dpo_position_resources` | DPO position and resources. |
-| `Art.39` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.dpo_tasks` | DPO tasks. |
-| `Art.44` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.transfers_adequate_protection` | Transfers only with adequate protection. |
-| `Art.45` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.adequacy_decision_basis` | Adequacy decision basis. |
-| `Art.46` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.appropriate_safeguards` | Appropriate safeguards (SCCs, BCR). |
-| `Art.49` | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.transfer_derogations` | Derogations for specific situations. |
+| [`Art.5(1)(a)`](#art-5-1-a) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.lawfulness_fairness_transparency` | Lawfulness, fairness, transparency. |
+| [`Art.5(1)(b)`](#art-5-1-b) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.purpose_limitation` | Purpose limitation. |
+| [`Art.5(1)(c)`](#art-5-1-c) | Engineering / automatic | Always evaluated | `evidence.action_schema_present` | Data minimisation (request_hash only). |
+| [`Art.5(1)(d)`](#art-5-1-d) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.accuracy` | Accuracy. |
+| [`Art.5(1)(e)`](#art-5-1-e) | Engineering / automatic | Always evaluated | `evidence.audit_worm_retention_set` | Storage limitation (retention configured). |
+| [`Art.5(1)(f)`](#art-5-1-f) | Engineering or legal attestation | Always evaluated | `evidence.privacy_py_present`, `attestation.audit_worm_retention_set` | Integrity and confidentiality. |
+| [`Art.5(2)`](#art-5-2) | Engineering / automatic | Always evaluated | `evidence.audit_evidence_dir_non_empty` | Accountability demonstrated. |
+| [`Art.6`](#art-6) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.legal_basis_documented` | Legal basis for processing documented. |
+| [`Art.9(1)`](#art-9-1) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.special_categories_basis` | Special categories not processed without Art.9(2) basis. |
+| [`Art.12`](#art-12) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.transparent_communication` | Transparent communication to data subjects. |
+| [`Art.13`](#art-13) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.information_at_collection` | Information provided at collection. |
+| [`Art.14`](#art-14) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.information_not_from_subject` | Information where data not collected from subject. |
+| [`Art.15`](#art-15) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_of_access` | Right of access implemented. |
+| [`Art.16`](#art-16) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_to_rectification` | Right to rectification. |
+| [`Art.17`](#art-17) | Engineering / automatic | Always evaluated | `evidence.privacy_py_present` | Right to erasure — crypto-shredding. |
+| [`Art.18`](#art-18) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_to_restriction` | Right to restriction of processing. |
+| [`Art.19`](#art-19) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.notification_on_erasure` | Notification obligation on erasure/restriction. |
+| [`Art.20`](#art-20) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_to_portability` | Right to data portability. |
+| [`Art.21`](#art-21) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.right_to_object` | Right to object. |
+| [`Art.22`](#art-22) | Engineering or legal attestation | Always evaluated | `evidence.governor_approvals_present`, `attestation.automated_decision_safeguards` | Automated decision-making safeguards / human approval. |
+| [`Art.24`](#art-24) | Engineering or legal attestation | Always evaluated | `evidence.audit_evidence_dir_non_empty`, `attestation.compliance_gdpr_doc` | Controller responsibility and accountability. |
+| [`Art.25`](#art-25) | Engineering or legal attestation | Always evaluated | `evidence.privacy_py_present`, `attestation.action_schema_present` | Data protection by design and by default. |
+| [`Art.26`](#art-26) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.joint_controller_agreement` | Joint controller agreement. |
+| [`Art.27`](#art-27) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.representative_in_eu` | Representative in EU designated. |
+| [`Art.28`](#art-28) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.processor_agreement` | Processor agreement in place. |
+| [`Art.29`](#art-29) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.processing_under_authority_only` | Processing under controller/processor authority only. |
+| [`Art.30`](#art-30) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.records_of_processing` | Records of processing activities (RoPA). |
+| [`Art.31`](#art-31) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.cooperation_supervisory_authority` | Cooperation with supervisory authority. |
+| [`Art.32(1)(a)`](#art-32-1-a) | Engineering / automatic | Always evaluated | `evidence.privacy_py_present` | Pseudonymisation and encryption. |
+| [`Art.32(1)(b)`](#art-32-1-b) | Engineering / automatic | Always evaluated | `evidence.audit_worm_retention_set` | Ongoing confidentiality, integrity, availability. |
+| [`Art.32(1)(c)`](#art-32-1-c) | Engineering or legal attestation | Always evaluated | `evidence.rollback_target_in_makefile`, `attestation.audit_verify_target` | Ability to restore data after incident. |
+| [`Art.32(1)(d)`](#art-32-1-d) | Engineering or legal attestation | Always evaluated | `evidence.audit_verify_target`, `attestation.security_report_target` | Process for regular testing. |
+| [`Art.33`](#art-33) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.breach_notification_72h` | Data breach notification to SA ≤72h. |
+| [`Art.34`](#art-34) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.communicate_to_subjects` | Communication to data subjects. |
+| [`Art.35`](#art-35) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.dpia` | Data protection impact assessment (DPIA). |
+| [`Art.36`](#art-36) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.prior_consultation` | Prior consultation with supervisory authority. |
+| [`Art.37`](#art-37) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.dpo_designated` | DPO designated where required. |
+| [`Art.38`](#art-38) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.dpo_position_resources` | DPO position and resources. |
+| [`Art.39`](#art-39) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.dpo_tasks` | DPO tasks. |
+| [`Art.44`](#art-44) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.transfers_adequate_protection` | Transfers only with adequate protection. |
+| [`Art.45`](#art-45) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.adequacy_decision_basis` | Adequacy decision basis. |
+| [`Art.46`](#art-46) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.appropriate_safeguards` | Appropriate safeguards (SCCs, BCR). |
+| [`Art.49`](#art-49) | Legal / reviewer (not code) **(reviewer/legal — not code)** | Always evaluated | `attestation.transfer_derogations` | Derogations for specific situations. |

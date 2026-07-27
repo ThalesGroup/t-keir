@@ -1321,12 +1321,16 @@ BEIR_SMOKE_TOP_K   ?= 10
 BEIR_SMOKE_INDEX_MODE ?= chunking
 BEIR_SMOKE_EXTRA   ?=
 
-beir-eval: ## [eval] Full BEIR IR eval (thot.tools.eval.beir_eval); BEIR_DATASETS=scifact
-	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python $(PYTHON)
+# uv may re-fetch spaCy wheels from GitHub (slow / flaky); raise timeout for eval sync.
+UV_HTTP_TIMEOUT ?= 300
+
+beir-eval: install-spacy-models ## [eval] Full BEIR IR eval (thot.tools.eval.beir_eval); BEIR_DATASETS=scifact
+	cd $(TKEIR_DIR) && UV_HTTP_TIMEOUT="$(UV_HTTP_TIMEOUT)" \
+		$(UV) sync --group beir --group models --python $(PYTHON)
 	cd $(TKEIR_DIR) && \
 		VESPA_NAME="$(BEIR_VESPA_NAME)" \
 		VESPA_VOLUME="$(BEIR_VESPA_VOLUME)" \
-		$(UV) run --python $(PYTHON) --group beir --group models \
+		$(UV) run --no-sync --python $(PYTHON) --group beir --group models \
 		python -m thot.tools.eval.beir_eval \
 		--datasets $(BEIR_DATASETS) \
 		--datasets-dir "$(BEIR_DATASETS_DIR)" \
@@ -1334,12 +1338,13 @@ beir-eval: ## [eval] Full BEIR IR eval (thot.tools.eval.beir_eval); BEIR_DATASET
 		$(if $(strip $(BEIR_REPORT)),--report "$(BEIR_REPORT)",) \
 		$(BEIR_EXTRA)
 
-beir-smoke: ## [eval] Fast BEIR smoke (thot.tools.eval.beir_smoke)
-	cd $(TKEIR_DIR) && $(UV) sync --group beir --group models --python $(PYTHON)
+beir-smoke: install-spacy-models ## [eval] Fast BEIR smoke (thot.tools.eval.beir_smoke)
+	cd $(TKEIR_DIR) && UV_HTTP_TIMEOUT="$(UV_HTTP_TIMEOUT)" \
+		$(UV) sync --group beir --group models --python $(PYTHON)
 	cd $(TKEIR_DIR) && \
 		VESPA_NAME="$(BEIR_VESPA_NAME)" \
 		VESPA_VOLUME="$(BEIR_VESPA_VOLUME)" \
-		$(UV) run --python $(PYTHON) --group beir --group models \
+		$(UV) run --no-sync --python $(PYTHON) --group beir --group models \
 		python -m thot.tools.eval.beir_smoke \
 		--datasets $(BEIR_DATASETS) \
 		--datasets-dir "$(BEIR_DATASETS_DIR)" \
@@ -1387,7 +1392,11 @@ compliance-doc-results:
 	python3 compliance/opa/scripts/gen_doc_results.py --allow-missing
 
 ## compliance-doc-tables: regenerate MkDocs article tables from Rego catalogues
-.PHONY: compliance-doc-tables
+## (+ EUR-Lex legal excerpts from compliance/opa/legal/*.yaml)
+.PHONY: compliance-doc-tables compliance-legal-texts
+compliance-legal-texts:
+	python3 compliance/opa/scripts/fetch_legal_texts.py
+
 compliance-doc-tables:
 	python3 compliance/opa/scripts/gen_doc_tables.py
 

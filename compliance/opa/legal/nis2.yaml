@@ -1,0 +1,266 @@
+regulation: NIS2
+key: nis2
+celex: 32022L2555
+source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022L2555
+language: en
+fetched_at: '2026-07-27T12:50:51Z'
+disclaimer: 'Official EU legal text sourced via Publications Office Cellar (English). Not legal advice.
+  Attribution: © European Union, https://eur-lex.europa.eu/'
+articles:
+  Art.20(1):
+    title: Governance
+    text: "1. Member States shall ensure that the management bodies of essential and important entities\
+      \ approve the cybersecurity risk-management measures taken by those entities in order to comply\
+      \ with Article 21, oversee its implementation and can be held liable for infringements by the entities\
+      \ of that Article.\n\n The application of this paragraph shall be without prejudice to national\
+      \ law as regards the liability rules applicable to public institutions, as well as the liability\
+      \ of public servants and elected or appointed officials."
+    status: paragraph
+  Art.20(2):
+    title: Governance
+    text: 2. Member States shall ensure that the members of the management bodies of essential and important
+      entities are required to follow training, and shall encourage essential and important entities to
+      offer similar training to their employees on a regular basis, in order that they gain sufficient
+      knowledge and skills to enable them to identify risks and assess cybersecurity risk-management practices
+      and their impact on the services provided by the entity.
+    status: paragraph
+  Art.20(3):
+    title: Governance
+    text: "1. Member States shall ensure that the management bodies of essential and important entities\
+      \ approve the cybersecurity risk-management measures taken by those entities in order to comply\
+      \ with Article 21, oversee its implementation and can be held liable for infringements by the entities\
+      \ of that Article.\n\n The application of this paragraph shall be without prejudice to national\
+      \ law as regards the liability rules applicable to public institutions, as well as the liability\
+      \ of public servants and elected or appointed officials.\n\n 2. Member States shall ensure that\
+      \ the members of the management bodies of essential and important entities are required to follow\
+      \ training, and shall encourage essential and important entities to offer similar training to their\
+      \ employees on a regular basis, in order that they gain sufficient knowledge and skills to enable\
+      \ them to identify risks and assess cybersecurity risk-management practices and their impact on\
+      \ the services provided by the entity."
+    status: article_fallback
+    note: Paragraph 3 boundaries not detected; full Article 20 shown.
+  Art.21(1):
+    title: Cybersecurity risk-management measures
+    text: "1. Member States shall ensure that essential and important entities take appropriate and proportionate\
+      \ technical, operational and organisational measures to manage the risks posed to the security of\
+      \ network and information systems which those entities use for their operations or for the provision\
+      \ of their services, and to prevent or minimise the impact of incidents on recipients of their services\
+      \ and on other services.\n\n Taking into account the state-of-the-art and, where applicable, relevant\
+      \ European and international standards, as well as the cost of implementation, the measures referred\
+      \ to in the first subparagraph shall ensure a level of security of network and information systems\
+      \ appropriate to the risks posed. When assessing the proportionality of those measures, due account\
+      \ shall be taken of the degree of the entity’s exposure to risks, the entity’s size and the likelihood\
+      \ of occurrence of incidents and their severity, including their societal and economic impact."
+    status: paragraph
+  Art.21(2)(a):
+    title: Cybersecurity risk-management measures
+    text: (a) policies on risk analysis and information system security;
+    status: point
+  Art.21(2)(b):
+    title: Cybersecurity risk-management measures
+    text: (b) incident handling;
+    status: point
+  Art.21(2)(c):
+    title: Cybersecurity risk-management measures
+    text: (c) business continuity, such as backup management and disaster recovery, and crisis management;
+    status: point
+  Art.21(2)(d):
+    title: Cybersecurity risk-management measures
+    text: (d) supply chain security, including security-related aspects concerning the relationships between
+      each entity and its direct suppliers or service providers;
+    status: point
+  Art.21(2)(e):
+    title: Cybersecurity risk-management measures
+    text: (e) security in network and information systems acquisition, development and maintenance, including
+      vulnerability handling and disclosure;
+    status: point
+  Art.21(2)(f):
+    title: Cybersecurity risk-management measures
+    text: (f) policies and procedures to assess the effectiveness of cybersecurity risk-management measures;
+    status: point
+  Art.21(2)(g):
+    title: Cybersecurity risk-management measures
+    text: (g) basic cyber hygiene practices and cybersecurity training;
+    status: point
+  Art.21(2)(h):
+    title: Cybersecurity risk-management measures
+    text: (h) policies and procedures regarding the use of cryptography and, where appropriate, encryption;
+    status: point
+  Art.21(2)(i):
+    title: Cybersecurity risk-management measures
+    text: (i) human resources security, access control policies and asset management;
+    status: point
+  Art.21(2)(j):
+    title: Cybersecurity risk-management measures
+    text: (j) the use of multi-factor authentication or continuous authentication solutions, secured voice,
+      video and text communications and secured emergency communication systems within the entity, where
+      appropriate.
+    status: point
+  Art.21(2)(k):
+    title: Cybersecurity risk-management measures
+    text: "2. The measures referred to in paragraph 1 shall be based on an all-hazards approach that aims\
+      \ to protect network and information systems and the physical environment of those systems from\
+      \ incidents, and shall include at least the following:\n\n (a)\n\n policies on risk analysis and\
+      \ information system security;\n\n (b)\n\n incident handling;\n\n (c)\n\n business continuity, such\
+      \ as backup management and disaster recovery, and crisis management;\n\n (d)\n\n supply chain security,\
+      \ including security-related aspects concerning the relationships between each entity and its direct\
+      \ suppliers or service providers;\n\n (e)\n\n security in network and information systems acquisition,\
+      \ development and maintenance, including vulnerability handling and disclosure;\n\n (f)\n\n policies\
+      \ and procedures to assess the effectiveness of cybersecurity risk-management measures;\n\n (g)\n\
+      \n basic cyber hygiene practices and cybersecurity training;\n\n (h)\n\n policies and procedures\
+      \ regarding the use of cryptography and, where appropriate, encryption;\n\n (i)\n\n human resources\
+      \ security, access control policies and asset management;\n\n (j)\n\n the use of multi-factor authentication\
+      \ or continuous authentication solutions, secured voice, video and text communications and secured\
+      \ emergency communication systems within the entity, where appropriate."
+    status: paragraph_fallback
+    note: Point (k) not isolated; full paragraph 2 shown.
+  Art.21(3):
+    title: Cybersecurity risk-management measures
+    text: 3. Member States shall ensure that, when considering which measures referred to in paragraph
+      2, point (d), of this Article are appropriate, entities take into account the vulnerabilities specific
+      to each direct supplier and service provider and the overall quality of products and cybersecurity
+      practices of their suppliers and service providers, including their secure development procedures.
+      Member States shall also ensure that, when considering which measures referred to in that point
+      are appropriate, entities are required to take into account the results of the coordinated security
+      risk assessments of critical supply chains carried out in accordance with Article 22(1).
+    status: paragraph
+  Art.21(4):
+    title: Cybersecurity risk-management measures
+    text: 4. Member States shall ensure that an entity that finds that it does not comply with the measures
+      provided for in paragraph 2 takes, without undue delay, all necessary, appropriate and proportionate
+      corrective measures.
+    status: paragraph
+  Art.23(1):
+    title: Reporting obligations
+    text: "1. Each Member State shall ensure that essential and important entities notify, without undue\
+      \ delay, its CSIRT or, where applicable, its competent authority in accordance with paragraph 4\
+      \ of any incident that has a significant impact on the provision of their services as referred to\
+      \ in paragraph 3 (significant incident). Where appropriate, entities concerned shall notify, without\
+      \ undue delay, the recipients of their services of significant incidents that are likely to adversely\
+      \ affect the provision of those services. Each Member State shall ensure that those entities report,\
+      \ inter alia, any information enabling the CSIRT or, where applicable, the competent authority to\
+      \ determine any cross-border impact of the incident. The mere act of notification shall not subject\
+      \ the notifying entity to increased liability.\n\n Where the entities concerned notify the competent\
+      \ authority of a significant incident under the first subparagraph, the Member State shall ensure\
+      \ that that competent authority forwards the notification to the CSIRT upon receipt.\n\n In the\
+      \ case of a cross-border or cross-sectoral significant incident, Member States shall ensure that\
+      \ their single points of contact are provided in due time with relevant information notified in\
+      \ accordance with paragraph"
+    status: paragraph
+  Art.23(3):
+    title: Reporting obligations
+    text: "3. The Commission may adopt such implementing acts with regard to other essential and important\
+      \ entities.\n\n The Commission shall exchange advice and cooperate with the Cooperation Group on\
+      \ the draft implementing acts referred to in the first and second subparagraphs of this paragraph\
+      \ in accordance with Article 14(4), point (e).\n\n Those implementing acts shall be adopted in accordance\
+      \ with the examination procedure referred to in Article 39(2)."
+    status: paragraph
+  Art.23(4):
+    title: Reporting obligations
+    text: 4. In so doing, the CSIRT, the competent authority or the single point of contact shall, in
+      accordance with Union or national law, preserve the entity’s security and commercial interests as
+      well as the confidentiality of the information provided.
+    status: paragraph
+  Art.23(5):
+    title: Reporting obligations
+    text: 5. The CSIRT or the competent authority shall provide, without undue delay and where possible
+      within 24 hours of receiving the early warning referred to in paragraph 4, point (a), a response
+      to the notifying entity, including initial feedback on the significant incident and, upon request
+      of the entity, guidance or operational advice on the implementation of possible mitigation measures.
+      Where the CSIRT is not the initial recipient of the notification referred to in paragraph 1, the
+      guidance shall be provided by the competent authority in cooperation with the CSIRT. The CSIRT shall
+      provide additional technical support if the entity concerned so requests. Where the significant
+      incident is suspected to be of criminal nature, the CSIRT or the competent authority shall also
+      provide guidance on reporting the significant incident to law enforcement authorities.
+    status: paragraph
+  Art.23(6):
+    title: Reporting obligations
+    text: 6. Where appropriate, and in particular where the significant incident concerns two or more
+      Member States, the CSIRT, the competent authority or the single point of contact shall inform, without
+      undue delay, the other affected Member States and ENISA of the significant incident. Such information
+      shall include the type of information received in accordance with paragraph
+    status: paragraph
+  Art.24:
+    title: Use of European cybersecurity certification schemes
+    text: "1. In order to demonstrate compliance with particular requirements of Article 21, Member States\
+      \ may require essential and important entities to use particular ICT products, ICT services and\
+      \ ICT processes, developed by the essential or important entity or procured from third parties,\
+      \ that are certified under European cybersecurity certification schemes adopted pursuant to Article\
+      \ 49 of Regulation (EU) 2019/881. Furthermore, Member States shall encourage essential and important\
+      \ entities to use qualified trust services.\n\n 2. The Commission is empowered to adopt delegated\
+      \ acts, in accordance with Article 38, to supplement this Directive by specifying which categories\
+      \ of essential and important entities are to be required to use certain certified ICT products,\
+      \ ICT services and ICT processes or obtain a certificate under a European cybersecurity certification\
+      \ scheme adopted pursuant to Article 49 of Regulation (EU) 2019/881. Those delegated acts shall\
+      \ be adopted where insufficient levels of cybersecurity have been identified and shall include an\
+      \ implementation period.\n\n Before adopting such delegated acts, the Commission shall carry out\
+      \ an impact assessment and shall carry out consultations in accordance with Article 56 of Regulation\
+      \ (EU) 2019/881.\n\n 3. Where no appropriate European cybersecurity certification scheme for the\
+      \ purposes of paragraph 2 of this Article is available, the Commission may, after consulting the\
+      \ Cooperation Group and the European Cybersecurity Certification Group, request ENISA to prepare\
+      \ a candidate scheme pursuant to Article 48(2) of Regulation (EU) 2019/881."
+    status: article
+  Art.26:
+    title: Jurisdiction and territoriality
+    text: "1. Entities falling within the scope of this Directive shall be considered to fall under the\
+      \ jurisdiction of the Member State in which they are established, except in the case of:\n\n (a)\n\
+      \n providers of public electronic communications networks or providers of publicly available electronic\
+      \ communications services, which shall be considered to fall under the jurisdiction of the Member\
+      \ State in which they provide their services;\n\n (b)\n\n DNS service providers, TLD name registries,\
+      \ entities providing domain name registration services, cloud computing service providers, data\
+      \ centre service providers, content delivery network providers, managed service providers, managed\
+      \ security service providers, as well as providers of online marketplaces, of online search engines\
+      \ or of social networking services platforms, which shall be considered to fall under the jurisdiction\
+      \ of the Member State in which they have their main establishment in the Union under paragraph 2;\n\
+      \n (c)\n\n public administration entities, which shall be considered to fall under the jurisdiction\
+      \ of the Member State which established them.\n\n 2. For the purposes of this Directive, an entity\
+      \ as referred to in paragraph 1, point (b), shall be considered to have its main establishment in\
+      \ the Union in the Member State where the decisions related to the cybersecurity risk-management\
+      \ measures are predominantly taken. If such a Member State cannot be determined or if such decisions\
+      \ are not taken in the Union, the main establishment shall be considered to be in the Member State\
+      \ where cybersecurity operations are carried out. If such a Member State cannot be determined, the\
+      \ main establishment shall be considered to be in the Member State where the entity concerned has\
+      \ the establishment with the highest number of employees in the Union.\n\n 3. If an entity as referred\
+      \ to in paragraph 1, point (b), is not established in the Union, but offers services within the\
+      \ Union, it shall designate a representative in the Union. The representative shall be established\
+      \ in one of those Member States where the services are offered. Such an entity shall be considered\
+      \ to fall under the jurisdiction of the Member State where the representative is established. In\
+      \ the absence of a representative in the Union designated under this paragraph, any Member State\
+      \ in which the entity provides services may take legal actions against the entity for the infringement\
+      \ of this Directive.\n\n 4. The designation of a representative by an entity as referred to in paragraph\
+      \ 1, point (b), shall be without prejudice to legal actions, which could be initiated against the\
+      \ entity itself.\n\n 5. Member States that have received a request for mutual assistance in relation\
+      \ to an entity as referred to in paragraph 1, point (b), may, within the limits of that request,\
+      \ take appropriate supervisory and enforcement measures in relation to the entity concerned that\
+      \ provides services or which has a network and information system on their territory."
+    status: article
+  Art.27:
+    title: Registry of entities
+    text: "1. ENISA shall create and maintain a registry of DNS service providers, TLD name registries,\
+      \ entities providing domain name registration services, cloud computing service providers, data\
+      \ centre service providers, content delivery network providers, managed service providers, managed\
+      \ security service providers, as well as providers of online marketplaces, of online search engines\
+      \ and of social networking services platforms, on the basis of the information received from the\
+      \ single points of contact in accordance with paragraph 4. Upon request, ENISA shall allow the competent\
+      \ authorities access to that registry, while ensuring that the confidentiality of information is\
+      \ protected where applicable.\n\n 2. Member States shall require entities referred to in paragraph\
+      \ 1 to submit the following information to the competent authorities by 17 January 2025:\n\n (a)\n\
+      \n the name of the entity;\n\n (b)\n\n the relevant sector, subsector and type of entity referred\
+      \ to in Annex I or II, where applicable;\n\n (c)\n\n the address of the entity’s main establishment\
+      \ and its other legal establishments in the Union or, if not established in the Union, of its representative\
+      \ designated pursuant to Article 26(3);\n\n (d)\n\n up-to-date contact details, including email\
+      \ addresses and telephone numbers of the entity and, where applicable, its representative designated\
+      \ pursuant to Article 26(3);\n\n (e)\n\n the Member States where the entity provides services; and\n\
+      \n (f)\n\n the entity’s IP ranges.\n\n 3. Member States shall ensure that the entities referred\
+      \ to in paragraph 1 notify the competent authority about any changes to the information they submitted\
+      \ under paragraph 2 without delay and in any event within three months of the date of the change.\n\
+      \n 4. Upon receipt of the information referred to in paragraphs 2 and 3, except for that referred\
+      \ to in paragraph 2, point (f), the single point of contact of the Member State concerned shall,\
+      \ without undue delay, forward it to ENISA.\n\n 5. Where applicable, the information referred to\
+      \ in paragraphs 2 and 3 of this Article shall be submitted through the national mechanism referred\
+      \ to in Article 3(4), fourth subparagraph."
+    status: article
+stats:
+  catalogue_ids: 25
+  with_text: 25
+  missing: []

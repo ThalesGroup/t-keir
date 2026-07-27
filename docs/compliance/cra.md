@@ -32,6 +32,13 @@
 
 --8<-- "./docs/compliance/generated/cra_articles.md"
 
+## Exact legal text (EUR-Lex)
+
+Official English excerpts for each catalogue citation (including Annex I
+essential requirements). Links in the table above jump here.
+
+--8<-- "./docs/compliance/generated/cra_article_texts.md"
+
 ## Latest audit results
 
 --8<-- "./docs/compliance/generated/cra_results.md"

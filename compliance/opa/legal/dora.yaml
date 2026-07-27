@@ -1,0 +1,518 @@
+regulation: DORA
+key: dora
+celex: 32022R2554
+source_url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32022R2554
+language: en
+fetched_at: '2026-07-27T12:50:52Z'
+disclaimer: 'Official EU legal text sourced via Publications Office Cellar (English). Not legal advice.
+  Attribution: © European Union, https://eur-lex.europa.eu/'
+articles:
+  Art.5(1):
+    title: Governance and organisation
+    text: 1. Financial entities shall have in place an internal governance and control framework that
+      ensures an effective and prudent management of ICT risk, in accordance with Article 6(4), in order
+      to achieve a high level of digital operational resilience.
+    status: paragraph
+  Art.5(2):
+    title: Governance and organisation
+    text: "2. The management body of the financial entity shall define, approve, oversee and be responsible\
+      \ for the implementation of all arrangements related to the ICT risk management framework referred\
+      \ to in Article 6(1).\n\n For the purposes of the first subparagraph, the management body shall:\n\
+      \n (a)\n\n bear the ultimate responsibility for managing the financial entity’s ICT risk;\n\n (b)\n\
+      \n put in place policies that aim to ensure the maintenance of high standards of availability, authenticity,\
+      \ integrity and confidentiality, of data;\n\n (c)\n\n set clear roles and responsibilities for all\
+      \ ICT-related functions and establish appropriate governance arrangements to ensure effective and\
+      \ timely communication, cooperation and coordination among those functions;\n\n (d)\n\n bear the\
+      \ overall responsibility for setting and approving the digital operational resilience strategy as\
+      \ referred to in Article 6(8), including the determination of the appropriate risk tolerance level\
+      \ of ICT risk of the financial entity, as referred to in Article 6(8), point (b);\n\n (e)\n\n approve,\
+      \ oversee and periodically review the implementation of the financial entity’s ICT business continuity\
+      \ policy and ICT response and recovery plans, referred to, respectively, in Article 11(1) and (3),\
+      \ which may be adopted as a dedicated specific policy forming an integral part of the financial\
+      \ entity’s overall business continuity policy and response and recovery plan;\n\n (f)\n\n approve\
+      \ and periodically review the financial entity’s ICT internal audit plans, ICT audits and material\
+      \ modifications to them;\n\n (g)\n\n allocate and periodically review the appropriate budget to\
+      \ fulfil the financial entity’s digital operational resilience needs in respect of all types of\
+      \ resources, including relevant ICT security awareness programmes and digital operational resilience\
+      \ training referred to in Article 13(6), and ICT skills for all staff;\n\n (h)\n\n approve and periodically\
+      \ review the financial entity’s policy on arrangements regarding the use of ICT services provided\
+      \ by ICT third-party service providers;\n\n (i)\n\n put in place, at corporate level, reporting\
+      \ channels enabling it to be duly informed of the following:\n\n (i)\n\n arrangements concluded\
+      \ with ICT third-party service providers on the use of ICT services,\n\n (ii)\n\n any relevant planned\
+      \ material changes regarding the ICT third-party service providers,\n\n (iii)\n\n the potential\
+      \ impact of such changes on the critical or important functions subject to those arrangements, including\
+      \ a risk analysis summary to assess the impact of those changes, and at least major ICT-related\
+      \ incidents and their impact, as well as response, recovery and corrective measures."
+    status: paragraph
+  Art.5(4):
+    title: Governance and organisation
+    text: "4. Members of the management body of the financial entity shall actively keep up to date with\
+      \ sufficient knowledge and skills to understand and assess ICT risk and its impact on the operations\
+      \ of the financial entity, including by following specific training on a regular basis, commensurate\
+      \ to the ICT risk being managed.\n\n Section II"
+    status: paragraph
+  Art.6(1):
+    title: ICT risk management framework
+    text: 1. Financial entities shall have a sound, comprehensive and well-documented ICT risk management
+      framework as part of their overall risk management system, which enables them to address ICT risk
+      quickly, efficiently and comprehensively and to ensure a high level of digital operational resilience.
+    status: paragraph
+  Art.6(2):
+    title: ICT risk management framework
+    text: 2. The ICT risk management framework shall include at least strategies, policies, procedures,
+      ICT protocols and tools that are necessary to duly and adequately protect all information assets
+      and ICT assets, including computer software, hardware, servers, as well as to protect all relevant
+      physical components and infrastructures, such as premises, data centres and sensitive designated
+      areas, to ensure that all information assets and ICT assets are adequately protected from risks
+      including damage and unauthorised access or usage.
+    status: paragraph
+  Art.6(5):
+    title: ICT risk management framework
+    text: 5. The ICT risk management framework shall be documented and reviewed at least once a year,
+      or periodically in the case of microenterprises, as well as upon the occurrence of major ICT-related
+      incidents, and following supervisory instructions or conclusions derived from relevant digital operational
+      resilience testing or audit processes. It shall be continuously improved on the basis of lessons
+      derived from implementation and monitoring. A report on the review of the ICT risk management framework
+      shall be submitted to the competent authority upon its request.
+    status: paragraph
+  Art.7:
+    title: ICT systems, protocols and tools
+    text: "In order to address and manage ICT risk, financial entities shall use and maintain updated\
+      \ ICT systems, protocols and tools that are:\n\n (a)\n\n appropriate to the magnitude of operations\
+      \ supporting the conduct of their activities, in accordance with the proportionality principle as\
+      \ referred to in Article 4;\n\n (b)\n\n reliable;\n\n (c)\n\n equipped with sufficient capacity\
+      \ to accurately process the data necessary for the performance of activities and the timely provision\
+      \ of services, and to deal with peak orders, message or transaction volumes, as needed, including\
+      \ where new technology is introduced;\n\n (d)\n\n technologically resilient in order to adequately\
+      \ deal with additional information processing needs as required under stressed market conditions\
+      \ or other adverse situations."
+    status: article
+  Art.8(1):
+    title: Identification
+    text: 1. As part of the ICT risk management framework referred to in Article 6(1), financial entities
+      shall identify, classify and adequately document all ICT supported business functions, roles and
+      responsibilities, the information assets and ICT assets supporting those functions, and their roles
+      and dependencies in relation to ICT risk. Financial entities shall review as needed, and at least
+      yearly, the adequacy of this classification and of any relevant documentation.
+    status: paragraph
+  Art.8(2):
+    title: Identification
+    text: 2. Financial entities shall, on a continuous basis, identify all sources of ICT risk, in particular
+      the risk exposure to and from other financial entities, and assess cyber threats and ICT vulnerabilities
+      relevant to their ICT supported business functions, information assets and ICT assets. Financial
+      entities shall review on a regular basis, and at least yearly, the risk scenarios impacting them.
+    status: paragraph
+  Art.9(1):
+    title: Protection and prevention
+    text: 1. For the purposes of adequately protecting ICT systems and with a view to organising response
+      measures, financial entities shall continuously monitor and control the security and functioning
+      of ICT systems and tools and shall minimise the impact of ICT risk on ICT systems through the deployment
+      of appropriate ICT security tools, policies and procedures.
+    status: paragraph
+  Art.9(2):
+    title: Protection and prevention
+    text: 2. Financial entities shall design, procure and implement ICT security policies, procedures,
+      protocols and tools that aim to ensure the resilience, continuity and availability of ICT systems,
+      in particular for those supporting critical or important functions, and to maintain high standards
+      of availability, authenticity, integrity and confidentiality of data, whether at rest, in use or
+      in transit.
+    status: paragraph
+  Art.9(3):
+    title: Protection and prevention
+    text: 3. In order to achieve the objectives referred to in paragraph 2, financial entities shall use
+      ICT solutions and processes that are appropriate in accordance with Article
+    status: paragraph
+  Art.10(1):
+    title: Detection
+    text: "1. Financial entities shall have in place mechanisms to promptly detect anomalous activities,\
+      \ in accordance with Article 17, including ICT network performance issues and ICT-related incidents,\
+      \ and to identify potential material single points of failure.\n\n All detection mechanisms referred\
+      \ to in the first subparagraph shall be regularly tested in accordance with Article"
+    status: paragraph
+  Art.10(2):
+    title: Detection
+    text: 2. The detection mechanisms referred to in paragraph 1 shall enable multiple layers of control,
+      define alert thresholds and criteria to trigger and initiate ICT-related incident response processes,
+      including automatic alert mechanisms for relevant staff in charge of ICT-related incident response.
+    status: paragraph
+  Art.11(1):
+    title: Response and recovery
+    text: 1. As part of the ICT risk management framework referred to in Article 6(1) and based on the
+      identification requirements set out in Article 8, financial entities shall put in place a comprehensive
+      ICT business continuity policy, which may be adopted as a dedicated specific policy, forming an
+      integral part of the overall business continuity policy of the financial entity.
+    status: paragraph
+  Art.11(2):
+    title: Response and recovery
+    text: "2. Financial entities shall implement the ICT business continuity policy through dedicated,\
+      \ appropriate and documented arrangements, plans, procedures and mechanisms aiming to:\n\n (a)\n\
+      \n ensure the continuity of the financial entity’s critical or important functions;\n\n (b)\n\n\
+      \ quickly, appropriately and effectively respond to, and resolve, all ICT-related incidents in a\
+      \ way that limits damage and prioritises the resumption of activities and recovery actions;\n\n\
+      \ (c)\n\n activate, without delay, dedicated plans that enable containment measures, processes and\
+      \ technologies suited to each type of ICT-related incident and prevent further damage, as well as\
+      \ tailored response and recovery procedures established in accordance with Article 12;\n\n (d)\n\
+      \n estimate preliminary impacts, damages and losses;\n\n (e)\n\n set out communication and crisis\
+      \ management actions that ensure that updated information is transmitted to all relevant internal\
+      \ staff and external stakeholders in accordance with Article 14, and report to the competent authorities\
+      \ in accordance with Article"
+    status: paragraph
+  Art.11(3):
+    title: Response and recovery
+    text: 3. As part of the ICT risk management framework referred to in Article 6(1), financial entities
+      shall implement associated ICT response and recovery plans which, in the case of financial entities
+      other than microenterprises, shall be subject to independent internal audit reviews.
+    status: paragraph
+  Art.11(4):
+    title: Response and recovery
+    text: 4. Financial entities shall put in place, maintain and periodically test appropriate ICT business
+      continuity plans, notably with regard to critical or important functions outsourced or contracted
+      through arrangements with ICT third-party service providers.
+    status: paragraph
+  Art.11(6):
+    title: Response and recovery
+    text: "6. As part of their comprehensive ICT risk management, financial entities shall:\n\n (a)\n\n\
+      \ test the ICT business continuity plans and the ICT response and recovery plans in relation to\
+      \ ICT systems supporting all functions at least yearly, as well as in the event of any substantive\
+      \ changes to ICT systems supporting critical or important functions;\n\n (b)\n\n test the crisis\
+      \ communication plans established in accordance with Article"
+    status: paragraph
+  Art.12(1):
+    title: Backup policies and procedures, restoration and recovery procedures and methods
+    text: "1. For the purpose of ensuring the restoration of ICT systems and data with minimum downtime,\
+      \ limited disruption and loss, as part of their ICT risk management framework, financial entities\
+      \ shall develop and document:\n\n (a)\n\n backup policies and procedures specifying the scope of\
+      \ the data that is subject to the backup and the minimum frequency of the backup, based on the criticality\
+      \ of information or the confidentiality level of the data;\n\n (b)\n\n restoration and recovery\
+      \ procedures and methods."
+    status: paragraph
+  Art.12(2):
+    title: Backup policies and procedures, restoration and recovery procedures and methods
+    text: 2. Financial entities shall set up backup systems that can be activated in accordance with the
+      backup policies and procedures, as well as restoration and recovery procedures and methods. The
+      activation of backup systems shall not jeopardise the security of the network and information systems
+      or the availability, authenticity, integrity or confidentiality of data. Testing of the backup procedures
+      and restoration and recovery procedures and methods shall be undertaken periodically.
+    status: paragraph
+  Art.12(3):
+    title: Backup policies and procedures, restoration and recovery procedures and methods
+    text: "3. When restoring backup data using own systems, financial entities shall use ICT systems that\
+      \ are physically and logically segregated from the source ICT system. The ICT systems shall be securely\
+      \ protected from any unauthorised access or ICT corruption and allow for the timely restoration\
+      \ of services making use of data and system backups as necessary.\n\n For central counterparties,\
+      \ the recovery plans shall enable the recovery of all transactions at the time of disruption to\
+      \ allow the central counterparty to continue to operate with certainty and to complete settlement\
+      \ on the scheduled date.\n\n Data reporting service providers shall additionally maintain adequate\
+      \ resources and have back-up and restoration facilities in place in order to offer and maintain\
+      \ their services at all times."
+    status: paragraph
+  Art.13(1):
+    title: Learning and evolving
+    text: 1. Financial entities shall have in place capabilities and staff to gather information on vulnerabilities
+      and cyber threats, ICT-related incidents, in particular cyber-attacks, and analyse the impact they
+      are likely to have on their digital operational resilience.
+    status: paragraph
+  Art.13(2):
+    title: Learning and evolving
+    text: 2. Financial entities shall put in place post ICT-related incident reviews after a major ICT-related
+      incident disrupts their core activities, analysing the causes of disruption and identifying required
+      improvements to the ICT operations or within the ICT business continuity policy referred to in Article
+    status: paragraph
+  Art.24:
+    title: General requirements for the performance of digital operational resilience testing
+    text: "1. For the purpose of assessing preparedness for handling ICT-related incidents, of identifying\
+      \ weaknesses, deficiencies and gaps in digital operational resilience, and of promptly implementing\
+      \ corrective measures, financial entities, other than microenterprises, shall, taking into account\
+      \ the criteria set out in Article 4(2), establish, maintain and review a sound and comprehensive\
+      \ digital operational resilience testing programme as an integral part of the ICT risk-management\
+      \ framework referred to in Article 6.\n\n 2. The digital operational resilience testing programme\
+      \ shall include a range of assessments, tests, methodologies, practices and tools to be applied\
+      \ in accordance with Articles 25 and 26.\n\n 3. When conducting the digital operational resilience\
+      \ testing programme referred to in paragraph 1 of this Article, financial entities, other than microenterprises,\
+      \ shall follow a risk-based approach taking into account the criteria set out in Article 4(2) duly\
+      \ considering the evolving landscape of ICT risk, any specific risks to which the financial entity\
+      \ concerned is or might be exposed, the criticality of information assets and of services provided,\
+      \ as well as any other factor the financial entity deems appropriate.\n\n 4. Financial entities,\
+      \ other than microenterprises, shall ensure that tests are undertaken by independent parties, whether\
+      \ internal or external. Where tests are undertaken by an internal tester, financial entities shall\
+      \ dedicate sufficient resources and ensure that conflicts of interest are avoided throughout the\
+      \ design and execution phases of the test.\n\n 5. Financial entities, other than microenterprises,\
+      \ shall establish procedures and policies to prioritise, classify and remedy all issues revealed\
+      \ throughout the performance of the tests and shall establish internal validation methodologies\
+      \ to ascertain that all identified weaknesses, deficiencies or gaps are fully addressed.\n\n 6.\
+      \ Financial entities, other than microenterprises, shall ensure, at least yearly, that appropriate\
+      \ tests are conducted on all ICT systems and applications supporting critical or important functions."
+    status: article
+  Art.25:
+    title: Testing of ICT tools and systems
+    text: "1. The digital operational resilience testing programme referred to in Article 24 shall provide,\
+      \ in accordance with the criteria set out in Article 4(2), for the execution of appropriate tests,\
+      \ such as vulnerability assessments and scans, open source analyses, network security assessments,\
+      \ gap analyses, physical security reviews, questionnaires and scanning software solutions, source\
+      \ code reviews where feasible, scenario-based tests, compatibility testing, performance testing,\
+      \ end-to-end testing and penetration testing.\n\n 2. Central securities depositories and central\
+      \ counterparties shall perform vulnerability assessments before any deployment or redeployment of\
+      \ new or existing applications and infrastructure components, and ICT services supporting critical\
+      \ or important functions of the financial entity.\n\n 3. Microenterprises shall perform the tests\
+      \ referred to in paragraph 1 by combining a risk-based approach with a strategic planning of ICT\
+      \ testing, by duly considering the need to maintain a balanced approach between the scale of resources\
+      \ and the time to be allocated to the ICT testing provided for in this Article, on the one hand,\
+      \ and the urgency, type of risk, criticality of information assets and of services provided, as\
+      \ well as any other relevant factor, including the financial entity’s ability to take calculated\
+      \ risks, on the other hand."
+    status: article
+  Art.26(3):
+    title: Advanced testing of ICT tools, systems and processes based on TLPT
+    text: 3. Where ICT third-party service providers are included in the scope of TLPT, the financial
+      entity shall take the necessary measures and safeguards to ensure the participation of such ICT
+      third-party service providers in the TLPT and shall retain at all times full responsibility for
+      ensuring compliance with this Regulation.
+    status: paragraph
+  Art.28(1):
+    title: General principles
+    text: "1. Financial entities shall manage ICT third-party risk as an integral component of ICT risk\
+      \ within their ICT risk management framework as referred to in Article 6(1), and in accordance with\
+      \ the following principles:\n\n (a)\n\n financial entities that have in place contractual arrangements\
+      \ for the use of ICT services to run their business operations shall, at all times, remain fully\
+      \ responsible for compliance with, and the discharge of, all obligations under this Regulation and\
+      \ applicable financial services law;\n\n (b)\n\n financial entities’ management of ICT third-party\
+      \ risk shall be implemented in light of the principle of proportionality, taking into account:\n\
+      \n (i)\n\n the nature, scale, complexity and importance of ICT-related dependencies,\n\n (ii)\n\n\
+      \ the risks arising from contractual arrangements on the use of ICT services concluded with ICT\
+      \ third-party service providers, taking into account the criticality or importance of the respective\
+      \ service, process or function, and the potential impact on the continuity and availability of financial\
+      \ services and activities, at individual and at group level."
+    status: paragraph
+  Art.28(2):
+    title: General principles
+    text: 2. As part of their ICT risk management framework, financial entities, other than entities referred
+      to in Article 16(1), first subparagraph, and other than microenterprises, shall adopt, and regularly
+      review, a strategy on ICT third-party risk, taking into account the multi-vendor strategy referred
+      to in Article 6(9), where applicable. The strategy on ICT third-party risk shall include a policy
+      on the use of ICT services supporting critical or important functions provided by ICT third-party
+      service providers and shall apply on an individual basis and, where relevant, on a sub-consolidated
+      and consolidated basis. The management body shall, on the basis of an assessment of the overall
+      risk profile of the financial entity and the scale and complexity of the business services, regularly
+      review the risks identified in respect to contractual arrangements on the use of ICT services supporting
+      critical or important functions.
+    status: paragraph
+  Art.28(4):
+    title: General principles
+    text: "4. Before entering into a contractual arrangement on the use of ICT services, financial entities\
+      \ shall:\n\n (a)\n\n assess whether the contractual arrangement covers the use of ICT services supporting\
+      \ a critical or important function;\n\n (b)\n\n assess if supervisory conditions for contracting\
+      \ are met;\n\n (c)\n\n identify and assess all relevant risks in relation to the contractual arrangement,\
+      \ including the possibility that such contractual arrangement may contribute to reinforcing ICT\
+      \ concentration risk as referred to in Article 29;\n\n (d)\n\n undertake all due diligence on prospective\
+      \ ICT third-party service providers and ensure throughout the selection and assessment processes\
+      \ that the ICT third-party service provider is suitable;\n\n (e)\n\n identify and assess conflicts\
+      \ of interest that the contractual arrangement may cause."
+    status: paragraph
+  Art.30(1):
+    title: Key contractual provisions
+    text: 1. The rights and obligations of the financial entity and of the ICT third-party service provider
+      shall be clearly allocated and set out in writing. The full contract shall include the service level
+      agreements and be documented in one written document which shall be available to the parties on
+      paper, or in a document with another downloadable, durable and accessible format.
+    status: paragraph
+  Art.30(2):
+    title: Key contractual provisions
+    text: "2. The contractual arrangements on the use of ICT services shall include at least the following\
+      \ elements:\n\n (a)\n\n a clear and complete description of all functions and ICT services to be\
+      \ provided by the ICT third-party service provider, indicating whether subcontracting of an ICT\
+      \ service supporting a critical or important function, or material parts thereof, is permitted and,\
+      \ when that is the case, the conditions applying to such subcontracting;\n\n (b)\n\n the locations,\
+      \ namely the regions or countries, where the contracted or subcontracted functions and ICT services\
+      \ are to be provided and where data is to be processed, including the storage location, and the\
+      \ requirement for the ICT third-party service provider to notify the financial entity in advance\
+      \ if it envisages changing such locations;\n\n (c)\n\n provisions on availability, authenticity,\
+      \ integrity and confidentiality in relation to the protection of data, including personal data;\n\
+      \n (d)\n\n provisions on ensuring access, recovery and return in an easily accessible format of\
+      \ personal and non-personal data processed by the financial entity in the event of the insolvency,\
+      \ resolution or discontinuation of the business operations of the ICT third-party service provider,\
+      \ or in the event of the termination of the contractual arrangements;\n\n (e)\n\n service level\
+      \ descriptions, including updates and revisions thereof;\n\n (f)\n\n the obligation of the ICT third-party\
+      \ service provider to provide assistance to the financial entity at no additional cost, or at a\
+      \ cost that is determined ex-ante , when an ICT incident that is related to the ICT service provided\
+      \ to the financial entity occurs;\n\n (g)\n\n the obligation of the ICT third-party service provider\
+      \ to fully cooperate with the competent authorities and the resolution authorities of the financial\
+      \ entity, including persons appointed by them;\n\n (h)\n\n termination rights and related minimum\
+      \ notice periods for the termination of the contractual arrangements, in accordance with the expectations\
+      \ of competent authorities and resolution authorities;\n\n (i)\n\n the conditions for the participation\
+      \ of ICT third-party service providers in the financial entities’ ICT security awareness programmes\
+      \ and digital operational resilience training in accordance with Article 13(6)."
+    status: paragraph
+  Art.30(3):
+    title: Key contractual provisions
+    text: "3. The contractual arrangements on the use of ICT services supporting critical or important\
+      \ functions shall include, in addition to the elements referred to in paragraph 2, at least the\
+      \ following:\n\n (a)\n\n full service level descriptions, including updates and revisions thereof\
+      \ with precise quantitative and qualitative performance targets within the agreed service levels\
+      \ to allow effective monitoring by the financial entity of ICT services and enable appropriate corrective\
+      \ actions to be taken, without undue delay, when agreed service levels are not met;\n\n (b)\n\n\
+      \ notice periods and reporting obligations of the ICT third-party service provider to the financial\
+      \ entity, including notification of any development that might have a material impact on the ICT\
+      \ third-party service provider’s ability to effectively provide the ICT services supporting critical\
+      \ or important functions in line with agreed service levels;\n\n (c)\n\n requirements for the ICT\
+      \ third-party service provider to implement and test business contingency plans and to have in place\
+      \ ICT security measures, tools and policies that provide an appropriate level of security for the\
+      \ provision of services by the financial entity in line with its regulatory framework;\n\n (d)\n\
+      \n the obligation of the ICT third-party service provider to participate and fully cooperate in\
+      \ the financial entity’s TLPT as referred to in Articles 26 and 27;\n\n (e)\n\n the right to monitor,\
+      \ on an ongoing basis, the ICT third-party service provider’s performance, which entails the following:\n\
+      \n (i)\n\n unrestricted rights of access, inspection and audit by the financial entity, or an appointed\
+      \ third party, and by the competent authority, and the right to take copies of relevant documentation\
+      \ on-site if they are critical to the operations of the ICT third-party service provider, the effective\
+      \ exercise of which is not impeded or limited by other contractual arrangements or implementation\
+      \ policies;\n\n (ii)\n\n the right to agree on alternative assurance levels if other clients’ rights\
+      \ are affected;\n\n (iii)\n\n the obligation of the ICT third-party service provider to fully cooperate\
+      \ during the onsite inspections and audits performed by the competent authorities, the Lead Overseer,\
+      \ financial entity or an appointed third party; and\n\n (iv)\n\n the obligation to provide details\
+      \ on the scope, procedures to be followed and frequency of such inspections and audits;\n\n (f)\n\
+      \n exit strategies, in particular the establishment of a mandatory adequate transition period:\n\
+      \n (i)\n\n during which the ICT third-party service provider will continue providing the respective\
+      \ functions, or ICT services, with a view to reducing the risk of disruption at the financial entity\
+      \ or to ensure its effective resolution and restructuring;\n\n (ii)\n\n allowing the financial entity\
+      \ to migrate to another ICT third-party service provider or change to in-house solutions consistent\
+      \ with the complexity of the service provided.\n\n By way of derogation from point (e), the ICT\
+      \ third-party service provider and the financial entity that is a microenterprise may agree that\
+      \ the financial entity’s rights of access, inspection and audit can be delegated to an independent\
+      \ third party, appointed by the ICT third-party service provider, and that the financial entity\
+      \ is able to request information and assurance on the ICT third-party service provider’s performance\
+      \ from the third party at any time."
+    status: paragraph
+  Art.17(1):
+    title: ICT-related incident management process
+    text: 1. Financial entities shall define, establish and implement an ICT-related incident management
+      process to detect, manage and notify ICT-related incidents.
+    status: paragraph
+  Art.17(2):
+    title: ICT-related incident management process
+    text: 2. Financial entities shall record all ICT-related incidents and significant cyber threats.
+      Financial entities shall establish appropriate procedures and processes to ensure a consistent and
+      integrated monitoring, handling and follow-up of ICT-related incidents, to ensure that root causes
+      are identified, documented and addressed in order to prevent the occurrence of such incidents.
+    status: paragraph
+  Art.17(3):
+    title: ICT-related incident management process
+    text: "3. The ICT-related incident management process referred to in paragraph 1 shall:\n\n (a)\n\n\
+      \ put in place early warning indicators;\n\n (b)\n\n establish procedures to identify, track, log,\
+      \ categorise and classify ICT-related incidents according to their priority and severity and according\
+      \ to the criticality of the services impacted, in accordance with the criteria set out in Article\
+      \ 18(1);\n\n (c)\n\n assign roles and responsibilities that need to be activated for different ICT-related\
+      \ incident types and scenarios;\n\n (d)\n\n set out plans for communication to staff, external stakeholders\
+      \ and media in accordance with Article 14 and for notification to clients, for internal escalation\
+      \ procedures, including ICT-related customer complaints, as well as for the provision of information\
+      \ to financial entities that act as counterparts, as appropriate;\n\n (e)\n\n ensure that at least\
+      \ major ICT-related incidents are reported to relevant senior management and inform the management\
+      \ body of at least major ICT-related incidents, explaining the impact, response and additional controls\
+      \ to be established as a result of such ICT-related incidents;\n\n (f)\n\n establish ICT-related\
+      \ incident response procedures to mitigate impacts and ensure that services become operational and\
+      \ secure in a timely manner."
+    status: paragraph
+  Art.17(4):
+    title: ICT-related incident management process
+    text: "1. Financial entities shall define, establish and implement an ICT-related incident management\
+      \ process to detect, manage and notify ICT-related incidents.\n\n 2. Financial entities shall record\
+      \ all ICT-related incidents and significant cyber threats. Financial entities shall establish appropriate\
+      \ procedures and processes to ensure a consistent and integrated monitoring, handling and follow-up\
+      \ of ICT-related incidents, to ensure that root causes are identified, documented and addressed\
+      \ in order to prevent the occurrence of such incidents.\n\n 3. The ICT-related incident management\
+      \ process referred to in paragraph 1 shall:\n\n (a)\n\n put in place early warning indicators;\n\
+      \n (b)\n\n establish procedures to identify, track, log, categorise and classify ICT-related incidents\
+      \ according to their priority and severity and according to the criticality of the services impacted,\
+      \ in accordance with the criteria set out in Article 18(1);\n\n (c)\n\n assign roles and responsibilities\
+      \ that need to be activated for different ICT-related incident types and scenarios;\n\n (d)\n\n\
+      \ set out plans for communication to staff, external stakeholders and media in accordance with Article\
+      \ 14 and for notification to clients, for internal escalation procedures, including ICT-related\
+      \ customer complaints, as well as for the provision of information to financial entities that act\
+      \ as counterparts, as appropriate;\n\n (e)\n\n ensure that at least major ICT-related incidents\
+      \ are reported to relevant senior management and inform the management body of at least major ICT-related\
+      \ incidents, explaining the impact, response and additional controls to be established as a result\
+      \ of such ICT-related incidents;\n\n (f)\n\n establish ICT-related incident response procedures\
+      \ to mitigate impacts and ensure that services become operational and secure in a timely manner."
+    status: article_fallback
+    note: Paragraph 4 boundaries not detected; full Article 17 shown.
+  Art.19:
+    title: Reporting of major ICT-related incidents and voluntary notification of significant cyber threats
+    text: "1. Financial entities shall report major ICT-related incidents to the relevant competent authority\
+      \ as referred to in Article 46 in accordance with paragraph 4 of this Article.\n\n Where a financial\
+      \ entity is subject to supervision by more than one national competent authority referred to in\
+      \ Article 46, Member States shall designate a single competent authority as the relevant competent\
+      \ authority responsible for carrying out the functions and duties provided for in this Article.\n\
+      \n Credit institutions classified as significant, in accordance with Article 6(4) of Regulation\
+      \ (EU) No 1024/2013, shall report major ICT-related incidents to the relevant national competent\
+      \ authority designated in accordance with Article 4 of Directive 2013/36/EU, which shall immediately\
+      \ transmit that report to the ECB.\n\n For the purpose of the first subparagraph, financial entities\
+      \ shall produce, after collecting and analysing all relevant information, the initial notification\
+      \ and reports referred to in paragraph 4 of this Article using the templates referred to in Article\
+      \ 20 and submit them to the competent authority. In the event that a technical impossibility prevents\
+      \ the submission of the initial notification using the template, financial entities shall notify\
+      \ the competent authority about it via alternative means.\n\n The initial notification and reports\
+      \ referred to in paragraph 4 shall include all information necessary for the competent authority\
+      \ to determine the significance of the major ICT-related incident and assess possible cross-border\
+      \ impacts.\n\n Without prejudice to the reporting pursuant to the first subparagraph by the financial\
+      \ entity to the relevant competent authority, Member States may additionally determine that some\
+      \ or all financial entities shall also provide the initial notification and each report referred\
+      \ to in paragraph 4 of this Article using the templates referred to in Article 20 to the competent\
+      \ authorities or the computer security incident response teams (CSIRTs) designated or established\
+      \ in accordance with Directive (EU) 2022/2555.\n\n 2. Financial entities may, on a voluntary basis,\
+      \ notify significant cyber threats to the relevant competent authority when they deem the threat\
+      \ to be of relevance to the financial system, service users or clients. The relevant competent authority\
+      \ may provide such information to other relevant authorities referred to in paragraph 6.\n\n Credit\
+      \ institutions classified as significant, in accordance with Article 6(4) of Regulation (EU) No\
+      \ 1024/2013, may, on a voluntary basis, notify significant cyber threats to relevant national competent\
+      \ authority, designated in accordance with Article 4 of Directive 2013/36/EU, which shall immediately\
+      \ transmit the notification to the ECB.\n\n Member States may determine that those financial entities\
+      \ that on a voluntary basis notify in accordance with the first subparagraph may also transmit that\
+      \ notification to the CSIRTs designated or established in accordance with Directive (EU) 2022/2555.\n\
+      \n 3. Where a major ICT-related incident occurs and has an impact on the financial interests of\
+      \ clients, financial entities shall, without undue delay as soon as they become aware of it, inform\
+      \ their clients about the major ICT-related incident and about the measures that have been taken\
+      \ to mitigate the adverse effects of such incident.\n\n In the case of a significant cyber threat,\
+      \ financial entities shall, where applicable, inform their clients that are potentially affected\
+      \ of any appropriate protection measures which the latter may consider taking.\n\n 4. Financial\
+      \ entities shall, within the time limits to be laid down in accordance with Article 20, first paragraph,\
+      \ point (a), point (ii), submit the following to the relevant competent authority:\n\n (a)\n\n an\
+      \ initial notification;\n\n (b)\n\n an intermediate report after the initial notification referred\
+      \ to in point (a), as soon as the status of the original incident has changed significantly or the\
+      \ handling of the major ICT-related incident has changed based on new information available, followed,\
+      \ as appropriate, by updated notifications every time a relevant status update is available, as\
+      \ well as upon a specific request of the competent authority;\n\n (c)\n\n a final report, when the\
+      \ root cause analysis has been completed, regardless of whether mitigation measures have already\
+      \ been implemented, and when the actual impact figures are available to replace estimates.\n\n 5.\
+      \ Financial entities may outsource, in accordance with Union and national sectoral law, the reporting\
+      \ obligations under this Article to a third-party service provider. In case of such outsourcing,\
+      \ the financial entity remains fully responsible for the fulfilment of the incident reporting requirements.\n\
+      \n 6. Upon receipt of the initial notification and of each report referred to in paragraph 4, the\
+      \ competent authority shall, in a timely manner, provide details of the major ICT-related incident\
+      \ to the following recipients based, as applicable, on their respective competences:\n\n (a)\n\n\
+      \ EBA, ESMA or EIOPA;\n\n (b)\n\n the ECB, in the case of financial entities referred to in Article\
+      \ 2(1), points (a), (b) and (d);\n\n (c)\n\n the competent authorities, single points of contact\
+      \ or CSIRTs designated or established in accordance with Directive (EU) 2022/2555;\n\n (d)\n\n the\
+      \ resolution authorities, as referred to in Article 3 of Directive 2014/59/EU, and the Single Resolution\
+      \ Board (SRB) with respect to entities referred to in Article 7(2) of Regulation (EU) No 806/2014\
+      \ of the European Parliament and of the Council ( 37 ) , and with respect to entities and groups\
+      \ referred to in Article 7(4)(b) and (5) of Regulation (EU) No 806/2014 if such details concern\
+      \ incidents that pose a risk to ensuring critical functions within the meaning of Article 2(1),\
+      \ point (35), of Directive 2014/59/EU; and\n\n (e)\n\n other relevant public authorities under national\
+      \ law.\n\n 7. Following receipt of information in accordance with paragraph 6, EBA, ESMA or EIOPA\
+      \ and the ECB, in consultation with ENISA and in cooperation with the relevant competent authority,\
+      \ shall assess whether the major ICT-related incident is relevant for competent authorities in other\
+      \ Member States. Following that assessment, EBA, ESMA or EIOPA shall, as soon as possible, notify\
+      \ relevant competent authorities in other Member States accordingly. The ECB shall notify the members\
+      \ of the European System of Central Banks on issues relevant to the payment system. Based on that\
+      \ notification, the competent authorities shall, where appropriate, take all of the necessary measures\
+      \ to protect the immediate stability of the financial system.\n\n 8. The notification to be done\
+      \ by ESMA pursuant to paragraph 7 of this Article shall be without prejudice to the responsibility\
+      \ of the competent authority to urgently transmit the details of the major ICT-related incident\
+      \ to the relevant authority in the host Member State, where a central securities depository has\
+      \ significant cross-border activity in the host Member State, the major ICT-related incident is\
+      \ likely to have severe consequences for the financial markets of the host Member State and where\
+      \ there are cooperation arrangements among competent authorities related to the supervision of financial\
+      \ entities."
+    status: article
+stats:
+  catalogue_ids: 38
+  with_text: 38
+  missing: []

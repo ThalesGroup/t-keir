@@ -32,6 +32,13 @@ attestation block under `dora.attestation`.
 
 --8<-- "./docs/compliance/generated/dora_articles.md"
 
+## Exact legal text (EUR-Lex)
+
+Official English excerpts for each catalogue citation (paragraph / point when
+available). Links in the table above jump here.
+
+--8<-- "./docs/compliance/generated/dora_article_texts.md"
+
 ## Latest audit results
 
 --8<-- "./docs/compliance/generated/dora_results.md"

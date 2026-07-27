@@ -4,13 +4,13 @@
 
 | Article | Prohibited practice flag (`overrides.yaml`) | Severity if true |
 |---|---|---|
-| `Art.5(1)(a)` | `prohibited_practices.subliminal_manipulation` | CRITICAL |
-| `Art.5(1)(b)` | `prohibited_practices.exploits_vulnerabilities` | CRITICAL |
-| `Art.5(1)(c)` | `prohibited_practices.social_scoring_public_authority` | CRITICAL |
-| `Art.5(1)(d)` | `prohibited_practices.real_time_biometric_public_space` | CRITICAL |
-| `Art.5(1)(e)` | `prohibited_practices.emotion_recognition_workplace_education` | CRITICAL |
-| `Art.5(1)(f)` | `prohibited_practices.biometric_categorisation_sensitive_attributes` | CRITICAL |
-| `Art.5(1)(g)` | `prohibited_practices.predictive_policing_individual` | CRITICAL |
+| [`Art.5(1)(a)`](#art-5-1-a) | `prohibited_practices.subliminal_manipulation` | CRITICAL |
+| [`Art.5(1)(b)`](#art-5-1-b) | `prohibited_practices.exploits_vulnerabilities` | CRITICAL |
+| [`Art.5(1)(c)`](#art-5-1-c) | `prohibited_practices.social_scoring_public_authority` | CRITICAL |
+| [`Art.5(1)(d)`](#art-5-1-d) | `prohibited_practices.real_time_biometric_public_space` | CRITICAL |
+| [`Art.5(1)(e)`](#art-5-1-e) | `prohibited_practices.emotion_recognition_workplace_education` | CRITICAL |
+| [`Art.5(1)(f)`](#art-5-1-f) | `prohibited_practices.biometric_categorisation_sensitive_attributes` | CRITICAL |
+| [`Art.5(1)(g)`](#art-5-1-g) | `prohibited_practices.predictive_policing_individual` | CRITICAL |
 
 **Rule:** Title II applies to **all** categories. If any flag is `true` (or
 `determined_category == UNACCEPTABLE`), each active practice yields a CRITICAL
@@ -23,105 +23,105 @@
 
 | Article | Applicability gate | OPA check (evidence / attestation) | Requirement (policy message) |
 |---|---|---|---|
-| `Art.6` | HIGH_RISK only | `evidence.annex_iv_dir_non_empty`, `attestation.risk_management_system` | High-risk classification is documented (Annex III / Art.6). |
-| `Art.7` | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | Classification rules for high-risk AI are applied and recorded. |
-| `Art.9(1)` | HIGH_RISK only | `attestation.risk_management_system` | Risk management system established. |
-| `Art.9(2)` | HIGH_RISK only | `attestation.risk_mgmt_identification_estimation_evaluation` | Risk management covers identification, estimation and evaluation. |
-| `Art.9(3)` | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.residual_risk_tested_post_market` | Residual risks tested after market placement. |
-| `Art.9(4)` | HIGH_RISK only | `attestation.risk_management_measures_adopted` | Risk management measures adopted. |
-| `Art.9(5)` | HIGH_RISK only | `evidence.beir_eval_report_present`, `attestation.conformity_assessment_standards` | Testing against defined metrics before market placement. |
-| `Art.9(6)` | HIGH_RISK only | `evidence.beir_eval_report_present` | Testing on real-world conditions where applicable. |
-| `Art.9(7)` | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.feedback_loop_controls` | Serious incident testing feedback loop in place. |
-| `Art.9(8)` | HIGH_RISK only | `attestation.conformity_assessment_standards` | Conformity assessment standards applied. |
-| `Art.10(1)` | HIGH_RISK only | `evidence.aibom_present` | Training/validation/test data governance via AIBOM. |
-| `Art.10(2)` | HIGH_RISK only | `evidence.aibom_present` | Data governance practices documented in AIBOM entries. |
-| `Art.10(3)` | HIGH_RISK only | `evidence.sbom_cyclonedx_present` | Data relevant, representative, free of errors (inventory present). |
-| `Art.10(4)` | HIGH_RISK only | `attestation.data_bias_examination` | Examination for biases performed. |
-| `Art.10(5)` | HIGH_RISK only | `evidence.compliance_gdpr_doc`, `attestation.special_category_data_justified` | Special-category data processing justified. |
-| `Art.11(1)` | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | Technical documentation drawn up (Annex IV). |
-| `Art.11(2)` | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | Technical documentation kept up to date. |
-| `Art.12(1)` | HIGH_RISK only | `evidence.action_schema_present` | Automatic logging enabled throughout lifecycle. |
-| `Art.12(2)` | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.action_schema_present` | Logs automatically generated. |
-| `Art.12(3)` | HIGH_RISK only | `evidence.audit_worm_retention_set`, `attestation.action_schema_present` | Logs kept for period appropriate to intended purpose. |
-| `Art.12(4)` | HIGH_RISK + biometric | `evidence.audit_evidence_dir_non_empty` | Biometric identification system logging specifics present. |
-| `Art.13(1)` | HIGH_RISK only | `attestation.system_sufficiently_transparent` | System designed to be sufficiently transparent. |
-| `Art.13(2)` | HIGH_RISK only | `attestation.instructions_for_use_provided` | Instructions for use provided. |
-| `Art.13(3)(a)` | HIGH_RISK only | `attestation.instructions_provider_identity` | Instructions include provider identity and contact. |
-| `Art.13(3)(b)` | HIGH_RISK only | `attestation.instructions_capabilities_limitations` | Instructions include capabilities and limitations. |
-| `Art.13(3)(c)` | HIGH_RISK only | `evidence.beir_eval_report_present` | Instructions include expected accuracy levels. |
-| `Art.13(3)(d)` | HIGH_RISK only | `evidence.kill_switch_runbook_present` | Instructions include human oversight measures. |
-| `Art.13(3)(e)` | HIGH_RISK only | `attestation.instructions_compute_resources` | Instructions include computational resource requirements. |
-| `Art.14(1)` | HIGH_RISK only | `evidence.governor_flags_present` | Human oversight measures built in (governor flags). |
-| `Art.14(2)` | HIGH_RISK only | `evidence.hmi_admin_page_present`, `attestation.governor_flags_present` | System designed for human oversight implementation. |
-| `Art.14(3)(a)` | HIGH_RISK only | `attestation.oversight_understand_capabilities` | Oversight persons can understand capabilities and limitations. |
-| `Art.14(3)(b)` | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.audit_verify_target` | Oversight persons can detect anomalies. |
-| `Art.14(3)(c)` | HIGH_RISK only | `evidence.governor_kill_target`, `attestation.kill_switch_runbook_present` | Oversight persons can interrupt the system. |
-| `Art.14(3)(d)` | HIGH_RISK only | `evidence.governor_approvals_present` | Oversight persons can override output. |
-| `Art.14(3)(e)` | HIGH_RISK only | `evidence.hmi_admin_page_present` | Oversight persons can decide not to use output. |
-| `Art.14(4)` | HIGH_RISK + biometric | `evidence.hmi_admin_page_present` | Specific oversight measures for biometric systems. |
-| `Art.14(5)` | HIGH_RISK only | `evidence.governor_flags_present` | Automated control measures for fully automated deployment. |
-| `Art.15(1)` | HIGH_RISK only | `evidence.beir_eval_report_present`, `attestation.trivy_report_present` | Appropriate accuracy, robustness and cybersecurity. |
-| `Art.15(2)` | HIGH_RISK only | `evidence.beir_eval_report_present` | Performance metrics declared. |
-| `Art.15(3)` | HIGH_RISK only | `attestation.adversarial_resilience` | Resilience against adversarial inputs. |
-| `Art.15(4)` | HIGH_RISK only | `attestation.feedback_loop_controls` | Technical measures against feedback-loop risks. |
-| `Art.15(5)` | HIGH_RISK only | `evidence.security_report_target`, `attestation.trivy_report_present` | Cybersecurity measures in place. |
-| `Art.16(a)` | HIGH_RISK only | `attestation.quality_management_system` | Quality management system implemented. |
-| `Art.16(b)` | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | Technical documentation drawn up. |
-| `Art.16(c)` | HIGH_RISK only | `evidence.action_schema_present` | Logging capability implemented. |
-| `Art.16(d)` | HIGH_RISK only | `attestation.conformity_assessment.performed` | Conformity assessment performed. |
-| `Art.16(e)` | HIGH_RISK only | `attestation.eu_declaration_of_conformity` | EU declaration of conformity drawn up. |
-| `Art.16(f)` | HIGH_RISK only | `attestation.ce_marking_affixed` | CE marking affixed. |
-| `Art.16(g)` | HIGH_RISK only | `attestation.eu_database_registration` | Registration in EU database. |
-| `Art.16(h)` | HIGH_RISK only | `evidence.rollback_target_in_makefile`, `attestation.governor_kill_target` | Corrective actions taken without undue delay. |
-| `Art.16(i)` | HIGH_RISK only | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | Competent authorities informed of serious incidents. |
-| `Art.16(j)` | HIGH_RISK only | `attestation.competent_authorities_on_request` | Competent authorities informed upon request. |
-| `Art.17(1)(a)` | HIGH_RISK only | `attestation.qms_regulatory_strategy` | QMS covers strategy for regulatory compliance. |
-| `Art.17(1)(b)` | HIGH_RISK only | `attestation.qms_design_techniques` | QMS covers techniques for design development. |
-| `Art.17(1)(c)` | HIGH_RISK only | `evidence.beir_eval_report_present`, `attestation.audit_verify_target` | QMS covers system testing and validation. |
-| `Art.17(1)(d)` | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | QMS covers technical documentation. |
-| `Art.17(1)(e)` | HIGH_RISK only | `evidence.aibom_present` | QMS covers data management. |
-| `Art.17(1)(f)` | HIGH_RISK only | `attestation.risk_management_system` | QMS covers risk management. |
-| `Art.17(1)(g)` | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.feedback_loop_controls` | QMS covers post-market monitoring. |
-| `Art.17(1)(h)` | HIGH_RISK only | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | QMS covers serious incident reporting. |
-| `Art.17(2)` | HIGH_RISK only | `attestation.qms_documented` | QMS implemented and documented. |
-| `Art.18` | HIGH_RISK only | `evidence.audit_worm_retention_days`, `attestation.qms_documented` | Technical documentation retained 10 years (or attested). |
-| `Art.19` | HIGH_RISK only | `evidence.audit_worm_retention_set` | Automatically generated logs kept by provider. |
-| `Art.20(1)` | HIGH_RISK only | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | Serious incidents reported to authorities. |
-| `Art.20(2)` | HIGH_RISK only | `attestation.serious_incident_report_within_15_days` | Serious incident reported within 15 days of becoming aware. |
-| `Art.21` | HIGH_RISK only | `attestation.competent_authorities_on_request` | Cooperation with competent authorities. |
-| `Art.22` | HIGH_RISK only | `attestation.authorised_representative_non_eu` | Authorised representative designated (non-EU providers). |
-| `Art.23(1)` | HIGH_RISK + importer role | `attestation.eu_declaration_of_conformity` | Importers verify CE marking and Annex IV / DoC. |
-| `Art.24(1)` | HIGH_RISK + distributor role | `attestation.ce_marking_affixed` | Distributors verify CE marking. |
-| `Art.25(1)` | HIGH_RISK only | `attestation.deployer_uses_per_instructions` | Deployer obligations for inputs under their control. |
-| `Art.25(3)` | HIGH_RISK only | `attestation.deployer_uses_per_instructions` | Deployers use system according to instructions. |
-| `Art.25(5)` | HIGH_RISK only | `evidence.governor_approvals_present`, `attestation.hmi_admin_page_present` | Deployers implement human oversight. |
-| `Art.25(6)` | HIGH_RISK only | `attestation.deployer_informs_affected_persons` | Deployers inform affected persons. |
-| `Art.25(9)` | HIGH_RISK only | `evidence.compliance_gdpr_doc`, `attestation.deployer_dpia` | Deployers perform DPIA where required. |
-| `Art.26(1)` | HIGH_RISK only | `attestation.eu_declaration_of_conformity` | EU declaration of conformity drawn up. |
-| `Art.26(2)` | HIGH_RISK only | `attestation.eu_declaration_of_conformity` | EU DoC contains information from Annex V. |
-| `Art.27(1)` | HIGH_RISK only | `attestation.ce_marking_affixed` | CE marking affixed before market placement. |
-| `Art.27(2)` | HIGH_RISK only | `attestation.ce_marking_affixed` | CE marking requirements (visible, legible, indelible). |
-| `Art.28` | HIGH_RISK only | `attestation.eu_database_registration` | High-risk AI systems registered in EU database. |
-| `Art.29(1)` | HIGH_RISK only | `attestation.fundamental_rights_impact_assessment` | Fundamental rights impact assessment performed. |
-| `Art.33` | HIGH_RISK + notified body | `attestation.conformity_assessment.notified_body_designated` | Notified body designated and notified. |
-| `Art.34` | HIGH_RISK + notified body | `attestation.conformity_assessment.notified_body_org_requirements` | Notified body organisational requirements met. |
-| `Art.43(1)` | HIGH_RISK + notified body | `attestation.conformity_assessment.procedure_followed` | Conformity assessment procedure followed. |
-| `Art.43(2)` | HIGH_RISK + notified body | `attestation.conformity_assessment.harmonised_standards_or_cs` | Harmonised standards applied or CS used. |
-| `Art.43(4)` | HIGH_RISK + notified body | `attestation.conformity_assessment.third_party_assessment` | Third-party assessment where required. |
-| `Art.50(1)` | LIMITED_RISK or HIGH_RISK | `attestation.transparency.persons_informed_interacting_with_ai` | Persons informed they are interacting with AI. |
-| `Art.50(2)` | LIMITED/HIGH + emotion recognition | `attestation.transparency.persons_informed_interacting_with_ai` | Emotion recognition disclosure to natural persons. |
-| `Art.50(3)` | LIMITED/HIGH + biometric categorisation | `attestation.transparency.persons_informed_interacting_with_ai` | Biometric categorisation disclosure to natural persons. |
-| `Art.50(4)` | LIMITED_RISK or HIGH_RISK | `attestation.transparency.ai_generated_content_labelling` | AI-generated content labelling. |
-| `Art.53(1)(a)` | GPAI_STANDARD or GPAI_SYSTEMIC | `evidence.aibom_present` | Technical documentation provided to downstream providers (AIBOM). |
-| `Art.53(1)(b)` | GPAI_STANDARD or GPAI_SYSTEMIC | `evidence.annex_iv_dir_non_empty` | Information and documentation for downstream providers. |
-| `Art.53(1)(c)` | GPAI_STANDARD or GPAI_SYSTEMIC | `attestation.gpai.copyright_compliance_policy` | Copyright compliance policy. |
-| `Art.53(1)(d)` | GPAI_STANDARD or GPAI_SYSTEMIC | `evidence.aibom_present` | Summary of training data published. |
-| `Art.53(2)` | GPAI_STANDARD or GPAI_SYSTEMIC | `attestation.gpai.copyright_obligations` | Copyright compliance obligations. |
-| `Art.54` | GPAI_STANDARD or GPAI_SYSTEMIC | `attestation.gpai.authorised_representative_non_eu` | Authorised representative for non-EU GPAI providers. |
-| `Art.55(1)(a)` | GPAI_SYSTEMIC only | `attestation.gpai.model_evaluation_protocols` | Model evaluation per standardised protocols. |
-| `Art.55(1)(b)` | GPAI_SYSTEMIC only | `attestation.gpai.adversarial_red_teaming` | Adversarial testing (red-teaming). |
-| `Art.55(1)(c)` | GPAI_SYSTEMIC only | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | Serious incidents reported to AI Office within 2 weeks. |
-| `Art.55(1)(d)` | GPAI_SYSTEMIC only | `evidence.security_report_target`, `attestation.trivy_report_present` | Cybersecurity protection for systemic-risk GPAI. |
-| `Art.55(2)` | GPAI_SYSTEMIC only | `attestation.gpai.codes_of_practice` | Codes of practice followed. |
-| `Art.72` | is_ai_system (not UNACCEPTABLE) | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | Serious incident notification to market surveillance. |
-| `Art.73` | is_ai_system (not UNACCEPTABLE) | `evidence.audit_evidence_dir_non_empty`, `attestation.feedback_loop_controls` | Post-market monitoring plan in place. |
+| [`Art.6`](#art-6) | HIGH_RISK only | `evidence.annex_iv_dir_non_empty`, `attestation.risk_management_system` | High-risk classification is documented (Annex III / Art.6). |
+| [`Art.7`](#art-7) | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | Classification rules for high-risk AI are applied and recorded. |
+| [`Art.9(1)`](#art-9-1) | HIGH_RISK only | `attestation.risk_management_system` | Risk management system established. |
+| [`Art.9(2)`](#art-9-2) | HIGH_RISK only | `attestation.risk_mgmt_identification_estimation_evaluation` | Risk management covers identification, estimation and evaluation. |
+| [`Art.9(3)`](#art-9-3) | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.residual_risk_tested_post_market` | Residual risks tested after market placement. |
+| [`Art.9(4)`](#art-9-4) | HIGH_RISK only | `attestation.risk_management_measures_adopted` | Risk management measures adopted. |
+| [`Art.9(5)`](#art-9-5) | HIGH_RISK only | `evidence.beir_eval_report_present`, `attestation.conformity_assessment_standards` | Testing against defined metrics before market placement. |
+| [`Art.9(6)`](#art-9-6) | HIGH_RISK only | `evidence.beir_eval_report_present` | Testing on real-world conditions where applicable. |
+| [`Art.9(7)`](#art-9-7) | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.feedback_loop_controls` | Serious incident testing feedback loop in place. |
+| [`Art.9(8)`](#art-9-8) | HIGH_RISK only | `attestation.conformity_assessment_standards` | Conformity assessment standards applied. |
+| [`Art.10(1)`](#art-10-1) | HIGH_RISK only | `evidence.aibom_present` | Training/validation/test data governance via AIBOM. |
+| [`Art.10(2)`](#art-10-2) | HIGH_RISK only | `evidence.aibom_present` | Data governance practices documented in AIBOM entries. |
+| [`Art.10(3)`](#art-10-3) | HIGH_RISK only | `evidence.sbom_cyclonedx_present` | Data relevant, representative, free of errors (inventory present). |
+| [`Art.10(4)`](#art-10-4) | HIGH_RISK only | `attestation.data_bias_examination` | Examination for biases performed. |
+| [`Art.10(5)`](#art-10-5) | HIGH_RISK only | `evidence.compliance_gdpr_doc`, `attestation.special_category_data_justified` | Special-category data processing justified. |
+| [`Art.11(1)`](#art-11-1) | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | Technical documentation drawn up (Annex IV). |
+| [`Art.11(2)`](#art-11-2) | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | Technical documentation kept up to date. |
+| [`Art.12(1)`](#art-12-1) | HIGH_RISK only | `evidence.action_schema_present` | Automatic logging enabled throughout lifecycle. |
+| [`Art.12(2)`](#art-12-2) | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.action_schema_present` | Logs automatically generated. |
+| [`Art.12(3)`](#art-12-3) | HIGH_RISK only | `evidence.audit_worm_retention_set`, `attestation.action_schema_present` | Logs kept for period appropriate to intended purpose. |
+| [`Art.12(4)`](#art-12-4) | HIGH_RISK + biometric | `evidence.audit_evidence_dir_non_empty` | Biometric identification system logging specifics present. |
+| [`Art.13(1)`](#art-13-1) | HIGH_RISK only | `attestation.system_sufficiently_transparent` | System designed to be sufficiently transparent. |
+| [`Art.13(2)`](#art-13-2) | HIGH_RISK only | `attestation.instructions_for_use_provided` | Instructions for use provided. |
+| [`Art.13(3)(a)`](#art-13-3-a) | HIGH_RISK only | `attestation.instructions_provider_identity` | Instructions include provider identity and contact. |
+| [`Art.13(3)(b)`](#art-13-3-b) | HIGH_RISK only | `attestation.instructions_capabilities_limitations` | Instructions include capabilities and limitations. |
+| [`Art.13(3)(c)`](#art-13-3-c) | HIGH_RISK only | `evidence.beir_eval_report_present` | Instructions include expected accuracy levels. |
+| [`Art.13(3)(d)`](#art-13-3-d) | HIGH_RISK only | `evidence.kill_switch_runbook_present` | Instructions include human oversight measures. |
+| [`Art.13(3)(e)`](#art-13-3-e) | HIGH_RISK only | `attestation.instructions_compute_resources` | Instructions include computational resource requirements. |
+| [`Art.14(1)`](#art-14-1) | HIGH_RISK only | `evidence.governor_flags_present` | Human oversight measures built in (governor flags). |
+| [`Art.14(2)`](#art-14-2) | HIGH_RISK only | `evidence.hmi_admin_page_present`, `attestation.governor_flags_present` | System designed for human oversight implementation. |
+| [`Art.14(3)(a)`](#art-14-3-a) | HIGH_RISK only | `attestation.oversight_understand_capabilities` | Oversight persons can understand capabilities and limitations. |
+| [`Art.14(3)(b)`](#art-14-3-b) | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.audit_verify_target` | Oversight persons can detect anomalies. |
+| [`Art.14(3)(c)`](#art-14-3-c) | HIGH_RISK only | `evidence.governor_kill_target`, `attestation.kill_switch_runbook_present` | Oversight persons can interrupt the system. |
+| [`Art.14(3)(d)`](#art-14-3-d) | HIGH_RISK only | `evidence.governor_approvals_present` | Oversight persons can override output. |
+| [`Art.14(3)(e)`](#art-14-3-e) | HIGH_RISK only | `evidence.hmi_admin_page_present` | Oversight persons can decide not to use output. |
+| [`Art.14(4)`](#art-14-4) | HIGH_RISK + biometric | `evidence.hmi_admin_page_present` | Specific oversight measures for biometric systems. |
+| [`Art.14(5)`](#art-14-5) | HIGH_RISK only | `evidence.governor_flags_present` | Automated control measures for fully automated deployment. |
+| [`Art.15(1)`](#art-15-1) | HIGH_RISK only | `evidence.beir_eval_report_present`, `attestation.trivy_report_present` | Appropriate accuracy, robustness and cybersecurity. |
+| [`Art.15(2)`](#art-15-2) | HIGH_RISK only | `evidence.beir_eval_report_present` | Performance metrics declared. |
+| [`Art.15(3)`](#art-15-3) | HIGH_RISK only | `attestation.adversarial_resilience` | Resilience against adversarial inputs. |
+| [`Art.15(4)`](#art-15-4) | HIGH_RISK only | `attestation.feedback_loop_controls` | Technical measures against feedback-loop risks. |
+| [`Art.15(5)`](#art-15-5) | HIGH_RISK only | `evidence.security_report_target`, `attestation.trivy_report_present` | Cybersecurity measures in place. |
+| [`Art.16(a)`](#art-16-a) | HIGH_RISK only | `attestation.quality_management_system` | Quality management system implemented. |
+| [`Art.16(b)`](#art-16-b) | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | Technical documentation drawn up. |
+| [`Art.16(c)`](#art-16-c) | HIGH_RISK only | `evidence.action_schema_present` | Logging capability implemented. |
+| [`Art.16(d)`](#art-16-d) | HIGH_RISK only | `attestation.conformity_assessment.performed` | Conformity assessment performed. |
+| [`Art.16(e)`](#art-16-e) | HIGH_RISK only | `attestation.eu_declaration_of_conformity` | EU declaration of conformity drawn up. |
+| [`Art.16(f)`](#art-16-f) | HIGH_RISK only | `attestation.ce_marking_affixed` | CE marking affixed. |
+| [`Art.16(g)`](#art-16-g) | HIGH_RISK only | `attestation.eu_database_registration` | Registration in EU database. |
+| [`Art.16(h)`](#art-16-h) | HIGH_RISK only | `evidence.rollback_target_in_makefile`, `attestation.governor_kill_target` | Corrective actions taken without undue delay. |
+| [`Art.16(i)`](#art-16-i) | HIGH_RISK only | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | Competent authorities informed of serious incidents. |
+| [`Art.16(j)`](#art-16-j) | HIGH_RISK only | `attestation.competent_authorities_on_request` | Competent authorities informed upon request. |
+| [`Art.17(1)(a)`](#art-17-1-a) | HIGH_RISK only | `attestation.qms_regulatory_strategy` | QMS covers strategy for regulatory compliance. |
+| [`Art.17(1)(b)`](#art-17-1-b) | HIGH_RISK only | `attestation.qms_design_techniques` | QMS covers techniques for design development. |
+| [`Art.17(1)(c)`](#art-17-1-c) | HIGH_RISK only | `evidence.beir_eval_report_present`, `attestation.audit_verify_target` | QMS covers system testing and validation. |
+| [`Art.17(1)(d)`](#art-17-1-d) | HIGH_RISK only | `evidence.annex_iv_dir_non_empty` | QMS covers technical documentation. |
+| [`Art.17(1)(e)`](#art-17-1-e) | HIGH_RISK only | `evidence.aibom_present` | QMS covers data management. |
+| [`Art.17(1)(f)`](#art-17-1-f) | HIGH_RISK only | `attestation.risk_management_system` | QMS covers risk management. |
+| [`Art.17(1)(g)`](#art-17-1-g) | HIGH_RISK only | `evidence.audit_evidence_dir_non_empty`, `attestation.feedback_loop_controls` | QMS covers post-market monitoring. |
+| [`Art.17(1)(h)`](#art-17-1-h) | HIGH_RISK only | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | QMS covers serious incident reporting. |
+| [`Art.17(2)`](#art-17-2) | HIGH_RISK only | `attestation.qms_documented` | QMS implemented and documented. |
+| [`Art.18`](#art-18) | HIGH_RISK only | `evidence.audit_worm_retention_days`, `attestation.qms_documented` | Technical documentation retained 10 years (or attested). |
+| [`Art.19`](#art-19) | HIGH_RISK only | `evidence.audit_worm_retention_set` | Automatically generated logs kept by provider. |
+| [`Art.20(1)`](#art-20-1) | HIGH_RISK only | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | Serious incidents reported to authorities. |
+| [`Art.20(2)`](#art-20-2) | HIGH_RISK only | `attestation.serious_incident_report_within_15_days` | Serious incident reported within 15 days of becoming aware. |
+| [`Art.21`](#art-21) | HIGH_RISK only | `attestation.competent_authorities_on_request` | Cooperation with competent authorities. |
+| [`Art.22`](#art-22) | HIGH_RISK only | `attestation.authorised_representative_non_eu` | Authorised representative designated (non-EU providers). |
+| [`Art.23(1)`](#art-23-1) | HIGH_RISK + importer role | `attestation.eu_declaration_of_conformity` | Importers verify CE marking and Annex IV / DoC. |
+| [`Art.24(1)`](#art-24-1) | HIGH_RISK + distributor role | `attestation.ce_marking_affixed` | Distributors verify CE marking. |
+| [`Art.25(1)`](#art-25-1) | HIGH_RISK only | `attestation.deployer_uses_per_instructions` | Deployer obligations for inputs under their control. |
+| [`Art.25(3)`](#art-25-3) | HIGH_RISK only | `attestation.deployer_uses_per_instructions` | Deployers use system according to instructions. |
+| [`Art.25(5)`](#art-25-5) | HIGH_RISK only | `evidence.governor_approvals_present`, `attestation.hmi_admin_page_present` | Deployers implement human oversight. |
+| [`Art.25(6)`](#art-25-6) | HIGH_RISK only | `attestation.deployer_informs_affected_persons` | Deployers inform affected persons. |
+| [`Art.25(9)`](#art-25-9) | HIGH_RISK only | `evidence.compliance_gdpr_doc`, `attestation.deployer_dpia` | Deployers perform DPIA where required. |
+| [`Art.26(1)`](#art-26-1) | HIGH_RISK only | `attestation.eu_declaration_of_conformity` | EU declaration of conformity drawn up. |
+| [`Art.26(2)`](#art-26-2) | HIGH_RISK only | `attestation.eu_declaration_of_conformity` | EU DoC contains information from Annex V. |
+| [`Art.27(1)`](#art-27-1) | HIGH_RISK only | `attestation.ce_marking_affixed` | CE marking affixed before market placement. |
+| [`Art.27(2)`](#art-27-2) | HIGH_RISK only | `attestation.ce_marking_affixed` | CE marking requirements (visible, legible, indelible). |
+| [`Art.28`](#art-28) | HIGH_RISK only | `attestation.eu_database_registration` | High-risk AI systems registered in EU database. |
+| [`Art.29(1)`](#art-29-1) | HIGH_RISK only | `attestation.fundamental_rights_impact_assessment` | Fundamental rights impact assessment performed. |
+| [`Art.33`](#art-33) | HIGH_RISK + notified body | `attestation.conformity_assessment.notified_body_designated` | Notified body designated and notified. |
+| [`Art.34`](#art-34) | HIGH_RISK + notified body | `attestation.conformity_assessment.notified_body_org_requirements` | Notified body organisational requirements met. |
+| [`Art.43(1)`](#art-43-1) | HIGH_RISK + notified body | `attestation.conformity_assessment.procedure_followed` | Conformity assessment procedure followed. |
+| [`Art.43(2)`](#art-43-2) | HIGH_RISK + notified body | `attestation.conformity_assessment.harmonised_standards_or_cs` | Harmonised standards applied or CS used. |
+| [`Art.43(4)`](#art-43-4) | HIGH_RISK + notified body | `attestation.conformity_assessment.third_party_assessment` | Third-party assessment where required. |
+| [`Art.50(1)`](#art-50-1) | LIMITED_RISK or HIGH_RISK | `attestation.transparency.persons_informed_interacting_with_ai` | Persons informed they are interacting with AI. |
+| [`Art.50(2)`](#art-50-2) | LIMITED/HIGH + emotion recognition | `attestation.transparency.persons_informed_interacting_with_ai` | Emotion recognition disclosure to natural persons. |
+| [`Art.50(3)`](#art-50-3) | LIMITED/HIGH + biometric categorisation | `attestation.transparency.persons_informed_interacting_with_ai` | Biometric categorisation disclosure to natural persons. |
+| [`Art.50(4)`](#art-50-4) | LIMITED_RISK or HIGH_RISK | `attestation.transparency.ai_generated_content_labelling` | AI-generated content labelling. |
+| [`Art.53(1)(a)`](#art-53-1-a) | GPAI_STANDARD or GPAI_SYSTEMIC | `evidence.aibom_present` | Technical documentation provided to downstream providers (AIBOM). |
+| [`Art.53(1)(b)`](#art-53-1-b) | GPAI_STANDARD or GPAI_SYSTEMIC | `evidence.annex_iv_dir_non_empty` | Information and documentation for downstream providers. |
+| [`Art.53(1)(c)`](#art-53-1-c) | GPAI_STANDARD or GPAI_SYSTEMIC | `attestation.gpai.copyright_compliance_policy` | Copyright compliance policy. |
+| [`Art.53(1)(d)`](#art-53-1-d) | GPAI_STANDARD or GPAI_SYSTEMIC | `evidence.aibom_present` | Summary of training data published. |
+| [`Art.53(2)`](#art-53-2) | GPAI_STANDARD or GPAI_SYSTEMIC | `attestation.gpai.copyright_obligations` | Copyright compliance obligations. |
+| [`Art.54`](#art-54) | GPAI_STANDARD or GPAI_SYSTEMIC | `attestation.gpai.authorised_representative_non_eu` | Authorised representative for non-EU GPAI providers. |
+| [`Art.55(1)(a)`](#art-55-1-a) | GPAI_SYSTEMIC only | `attestation.gpai.model_evaluation_protocols` | Model evaluation per standardised protocols. |
+| [`Art.55(1)(b)`](#art-55-1-b) | GPAI_SYSTEMIC only | `attestation.gpai.adversarial_red_teaming` | Adversarial testing (red-teaming). |
+| [`Art.55(1)(c)`](#art-55-1-c) | GPAI_SYSTEMIC only | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | Serious incidents reported to AI Office within 2 weeks. |
+| [`Art.55(1)(d)`](#art-55-1-d) | GPAI_SYSTEMIC only | `evidence.security_report_target`, `attestation.trivy_report_present` | Cybersecurity protection for systemic-risk GPAI. |
+| [`Art.55(2)`](#art-55-2) | GPAI_SYSTEMIC only | `attestation.gpai.codes_of_practice` | Codes of practice followed. |
+| [`Art.72`](#art-72) | is_ai_system (not UNACCEPTABLE) | `evidence.incident_runbook_present`, `attestation.serious_incident_report_within_15_days` | Serious incident notification to market surveillance. |
+| [`Art.73`](#art-73) | is_ai_system (not UNACCEPTABLE) | `evidence.audit_evidence_dir_non_empty`, `attestation.feedback_loop_controls` | Post-market monitoring plan in place. |

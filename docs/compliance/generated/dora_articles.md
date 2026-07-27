@@ -2,41 +2,41 @@
 
 | Article | Applicability gate | OPA check (evidence / attestation) | Requirement (policy message) |
 |---|---|---|---|
-| `Art.5(1)` | When regulation in scope | `attestation.management_ict_risk_responsibility` | Management body responsible for ICT risk management. |
-| `Art.5(2)` | When regulation in scope | `attestation.management_approves_framework` | Management body approves ICT risk management framework. |
-| `Art.5(4)` | When regulation in scope | `attestation.risk_appetite_defined` | Management body defines risk appetite. |
-| `Art.6(1)` | When regulation in scope | `evidence.security_report_target`, `attestation.framework_documented_reviewed` | Sound and comprehensive ICT risk management framework. |
-| `Art.6(2)` | When regulation in scope | `attestation.framework_documented_reviewed` | ICT risk management framework documented and reviewed. |
-| `Art.6(5)` | When regulation in scope | `attestation.framework_reviewed_annually` | ICT risk management framework reviewed annually. |
-| `Art.7` | When regulation in scope | `evidence.versions_lock_present` | ICT systems and tools management. |
-| `Art.8(1)` | When regulation in scope | `evidence.versions_lock_present` | ICT assets identified and classified. |
-| `Art.8(2)` | When regulation in scope | `attestation.critical_information_assets_identified` | Information assets critical to important functions identified. |
-| `Art.9(1)` | When regulation in scope | `evidence.action_schema_present`, `attestation.audit_worm_retention_set` | Data integrity, availability, authenticity protected. |
-| `Art.9(2)` | When regulation in scope | `evidence.keycloak_realm_present`, `attestation.governor_flags_present` | Physical and logical access controls. |
-| `Art.9(3)` | When regulation in scope | `attestation.encryption_policies` | Encryption policies where appropriate. |
-| `Art.10(1)` | When regulation in scope | `evidence.observability_profile` | Detection mechanisms for anomalous activities. |
-| `Art.10(2)` | When regulation in scope | `evidence.observability_profile` | Automated alert system. |
-| `Art.11(1)` | When regulation in scope | `attestation.bcp_policy` | ICT business continuity policy. |
-| `Art.11(2)` | When regulation in scope | `attestation.bcp_rto_rpo` | BCP with defined RTO/RPO. |
-| `Art.11(3)` | When regulation in scope | `evidence.rollback_target_in_makefile`, `attestation.audit_verify_target` | Backup procedures and restoration. |
-| `Art.11(4)` | When regulation in scope | `attestation.alternative_facilities` | Alternative facilities and redundant ICT. |
-| `Art.11(6)` | When regulation in scope | `attestation.bcp_tested_annually` | BCP tested annually. |
-| `Art.12(1)` | When regulation in scope | `evidence.incident_runbook_present` | ICT-related incident management process defined. |
-| `Art.12(2)` | When regulation in scope | `attestation.incidents_classified` | Incidents classified. |
-| `Art.12(3)` | When regulation in scope | `evidence.incident_runbook_present`, `attestation.major_incidents_to_authority` | Significant ICT incidents reported. |
-| `Art.13(1)` | When regulation in scope | `evidence.audit_evidence_dir_non_empty` | Post-ICT-incident review conducted. |
-| `Art.13(2)` | When regulation in scope | `attestation.lessons_learned_integrated` | Lessons learned integrated. |
-| `Art.24` | When regulation in scope | `evidence.audit_verify_target`, `attestation.security_report_target` | General DORA resilience testing programme. |
-| `Art.25` | When regulation in scope | `attestation.tlpt_programme` | Advanced testing — TLPT (significant entities). |
-| `Art.26(3)` | When regulation in scope | `attestation.tlpt_covers_production` | TLPT scope covers production systems. |
-| `Art.28(1)` | When regulation in scope | `attestation.third_party_risk_policy` | ICT third-party risk management policy. |
-| `Art.28(2)` | When regulation in scope | `evidence.versions_lock_present`, `attestation.sbom_cyclonedx_present` | Due diligence on ICT third-party providers. |
-| `Art.28(4)` | When regulation in scope | `evidence.versions_lock_present` | ICT third-party risk register maintained. |
-| `Art.30(1)` | When regulation in scope | `attestation.contractual_provisions` | Contractual provisions with ICT providers. |
-| `Art.30(2)` | When regulation in scope | `attestation.contract_sla_audit_rights` | Contract includes service description, SLAs, right to audit. |
-| `Art.30(3)` | When regulation in scope | `attestation.exit_plan_critical_providers` | Exit plan for critical ICT providers. |
-| `Art.17(1)` | When regulation in scope | `attestation.major_incidents_to_authority` | Major ICT incidents reported to competent authority. |
-| `Art.17(2)` | When regulation in scope | `attestation.initial_notification_4h` | Initial notification within 4 hours. |
-| `Art.17(3)` | When regulation in scope | `evidence.incident_runbook_present`, `attestation.major_incidents_to_authority` | Intermediate report within 72 hours. |
-| `Art.17(4)` | When regulation in scope | `attestation.final_report_one_month` | Final report within 1 month. |
-| `Art.19` | When regulation in scope | `attestation.voluntary_cyber_threats` | Voluntary reporting of significant cyber threats. |
+| [`Art.5(1)`](#art-5-1) | When regulation in scope | `attestation.management_ict_risk_responsibility` | Management body responsible for ICT risk management. |
+| [`Art.5(2)`](#art-5-2) | When regulation in scope | `attestation.management_approves_framework` | Management body approves ICT risk management framework. |
+| [`Art.5(4)`](#art-5-4) | When regulation in scope | `attestation.risk_appetite_defined` | Management body defines risk appetite. |
+| [`Art.6(1)`](#art-6-1) | When regulation in scope | `evidence.security_report_target`, `attestation.framework_documented_reviewed` | Sound and comprehensive ICT risk management framework. |
+| [`Art.6(2)`](#art-6-2) | When regulation in scope | `attestation.framework_documented_reviewed` | ICT risk management framework documented and reviewed. |
+| [`Art.6(5)`](#art-6-5) | When regulation in scope | `attestation.framework_reviewed_annually` | ICT risk management framework reviewed annually. |
+| [`Art.7`](#art-7) | When regulation in scope | `evidence.versions_lock_present` | ICT systems and tools management. |
+| [`Art.8(1)`](#art-8-1) | When regulation in scope | `evidence.versions_lock_present` | ICT assets identified and classified. |
+| [`Art.8(2)`](#art-8-2) | When regulation in scope | `attestation.critical_information_assets_identified` | Information assets critical to important functions identified. |
+| [`Art.9(1)`](#art-9-1) | When regulation in scope | `evidence.action_schema_present`, `attestation.audit_worm_retention_set` | Data integrity, availability, authenticity protected. |
+| [`Art.9(2)`](#art-9-2) | When regulation in scope | `evidence.keycloak_realm_present`, `attestation.governor_flags_present` | Physical and logical access controls. |
+| [`Art.9(3)`](#art-9-3) | When regulation in scope | `attestation.encryption_policies` | Encryption policies where appropriate. |
+| [`Art.10(1)`](#art-10-1) | When regulation in scope | `evidence.observability_profile` | Detection mechanisms for anomalous activities. |
+| [`Art.10(2)`](#art-10-2) | When regulation in scope | `evidence.observability_profile` | Automated alert system. |
+| [`Art.11(1)`](#art-11-1) | When regulation in scope | `attestation.bcp_policy` | ICT business continuity policy. |
+| [`Art.11(2)`](#art-11-2) | When regulation in scope | `attestation.bcp_rto_rpo` | BCP with defined RTO/RPO. |
+| [`Art.11(3)`](#art-11-3) | When regulation in scope | `evidence.rollback_target_in_makefile`, `attestation.audit_verify_target` | Backup procedures and restoration. |
+| [`Art.11(4)`](#art-11-4) | When regulation in scope | `attestation.alternative_facilities` | Alternative facilities and redundant ICT. |
+| [`Art.11(6)`](#art-11-6) | When regulation in scope | `attestation.bcp_tested_annually` | BCP tested annually. |
+| [`Art.12(1)`](#art-12-1) | When regulation in scope | `evidence.incident_runbook_present` | ICT-related incident management process defined. |
+| [`Art.12(2)`](#art-12-2) | When regulation in scope | `attestation.incidents_classified` | Incidents classified. |
+| [`Art.12(3)`](#art-12-3) | When regulation in scope | `evidence.incident_runbook_present`, `attestation.major_incidents_to_authority` | Significant ICT incidents reported. |
+| [`Art.13(1)`](#art-13-1) | When regulation in scope | `evidence.audit_evidence_dir_non_empty` | Post-ICT-incident review conducted. |
+| [`Art.13(2)`](#art-13-2) | When regulation in scope | `attestation.lessons_learned_integrated` | Lessons learned integrated. |
+| [`Art.24`](#art-24) | When regulation in scope | `evidence.audit_verify_target`, `attestation.security_report_target` | General DORA resilience testing programme. |
+| [`Art.25`](#art-25) | When regulation in scope | `attestation.tlpt_programme` | Advanced testing — TLPT (significant entities). |
+| [`Art.26(3)`](#art-26-3) | When regulation in scope | `attestation.tlpt_covers_production` | TLPT scope covers production systems. |
+| [`Art.28(1)`](#art-28-1) | When regulation in scope | `attestation.third_party_risk_policy` | ICT third-party risk management policy. |
+| [`Art.28(2)`](#art-28-2) | When regulation in scope | `evidence.versions_lock_present`, `attestation.sbom_cyclonedx_present` | Due diligence on ICT third-party providers. |
+| [`Art.28(4)`](#art-28-4) | When regulation in scope | `evidence.versions_lock_present` | ICT third-party risk register maintained. |
+| [`Art.30(1)`](#art-30-1) | When regulation in scope | `attestation.contractual_provisions` | Contractual provisions with ICT providers. |
+| [`Art.30(2)`](#art-30-2) | When regulation in scope | `attestation.contract_sla_audit_rights` | Contract includes service description, SLAs, right to audit. |
+| [`Art.30(3)`](#art-30-3) | When regulation in scope | `attestation.exit_plan_critical_providers` | Exit plan for critical ICT providers. |
+| [`Art.17(1)`](#art-17-1) | When regulation in scope | `attestation.major_incidents_to_authority` | Major ICT incidents reported to competent authority. |
+| [`Art.17(2)`](#art-17-2) | When regulation in scope | `attestation.initial_notification_4h` | Initial notification within 4 hours. |
+| [`Art.17(3)`](#art-17-3) | When regulation in scope | `evidence.incident_runbook_present`, `attestation.major_incidents_to_authority` | Intermediate report within 72 hours. |
+| [`Art.17(4)`](#art-17-4) | When regulation in scope | `attestation.final_report_one_month` | Final report within 1 month. |
+| [`Art.19`](#art-19) | When regulation in scope | `attestation.voluntary_cyber_threats` | Voluntary reporting of significant cyber threats. |

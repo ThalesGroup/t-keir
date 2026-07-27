@@ -2,21 +2,21 @@
 
 | Article | Applicability gate | OPA check (evidence / attestation) | Requirement (policy message) |
 |---|---|---|---|
-| `Art.4` | When regulation in scope | `evidence.is_software` | Product includes software and AI systems. |
-| `Art.5` | When regulation in scope | `evidence.correlation_id_in_code`, `attestation.action_records_bind_versions` | Defective product — proof chain (damage/defect/causal link) supported by audit. |
-| `Art.6(1)` | When regulation in scope | `evidence.sbom_cyclonedx_present`, `attestation.trivy_report_present` | Product defectiveness criteria (inventory + vuln evidence). |
-| `Art.6(2)` | When regulation in scope | `evidence.values_secure_present` | Legitimate expectations of product safety. |
-| `Art.6(3)` | When regulation in scope | `evidence.versions_lock_present`, `attestation.changelog_present` | Defect includes software updates introducing defects. |
-| `Art.7` | When regulation in scope | `attestation.economic_operator_role_documented` | Economic operator liable (manufacturer / importer / authorised rep). |
-| `Art.8` | When regulation in scope | `attestation.rebuttable_presumptions_acknowledged` | Rebuttable presumptions of defect. |
-| `Art.9` | When regulation in scope | `evidence.audit_verify_target`, `attestation.audit_worm_retention_set` | Damage covered (including data corruption) — WORM integrity. |
-| `Art.10` | When regulation in scope | `attestation.liability_exemptions_documented` | Exemptions from liability. |
-| `Art.11(1)` | When regulation in scope | `evidence.changelog_present`, `attestation.sbom_cyclonedx_present` | Liability limited to 10 years from market placement (version history). |
-| `Art.12` | When regulation in scope | `evidence.correlation_id_in_code`, `attestation.action_records_bind_versions` | Disclosure of evidence — manufacturer must disclose relevant data. |
-| `Art.13` | When regulation in scope | `attestation.court_disclosure_process` | Court power to order disclosure — process documented. |
-| `Art.14` | When regulation in scope | `evidence.audit_worm_retention_days` | Relevant evidence preserved (retention ≥ 3650 days). |
-| `Art.15` | When regulation in scope | `evidence.audit_evidence_dir_non_empty` | Burden of proof (rebuttable presumption where evidence withheld). |
-| `Art.16` | When regulation in scope | `evidence.audit_worm_retention_days` | Limitation period — 3 years from awareness of damage (retention sufficient). |
-| `Art.17` | When regulation in scope | `evidence.versions_lock_present` | Long-stop period — 10 years from market placement (version history). |
-| `Art.18` | When regulation in scope | `attestation.right_to_full_compensation` | Right to full compensation. |
-| `Art.22` | When regulation in scope | `attestation.contractual_exclusions_prohibited` | Contractual exclusions prohibited. |
+| [`Art.4`](#art-4) | When regulation in scope | `evidence.is_software` | Product includes software and AI systems. |
+| [`Art.5`](#art-5) | When regulation in scope | `evidence.correlation_id_in_code`, `attestation.action_records_bind_versions` | Defective product — proof chain (damage/defect/causal link) supported by audit. |
+| [`Art.6(1)`](#art-6-1) | When regulation in scope | `evidence.sbom_cyclonedx_present`, `attestation.trivy_report_present` | Product defectiveness criteria (inventory + vuln evidence). |
+| [`Art.6(2)`](#art-6-2) | When regulation in scope | `evidence.values_secure_present` | Legitimate expectations of product safety. |
+| [`Art.6(3)`](#art-6-3) | When regulation in scope | `evidence.versions_lock_present`, `attestation.changelog_present` | Defect includes software updates introducing defects. |
+| [`Art.7`](#art-7) | When regulation in scope | `attestation.economic_operator_role_documented` | Economic operator liable (manufacturer / importer / authorised rep). |
+| [`Art.8`](#art-8) | When regulation in scope | `attestation.rebuttable_presumptions_acknowledged` | Rebuttable presumptions of defect. |
+| [`Art.9`](#art-9) | When regulation in scope | `evidence.audit_verify_target`, `attestation.audit_worm_retention_set` | Damage covered (including data corruption) — WORM integrity. |
+| [`Art.10`](#art-10) | When regulation in scope | `attestation.liability_exemptions_documented` | Exemptions from liability. |
+| [`Art.11(1)`](#art-11-1) | When regulation in scope | `evidence.changelog_present`, `attestation.sbom_cyclonedx_present` | Liability limited to 10 years from market placement (version history). |
+| [`Art.12`](#art-12) | When regulation in scope | `evidence.correlation_id_in_code`, `attestation.action_records_bind_versions` | Disclosure of evidence — manufacturer must disclose relevant data. |
+| [`Art.13`](#art-13) | When regulation in scope | `attestation.court_disclosure_process` | Court power to order disclosure — process documented. |
+| [`Art.14`](#art-14) | When regulation in scope | `evidence.audit_worm_retention_days` | Relevant evidence preserved (retention ≥ 3650 days). |
+| [`Art.15`](#art-15) | When regulation in scope | `evidence.audit_evidence_dir_non_empty` | Burden of proof (rebuttable presumption where evidence withheld). |
+| [`Art.16`](#art-16) | When regulation in scope | `evidence.audit_worm_retention_days` | Limitation period — 3 years from awareness of damage (retention sufficient). |
+| [`Art.17`](#art-17) | When regulation in scope | `evidence.versions_lock_present` | Long-stop period — 10 years from market placement (version history). |
+| [`Art.18`](#art-18) | When regulation in scope | `attestation.right_to_full_compensation` | Right to full compensation. |
+| [`Art.22`](#art-22) | When regulation in scope | `attestation.contractual_exclusions_prohibited` | Contractual exclusions prohibited. |

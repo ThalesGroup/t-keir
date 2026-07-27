@@ -27,6 +27,13 @@
 
 --8<-- "./docs/compliance/generated/pld_articles.md"
 
+## Exact legal text (EUR-Lex)
+
+Official English excerpts for each catalogue citation. Links in the table above
+jump here.
+
+--8<-- "./docs/compliance/generated/pld_article_texts.md"
+
 ## Latest audit results
 
 --8<-- "./docs/compliance/generated/pld_results.md"

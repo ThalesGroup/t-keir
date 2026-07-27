@@ -40,6 +40,13 @@ id; the gate column states when the article is mandatory vs `NOT_MANDATORY`.
 
 --8<-- "./docs/compliance/generated/ai_act_articles.md"
 
+## Exact legal text (EUR-Lex)
+
+Official English excerpts for each catalogue citation (paragraph / point when
+available). Links in the tables above jump here.
+
+--8<-- "./docs/compliance/generated/ai_act_article_texts.md"
+
 ## Latest audit results
 
 Full outcomes from the last `make audit-compliance` / `make ci` run (also on

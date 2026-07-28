@@ -1,8 +1,0 @@
-logger:
-  logging-level: error
-tokenizers:
-  segmenters:
-  - language: en
-    resources-base-path: /Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en
-    normalization-rules: tokenizer-rules.json
-    annotation-resources-reference: annotation-resources.json

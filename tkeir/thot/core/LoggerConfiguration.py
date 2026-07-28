@@ -1,55 +1,37 @@
-"""Title: Logger configuration
-
+# -*- coding: utf-8 -*-
+"""Logger configuration
 define logger configuration
 
-Author: Eric Blaudez
+Author: Eric Blaudez (Eric Blaudez)
 
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
 
 import logging
-
+import traceback
+import json
+import os
+import errno
 from thot.core.CommonConfiguration import CommonConfiguration
-from thot.core.ConfigurationUtils import load_configuration
 
 
 class LoggerConfiguration:
-    """Load and store logger configuration from JSON sources.
-
-    Example of logger entry:
-
+    """load logger configuration
+    Example of logger entry
     "logger": {
         "logging-level": "debug"
     }
-
-    Logger should be at top level.
+    Logger should be at top level
     """
 
     def __init__(self):
-        """Initialize class variables.
-
-        Example:
-            >>> from thot.core.LoggerConfiguration import LoggerConfiguration
-            >>> config = LoggerConfiguration()
-            >>> config.logger_name
-            'default'
-            >>> config.configuration is None
-            True
-        """
+        """Initialize class variables"""
         self.logger_name = "default"
         self.configuration = None
 
     def _default_load(self):
-        """Create default logger settings when configuration is incomplete.
-
-        Example:
-            >>> from thot.core.LoggerConfiguration import LoggerConfiguration
-            >>> config = LoggerConfiguration()
-            >>> config._default_load()
-            >>> config.configuration["logger"]["logging-level"]
-            'debug'
-        """
+        """create logger"""
         if (not self.configuration) or ("logger" not in self.configuration):
             logging.warning("Create default logger")
             self.configuration = {"logger": dict()}
@@ -57,61 +39,30 @@ class LoggerConfiguration:
         if "logging-level" not in self.configuration["logger"]:
             self.configuration["logger"]["logging-level"] = "debug"
 
-    def load(self, config_f, logger_name: str = "default", path: list = []):
-        """Load logger configuration from a JSON file.
+    def load(self, config_f , logger_name: str = "default", path: list = []):
+        """Load logger configuration from file
 
         Args:
-            config_f: File-like object containing configuration JSON.
-            logger_name: Logger name displayed in log lines.
-            path: Optional configuration path prefix.
-
-        Example:
-            >>> from io import StringIO
-            >>> import json
-            >>> from thot.core.LoggerConfiguration import LoggerConfiguration
-            >>> config = LoggerConfiguration()
-            >>> config.load(
-            ...     StringIO(json.dumps({"logger": {"logging-level": "info"}}))
-            ... )
-            >>> config.configuration["logger"]["logging-level"]
-            'info'
+            config_f (mandatory): configruation with file handler.
+            logger_name (str,optional) : name of the logger (display in log line). Defaults to default
+            path (list,option): access to a part of the configuration
         """
-        self.configuration = CommonConfiguration.go_to_configuration_field(
-            load_configuration(config_f), path
-        )
+        self.configuration = CommonConfiguration.go_to_configuration_field(json.load(config_f), path)
         self.logger_name = logger_name
         self._default_load()
 
     def loads(self, configuration: dict = None, logger_name: str = "default"):
-        """Load logger configuration from a dictionary.
+        """Load logger configuration from dict (json)
 
         Args:
-            configuration: Logger configuration dictionary.
-            logger_name: Logger name displayed in log lines.
-
-        Example:
-            >>> from thot.core.LoggerConfiguration import LoggerConfiguration
-            >>> config = LoggerConfiguration()
-            >>> config.loads({"logger": {"logging-level": "warning"}})
-            >>> config.configuration["logger"]["logging-level"]
-            'warning'
+            configuration (dict, optional): load logger configruation with dict. Defaults to None.
+            logger_name (str,optional) : name of the logger (display in log line). Defaults to default
         """
         self.logger_name = logger_name
         self.configuration = configuration
         self._default_load()
 
     def clear(self):
-        """Clear logger configuration and reset the logger name.
-
-        Example:
-            >>> from thot.core.LoggerConfiguration import LoggerConfiguration
-            >>> config = LoggerConfiguration()
-            >>> config.loads({"logger": {"logging-level": "debug"}})
-            >>> config.clear()
-            >>> config.logger_name
-            'default'
-            >>> config.configuration is None
-            True
-        """
+        """clear logger configuration"""
         self.logger_name = "default"
         self.configuration = None

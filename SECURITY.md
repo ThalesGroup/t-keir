@@ -1,83 +1,45 @@
+Describe here all the security policies in place on this repository to help your contributors to handle security issues efficiently.
+
+## Goods practices to follow
+
+:warning:**You must never store credentials information into source code or config file in a GitHub repository** 
+- Block sensitive data being pushed to GitHub by git-secrets or its likes as a git pre-commit hook
+- Audit for slipped secrets with dedicated tools
+- Use environment variables for secrets in CI/CD (e.g. GitHub Secrets) and secret managers in production
+
 # Security Policy
 
-T-KEIR ships as a local toolkit, optional HTTP services, and progressive
-deployment profiles. This file explains how to report vulnerabilities and what
-security controls are already part of the repository.
+## Supported Versions
 
-For platform controls and engineering details, see:
+Use this section to tell people about which versions of your project are currently being supported with security updates.
 
-- [`docs/security.md`](docs/security.md)
-- [`docs/deployment/index.md`](docs/deployment/index.md)
-- [`docs/compliance/index.md`](docs/compliance/index.md)
+| Version | Supported          |
+| ------- | ------------------ |
+| 5.1.x   | :white_check_mark: |
+| 5.0.x   | :x:                |
+| 4.0.x   | :white_check_mark: |
+| < 4.0   | :x:                |
 
-## Supported versions
+## Reporting a Vulnerability
 
-Security fixes are applied to the current active major line.
+Use this section to tell people how to report a vulnerability.
+Tell them where to go, how often they can expect to get an update on a reported vulnerability, what to expect if the vulnerability is accepted or declined, etc.
 
-| Version | Supported |
-|---------|-----------|
-| 2.0.x   | ✅ |
-| < 2.0   | ❌ |
+You can ask for support by contacting security@opensource.thalesgroup.com
 
-## Reporting a vulnerability
+## Disclosure policy
 
-Please do not open a public GitHub issue for suspected security problems.
+Define the procedure for what a reporter who finds a security issue needs to do in order to fully disclose the problem safely, including who to contact and how.
 
-Report vulnerabilities to: `security@opensource.thalesgroup.com`
+## Security Update policy
 
-When possible, include:
+Define how you intend to update users about new security vulnerabilities as they are found.
 
-- affected version, commit, or image tag
-- deployment profile (`P0`, `compose`, `k8s-dev`, `k8s-secure`, `platform`)
-- reproduction steps or proof of concept
-- impact assessment and any suggested mitigation
+## Security related configuration.
 
-## Disclosure process
+Settings users should consider that would impact the security posture of deploying this project, such as HTTPS, authorization and many others.
 
-The project follows coordinated disclosure:
+## Known security gaps & future enhancements.
 
-1. Acknowledge receipt of the report as quickly as possible.
-2. Validate impact and scope.
-3. Prepare a fix or mitigation.
-4. Coordinate disclosure timing with the reporter when the issue is confirmed.
-
-If a report is rejected, the maintainer response should explain whether the
-finding is out of scope, not reproducible, or already mitigated elsewhere.
-
-## Repository security controls
-
-Current repository and CI controls include:
-
-- lockfile verification via `make verify-lockfile`
-- secret hygiene via `make check-secrets` (tracked `.env` guard + pattern scan)
-- Python dependency audit via `make pip-audit`
-- Trivy filesystem/config scan via `make trivy`
-- OWASP Dependency-Check via `make owasp-dependency-check`
-- SBOM / AIBOM generation via `make bom`
-- license review via `make liccheck`
-- complexity gates via `make complexity`
-- GitHub Actions validation for Python, HMI, Helm, and security scans
-- pre-commit / pre-push hooks for YAML/JSON hygiene and local quality gates
-
-## Deployment guidance
-
-For stronger security posture outside P0 local development:
-
-- enable OIDC / Keycloak in Compose or Kubernetes profiles
-- prefer `governor.mode=enforce` for controlled environments
-- enable the audit store for attributable actions
-- keep `.env` files out of git and use secret managers in CI/CD and production
-- prefer local or in-cluster inference when data egress is restricted
-
-## Known gaps and future work
-
-The current repository does **not** claim full compliance or full production
-hardening by default. Notable remaining gaps include:
-
-- Full-mesh SPIFFE for non-agent services (agents use SPIRE — ADR-0008)
-- full NetworkPolicy allow-listing for every service path
-- deeper rollback automation for index mutations
-- regulation-specific compliance evidence packs under `docs/compliance/`
-
-These are tracked as later workstreams rather than treated as default
-requirements for software development.
+Security improvements you haven’t gotten to yet.
+Inform users those security controls aren’t in place, and perhaps suggest they contribute an implementation

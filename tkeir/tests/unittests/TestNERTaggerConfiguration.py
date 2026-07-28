@@ -1,70 +1,103 @@
-"""Title: NERTagger Configuration
+# -*- coding: utf-8 -*-
+"""Convert source document to tkeir indexer document
+Author: Eric Blaudez (Eric Blaudez)
 
-Test NER tagger configuration.
-
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2020 by THALES
 """
 
-import json
-import os
-import unittest
-
 from thot.tasks.ner.NERTaggerConfiguration import NERTaggerConfiguration
+import unittest
+import json
 
 
 class TestNERTaggerConfiguration(unittest.TestCase):
+
     test_dict = {
         "logger": {"logging-level": "debug"},
         "named-entities": {
             "label": [
                 {
                     "language": "en",
-                    "resources-base-path": (
-                        "/home/tkeir_svc/tkeir/thot/tests/data"
-                    ),
+                    "resources-base-path": "/home/tkeir_svc/tkeir/thot/tests/data",
                     "mwe": "tkeir_mwe.pkl",
                     "use-pre-label": True,
                 }
             ],
+            "network": {
+                "host": "0.0.0.0",
+                "port": 8080,
+                "associate-environment": {"host": "HOST_ENVNAME", "port": "PORT_ENVNAME"},
+            },
+            "runtime": {
+                "request-max-size": 100000000,
+                "request-buffer-queue-size": 100,
+                "keep-alive": True,
+                "keep-alive-timeout": 5,
+                "graceful-shutown-timeout": 15.0,
+                "request-timeout": 60,
+                "response-timeout": 60,
+                "workers": 1,
+            },
+            "serialize": {
+                "input": {"path": "/tmp", "keep-service-info": True},
+                "output": {"path": "/tmp", "keep-service-info": True},
+            },
         },
     }
 
     def test_load(self):
-        with open("/tmp/cfg.json", "w", encoding="utf-8") as handle:
-            json.dump(self.test_dict, handle)
-        with open("/tmp/cfg.json", encoding="utf-8") as handle:
-            config = NERTaggerConfiguration()
-            config.load(handle)
+        try:
+            with open("/tmp/cfg.json", "w") as f:
+                json.dump(TestNERTaggerConfiguration.test_dict, f)
+                f.close()
+        except Exception as e:
+            self.assertFalse(True)
+        fh = open("/tmp/cfg.json")
+        namedEntityConfig = NERTaggerConfiguration()
+        namedEntityConfig.load(fh)
+        fh.close()
+
         self.assertEqual(
-            config.logger_config.configuration["logger"],
-            self.test_dict["logger"],
+            namedEntityConfig.logger_config.configuration["logger"], TestNERTaggerConfiguration.test_dict["logger"]
         )
         self.assertEqual(
-            config.configuration["label"],
-            self.test_dict["named-entities"]["label"],
+            namedEntityConfig.net_config.configuration["network"],
+            TestNERTaggerConfiguration.test_dict["named-entities"]["network"],
         )
-        if os.path.isfile("/tmp/cfg.json"):
-            os.remove("/tmp/cfg.json")
+        TestNERTaggerConfiguration.test_dict["named-entities"]["serialize"]["do-serialization"] = True
+        self.assertEqual(
+            namedEntityConfig.runtime_config.configuration["runtime"],
+            TestNERTaggerConfiguration.test_dict["named-entities"]["runtime"],
+        )
+        self.assertEqual(
+            namedEntityConfig.configuration["label"], TestNERTaggerConfiguration.test_dict["named-entities"]["label"]
+        )
 
     def test_loads(self):
-        config = NERTaggerConfiguration()
-        config.loads(self.test_dict)
+        namedEntityConfig = NERTaggerConfiguration()
+        namedEntityConfig.loads(TestNERTaggerConfiguration.test_dict)
         self.assertEqual(
-            config.logger_config.configuration["logger"],
-            self.test_dict["logger"],
+            namedEntityConfig.logger_config.configuration["logger"], TestNERTaggerConfiguration.test_dict["logger"]
         )
         self.assertEqual(
-            config.configuration["label"],
-            self.test_dict["named-entities"]["label"],
+            namedEntityConfig.net_config.configuration["network"],
+            TestNERTaggerConfiguration.test_dict["named-entities"]["network"],
+        )
+        TestNERTaggerConfiguration.test_dict["named-entities"]["serialize"]["do-serialization"] = True
+        self.assertEqual(
+            namedEntityConfig.runtime_config.configuration["runtime"],
+            TestNERTaggerConfiguration.test_dict["named-entities"]["runtime"],
+        )
+        self.assertEqual(
+            namedEntityConfig.configuration["label"], TestNERTaggerConfiguration.test_dict["named-entities"]["label"]
         )
 
     def test_clear(self):
-        config = NERTaggerConfiguration()
-        config.loads(self.test_dict)
-        config.clear()
-        self.assertEqual(config.logger_config.logger_name, "default")
-        self.assertEqual(config.logger_config.configuration, None)
-        self.assertEqual(config.configuration, dict())
+        namedEntityConfig = NERTaggerConfiguration()
+        namedEntityConfig.loads(TestNERTaggerConfiguration.test_dict)
+        namedEntityConfig.clear()
+        self.assertEqual(namedEntityConfig.logger_config.logger_name, "default")
+        self.assertEqual(namedEntityConfig.logger_config.configuration, None)
+        self.assertEqual(namedEntityConfig.net_config.configuration, None)
+        self.assertEqual(namedEntityConfig.runtime_config.configuration, None)
+        self.assertEqual(namedEntityConfig.configuration, dict())

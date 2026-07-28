@@ -1,15 +1,16 @@
-"""Title: Synatctic tagger configuration
+# -*- coding: utf-8 -*-
+"""Synatctic tagger configuration
+Author : Eric Blaudez (Eric Blaudez)
 
-Syntactic tagging and SVO triple extraction.
-
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
 
-from thot.core.ConfigurationUtils import load_configuration
+import json
+
 from thot.core.LoggerConfiguration import LoggerConfiguration
+from thot.core.NetworkConfiguration import NetworkConfiguration
+from thot.core.RuntimeConfiguration import RuntimeConfiguration
 
 
 class SyntacticTaggerConfiguration:
@@ -26,21 +27,34 @@ class SyntacticTaggerConfiguration:
             "language":"en",
             "resources-base-path":"/home/tkeir_svc/tkeir/thot/tests/data",
             "syntactic-rules": "syntactic-rules.json"
-        }]
+        }],
+        "network": {
+            "host":"0.0.0.0",
+            "port":8080,
+            "associate-environment": {
+                "host":"HOST_ENVNAME",
+                "port":"PORT_ENVNAME"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1
+        }
 
     }
     }
     """
 
     def __init__(self):
-        """Initialize the instance.
-
-        Example:
-            >>> cfg = SyntacticTaggerConfiguration()
-            >>> cfg.configuration
-            {}
-        """
         self.logger_config = LoggerConfiguration()
+        self.net_config = NetworkConfiguration()
+        self.runtime_config = RuntimeConfiguration()
         # Fill on tokenizer empty
         self.configuration = dict()
 
@@ -50,45 +64,27 @@ class SyntacticTaggerConfiguration:
         Args:
             config_f (str, optional): load configruation with file handler. Defaults to None.
             path (list,option): access to a part of the configuration
-
-                Example:
-                    >>> callable(SyntacticTaggerConfiguration().load)
-                    True
         """
-        json_config = load_configuration(config_f)
+        json_config = json.load(config_f)
         self.loads(json_config)
 
-    def loads(self, configuration: dict | None = None):
+    def loads(self, configuration: dict = None):
         """Load logger configuration from dict (json)
 
         Args:
             configuration (dict, optional): load logger configruation with dict. Defaults to None.
-
-                Example:
-                    >>> cfg = SyntacticTaggerConfiguration()
-                    >>> cfg.loads({'logger': {}, 'syntax': {'taggers': [{'language': 'en'}]}})
-                    >>> 'taggers' in cfg.configuration
-                    True
         """
-        if configuration is None:
-            raise ValueError("configuration is required")
         self.logger_config.loads(configuration, logger_name="syntax")
+        self.net_config.loads(configuration["syntax"])
+        self.runtime_config.loads(configuration["syntax"])
         if "taggers" in configuration["syntax"]:
             self.configuration["taggers"] = configuration["syntax"]["taggers"]
         else:
-            raise ValueError(
-                "taggers are mandatory in morphosyntactic tagger configuration"
-            )
+            raise ValueError("taggers are mandatory in morphosyntactic tagger configuration")
 
     def clear(self):
-        """clear logger configuration
-
-        Example:
-            >>> cfg = SyntacticTaggerConfiguration()
-            >>> cfg.loads({'logger': {}, 'syntax': {'taggers': [{'language': 'en'}]}})
-            >>> cfg.clear()
-            >>> cfg.configuration
-            {}
-        """
+        """clear logger configuration"""
         self.logger_config.clear()
+        self.net_config.clear()
+        self.runtime_config.clear()
         self.configuration = dict()

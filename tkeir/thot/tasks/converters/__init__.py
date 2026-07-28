@@ -1,15 +1,14 @@
-"""Title: Package initialization
+# -*- coding: utf-8 -*-
+"""Package initialization
 
-Document conversion into T-KEIR JSON.
+Author: Eric Blaudez (Eric Blaudez)
 
-Author: Eric Blaudez
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
 """
-
-import os
 import sys
+import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "../../../")))
@@ -19,5 +18,5 @@ sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "./")))
 
 
 # Converter service
-__version_converter__ = "2.0.0"
+__version_converter__ = "1.0.3"
 __date_converter__ = "2022/09"

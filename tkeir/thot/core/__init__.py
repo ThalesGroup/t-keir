@@ -1,15 +1,13 @@
-"""Title: Package initialization
+# -*- coding: utf-8 -*-
+"""Package initialization
 
-Core T-KEIR libraries (logging, config, paths, utilities).
+Author: Eric Blaudez (Eric Blaudez)
 
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
-
-import os
 import sys
+import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "../../../")))

@@ -1,8 +1,0 @@
-logger:
-  logging-level: error
-keywords:
-  extractors:
-  - language: en
-    prunning: 10
-    resources-base-path: /Users/blaudez/workspace/t-keir/tkeir/resources/modeling/tokenizer/en
-    keywords-rules: tokenizer-rules.json

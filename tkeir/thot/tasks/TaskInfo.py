@@ -1,11 +1,8 @@
-"""Title: Task information
+"""Task information
+Author : Eric Blaudez (Eric Blaudez)
 
-T-KEIR core package module.
-
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
 
 import os
@@ -13,74 +10,28 @@ import socket
 import time
 
 
-def _hostname() -> str:
-    """Return the current host name for task metadata.
-
-    Example:
-        >>> isinstance(_hostname(), str)
-        True
-    """
-    return socket.gethostname()
-
-
-def _host_address() -> str:
-    """Return a resolvable host address for task metadata.
-
-    Example:
-        >>> _host_address().count(".") == 3
-        True
-    """
-    hostname = _hostname()
-    for candidate in (hostname, "localhost"):
-        try:
-            return socket.gethostbyname(candidate)
-        except OSError:
-            continue
-    return "127.0.0.1"
-
-
 class TaskInfo:
     def __init__(self, task_name=None, task_version=None, task_date=None):
-        """Create task metadata helper.
-
+        """ Create task info 
         Args:
-            task_name: Logical task name.
-            task_version: Task version string.
-            task_date: Task release date string.
-
-        Example:
-            >>> info = TaskInfo("converter", "1.0", "2026-01-01")
-            >>> info._name
-            'converter'
+        - task_name is the name of the task
+        - task_version is the version of the task
+        - task_date is the date of task run
         """
         self._version = task_version
         self._date = task_date
         self._name = task_name
 
     def addInfo(self, tkeir_doc):
-        """Append task execution metadata to a T-KEIR document.
-
-        Args:
-            tkeir_doc: Document dict to enrich.
-
-        Returns:
-            The same document with a ``tasks-info`` entry appended.
-
-        Example:
-            >>> doc = TaskInfo("converter", "1.0", "2026-01-01").addInfo({})
-            >>> doc["tasks-info"][-1]["task-name"]
-            'converter'
-        """
+        """ Add task information into tkeir_doc """
         if "tasks-info" not in tkeir_doc:
             tkeir_doc["tasks-info"] = []
         tkeir_doc["tasks-info"].append(
             {
                 "os": list(os.uname()),
-                "hostname": _hostname(),
-                "host": _host_address(),
-                "execution-date": time.strftime(
-                    "%b %d %Y %H:%M:%S", time.gmtime()
-                ),
+                "hostname": socket.gethostname(),
+                "host": socket.gethostbyname(socket.gethostname()),
+                "execution-date": time.strftime("%b %d %Y %H:%M:%S", time.gmtime()),
                 "task-version": self._version,
                 "task-development-date": self._date,
                 "task-name": self._name,

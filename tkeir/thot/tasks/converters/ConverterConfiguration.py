@@ -1,89 +1,98 @@
-"""Title: Converter Configuration
+# -*- coding: utf-8 -*-
+"""Converter documentation
 
-Converter configuration.
+Author: Eric Blaudez (Eric Blaudez)
 
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
 
-from thot.core.ConfigurationUtils import load_configuration
+import json
+
 from thot.core.LoggerConfiguration import LoggerConfiguration
+from thot.core.NetworkConfiguration import NetworkConfiguration
+from thot.core.RuntimeConfiguration import RuntimeConfiguration
+from thot.core.CommonConfiguration import CommonConfiguration
 
 
 class ConverterConfiguration:
-    def __init__(self):
-        """Initialize empty converter configuration holders.
+    """load network configuration
+    A converter configuration is represented by JSON entry:
 
-        Example:
-            >>> cfg = ConverterConfiguration()
-            >>> cfg.configuration
-            {}
-        """
+    Example
+     "logger": {
+                            "logging-level": 'debug'
+                        },
+    "converter": {
+        "network": {
+            "host":"0.0.0.0",
+            "port":"8080",
+            "associate-environment": {
+                "host":"HOST_ENVNAME",
+                "port":"PORT_ENVNAME"
+            }
+        },
+        "runtime":{
+            "request-max-size":100000000,
+            "request-buffer-queue-size":100,
+            "keep-alive":true,
+            "keep-alive-timeout":5,
+            "graceful-shutown-timeout":15.0,
+            "request-timeout":60,
+            "response-timeout":60,
+            "workers":1,
+            "associate-environment": {
+                "request-max-size":ENV1,
+                "request-buffer-queue-size":ENV2,
+                "keep-alive":ENV3,
+                "keep-alive-timeout":ENV4,
+                "graceful-shutown-timeout":ENV5,
+                "request-timout":ENV6,
+                "response-timeout":ENV7,
+                "workers":ENV8,
+            }
+        }
+    }
+
+    """
+
+    def __init__(self):
         self.logger_config = LoggerConfiguration()
+        self.net_config = NetworkConfiguration()
+        self.runtime_config = RuntimeConfiguration()
         self.configuration = {}
 
     def load(self, config_f=None, path: list = []):
-        """Load converter configuration from a YAML/JSON file handle.
+        """Load logger configuration from file
 
         Args:
-            config_f: Open file-like object containing YAML or JSON.
-            path: Unused legacy parameter kept for API compatibility.
-
-        Example:
-            >>> cfg = ConverterConfiguration()
-            >>> isinstance(cfg.load, type(cfg.loads))
-            True
+            config_f (str, optional): load configruation with file handler. Defaults to None.
+            path (list,option): access to a part of the configuration
         """
-        self.loads(load_configuration(config_f))
+        json_config = json.load(config_f)
+        self.loads(json_config)
 
-    def loads(self, configuration: dict | None = None):
-        """Load converter configuration from a dictionary.
+    def loads(self, configuration: dict = None):
+        """Load logger configuration from dict (json)
 
         Args:
-            configuration: Parsed converter JSON configuration.
-
-        Raises:
-            ValueError: When configuration is missing.
-
-        Example:
-            >>> cfg = ConverterConfiguration()
-            >>> cfg.loads({"logger": {}, "converter": {"settings": {}}})
-            >>> cfg.configuration["settings"]["ocr"]["enabled"]
-            False
+            configuration (dict, optional): load logger configruation with dict. Defaults to None.
         """
-        if not configuration:
-            raise ValueError("Converter configuration is mandatory")
         self.logger_config.loads(configuration, logger_name="converter")
-        settings = configuration["converter"].get("settings", {})
-        output = settings.get("output", {})
-        ocr = settings.get("ocr", {})
-        configuration["converter"]["settings"] = {
-            "output": {"zip": output.get("zip", False)},
-            "ocr": {
-                "enabled": ocr.get("enabled", False),
-                "mode": ocr.get("mode", "tesseract"),
-                "min-image-pixels": ocr.get("min-image-pixels", 10000),
-                "min-page-text-chars": ocr.get("min-page-text-chars", 40),
-                "render-dpi": ocr.get("render-dpi", 200),
-                "llm-model": ocr.get("llm-model"),
-                "llm-base-url": ocr.get("llm-base-url"),
-                "llm-api-key": ocr.get("llm-api-key"),
-                "llm-prompt": ocr.get("llm-prompt"),
-            },
-        }
+        self.net_config.loads(configuration["converter"])
+        self.runtime_config.loads(configuration["converter"])
+        if "settings" in configuration["converter"]:
+            if "tika" in configuration["converter"]["settings"]:
+                CommonConfiguration.affect_associated_environment(configuration["converter"]["settings"]["tika"])
+            else:
+                configuration["converter"]["settings"]["tika"]["host"] = None
+                configuration["converter"]["settings"]["tika"]["port"] = None
+        else:
+            configuration["converter"]["settings"] = {"tika": {"host": None, "port": None}, "zip": False}
         self.configuration = configuration["converter"]
 
     def clear(self):
-        """Reset logger and converter configuration state.
-
-        Example:
-            >>> cfg = ConverterConfiguration()
-            >>> cfg.loads({"logger": {}, "converter": {"settings": {}}})
-            >>> cfg.clear()
-            >>> cfg.configuration
-            {}
-        """
+        """clear logger configuration"""
         self.logger_config.clear()
-        self.configuration = {}
+        self.net_config.clear()
+        self.runtime_config.clear()

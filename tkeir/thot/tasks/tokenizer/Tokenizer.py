@@ -1,130 +1,79 @@
-"""Title: Tokenizer
+"""Tokenizer
 
-Tokenization and MWE handling for T-KEIR documents.
+Author : Eric Blaudez (Eric Blaudez)
 
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
-
-import gc
-import json
-import os
-import pickle
-import re
-import string
-import time
 import traceback
-
+import string
+import pickle
+import os
+import re
+import time
 import spacy
-from spacy.language import Language
-from spacy.tokens import Doc, Token
-from spacy.util import (
-    compile_infix_regex,
-    compile_prefix_regex,
-    compile_suffix_regex,
-)
+import nltk
+from thot.core.DictionaryTrie import make_trie, prefix_trie, end_trie
 
-from thot.core.Constants import exception_error_and_trace
-from thot.core.DictionaryTrie import Trie, end_trie, make_trie, prefix_trie
-from thot.core.SentenceSegmenter import SentenceSegmenter
-from thot.core.SpacyModelLoader import load_spacy_model
+import json
+import gc
+
+from spacy.language import Language
+from spacy.util import compile_infix_regex, compile_suffix_regex, compile_prefix_regex
+from spacy.tokens import Doc, Token
+
+from thot.core.DictionaryTrie import Trie
 from thot.core.ThotLogger import ThotLogger
-from thot.tasks.TaskInfo import TaskInfo
-from thot.tasks.tokenizer import __date_tokenizer__, __version_tokenizer__
+from thot.core.Constants import exception_error_and_trace
 from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
+
+from thot.tasks.tokenizer import __version_tokenizer__, __date_tokenizer__
+from thot.tasks.TaskInfo import TaskInfo
 
 
 class SpacyTokenizerPipe:
-    def __init__(
-        self, nlp: Doc = None, config: dict = None, call_context=None
-    ):
-        """Initialize the instance.
-
-        Example:
-            >>> callable(SpacyTokenizerPipe)
-            True
-        """
+    def __init__(self, nlp: Doc = None, config: dict = None, call_context=None):
         if not config:
-            raise ValueError(
-                "Spacy Tokenizer module needs tokenizer configuration"
-            )
+            raise ValueError("Spacy Tokenizer module needs tokenizer configuration")
         self._mwes = None
         self._normalizer = dict()
         self._typos = dict()
         self._nlp = nlp
-        segmenter = config["segmenters"][0]
-        mwe_file = segmenter.get("mwe")
-        if mwe_file:
-            try:
-                mwefile = os.path.join(
-                    segmenter["resources-base-path"],
-                    mwe_file,
-                )
-                ThotLogger.info(
-                    "Load tokenizer:" + mwefile, context=call_context
-                )
-                with open(mwefile, "rb") as pattern_f:
-                    self._mwes = pickle.load(pattern_f)
-                    self._punctuation_words = make_trie(
-                        set(self._mwes["punctuated-words"])
-                    )
-                    self._mwes["punctuated-words"] = None
-                    gc.collect()
-            except Exception as e:
-                ThotLogger.warning(
-                    "Exception occured",
-                    trace=exception_error_and_trace(
-                        str(e), str(traceback.format_exc())
-                    ),
-                    context=call_context,
-                )
+        try:
+            mwefile = os.path.join(config["segmenters"][0]["resources-base-path"], config["segmenters"][0]["mwe"])
+            ThotLogger.info("Load tokenizer:" + mwefile, context=call_context)
+            with open(mwefile, "rb") as pattern_f:
+                self._mwes = pickle.load(pattern_f)
+                self._punctuation_words = make_trie(set(self._mwes["punctuated-words"]))
+                self._mwes["punctuated-words"] = None
+                gc.collect()
+        except Exception as e:
+            ThotLogger.warning(
+                "Exception occured", trace=exception_error_and_trace(str(e), str(traceback.format_exc())), context=call_context
+            )
         try:
             if "normalization-rules" in config["segmenters"][0]:
                 nfile = os.path.join(
-                    config["segmenters"][0]["resources-base-path"],
-                    config["segmenters"][0]["normalization-rules"],
+                    config["segmenters"][0]["resources-base-path"], config["segmenters"][0]["normalization-rules"]
                 )
                 with open(nfile) as norm_f:
                     norm_json = json.load(norm_f)
                     norm_f.close()
                     if "normalization" in norm_json:
                         if "word-mapping" in norm_json["normalization"]:
-                            for norm_mapper_i in norm_json["normalization"][
-                                "word-mapping"
-                            ]:
-                                self._normalizer[
-                                    norm_mapper_i["from"].lower()
-                                ] = norm_mapper_i["to"].lower()
+                            for norm_mapper_i in norm_json["normalization"]["word-mapping"]:
+                                self._normalizer[norm_mapper_i["from"].lower()] = norm_mapper_i["to"].lower()
                         if "typos" in norm_json["normalization"]:
-                            for typos_mapper_i in norm_json["normalization"][
-                                "typos"
-                            ]:
-                                self._typos[
-                                    typos_mapper_i["misspelling"].lower()
-                                ] = typos_mapper_i["correct"].lower()
+                            for typos_mapper_i in norm_json["normalization"]["typos"]:
+                                self._typos[typos_mapper_i["misspelling"].lower()] = typos_mapper_i["correct"].lower()
 
-                ThotLogger.info(
-                    "Load normalization tokenizer:" + nfile,
-                    context=call_context,
-                )
+                ThotLogger.info("Load normalization tokenizer:" + nfile, context=call_context)
         except Exception as e:
             ThotLogger.warning(
-                "Exception occured.",
-                trace=exception_error_and_trace(
-                    str(e), str(traceback.format_exc())
-                ),
-                context=call_context,
+                "Exception occured.", trace=exception_error_and_trace(str(e), str(traceback.format_exc())), context=call_context
             )
 
     def _normalize_word(self, word):
-        """Normalize word helper.
-
-        Example:
-            >>> callable(SpacyTokenizerPipe._normalize_word)
-            True
-        """
         if word.lower() in self._typos:
             normalized_word = self._typos[word.lower()]
             if word.isupper():
@@ -142,170 +91,6 @@ class SpacyTokenizerPipe:
             word = normalized_word
         return word
 
-    def _collect_punctuated_compound(
-        self, doc, token_i, word, max_word_length
-    ):
-        wtrie = prefix_trie(self._punctuation_words, word.lower())
-        current_pos = token_i + 1
-        current_word = word
-        compound_table = []
-        doc_len = len(doc)
-        while (
-            wtrie
-            and (len(current_word) < max_word_length)
-            and (current_pos < doc_len)
-        ):
-            if end_trie(wtrie):
-                compound_table.append(current_pos - 1)
-            current_word = doc[current_pos].text
-            wtrie = prefix_trie(wtrie, current_word.lower())
-            if wtrie and end_trie(wtrie):
-                compound_table.append(current_pos)
-            current_pos = current_pos + 1
-        return compound_table
-
-    def _build_words_with_mwes(self, doc):
-        words = []
-        token_compounds = []
-        doc_len = len(doc)
-        token_i = 0
-        max_word_length = self._mwes["max-word-length"] + 1
-        trie = self._mwes["trie"]
-        while token_i < doc_len:
-            token = doc[token_i]
-            word = self._normalize_word(token.text)
-            compound_table = self._collect_punctuated_compound(
-                doc, token_i, word, max_word_length
-            )
-            if compound_table:
-                compound_word = doc[token_i : compound_table[-1] + 1]
-                words.append(compound_word.text.replace(" ", ""))
-                token_i = compound_table[-1]
-                token_compounds.append(
-                    {
-                        "data": trie[words[-1].lower()][Trie.LEAF][
-                            "label_info"
-                        ],
-                        "is-compound": False,
-                    }
-                )
-            else:
-                words.append(word)
-                token_compounds.append(token._.compound_word)
-            token_i = token_i + 1
-        return words, token_compounds
-
-    def _build_words_without_mwes(self, doc):
-        words = []
-        doc_len = len(doc)
-        token_i = 0
-        while token_i < doc_len:
-            words.append(self._normalize_word(doc[token_i].text))
-            token_i = token_i + 1
-        return words
-
-    def _attach_compound_metadata(self, doc, token_compounds):
-        doc_len = len(doc)
-        for token_i in range(doc_len):
-            doc[token_i]._.compound_word = token_compounds[token_i]
-
-    def _walk_mwe_trie(self, doc, i, max_pattern_length):
-        j = i
-        trie = self._mwes["trie"]
-        last_trie = None
-        leaf_at = []
-        last_is_hyphen = True
-        trie_tagged_word = False
-        to_pattern_i = min(i + max_pattern_length, len(doc))
-        while j < to_pattern_i:
-            lower_text = doc[j].text.lower().strip()
-            if lower_text:
-                if lower_text == "-":
-                    last_is_hyphen = True
-                    hyphen_toks = []
-                else:
-                    last_is_hyphen = False
-                    hyphen_toks = lower_text.split("-")
-                for doc_text in hyphen_toks:
-                    last_trie = trie
-                    if doc_text in trie:
-                        trie = trie[doc_text]
-                        if Trie.LEAF in trie:
-                            leaf_at.append(
-                                {"data": trie[Trie.LEAF], "idx": j + 1}
-                            )
-                    elif (i != j) and ("-" in trie):
-                        trie = trie["-"]
-                        if doc_text in trie:
-                            trie = trie[doc_text]
-                            if Trie.LEAF in trie:
-                                leaf_at.append(
-                                    {
-                                        "data": trie[Trie.LEAF],
-                                        "idx": j + 1,
-                                    }
-                                )
-                        else:
-                            trie_tagged_word = True
-                            break
-                    else:
-                        trie_tagged_word = True
-                        break
-                if trie_tagged_word or (
-                    (last_trie == trie) and (len(hyphen_toks) > 0)
-                ):
-                    break
-            j = j + 1
-        return leaf_at, last_is_hyphen
-
-    def _try_merge_mwe_match(self, doc, retokenizer, i, max_pattern_length):
-        if doc[i].text.lower() not in self._mwes["trie"]:
-            return 1
-        leaf_at, last_is_hyphen = self._walk_mwe_trie(
-            doc, i, max_pattern_length
-        )
-        if not leaf_at:
-            return 1
-        j_idx = leaf_at[-1]["idx"]
-        if last_is_hyphen:
-            j_idx = j_idx - 1
-        if (j_idx - i) <= 1:
-            return 1
-        retokenizer.merge(doc[i:j_idx], attrs={})
-        doc[i]._.compound_word = {
-            "is-compound": True,
-            "data": leaf_at[-1]["data"]["label_info"],
-        }
-        return j_idx - i
-
-    def _try_merge_special_token(self, doc, retokenizer, i):
-        if len(set(doc[i].text) & set(string.punctuation + "\\_")) == len(
-            set(doc[i].text)
-        ):
-            retokenizer.merge(doc[i : i + 1], attrs={"POS": "PUNCT"})
-            return True
-        if doc[i].like_url:
-            retokenizer.merge(doc[i : i + 1], attrs={"POS": "NOUN"})
-            return True
-        if doc[i].like_email:
-            retokenizer.merge(doc[i : i + 1], attrs={"POS": "ADJ"})
-            return True
-        return False
-
-    def _retokenize_compound_patterns(self, doc):
-        with doc.retokenize() as retokenizer:
-            i = 0
-            n = len(doc)
-            max_pattern_length = self._mwes["max-pattern-length"] + 1
-            while i < n:
-                skip_i = self._try_merge_mwe_match(
-                    doc, retokenizer, i, max_pattern_length
-                )
-                if skip_i == 1:
-                    self._try_merge_special_token(doc, retokenizer, i)
-                i += skip_i
-                n = len(doc)
-
     def __call__(self, doc: Doc):
         """Call tokenizer trought spacy pipeline
 
@@ -314,46 +99,136 @@ class SpacyTokenizerPipe:
 
         Returns:
             [spacy.Doc]: The spacy doc tokenized
-
-                Example:
-                    >>> callable(SpacyTokenizerPipe.__call__)
-                    True
         """
+        words = []
+        doc_len = len(doc)
+        token_i = 0
         if self._mwes:
-            words, token_compounds = self._build_words_with_mwes(doc)
-        else:
-            words = self._build_words_without_mwes(doc)
-            token_compounds = None
+            max_word_length = self._mwes["max-word-length"] + 1
+            current_word = ""
+            token_compounds = []
+            trie = self._mwes["trie"]
+        while token_i < doc_len:
+            token = doc[token_i]
+            # fix common typos and normalize
+            word = self._normalize_word(token.text)
+            if self._mwes:
+                wtrie = prefix_trie(self._punctuation_words, word.lower())
+                current_pos = token_i + 1
+                current_word = word
+                compound_table = []
+                while wtrie and (len(current_word) < max_word_length) and (current_pos < doc_len):
+                    if end_trie(wtrie):
+                        compound_table.append(current_pos - 1)
+                    current_word = doc[current_pos].text
+                    wtrie = prefix_trie(wtrie, current_word.lower())
+                    if wtrie and end_trie(wtrie):
+                        compound_table.append(current_pos)
+                    current_pos = current_pos + 1
+                if compound_table:
+                    compound_word = doc[token_i : compound_table[-1] + 1]
+                    words.append(compound_word.text.replace(" ", ""))
+                    token_i = compound_table[-1]
+                    token_compounds.append({"data": trie[words[-1].lower()][Trie.LEAF]["label_info"], "is-compound": False})
+                else:
+                    words.append(word)
+                    token_compounds.append(token._.compound_word)
+            else:
+                words.append(word)
+            token_i = token_i + 1
 
         doc = Doc(doc.vocab, words=words)
         if self._mwes:
-            self._attach_compound_metadata(doc, token_compounds)
-            self._retokenize_compound_patterns(doc)
+            doc_len = len(doc)
+            for token_i in range(doc_len):
+                doc[token_i]._.compound_word = token_compounds[token_i]
+        if self._mwes:
+            # compound words
+            with doc.retokenize() as retokenizer:
+                i = 0
+                n = len(doc)
+                trie = self._mwes["trie"]
 
-        return doc
+                max_pattern_length = self._mwes["max-pattern-length"] + 1
+                max_word_length = self._mwes["max-word-length"] + 1
+                while i < n:
+                    skip_i = 1
+                    if doc[i].text.lower() in self._mwes["trie"]:
+                        # possible MWE match
+                        j = i
+                        trie = self._mwes["trie"]
+                        last_trie = None
+                        leaf_at = []
+                        last_is_hyphen = True
+                        trie_tagged_word = False
+                        to_pattern_i = i + max_pattern_length
+                        if to_pattern_i > len(doc):
+                            to_pattern_i = len(doc)
+
+                        while j < to_pattern_i:
+                            lower_text = doc[j].text.lower()
+                            lower_text = lower_text.strip()
+                            if lower_text:
+                                if lower_text == "-":
+                                    last_is_hyphen = True
+                                    hyphen_toks = []
+                                else:
+                                    last_is_hyphen = False
+                                    hyphen_toks = lower_text.split("-")
+                                for doc_text in hyphen_toks:
+                                    last_trie = trie
+                                    if doc_text in trie:
+                                        trie = trie[doc_text]
+                                        if Trie.LEAF in trie:
+                                            leaf_at.append({"data": trie[Trie.LEAF], "idx": j + 1})
+                                    elif (i != j) and ("-" in trie):
+                                        trie = trie["-"]
+                                        if doc_text in trie:
+                                            trie = trie[doc_text]
+                                            if Trie.LEAF in trie:
+                                                leaf_at.append({"data": trie[Trie.LEAF], "idx": j + 1})
+                                        else:
+                                            trie_tagged_word = True
+                                            break
+                                    else:
+                                        trie_tagged_word = True
+                                        break
+                                if trie_tagged_word or ((last_trie == trie) and (len(hyphen_toks) > 0)):
+                                    break
+                            j = j + 1
+                        if len(leaf_at) > 0:
+                            # success!
+                            j_idx = leaf_at[-1]["idx"]
+                            if last_is_hyphen:
+                                j_idx = j_idx - 1
+                            if (j_idx - i) > 1:
+                                attrs = {}
+                                n = len(doc)
+                                retokenizer.merge(doc[i:j_idx], attrs=attrs)
+                                doc[i]._.compound_word = {"is-compound": True, "data": leaf_at[-1]["data"]["label_info"]}
+                                n = len(doc)
+                                skip_i = j_idx - i
+                    elif len(set(doc[i].text) & set(string.punctuation + "\\_")) == len(set(doc[i].text)):
+                        attrs = {"POS": "PUNCT"}
+                        retokenizer.merge(doc[i : i + 1], attrs=attrs)
+                    elif doc[i].like_url:
+                        attrs = {"POS": "NOUN"}
+                        retokenizer.merge(doc[i : i + 1], attrs=attrs)
+                    elif doc[i].like_email:
+                        attrs = {"POS": "ADJ"}
+                        retokenizer.merge(doc[i : i + 1], attrs=attrs)
+                    i += skip_i
+
+            return doc
 
 
-@Language.factory(
-    "spacy_thot_tokenizer",
-    default_config={"config": None, "call_context": None},
-)
+@Language.factory("spacy_thot_tokenizer", default_config={"config": None, "call_context": None})
 def spacy_thot_tokenizer(nlp, name, config: dict = None, call_context=None):
-    """spacy_thot_tokenizer API.
-
-    Example:
-        >>> from thot.tasks.tokenizer.Tokenizer import spacy_thot_tokenizer
-        >>> callable(spacy_thot_tokenizer)
-        True
-    """
-    return SpacyTokenizerPipe(
-        nlp=nlp, config=config, call_context=call_context
-    )
+    return SpacyTokenizerPipe(nlp=nlp, config=config, call_context=call_context)
 
 
 class SpacyTokenizer:
-    def __init__(
-        self, config: TokenizerConfiguration = None, call_context=None
-    ):
+    def __init__(self, config: TokenizerConfiguration = None, call_context=None):
         """Initialize spacy tokenizer
 
         Args:
@@ -362,42 +237,34 @@ class SpacyTokenizer:
         Raises:
             ValueError: Exception raised when configuration is empty
             ValueError: Exception raised when language is not managed
-
-                Example:
-                    >>> callable(SpacyTokenizer)
-                    True
         """
+        nltk.download("punkt")
         if not config:
             raise ValueError("Custom Spacy tokenizer need configuration")
-        language = config.configuration["segmenters"][0]["language"]
-        self._language = language
-        self._nlp, self._spacy_model = load_spacy_model(
-            language,
-            size="sm",
-            call_context=call_context,
-            task_name="tokenizer",
-        )
-        self._sent_segmenter = SentenceSegmenter(language)
+        language = config.configuration["segmenters"][0]["language"]  # TODO : management multiple language
+        if language == "en":
+            # Load sm model : do not use tagger models
+            self._nlp = spacy.load("en_core_web_sm")
+            self._sent_tokenizer = nltk.data.load("tokenizers/punkt/english.pickle")
+        elif language == "fr":
+            self._nlp = spacy.load("fr_core_news_sm")
+            self._sent_tokenizer = nltk.data.load("tokenizers/punkt/french.pickle")
+        else:
+            raise ValueError("Language '" + language + "' not managed.")
 
         inf = list(self._nlp.Defaults.infixes)  # Default infixes
-        inf.remove(
-            r"(?<=[0-9])[+\-\*^](?=[0-9-])"
-        )  # Remove the generic op between numbers or between a number and a -
+        inf.remove(r"(?<=[0-9])[+\-\*^](?=[0-9-])")  # Remove the generic op between numbers or between a number and a -
         inf = tuple(inf)  # Convert inf to tuple
         infixes = inf + tuple(
             [r"(?<=[0-9])[+*^](?=[0-9-])", r"(?<=[0-9])-(?=-)"]
         )  # Add the removed rule after subtracting (?<=[0-9])-(?=[0-9]) pattern
         infixes = inf + tuple([r"\.\.\.+", r"[!&,()/;]"])
-        infixes = [
-            x for x in infixes if "-|–|—|--|---|——|~" not in x
-        ]  # Remove - between letters rule
+        infixes = [x for x in infixes if "-|–|—|--|---|——|~" not in x]  # Remove - between letters rule
         infix_re = compile_infix_regex(infixes)
 
         suf = list(self._nlp.Defaults.suffixes)  # Default infixes
         suf = tuple(suf)
-        suffixes = suf + tuple(
-            [r"--+", r"~~+", r",,+", r"__+" r"\\\\+", r";;+", r"\?\?+", r"!!+"]
-        )
+        suffixes = suf + tuple([r"--+", r"~~+", r",,+", r"__+" r"\\\\+", r";;+", r"\?\?+", r"!!+"])
         suffix_re = compile_suffix_regex(suffixes)
 
         pref = list(self._nlp.Defaults.prefixes)  # Default infixes
@@ -414,29 +281,10 @@ class SpacyTokenizer:
             rules=self._nlp.Defaults.tokenizer_exceptions,
         )
 
-        Token.set_extension(
-            "compound_word",
-            default={"is-compound": False, "data": {}},
-            force=True,
-        )
-        # load_spacy_model() returns a process-cached Language; do not add_pipe twice.
-        if "spacy_thot_tokenizer" in self._nlp.pipe_names:
-            self._nlp.remove_pipe("spacy_thot_tokenizer")
-        self._nlp.add_pipe(
-            "spacy_thot_tokenizer",
-            config={
-                "config": config.configuration,
-                "call_context": call_context,
-            },
-        )
+        Token.set_extension("compound_word", default={"is-compound": False, "data": {}}, force=True)
+        self._nlp.add_pipe("spacy_thot_tokenizer", config={"config": config.configuration, "call_context": call_context})
 
     def _tokenize_sentence(self, text, call_context=None):
-        """Tokenize sentence helper.
-
-        Example:
-            >>> callable(SpacyTokenizer._tokenize_sentence)
-            True
-        """
         block_tokens = []
         if isinstance(text, list):
             for text_i in text:
@@ -444,30 +292,14 @@ class SpacyTokenizer:
                 if len(toks) > 0:
                     block_tokens.append(toks)
         else:
-            sentences = self._sent_segmenter.segment(text)
+            sentences = self._sent_tokenizer.tokenize(text)
             for sent_i in sentences:
-                sent = re.sub(r"\s+", " ", sent_i)
-                spacy_doc = self._nlp(
-                    sent,
-                    disable=[
-                        "tok2vec",
-                        "tagger",
-                        "parser",
-                        "ner",
-                        "attribute_ruler",
-                        "lemmatizer",
-                    ],
-                )
+                sent = re.sub("\s+", " ", sent_i)
+                spacy_doc = self._nlp(sent, disable=["tok2vec", "tagger", "parser", "ner", "attribute_ruler", "lemmatizer"])
                 tokens = []
                 token_id = 0
                 for token in spacy_doc:
-                    tokens.append(
-                        {
-                            "token": token.text,
-                            "start_sentence": token_id == 0,
-                            "mwe": token._.compound_word,
-                        }
-                    )
+                    tokens.append({"token": token.text, "start_sentence": (token_id == 0), "mwe": token._.compound_word})
                     token_id = token_id + 1
                 block_tokens.append(tokens)
         return block_tokens
@@ -480,23 +312,15 @@ class SpacyTokenizer:
 
         Returns:
             [list]: the list of token (structure is equivalent to text but plistted into token)
-
-                Example:
-                    >>> callable(SpacyTokenizer.tokenize)
-                    True
         """
         tokenized_text = []
         if isinstance(text, list):
             for text_i in text:
-                tokenized_text.append(
-                    self.tokenize(text_i, call_context=call_context)
-                )
+                tokenized_text.append(self.tokenize(text_i,call_context=call_context))
         else:
             text = text.strip()
             if text:
-                tokenized_text = self._tokenize_sentence(
-                    text, call_context=call_context
-                )
+                tokenized_text = self._tokenize_sentence(text, call_context=call_context)
         return tokenized_text
 
 
@@ -505,29 +329,20 @@ class Tokenizer:
     Tokenizer helper integrating MWE tokenizer
     """
 
-    def __init__(
-        self, config: TokenizerConfiguration = None, call_context=None
-    ):
-        """Initialize tokenizer
-
+    def __init__(self, config: TokenizerConfiguration = None, call_context=None):
+        """
+        Initialize tokenizer
         :param patterns_file : mwe trie structure (created with createAnnotationResources.py)
-
-                Example:
-                    >>> callable(Tokenizer)
-                    True
         """
         if not config:
             raise ValueError("Tokenizer configuration should be load")
         # Initializer Spacy Tokenizer:
-        self._spacyTokenizer = SpacyTokenizer(
-            config=config, call_context=call_context
-        )
+        self._spacyTokenizer = SpacyTokenizer(config=config, call_context=call_context)
         self._count_run = 0
 
     def tokenize(self, tkeirDoc: dict, call_context=None):
         """Tokenize tkeir doc (generally coming from converter)
-
-        * tokenize "content" into content_tokens
+           * tokenize "content" into content_tokens
            * tokenize "title"   into title_tokens
 
         Args:
@@ -535,69 +350,39 @@ class Tokenizer:
 
         Returns:
             [dict]: tkeir doc with token field added
-
-                Example:
-                    >>> callable(Tokenizer.tokenize)
-                    True
         """
         tkeirDoc["error"] = False
         es_time = time.time()
 
         try:
             if ("content" in tkeirDoc) and tkeirDoc["content"]:
-                tkeirDoc["content_tokens"] = self._spacyTokenizer.tokenize(
-                    tkeirDoc["content"], call_context=call_context
-                )
+                tkeirDoc["content_tokens"] = self._spacyTokenizer.tokenize(tkeirDoc["content"], call_context=call_context)
         except Exception as e:
             tkeirDoc["error"] = True
             ThotLogger.error(
-                "Exception occured.",
-                context=call_context,
-                trace=exception_error_and_trace(
-                    str(e), str(traceback.format_exc())
-                ),
+                "Exception occured.", context=call_context, trace=exception_error_and_trace(str(e), str(traceback.format_exc()))
             )
         try:
             if ("title" in tkeirDoc) and tkeirDoc["title"]:
-                tkeirDoc["title_tokens"] = self._spacyTokenizer.tokenize(
-                    tkeirDoc["title"], call_context=call_context
-                )
+                tkeirDoc["title_tokens"] = self._spacyTokenizer.tokenize(tkeirDoc["title"], call_context=call_context)
         except Exception as e:
             tkeirDoc["error"] = True
             ThotLogger.error(
-                "Exception occured.",
-                context=call_context,
-                trace=exception_error_and_trace(
-                    str(e), str(traceback.format_exc())
-                ),
+                "Exception occured.", context=call_context, trace=exception_error_and_trace(str(e), str(traceback.format_exc()))
             )
         if ("content" not in tkeirDoc) and ("title" not in tkeirDoc):
-            raise ValueError(
-                "content and/or title have to be present in tkeir doc"
-            )
+            raise ValueError("content and/or title have to be present in tkeir doc")
         # prevent memory leak
         self._count_run = self._count_run + 1
         if self._count_run > 100:
             gc.collect()
             self._count_run = 0
-        taskInfo = TaskInfo(
-            task_name="tokenizer",
-            task_version=__version_tokenizer__,
-            task_date=__date_tokenizer__,
-        )
+        taskInfo = TaskInfo(task_name="tokenizer", task_version=__version_tokenizer__, task_date=__date_tokenizer__)
         tkeirDoc = taskInfo.addInfo(tkeirDoc)
         es_time = time.time() - es_time
-        ThotLogger.debug(
-            "Tokenized time:" + str(es_time), context=call_context
-        )
+        ThotLogger.debug("Tokenized time:" + str(es_time), context=call_context)
         es_time = time.time()
         return tkeirDoc
 
     def run(self, tkeir_doc, call_context=None):
-        """Run the run task step on a T-KEIR document.
-
-        Example:
-            >>> callable(Tokenizer.run)
-            True
-        """
         return self.tokenize(tkeir_doc, call_context=call_context)

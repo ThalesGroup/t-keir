@@ -1,15 +1,16 @@
-"""Title: Keyword configuration
+# -*- coding: utf-8 -*-
+"""Keyword configuration
+Author: Eric Blaudez (Eric Blaudez)
 
-Keyword and keyphrase extraction.
-
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
 
-from thot.core.ConfigurationUtils import load_configuration
+import json
+
 from thot.core.LoggerConfiguration import LoggerConfiguration
+from thot.core.NetworkConfiguration import NetworkConfiguration
+from thot.core.RuntimeConfiguration import RuntimeConfiguration
 
 
 class KeywordsConfiguration:
@@ -53,14 +54,9 @@ class KeywordsConfiguration:
     """
 
     def __init__(self):
-        """Initialize the instance.
-
-        Example:
-            >>> cfg = KeywordsConfiguration()
-            >>> cfg.configuration
-            {}
-        """
         self.logger_config = LoggerConfiguration()
+        self.net_config = NetworkConfiguration()
+        self.runtime_config = RuntimeConfiguration()
         self.configuration = dict()
 
     def load(self, config_f=None, path: list = []):
@@ -69,47 +65,27 @@ class KeywordsConfiguration:
         Args:
             config_f (str, optional): load configruation with file handler. Defaults to None.
             path (list,option): access to a part of the configuration
-
-                Example:
-                    >>> callable(KeywordsConfiguration().load)
-                    True
         """
-        json_config = load_configuration(config_f)
+        json_config = json.load(config_f)
         self.loads(json_config)
 
-    def loads(self, configuration: dict | None = None):
+    def loads(self, configuration: dict = None):
         """Load logger configuration from dict (json)
 
         Args:
             configuration (dict, optional): load logger configruation with dict. Defaults to None.
-
-                Example:
-                    >>> cfg = KeywordsConfiguration()
-                    >>> cfg.loads({'logger': {}, 'keywords': {'extractors': [{'language': 'en'}]}})
-                    >>> 'extractors' in cfg.configuration
-                    True
         """
-        if configuration is None:
-            raise ValueError("configuration is required")
         self.logger_config.loads(configuration, logger_name="keywords")
+        self.net_config.loads(configuration["keywords"])
+        self.runtime_config.loads(configuration["keywords"])
         if "extractors" in configuration["keywords"]:
-            self.configuration["extractors"] = configuration["keywords"][
-                "extractors"
-            ]
+            self.configuration["extractors"] = configuration["keywords"]["extractors"]
         else:
-            raise ValueError(
-                "extractors are mandatory in keywords configuration"
-            )
+            raise ValueError("extractors are mandatory in keywords configuration")
 
     def clear(self):
-        """clear logger configuration
-
-        Example:
-            >>> cfg = KeywordsConfiguration()
-            >>> cfg.loads({'logger': {}, 'keywords': {'extractors': [{'language': 'en'}]}})
-            >>> cfg.clear()
-            >>> cfg.configuration
-            {}
-        """
+        """clear logger configuration"""
         self.logger_config.clear()
+        self.net_config.clear()
+        self.runtime_config.clear()
         self.configuration = dict()

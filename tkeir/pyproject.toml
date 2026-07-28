@@ -1,195 +1,103 @@
-[project]
+[tool.poetry]
 name = "tkeir"
-version = "2.0.0"
+version = "1.0.3"
 description = "t-keir-community"
-readme = "README.md"
-license = { text = "MIT" }
-authors = [{ name = "Eric Blaudez" }]
-maintainers = [{ name = "Eric Blaudez" }]
+authors = ["Eric Blaudez"]
+maintainers = ["Eric Blaudez"]
+license = "MIT"
 keywords = ["Python"]
-requires-python = ">=3.10,<3.13"
+readme = "README.md"
+packages = [
+    { include = "tkeir", from = ".." },
+]
 classifiers = [
     "Environment :: Console",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.10",
-    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Software Development :: Libraries :: Python Modules"
 ]
-dependencies = [
-    "beautifulsoup4==4.11.1",
-    "emoji==2.0.0",
-    "fold-to-ascii==1.0.2.post1",
-    "Jinja2>=3.1.4",
-    "pysbd>=0.3.4",
-    "pandas>=1.5.0,<3.0",
-    "numpy>=1.19.0,<2.0",
-    "opentelemetry-api>=1.27.0",
-    "opentelemetry-sdk>=1.27.0",
-    "opentelemetry-exporter-prometheus>=0.48b0",
-    "protobuf>=5.29.6,<6.0",
-    "fastapi>=0.100.0",
-    "python-multipart>=0.0.9",
-    "uvicorn[standard]>=0.23.0",
-    "spacy==3.6.1",
-    "scikit-learn>=1.5.0",
-    "torch>=2.2.0",
-    "sentencepiece>=0.2.1",
-    "transformers>=5.0.0rc3,<6.0",
-    "websockets>=10.4",
-    "requests>=2.28.0",
-    "filelock>=3.0.0",
-    "joblib>=1.0.0",
-    "markitdown[all]==0.1.2",
-    "langdetect>=1.0.9",
-    "pymupdf>=1.28.0",
-    "pytesseract>=0.3.13",
-    "pillow>=12.3.0",
-    "rdflib>=7.0.0",
-    "pyshacl>=0.26.0",
-    "httpx>=0.24.0",
-    "pyyaml>=6.0",
-    "nltk>=3.10.0",
-    "sentence-transformers>=3.0.0",
+homepage = "https://github.com/ThalesGroup/t-keir"
+repository = "https://github.com/ThalesGroup/t-keir"
+documentation = "https://github.com/ThalesGroup/t-keir"
+include = [
+    { path = "LICENSE" },
+    { path = "runtimes" },
+    { path = "tests"},
+    { path = "app"},
+    { path = "doc"},
 ]
 
-[project.optional-dependencies]
-mcp = [
-    "mcp>=1.0.0",
-]
-# OWL reasoners via OWLAPY + OWLAPI (Java/JPype). Used by
-# POST /rag/ontology/query when prefer_owlapy=true.
-# Requires Python >= 3.11 (owlapy 1.6.3+).
-owl = [
-    "owlapy>=1.6.3; python_full_version >= '3.11'",
-]
-# Optional Workload API client (import guarded in thot.agent.spiffe).
-# PyPI package is currently 0.3.x; env/file SPIFFE_ID works without it.
-spiffe = [
-    "spiffe>=0.2.0,<0.4",
-]
-
-[project.urls]
-Homepage = "https://github.com/ThalesGroup/t-keir"
-Repository = "https://github.com/ThalesGroup/t-keir"
-Documentation = "https://github.com/ThalesGroup/t-keir"
+[tool.poetry.urls]
 Releases = "https://github.com/ThalesGroup/t-keir/releases"
 
-[project.scripts]
-tkeir-pipeline = "thot.tools.pipeline:main"
-tkeir-index-documents = "thot.tools.search.index_documents:main"
-tkeir-rag = "thot.tools.search.app:main"
-tkeir-ingest = "thot.ingest.app:main"
-tkeir-audit = "thot.audit.app:main"
-tkeir-governor = "thot.governor.app:main"
-tkeir-init-vespa = "thot.tools.search.init_vespa:main"
-tkeir-create-annotation-resource = "thot.tools.annotation.create_annotation_resource:main"
-tkeir-beir-eval = "thot.tools.search.beir_eval:main"
-tkeir-mcp = "thot.mcp.server:main"
-tkeir-agent = "thot.agent.service:main"
-tkeir-compose = "thot.compose.__main__:main"
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+beautifulsoup4="4.11.1"
+elasticsearch="7.14.0"
+mistune="2.0.4"
+emoji="2.0.0"
+fold-to-ascii="1.0.2.post1"
+Django=">=4.2.26,<5.0"
+Jinja2="^3.1.4"
+nltk="^3.7"
+pandas="1.4.3"
+prometheus-client="0.14.1"
+protobuf=">=5.29.6,<6.0"
+sanic="22.6.2"
+Sanic-Cors="2.1.0"
+spacy="3.6.1"
+en-core-web-sm = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl"}
+en-core-web-md = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl"}
+fr-core-news-sm = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.6.0/fr_core_news_sm-3.6.0-py3-none-any.whl"}
+fr-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl"}
+scikit-learn="^1.5.0"
+torch="^2.2.0"
+sentencepiece=">=0.2.1"
+transformers=">=5.0.0rc3,<6.0"
+websockets="10.0.0"
 
-[dependency-groups]
-dev = [
-    "coverage>=7.0",
-    "pytest>=7.0",
-    "liccheck",
-    "pip",
-    "setuptools<81",
-    "radon>=6.0.1",
-    "xenon>=0.9.1",
-    "pip-licenses>=4.0",
-    "pip-audit>=2.7.0",
-    "cyclonedx-bom>=7.3.0",
-]
-audit = [
-    "psycopg[binary]>=3.2",
-]
-beir = [
-    "beir>=2.0.0",
-    "rank-bm25>=0.2.2",
-    "sentence-transformers>=3.0.0",
-]
-models = [
-    "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl",
-    "en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
-    "fr-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.6.0/fr_core_news_sm-3.6.0-py3-none-any.whl",
-    "fr-core-news-md @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl",
-    "xx-ent-wiki-sm @ https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.6.0/xx_ent_wiki_sm-3.6.0-py3-none-any.whl",
-]
+[tool.poetry.group.dev.dependencies]
+
+[tool.poetry.scripts]
+tkeir-converter-svc = "tkeir.thot.converter_svc:main"
+tkeir-converter-client = "tkeir.thot.converter_client:main"
+tkeir-tokenizer-svc = "tkeir.thot.tokenizer_svc:main"
+tkeir-tokenizer-client = "tkeir.thot.tokenizer_client:main"
+tkeir-mstagger-svc = "tkeir.thot.mstagger_svc:main" 
+tkeir-mstagger-client = "tkeir.thot.mstagger_client:main" 
+tkeir-nertagger-svc = "tkeir.thot.nertagger_svc:main"
+tkeir-nertagger-client = "tkeir.thot.nertagger_svc:main"
+tkeir-syntax-svc = "tkeir.thot.syntactictagger_svc:main"
+tkeir-syntax-client = "tkeir.thot.syntactictagger_svc:main"
+tkeir-keywords-svc = "tkeir.thot.keywordextractor_svc:main"
+tkeir-keywords-client = "tkeir.thot.keywordextractor_client:main"
+tkeir-sentiment-svc = "tkeir.thot.sentiment_svc:main"
+tkeir-sentiment-client = "tkeir.thot.sentiment_client:main"
+tkeir-summarizer-svc = "tkeir.thot.summarizer_svc:main"
+tkeir-summarizer-client = "tkeir.thot.summarizer_client:main"
+tkeir-zeroshotclassifier-svc = "tkeir.thot.zeroshotclassifier_svc:main"
+tkeir-zeroshotclassifier-client = "tkeir.thot.zeroshotclassifier_client:main"
+tkeir-embeddings-svc = "tkeir.thot.embeddings_svc:main"
+tkeir-embeddings-client = "tkeir.thot.embeddings_client:main"
+tkeir-clusterinfer-svc = "tkeir.thot.clusterinfer_svc:main"
+tkeir-clusterinfer-cliebt = "tkeir.thot.clusterinfer_client:main"
+tkeir-qa-svc = "tkeir.thot.qa_svc:main"
+tkeir-qa-client = "tkeir.thot.qa_client:main"
+tkeir-index-svc = "tkeir.thot.index_svc:main"
+tkeir-index-client = "tkeir.thot.index_client:main"
+tkeir-search-svc = "tkeir.thot.search_svc:main"
+tkeir-search-client = "tkeir.thot.search_client:main"
+tkeir-batch-ingester = "tkeir.thot.batch_ingester:main"
+tkeir-init-project = "tkeir.thot.tkeir_init_project:main"
+tkeir-relation-clustering = "tkeir.thot.relation_clustering:main"
+tkeir-relation-stat = "tkeir.thot.relation_stats:main"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build]
-directory = ".."
-
-[tool.hatch.build.targets.wheel]
-packages = ["thot"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"configs" = "tkeir/configs"
-"resources" = "tkeir/resources"
-"thot/action/schemas" = "thot/action/schemas"
-"thot/ingest/schemas" = "thot/ingest/schemas"
-
-[tool.coverage.run]
-source = ["thot"]
-branch = false
-
-[tool.coverage.report]
-include = [
-    "*/thot/core/*",
-    "*/thot/action/*",
-    "*/thot/ingest/*",
-    "*/thot/audit/*",
-    "*/thot/governor/*",
-    "*/thot/tasks/*Configuration.py",
-    "*/thot/tasks/converters/*",
-    "*/thot/tasks/keywords/*",
-    "*/thot/tasks/morphosyntax/*",
-    "*/thot/tasks/syntax/*",
-    "*/thot/tasks/ner/NERTaggerConfiguration.py",
-    "*/thot/tasks/language_detection/*",
-    "*/thot/tasks/pipeline/*",
-    "*/thot/tools/pipeline.py",
-]
-omit = [
-    "*/thot/tasks/converters/OrbitConverter.py",
-    "*/thot/core/DictionaryTrie.py",
-]
-fail_under = 90
-show_missing = true
-skip_covered = false
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.isort]
 profile = "black"
-
-[tool.ruff]
-line-length = 79
-target-version = "py311"
-src = ["thot", "tests"]
-
-[tool.ruff.lint]
-select = [
-    "E4", # import
-    "E7", # statement
-    "E9", # runtime
-    "F",  # pyflakes
-]
-ignore = [
-    "E501", # line length handled by formatter / black
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**" = ["E402"]
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-line-ending = "auto"
 
 [tool.black]
 line-length = 79
@@ -201,8 +109,8 @@ exclude = '''
 
 (
   /(
-      \.eggs
-    | \.git
+      \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
     | \.hg
     | \.mypy_cache
     | \.tox
@@ -220,19 +128,8 @@ exclude = '''
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-q"
+addopts = "--instafail"
 testpaths = ["tests"]
-python_files = ["Test*.py", "test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-filterwarnings = [
-    "ignore:builtin type SwigPyPacked has no __module__ attribute:DeprecationWarning",
-    "ignore:builtin type SwigPyObject has no __module__ attribute:DeprecationWarning",
-    "ignore:builtin type swigvarlink has no __module__ attribute:DeprecationWarning",
-    "ignore:'BaseCommand' is deprecated and will be removed in Click 9.0:DeprecationWarning",
-    "ignore:Importing 'parser.split_arg_string' is deprecated:DeprecationWarning",
-    "ignore:Couldn't find ffmpeg or avconv - defaulting to ffmpeg:RuntimeWarning",
-]
 markers = [
     "profile: marks tests to be profiled (deselect with '-m \"not profile\"')",
     "benchmark: marks tests to be benchmarked (deselect with '-m \"not benchmark\"')",
@@ -265,7 +162,6 @@ authorized_licenses = [
     "Apache 2.0",
     "Apache 2.0 license",
     "Apache License 2.0",
-    "Apache-2.0",
     "http://www.apache.org/licenses/LICENSE-2.0",
     "Apache Software",
     "Apache software license",
@@ -293,8 +189,7 @@ authorized_licenses = [
     "Mozilla Public License 2.0 (MPL 2.0)",
     "MPL",
     "Historical Permission Notice and Disclaimer (HPND)",
-    "HPND",
-    "W3C-20150513",
+    "HPND"
 ]
 unauthorized_licenses = [
     "GPL v3",
@@ -311,60 +206,64 @@ unauthorized_licenses = [
 ]
 
 [tool.liccheck.authorized_packages]
+# The following are allowed as long as it is not imported (linked) but used
+# through command line calls
 autoimport = "*"
 hypothesis = ">=3.4"
 pygal = "*"
 pylint = "*"
+
+# The following are sub-dependencies of the above tools
 pathspec = "*"
 text-unidecode = "*"
 certifi = "*"
+
+# the following projects are poorly configured. Under MIT License.
 tomlkit = "*"
 cachy = "*"
 cleo = "*"
 clikit = "*"
 pastel = "*"
 crashtest ="*"
-sentencepiece = "*"
-cffi = "*"
-en-core-web-md = "*"
-en-core-web-sm = "*"
-fr-core-news-md = "*"
-fr-core-news-sm = "*"
-pillow = "*"
-pymupdf = "*"
-regex = "*"
-torch = "*"
-tqdm = "*"
-typing-extensions = "*"
-tzdata = "*"
 
 [tool.mypy]
-python_version = "3.11"
-explicit_package_bases = true
-mypy_path = "."
-ignore_missing_imports = true
-no_implicit_optional = false
-warn_unused_ignores = true
-pretty = true
-show_error_codes = true
+# Specify the target platform details in config, so your developers are
+# free to run mypy on Windows, Linux, or macOS and get consistent
+# results.
+platform = "linux"
+python_version = ">=3.7"
 
-[[tool.mypy.overrides]]
-module = [
-    "thot.tasks.tokenizer.Tokenizer",
-    "thot.tasks.syntax.SyntacticTagger",
-    "thot.tasks.ner.NERTagger",
-    "thot.tasks.keywords.KeywordsExtractor",
-    "thot.tasks.morphosyntax.MorphoSyntacticTagger",
-    "thot.tools.search.ontology_utils",
-    "thot.tasks.document_ontology.OntologyRepairer",
-]
-disable_error_code = [
-    "arg-type",
-    "assignment",
-    "attr-defined",
-    "var-annotated",
-    "union-attr",
-    "operator",
-    "call-overload",
-    "index",
-]
+# show error messages from unrelated files
+follow_imports = "normal"
+
+# suppress errors about unsatisfied imports
+ignore_missing_imports = true
+
+# be strict
+strict_optional = true
+strict_equality = true
+
+disallow_any_generics = true
+disallow_incomplete_defs = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+
+warn_return_any = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+check_untyped_defs = true
+
+no_implicit_optional = true
+no_implicit_reexport = true
+
+pretty = true
+
+show_column_numbers = true
+show_error_codes = true
+show_error_context = true

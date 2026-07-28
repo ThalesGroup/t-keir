@@ -1,11 +1,6 @@
-"""Title: tkeir package init
-
-T-KEIR top-level package.
-
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+"""Convert source document to tkeir indexer document
+Author: Eric Blaudez (Eric Blaudez)
+All rights Reserved.
+Copyright (c) 2022 by THALES
 """
-
-__version__ = "2.0.0"
+__version__="1.0.3"

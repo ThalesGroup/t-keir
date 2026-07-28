@@ -25,7 +25,9 @@ export config_path=$1
 export MODEL_PATH=$2
 export TRANSFORMERS_CACHE=$2
 
-resources_en=$source_path/resources/modeling/tokenizer/en
-uv run --python 3.11 tkeir-create-annotation-resource \
-    --entries-file $resources_en/annotation-resources.json \
-    --output $resources_en/tkeir_mwe.pkl
+python3 thot/tokenizer_svc.py -c $config_path/tokenizer.json --init
+python3 thot/embeddings_svc.py -c $config_path/embeddings.json --init                    
+python3 thot/zeroshotclassifier_svc.py -c $config_path/zeroshotclassifier.json --init
+python3 thot/sentiment_svc.py -c $config_path/sentiment.json --init
+python3 thot/qa_svc.py -c $config_path/qa.json --init
+python3 thot/summarizer_svc.py -c $config_path/summarizer.json --init

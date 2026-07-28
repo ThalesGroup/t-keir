@@ -1,66 +1,66 @@
-"""Title: Syntax tagger
+# -*- coding: utf-8 -*-
+"""Syntax tagger 
+Author : Eric Blaudez (Eric Blaudez)
 
-Syntactic tagging and SVO triple extraction.
-
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
-
-import collections
-import gc
-import hashlib
-import json
 import os
-import warnings
+import json
+import collections
 from operator import attrgetter
+from typing import Iterable, List, Optional, Pattern, Tuple
+import gc
 
+import spacy
 import numpy
-from spacy.attrs import ENT_TYPE, IS_ALPHA, LOWER, POS
+import hashlib
+from spacy.tokens import Doc, Span, Token
 from spacy.matcher import Matcher
 from spacy.symbols import (
+    AUX,
+    VERB,
     agent,
+    attr,
+    aux,
+    auxpass,
+    csubj,
+    csubjpass,
     dobj,
+    neg,
+    nsubj,
+    nsubjpass,
+    obj,
+    pobj,
+    xcomp,
 )
-from spacy.tokens import Doc, Span, Token
-
-from thot.core.SpacyModelLoader import load_spacy_model
-from thot.core.ThotLogger import ThotLogger
+from thot.tasks.syntax.SyntacticTaggerConfiguration import SyntacticTaggerConfiguration
 from thot.core.Utils import ThotTokenizerToSpacy
-from thot.tasks.syntax import __date_syntax__, __version_syntax__
-from thot.tasks.syntax.SyntacticTaggerConfiguration import (
-    SyntacticTaggerConfiguration,
-)
+from thot.core.ThotLogger import ThotLogger
 from thot.tasks.TaskInfo import TaskInfo
+from thot.tasks.syntax import __version_syntax__, __date_syntax__
+
+
+import warnings
 
 warnings.filterwarnings("ignore")
 
+from spacy.attrs import LOWER, POS, ENT_TYPE, IS_ALPHA
+
 
 def remove_tokens_on_match(doc):
-    """remove_tokens_on_match API.
-
-    Example:
-        >>> callable(remove_tokens_on_match)
-        True
-    """
     indexes = []
     for index, token in enumerate(doc):
         if token.pos_ in ("SPACE"):
             indexes.append(index)
     np_array = doc.to_array([LOWER, POS, ENT_TYPE, IS_ALPHA])
     np_array = numpy.delete(np_array, indexes, axis=0)
-    doc2 = Doc(
-        doc.vocab,
-        words=[t.text for i, t in enumerate(doc) if i not in indexes],
-    )
+    doc2 = Doc(doc.vocab, words=[t.text for i, t in enumerate(doc) if i not in indexes])
     doc2.from_array([LOWER, POS, ENT_TYPE, IS_ALPHA], np_array)
     return doc2
 
 
-SVOTriple: tuple[list[Token], list[Token], list[Token]] = (
-    collections.namedtuple("SVOTriple", ["subject", "verb", "object"])
-)
+SVOTriple: Tuple[List[Token], List[Token], List[Token]] = collections.namedtuple("SVOTriple", ["subject", "verb", "object"])
 
 _NOMINAL_SUBJ_DEPS = {"nsubj", "nsubjpass"}
 _CLAUSAL_SUBJ_DEPS = {"csubj", "csubjpass"}
@@ -68,9 +68,7 @@ _VERB_MODIFIER_DEPS = {"aux", "auxpass", "neg"}
 
 
 class SyntacticTagger:
-    def __init__(
-        self, config: SyntacticTaggerConfiguration = None, call_context=None
-    ):
+    def __init__(self, config: SyntacticTaggerConfiguration = None, call_context=None):
         """Initialize tagger
 
         Args:
@@ -79,56 +77,21 @@ class SyntacticTagger:
         Raises:
             ValueError: If configuration is not set
             ValueError: If language is not managed
-
-                Example:
-                    >>> callable(SyntacticTagger)
-                    True
         """
         if not config:
             raise ValueError("tagger configuration is mandatory")
-        language = config.configuration["taggers"][0][
-            "language"
-        ]  # TODO : management multiple language
-        if language == "en" or language == "fr":
-            self._nlp, self._spacy_model = load_spacy_model(
-                language,
-                size="md",
-                call_context=call_context,
-                download_if_missing=True,
-                task_name="syntax",
-            )
+        language = config.configuration["taggers"][0]["language"]  # TODO : management multiple language
+        if language == "en":
+            self._nlp = spacy.load("en_core_web_md")
+        elif language == "fr":
+            self._nlp = spacy.load("fr_core_news_md")
         else:
             raise ValueError("Language is not managed")
-        self._nlp.tokenizer = ThotTokenizerToSpacy(
-            self._nlp.vocab, config.configuration["taggers"]
-        )
+        self._nlp.tokenizer = ThotTokenizerToSpacy(self._nlp.vocab, config.configuration["taggers"])
 
-        self.NUMERIC_NE_TYPES = {
-            "ORDINAL",
-            "CARDINAL",
-            "MONEY",
-            "QUANTITY",
-            "PERCENT",
-            "TIME",
-            "DATE",
-        }
-        self.SUBJ_DEPS = {
-            "csubj",
-            "csubjpass",
-            "expl",
-            "nsubj",
-            "nsubjpass",
-            "rsubj",
-        }
-        self.OBJ_DEPS = {
-            "attr",
-            "dobj",
-            "dative",
-            "oprd",
-            "obj",
-            "pobj",
-            "iobj",
-        }
+        self.NUMERIC_NE_TYPES = {"ORDINAL", "CARDINAL", "MONEY", "QUANTITY", "PERCENT", "TIME", "DATE"}
+        self.SUBJ_DEPS = {"csubj", "csubjpass", "expl", "nsubj", "nsubjpass", "rsubj"}
+        self.OBJ_DEPS = {"attr", "dobj", "dative", "oprd", "obj", "pobj", "iobj"}
         self.AUX_DEPS = {"aux", "auxpass", "neg"}
 
         if ("resources-base-path" in config.configuration["taggers"][0]) and (
@@ -175,18 +138,12 @@ class SyntacticTagger:
                     # rule is in triple
                     if r_i == "settings":
                         if "suppress-bounds-sw" in rules["settings"]:
-                            self._rule_settings["suppress-bounds-sw"] = rules[
-                                "settings"
-                            ]["suppress-bounds-sw"]
+                            self._rule_settings["suppress-bounds-sw"] = rules["settings"]["suppress-bounds-sw"]
                         if "pos-to-suppress" in rules["settings"]:
-                            self._rule_settings["pos-to-suppress"] = rules[
-                                "settings"
-                            ]["pos-to-suppress"]
+                            self._rule_settings["pos-to-suppress"] = rules["settings"]["pos-to-suppress"]
                     else:
                         if set(rules[r_i]["type"]) & self._basic_types:
-                            self._matcher.add(
-                                r_i, rules[r_i]["rule"], greedy="LONGEST"
-                            )
+                            self._matcher.add(r_i, rules[r_i]["rule"], greedy="LONGEST")
                             self._rule_type[r_i] = set(rules[r_i]["type"])
 
                         elif "triple" in set(rules[r_i]["type"]):
@@ -215,12 +172,6 @@ class SyntacticTagger:
         self._count_run = 0
 
     def linkRule(self, span_left, span_right):
-        """linkRule API.
-
-        Example:
-            >>> callable(SyntacticTagger.linkRule)
-            True
-        """
         rule_applied = False
         for link_rule in self._link_rules:
             rule = self._link_rules[link_rule]
@@ -245,138 +196,76 @@ class SyntacticTagger:
                     rule_applied = True
         return rule_applied
 
-    def expand_noun(self, tok: Token) -> list[Token]:
-        """expand_noun API.
-
-        Example:
-            >>> callable(SyntacticTagger.expand_noun)
-            True
-        """
+    def expand_noun(self, tok: Token) -> List[Token]:
         tok_and_conjuncts = [tok] + list(tok.conjuncts)
-        compounds = [
-            child
-            for tc in tok_and_conjuncts
-            for child in tc.children
-            if child.dep_ == "compound"
-        ]
+        compounds = [child for tc in tok_and_conjuncts for child in tc.children if child.dep_ == "compound"]
         return tok_and_conjuncts + compounds
 
-    def expand_verb(self, tok: Token) -> list[Token]:
-        """Expand a verb token to include all associated auxiliary and negation tokens.
-
-        Example:
-            >>> callable(SyntacticTagger.expand_verb)
-            True
-        """
-        verb_modifiers = [
-            child
-            for child in tok.children
-            if child.dep_ in _VERB_MODIFIER_DEPS
-        ]
+    def expand_verb(self, tok: Token) -> List[Token]:
+        """Expand a verb token to include all associated auxiliary and negation tokens."""
+        verb_modifiers = [child for child in tok.children if child.dep_ in _VERB_MODIFIER_DEPS]
         return [tok] + verb_modifiers
 
-    def _ensure_verb_entry(self, verb_sos, tok):
-        if tok.pos_ in ["VERB", "AUX"]:
-            _ = verb_sos[tok]
-
-    def _collect_token_svo(self, tok, verb_sos):
-        head = tok.head
-        if tok.dep_ in _NOMINAL_SUBJ_DEPS:
-            if head.pos_ in ["VERB", "AUX"]:
-                verb_sos[head]["subjects"].update(self.expand_noun(tok))
-            return
-        if tok.dep_ in _CLAUSAL_SUBJ_DEPS:
-            if head.pos_ in ["VERB", "AUX"]:
-                verb_sos[head]["subjects"].update(tok.subtree)
-            return
-        if tok.dep_ == "dobj":
-            if head.pos_ in ["VERB", "AUX"]:
-                verb_sos[head]["objects"].update(self.expand_noun(tok))
-            return
-        if tok.dep_ == "pobj":
-            if head.dep == agent and head.head.pos_ in ["VERB", "AUX"]:
-                verb_sos[head.head]["objects"].update(self.expand_noun(tok))
-            return
-        if tok.dep_ != "xcomp":
-            return
-        if head.pos_ in ["VERB", "AUX"] and not any(
-            child.dep == dobj for child in head.children
-        ):
-            verb_sos[head]["objects"].update(tok.subtree)
-
-    def _propagate_conjunct_svos(self, verb_sos):
-        for verb, so_dict in verb_sos.items():
-            conjuncts = verb.conjuncts
-            if so_dict.get("subjects"):
-                for conj in conjuncts:
-                    conj_so_dict = verb_sos.get(conj)
-                    if conj_so_dict and not conj_so_dict.get("subjects"):
-                        conj_so_dict["subjects"].update(so_dict["subjects"])
-            if not so_dict.get("objects"):
-                so_dict["objects"].update(
-                    obj
-                    for conj in conjuncts
-                    for obj in verb_sos.get(conj, {}).get("objects", [])
-                )
-
-    def _yield_dependency_svo_triples(self, verb_sos):
-        for verb, so_dict in verb_sos.items():
-            if so_dict["subjects"] and so_dict["objects"]:
-                yield SVOTriple(
-                    subject=sorted(so_dict["subjects"], key=attrgetter("i")),
-                    verb=sorted(self.expand_verb(verb), key=attrgetter("i")),
-                    object=sorted(so_dict["objects"], key=attrgetter("i")),
-                )
-
     def dependency_svo(self, doc):
-        """dependency_svo API.
-
-        Example:
-            >>> callable(SyntacticTagger.dependency_svo)
-            True
-        """
         for sent in doc.sents:
             # connect subjects/objects to direct verb heads
             # and expand them to include conjuncts, compound nouns, ...
-            verb_sos = collections.defaultdict(
-                lambda: collections.defaultdict(set)
-            )
+            verb_sos = collections.defaultdict(lambda: collections.defaultdict(set))
             for tok in sent:
-                self._ensure_verb_entry(verb_sos, tok)
-                self._collect_token_svo(tok, verb_sos)
-            self._propagate_conjunct_svos(verb_sos)
-            yield from self._yield_dependency_svo_triples(verb_sos)
+                head = tok.head
+                # ensure entry for all verbs, even if empty
+                # to catch conjugate verbs without direct subject/object deps
+                if tok.pos_ in ["VERB", "AUX"]:
+                    _ = verb_sos[tok]
+                # nominal subject of active or passive verb
+                if tok.dep_ in _NOMINAL_SUBJ_DEPS:
+                    if head.pos_ in ["VERB", "AUX"]:
+                        verb_sos[head]["subjects"].update(self.expand_noun(tok))
+                # clausal subject of active or passive verb
+                elif tok.dep_ in _CLAUSAL_SUBJ_DEPS:
+                    if head.pos_ in ["VERB", "AUX"]:
+                        verb_sos[head]["subjects"].update(tok.subtree)
+                # nominal direct object of transitive verb
+                elif tok.dep_ == "dobj":
+                    if head.pos_ in ["VERB", "AUX"]:
+                        verb_sos[head]["objects"].update(self.expand_noun(tok))
+                # prepositional object acting as agent of passive verb
+                elif tok.dep_ == "pobj":
+                    if head.dep == agent and head.head.pos_ in ["VERB", "AUX"]:
+                        verb_sos[head.head]["objects"].update(self.expand_noun(tok))
+                # open clausal complement, but not as a secondary predicate
+                elif tok.dep_ == "xcomp":
+                    if head.pos_ in ["VERB", "AUX"] and not any(child.dep == dobj for child in head.children):
+                        verb_sos[head]["objects"].update(tok.subtree)
+            # fill in any indirect relationships connected via verb conjuncts
+            for verb, so_dict in verb_sos.items():
+                conjuncts = verb.conjuncts
+                if so_dict.get("subjects"):
+                    for conj in conjuncts:
+                        conj_so_dict = verb_sos.get(conj)
+                        if conj_so_dict and not conj_so_dict.get("subjects"):
+                            conj_so_dict["subjects"].update(so_dict["subjects"])
+                if not so_dict.get("objects"):
+                    so_dict["objects"].update(obj for conj in conjuncts for obj in verb_sos.get(conj, {}).get("objects", []))
+            # expand verbs and restructure into svo triples
+            for verb, so_dict in verb_sos.items():
+                if so_dict["subjects"] and so_dict["objects"]:
+                    yield SVOTriple(
+                        subject=sorted(so_dict["subjects"], key=attrgetter("i")),
+                        verb=sorted(self.expand_verb(verb), key=attrgetter("i")),
+                        object=sorted(so_dict["objects"], key=attrgetter("i")),
+                    )
 
     def apply_link_rule(self, matches_content):
-        """apply_link_rule API.
-
-        Example:
-            >>> callable(SyntacticTagger.apply_link_rule)
-            True
-        """
         for span_i in range(len(matches_content)):
             for span_j in range(span_i + 1, len(matches_content)):
-                if matches_content[span_i].start == (
-                    matches_content[span_j].end - 1
-                ):
-                    self.linkRule(
-                        matches_content[span_j], matches_content[span_i]
-                    )
-                if matches_content[span_j].start == (
-                    matches_content[span_i].end - 1
-                ):
-                    self.linkRule(
-                        matches_content[span_i], matches_content[span_j]
-                    )
+                if matches_content[span_i].start == (matches_content[span_j].end - 1):
+                    self.linkRule(matches_content[span_j], matches_content[span_i])
+                if matches_content[span_j].start == (matches_content[span_i].end - 1):
+                    self.linkRule(matches_content[span_i], matches_content[span_j])
 
     def add_svo(self, svos, svo):
         # compute cache key:
-        """add_svo API.
-
-        Example:
-            >>> callable(SyntacticTagger.add_svo)
-            True
-        """
         triple_str = ""
         for triple_entry in svo:
             for alternate in triple_entry:
@@ -389,12 +278,6 @@ class SyntacticTagger:
         return svos
 
     def search_svos(self, matches_content):
-        """search_svos API.
-
-        Example:
-            >>> callable(SyntacticTagger.search_svos)
-            True
-        """
         svos = []
         for span_i in range(len(matches_content)):
             for pattern in self._svo_patterns:
@@ -402,9 +285,7 @@ class SyntacticTagger:
                 matched_pattern = []
                 end_pattern = -1
                 for item in pattern:
-                    if (end_pattern != -1) and (
-                        end_pattern != matches_content[current_span].start
-                    ):
+                    if (end_pattern != -1) and (end_pattern != matches_content[current_span].start):
                         break
                     pattern_positions = [matches_content[current_span]]
                     item_key = list(item.keys())[0]
@@ -421,14 +302,8 @@ class SyntacticTagger:
                     # check if next pattern overide the current one:
                     if (
                         (next_span < len(matches_content))
-                        and (
-                            matches_content[next_span].start
-                            >= matches_content[current_span].start
-                        )
-                        and (
-                            matches_content[next_span].end
-                            <= matches_content[current_span].end
-                        )
+                        and (matches_content[next_span].start >= matches_content[current_span].start)
+                        and (matches_content[next_span].end <= matches_content[current_span].end)
                     ):
                         pattern_positions.append(matches_content[next_span])
                         test_labels.add(matches_content[next_span].label_)
@@ -436,22 +311,14 @@ class SyntacticTagger:
                     # check if next pattern is in current pattern
                     elif (
                         (next_span < len(matches_content))
-                        and (
-                            matches_content[next_span].start
-                            == matches_content[current_span].start
-                        )
-                        and (
-                            matches_content[next_span].end
-                            >= matches_content[current_span].end
-                        )
+                        and (matches_content[next_span].start == matches_content[current_span].start)
+                        and (matches_content[next_span].end >= matches_content[current_span].end)
                     ):
                         pattern_positions.append(matches_content[next_span])
                         current_span = next_span
                         test_labels.add(matches_content[next_span].label_)
                         end_pattern = matches_content[next_span].end
-                    if (current_span < len(matches_content)) and (
-                        test_labels & possible_pattern_labels
-                    ):
+                    if (current_span < len(matches_content)) and (test_labels & possible_pattern_labels):
                         matched_pattern.append(pattern_positions)
                         current_span = current_span + 1
                         if current_span == len(matches_content):
@@ -463,12 +330,6 @@ class SyntacticTagger:
         return svos
 
     def get_dependencies(self, content):
-        """get_dependencies API.
-
-        Example:
-            >>> callable(SyntacticTagger.get_dependencies)
-            True
-        """
         deps = []
         for token in content:
             deps.append(
@@ -484,248 +345,103 @@ class SyntacticTagger:
             )
         return deps
 
-    def _relation_item(self, alternate):
-        return {
-            "content": [token.text for token in alternate],
-            "lemma_content": [token.lemma_ for token in alternate],
-            "pos": [token.pos_ for token in alternate],
-            "positions": [token.i for token in alternate],
-            "label": alternate.label_,
-        }
-
-    def _merge_triple_entry(
-        self, current_triples, triple_entry, triple_position
-    ):
-        sz_alt = len(triple_entry)
-        sz_triple = len(current_triples)
-        if sz_triple:
-            for alti in range(sz_alt):
-                item = self._relation_item(triple_entry[alti])
-                if alti == 0:
-                    for t in range(sz_triple):
-                        current_triples[t][triple_position] = item
-                else:
-                    for t in range(sz_triple):
-                        current_triples.append(current_triples[t])
-                        current_triples[-1][triple_position] = item
-            return current_triples
-
-        for alti in range(sz_alt):
-            item = self._relation_item(triple_entry[alti])
-            current_triples.append([item, None, None])
-        return current_triples
-
-    def _build_svo_triples(self, svo):
-        current_triples = []
-        triple_position = 0
-        for triple_entry in svo:
-            current_triples = self._merge_triple_entry(
-                current_triples,
-                triple_entry,
-                triple_position,
-            )
-            triple_position = triple_position + 1
-        return current_triples
-
-    def _relation_checksum(self, ct):
-        triple_str = ""
-        for item_i in ct:
-            triple_str = (
-                triple_str
-                + "#"
-                + str(item_i["content"])
-                + "#"
-                + str(item_i["pos"])
-                + "#"
-                + str(item_i["lemma_content"])
-                + "#"
-                + str(item_i["positions"])
-                + "#"
-                + str(item_i["label"])
-            )
-        return hashlib.md5(triple_str.encode()).hexdigest()
-
-    def _trim_relation_bounds(self, ct):
-        if not self._rule_settings["suppress-bounds-sw"]:
-            return
-        for c_p_o in [0, 2]:
-            while (len(ct[c_p_o]["pos"]) > 0) and (
-                ct[c_p_o]["pos"][0] in self._rule_settings["pos-to-suppress"]
-            ):
-                del ct[c_p_o]["pos"][0]
-                del ct[c_p_o]["positions"][0]
-                del ct[c_p_o]["content"][0]
-                del ct[c_p_o]["lemma_content"][0]
-            while (len(ct[c_p_o]["pos"]) > 0) and (
-                ct[c_p_o]["pos"][-1] in self._rule_settings["pos-to-suppress"]
-            ):
-                del ct[c_p_o]["pos"][-1]
-                del ct[c_p_o]["positions"][-1]
-                del ct[c_p_o]["content"][-1]
-                del ct[c_p_o]["lemma_content"][-1]
-
-    def _should_discard_relation(self, ct):
-        discard_pos = {"PART", "DET", "PRON", "CONJ", "CCONJ"}
-        if (
-            len(ct[0]["pos"]) == 1
-            and len(ct[2]["pos"]) == 1
-            and ct[0]["pos"][0] in discard_pos
-            and ct[2]["pos"][0] in discard_pos
-        ):
-            return True
-        return (
-            len(ct[0]["pos"]) == 0
-            or len(ct[1]["pos"]) == 0
-            or len(ct[2]["pos"]) == 0
-        )
-
-    def _append_relation(self, triple_list, ct, field):
-        triple_list.append(
-            {
-                "subject": ct[0],
-                "property": ct[1],
-                "value": ct[2],
-                "automatically_fill": True,
-                "confidence": 0.0,
-                "weight": 0.0,
-                "field_type": field,
-            }
-        )
-
     def get_relations(self, svos, field):
-        """get_relations API.
-
-        Example:
-            >>> callable(SyntacticTagger.get_relations)
-            True
-        """
         triple_list = []
         no_replicate = set()
         for svo in svos:
-            for ct in self._build_svo_triples(svo):
-                ct_check_sum = self._relation_checksum(ct)
-                if ct_check_sum in no_replicate:
-                    continue
-                self._trim_relation_bounds(ct)
-                if not self._should_discard_relation(ct):
-                    self._append_relation(triple_list, ct, field)
-                no_replicate.add(ct_check_sum)
+            current_triples = []
+            triple_position = 0
+            for triple_entry in svo:
+                sz_alt = len(triple_entry)
+                sz_triple = len(current_triples)
+                if sz_triple:
+                    for alti in range(sz_alt):
+                        alternate = triple_entry[alti]
+                        item = {
+                            "content": [token.text for token in alternate],
+                            "lemma_content": [token.lemma_ for token in alternate],
+                            "pos": [token.pos_ for token in alternate],
+                            "positions": [token.i for token in alternate],
+                            "label": alternate.label_,
+                        }
+                        if alti == 0:
+                            for t in range(sz_triple):
+                                current_triples[t][triple_position] = item
+                        else:
+                            for t in range(sz_triple):
+                                current_triples.append(current_triples[t])
+                                current_triples[-1][triple_position] = item
+                else:
+                    for alti in range(sz_alt):
+                        alternate = triple_entry[alti]
+                        item = {
+                            "content": [token.text for token in alternate],
+                            "lemma_content": [token.lemma_ for token in alternate],
+                            "pos": [token.pos_ for token in alternate],
+                            "positions": [token.i for token in alternate],
+                            "label": alternate.label_,
+                        }
+                        current_triples.append([item, None, None])
+                triple_position = triple_position + 1
+            for ct in current_triples:
+                triple_str = ""
+                for item_i in ct:
+                    triple_str = (
+                        triple_str
+                        + "#"
+                        + str(item_i["content"])
+                        + "#"
+                        + str(item_i["pos"])
+                        + "#"
+                        + str(item_i["lemma_content"])
+                        + "#"
+                        + str(item_i["positions"])
+                        + "#"
+                        + str(item_i["label"])
+                    )
+                ct_check_sum = hashlib.md5(triple_str.encode()).hexdigest()
+                if ct_check_sum not in no_replicate:
+                    if self._rule_settings["suppress-bounds-sw"]:
+                        for c_p_o in [0, 2]:
+                            while (len(ct[c_p_o]["pos"]) > 0) and (
+                                ct[c_p_o]["pos"][0] in self._rule_settings["pos-to-suppress"]
+                            ):
+                                del ct[c_p_o]["pos"][0]
+                                del ct[c_p_o]["positions"][0]
+                                del ct[c_p_o]["content"][0]
+                                del ct[c_p_o]["lemma_content"][0]
+                            while (len(ct[c_p_o]["pos"]) > 0) and (
+                                ct[c_p_o]["pos"][-1] in self._rule_settings["pos-to-suppress"]
+                            ):
+                                del ct[c_p_o]["pos"][-1]
+                                del ct[c_p_o]["positions"][-1]
+                                del ct[c_p_o]["content"][-1]
+                                del ct[c_p_o]["lemma_content"][-1]
+
+                    discard_svo = (
+                        (len(ct[0]["pos"]) == 1)
+                        and (len(ct[2]["pos"]) == 1)
+                        and (
+                            ct[0]["pos"][0] in ["PART", "DET", "PRON", "CONJ", "CCONJ"]
+                            and (ct[2]["pos"][0] in ["PART", "DET", "PRON", "CONJ", "CCONJ"])
+                        )
+                    )
+                    if not discard_svo:
+                        discard_svo = (len(ct[0]["pos"]) == 0) or (len(ct[1]["pos"]) == 0) or (len(ct[2]["pos"]) == 0)
+                    if not discard_svo:
+                        triple_list.append(
+                            {
+                                "subject": ct[0],
+                                "property": ct[1],
+                                "value": ct[2],
+                                "automatically_fill": True,
+                                "confidence": 0.0,
+                                "weight": 0.0,
+                                "field_type": field,
+                            }
+                        )
+                    no_replicate.add(ct_check_sum)
         return triple_list
-
-    def _validate_tag_input(self, tkeir_doc):
-        if ("title_tokens" not in tkeir_doc) and (
-            "content_tokens" not in tkeir_doc
-        ):
-            raise ValueError("title tokens or content tokens should be set")
-
-    def _prepare_spacy_doc(self, tokens):
-        search_doc = self._nlp.tokenizer(tokens)
-        return self._nlp(
-            search_doc,
-            disable=["tagger", "ner", "attribute_ruler", "lemmatizer"],
-        )
-
-    def _apply_morphosyntax(self, doc, morphosyntax):
-        with doc.retokenize() as retokenizer:
-            for token_i in range(len(doc)):
-                attrs = {
-                    "POS": morphosyntax[token_i]["pos"],
-                    "LEMMA": morphosyntax[token_i]["lemma"],
-                }
-                retokenizer.merge(doc[token_i : token_i + 1], attrs=attrs)
-
-    def _should_add_ner_span(self, doc, span):
-        if (span["end"] - span["start"]) != 1:
-            return True
-        return doc[span["start"]].pos_ not in [
-            "PART",
-            "DET",
-            "PRON",
-            "CCONJ",
-            "CONJ",
-            "INT",
-        ]
-
-    def _append_ner_spans(self, doc, matches, ner_spans):
-        for span in ner_spans or []:
-            if not self._should_add_ner_span(doc, span):
-                continue
-            matches.append(
-                Span(
-                    doc=doc,
-                    start=span["start"],
-                    end=span["end"],
-                    label=span["label"],
-                )
-            )
-
-    @staticmethod
-    def _ner_spans_overlap(a: dict, b: dict) -> bool:
-        return not (a["end"] <= b["start"] or b["end"] <= a["start"])
-
-    def _merge_ontology_ner(
-        self, existing: list[dict], ontology_spans: list[dict]
-    ) -> list[dict]:
-        """Merge ontology concept spans into NER without overlapping existing."""
-        merged = list(existing)
-        for span in ontology_spans:
-            if any(self._ner_spans_overlap(span, other) for other in merged):
-                continue
-            merged.append(span)
-        return merged
-
-    def _dep_svo_spans(self, doc, dep_svo):
-        d_subject = [
-            Span(
-                doc,
-                start=dep_svo.subject[0].i,
-                end=dep_svo.subject[-1].i + 1,
-                label="dep_subject",
-            )
-        ]
-        d_verb = [
-            Span(
-                doc,
-                start=dep_svo.verb[0].i,
-                end=dep_svo.verb[-1].i + 1,
-                label="dep_verb",
-            )
-        ]
-        d_object = [
-            Span(
-                doc,
-                start=dep_svo.object[0].i,
-                end=dep_svo.object[-1].i + 1,
-                label="dep_object",
-            )
-        ]
-        return [d_subject, d_verb, d_object]
-
-    def _tag_field(
-        self,
-        doc,
-        tkeir_doc,
-        morph_key,
-        ner_key,
-        deps_key,
-        field_type,
-    ):
-        if doc is None or not len(doc):
-            return
-
-        self._apply_morphosyntax(doc, tkeir_doc[morph_key])
-        matches = self._matcher(doc, as_spans=True)
-        self.apply_link_rule(matches)
-        self._append_ner_spans(doc, matches, tkeir_doc.get(ner_key))
-        matches = sorted(matches, key=attrgetter("start"))
-        svos = self.search_svos(matches)
-        for dep_svo in self.dependency_svo(doc):
-            svos = self.add_svo(svos, self._dep_svo_spans(doc, dep_svo))
-        svos = sorted(svos, key=lambda x: x[0][0].start)
-        tkeir_doc[deps_key] = self.get_dependencies(doc)
-        relations = self.get_relations(svos, field_type)
-        if relations:
-            tkeir_doc["kg"] = tkeir_doc["kg"] + relations
 
     def tag(self, tkeir_doc: dict):
         """POS tag the tkeir document
@@ -735,67 +451,94 @@ class SyntacticTagger:
 
         Returns:
             [dict]: the document in tkeir format with POS tags
-
-                Example:
-                    >>> callable(SyntacticTagger.tag)
-                    True
         """
         self._cache_svos = set()
-        self._validate_tag_input(tkeir_doc)
-        # Reinforce NER spans from per-document external ontologies so SVO /
-        # dependency linking stays coherent with reference vocabularies.
-        from thot.tasks.document_ontology.OntologyLexicon import (
-            ontology_ner_spans_for_document,
-            ontology_paths_from_document,
-        )
-
-        if ontology_paths_from_document(tkeir_doc):
-            onto_title, onto_content = ontology_ner_spans_for_document(
-                tkeir_doc
-            )
-            if onto_title:
-                existing = list(tkeir_doc.get("title_ner") or [])
-                tkeir_doc["title_ner"] = self._merge_ontology_ner(
-                    existing, onto_title
-                )
-            if onto_content:
-                existing = list(tkeir_doc.get("content_ner") or [])
-                tkeir_doc["content_ner"] = self._merge_ontology_ner(
-                    existing, onto_content
-                )
-
-        doc_title = None
-        doc_content = None
+        doc_title = dict()
+        search_doc_title = dict()
+        doc_content = dict()
+        search_doc_content = dict()
+        if ("title_tokens" not in tkeir_doc) and ("content_tokens" not in tkeir_doc):
+            raise ValueError("title tokens or content tokens should be set")
         if "title_tokens" in tkeir_doc:
-            doc_title = self._prepare_spacy_doc(tkeir_doc["title_tokens"])
+            search_doc_title = self._nlp.tokenizer(tkeir_doc["title_tokens"])
+            doc_title = self._nlp(search_doc_title, disable=["tagger", "ner", "attribute_ruler", "lemmatizer"])
         if "content_tokens" in tkeir_doc:
-            doc_content = self._prepare_spacy_doc(tkeir_doc["content_tokens"])
+            search_doc_content = self._nlp.tokenizer(tkeir_doc["content_tokens"])
+            doc_content = self._nlp(search_doc_content, disable=["tagger", "ner", "attribute_ruler", "lemmatizer"])
+        token_i = 0
 
         if "kg" not in tkeir_doc:
             tkeir_doc["kg"] = []
 
-        self._tag_field(
-            doc_content,
-            tkeir_doc,
-            "content_morphosyntax",
-            "content_ner",
-            "content_deps",
-            "content",
-        )
-        self._tag_field(
-            doc_title,
-            tkeir_doc,
-            "title_morphosyntax",
-            "title_ner",
-            "title_deps",
-            "title",
-        )
+        len_doc = len(doc_content)
+        if len_doc:
+            with doc_content.retokenize() as retokenizer:
+                for token_i in range(len_doc):
+                    attrs = {
+                        "POS": tkeir_doc["content_morphosyntax"][token_i]["pos"],
+                        "LEMMA": tkeir_doc["content_morphosyntax"][token_i]["lemma"],
+                    }
+                    retokenizer.merge(doc_content[token_i : token_i + 1], attrs=attrs)
+            matches_content = self._matcher(doc_content, as_spans=True)
+            self.apply_link_rule(matches_content)
+            if "content_ner" in tkeir_doc:
+                for span in tkeir_doc["content_ner"]:
+                    add_ner = True
+                    if (span["end"] - span["start"]) == 1:
+                        if doc_content[span["start"]].pos_ in ["PART", "DET", "PRON", "CCONJ", "CONJ", "INT"]:
+                            add_ner = False
+                    if add_ner:
+                        matches_content.append(Span(doc=doc_content, start=span["start"], end=span["end"], label=span["label"]))
+            matches_content = sorted(matches_content, key=attrgetter("start"))
+            svos_content = self.search_svos(matches_content)
+            dep_svos_content = self.dependency_svo(doc_content)
+            for dep_svo in dep_svos_content:
+                d_subject = [Span(doc_content, start=dep_svo.subject[0].i, end=dep_svo.subject[-1].i + 1, label="dep_subject")]
+                d_verb = [Span(doc_content, start=dep_svo.verb[0].i, end=dep_svo.verb[-1].i + 1, label="dep_verb")]
+                d_object = [Span(doc_content, start=dep_svo.object[0].i, end=dep_svo.object[-1].i + 1, label="dep_object")]
+                current_svo = [d_subject, d_verb, d_object]
+                svos_content = self.add_svo(svos_content, current_svo)
+            svos_content = sorted(svos_content, key=lambda x: x[0][0].start)
+            tkeir_doc["content_deps"] = self.get_dependencies(doc_content)
+            content_relation = self.get_relations(svos_content, "content")
+            if content_relation:
+                tkeir_doc["kg"] = tkeir_doc["kg"] + content_relation
 
-        taskInfo = TaskInfo(
-            task_name="syntax",
-            task_version=__version_syntax__,
-            task_date=__date_syntax__,
-        )
+        len_doc = len(doc_title)
+        if len_doc:
+            with doc_title.retokenize() as retokenizer:
+                for token_i in range(len_doc):
+                    attrs = {
+                        "POS": tkeir_doc["title_morphosyntax"][token_i]["pos"],
+                        "LEMMA": tkeir_doc["title_morphosyntax"][token_i]["lemma"],
+                    }
+                    retokenizer.merge(doc_title[token_i : token_i + 1], attrs=attrs)
+            matches_title = self._matcher(doc_title, as_spans=True)
+            self.apply_link_rule(matches_title)
+            if "title_ner" in tkeir_doc:
+                for span in tkeir_doc["title_ner"]:
+                    add_ner = True
+                    if (span["end"] - span["start"]) == 1:
+                        if doc_title[span["start"]].pos_ in ["PART", "DET", "PRON", "CCONJ", "CONJ", "INT"]:
+                            add_ner = False
+                    if add_ner:
+                        matches_title.append(Span(doc=doc_title, start=span["start"], end=span["end"], label=span["label"]))
+            matches_title = sorted(matches_title, key=attrgetter("start"))
+            svos_title = self.search_svos(matches_title)
+            dep_svos_title = self.dependency_svo(doc_title)
+            for dep_svo in dep_svos_title:
+                d_subject = [Span(doc_title, start=dep_svo.subject[0].i, end=dep_svo.subject[-1].i + 1, label="dep_subject")]
+                d_verb = [Span(doc_title, start=dep_svo.verb[0].i, end=dep_svo.verb[-1].i + 1, label="dep_verb")]
+                d_object = [Span(doc_title, start=dep_svo.object[0].i, end=dep_svo.object[-1].i + 1, label="dep_object")]
+                current_svo = [d_subject, d_verb, d_object]
+                svos_title = self.add_svo(svos_title, current_svo)
+            svos_title = sorted(svos_title, key=lambda x: x[0][0].start)
+            tkeir_doc["title_deps"] = self.get_dependencies(doc_title)
+            title_relation = self.get_relations(svos_title, "title")
+            if title_relation:
+                tkeir_doc["kg"] = tkeir_doc["kg"] + title_relation
+
+        taskInfo = TaskInfo(task_name="syntax", task_version=__version_syntax__, task_date=__date_syntax__)
         tkeir_doc = taskInfo.addInfo(tkeir_doc)
         self._count_run = self._count_run + 1
         if self._count_run > 100:
@@ -804,10 +547,4 @@ class SyntacticTagger:
         return tkeir_doc
 
     def run(self, tkeir_doc: dict):
-        """Run the run task step on a T-KEIR document.
-
-        Example:
-            >>> callable(SyntacticTagger.run)
-            True
-        """
         return self.tag(tkeir_doc)

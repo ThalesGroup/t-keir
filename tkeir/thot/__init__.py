@@ -1,15 +1,12 @@
-"""Title: thot package init
+# -*- coding: utf-8 -*-
+"""Package initialization
 
-THOT suite tools — T-KEIR core package.
+Author: Eric Blaudez (Eric Blaudez)
 
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2020 by THALES
 """
-
-import os
 import sys
+import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "../../../")))
@@ -17,11 +14,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "../../")))
 sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "../")))
 sys.path.insert(0, os.path.abspath(os.path.join(dir_path, "./")))
 
-# Package metadata (single source for ``import thot``)
-__version__ = "2.0.0"
-__date__ = "2026/07"
+
+# THOT suite tools
+__version__ = "1.0.3"
+__date__ = "2022/09"
 __author__ = "Eric Blaudez"
-__copyright__ = "Copyright 2026, Thales SIX GTS FRANCE"
+__copyright__ = "Copyright 2022, Thales SIX GTS FRANCE, Theresis"
 __credits__ = [__author__]
 __maintainer__ = __author__
 __email__ = "Eric Blaudez"
+__status__ = "Development"

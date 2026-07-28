@@ -1,14 +1,14 @@
-"""Title: Logger of library
+# -*- coding: utf-8 -*-
+"""Logger of library
 
-Core T-KEIR libraries (logging, config, paths, utilities).
+Author: Eric Blaudez (Eric Blaudez)
 
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2022 THALES 
+All Rights Reserved.
 """
 
 import logging
+import os
 import sys
 from time import gmtime, strftime
 
@@ -17,26 +17,13 @@ from thot.core.ThotMetrics import ThotMetrics
 
 
 class LogUserContext(dict):
-    """Dictionary-backed logging context for a single user request."""
-
-    def __init__(self, correlation_id: str):
-        """Initialize logger context with a correlation id.
-
-        Args:
-            correlation_id: Identifier used to correlate log lines.
-
-        Example:
-            >>> from thot.core.ThotLogger import LogUserContext
-            >>> ctx = LogUserContext("req-1")
-            >>> ctx["correlation-id"]
-            'req-1'
-            >>> ctx["status"]
-            200
+    def __init__(self, correlation_id:str):
+        """Initialiaize logger context with a correlation_id
+            Args:
+                correlation_id : string representating the correlation_id to follow the logs 
         """
         self["correlation-id"] = correlation_id
-        self["initial-call-date"] = strftime(
-            "%a, %d %b %Y %H:%M:%S +0000", gmtime()
-        )
+        self["initial-call-date"] = strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
         self["call-date"] = self["initial-call-date"]
         self["context-log-chunk"] = 0
         self["status"] = 200
@@ -44,8 +31,6 @@ class LogUserContext(dict):
 
 
 class ThotLoggerLevel:
-    """Expose standard logging levels and string mappings."""
-
     NOTSET = logging.NOTSET
     CRITICAL = logging.CRITICAL
     ERROR = logging.ERROR
@@ -63,8 +48,8 @@ class ThotLoggerLevel:
 
 
 class ThotLogger:
-    """Logging wrapper configured from JSON logger settings.
-
+    """Logging wrapper
+    Load/Create logger with json like configuration :
     JSON format:
 
     "logger": {
@@ -78,31 +63,18 @@ class ThotLogger:
 
     @staticmethod
     def _default_load():
-        """Create the default logger and metrics counter.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger._default_load()  # doctest: +SKIP
-        """
+        """create logger"""
         if not ThotLogger.logger_config.configuration:
             ThotLogger.logger_config._default_load()
 
         ThotMetrics.create_counter(
-            short_name="logger_errors",
-            function_name="logger_errors",
-            counter_description="Count error coming from logs",
+            short_name="logger_errors", function_name="logger_errors", counter_description="Count error coming from logs"
         )
 
-        ThotLogger.logger = logging.getLogger(
-            ThotLogger.logger_config.logger_name
-        )
+        ThotLogger.logger = logging.getLogger(ThotLogger.logger_config.logger_name)
 
         ThotLogger.logger.setLevel(
-            ThotLoggerLevel.log_levels_map[
-                ThotLogger.logger_config.configuration["logger"][
-                    "logging-level"
-                ]
-            ]
+            ThotLoggerLevel.log_levels_map[ThotLogger.logger_config.configuration["logger"]["logging-level"]]
         )
         screen_handler = logging.StreamHandler(sys.stdout)
         screen_formatter = logging.Formatter(
@@ -112,23 +84,14 @@ class ThotLogger:
         ThotLogger.logger.addHandler(screen_handler)
 
     @staticmethod
-    def _aggregate_context(trace: str = None, context: dict = None) -> str:
-        """Aggregate context fields into a log prefix string.
+    def _aggregate_context(trace:str=None, context:dict=None)->str:
+        """Aggregate context to generate string
 
         Args:
-            trace: Optional trace string.
-            context: Optional context dictionary.
-
-        Returns:
-            Formatted context prefix.
-
-        Example:
-            >>> from thot.core.ThotLogger import LogUserContext, ThotLogger
-            >>> ThotLogger.shutdown()
-            >>> ctx = LogUserContext("req-1")
-            >>> prefix = ThotLogger._aggregate_context(context=ctx)
-            >>> "[correlation-id:req-1]" in prefix
-            True
+            trace (str): trace (if it is generated).
+            context (dict) : dictionary containing log context
+        Return:
+            str : string containing context and trace
         """
         if not ThotLogger.logger:
             ThotLogger._default_load()
@@ -136,188 +99,95 @@ class ThotLogger:
         log_ctx = "[global-log-count:" + str(ThotLogger.count_logs) + "]"
         if context:
             context["context-log-chunk"] = context["context-log-chunk"] + 1
-            context["call-date"] = strftime(
-                "%a, %d %b %Y %H:%M:%S +0000", gmtime()
-            )
+            context["call-date"] = strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
             for ctx_i in context:
-                log_ctx = (
-                    log_ctx
-                    + "["
-                    + str(ctx_i)
-                    + ":"
-                    + str(context[ctx_i])
-                    + "]"
-                )
+                log_ctx = log_ctx + "[" + str(ctx_i) + ":" + str(context[ctx_i]) + "]"
         if trace:
             log_ctx = log_ctx + "[trace:" + trace + "]"
         return log_ctx
 
     @staticmethod
     def load(config_f, logger_name: str = "default", path: list = []):
-        """Load logger configuration from a JSON file.
+        """Load logger configuration from file
 
         Args:
-            config_f: File-like object containing configuration JSON.
-            logger_name: Logger name displayed in log lines.
-            path: Optional configuration path prefix.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger.load(open("/dev/null"))  # doctest: +SKIP
+            config_f (mandatory): configruation with file handler.
+            logger_name (str,optional) : name of the logger (display in log line). Defaults to default
+            path (list,option): access to a part of the configuration
         """
-        ThotLogger.logger_config.load(
-            config_f, logger_name=logger_name, path=path
-        )
+        ThotLogger.logger_config.load(config_f, logger_name=logger_name, path=path)
         ThotLogger._default_load()
 
     @staticmethod
     def loads(configuration: dict = None, logger_name: str = "default"):
-        """Load logger configuration from a dictionary.
+        """Load logger configuration from dict (json)
 
         Args:
-            configuration: Logger configuration dictionary.
-            logger_name: Logger name displayed in log lines.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger.loads({"logger": {"logging-level": "debug"}})  # doctest: +SKIP
+            configuration (dict, optional): load logger configruation with dict. Defaults to None.
         """
-        ThotLogger.logger_config.loads(
-            configuration=configuration, logger_name=logger_name
-        )
+        ThotLogger.logger_config.loads(configuration=configuration, logger_name=logger_name)
         ThotLogger._default_load()
 
     @staticmethod
     def critical(text: str, trace=None, context=None):
-        """Log a critical message.
-
+        """Logger Helper on error
         Args:
-            text: Message to display.
-            trace: Optional trace string.
-            context: Optional logging context.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger.critical("failure")  # doctest: +SKIP
+            text (str): string to display on error level
         """
         if not ThotLogger.logger:
             ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
-        )
-        ThotMetrics.increment_counter(
-            short_name="logger_errors", path="/", method="error"
-        )
+        msg = ThotLogger._aggregate_context(trace=trace, context=context) + " " + text
+        ThotMetrics.increment_counter(short_name="logger_errors", path="/", method="error")
         ThotLogger.logger.critical(msg)
 
     @staticmethod
     def error(text: str, trace=None, context=None):
-        """Log an error message.
-
+        """Logger Helper on error
         Args:
-            text: Message to display.
-            trace: Optional trace string.
-            context: Optional logging context.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger.error("failure")  # doctest: +SKIP
+            text (str): string to display on error level
         """
         if not ThotLogger.logger:
             ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
-        )
-        ThotMetrics.increment_counter(
-            short_name="logger_errors", path="/", method="error"
-        )
+        msg = ThotLogger._aggregate_context(trace=trace, context=context) + " " + text
+        ThotMetrics.increment_counter(short_name="logger_errors", path="/", method="error")
         ThotLogger.logger.error(msg)
 
     @staticmethod
     def warning(text: str, trace=None, context=None):
-        """Log a warning message.
-
+        """Logger Helper on warning
         Args:
-            text: Message to display.
-            trace: Optional trace string.
-            context: Optional logging context.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger.warning("careful")  # doctest: +SKIP
+            text (str): string to display on warning level
         """
         if not ThotLogger.logger:
             ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
-        )
+        msg = ThotLogger._aggregate_context(trace=trace, context=context) + " " + text
         ThotLogger.logger.warning(msg)
 
     @staticmethod
     def info(text: str, trace=None, context=None):
-        """Log an informational message.
-
+        """Logger Helper on info
         Args:
-            text: Message to display.
-            trace: Optional trace string.
-            context: Optional logging context.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger.info("started")  # doctest: +SKIP
+            text (str): string to display on info level
         """
         if not ThotLogger.logger:
             ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
-        )
+        msg = ThotLogger._aggregate_context(trace=trace, context=context) + " " + text
         ThotLogger.logger.info(msg)
 
     @staticmethod
     def debug(text: str, trace=None, context=None):
-        """Log a debug message.
-
+        """Logger Helper on debug
         Args:
-            text: Message to display.
-            trace: Optional trace string.
-            context: Optional logging context.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger.debug("details")  # doctest: +SKIP
+            text (str): string to display on debug level
         """
         if not ThotLogger.logger:
             ThotLogger._default_load()
-        assert ThotLogger.logger is not None
-        msg = (
-            ThotLogger._aggregate_context(trace=trace, context=context)
-            + " "
-            + text
-        )
+        msg = ThotLogger._aggregate_context(trace=trace, context=context) + " " + text
         ThotLogger.logger.debug(msg)
 
     @staticmethod
     def shutdown():
-        """Shut down logging and clear the cached logger.
-
-        Example:
-            >>> from thot.core.ThotLogger import ThotLogger
-            >>> ThotLogger.shutdown()
-            >>> ThotLogger.logger is None
-            True
-        """
+        """shutdown help to logging and clear ThotLogger"""
         logging.shutdown()
         ThotLogger.logger = None
         ThotLogger.logger_config.clear()

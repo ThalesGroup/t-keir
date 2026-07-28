@@ -1,17 +1,14 @@
-"""Title: Convert source document to tkeir indexer document
+# -*- coding: utf-8 -*-
+"""Convert source document to tkeir indexer document
+Author: Eric Blaudez (Eric Blaudez)
 
-Automated tests for T-KEIR (unit / functional).
-
-Author: Eric Blaudez
-
-Copyright (c) 2026 Thales
-Licensed under the MIT License.
+Copyright (c) 2020 by THALES
 """
 
-import json
-import unittest
-
 from thot.core.LoggerConfiguration import LoggerConfiguration
+import json
+import os
+import unittest
 
 
 class TestLoggerConfiguration(unittest.TestCase):
@@ -22,7 +19,7 @@ class TestLoggerConfiguration(unittest.TestCase):
             with open("/tmp/cfg.json", "w") as f:
                 json.dump(test_dict, f)
                 f.close()
-        except Exception:
+        except Exception as e:
             self.assertFalse(True)
         fh = open("/tmp/cfg.json")
         logger_config = LoggerConfiguration()
@@ -34,17 +31,13 @@ class TestLoggerConfiguration(unittest.TestCase):
     def test_loads(self):
         """Test load with dict function"""
         logger_config = LoggerConfiguration()
-        logger_config.loads(
-            {"logger": {"logging-level": "info"}}, logger_name="test"
-        )
+        logger_config.loads({"logger": {"logging-level": "info"}}, logger_name="test")
 
         test_dict = {"logger": {"logging-level": "info"}}
         self.assertEqual(logger_config.configuration, test_dict)
 
         logger_config.clear()
-        logger_config.loads(
-            {"logger": {"logging-level": "debug"}}, logger_name="test"
-        )
+        logger_config.loads({"logger": {"logging-level": "debug"}}, logger_name="test")
         test_dict = {"logger": {"logging-level": "debug"}}
         self.assertEqual(logger_config.configuration, test_dict)
 

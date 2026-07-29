@@ -1,0 +1,4352 @@
+{
+  "dataset": {
+    "name": "user_specific_j2x_humint",
+    "version": "1.0",
+    "persona": "J2X HUMINT Operator",
+    "primary_report_type": "SPOTREP",
+    "generated_utc": "2026-07-28T06:00:00Z",
+    "record_count": 110,
+    "index_type": "USER_SPECIFIC",
+    "classification_of_compilation": "SECRET//REL TO COALITION TF",
+    "note": "Simulated user-specific data. Links to generic dataset via generic_refs and to ontology via concept_ids.",
+    "coverage_window_utc": {
+      "from": "2026-06-28T06:00:00Z",
+      "to": "2026-07-28T06:00:00Z"
+    },
+    "cross_reference_schema": {
+      "generic_refs": "doc_id values from c2_middle_east_multi_source_1000_v3_en.json",
+      "pir_refs": "PIR-01..06 from the dataset pir_register",
+      "location_refs": "location.name values shared with the generic dataset",
+      "concept_ids": "concept_id values from c2_middle_east_business_ontology.yaml",
+      "vessel_refs": "vessel.imo values from the generic dataset vessel registry"
+    }
+  },
+  "records": [
+    {
+      "doc_id": "J2X-202606-0001",
+      "dtg": "272347ZJUN26",
+      "timestamp_utc": "2026-06-27T23:47:25Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "COVER_PLAN",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Cover plan — SRC-115 / Salalah Port Approac",
+      "text": "Cover and security plan for SRC-115 operations in Salalah Port Approach. Cover story: Local merchant. Emergency contact: CO-01. Exfil route: Maritime extraction — WARSHIP CYGNET. Plan validity: 55 days.",
+      "source_id": "SRC-115",
+      "case_officer": "CO-08",
+      "cover_story": "Truck driver",
+      "exfil_route": "LAND_CORRIDOR",
+      "validity_days": 33,
+      "pir_refs": [],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0002",
+      "dtg": "280241ZJUN26",
+      "timestamp_utc": "2026-06-28T02:41:56Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-101 / 28 Jun 2026",
+      "text": "Post-meeting debrief note for SRC-101. Case officer: CO-02. Meeting duration: 30 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next meeting scheduled: 8 days. Security assessment: MINOR CONCERNS NOTED.",
+      "source_id": "SRC-101",
+      "case_officer": "CO-02",
+      "duration_minutes": 58,
+      "reporting_quality": "AVERAGE",
+      "new_intel": true,
+      "next_meeting_days": 16,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0003",
+      "dtg": "280637ZJUN26",
+      "timestamp_utc": "2026-06-28T06:37:16Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-113 / 28 Jun 2026",
+      "text": "Post-meeting debrief note for SRC-113. Case officer: CO-05. Meeting duration: 99 min. Reporting quality: EXCELLENT — detailed and consistent. New intelligence obtained: NO. Next meeting scheduled: 14 days. Security assessment: MINOR CONCERNS NOTED.",
+      "source_id": "SRC-113",
+      "case_officer": "CO-05",
+      "duration_minutes": 27,
+      "reporting_quality": "GOOD",
+      "new_intel": true,
+      "next_meeting_days": 14,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0004",
+      "dtg": "281338ZJUN26",
+      "timestamp_utc": "2026-06-28T13:38:11Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-110 / PIR-06",
+      "text": "Tasking order for SRC-110 against PIR-06. Requirement: Report on armed group activity near coastal approach. Area: Mocha Coastal Sector. Deadline: 29h. Case officer: CO-01. Priority: PRIORITY.",
+      "source_id": "SRC-110",
+      "case_officer": "CO-01",
+      "tasking_pir": "PIR-06",
+      "area_of_interest": "Mocha Coastal Sector",
+      "requirement_text": "Observe and report convoy routes",
+      "deadline_hours": 29,
+      "priority": "ROUTINE",
+      "status": "IN PROGRESS",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0046",
+        "C2-202606-0071"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_FORCE_POSTURE",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0005",
+      "dtg": "281441ZJUN26",
+      "timestamp_utc": "2026-06-28T14:41:04Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-109 / pending validation",
+      "text": "Raw report from SRC-109 received 281441ZJUN26. Observation time: 271041ZJUN26. Reporting: Mobile radar deployed near road junction at Southern Red Sea. Validation status: PENDING. Provisional evaluation: F4. Case officer: CO-03.",
+      "source_id": "SRC-109",
+      "case_officer": "CO-03",
+      "observation_utc": "2026-06-27T10:41:04Z",
+      "raw_text_summary": "Armed personnel near coastal position",
+      "validation_status": "PENDING",
+      "provisional_reliability": "F",
+      "provisional_credibility": 4,
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0006",
+      "dtg": "282334ZJUN26",
+      "timestamp_utc": "2026-06-28T23:34:14Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-113 / pending validation",
+      "text": "Raw report from SRC-113 received 282334ZJUN26. Observation time: 271134ZJUN26. Reporting: Observed cargo transfer at isolated pier at Kharg Island Terminal. Validation status: PENDING. Provisional evaluation: A3. Case officer: CO-06.",
+      "source_id": "SRC-113",
+      "case_officer": "CO-06",
+      "observation_utc": "2026-06-27T11:34:14Z",
+      "raw_text_summary": "Mobile radar near road junction",
+      "validation_status": "PENDING",
+      "provisional_reliability": "A",
+      "provisional_credibility": 3,
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0007",
+      "dtg": "290116ZJUN26",
+      "timestamp_utc": "2026-06-29T01:16:51Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-126 / pending validation",
+      "text": "Raw report from SRC-126 received 290116ZJUN26. Observation time: 271016ZJUN26. Reporting: Vehicle convoy with covered loads on coastal road at Beirut Port Approach. Validation status: PENDING. Provisional evaluation: F5. Case officer: CO-04.",
+      "source_id": "SRC-126",
+      "case_officer": "CO-04",
+      "observation_utc": "2026-06-27T10:16:51Z",
+      "raw_text_summary": "Mobile radar near road junction",
+      "validation_status": "PENDING",
+      "provisional_reliability": "F",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0008",
+      "dtg": "290227ZJUN26",
+      "timestamp_utc": "2026-06-29T02:27:38Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-123 / PIR-01",
+      "text": "Tasking order for SRC-123 against PIR-01. Requirement: Observe and report on convoy routes. Area: Port of Tartus Approach. Deadline: 50h. Case officer: CO-08. Priority: IMMEDIATE.",
+      "source_id": "SRC-123",
+      "case_officer": "CO-08",
+      "tasking_pir": "PIR-01",
+      "area_of_interest": "Port of Tartus Approach",
+      "requirement_text": "Confirm vessel offload schedule",
+      "deadline_hours": 66,
+      "priority": "IMMEDIATE",
+      "status": "ACKNOWLEDGED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_MARITIME_INTERDICTION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0009",
+      "dtg": "291853ZJUN26",
+      "timestamp_utc": "2026-06-29T18:53:36Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-114",
+      "text": "Access evaluation for SRC-114. Primary area: Suez Gulf Approach. Secondary areas: Gulf of Aden Corridor, Gaza Maritime Approach. Access level to: armed group networks. Corroboration: WEAK — unverified. Access risk: MEDIUM.",
+      "source_id": "SRC-114",
+      "case_officer": "CO-06",
+      "primary_area": "Suez Gulf Approach",
+      "secondary_areas": [
+        "Gulf of Aden Corridor",
+        "Gaza Maritime Approach"
+      ],
+      "access_type": "LOGISTICS_HUB",
+      "corroboration": "NONE",
+      "access_risk": "MEDIUM",
+      "pir_refs": [
+        "PIR-03",
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach",
+        "Gulf of Aden Corridor",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0010",
+      "dtg": "292128ZJUN26",
+      "timestamp_utc": "2026-06-29T21:28:03Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-138 / PIR-06",
+      "text": "Tasking order for SRC-138 against PIR-06. Requirement: Report on armed group activity near coastal approach. Area: Port of Aden Anchorage. Deadline: 62h. Case officer: CO-04. Priority: IMMEDIATE.",
+      "source_id": "SRC-138",
+      "case_officer": "CO-04",
+      "tasking_pir": "PIR-06",
+      "area_of_interest": "Port of Aden Anchorage",
+      "requirement_text": "Confirm vessel offload schedule",
+      "deadline_hours": 45,
+      "priority": "ROUTINE",
+      "status": "COMPLETED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0001",
+        "C2-202606-0058"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_FORCE_POSTURE",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0011",
+      "dtg": "300230ZJUN26",
+      "timestamp_utc": "2026-06-30T02:30:00Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-120",
+      "text": "Access evaluation for SRC-120. Primary area: Port of Aden Anchorage. Secondary areas: Port of Hodeidah. Access level to: coastal roads. Corroboration: STRONG — 3+ independent sources confirm. Access risk: LOW.",
+      "source_id": "SRC-120",
+      "case_officer": "CO-05",
+      "primary_area": "Port of Aden Anchorage",
+      "secondary_areas": [
+        "Port of Hodeidah"
+      ],
+      "access_type": "ARMED_GROUP",
+      "corroboration": "STRONG",
+      "access_risk": "LOW",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage",
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0012",
+      "dtg": "300831ZJUN26",
+      "timestamp_utc": "2026-06-30T08:31:45Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-115 / pending validation",
+      "text": "Raw report from SRC-115 received 300831ZJUN26. Observation time: 282331ZJUN26. Reporting: Vehicle convoy with covered loads on coastal road at Suez Gulf Approach. Validation status: PENDING. Provisional evaluation: C2. Case officer: CO-08.",
+      "source_id": "SRC-115",
+      "case_officer": "CO-08",
+      "observation_utc": "2026-06-28T23:31:45Z",
+      "raw_text_summary": "Armed small craft departing inlet",
+      "validation_status": "PENDING",
+      "provisional_reliability": "C",
+      "provisional_credibility": 2,
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0013",
+      "dtg": "301027ZJUN26",
+      "timestamp_utc": "2026-06-30T10:27:35Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-130 / 30 Jun 2026",
+      "text": "Post-meeting debrief note for SRC-130. Case officer: CO-05. Meeting duration: 110 min. Reporting quality: AVERAGE — some gaps. New intelligence obtained: YES. Next meeting scheduled: 9 days. Security assessment: MINOR CONCERNS NOTED.",
+      "source_id": "SRC-130",
+      "case_officer": "CO-05",
+      "duration_minutes": 88,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": false,
+      "next_meeting_days": 5,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0014",
+      "dtg": "301206ZJUN26",
+      "timestamp_utc": "2026-06-30T12:06:51Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "COVER_PLAN",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Cover plan — SRC-107 / Southern Red Sea",
+      "text": "Cover and security plan for SRC-107 operations in Southern Red Sea. Cover story: Fuel distributor. Emergency contact: CO-08. Exfil route: Primary via coastal road north. Plan validity: 36 days.",
+      "source_id": "SRC-107",
+      "case_officer": "CO-05",
+      "cover_story": "Fuel distributor",
+      "exfil_route": "LAND_CORRIDOR",
+      "validity_days": 44,
+      "pir_refs": [],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202606-0015",
+      "dtg": "302121ZJUN26",
+      "timestamp_utc": "2026-06-30T21:21:17Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-102",
+      "text": "Access evaluation for SRC-102. Primary area: Gaza Maritime Approach. Secondary areas: Bab-el-Mandeb Strait, Port of Hodeidah, Kharg Island Terminal, Southern Red Sea. Access level to: maritime transport nodes. Corroboration: NONE — single-source. Access risk: HIGH.",
+      "source_id": "SRC-102",
+      "case_officer": "CO-01",
+      "primary_area": "Gaza Maritime Approach",
+      "secondary_areas": [
+        "Bab-el-Mandeb Strait",
+        "Port of Hodeidah",
+        "Kharg Island Terminal",
+        "Southern Red Sea"
+      ],
+      "access_type": "MARITIME_NODE",
+      "corroboration": "MODERATE",
+      "access_risk": "MEDIUM",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Bab-el-Mandeb Strait",
+        "Port of Hodeidah",
+        "Kharg Island Terminal",
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0016",
+      "dtg": "010808ZJUL26",
+      "timestamp_utc": "2026-07-01T08:08:58Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-127 / PIR-05",
+      "text": "Tasking order for SRC-127 against PIR-05. Requirement: Establish pattern of life for suspected facilitation node. Area: Mocha Coastal Sector. Deadline: 79h. Case officer: CO-07. Priority: IMMEDIATE.",
+      "source_id": "SRC-127",
+      "case_officer": "CO-07",
+      "tasking_pir": "PIR-05",
+      "area_of_interest": "Mocha Coastal Sector",
+      "requirement_text": "Observe and report convoy routes",
+      "deadline_hours": 95,
+      "priority": "IMMEDIATE",
+      "status": "IN PROGRESS",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0007",
+        "C2-202606-0020"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0017",
+      "dtg": "011039ZJUL26",
+      "timestamp_utc": "2026-07-01T10:39:37Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-108 / 01 Jul 2026",
+      "text": "Meeting log: SRC-108 / Case officer CO-04. Location type: Dead drop. Duration: 34 min. Material passed: NO. Counter-surveillance: MINOR SURVEILLANCE NOTED — ABORTED.",
+      "source_id": "SRC-108",
+      "case_officer": "CO-04",
+      "meeting_type": "DEAD_DROP",
+      "duration_minutes": 48,
+      "material_passed": false,
+      "counter_surveillance": "SURVEILLANCE_NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0018",
+      "dtg": "020000ZJUL26",
+      "timestamp_utc": "2026-07-02T00:00:37Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-122",
+      "text": "Access evaluation for SRC-122. Primary area: Latakia Port Approach. Secondary areas: Port of Bandar Abbas, South Tyre / Coastal Route, Gaza Maritime Approach, Gulf of Aden Corridor. Access level to: maritime transport nodes. Corroboration: NONE — single-source. Access risk: MEDIUM.",
+      "source_id": "SRC-122",
+      "case_officer": "CO-05",
+      "primary_area": "Latakia Port Approach",
+      "secondary_areas": [
+        "Port of Bandar Abbas",
+        "South Tyre / Coastal Route",
+        "Gaza Maritime Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "access_type": "COASTAL_ROAD",
+      "corroboration": "NONE",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-02",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Latakia Port Approach",
+        "Port of Bandar Abbas",
+        "South Tyre / Coastal Route",
+        "Gaza Maritime Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0019",
+      "dtg": "020630ZJUL26",
+      "timestamp_utc": "2026-07-02T06:30:10Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-120 / 02 Jul 2026",
+      "text": "Meeting log: SRC-120 / Case officer CO-08. Location type: Digital comms. Duration: 42 min. Material passed: YES. Counter-surveillance: CLEAR.",
+      "source_id": "SRC-120",
+      "case_officer": "CO-08",
+      "meeting_type": "DIRECT",
+      "duration_minutes": 35,
+      "material_passed": true,
+      "counter_surveillance": "SURVEILLANCE_NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0020",
+      "dtg": "020842ZJUL26",
+      "timestamp_utc": "2026-07-02T08:42:15Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-107 / PIR-02",
+      "text": "Tasking order for SRC-107 against PIR-02. Requirement: Observe and report on convoy routes. Area: Gaza Maritime Approach. Deadline: 40h. Case officer: CO-06. Priority: PRIORITY.",
+      "source_id": "SRC-107",
+      "case_officer": "CO-06",
+      "tasking_pir": "PIR-02",
+      "area_of_interest": "Gaza Maritime Approach",
+      "requirement_text": "Report on armed group coastal activity",
+      "deadline_hours": 74,
+      "priority": "ROUTINE",
+      "status": "COMPLETED",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0048",
+        "C2-202606-0072"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_SANCTIONS_EVASION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0021",
+      "dtg": "021509ZJUL26",
+      "timestamp_utc": "2026-07-02T15:09:36Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "COVER_PLAN",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Cover plan — SRC-112 / Fujairah OPL Anchora",
+      "text": "Cover and security plan for SRC-112 operations in Fujairah OPL Anchorage. Cover story: Local merchant. Emergency contact: CO-01. Exfil route: Maritime extraction — WARSHIP CYGNET. Plan validity: 82 days.",
+      "source_id": "SRC-112",
+      "case_officer": "CO-04",
+      "cover_story": "Port logistics contractor",
+      "exfil_route": "MARITIME_EXTRACT",
+      "validity_days": 36,
+      "pir_refs": [],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0022",
+      "dtg": "021851ZJUL26",
+      "timestamp_utc": "2026-07-02T18:51:50Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-123 / 02 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-123. Case officer: CO-02. Meeting duration: 114 min. Reporting quality: EXCELLENT — detailed and consistent. New intelligence obtained: YES. Next meeting scheduled: 12 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-123",
+      "case_officer": "CO-02",
+      "duration_minutes": 30,
+      "reporting_quality": "GOOD",
+      "new_intel": true,
+      "next_meeting_days": 4,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0023",
+      "dtg": "021952ZJUL26",
+      "timestamp_utc": "2026-07-02T19:52:19Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-108 / pending validation",
+      "text": "Raw report from SRC-108 received 021952ZJUL26. Observation time: 020852ZJUL26. Reporting: Armed personnel establishing position near coast at Fujairah OPL Anchorage. Validation status: PENDING. Provisional evaluation: F5. Case officer: CO-08.",
+      "source_id": "SRC-108",
+      "case_officer": "CO-08",
+      "observation_utc": "2026-07-02T08:52:19Z",
+      "raw_text_summary": "Armed small craft departing inlet",
+      "validation_status": "PENDING",
+      "provisional_reliability": "F",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0024",
+      "dtg": "030241ZJUL26",
+      "timestamp_utc": "2026-07-03T02:41:01Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-112 / 03 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-112. Case officer: CO-03. Meeting duration: 27 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: NO. Next meeting scheduled: 9 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-112",
+      "case_officer": "CO-03",
+      "duration_minutes": 86,
+      "reporting_quality": "GOOD",
+      "new_intel": true,
+      "next_meeting_days": 6,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0025",
+      "dtg": "031201ZJUL26",
+      "timestamp_utc": "2026-07-03T12:01:09Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-119 / PIR-02",
+      "text": "Tasking order for SRC-119 against PIR-02. Requirement: Observe and report on convoy routes. Area: Latakia Port Approach. Deadline: 29h. Case officer: CO-04. Priority: PRIORITY.",
+      "source_id": "SRC-119",
+      "case_officer": "CO-04",
+      "tasking_pir": "PIR-02",
+      "area_of_interest": "Latakia Port Approach",
+      "requirement_text": "Confirm vessel offload schedule",
+      "deadline_hours": 60,
+      "priority": "IMMEDIATE",
+      "status": "ISSUED",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0053",
+        "C2-202606-0026"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_SANCTIONS_EVASION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0026",
+      "dtg": "031947ZJUL26",
+      "timestamp_utc": "2026-07-03T19:47:27Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-113 / 03 Jul 2026",
+      "text": "Meeting log: SRC-113 / Case officer CO-02. Location type: Safe house. Duration: 21 min. Material passed: YES. Counter-surveillance: CLEAR.",
+      "source_id": "SRC-113",
+      "case_officer": "CO-02",
+      "meeting_type": "BRUSH_PASS",
+      "duration_minutes": 65,
+      "material_passed": true,
+      "counter_surveillance": "CLEAR",
+      "pir_refs": [],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0027",
+      "dtg": "032147ZJUL26",
+      "timestamp_utc": "2026-07-03T21:47:14Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-120 / 03 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-120. Case officer: CO-07. Meeting duration: 106 min. Reporting quality: AVERAGE — some gaps. New intelligence obtained: NO. Next meeting scheduled: 15 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-120",
+      "case_officer": "CO-07",
+      "duration_minutes": 94,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": true,
+      "next_meeting_days": 8,
+      "security_assessment": "NO_CONCERNS",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0028",
+      "dtg": "032203ZJUL26",
+      "timestamp_utc": "2026-07-03T22:03:20Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-118",
+      "text": "Access evaluation for SRC-118. Primary area: Gaza Maritime Approach. Secondary areas: Fujairah OPL Anchorage. Access level to: port facilities. Corroboration: MODERATE — partially corroborated. Access risk: MEDIUM.",
+      "source_id": "SRC-118",
+      "case_officer": "CO-03",
+      "primary_area": "Gaza Maritime Approach",
+      "secondary_areas": [
+        "Fujairah OPL Anchorage"
+      ],
+      "access_type": "ARMED_GROUP",
+      "corroboration": "STRONG",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-04",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0029",
+      "dtg": "040506ZJUL26",
+      "timestamp_utc": "2026-07-04T05:06:56Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-118 / 04 Jul 2026",
+      "text": "Meeting log: SRC-118 / Case officer CO-02. Location type: Safe house. Duration: 20 min. Material passed: YES. Counter-surveillance: MINOR SURVEILLANCE NOTED — ABORTED.",
+      "source_id": "SRC-118",
+      "case_officer": "CO-02",
+      "meeting_type": "BRUSH_PASS",
+      "duration_minutes": 43,
+      "material_passed": true,
+      "counter_surveillance": "CLEAR_AFTER_SDR",
+      "pir_refs": [],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0030",
+      "dtg": "041543ZJUL26",
+      "timestamp_utc": "2026-07-04T15:43:17Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-136 / PIR-05",
+      "text": "Tasking order for SRC-136 against PIR-05. Requirement: Identify contact for cargo transfer network. Area: Gulf of Aden Corridor. Deadline: 40h. Case officer: CO-04. Priority: ROUTINE.",
+      "source_id": "SRC-136",
+      "case_officer": "CO-04",
+      "tasking_pir": "PIR-05",
+      "area_of_interest": "Gulf of Aden Corridor",
+      "requirement_text": "Confirm vessel offload schedule",
+      "deadline_hours": 51,
+      "priority": "ROUTINE",
+      "status": "COMPLETED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0007",
+        "C2-202606-0041"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0031",
+      "dtg": "042246ZJUL26",
+      "timestamp_utc": "2026-07-04T22:46:22Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "COVER_PLAN",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Cover plan — SRC-104 / Beirut Port Approach",
+      "text": "Cover and security plan for SRC-104 operations in Beirut Port Approach. Cover story: Local merchant. Emergency contact: CO-02. Exfil route: Maritime extraction — WARSHIP CYGNET. Plan validity: 67 days.",
+      "source_id": "SRC-104",
+      "case_officer": "CO-03",
+      "cover_story": "Local merchant",
+      "exfil_route": "COASTAL_ROAD_NORTH",
+      "validity_days": 43,
+      "pir_refs": [],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0032",
+      "dtg": "051411ZJUL26",
+      "timestamp_utc": "2026-07-05T14:11:49Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-125 / 05 Jul 2026",
+      "text": "Meeting log: SRC-125 / Case officer CO-01. Location type: Brush pass. Duration: 64 min. Material passed: YES. Counter-surveillance: CLEAR.",
+      "source_id": "SRC-125",
+      "case_officer": "CO-01",
+      "meeting_type": "DIRECT",
+      "duration_minutes": 25,
+      "material_passed": true,
+      "counter_surveillance": "SURVEILLANCE_NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0033",
+      "dtg": "051528ZJUL26",
+      "timestamp_utc": "2026-07-05T15:28:40Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-107",
+      "text": "Access evaluation for SRC-107. Primary area: Strait of Hormuz. Secondary areas: Fujairah OPL Anchorage, Naqoura Sector / Blue Line, Gaza Maritime Approach. Access level to: logistics hubs. Corroboration: NONE — single-source. Access risk: HIGH.",
+      "source_id": "SRC-107",
+      "case_officer": "CO-08",
+      "primary_area": "Strait of Hormuz",
+      "secondary_areas": [
+        "Fujairah OPL Anchorage",
+        "Naqoura Sector / Blue Line",
+        "Gaza Maritime Approach"
+      ],
+      "access_type": "MARITIME_NODE",
+      "corroboration": "NONE",
+      "access_risk": "LOW",
+      "pir_refs": [
+        "PIR-03",
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Fujairah OPL Anchorage",
+        "Naqoura Sector / Blue Line",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0034",
+      "dtg": "052236ZJUL26",
+      "timestamp_utc": "2026-07-05T22:36:53Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-105 / pending validation",
+      "text": "Raw report from SRC-105 received 052236ZJUL26. Observation time: 041736ZJUL26. Reporting: Small craft with armed crew departing inlet at Mocha Coastal Sector. Validation status: PENDING. Provisional evaluation: D4. Case officer: CO-01.",
+      "source_id": "SRC-105",
+      "case_officer": "CO-01",
+      "observation_utc": "2026-07-04T17:36:53Z",
+      "raw_text_summary": "Covered vehicle convoy on coastal road",
+      "validation_status": "PENDING",
+      "provisional_reliability": "D",
+      "provisional_credibility": 4,
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0035",
+      "dtg": "070148ZJUL26",
+      "timestamp_utc": "2026-07-07T01:48:29Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-111 / PIR-02",
+      "text": "Tasking order for SRC-111 against PIR-02. Requirement: Confirm vessel offload schedule at indicated pier. Area: Bab-el-Mandeb Strait. Deadline: 59h. Case officer: CO-03. Priority: PRIORITY.",
+      "source_id": "SRC-111",
+      "case_officer": "CO-03",
+      "tasking_pir": "PIR-02",
+      "area_of_interest": "Bab-el-Mandeb Strait",
+      "requirement_text": "Identify cargo transfer network contact",
+      "deadline_hours": 94,
+      "priority": "ROUTINE",
+      "status": "IN PROGRESS",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0053",
+        "C2-202606-0098"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_SANCTIONS_EVASION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0036",
+      "dtg": "071220ZJUL26",
+      "timestamp_utc": "2026-07-07T12:20:48Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-126",
+      "text": "Access evaluation for SRC-126. Primary area: Naqoura Sector / Blue Line. Secondary areas: Bab-el-Mandeb Strait, Port of Bandar Abbas, Latakia Port Approach. Access level to: port facilities. Corroboration: MODERATE — partially corroborated. Access risk: LOW.",
+      "source_id": "SRC-126",
+      "case_officer": "CO-01",
+      "primary_area": "Naqoura Sector / Blue Line",
+      "secondary_areas": [
+        "Bab-el-Mandeb Strait",
+        "Port of Bandar Abbas",
+        "Latakia Port Approach"
+      ],
+      "access_type": "LOGISTICS_HUB",
+      "corroboration": "STRONG",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-05",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line",
+        "Bab-el-Mandeb Strait",
+        "Port of Bandar Abbas",
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0037",
+      "dtg": "080532ZJUL26",
+      "timestamp_utc": "2026-07-08T05:32:15Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-127 / PIR-01",
+      "text": "Tasking order for SRC-127 against PIR-01. Requirement: Report on armed group activity near coastal approach. Area: Latakia Port Approach. Deadline: 24h. Case officer: CO-05. Priority: ROUTINE.",
+      "source_id": "SRC-127",
+      "case_officer": "CO-05",
+      "tasking_pir": "PIR-01",
+      "area_of_interest": "Latakia Port Approach",
+      "requirement_text": "Confirm vessel offload schedule",
+      "deadline_hours": 62,
+      "priority": "PRIORITY",
+      "status": "ISSUED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_MARITIME_INTERDICTION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0038",
+      "dtg": "080713ZJUL26",
+      "timestamp_utc": "2026-07-08T07:13:37Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-135 / 08 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-135. Case officer: CO-02. Meeting duration: 34 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: NO. Next meeting scheduled: 18 days. Security assessment: MINOR CONCERNS NOTED.",
+      "source_id": "SRC-135",
+      "case_officer": "CO-02",
+      "duration_minutes": 40,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": true,
+      "next_meeting_days": 5,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0039",
+      "dtg": "080814ZJUL26",
+      "timestamp_utc": "2026-07-08T08:14:06Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-129 / 08 Jul 2026",
+      "text": "Meeting log: SRC-129 / Case officer CO-06. Location type: Dead drop. Duration: 89 min. Material passed: NO. Counter-surveillance: CLEAR AFTER SDR.",
+      "source_id": "SRC-129",
+      "case_officer": "CO-06",
+      "meeting_type": "DIGITAL",
+      "duration_minutes": 44,
+      "material_passed": false,
+      "counter_surveillance": "CLEAR",
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0040",
+      "dtg": "090154ZJUL26",
+      "timestamp_utc": "2026-07-09T01:54:22Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-126",
+      "text": "Access evaluation for SRC-126. Primary area: Latakia Port Approach. Secondary areas: Suez Gulf Approach. Access level to: coastal roads. Corroboration: MODERATE — partially corroborated. Access risk: HIGH.",
+      "source_id": "SRC-126",
+      "case_officer": "CO-05",
+      "primary_area": "Latakia Port Approach",
+      "secondary_areas": [
+        "Suez Gulf Approach"
+      ],
+      "access_type": "COASTAL_ROAD",
+      "corroboration": "STRONG",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-04",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Latakia Port Approach",
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0041",
+      "dtg": "090558ZJUL26",
+      "timestamp_utc": "2026-07-09T05:58:05Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "COVER_PLAN",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Cover plan — SRC-122 / Suez Gulf Approach",
+      "text": "Cover and security plan for SRC-122 operations in Suez Gulf Approach. Cover story: Local merchant. Emergency contact: CO-05. Exfil route: Maritime extraction — WARSHIP CYGNET. Plan validity: 84 days.",
+      "source_id": "SRC-122",
+      "case_officer": "CO-03",
+      "cover_story": "Port logistics contractor",
+      "exfil_route": "HELICOPTER_LZ_BRAVO",
+      "validity_days": 60,
+      "pir_refs": [],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0042",
+      "dtg": "090911ZJUL26",
+      "timestamp_utc": "2026-07-09T09:11:55Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-118 / pending validation",
+      "text": "Raw report from SRC-118 received 090911ZJUL26. Observation time: 070911ZJUL26. Reporting: Mobile radar deployed near road junction at Port of Tartus Approach. Validation status: PENDING. Provisional evaluation: D5. Case officer: CO-02.",
+      "source_id": "SRC-118",
+      "case_officer": "CO-02",
+      "observation_utc": "2026-07-07T09:11:55Z",
+      "raw_text_summary": "Armed personnel near coastal position",
+      "validation_status": "PENDING",
+      "provisional_reliability": "D",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0043",
+      "dtg": "091241ZJUL26",
+      "timestamp_utc": "2026-07-09T12:41:57Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-125",
+      "text": "Access evaluation for SRC-125. Primary area: South Tyre / Coastal Route. Secondary areas: Naqoura Sector / Blue Line, Port of Hodeidah. Access level to: maritime transport nodes. Corroboration: WEAK — unverified. Access risk: LOW.",
+      "source_id": "SRC-125",
+      "case_officer": "CO-08",
+      "primary_area": "South Tyre / Coastal Route",
+      "secondary_areas": [
+        "Naqoura Sector / Blue Line",
+        "Port of Hodeidah"
+      ],
+      "access_type": "COASTAL_ROAD",
+      "corroboration": "NONE",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-03",
+        "PIR-01"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route",
+        "Naqoura Sector / Blue Line",
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0044",
+      "dtg": "091534ZJUL26",
+      "timestamp_utc": "2026-07-09T15:34:03Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-128 / PIR-05",
+      "text": "Tasking order for SRC-128 against PIR-05. Requirement: Observe and report on convoy routes. Area: Bab-el-Mandeb Strait. Deadline: 89h. Case officer: CO-05. Priority: IMMEDIATE.",
+      "source_id": "SRC-128",
+      "case_officer": "CO-05",
+      "tasking_pir": "PIR-05",
+      "area_of_interest": "Bab-el-Mandeb Strait",
+      "requirement_text": "Identify cargo transfer network contact",
+      "deadline_hours": 26,
+      "priority": "PRIORITY",
+      "status": "ISSUED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0016",
+        "C2-202606-0028"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0045",
+      "dtg": "091949ZJUL26",
+      "timestamp_utc": "2026-07-09T19:49:17Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-135 / 09 Jul 2026",
+      "text": "Meeting log: SRC-135 / Case officer CO-08. Location type: Brush pass. Duration: 13 min. Material passed: NO. Counter-surveillance: CLEAR AFTER SDR.",
+      "source_id": "SRC-135",
+      "case_officer": "CO-08",
+      "meeting_type": "DIGITAL",
+      "duration_minutes": 87,
+      "material_passed": false,
+      "counter_surveillance": "CLEAR_AFTER_SDR",
+      "pir_refs": [],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0046",
+      "dtg": "092213ZJUL26",
+      "timestamp_utc": "2026-07-09T22:13:18Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-117 / PIR-01",
+      "text": "Tasking order for SRC-117 against PIR-01. Requirement: Confirm vessel offload schedule at indicated pier. Area: Kharg Island Terminal. Deadline: 90h. Case officer: CO-08. Priority: ROUTINE.",
+      "source_id": "SRC-117",
+      "case_officer": "CO-08",
+      "tasking_pir": "PIR-01",
+      "area_of_interest": "Kharg Island Terminal",
+      "requirement_text": "Report on armed group coastal activity",
+      "deadline_hours": 79,
+      "priority": "IMMEDIATE",
+      "status": "COMPLETED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_MARITIME_INTERDICTION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0047",
+      "dtg": "100232ZJUL26",
+      "timestamp_utc": "2026-07-10T02:32:16Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-126 / pending validation",
+      "text": "Raw report from SRC-126 received 100232ZJUL26. Observation time: 080632ZJUL26. Reporting: Small craft with armed crew departing inlet at Southern Red Sea. Validation status: PENDING. Provisional evaluation: D3. Case officer: CO-08.",
+      "source_id": "SRC-126",
+      "case_officer": "CO-08",
+      "observation_utc": "2026-07-08T06:32:16Z",
+      "raw_text_summary": "Armed small craft departing inlet",
+      "validation_status": "PENDING",
+      "provisional_reliability": "D",
+      "provisional_credibility": 3,
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0048",
+      "dtg": "101428ZJUL26",
+      "timestamp_utc": "2026-07-10T14:28:36Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-101 / pending validation",
+      "text": "Raw report from SRC-101 received 101428ZJUL26. Observation time: 091628ZJUL26. Reporting: Small craft with armed crew departing inlet at Port of Bandar Abbas. Validation status: PENDING. Provisional evaluation: B3. Case officer: CO-02.",
+      "source_id": "SRC-101",
+      "case_officer": "CO-02",
+      "observation_utc": "2026-07-09T16:28:36Z",
+      "raw_text_summary": "Covered vehicle convoy on coastal road",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 3,
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0049",
+      "dtg": "102303ZJUL26",
+      "timestamp_utc": "2026-07-10T23:03:41Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-124 / pending validation",
+      "text": "Raw report from SRC-124 received 102303ZJUL26. Observation time: 091003ZJUL26. Reporting: Small craft with armed crew departing inlet at Port of Tartus Approach. Validation status: PENDING. Provisional evaluation: F5. Case officer: CO-03.",
+      "source_id": "SRC-124",
+      "case_officer": "CO-03",
+      "observation_utc": "2026-07-09T10:03:41Z",
+      "raw_text_summary": "Armed personnel near coastal position",
+      "validation_status": "PENDING",
+      "provisional_reliability": "F",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_UAS_USV_THREAT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0050",
+      "dtg": "110121ZJUL26",
+      "timestamp_utc": "2026-07-11T01:21:11Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-113 / 11 Jul 2026",
+      "text": "Meeting log: SRC-113 / Case officer CO-05. Location type: Safe house. Duration: 41 min. Material passed: YES. Counter-surveillance: CLEAR.",
+      "source_id": "SRC-113",
+      "case_officer": "CO-05",
+      "meeting_type": "DEAD_DROP",
+      "duration_minutes": 64,
+      "material_passed": true,
+      "counter_surveillance": "CLEAR_AFTER_SDR",
+      "pir_refs": [],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0051",
+      "dtg": "110228ZJUL26",
+      "timestamp_utc": "2026-07-11T02:28:53Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-129 / PIR-06",
+      "text": "Tasking order for SRC-129 against PIR-06. Requirement: Establish pattern of life for suspected facilitation node. Area: Gaza Maritime Approach. Deadline: 66h. Case officer: CO-08. Priority: IMMEDIATE.",
+      "source_id": "SRC-129",
+      "case_officer": "CO-08",
+      "tasking_pir": "PIR-06",
+      "area_of_interest": "Gaza Maritime Approach",
+      "requirement_text": "Establish pattern of life at facilitation node",
+      "deadline_hours": 29,
+      "priority": "IMMEDIATE",
+      "status": "COMPLETED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0022",
+        "C2-202606-0071"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_FORCE_POSTURE",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0052",
+      "dtg": "111114ZJUL26",
+      "timestamp_utc": "2026-07-11T11:14:29Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-138 / pending validation",
+      "text": "Raw report from SRC-138 received 111114ZJUL26. Observation time: 100214ZJUL26. Reporting: Mobile radar deployed near road junction at Salalah Port Approach. Validation status: PENDING. Provisional evaluation: B5. Case officer: CO-02.",
+      "source_id": "SRC-138",
+      "case_officer": "CO-02",
+      "observation_utc": "2026-07-10T02:14:29Z",
+      "raw_text_summary": "Armed small craft departing inlet",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0053",
+      "dtg": "120123ZJUL26",
+      "timestamp_utc": "2026-07-12T01:23:32Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-135 / 12 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-135. Case officer: CO-08. Meeting duration: 64 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next meeting scheduled: 14 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-135",
+      "case_officer": "CO-08",
+      "duration_minutes": 66,
+      "reporting_quality": "AVERAGE",
+      "new_intel": true,
+      "next_meeting_days": 5,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0054",
+      "dtg": "120452ZJUL26",
+      "timestamp_utc": "2026-07-12T04:52:01Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-109 / 12 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-109. Case officer: CO-01. Meeting duration: 113 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: NO. Next meeting scheduled: 8 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-109",
+      "case_officer": "CO-01",
+      "duration_minutes": 37,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": false,
+      "next_meeting_days": 7,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0055",
+      "dtg": "120722ZJUL26",
+      "timestamp_utc": "2026-07-12T07:22:50Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-129 / pending validation",
+      "text": "Raw report from SRC-129 received 120722ZJUL26. Observation time: 111022ZJUL26. Reporting: Observed cargo transfer at isolated pier at Fujairah OPL Anchorage. Validation status: PENDING. Provisional evaluation: D3. Case officer: CO-02.",
+      "source_id": "SRC-129",
+      "case_officer": "CO-02",
+      "observation_utc": "2026-07-11T10:22:50Z",
+      "raw_text_summary": "Armed personnel near coastal position",
+      "validation_status": "PENDING",
+      "provisional_reliability": "D",
+      "provisional_credibility": 3,
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0056",
+      "dtg": "120734ZJUL26",
+      "timestamp_utc": "2026-07-12T07:34:00Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-116 / PIR-05",
+      "text": "Tasking order for SRC-116 against PIR-05. Requirement: Establish pattern of life for suspected facilitation node. Area: Port of Hodeidah. Deadline: 30h. Case officer: CO-03. Priority: ROUTINE.",
+      "source_id": "SRC-116",
+      "case_officer": "CO-03",
+      "tasking_pir": "PIR-05",
+      "area_of_interest": "Port of Hodeidah",
+      "requirement_text": "Establish pattern of life at facilitation node",
+      "deadline_hours": 70,
+      "priority": "PRIORITY",
+      "status": "IN PROGRESS",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0068",
+        "C2-202606-0055"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0057",
+      "dtg": "121835ZJUL26",
+      "timestamp_utc": "2026-07-12T18:35:12Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-115 / pending validation",
+      "text": "Raw report from SRC-115 received 121835ZJUL26. Observation time: 112235ZJUL26. Reporting: Small craft with armed crew departing inlet at Naqoura Sector / Blue Line. Validation status: PENDING. Provisional evaluation: B2. Case officer: CO-03.",
+      "source_id": "SRC-115",
+      "case_officer": "CO-03",
+      "observation_utc": "2026-07-11T22:35:12Z",
+      "raw_text_summary": "Armed personnel near coastal position",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 2,
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0058",
+      "dtg": "132235ZJUL26",
+      "timestamp_utc": "2026-07-13T22:35:16Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-132 / PIR-05",
+      "text": "Tasking order for SRC-132 against PIR-05. Requirement: Report on armed group activity near coastal approach. Area: Naqoura Sector / Blue Line. Deadline: 44h. Case officer: CO-06. Priority: IMMEDIATE.",
+      "source_id": "SRC-132",
+      "case_officer": "CO-06",
+      "tasking_pir": "PIR-05",
+      "area_of_interest": "Naqoura Sector / Blue Line",
+      "requirement_text": "Observe and report convoy routes",
+      "deadline_hours": 90,
+      "priority": "ROUTINE",
+      "status": "ACKNOWLEDGED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0068",
+        "C2-202606-0028"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0059",
+      "dtg": "141139ZJUL26",
+      "timestamp_utc": "2026-07-14T11:39:43Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-132 / pending validation",
+      "text": "Raw report from SRC-132 received 141139ZJUL26. Observation time: 132339ZJUL26. Reporting: Vehicle convoy with covered loads on coastal road at Suez Gulf Approach. Validation status: PENDING. Provisional evaluation: B4. Case officer: CO-06.",
+      "source_id": "SRC-132",
+      "case_officer": "CO-06",
+      "observation_utc": "2026-07-13T23:39:43Z",
+      "raw_text_summary": "Cargo transfer at isolated pier",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 4,
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0060",
+      "dtg": "141348ZJUL26",
+      "timestamp_utc": "2026-07-14T13:48:56Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-101 / PIR-02",
+      "text": "Tasking order for SRC-101 against PIR-02. Requirement: Identify contact for cargo transfer network. Area: Strait of Hormuz. Deadline: 49h. Case officer: CO-05. Priority: PRIORITY.",
+      "source_id": "SRC-101",
+      "case_officer": "CO-05",
+      "tasking_pir": "PIR-02",
+      "area_of_interest": "Strait of Hormuz",
+      "requirement_text": "Establish pattern of life at facilitation node",
+      "deadline_hours": 49,
+      "priority": "PRIORITY",
+      "status": "COMPLETED",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0072",
+        "C2-202606-0112"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_SANCTIONS_EVASION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0061",
+      "dtg": "141430ZJUL26",
+      "timestamp_utc": "2026-07-14T14:30:29Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-107 / PIR-05",
+      "text": "Tasking order for SRC-107 against PIR-05. Requirement: Establish pattern of life for suspected facilitation node. Area: Latakia Port Approach. Deadline: 65h. Case officer: CO-05. Priority: IMMEDIATE.",
+      "source_id": "SRC-107",
+      "case_officer": "CO-05",
+      "tasking_pir": "PIR-05",
+      "area_of_interest": "Latakia Port Approach",
+      "requirement_text": "Report on armed group coastal activity",
+      "deadline_hours": 45,
+      "priority": "IMMEDIATE",
+      "status": "ACKNOWLEDGED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0068",
+        "C2-202606-0020"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0062",
+      "dtg": "141527ZJUL26",
+      "timestamp_utc": "2026-07-14T15:27:29Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-108",
+      "text": "Access evaluation for SRC-108. Primary area: Port of Tartus Approach. Secondary areas: Bab-el-Mandeb Strait, Port of Aden Anchorage, Naqoura Sector / Blue Line, Salalah Port Approach. Access level to: port facilities. Corroboration: WEAK — unverified. Access risk: LOW.",
+      "source_id": "SRC-108",
+      "case_officer": "CO-02",
+      "primary_area": "Port of Tartus Approach",
+      "secondary_areas": [
+        "Bab-el-Mandeb Strait",
+        "Port of Aden Anchorage",
+        "Naqoura Sector / Blue Line",
+        "Salalah Port Approach"
+      ],
+      "access_type": "PORT_FACILITY",
+      "corroboration": "WEAK",
+      "access_risk": "MEDIUM",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach",
+        "Bab-el-Mandeb Strait",
+        "Port of Aden Anchorage",
+        "Naqoura Sector / Blue Line",
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0063",
+      "dtg": "142207ZJUL26",
+      "timestamp_utc": "2026-07-14T22:07:54Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-104",
+      "text": "Access evaluation for SRC-104. Primary area: Kharg Island Terminal. Secondary areas: Southern Red Sea. Access level to: armed group networks. Corroboration: NONE — single-source. Access risk: MEDIUM.",
+      "source_id": "SRC-104",
+      "case_officer": "CO-08",
+      "primary_area": "Kharg Island Terminal",
+      "secondary_areas": [
+        "Southern Red Sea"
+      ],
+      "access_type": "ARMED_GROUP",
+      "corroboration": "STRONG",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-05",
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal",
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0064",
+      "dtg": "151145ZJUL26",
+      "timestamp_utc": "2026-07-15T11:45:55Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-133 / pending validation",
+      "text": "Raw report from SRC-133 received 151145ZJUL26. Observation time: 150445ZJUL26. Reporting: Small craft with armed crew departing inlet at Port of Aden Anchorage. Validation status: PENDING. Provisional evaluation: C5. Case officer: CO-02.",
+      "source_id": "SRC-133",
+      "case_officer": "CO-02",
+      "observation_utc": "2026-07-15T04:45:55Z",
+      "raw_text_summary": "Armed personnel near coastal position",
+      "validation_status": "PENDING",
+      "provisional_reliability": "C",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0065",
+      "dtg": "151344ZJUL26",
+      "timestamp_utc": "2026-07-15T13:44:09Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-132",
+      "text": "Access evaluation for SRC-132. Primary area: South Tyre / Coastal Route. Secondary areas: Kharg Island Terminal, Gaza Maritime Approach. Access level to: logistics hubs. Corroboration: STRONG — 3+ independent sources confirm. Access risk: LOW.",
+      "source_id": "SRC-132",
+      "case_officer": "CO-06",
+      "primary_area": "South Tyre / Coastal Route",
+      "secondary_areas": [
+        "Kharg Island Terminal",
+        "Gaza Maritime Approach"
+      ],
+      "access_type": "COASTAL_ROAD",
+      "corroboration": "NONE",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-02",
+        "PIR-01"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route",
+        "Kharg Island Terminal",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0066",
+      "dtg": "151404ZJUL26",
+      "timestamp_utc": "2026-07-15T14:04:08Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-125 / 15 Jul 2026",
+      "text": "Meeting log: SRC-125 / Case officer CO-03. Location type: Dead drop. Duration: 16 min. Material passed: YES. Counter-surveillance: MINOR SURVEILLANCE NOTED — ABORTED.",
+      "source_id": "SRC-125",
+      "case_officer": "CO-03",
+      "meeting_type": "SAFE_HOUSE",
+      "duration_minutes": 65,
+      "material_passed": true,
+      "counter_surveillance": "CLEAR_AFTER_SDR",
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0067",
+      "dtg": "160105ZJUL26",
+      "timestamp_utc": "2026-07-16T01:05:53Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-125 / 16 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-125. Case officer: CO-07. Meeting duration: 49 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: NO. Next meeting scheduled: 5 days. Security assessment: MINOR CONCERNS NOTED.",
+      "source_id": "SRC-125",
+      "case_officer": "CO-07",
+      "duration_minutes": 112,
+      "reporting_quality": "POOR",
+      "new_intel": false,
+      "next_meeting_days": 15,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0068",
+      "dtg": "160157ZJUL26",
+      "timestamp_utc": "2026-07-16T01:57:17Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-102 / pending validation",
+      "text": "Raw report from SRC-102 received 160157ZJUL26. Observation time: 150757ZJUL26. Reporting: Observed cargo transfer at isolated pier at Fujairah OPL Anchorage. Validation status: PENDING. Provisional evaluation: A3. Case officer: CO-07.",
+      "source_id": "SRC-102",
+      "case_officer": "CO-07",
+      "observation_utc": "2026-07-15T07:57:17Z",
+      "raw_text_summary": "Covered vehicle convoy on coastal road",
+      "validation_status": "PENDING",
+      "provisional_reliability": "A",
+      "provisional_credibility": 3,
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0069",
+      "dtg": "160342ZJUL26",
+      "timestamp_utc": "2026-07-16T03:42:38Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-132",
+      "text": "Access evaluation for SRC-132. Primary area: Naqoura Sector / Blue Line. Secondary areas: South Tyre / Coastal Route, Kharg Island Terminal, Suez Gulf Approach, Gaza Maritime Approach. Access level to: armed group networks. Corroboration: NONE — single-source. Access risk: LOW.",
+      "source_id": "SRC-132",
+      "case_officer": "CO-03",
+      "primary_area": "Naqoura Sector / Blue Line",
+      "secondary_areas": [
+        "South Tyre / Coastal Route",
+        "Kharg Island Terminal",
+        "Suez Gulf Approach",
+        "Gaza Maritime Approach"
+      ],
+      "access_type": "ARMED_GROUP",
+      "corroboration": "WEAK",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line",
+        "South Tyre / Coastal Route",
+        "Kharg Island Terminal",
+        "Suez Gulf Approach",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0070",
+      "dtg": "160433ZJUL26",
+      "timestamp_utc": "2026-07-16T04:33:59Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-107 / pending validation",
+      "text": "Raw report from SRC-107 received 160433ZJUL26. Observation time: 151033ZJUL26. Reporting: Small craft with armed crew departing inlet at Bab-el-Mandeb Strait. Validation status: PENDING. Provisional evaluation: C3. Case officer: CO-01.",
+      "source_id": "SRC-107",
+      "case_officer": "CO-01",
+      "observation_utc": "2026-07-15T10:33:59Z",
+      "raw_text_summary": "Covered vehicle convoy on coastal road",
+      "validation_status": "PENDING",
+      "provisional_reliability": "C",
+      "provisional_credibility": 3,
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0071",
+      "dtg": "160938ZJUL26",
+      "timestamp_utc": "2026-07-16T09:38:45Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-130 / 16 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-130. Case officer: CO-08. Meeting duration: 115 min. Reporting quality: EXCELLENT — detailed and consistent. New intelligence obtained: NO. Next meeting scheduled: 15 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-130",
+      "case_officer": "CO-08",
+      "duration_minutes": 102,
+      "reporting_quality": "POOR",
+      "new_intel": true,
+      "next_meeting_days": 3,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0072",
+      "dtg": "161703ZJUL26",
+      "timestamp_utc": "2026-07-16T17:03:53Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-106 / 16 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-106. Case officer: CO-02. Meeting duration: 82 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next meeting scheduled: 5 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-106",
+      "case_officer": "CO-02",
+      "duration_minutes": 95,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": true,
+      "next_meeting_days": 15,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0073",
+      "dtg": "171658ZJUL26",
+      "timestamp_utc": "2026-07-17T16:58:25Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-112 / 17 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-112. Case officer: CO-08. Meeting duration: 118 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: NO. Next meeting scheduled: 14 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-112",
+      "case_officer": "CO-08",
+      "duration_minutes": 35,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": false,
+      "next_meeting_days": 9,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0074",
+      "dtg": "172012ZJUL26",
+      "timestamp_utc": "2026-07-17T20:12:28Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-108 / pending validation",
+      "text": "Raw report from SRC-108 received 172012ZJUL26. Observation time: 170012ZJUL26. Reporting: Mobile radar deployed near road junction at Suez Gulf Approach. Validation status: PENDING. Provisional evaluation: B4. Case officer: CO-03.",
+      "source_id": "SRC-108",
+      "case_officer": "CO-03",
+      "observation_utc": "2026-07-17T00:12:28Z",
+      "raw_text_summary": "Covered vehicle convoy on coastal road",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 4,
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0075",
+      "dtg": "172312ZJUL26",
+      "timestamp_utc": "2026-07-17T23:12:16Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-111 / PIR-01",
+      "text": "Tasking order for SRC-111 against PIR-01. Requirement: Identify contact for cargo transfer network. Area: Latakia Port Approach. Deadline: 27h. Case officer: CO-01. Priority: ROUTINE.",
+      "source_id": "SRC-111",
+      "case_officer": "CO-01",
+      "tasking_pir": "PIR-01",
+      "area_of_interest": "Latakia Port Approach",
+      "requirement_text": "Identify cargo transfer network contact",
+      "deadline_hours": 51,
+      "priority": "PRIORITY",
+      "status": "ACKNOWLEDGED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0023",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_MARITIME_INTERDICTION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0076",
+      "dtg": "190501ZJUL26",
+      "timestamp_utc": "2026-07-19T05:01:28Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-103 / 19 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-103. Case officer: CO-07. Meeting duration: 107 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next meeting scheduled: 3 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-103",
+      "case_officer": "CO-07",
+      "duration_minutes": 47,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": true,
+      "next_meeting_days": 4,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0077",
+      "dtg": "191536ZJUL26",
+      "timestamp_utc": "2026-07-19T15:36:29Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-107 / 19 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-107. Case officer: CO-07. Meeting duration: 101 min. Reporting quality: AVERAGE — some gaps. New intelligence obtained: YES. Next meeting scheduled: 16 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-107",
+      "case_officer": "CO-07",
+      "duration_minutes": 43,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": false,
+      "next_meeting_days": 6,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0078",
+      "dtg": "191745ZJUL26",
+      "timestamp_utc": "2026-07-19T17:45:11Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-136 / PIR-06",
+      "text": "Tasking order for SRC-136 against PIR-06. Requirement: Establish pattern of life for suspected facilitation node. Area: Gulf of Aden Corridor. Deadline: 76h. Case officer: CO-01. Priority: IMMEDIATE.",
+      "source_id": "SRC-136",
+      "case_officer": "CO-01",
+      "tasking_pir": "PIR-06",
+      "area_of_interest": "Gulf of Aden Corridor",
+      "requirement_text": "Identify cargo transfer network contact",
+      "deadline_hours": 59,
+      "priority": "ROUTINE",
+      "status": "ISSUED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0021",
+        "C2-202606-0001"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_FORCE_POSTURE",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0079",
+      "dtg": "191842ZJUL26",
+      "timestamp_utc": "2026-07-19T18:42:25Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-125",
+      "text": "Access evaluation for SRC-125. Primary area: Port of Tartus Approach. Secondary areas: Gaza Maritime Approach, Beirut Port Approach. Access level to: coastal roads. Corroboration: MODERATE — partially corroborated. Access risk: LOW.",
+      "source_id": "SRC-125",
+      "case_officer": "CO-02",
+      "primary_area": "Port of Tartus Approach",
+      "secondary_areas": [
+        "Gaza Maritime Approach",
+        "Beirut Port Approach"
+      ],
+      "access_type": "COASTAL_ROAD",
+      "corroboration": "MODERATE",
+      "access_risk": "LOW",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach",
+        "Gaza Maritime Approach",
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0080",
+      "dtg": "200001ZJUL26",
+      "timestamp_utc": "2026-07-20T00:01:05Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-124 / 20 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-124. Case officer: CO-05. Meeting duration: 27 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next meeting scheduled: 17 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-124",
+      "case_officer": "CO-05",
+      "duration_minutes": 30,
+      "reporting_quality": "GOOD",
+      "new_intel": true,
+      "next_meeting_days": 21,
+      "security_assessment": "NO_CONCERNS",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0081",
+      "dtg": "200412ZJUL26",
+      "timestamp_utc": "2026-07-20T04:12:26Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-106 / 20 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-106. Case officer: CO-05. Meeting duration: 40 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: NO. Next meeting scheduled: 10 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-106",
+      "case_officer": "CO-05",
+      "duration_minutes": 72,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": true,
+      "next_meeting_days": 17,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0082",
+      "dtg": "202205ZJUL26",
+      "timestamp_utc": "2026-07-20T22:05:46Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-131 / 20 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-131. Case officer: CO-01. Meeting duration: 104 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next meeting scheduled: 16 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-131",
+      "case_officer": "CO-01",
+      "duration_minutes": 99,
+      "reporting_quality": "AVERAGE",
+      "new_intel": true,
+      "next_meeting_days": 11,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0083",
+      "dtg": "202358ZJUL26",
+      "timestamp_utc": "2026-07-20T23:58:44Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-126 / pending validation",
+      "text": "Raw report from SRC-126 received 202358ZJUL26. Observation time: 190658ZJUL26. Reporting: Small craft with armed crew departing inlet at South Tyre / Coastal Route. Validation status: PENDING. Provisional evaluation: A5. Case officer: CO-03.",
+      "source_id": "SRC-126",
+      "case_officer": "CO-03",
+      "observation_utc": "2026-07-19T06:58:44Z",
+      "raw_text_summary": "Armed personnel near coastal position",
+      "validation_status": "PENDING",
+      "provisional_reliability": "A",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0084",
+      "dtg": "211836ZJUL26",
+      "timestamp_utc": "2026-07-21T18:36:32Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-138",
+      "text": "Access evaluation for SRC-138. Primary area: Salalah Port Approach. Secondary areas: Gaza Maritime Approach, Strait of Hormuz, Southern Red Sea, Mocha Coastal Sector. Access level to: logistics hubs. Corroboration: MODERATE — partially corroborated. Access risk: MEDIUM.",
+      "source_id": "SRC-138",
+      "case_officer": "CO-07",
+      "primary_area": "Salalah Port Approach",
+      "secondary_areas": [
+        "Gaza Maritime Approach",
+        "Strait of Hormuz",
+        "Southern Red Sea",
+        "Mocha Coastal Sector"
+      ],
+      "access_type": "LOGISTICS_HUB",
+      "corroboration": "MODERATE",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "Gaza Maritime Approach",
+        "Strait of Hormuz",
+        "Southern Red Sea",
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0085",
+      "dtg": "220742ZJUL26",
+      "timestamp_utc": "2026-07-22T07:42:13Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "COVER_PLAN",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Cover plan — SRC-109 / Gaza Maritime Approa",
+      "text": "Cover and security plan for SRC-109 operations in Gaza Maritime Approach. Cover story: Fuel distributor. Emergency contact: CO-02. Exfil route: Land corridor to friendly border. Plan validity: 78 days.",
+      "source_id": "SRC-109",
+      "case_officer": "CO-08",
+      "cover_story": "Local merchant",
+      "exfil_route": "MARITIME_EXTRACT",
+      "validity_days": 52,
+      "pir_refs": [],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0086",
+      "dtg": "220806ZJUL26",
+      "timestamp_utc": "2026-07-22T08:06:02Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-109 / 22 Jul 2026",
+      "text": "Meeting log: SRC-109 / Case officer CO-08. Location type: Direct meeting. Duration: 23 min. Material passed: NO. Counter-surveillance: CLEAR.",
+      "source_id": "SRC-109",
+      "case_officer": "CO-08",
+      "meeting_type": "DEAD_DROP",
+      "duration_minutes": 85,
+      "material_passed": true,
+      "counter_surveillance": "SURVEILLANCE_NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0087",
+      "dtg": "220810ZJUL26",
+      "timestamp_utc": "2026-07-22T08:10:26Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-116 / pending validation",
+      "text": "Raw report from SRC-116 received 220810ZJUL26. Observation time: 210310ZJUL26. Reporting: Vehicle convoy with covered loads on coastal road at Gaza Maritime Approach. Validation status: PENDING. Provisional evaluation: D4. Case officer: CO-06.",
+      "source_id": "SRC-116",
+      "case_officer": "CO-06",
+      "observation_utc": "2026-07-21T03:10:26Z",
+      "raw_text_summary": "Armed personnel near coastal position",
+      "validation_status": "PENDING",
+      "provisional_reliability": "D",
+      "provisional_credibility": 4,
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0088",
+      "dtg": "221930ZJUL26",
+      "timestamp_utc": "2026-07-22T19:30:13Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-127 / 22 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-127. Case officer: CO-07. Meeting duration: 116 min. Reporting quality: AVERAGE — some gaps. New intelligence obtained: NO. Next meeting scheduled: 3 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-127",
+      "case_officer": "CO-07",
+      "duration_minutes": 95,
+      "reporting_quality": "AVERAGE",
+      "new_intel": false,
+      "next_meeting_days": 16,
+      "security_assessment": "NO_CONCERNS",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0089",
+      "dtg": "230310ZJUL26",
+      "timestamp_utc": "2026-07-23T03:10:56Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-118 / pending validation",
+      "text": "Raw report from SRC-118 received 230310ZJUL26. Observation time: 220510ZJUL26. Reporting: Mobile radar deployed near road junction at Port of Tartus Approach. Validation status: PENDING. Provisional evaluation: B5. Case officer: CO-08.",
+      "source_id": "SRC-118",
+      "case_officer": "CO-08",
+      "observation_utc": "2026-07-22T05:10:56Z",
+      "raw_text_summary": "Cargo transfer at isolated pier",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0090",
+      "dtg": "230916ZJUL26",
+      "timestamp_utc": "2026-07-23T09:16:59Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-116 / PIR-01",
+      "text": "Tasking order for SRC-116 against PIR-01. Requirement: Observe and report on convoy routes. Area: Salalah Port Approach. Deadline: 34h. Case officer: CO-06. Priority: ROUTINE.",
+      "source_id": "SRC-116",
+      "case_officer": "CO-06",
+      "tasking_pir": "PIR-01",
+      "area_of_interest": "Salalah Port Approach",
+      "requirement_text": "Observe and report convoy routes",
+      "deadline_hours": 86,
+      "priority": "IMMEDIATE",
+      "status": "COMPLETED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_MARITIME_INTERDICTION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0091",
+      "dtg": "231616ZJUL26",
+      "timestamp_utc": "2026-07-23T16:16:18Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-102 / pending validation",
+      "text": "Raw report from SRC-102 received 231616ZJUL26. Observation time: 220016ZJUL26. Reporting: Small craft with armed crew departing inlet at Strait of Hormuz. Validation status: PENDING. Provisional evaluation: F3. Case officer: CO-04.",
+      "source_id": "SRC-102",
+      "case_officer": "CO-04",
+      "observation_utc": "2026-07-22T00:16:18Z",
+      "raw_text_summary": "Cargo transfer at isolated pier",
+      "validation_status": "PENDING",
+      "provisional_reliability": "F",
+      "provisional_credibility": 3,
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0092",
+      "dtg": "231811ZJUL26",
+      "timestamp_utc": "2026-07-23T18:11:37Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-120 / pending validation",
+      "text": "Raw report from SRC-120 received 231811ZJUL26. Observation time: 230511ZJUL26. Reporting: Vehicle convoy with covered loads on coastal road at Suez Gulf Approach. Validation status: PENDING. Provisional evaluation: D4. Case officer: CO-07.",
+      "source_id": "SRC-120",
+      "case_officer": "CO-07",
+      "observation_utc": "2026-07-23T05:11:37Z",
+      "raw_text_summary": "Mobile radar near road junction",
+      "validation_status": "PENDING",
+      "provisional_reliability": "D",
+      "provisional_credibility": 4,
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0093",
+      "dtg": "240852ZJUL26",
+      "timestamp_utc": "2026-07-24T08:52:54Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "COVER_PLAN",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Cover plan — SRC-102 / Bab-el-Mandeb Strait",
+      "text": "Cover and security plan for SRC-102 operations in Bab-el-Mandeb Strait. Cover story: Port logistics contractor. Emergency contact: CO-03. Exfil route: Helicopter extraction — LZ BRAVO. Plan validity: 65 days.",
+      "source_id": "SRC-102",
+      "case_officer": "CO-01",
+      "cover_story": "Fuel distributor",
+      "exfil_route": "HELICOPTER_LZ_BRAVO",
+      "validity_days": 74,
+      "pir_refs": [],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0094",
+      "dtg": "240901ZJUL26",
+      "timestamp_utc": "2026-07-24T09:01:08Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-115 / pending validation",
+      "text": "Raw report from SRC-115 received 240901ZJUL26. Observation time: 240301ZJUL26. Reporting: Vehicle convoy with covered loads on coastal road at Gaza Maritime Approach. Validation status: PENDING. Provisional evaluation: B2. Case officer: CO-01.",
+      "source_id": "SRC-115",
+      "case_officer": "CO-01",
+      "observation_utc": "2026-07-24T03:01:08Z",
+      "raw_text_summary": "Mobile radar near road junction",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 2,
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0095",
+      "dtg": "241131ZJUL26",
+      "timestamp_utc": "2026-07-24T11:31:52Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-107",
+      "text": "Access evaluation for SRC-107. Primary area: Strait of Hormuz. Secondary areas: South Tyre / Coastal Route, Mocha Coastal Sector, Kharg Island Terminal, Fujairah OPL Anchorage. Access level to: maritime transport nodes. Corroboration: WEAK — unverified. Access risk: LOW.",
+      "source_id": "SRC-107",
+      "case_officer": "CO-03",
+      "primary_area": "Strait of Hormuz",
+      "secondary_areas": [
+        "South Tyre / Coastal Route",
+        "Mocha Coastal Sector",
+        "Kharg Island Terminal",
+        "Fujairah OPL Anchorage"
+      ],
+      "access_type": "ARMED_GROUP",
+      "corroboration": "MODERATE",
+      "access_risk": "MEDIUM",
+      "pir_refs": [
+        "PIR-03",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "South Tyre / Coastal Route",
+        "Mocha Coastal Sector",
+        "Kharg Island Terminal",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0096",
+      "dtg": "241440ZJUL26",
+      "timestamp_utc": "2026-07-24T14:40:22Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-118 / 24 Jul 2026",
+      "text": "Meeting log: SRC-118 / Case officer CO-07. Location type: Direct meeting. Duration: 24 min. Material passed: NO. Counter-surveillance: MINOR SURVEILLANCE NOTED — ABORTED.",
+      "source_id": "SRC-118",
+      "case_officer": "CO-07",
+      "meeting_type": "DEAD_DROP",
+      "duration_minutes": 68,
+      "material_passed": false,
+      "counter_surveillance": "SURVEILLANCE_NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0097",
+      "dtg": "242119ZJUL26",
+      "timestamp_utc": "2026-07-24T21:19:38Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-126 / pending validation",
+      "text": "Raw report from SRC-126 received 242119ZJUL26. Observation time: 232119ZJUL26. Reporting: Mobile radar deployed near road junction at Suez Gulf Approach. Validation status: PENDING. Provisional evaluation: B4. Case officer: CO-02.",
+      "source_id": "SRC-126",
+      "case_officer": "CO-02",
+      "observation_utc": "2026-07-23T21:19:38Z",
+      "raw_text_summary": "Covered vehicle convoy on coastal road",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 4,
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_UAS_USV_THREAT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0098",
+      "dtg": "242128ZJUL26",
+      "timestamp_utc": "2026-07-24T21:28:15Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-101",
+      "text": "Access evaluation for SRC-101. Primary area: Salalah Port Approach. Secondary areas: Fujairah OPL Anchorage, Port of Bandar Abbas, Kharg Island Terminal. Access level to: logistics hubs. Corroboration: NONE — single-source. Access risk: HIGH.",
+      "source_id": "SRC-101",
+      "case_officer": "CO-08",
+      "primary_area": "Salalah Port Approach",
+      "secondary_areas": [
+        "Fujairah OPL Anchorage",
+        "Port of Bandar Abbas",
+        "Kharg Island Terminal"
+      ],
+      "access_type": "PORT_FACILITY",
+      "corroboration": "MODERATE",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "Fujairah OPL Anchorage",
+        "Port of Bandar Abbas",
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0099",
+      "dtg": "251548ZJUL26",
+      "timestamp_utc": "2026-07-25T15:48:30Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-117 / pending validation",
+      "text": "Raw report from SRC-117 received 251548ZJUL26. Observation time: 241048ZJUL26. Reporting: Armed personnel establishing position near coast at Bab-el-Mandeb Strait. Validation status: PENDING. Provisional evaluation: F2. Case officer: CO-04.",
+      "source_id": "SRC-117",
+      "case_officer": "CO-04",
+      "observation_utc": "2026-07-24T10:48:30Z",
+      "raw_text_summary": "Cargo transfer at isolated pier",
+      "validation_status": "PENDING",
+      "provisional_reliability": "F",
+      "provisional_credibility": 2,
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0100",
+      "dtg": "251621ZJUL26",
+      "timestamp_utc": "2026-07-25T16:21:05Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "COVER_PLAN",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Cover plan — SRC-101 / Bab-el-Mandeb Strait",
+      "text": "Cover and security plan for SRC-101 operations in Bab-el-Mandeb Strait. Cover story: Commercial fisherman. Emergency contact: CO-05. Exfil route: Primary via coastal road north. Plan validity: 72 days.",
+      "source_id": "SRC-101",
+      "case_officer": "CO-08",
+      "cover_story": "Port logistics contractor",
+      "exfil_route": "LAND_CORRIDOR",
+      "validity_days": 52,
+      "pir_refs": [],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0101",
+      "dtg": "251836ZJUL26",
+      "timestamp_utc": "2026-07-25T18:36:34Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-109 / PIR-06",
+      "text": "Tasking order for SRC-109 against PIR-06. Requirement: Confirm vessel offload schedule at indicated pier. Area: Port of Aden Anchorage. Deadline: 35h. Case officer: CO-06. Priority: IMMEDIATE.",
+      "source_id": "SRC-109",
+      "case_officer": "CO-06",
+      "tasking_pir": "PIR-06",
+      "area_of_interest": "Port of Aden Anchorage",
+      "requirement_text": "Establish pattern of life at facilitation node",
+      "deadline_hours": 47,
+      "priority": "PRIORITY",
+      "status": "ISSUED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0046",
+        "C2-202606-0001"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_FORCE_POSTURE",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0102",
+      "dtg": "251926ZJUL26",
+      "timestamp_utc": "2026-07-25T19:26:03Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-104 / 25 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-104. Case officer: CO-02. Meeting duration: 27 min. Reporting quality: AVERAGE — some gaps. New intelligence obtained: YES. Next meeting scheduled: 3 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-104",
+      "case_officer": "CO-02",
+      "duration_minutes": 64,
+      "reporting_quality": "EXCELLENT",
+      "new_intel": true,
+      "next_meeting_days": 10,
+      "security_assessment": "UNDER_REVIEW",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0103",
+      "dtg": "260906ZJUL26",
+      "timestamp_utc": "2026-07-26T09:06:02Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-132 / pending validation",
+      "text": "Raw report from SRC-132 received 260906ZJUL26. Observation time: 260206ZJUL26. Reporting: Small craft with armed crew departing inlet at Fujairah OPL Anchorage. Validation status: PENDING. Provisional evaluation: F5. Case officer: CO-06.",
+      "source_id": "SRC-132",
+      "case_officer": "CO-06",
+      "observation_utc": "2026-07-26T02:06:02Z",
+      "raw_text_summary": "Mobile radar near road junction",
+      "validation_status": "PENDING",
+      "provisional_reliability": "F",
+      "provisional_credibility": 5,
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0104",
+      "dtg": "261843ZJUL26",
+      "timestamp_utc": "2026-07-26T18:43:16Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "SOURCE_MEETING",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-103 / 26 Jul 2026",
+      "text": "Meeting log: SRC-103 / Case officer CO-05. Location type: Digital comms. Duration: 72 min. Material passed: NO. Counter-surveillance: MINOR SURVEILLANCE NOTED — ABORTED.",
+      "source_id": "SRC-103",
+      "case_officer": "CO-05",
+      "meeting_type": "DIGITAL",
+      "duration_minutes": 70,
+      "material_passed": true,
+      "counter_surveillance": "CLEAR",
+      "pir_refs": [],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "J2X_HUMINT",
+        "SOURCE_CATEGORY",
+        "SECRET_REL"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0105",
+      "dtg": "262008ZJUL26",
+      "timestamp_utc": "2026-07-26T20:08:02Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-122 / PIR-01",
+      "text": "Tasking order for SRC-122 against PIR-01. Requirement: Identify contact for cargo transfer network. Area: Port of Bandar Abbas. Deadline: 89h. Case officer: CO-05. Priority: PRIORITY.",
+      "source_id": "SRC-122",
+      "case_officer": "CO-05",
+      "tasking_pir": "PIR-01",
+      "area_of_interest": "Port of Bandar Abbas",
+      "requirement_text": "Identify cargo transfer network contact",
+      "deadline_hours": 60,
+      "priority": "PRIORITY",
+      "status": "COMPLETED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_MARITIME_INTERDICTION",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0106",
+      "dtg": "262115ZJUL26",
+      "timestamp_utc": "2026-07-26T21:15:34Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-109 / 26 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-109. Case officer: CO-05. Meeting duration: 20 min. Reporting quality: AVERAGE — some gaps. New intelligence obtained: YES. Next meeting scheduled: 9 days. Security assessment: MINOR CONCERNS NOTED.",
+      "source_id": "SRC-109",
+      "case_officer": "CO-05",
+      "duration_minutes": 64,
+      "reporting_quality": "AVERAGE",
+      "new_intel": true,
+      "next_meeting_days": 7,
+      "security_assessment": "MINOR_CONCERNS",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0107",
+      "dtg": "270524ZJUL26",
+      "timestamp_utc": "2026-07-27T05:24:54Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "DEBRIEF_NOTE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Debrief note — SRC-125 / 27 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-125. Case officer: CO-07. Meeting duration: 86 min. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next meeting scheduled: 16 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-125",
+      "case_officer": "CO-07",
+      "duration_minutes": 89,
+      "reporting_quality": "POOR",
+      "new_intel": false,
+      "next_meeting_days": 21,
+      "security_assessment": "NO_CONCERNS",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "J2X_HUMINT"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0108",
+      "dtg": "270859ZJUL26",
+      "timestamp_utc": "2026-07-27T08:59:53Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "TASKING_ORDER",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "HUMINT tasking order — SRC-103 / PIR-05",
+      "text": "Tasking order for SRC-103 against PIR-05. Requirement: Report on armed group activity near coastal approach. Area: Gulf of Aden Corridor. Deadline: 67h. Case officer: CO-02. Priority: ROUTINE.",
+      "source_id": "SRC-103",
+      "case_officer": "CO-02",
+      "tasking_pir": "PIR-05",
+      "area_of_interest": "Gulf of Aden Corridor",
+      "requirement_text": "Identify cargo transfer network contact",
+      "deadline_hours": 66,
+      "priority": "ROUTINE",
+      "status": "ISSUED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0016",
+        "C2-202606-0028"
+      ],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_CATEGORY",
+        "RECRUITED_ASSET",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0109",
+      "dtg": "271246ZJUL26",
+      "timestamp_utc": "2026-07-27T12:46:15Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "ACCESS_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-137",
+      "text": "Access evaluation for SRC-137. Primary area: Suez Gulf Approach. Secondary areas: Kharg Island Terminal, Port of Tartus Approach, Fujairah OPL Anchorage, Gulf of Aden Corridor. Access level to: armed group networks. Corroboration: NONE — single-source. Access risk: HIGH.",
+      "source_id": "SRC-137",
+      "case_officer": "CO-02",
+      "primary_area": "Suez Gulf Approach",
+      "secondary_areas": [
+        "Kharg Island Terminal",
+        "Port of Tartus Approach",
+        "Fujairah OPL Anchorage",
+        "Gulf of Aden Corridor"
+      ],
+      "access_type": "MARITIME_NODE",
+      "corroboration": "MODERATE",
+      "access_risk": "HIGH",
+      "pir_refs": [
+        "PIR-03",
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach",
+        "Kharg Island Terminal",
+        "Port of Tartus Approach",
+        "Fujairah OPL Anchorage",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "RECRUITED_ASSET",
+        "SOURCE_CATEGORY",
+        "SOURCE_RELIABILITY",
+        "INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "J2X-202607-0110",
+      "dtg": "271846ZJUL26",
+      "timestamp_utc": "2026-07-27T18:46:57Z",
+      "persona": "J2X_HUMINT_OPERATOR",
+      "record_type": "RAW_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "SOURCE IDENTITY PROTECTED",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw HUMINT report — SRC-122 / pending validation",
+      "text": "Raw report from SRC-122 received 271846ZJUL26. Observation time: 261846ZJUL26. Reporting: Mobile radar deployed near road junction at Salalah Port Approach. Validation status: PENDING. Provisional evaluation: B4. Case officer: CO-06.",
+      "source_id": "SRC-122",
+      "case_officer": "CO-06",
+      "observation_utc": "2026-07-26T18:46:57Z",
+      "raw_text_summary": "Armed small craft departing inlet",
+      "validation_status": "PENDING",
+      "provisional_reliability": "B",
+      "provisional_credibility": 4,
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SPOTREP",
+        "ADMIRALTY_EVALUATION",
+        "SOURCE_RELIABILITY",
+        "PIR_UAS_USV_THREAT"
+      ]
+    }
+  ]
+}

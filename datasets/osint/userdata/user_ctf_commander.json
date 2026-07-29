@@ -1,0 +1,4257 @@
+{
+  "dataset": {
+    "name": "user_specific_ctf_commander",
+    "version": "1.0",
+    "persona": "CTF Commander",
+    "primary_report_type": "COMMANDER_BRIEFING",
+    "generated_utc": "2026-07-28T06:00:00Z",
+    "record_count": 110,
+    "index_type": "USER_SPECIFIC",
+    "classification_of_compilation": "SECRET//REL TO COALITION TF",
+    "note": "Simulated user-specific data. Links to generic dataset via generic_refs and to ontology via concept_ids.",
+    "coverage_window_utc": {
+      "from": "2026-06-28T06:00:00Z",
+      "to": "2026-07-28T06:00:00Z"
+    },
+    "cross_reference_schema": {
+      "generic_refs": "doc_id values from c2_middle_east_multi_source_1000_v3_en.json",
+      "pir_refs": "PIR-01..06 from the dataset pir_register",
+      "location_refs": "location.name values shared with the generic dataset",
+      "concept_ids": "concept_id values from c2_middle_east_business_ontology.yaml",
+      "vessel_refs": "vessel.imo values from the generic dataset vessel registry"
+    }
+  },
+  "records": [
+    {
+      "doc_id": "CTF-202606-0001",
+      "dtg": "280825ZJUN26",
+      "timestamp_utc": "2026-06-28T08:25:59Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "COMMANDER_ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander's assessment — 28 Jun 2026",
+      "text": "Commander's periodic assessment 280825ZJUN26. Overall situation: UNCHANGED. Priority concern: Boarding team fatigue — rotation required. Intent for next 72h: Increase boarding operations.",
+      "situation_assessment": "DETERIORATING",
+      "priority_concern": "Sanctions evasion volume remains high",
+      "intent_72h": "Conduct deception operation",
+      "pir_refs": [
+        "PIR-03",
+        "PIR-04",
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Latakia Port Approach",
+        "South Tyre / Coastal Route",
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [
+        "9786255",
+        "9684720"
+      ],
+      "generic_refs": [
+        "C2-202606-0002",
+        "C2-202606-0005",
+        "C2-202606-0026",
+        "C2-202606-0048"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "C4ISR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR",
+        "ORIGINATOR_CELL",
+        "ADMIRALTY_EVALUATION"
+      ]
+    },
+    {
+      "doc_id": "CTF-202606-0002",
+      "dtg": "281753ZJUN26",
+      "timestamp_utc": "2026-06-28T17:53:01Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 28 Jun 2026 update",
+      "text": "ROE standing card effective 281753ZJUN26. Rules in force: ROE 422, ROE 441, ROE 421. Amplification: No changes from previous card. Legal adviser: LAO-02. Validity: 29 Jun 2026.",
+      "rules_in_force": [
+        "ROE 422 — Defence of other forces",
+        "ROE 441 — Non-combatant evacuation",
+        "ROE 421 — Right of self-defence"
+      ],
+      "amplification": "ROE 451 activated for Red Sea corridor",
+      "legal_adviser": "LAO-02",
+      "validity_date": "2026-07-05",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202606-0003",
+      "dtg": "282144ZJUN26",
+      "timestamp_utc": "2026-06-28T21:44:11Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 28 Jun 2026",
+      "text": "Force status report 282144ZJUN26. Nations contributing: UK, USA, France, Bahrain, Italy, Netherlands, Belgium, UAE. Total units under command: 9. Fully effective: 5. Degraded: 4. Current mission phase: PHASE 3 — CONSOLIDATE. Notable: All sectors covered.",
+      "contributing_nations": [
+        "UK",
+        "USA",
+        "France",
+        "Bahrain",
+        "Italy",
+        "Netherlands",
+        "Belgium",
+        "UAE"
+      ],
+      "total_units": 9,
+      "effective_units": 5,
+      "degraded_units": 4,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "All sectors covered",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Port of Aden Anchorage",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202606-0004",
+      "dtg": "291732ZJUN26",
+      "timestamp_utc": "2026-06-29T17:32:44Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 3 — CONSO",
+      "text": "Mission objective record. Phase: PHASE 2 — INTERDICT. Objective: Protect SLOC through Bab-el-Mandeb. Success criteria: Zero successful STS in AOR. Status: DEFERRED.",
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "objective_text": "Protect SLOC through Bab-el-Mandeb",
+      "success_criteria": "All vessels queried within 2h",
+      "status": "ACHIEVED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector",
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0013",
+        "C2-202606-0068"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202606-0005",
+      "dtg": "292340ZJUN26",
+      "timestamp_utc": "2026-06-29T23:40:53Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — USA / 29 Jun 2026",
+      "text": "Liaison report from USA representative. Subject: Vessel transit notification. Key point: National assets available for tasking with 24h notice. Action: LEGAL REVIEW.",
+      "liaison_nation": "USA",
+      "subject": "Intelligence exchange",
+      "action_required": "CDR_DECISION",
+      "pir_refs": [],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202606-0006",
+      "dtg": "300641ZJUN26",
+      "timestamp_utc": "2026-06-30T06:41:06Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — UK / 30 Jun 2026",
+      "text": "Liaison report from UK representative. Subject: Vessel transit notification. Key point: Intelligence product dissemination approved. Action: NOTED.",
+      "liaison_nation": "UK",
+      "subject": "Vessel transit notification",
+      "action_required": "CDR_DECISION",
+      "pir_refs": [],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202606-0007",
+      "dtg": "301306ZJUN26",
+      "timestamp_utc": "2026-06-30T13:06:44Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 30 Jun 2026 update",
+      "text": "ROE standing card effective 301306ZJUN26. Rules in force: ROE 422, ROE 441, ROE 431, ROE 461, ROE 421, ROE 481. Amplification: No changes from previous card. Legal adviser: LAO-02. Validity: 04 Jul 2026.",
+      "rules_in_force": [
+        "ROE 422 — Defence of other forces",
+        "ROE 441 — Non-combatant evacuation",
+        "ROE 431 — Approach and query",
+        "ROE 461 — Air defence weapons free",
+        "ROE 421 — Right of self-defence",
+        "ROE 481 — Proportional response"
+      ],
+      "amplification": "ROE 451 activated for Red Sea corridor",
+      "legal_adviser": "LAO-01",
+      "validity_date": "2026-07-03",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202606-0008",
+      "dtg": "301512ZJUN26",
+      "timestamp_utc": "2026-06-30T15:12:09Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 30 Jun 2026 update",
+      "text": "ROE standing card effective 301512ZJUN26. Rules in force: ROE 441, ROE 471, ROE 432, ROE 421, ROE 461, ROE 491. Amplification: Warning shots authorised in SECTOR ALPHA only. Legal adviser: LAO-02. Validity: 06 Jul 2026.",
+      "rules_in_force": [
+        "ROE 441 — Non-combatant evacuation",
+        "ROE 471 — Boarding operations",
+        "ROE 432 — Warning shots",
+        "ROE 421 — Right of self-defence",
+        "ROE 461 — Air defence weapons free",
+        "ROE 491 — Escalation of force"
+      ],
+      "amplification": "ROE 451 activated for Red Sea corridor",
+      "legal_adviser": "LAO-02",
+      "validity_date": "2026-07-03",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0009",
+      "dtg": "010013ZJUL26",
+      "timestamp_utc": "2026-07-01T00:13:06Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 4 — TRANS",
+      "text": "Mission objective record. Phase: PHASE 1 — ESTABLISH. Objective: Establish maritime security in IRTC. Success criteria: Zero successful STS in AOR. Status: AT RISK.",
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "objective_text": "Interdict STS transfers in OPL",
+      "success_criteria": "Zero successful STS in AOR",
+      "status": "AT_RISK",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route",
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0001",
+        "C2-202606-0058"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_FORCE_POSTURE",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0010",
+      "dtg": "010120ZJUL26",
+      "timestamp_utc": "2026-07-01T01:20:10Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 01 Jul 2026",
+      "text": "Force status report 010120ZJUL26. Nations contributing: Belgium, Netherlands, France, UK, Bahrain, Saudi Arabia, USA, UAE. Total units under command: 7. Fully effective: 6. Degraded: 1. Current mission phase: PHASE 2 — INTERDICT. Notable: All sectors covered.",
+      "contributing_nations": [
+        "Belgium",
+        "Netherlands",
+        "France",
+        "UK",
+        "Bahrain",
+        "Saudi Arabia",
+        "USA",
+        "UAE"
+      ],
+      "total_units": 7,
+      "effective_units": 6,
+      "degraded_units": 1,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "All sectors covered",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Suez Gulf Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0011",
+      "dtg": "010617ZJUL26",
+      "timestamp_utc": "2026-07-01T06:17:35Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 01 Jul 2026 update",
+      "text": "ROE standing card effective 010617ZJUL26. Rules in force: ROE 432, ROE 461, ROE 441, ROE 431, ROE 421, ROE 451. Amplification: Boarding authority extended to all flagged vessels. Legal adviser: LAO-02. Validity: 02 Jul 2026.",
+      "rules_in_force": [
+        "ROE 432 — Warning shots",
+        "ROE 461 — Air defence weapons free",
+        "ROE 441 — Non-combatant evacuation",
+        "ROE 431 — Approach and query",
+        "ROE 421 — Right of self-defence",
+        "ROE 451 — Maritime interception"
+      ],
+      "amplification": "No changes from previous card",
+      "legal_adviser": "LAO-02",
+      "validity_date": "2026-07-03",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0012",
+      "dtg": "011809ZJUL26",
+      "timestamp_utc": "2026-07-01T18:09:42Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "COMMANDER_ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander's assessment — 01 Jul 2026",
+      "text": "Commander's periodic assessment 011809ZJUL26. Overall situation: IMPROVING — interdiction effect demonstrated. Priority concern: STS activity at OPL anchorage continues. Intent for next 72h: Maintain patrol tempo.",
+      "situation_assessment": "STABLE",
+      "priority_concern": "Boarding team fatigue — rotation required",
+      "intent_72h": "Maintain patrol tempo",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-03",
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector",
+        "Latakia Port Approach",
+        "Fujairah OPL Anchorage",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9377468",
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0001",
+        "C2-202606-0010",
+        "C2-202606-0007",
+        "C2-202606-0013"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "C4ISR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR",
+        "ORIGINATOR_CELL",
+        "ADMIRALTY_EVALUATION"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0013",
+      "dtg": "020631ZJUL26",
+      "timestamp_utc": "2026-07-02T06:31:20Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 020631ZJUL26",
+      "text": "Commander decision log entry 020631ZJUL26. Decision: Task MPA HERON-01 against spoofing contact. Rationale: Commanders intent — maintain presence. Approved by: CTF-CDR. Time: 020631ZJUL26.",
+      "decision_text": "Increase patrol tempo in SECTOR ALPHA",
+      "rationale": "Legal authority confirmed",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_MARITIME_INTERDICTION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0014",
+      "dtg": "021054ZJUL26",
+      "timestamp_utc": "2026-07-02T10:54:31Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 021054ZJUL26: Has PIR-03 threshold been met in Southern Red Sea? Status: OPEN — collection ongoing. Raised by: CTF-CDR. J2 action: TASKED.",
+      "ccir_text": "What is AIS status of high-risk contact?",
+      "status": "OPEN",
+      "j2_action": "IN_PROGRESS",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0071",
+        "C2-202606-0010"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0015",
+      "dtg": "021817ZJUL26",
+      "timestamp_utc": "2026-07-02T18:17:47Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 021817ZJUL26: Is WARSHIP AJAX capable of boarding operations? Status: EXPIRED — situation changed. Raised by: CTF-CDR. J2 action: COMPLETE.",
+      "ccir_text": "Is boarding team available and capable?",
+      "status": "EXPIRED",
+      "j2_action": "IN_PROGRESS",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_MARITIME_INTERDICTION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0016",
+      "dtg": "030235ZJUL26",
+      "timestamp_utc": "2026-07-03T02:35:31Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 03 Jul 2026",
+      "text": "Force status report 030235ZJUL26. Nations contributing: France, USA, Belgium, UAE, Bahrain, Saudi Arabia, Italy. Total units under command: 10. Fully effective: 10. Degraded: 0. Current mission phase: PHASE 1 — ESTABLISH. Notable: All sectors covered.",
+      "contributing_nations": [
+        "France",
+        "USA",
+        "Belgium",
+        "UAE",
+        "Bahrain",
+        "Saudi Arabia",
+        "Italy"
+      ],
+      "total_units": 10,
+      "effective_units": 10,
+      "degraded_units": 0,
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "force_note": "Boarding capacity at maximum",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas",
+        "Kharg Island Terminal",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0017",
+      "dtg": "030703ZJUL26",
+      "timestamp_utc": "2026-07-03T07:03:32Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 4 — TRANS",
+      "text": "Mission objective record. Phase: PHASE 3 — CONSOLIDATE. Objective: Disrupt weapons transhipment through Hodeidah. Success criteria: No merchant vessel attack in 30 days. Status: ACHIEVED.",
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "objective_text": "Establish maritime security in IRTC",
+      "success_criteria": "Zero successful STS in AOR",
+      "status": "AT_RISK",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0071",
+        "C2-202606-0058"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_FORCE_POSTURE",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0018",
+      "dtg": "032153ZJUL26",
+      "timestamp_utc": "2026-07-03T21:53:16Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 03 Jul 2026",
+      "text": "Force status report 032153ZJUL26. Nations contributing: UK, Saudi Arabia, Netherlands, USA, UAE, Belgium, Bahrain. Total units under command: 14. Fully effective: 11. Degraded: 3. Current mission phase: PHASE 1 — ESTABLISH. Notable: All sectors covered.",
+      "contributing_nations": [
+        "UK",
+        "Saudi Arabia",
+        "Netherlands",
+        "USA",
+        "UAE",
+        "Belgium",
+        "Bahrain"
+      ],
+      "total_units": 14,
+      "effective_units": 11,
+      "degraded_units": 3,
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "force_note": "MPA availability reduced — weather",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "Salalah Port Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0019",
+      "dtg": "040536ZJUL26",
+      "timestamp_utc": "2026-07-04T05:36:18Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 2 — INTER",
+      "text": "Mission objective record. Phase: PHASE 3 — CONSOLIDATE. Objective: Degrade adversary coastal radar capability. Success criteria: Zero successful STS in AOR. Status: ON TRACK.",
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "objective_text": "Interdict STS transfers in OPL",
+      "success_criteria": "Less than 5% AIS dark unaccounted",
+      "status": "ACHIEVED",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0006",
+        "C2-202606-0005"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_UAS_USV_THREAT",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0020",
+      "dtg": "041740ZJUL26",
+      "timestamp_utc": "2026-07-04T17:40:14Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 041740ZJUL26",
+      "text": "Commander decision log entry 041740ZJUL26. Decision: Release WARSHIP EAGLE for scheduled maintenance. Rationale: Intelligence indicates imminent threat. Approved by: CTF-CDR. Time: 041740ZJUL26.",
+      "decision_text": "Detain vessel pending J2 assessment",
+      "rationale": "Force protection requirement",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0121",
+        "C2-202606-0107"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_AIR_DEFENCE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0021",
+      "dtg": "041911ZJUL26",
+      "timestamp_utc": "2026-07-04T19:11:54Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 041911ZJUL26: Has adversary resupply been confirmed at Port of Hodeidah this week? Status: EXPIRED — situation changed. Raised by: CTF-CDR. J2 action: IN PROGRESS.",
+      "ccir_text": "Is boarding team available and capable?",
+      "status": "EXPIRED",
+      "j2_action": "COMPLETE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0098",
+        "C2-202606-0059"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_SANCTIONS_EVASION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0022",
+      "dtg": "042009ZJUL26",
+      "timestamp_utc": "2026-07-04T20:09:59Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Italy / 04 Jul 2026",
+      "text": "Liaison report from Italy representative. Subject: ROE interpretation clarification. Key point: Boarding operations require ministerial authority. Action: NOTED.",
+      "liaison_nation": "Italy",
+      "subject": "Vessel transit notification",
+      "action_required": "CDR_DECISION",
+      "pir_refs": [],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0023",
+      "dtg": "050159ZJUL26",
+      "timestamp_utc": "2026-07-05T01:59:35Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 1 — ESTAB",
+      "text": "Mission objective record. Phase: PHASE 1 — ESTABLISH. Objective: Disrupt weapons transhipment through Hodeidah. Success criteria: <5% AIS dark periods unaccounted. Status: ON TRACK.",
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "objective_text": "Protect SLOC through Bab-el-Mandeb",
+      "success_criteria": "All vessels queried within 2h",
+      "status": "DEFERRED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0060",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_MARITIME_INTERDICTION",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0024",
+      "dtg": "050901ZJUL26",
+      "timestamp_utc": "2026-07-05T09:01:54Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 050901ZJUL26",
+      "text": "Commander decision log entry 050901ZJUL26. Decision: Authorise boarding of MT RED SEA EAGLE. Rationale: PIR threshold met. Approved by: CTF-CDR. Time: 050901ZJUL26.",
+      "decision_text": "Release unit for maintenance",
+      "rationale": "Commander's intent — maintain presence",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9684720"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_MARITIME_INTERDICTION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0025",
+      "dtg": "051953ZJUL26",
+      "timestamp_utc": "2026-07-05T19:53:59Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Bahrain / 05 Jul 2026",
+      "text": "Liaison report from Bahrain representative. Subject: National caveats update. Key point: Additional frigate available from {date}. Action: NOTED.",
+      "liaison_nation": "Bahrain",
+      "subject": "ROE interpretation",
+      "action_required": "NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0026",
+      "dtg": "060408ZJUL26",
+      "timestamp_utc": "2026-07-06T04:08:14Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 06 Jul 2026",
+      "text": "Force status report 060408ZJUL26. Nations contributing: Italy, UK, Bahrain, Saudi Arabia, Belgium, USA, France, Netherlands. Total units under command: 13. Fully effective: 11. Degraded: 2. Current mission phase: PHASE 3 — CONSOLIDATE. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "Italy",
+        "UK",
+        "Bahrain",
+        "Saudi Arabia",
+        "Belgium",
+        "USA",
+        "France",
+        "Netherlands"
+      ],
+      "total_units": 13,
+      "effective_units": 11,
+      "degraded_units": 2,
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "force_note": "MPA availability reduced — weather",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Hodeidah",
+        "Southern Red Sea",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0027",
+      "dtg": "060921ZJUL26",
+      "timestamp_utc": "2026-07-06T09:21:52Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 060921ZJUL26: Has adversary resupply been confirmed at Port of Hodeidah this week? Status: EXPIRED — situation changed. Raised by: CTF-CDR. J2 action: IN PROGRESS.",
+      "ccir_text": "Has shadow fleet vessel conducted STS in last 48h?",
+      "status": "ANSWERED",
+      "j2_action": "IN_PROGRESS",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0002",
+        "C2-202606-0006"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_UAS_USV_THREAT",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0028",
+      "dtg": "071145ZJUL26",
+      "timestamp_utc": "2026-07-07T11:45:18Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 071145ZJUL26: Is WARSHIP AJAX capable of boarding operations? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: TASKED.",
+      "ccir_text": "Is there confirmed AD radar covering eastern approaches?",
+      "status": "ANSWERED",
+      "j2_action": "COMPLETE",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0009",
+        "C2-202606-0031"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_UAS_USV_THREAT",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0029",
+      "dtg": "071201ZJUL26",
+      "timestamp_utc": "2026-07-07T12:01:03Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 071201ZJUL26",
+      "text": "Commander decision log entry 071201ZJUL26. Decision: Request national asset support for PIR-04. Rationale: Legal authority confirmed by LAO. Approved by: CTF-CDR. Time: 071201ZJUL26.",
+      "decision_text": "Request national asset support",
+      "rationale": "Force protection requirement",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0046",
+        "C2-202606-0001"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_FORCE_POSTURE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0030",
+      "dtg": "071700ZJUL26",
+      "timestamp_utc": "2026-07-07T17:00:15Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 071700ZJUL26: Has adversary resupply been confirmed at Port of Hodeidah this week? Status: OPEN — collection ongoing. Raised by: CTF-CDR. J2 action: COMPLETE.",
+      "ccir_text": "What is AIS status of high-risk contact?",
+      "status": "EXPIRED",
+      "j2_action": "TASKED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_MARITIME_INTERDICTION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0031",
+      "dtg": "072018ZJUL26",
+      "timestamp_utc": "2026-07-07T20:18:37Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 1 — ESTAB",
+      "text": "Mission objective record. Phase: PHASE 4 — TRANSITION. Objective: Interdict sanctions-evasion STS transfers in OPL. Success criteria: Zero successful STS in AOR. Status: AT RISK.",
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "objective_text": "Protect SLOC through Bab-el-Mandeb",
+      "success_criteria": "No merchant attack in 30 days",
+      "status": "ACHIEVED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0021",
+        "C2-202606-0001"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_FORCE_POSTURE",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0032",
+      "dtg": "072200ZJUL26",
+      "timestamp_utc": "2026-07-07T22:00:20Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Saudi Arabia / 07 Jul 2026",
+      "text": "Liaison report from Saudi Arabia representative. Subject: Intelligence exchange — HUMINT product. Key point: Additional frigate available from {date}. Action: LEGAL REVIEW.",
+      "liaison_nation": "Saudi Arabia",
+      "subject": "ROE interpretation",
+      "action_required": "J2_TASKED",
+      "pir_refs": [],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0033",
+      "dtg": "080757ZJUL26",
+      "timestamp_utc": "2026-07-08T07:57:46Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 080757ZJUL26",
+      "text": "Commander decision log entry 080757ZJUL26. Decision: Increase patrol tempo in SECTOR ALPHA. Rationale: PIR threshold met. Approved by: CTF-CDR. Time: 080757ZJUL26.",
+      "decision_text": "Request national asset support",
+      "rationale": "Commander's intent — maintain presence",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0135",
+        "C2-202606-0066"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_AIR_DEFENCE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0034",
+      "dtg": "081216ZJUL26",
+      "timestamp_utc": "2026-07-08T12:16:24Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 081216ZJUL26: Is WARSHIP AJAX capable of boarding operations? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: IN PROGRESS.",
+      "ccir_text": "Is adversary resupply confirmed at targeted port?",
+      "status": "ANSWERED",
+      "j2_action": "COMPLETE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0085",
+        "C2-202606-0112"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_SANCTIONS_EVASION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0035",
+      "dtg": "081339ZJUL26",
+      "timestamp_utc": "2026-07-08T13:39:17Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 3 — CONSO",
+      "text": "Mission objective record. Phase: PHASE 3 — CONSOLIDATE. Objective: Disrupt weapons transhipment through Hodeidah. Success criteria: All vessels queried within 2h of detection. Status: DEFERRED.",
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "objective_text": "Protect SLOC through Bab-el-Mandeb",
+      "success_criteria": "Zero successful STS in AOR",
+      "status": "ON_TRACK",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0068",
+        "C2-202606-0016"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0036",
+      "dtg": "091250ZJUL26",
+      "timestamp_utc": "2026-07-09T12:50:37Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 091250ZJUL26",
+      "text": "Commander decision log entry 091250ZJUL26. Decision: Request national asset support for PIR-04. Rationale: PIR threshold met. Approved by: CTF-CDR. Time: 091250ZJUL26.",
+      "decision_text": "Authorise boarding of high-risk vessel",
+      "rationale": "Legal authority confirmed",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0021",
+        "C2-202606-0001"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_FORCE_POSTURE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0037",
+      "dtg": "091729ZJUL26",
+      "timestamp_utc": "2026-07-09T17:29:37Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 091729ZJUL26: Has adversary resupply been confirmed at Port of Hodeidah this week? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: COMPLETE.",
+      "ccir_text": "Is adversary resupply confirmed at targeted port?",
+      "status": "ANSWERED",
+      "j2_action": "COMPLETE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0085",
+        "C2-202606-0026"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_SANCTIONS_EVASION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0038",
+      "dtg": "100610ZJUL26",
+      "timestamp_utc": "2026-07-10T06:10:19Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 100610ZJUL26",
+      "text": "Commander decision log entry 100610ZJUL26. Decision: Detain MT AMBER FORTUNE pending J2 assessment. Rationale: Legal authority confirmed by LAO. Approved by: CTF-CDR. Time: 100610ZJUL26.",
+      "decision_text": "Detain vessel pending J2 assessment",
+      "rationale": "Force protection requirement",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9610793"
+      ],
+      "generic_refs": [
+        "C2-202606-0066",
+        "C2-202606-0042"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_AIR_DEFENCE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0039",
+      "dtg": "101831ZJUL26",
+      "timestamp_utc": "2026-07-10T18:31:00Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 10 Jul 2026 update",
+      "text": "ROE standing card effective 101831ZJUL26. Rules in force: ROE 451, ROE 491, ROE 461, ROE 481, ROE 421, ROE 431. Amplification: Warning shots authorised in SECTOR ALPHA only. Legal adviser: LAO-01. Validity: 11 Jul 2026.",
+      "rules_in_force": [
+        "ROE 451 — Maritime interception",
+        "ROE 491 — Escalation of force",
+        "ROE 461 — Air defence weapons free",
+        "ROE 481 — Proportional response",
+        "ROE 421 — Right of self-defence",
+        "ROE 431 — Approach and query"
+      ],
+      "amplification": "Boarding authority extended",
+      "legal_adviser": "LAO-02",
+      "validity_date": "2026-07-11",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0040",
+      "dtg": "110259ZJUL26",
+      "timestamp_utc": "2026-07-11T02:59:02Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 110259ZJUL26: Has MT RED SEA EAGLE conducted an STS transfer in the last 48h? Status: EXPIRED — situation changed. Raised by: CTF-CDR. J2 action: COMPLETE.",
+      "ccir_text": "Is boarding team available and capable?",
+      "status": "OPEN",
+      "j2_action": "IN_PROGRESS",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0026",
+        "C2-202606-0053"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_SANCTIONS_EVASION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0041",
+      "dtg": "110406ZJUL26",
+      "timestamp_utc": "2026-07-11T04:06:08Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "COMMANDER_ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander's assessment — 11 Jul 2026",
+      "text": "Commander's periodic assessment 110406ZJUL26. Overall situation: DETERIORATING — increased adversary activity. Priority concern: Air defence coverage limiting MPA operations. Intent for next 72h: Increase boarding operations.",
+      "situation_assessment": "UNCHANGED",
+      "priority_concern": "Boarding team fatigue — rotation required",
+      "intent_72h": "Focus collection on PIR-04",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-06",
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Kharg Island Terminal",
+        "Suez Gulf Approach",
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9027764",
+        "9741839"
+      ],
+      "generic_refs": [
+        "C2-202606-0001",
+        "C2-202606-0010",
+        "C2-202606-0007",
+        "C2-202606-0013"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "C4ISR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR",
+        "ORIGINATOR_CELL",
+        "ADMIRALTY_EVALUATION"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0042",
+      "dtg": "110913ZJUL26",
+      "timestamp_utc": "2026-07-11T09:13:10Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 11 Jul 2026",
+      "text": "Force status report 110913ZJUL26. Nations contributing: USA, Saudi Arabia, France, Italy. Total units under command: 9. Fully effective: 5. Degraded: 4. Current mission phase: PHASE 2 — INTERDICT. Notable: SECTOR CHARLIE gap — requested reinforcement.",
+      "contributing_nations": [
+        "USA",
+        "Saudi Arabia",
+        "France",
+        "Italy"
+      ],
+      "total_units": 9,
+      "effective_units": 5,
+      "degraded_units": 4,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "All sectors covered",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector",
+        "Southern Red Sea",
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0043",
+      "dtg": "110941ZJUL26",
+      "timestamp_utc": "2026-07-11T09:41:05Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 11 Jul 2026",
+      "text": "Force status report 110941ZJUL26. Nations contributing: Belgium, UK, Saudi Arabia, Bahrain, USA. Total units under command: 8. Fully effective: 8. Degraded: 0. Current mission phase: PHASE 2 — INTERDICT. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "Belgium",
+        "UK",
+        "Saudi Arabia",
+        "Bahrain",
+        "USA"
+      ],
+      "total_units": 8,
+      "effective_units": 8,
+      "degraded_units": 0,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "Boarding capacity at maximum",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach",
+        "Gulf of Aden Corridor",
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0044",
+      "dtg": "111740ZJUL26",
+      "timestamp_utc": "2026-07-11T17:40:32Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 111740ZJUL26: Has PIR-03 threshold been met in Southern Red Sea? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: TASKED.",
+      "ccir_text": "Is adversary resupply confirmed at targeted port?",
+      "status": "ANSWERED",
+      "j2_action": "TASKED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0046",
+        "C2-202606-0010"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0045",
+      "dtg": "111754ZJUL26",
+      "timestamp_utc": "2026-07-11T17:54:28Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 11 Jul 2026 update",
+      "text": "ROE standing card effective 111754ZJUL26. Rules in force: ROE 471, ROE 481, ROE 491, ROE 422, ROE 432, ROE 431, ROE 451. Amplification: ROE 451 activated for Red Sea corridor. Legal adviser: LAO-01. Validity: 13 Jul 2026.",
+      "rules_in_force": [
+        "ROE 471 — Boarding operations",
+        "ROE 481 — Proportional response",
+        "ROE 491 — Escalation of force",
+        "ROE 422 — Defence of other forces",
+        "ROE 432 — Warning shots",
+        "ROE 431 — Approach and query",
+        "ROE 451 — Maritime interception"
+      ],
+      "amplification": "Boarding authority extended",
+      "legal_adviser": "LAO-03",
+      "validity_date": "2026-07-16",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0046",
+      "dtg": "120448ZJUL26",
+      "timestamp_utc": "2026-07-12T04:48:11Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 12 Jul 2026 update",
+      "text": "ROE standing card effective 120448ZJUL26. Rules in force: ROE 422, ROE 471, ROE 431. Amplification: Warning shots authorised in SECTOR ALPHA only. Legal adviser: LAO-02. Validity: 19 Jul 2026.",
+      "rules_in_force": [
+        "ROE 422 — Defence of other forces",
+        "ROE 471 — Boarding operations",
+        "ROE 431 — Approach and query"
+      ],
+      "amplification": "Warning shots authorised in SECTOR ALPHA only",
+      "legal_adviser": "LAO-01",
+      "validity_date": "2026-07-15",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0047",
+      "dtg": "121036ZJUL26",
+      "timestamp_utc": "2026-07-12T10:36:46Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Italy / 12 Jul 2026",
+      "text": "Liaison report from Italy representative. Subject: ROE interpretation clarification. Key point: Additional frigate available from {date}. Action: J2 TASKED.",
+      "liaison_nation": "Italy",
+      "subject": "ROE interpretation",
+      "action_required": "J2_TASKED",
+      "pir_refs": [],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0048",
+      "dtg": "121138ZJUL26",
+      "timestamp_utc": "2026-07-12T11:38:52Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 121138ZJUL26",
+      "text": "Commander decision log entry 121138ZJUL26. Decision: Increase patrol tempo in SECTOR ALPHA. Rationale: Legal authority confirmed by LAO. Approved by: CTF-CDR. Time: 121138ZJUL26.",
+      "decision_text": "Authorise boarding of high-risk vessel",
+      "rationale": "Force protection requirement",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9561849"
+      ],
+      "generic_refs": [
+        "C2-202606-0042",
+        "C2-202606-0079"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_AIR_DEFENCE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0049",
+      "dtg": "130650ZJUL26",
+      "timestamp_utc": "2026-07-13T06:50:10Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 130650ZJUL26: Is WARSHIP AJAX capable of boarding operations? Status: OPEN — collection ongoing. Raised by: CTF-CDR. J2 action: COMPLETE.",
+      "ccir_text": "Has shadow fleet vessel conducted STS in last 48h?",
+      "status": "EXPIRED",
+      "j2_action": "TASKED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0046",
+        "C2-202606-0058"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0050",
+      "dtg": "131612ZJUL26",
+      "timestamp_utc": "2026-07-13T16:12:08Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 3 — CONSO",
+      "text": "Mission objective record. Phase: PHASE 4 — TRANSITION. Objective: Degrade adversary coastal radar capability. Success criteria: No merchant vessel attack in 30 days. Status: ON TRACK.",
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "objective_text": "Establish maritime security in IRTC",
+      "success_criteria": "Less than 5% AIS dark unaccounted",
+      "status": "AT_RISK",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Southern Red Sea",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0002",
+        "C2-202606-0057"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_UAS_USV_THREAT",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0051",
+      "dtg": "131801ZJUL26",
+      "timestamp_utc": "2026-07-13T18:01:12Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 13 Jul 2026",
+      "text": "Force status report 131801ZJUL26. Nations contributing: Netherlands, Italy, UAE, Belgium, USA, Saudi Arabia. Total units under command: 7. Fully effective: 5. Degraded: 2. Current mission phase: PHASE 3 — CONSOLIDATE. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "Netherlands",
+        "Italy",
+        "UAE",
+        "Belgium",
+        "USA",
+        "Saudi Arabia"
+      ],
+      "total_units": 7,
+      "effective_units": 5,
+      "degraded_units": 2,
+      "mission_phase": "PHASE 2 — INTERDICT",
+      "force_note": "MPA availability reduced — weather",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal",
+        "Port of Hodeidah",
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0052",
+      "dtg": "131944ZJUL26",
+      "timestamp_utc": "2026-07-13T19:44:02Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 131944ZJUL26",
+      "text": "Commander decision log entry 131944ZJUL26. Decision: Task MPA HERON-01 against spoofing contact. Rationale: Force protection requirement. Approved by: CTF-CDR. Time: 131944ZJUL26.",
+      "decision_text": "Detain vessel pending J2 assessment",
+      "rationale": "Legal authority confirmed",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9786255"
+      ],
+      "generic_refs": [
+        "C2-202606-0079",
+        "C2-202606-0066"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_AIR_DEFENCE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0053",
+      "dtg": "132247ZJUL26",
+      "timestamp_utc": "2026-07-13T22:47:43Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 1 — ESTAB",
+      "text": "Mission objective record. Phase: PHASE 3 — CONSOLIDATE. Objective: Establish maritime security in IRTC. Success criteria: <5% AIS dark periods unaccounted. Status: AT RISK.",
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "objective_text": "Interdict STS transfers in OPL",
+      "success_criteria": "No merchant attack in 30 days",
+      "status": "DEFERRED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0010",
+        "C2-202606-0001"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_FORCE_POSTURE",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0054",
+      "dtg": "132314ZJUL26",
+      "timestamp_utc": "2026-07-13T23:14:47Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Saudi Arabia / 13 Jul 2026",
+      "text": "Liaison report from Saudi Arabia representative. Subject: Force contribution amendment. Key point: Transit notification for {vessel} submitted. Action: J2 TASKED.",
+      "liaison_nation": "Saudi Arabia",
+      "subject": "ROE interpretation",
+      "action_required": "LEGAL_REVIEW",
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0055",
+      "dtg": "140419ZJUL26",
+      "timestamp_utc": "2026-07-14T04:19:01Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 1 — ESTAB",
+      "text": "Mission objective record. Phase: PHASE 4 — TRANSITION. Objective: Degrade adversary coastal radar capability. Success criteria: Zero successful STS in AOR. Status: ACHIEVED.",
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "objective_text": "Disrupt weapons transhipment through regional ports",
+      "success_criteria": "Less than 5% AIS dark unaccounted",
+      "status": "ACHIEVED",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0079",
+        "C2-202606-0066"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_AIR_DEFENCE",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0056",
+      "dtg": "140744ZJUL26",
+      "timestamp_utc": "2026-07-14T07:44:10Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 140744ZJUL26: Is WARSHIP AJAX capable of boarding operations? Status: OPEN — collection ongoing. Raised by: CTF-CDR. J2 action: COMPLETE.",
+      "ccir_text": "What is AIS status of high-risk contact?",
+      "status": "EXPIRED",
+      "j2_action": "TASKED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0010",
+        "C2-202606-0071"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0057",
+      "dtg": "141447ZJUL26",
+      "timestamp_utc": "2026-07-14T14:47:50Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 14 Jul 2026",
+      "text": "Force status report 141447ZJUL26. Nations contributing: Italy, France, USA, Belgium, UAE. Total units under command: 8. Fully effective: 6. Degraded: 2. Current mission phase: PHASE 4 — TRANSITION. Notable: SECTOR CHARLIE gap — requested reinforcement.",
+      "contributing_nations": [
+        "Italy",
+        "France",
+        "USA",
+        "Belgium",
+        "UAE"
+      ],
+      "total_units": 8,
+      "effective_units": 6,
+      "degraded_units": 2,
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "force_note": "Boarding capacity at maximum",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Suez Gulf Approach",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0058",
+      "dtg": "141518ZJUL26",
+      "timestamp_utc": "2026-07-14T15:18:27Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 141518ZJUL26: Is there confirmed air defence radar covering SECTOR CHARLIE approaches? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: TASKED.",
+      "ccir_text": "Is boarding team available and capable?",
+      "status": "OPEN",
+      "j2_action": "IN_PROGRESS",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0020",
+        "C2-202606-0068"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0059",
+      "dtg": "150237ZJUL26",
+      "timestamp_utc": "2026-07-15T02:37:23Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 150237ZJUL26",
+      "text": "Commander decision log entry 150237ZJUL26. Decision: Release WARSHIP EAGLE for scheduled maintenance. Rationale: Intelligence indicates imminent threat. Approved by: CTF-CDR. Time: 150237ZJUL26.",
+      "decision_text": "Release unit for maintenance",
+      "rationale": "Intelligence indicates imminent threat",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0060",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_MARITIME_INTERDICTION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0060",
+      "dtg": "150540ZJUL26",
+      "timestamp_utc": "2026-07-15T05:40:23Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 150540ZJUL26",
+      "text": "Commander decision log entry 150540ZJUL26. Decision: Detain MT AMBER FORTUNE pending J2 assessment. Rationale: Force protection requirement. Approved by: CTF-CDR. Time: 150540ZJUL26.",
+      "decision_text": "Detain vessel pending J2 assessment",
+      "rationale": "Legal authority confirmed",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0112",
+        "C2-202606-0048"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_SANCTIONS_EVASION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0061",
+      "dtg": "151648ZJUL26",
+      "timestamp_utc": "2026-07-15T16:48:13Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 3 — CONSO",
+      "text": "Mission objective record. Phase: PHASE 1 — ESTABLISH. Objective: Establish maritime security in IRTC. Success criteria: Zero successful STS in AOR. Status: DEFERRED.",
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "objective_text": "Protect SLOC through Bab-el-Mandeb",
+      "success_criteria": "Less than 5% AIS dark unaccounted",
+      "status": "AT_RISK",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0098",
+        "C2-202606-0085"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_SANCTIONS_EVASION",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0062",
+      "dtg": "152224ZJUL26",
+      "timestamp_utc": "2026-07-15T22:24:53Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 3 — CONSO",
+      "text": "Mission objective record. Phase: PHASE 1 — ESTABLISH. Objective: Interdict sanctions-evasion STS transfers in OPL. Success criteria: All vessels queried within 2h of detection. Status: DEFERRED.",
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "objective_text": "Protect SLOC through Bab-el-Mandeb",
+      "success_criteria": "Zero successful STS in AOR",
+      "status": "ACHIEVED",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0121",
+        "C2-202606-0107"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_AIR_DEFENCE",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0063",
+      "dtg": "152311ZJUL26",
+      "timestamp_utc": "2026-07-15T23:11:30Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 15 Jul 2026",
+      "text": "Force status report 152311ZJUL26. Nations contributing: Bahrain, USA, UAE, Saudi Arabia, France, UK. Total units under command: 7. Fully effective: 4. Degraded: 3. Current mission phase: PHASE 2 — INTERDICT. Notable: SECTOR CHARLIE gap — requested reinforcement.",
+      "contributing_nations": [
+        "Bahrain",
+        "USA",
+        "UAE",
+        "Saudi Arabia",
+        "France",
+        "UK"
+      ],
+      "total_units": 7,
+      "effective_units": 4,
+      "degraded_units": 3,
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "force_note": "All sectors covered",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach",
+        "Fujairah OPL Anchorage",
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0064",
+      "dtg": "160406ZJUL26",
+      "timestamp_utc": "2026-07-16T04:06:01Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 160406ZJUL26",
+      "text": "Commander decision log entry 160406ZJUL26. Decision: Authorise boarding of MT RED SEA EAGLE. Rationale: Legal authority confirmed by LAO. Approved by: CTF-CDR. Time: 160406ZJUL26.",
+      "decision_text": "Detain vessel pending J2 assessment",
+      "rationale": "Commander's intent — maintain presence",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_MARITIME_INTERDICTION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0065",
+      "dtg": "160905ZJUL26",
+      "timestamp_utc": "2026-07-16T09:05:20Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 16 Jul 2026",
+      "text": "Force status report 160905ZJUL26. Nations contributing: Bahrain, UAE, Italy, UK, Saudi Arabia, Belgium, France, USA. Total units under command: 12. Fully effective: 8. Degraded: 4. Current mission phase: PHASE 1 — ESTABLISH. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "Bahrain",
+        "UAE",
+        "Italy",
+        "UK",
+        "Saudi Arabia",
+        "Belgium",
+        "France",
+        "USA"
+      ],
+      "total_units": 12,
+      "effective_units": 8,
+      "degraded_units": 4,
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "force_note": "SECTOR CHARLIE gap — reinforcement requested",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "Beirut Port Approach",
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0066",
+      "dtg": "161506ZJUL26",
+      "timestamp_utc": "2026-07-16T15:06:22Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — UAE / 16 Jul 2026",
+      "text": "Liaison report from UAE representative. Subject: ROE interpretation clarification. Key point: Additional frigate available from {date}. Action: NOTED.",
+      "liaison_nation": "UAE",
+      "subject": "ROE interpretation",
+      "action_required": "NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0067",
+      "dtg": "170031ZJUL26",
+      "timestamp_utc": "2026-07-17T00:31:35Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 17 Jul 2026",
+      "text": "Force status report 170031ZJUL26. Nations contributing: USA, Bahrain, Saudi Arabia, Belgium, UK. Total units under command: 7. Fully effective: 4. Degraded: 3. Current mission phase: PHASE 2 — INTERDICT. Notable: SECTOR CHARLIE gap — requested reinforcement.",
+      "contributing_nations": [
+        "USA",
+        "Bahrain",
+        "Saudi Arabia",
+        "Belgium",
+        "UK"
+      ],
+      "total_units": 7,
+      "effective_units": 4,
+      "degraded_units": 3,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "MPA availability reduced — weather",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Hodeidah",
+        "Suez Gulf Approach",
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0068",
+      "dtg": "170033ZJUL26",
+      "timestamp_utc": "2026-07-17T00:33:20Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 17 Jul 2026 update",
+      "text": "ROE standing card effective 170033ZJUL26. Rules in force: ROE 461, ROE 451, ROE 432, ROE 422, ROE 471. Amplification: Warning shots authorised in SECTOR ALPHA only. Legal adviser: LAO-02. Validity: 21 Jul 2026.",
+      "rules_in_force": [
+        "ROE 461 — Air defence weapons free",
+        "ROE 451 — Maritime interception",
+        "ROE 432 — Warning shots",
+        "ROE 422 — Defence of other forces",
+        "ROE 471 — Boarding operations"
+      ],
+      "amplification": "No changes from previous card",
+      "legal_adviser": "LAO-01",
+      "validity_date": "2026-07-19",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0069",
+      "dtg": "170111ZJUL26",
+      "timestamp_utc": "2026-07-17T01:11:26Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 17 Jul 2026",
+      "text": "Force status report 170111ZJUL26. Nations contributing: Saudi Arabia, Italy, UK, Netherlands, Belgium. Total units under command: 12. Fully effective: 10. Degraded: 2. Current mission phase: PHASE 2 — INTERDICT. Notable: SECTOR CHARLIE gap — requested reinforcement.",
+      "contributing_nations": [
+        "Saudi Arabia",
+        "Italy",
+        "UK",
+        "Netherlands",
+        "Belgium"
+      ],
+      "total_units": 12,
+      "effective_units": 10,
+      "degraded_units": 2,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "MPA availability reduced — weather",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach",
+        "Port of Bandar Abbas",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0070",
+      "dtg": "170308ZJUL26",
+      "timestamp_utc": "2026-07-17T03:08:04Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 17 Jul 2026 update",
+      "text": "ROE standing card effective 170308ZJUL26. Rules in force: ROE 432, ROE 422, ROE 421. Amplification: Warning shots authorised in SECTOR ALPHA only. Legal adviser: LAO-02. Validity: 21 Jul 2026.",
+      "rules_in_force": [
+        "ROE 432 — Warning shots",
+        "ROE 422 — Defence of other forces",
+        "ROE 421 — Right of self-defence"
+      ],
+      "amplification": "ROE 451 activated for Red Sea corridor",
+      "legal_adviser": "LAO-03",
+      "validity_date": "2026-07-23",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0071",
+      "dtg": "170448ZJUL26",
+      "timestamp_utc": "2026-07-17T04:48:16Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 170448ZJUL26",
+      "text": "Commander decision log entry 170448ZJUL26. Decision: Authorise boarding of MT RED SEA EAGLE. Rationale: Commanders intent — maintain presence. Approved by: CTF-CDR. Time: 170448ZJUL26.",
+      "decision_text": "Task MPA against spoofing contact",
+      "rationale": "Commander's intent — maintain presence",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0047"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_MARITIME_INTERDICTION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0072",
+      "dtg": "170615ZJUL26",
+      "timestamp_utc": "2026-07-17T06:15:42Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Bahrain / 17 Jul 2026",
+      "text": "Liaison report from Bahrain representative. Subject: ROE interpretation clarification. Key point: Boarding operations require ministerial authority. Action: CTF CDR DECISION REQUIRED.",
+      "liaison_nation": "Bahrain",
+      "subject": "Vessel transit notification",
+      "action_required": "NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0073",
+      "dtg": "171228ZJUL26",
+      "timestamp_utc": "2026-07-17T12:28:51Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 17 Jul 2026",
+      "text": "Force status report 171228ZJUL26. Nations contributing: Netherlands, France, UK, Italy, Belgium, USA, Bahrain, UAE. Total units under command: 7. Fully effective: 5. Degraded: 2. Current mission phase: PHASE 3 — CONSOLIDATE. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "Netherlands",
+        "France",
+        "UK",
+        "Italy",
+        "Belgium",
+        "USA",
+        "Bahrain",
+        "UAE"
+      ],
+      "total_units": 7,
+      "effective_units": 5,
+      "degraded_units": 2,
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "force_note": "All sectors covered",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas",
+        "Latakia Port Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0074",
+      "dtg": "171326ZJUL26",
+      "timestamp_utc": "2026-07-17T13:26:58Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "COMMANDER_ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander's assessment — 17 Jul 2026",
+      "text": "Commander's periodic assessment 171326ZJUL26. Overall situation: STABLE — mission on track. Priority concern: Sanctions evasion volume remains high. Intent for next 72h: Increase boarding operations.",
+      "situation_assessment": "DETERIORATING",
+      "priority_concern": "Sanctions evasion volume remains high",
+      "intent_72h": "Increase boarding operations",
+      "pir_refs": [
+        "PIR-04",
+        "PIR-02",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach",
+        "Beirut Port Approach",
+        "Southern Red Sea",
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9741839",
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0001",
+        "C2-202606-0010",
+        "C2-202606-0042",
+        "C2-202606-0054"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "C4ISR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR",
+        "ORIGINATOR_CELL",
+        "ADMIRALTY_EVALUATION"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0075",
+      "dtg": "171645ZJUL26",
+      "timestamp_utc": "2026-07-17T16:45:20Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Italy / 17 Jul 2026",
+      "text": "Liaison report from Italy representative. Subject: ROE interpretation clarification. Key point: Intelligence product dissemination approved. Action: LEGAL REVIEW.",
+      "liaison_nation": "Italy",
+      "subject": "Intelligence exchange",
+      "action_required": "NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0076",
+      "dtg": "171912ZJUL26",
+      "timestamp_utc": "2026-07-17T19:12:27Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 17 Jul 2026",
+      "text": "Force status report 171912ZJUL26. Nations contributing: France, Belgium, Saudi Arabia, Italy, USA, UAE, Bahrain, Netherlands. Total units under command: 9. Fully effective: 9. Degraded: 0. Current mission phase: PHASE 4 — TRANSITION. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "France",
+        "Belgium",
+        "Saudi Arabia",
+        "Italy",
+        "USA",
+        "UAE",
+        "Bahrain",
+        "Netherlands"
+      ],
+      "total_units": 9,
+      "effective_units": 9,
+      "degraded_units": 0,
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "force_note": "All sectors covered",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach",
+        "Naqoura Sector / Blue Line",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0077",
+      "dtg": "171941ZJUL26",
+      "timestamp_utc": "2026-07-17T19:41:47Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "COMMANDER_ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander's assessment — 17 Jul 2026",
+      "text": "Commander's periodic assessment 171941ZJUL26. Overall situation: DETERIORATING — increased adversary activity. Priority concern: HUMINT gaps in northern sector. Intent for next 72h: Increase boarding operations.",
+      "situation_assessment": "IMPROVING",
+      "priority_concern": "Sanctions evasion volume remains high",
+      "intent_72h": "Focus collection on PIR-04",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-02",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Hodeidah",
+        "Suez Gulf Approach",
+        "Fujairah OPL Anchorage",
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9492737",
+        "9684720"
+      ],
+      "generic_refs": [
+        "C2-202606-0026",
+        "C2-202606-0048",
+        "C2-202606-0003",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "C4ISR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR",
+        "ORIGINATOR_CELL",
+        "ADMIRALTY_EVALUATION"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0078",
+      "dtg": "172216ZJUL26",
+      "timestamp_utc": "2026-07-17T22:16:07Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 172216ZJUL26",
+      "text": "Commander decision log entry 172216ZJUL26. Decision: Authorise boarding of MT RED SEA EAGLE. Rationale: PIR threshold met. Approved by: CTF-CDR. Time: 172216ZJUL26.",
+      "decision_text": "Request national asset support",
+      "rationale": "Legal authority confirmed",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [
+        "9786255"
+      ],
+      "generic_refs": [
+        "C2-202606-0068",
+        "C2-202606-0016"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0079",
+      "dtg": "172239ZJUL26",
+      "timestamp_utc": "2026-07-17T22:39:44Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 172239ZJUL26",
+      "text": "Commander decision log entry 172239ZJUL26. Decision: Task MPA HERON-01 against spoofing contact. Rationale: Intelligence indicates imminent threat. Approved by: CTF-CDR. Time: 172239ZJUL26.",
+      "decision_text": "Increase patrol tempo in SECTOR ALPHA",
+      "rationale": "Force protection requirement",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0098",
+        "C2-202606-0085"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_SANCTIONS_EVASION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0080",
+      "dtg": "181323ZJUL26",
+      "timestamp_utc": "2026-07-18T13:23:26Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 18 Jul 2026",
+      "text": "Force status report 181323ZJUL26. Nations contributing: Saudi Arabia, Italy, France, Bahrain, Netherlands. Total units under command: 14. Fully effective: 12. Degraded: 2. Current mission phase: PHASE 3 — CONSOLIDATE. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "Saudi Arabia",
+        "Italy",
+        "France",
+        "Bahrain",
+        "Netherlands"
+      ],
+      "total_units": 14,
+      "effective_units": 12,
+      "degraded_units": 2,
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "force_note": "MPA availability reduced — weather",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Hodeidah",
+        "Port of Tartus Approach",
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0081",
+      "dtg": "182116ZJUL26",
+      "timestamp_utc": "2026-07-18T21:16:55Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 182116ZJUL26: Has PIR-03 threshold been met in Southern Red Sea? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: TASKED.",
+      "ccir_text": "Has shadow fleet vessel conducted STS in last 48h?",
+      "status": "ANSWERED",
+      "j2_action": "TASKED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0023",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_MARITIME_INTERDICTION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0082",
+      "dtg": "182252ZJUL26",
+      "timestamp_utc": "2026-07-18T22:52:12Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 3 — CONSO",
+      "text": "Mission objective record. Phase: PHASE 3 — CONSOLIDATE. Objective: Establish maritime security in IRTC. Success criteria: No merchant vessel attack in 30 days. Status: AT RISK.",
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "objective_text": "Interdict STS transfers in OPL",
+      "success_criteria": "All vessels queried within 2h",
+      "status": "DEFERRED",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0107",
+        "C2-202606-0135"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_AIR_DEFENCE",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0083",
+      "dtg": "182321ZJUL26",
+      "timestamp_utc": "2026-07-18T23:21:14Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 182321ZJUL26",
+      "text": "Commander decision log entry 182321ZJUL26. Decision: Request national asset support for PIR-04. Rationale: Legal authority confirmed by LAO. Approved by: CTF-CDR. Time: 182321ZJUL26.",
+      "decision_text": "Authorise boarding of high-risk vessel",
+      "rationale": "Legal authority confirmed",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0009",
+        "C2-202606-0005"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_UAS_USV_THREAT",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0084",
+      "dtg": "190123ZJUL26",
+      "timestamp_utc": "2026-07-19T01:23:26Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "COMMANDER_ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander's assessment — 19 Jul 2026",
+      "text": "Commander's periodic assessment 190123ZJUL26. Overall situation: DETERIORATING — increased adversary activity. Priority concern: Boarding team fatigue — rotation required. Intent for next 72h: Focus collection on PIR-04.",
+      "situation_assessment": "UNCHANGED",
+      "priority_concern": "Boarding team fatigue — rotation required",
+      "intent_72h": "Increase boarding operations",
+      "pir_refs": [
+        "PIR-04",
+        "PIR-02",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Hodeidah",
+        "Mocha Coastal Sector",
+        "Southern Red Sea",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [
+        "9561849",
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0001",
+        "C2-202606-0010",
+        "C2-202606-0026",
+        "C2-202606-0048"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "C4ISR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR",
+        "ORIGINATOR_CELL",
+        "ADMIRALTY_EVALUATION"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0085",
+      "dtg": "190456ZJUL26",
+      "timestamp_utc": "2026-07-19T04:56:58Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — UAE / 19 Jul 2026",
+      "text": "Liaison report from UAE representative. Subject: National caveats update. Key point: National assets available for tasking with 24h notice. Action: J2 TASKED.",
+      "liaison_nation": "UAE",
+      "subject": "ROE interpretation",
+      "action_required": "LEGAL_REVIEW",
+      "pir_refs": [],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0086",
+      "dtg": "191803ZJUL26",
+      "timestamp_utc": "2026-07-19T18:03:26Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 19 Jul 2026 update",
+      "text": "ROE standing card effective 191803ZJUL26. Rules in force: ROE 422, ROE 481, ROE 441. Amplification: Boarding authority extended to all flagged vessels. Legal adviser: LAO-02. Validity: 24 Jul 2026.",
+      "rules_in_force": [
+        "ROE 422 — Defence of other forces",
+        "ROE 481 — Proportional response",
+        "ROE 441 — Non-combatant evacuation"
+      ],
+      "amplification": "Warning shots authorised in SECTOR ALPHA only",
+      "legal_adviser": "LAO-03",
+      "validity_date": "2026-07-26",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0087",
+      "dtg": "200900ZJUL26",
+      "timestamp_utc": "2026-07-20T09:00:17Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 200900ZJUL26",
+      "text": "Commander decision log entry 200900ZJUL26. Decision: Release WARSHIP EAGLE for scheduled maintenance. Rationale: Intelligence indicates imminent threat. Approved by: CTF-CDR. Time: 200900ZJUL26.",
+      "decision_text": "Authorise boarding of high-risk vessel",
+      "rationale": "Force protection requirement",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9741839"
+      ],
+      "generic_refs": [
+        "C2-202606-0107",
+        "C2-202606-0054"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_AIR_DEFENCE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0088",
+      "dtg": "201207ZJUL26",
+      "timestamp_utc": "2026-07-20T12:07:05Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Netherlands / 20 Jul 2026",
+      "text": "Liaison report from Netherlands representative. Subject: Intelligence exchange — HUMINT product. Key point: Intelligence product dissemination approved. Action: CTF CDR DECISION REQUIRED.",
+      "liaison_nation": "Netherlands",
+      "subject": "Intelligence exchange",
+      "action_required": "LEGAL_REVIEW",
+      "pir_refs": [],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0089",
+      "dtg": "202001ZJUL26",
+      "timestamp_utc": "2026-07-20T20:01:51Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 20 Jul 2026 update",
+      "text": "ROE standing card effective 202001ZJUL26. Rules in force: ROE 431, ROE 471, ROE 441, ROE 491, ROE 461, ROE 432, ROE 421. Amplification: Warning shots authorised in SECTOR ALPHA only. Legal adviser: LAO-03. Validity: 26 Jul 2026.",
+      "rules_in_force": [
+        "ROE 431 — Approach and query",
+        "ROE 471 — Boarding operations",
+        "ROE 441 — Non-combatant evacuation",
+        "ROE 491 — Escalation of force",
+        "ROE 461 — Air defence weapons free",
+        "ROE 432 — Warning shots",
+        "ROE 421 — Right of self-defence"
+      ],
+      "amplification": "ROE 451 activated for Red Sea corridor",
+      "legal_adviser": "LAO-03",
+      "validity_date": "2026-07-26",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0090",
+      "dtg": "202221ZJUL26",
+      "timestamp_utc": "2026-07-20T22:21:52Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 2 — INTER",
+      "text": "Mission objective record. Phase: PHASE 3 — CONSOLIDATE. Objective: Disrupt weapons transhipment through Hodeidah. Success criteria: <5% AIS dark periods unaccounted. Status: ON TRACK.",
+      "mission_phase": "PHASE 3 — CONSOLIDATE",
+      "objective_text": "Protect SLOC through Bab-el-Mandeb",
+      "success_criteria": "All vessels queried within 2h",
+      "status": "DEFERRED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0068",
+        "C2-202606-0013"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0091",
+      "dtg": "210635ZJUL26",
+      "timestamp_utc": "2026-07-21T06:35:54Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 210635ZJUL26: Has MT RED SEA EAGLE conducted an STS transfer in the last 48h? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: IN PROGRESS.",
+      "ccir_text": "Is there confirmed AD radar covering eastern approaches?",
+      "status": "EXPIRED",
+      "j2_action": "TASKED",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0010",
+        "C2-202606-0021"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0092",
+      "dtg": "211530ZJUL26",
+      "timestamp_utc": "2026-07-21T15:30:19Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 211530ZJUL26",
+      "text": "Commander decision log entry 211530ZJUL26. Decision: Request national asset support for PIR-04. Rationale: Legal authority confirmed by LAO. Approved by: CTF-CDR. Time: 211530ZJUL26.",
+      "decision_text": "Authorise boarding of high-risk vessel",
+      "rationale": "PIR threshold met",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0135",
+        "C2-202606-0107"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_AIR_DEFENCE",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0093",
+      "dtg": "212314ZJUL26",
+      "timestamp_utc": "2026-07-21T23:14:52Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — Belgium / 21 Jul 2026",
+      "text": "Liaison report from Belgium representative. Subject: Intelligence exchange — HUMINT product. Key point: Boarding operations require ministerial authority. Action: CTF CDR DECISION REQUIRED.",
+      "liaison_nation": "Belgium",
+      "subject": "ROE interpretation",
+      "action_required": "NOTED",
+      "pir_refs": [],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0094",
+      "dtg": "220735ZJUL26",
+      "timestamp_utc": "2026-07-22T07:35:41Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "MISSION_OBJECTIVE",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Mission objective — PHASE 3 — CONSO",
+      "text": "Mission objective record. Phase: PHASE 2 — INTERDICT. Objective: Protect SLOC through Bab-el-Mandeb. Success criteria: <5% AIS dark periods unaccounted. Status: DEFERRED.",
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "objective_text": "Disrupt weapons transhipment through regional ports",
+      "success_criteria": "Zero successful STS in AOR",
+      "status": "ACHIEVED",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0107",
+        "C2-202606-0066"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "PIR_AIR_DEFENCE",
+        "PIR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0095",
+      "dtg": "220933ZJUL26",
+      "timestamp_utc": "2026-07-22T09:33:32Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — UAE / 22 Jul 2026",
+      "text": "Liaison report from UAE representative. Subject: Intelligence exchange — HUMINT product. Key point: Transit notification for {vessel} submitted. Action: LEGAL REVIEW.",
+      "liaison_nation": "UAE",
+      "subject": "Vessel transit notification",
+      "action_required": "J2_TASKED",
+      "pir_refs": [],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0096",
+      "dtg": "222221ZJUL26",
+      "timestamp_utc": "2026-07-22T22:21:45Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 222221ZJUL26: Has adversary resupply been confirmed at Port of Hodeidah this week? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: COMPLETE.",
+      "ccir_text": "Has PIR threshold been met in AOR?",
+      "status": "EXPIRED",
+      "j2_action": "IN_PROGRESS",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_MARITIME_INTERDICTION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0097",
+      "dtg": "231515ZJUL26",
+      "timestamp_utc": "2026-07-23T15:15:51Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 23 Jul 2026",
+      "text": "Force status report 231515ZJUL26. Nations contributing: France, Belgium, Netherlands, UAE. Total units under command: 11. Fully effective: 8. Degraded: 3. Current mission phase: PHASE 2 — INTERDICT. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "France",
+        "Belgium",
+        "Netherlands",
+        "UAE"
+      ],
+      "total_units": 11,
+      "effective_units": 8,
+      "degraded_units": 3,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "MPA availability reduced — weather",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "South Tyre / Coastal Route",
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0098",
+      "dtg": "231957ZJUL26",
+      "timestamp_utc": "2026-07-23T19:57:30Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 231957ZJUL26",
+      "text": "Commander decision log entry 231957ZJUL26. Decision: Increase patrol tempo in SECTOR ALPHA. Rationale: PIR threshold met. Approved by: CTF-CDR. Time: 231957ZJUL26.",
+      "decision_text": "Detain vessel pending J2 assessment",
+      "rationale": "Legal authority confirmed",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0003"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_MARITIME_INTERDICTION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0099",
+      "dtg": "232210ZJUL26",
+      "timestamp_utc": "2026-07-23T22:10:56Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 23 Jul 2026",
+      "text": "Force status report 232210ZJUL26. Nations contributing: Bahrain, Belgium, France, UAE, UK, Italy. Total units under command: 9. Fully effective: 5. Degraded: 4. Current mission phase: PHASE 2 — INTERDICT. Notable: Boarding capacity at maximum.",
+      "contributing_nations": [
+        "Bahrain",
+        "Belgium",
+        "France",
+        "UAE",
+        "UK",
+        "Italy"
+      ],
+      "total_units": 9,
+      "effective_units": 5,
+      "degraded_units": 4,
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "force_note": "Boarding capacity at maximum",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Port of Hodeidah",
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0100",
+      "dtg": "241635ZJUL26",
+      "timestamp_utc": "2026-07-24T16:35:05Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "COMMANDER_ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander's assessment — 24 Jul 2026",
+      "text": "Commander's periodic assessment 241635ZJUL26. Overall situation: DETERIORATING — increased adversary activity. Priority concern: Boarding team fatigue — rotation required. Intent for next 72h: Request reinforcement from national authority.",
+      "situation_assessment": "UNCHANGED",
+      "priority_concern": "Boarding team fatigue — rotation required",
+      "intent_72h": "Focus collection on PIR-04",
+      "pir_refs": [
+        "PIR-02",
+        "PIR-06",
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal",
+        "South Tyre / Coastal Route",
+        "Strait of Hormuz",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9684720",
+        "9561849"
+      ],
+      "generic_refs": [
+        "C2-202606-0007",
+        "C2-202606-0013",
+        "C2-202606-0026",
+        "C2-202606-0048"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "C4ISR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR",
+        "ORIGINATOR_CELL",
+        "ADMIRALTY_EVALUATION"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0101",
+      "dtg": "250129ZJUL26",
+      "timestamp_utc": "2026-07-25T01:29:41Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "COMMANDER_ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander's assessment — 25 Jul 2026",
+      "text": "Commander's periodic assessment 250129ZJUL26. Overall situation: IMPROVING — interdiction effect demonstrated. Priority concern: Air defence coverage limiting MPA operations. Intent for next 72h: Increase boarding operations.",
+      "situation_assessment": "DETERIORATING",
+      "priority_concern": "Air defence limiting MPA operations",
+      "intent_72h": "Increase boarding operations",
+      "pir_refs": [
+        "PIR-02",
+        "PIR-01",
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "Southern Red Sea",
+        "Mocha Coastal Sector",
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9786255",
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0001",
+        "C2-202606-0010",
+        "C2-202606-0002",
+        "C2-202606-0005"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "C4ISR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR",
+        "ORIGINATOR_CELL",
+        "ADMIRALTY_EVALUATION"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0102",
+      "dtg": "250837ZJUL26",
+      "timestamp_utc": "2026-07-25T08:37:59Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 25 Jul 2026",
+      "text": "Force status report 250837ZJUL26. Nations contributing: Italy, France, Saudi Arabia, Belgium. Total units under command: 10. Fully effective: 7. Degraded: 3. Current mission phase: PHASE 4 — TRANSITION. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "Italy",
+        "France",
+        "Saudi Arabia",
+        "Belgium"
+      ],
+      "total_units": 10,
+      "effective_units": 7,
+      "degraded_units": 3,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "Boarding capacity at maximum",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal",
+        "Naqoura Sector / Blue Line",
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0103",
+      "dtg": "250910ZJUL26",
+      "timestamp_utc": "2026-07-25T09:10:02Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 25 Jul 2026",
+      "text": "Force status report 250910ZJUL26. Nations contributing: Bahrain, Italy, UAE, UK, USA, France, Saudi Arabia. Total units under command: 9. Fully effective: 8. Degraded: 1. Current mission phase: PHASE 1 — ESTABLISH. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "Bahrain",
+        "Italy",
+        "UAE",
+        "UK",
+        "USA",
+        "France",
+        "Saudi Arabia"
+      ],
+      "total_units": 9,
+      "effective_units": 8,
+      "degraded_units": 1,
+      "mission_phase": "PHASE 1 — ESTABLISH",
+      "force_note": "SECTOR CHARLIE gap — reinforcement requested",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "Southern Red Sea",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0104",
+      "dtg": "251854ZJUL26",
+      "timestamp_utc": "2026-07-25T18:54:30Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 25 Jul 2026",
+      "text": "Force status report 251854ZJUL26. Nations contributing: Bahrain, UAE, Italy, Saudi Arabia, USA, Netherlands, Belgium, France. Total units under command: 14. Fully effective: 8. Degraded: 6. Current mission phase: PHASE 4 — TRANSITION. Notable: SECTOR CHARLIE gap — requested reinforcement.",
+      "contributing_nations": [
+        "Bahrain",
+        "UAE",
+        "Italy",
+        "Saudi Arabia",
+        "USA",
+        "Netherlands",
+        "Belgium",
+        "France"
+      ],
+      "total_units": 14,
+      "effective_units": 8,
+      "degraded_units": 6,
+      "mission_phase": "PHASE 2 — INTERDICT",
+      "force_note": "All sectors covered",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "Kharg Island Terminal",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0105",
+      "dtg": "260036ZJUL26",
+      "timestamp_utc": "2026-07-26T00:36:55Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 260036ZJUL26: Has MT RED SEA EAGLE conducted an STS transfer in the last 48h? Status: ANSWERED — see J2 assessment. Raised by: CTF-CDR. J2 action: IN PROGRESS.",
+      "ccir_text": "Has PIR threshold been met in AOR?",
+      "status": "ANSWERED",
+      "j2_action": "COMPLETE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0003"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_MARITIME_INTERDICTION",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0106",
+      "dtg": "260311ZJUL26",
+      "timestamp_utc": "2026-07-26T03:11:22Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "ROE_CARD",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "ROE card — 26 Jul 2026 update",
+      "text": "ROE standing card effective 260311ZJUL26. Rules in force: ROE 441, ROE 481, ROE 491. Amplification: Boarding authority extended to all flagged vessels. Legal adviser: LAO-01. Validity: 30 Jul 2026.",
+      "rules_in_force": [
+        "ROE 441 — Non-combatant evacuation",
+        "ROE 481 — Proportional response",
+        "ROE 491 — Escalation of force"
+      ],
+      "amplification": "No changes from previous card",
+      "legal_adviser": "LAO-01",
+      "validity_date": "2026-07-31",
+      "pir_refs": [],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CLASSIFICATION_LEVEL",
+        "SECRET_REL",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0107",
+      "dtg": "260939ZJUL26",
+      "timestamp_utc": "2026-07-26T09:39:54Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "FORCE_STATUS",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Forces under command status — 26 Jul 2026",
+      "text": "Force status report 260939ZJUL26. Nations contributing: France, UAE, Saudi Arabia, Netherlands, Bahrain. Total units under command: 8. Fully effective: 6. Degraded: 2. Current mission phase: PHASE 1 — ESTABLISH. Notable: MPA availability reduced — weather.",
+      "contributing_nations": [
+        "France",
+        "UAE",
+        "Saudi Arabia",
+        "Netherlands",
+        "Bahrain"
+      ],
+      "total_units": 8,
+      "effective_units": 6,
+      "degraded_units": 2,
+      "mission_phase": "PHASE 4 — TRANSITION",
+      "force_note": "All sectors covered",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line",
+        "Mocha Coastal Sector",
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "C4ISR"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0108",
+      "dtg": "261430ZJUL26",
+      "timestamp_utc": "2026-07-26T14:30:44Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "CCIR",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Commander's critical information requirement",
+      "text": "CCIR raised 261430ZJUL26: What is the current AIS status of MIDNIGHT RUNNER? Status: OPEN — collection ongoing. Raised by: CTF-CDR. J2 action: TASKED.",
+      "ccir_text": "Has shadow fleet vessel conducted STS in last 48h?",
+      "status": "ANSWERED",
+      "j2_action": "COMPLETE",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0010",
+        "C2-202606-0058"
+      ],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE",
+        "C4ISR",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0109",
+      "dtg": "270725ZJUL26",
+      "timestamp_utc": "2026-07-27T07:25:12Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "DECISION_LOG",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Commander decision log — 270725ZJUL26",
+      "text": "Commander decision log entry 270725ZJUL26. Decision: Release WARSHIP EAGLE for scheduled maintenance. Rationale: Force protection requirement. Approved by: CTF-CDR. Time: 270725ZJUL26.",
+      "decision_text": "Task MPA against spoofing contact",
+      "rationale": "Commander's intent — maintain presence",
+      "authority": "CTF-CDR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "OPORD",
+        "C4ISR",
+        "FLASH",
+        "PIR_MARITIME_INTERDICTION",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "CTF-202607-0110",
+      "dtg": "271844ZJUL26",
+      "timestamp_utc": "2026-07-27T18:44:28Z",
+      "persona": "CTF_COMMANDER",
+      "record_type": "LIAISON_REPORT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "EYES ONLY — COMDs DISTRIBUTION"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Liaison report — UK / 27 Jul 2026",
+      "text": "Liaison report from UK representative. Subject: Intelligence exchange — HUMINT product. Key point: Intelligence product dissemination approved. Action: LEGAL REVIEW.",
+      "liaison_nation": "UK",
+      "subject": "Force contribution amendment",
+      "action_required": "CDR_DECISION",
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "LIAISON_SERVICE",
+        "C4ISR",
+        "NATOPUB",
+        "CLASSIFICATION_LEVEL"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4914 @@
+{
+  "dataset": {
+    "name": "user_specific_moc_watch",
+    "version": "1.0",
+    "persona": "MOC Watch Officer",
+    "primary_report_type": "SITREP",
+    "generated_utc": "2026-07-28T06:00:00Z",
+    "record_count": 110,
+    "index_type": "USER_SPECIFIC",
+    "classification_of_compilation": "SECRET//REL TO COALITION TF",
+    "note": "Simulated user-specific data. Links to generic dataset via generic_refs and to ontology via concept_ids.",
+    "coverage_window_utc": {
+      "from": "2026-06-28T06:00:00Z",
+      "to": "2026-07-28T06:00:00Z"
+    },
+    "cross_reference_schema": {
+      "generic_refs": "doc_id values from c2_middle_east_multi_source_1000_v3_en.json",
+      "pir_refs": "PIR-01..06 from the dataset pir_register",
+      "location_refs": "location.name values shared with the generic dataset",
+      "concept_ids": "concept_id values from c2_middle_east_business_ontology.yaml",
+      "vessel_refs": "vessel.imo values from the generic dataset vessel registry"
+    }
+  },
+  "records": [
+    {
+      "doc_id": "MOC-202606-0001",
+      "dtg": "272345ZJUN26",
+      "timestamp_utc": "2026-06-27T23:45:48Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA HERON-01 / SECTOR BRAVO",
+      "text": "MPA HERON-01 (P-3C, USA) reporting position 24.9029N 44.6617E in SECTOR BRAVO, vicinity Port of Aden Anchorage. Speed: 14 kts, heading: 052T. Fuel state: 52%. Readiness: EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA HERON-01",
+        "pennant": "P-3C",
+        "type": "Maritime Patrol",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "ASW",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 24.9029,
+        "longitude": 44.6617
+      },
+      "sector": "SECTOR BRAVO",
+      "speed_kts": 13,
+      "heading_deg": 178,
+      "fuel_pct": 60,
+      "readiness": "PARTIALLY EFFECTIVE",
+      "next_report_utc": "2026-06-28T03:45:48Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202606-0002",
+      "dtg": "281309ZJUN26",
+      "timestamp_utc": "2026-06-28T13:09:45Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — MPA KITE-01 / SECTOR BRAVO",
+      "text": "Patrol report from MPA KITE-01 covering SECTOR BRAVO (Gulf of Aden Corridor, Port of Aden Anchorage). Duration: 19h. Merchant contacts: 3. Suspicious contacts: 1. AIS anomalies observed: 3. Area assessment: ROUTINE.",
+      "unit": {
+        "callsign": "MPA KITE-01",
+        "pennant": "ATL2",
+        "type": "Maritime Patrol",
+        "nation": "France",
+        "capability": [
+          "ISR",
+          "AIS_RELAY"
+        ]
+      },
+      "sector": "SECTOR BRAVO",
+      "duration_hours": 18,
+      "merchant_contacts": 3,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 1,
+      "area_assessment": "ROUTINE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202606-0003",
+      "dtg": "281905ZJUN26",
+      "timestamp_utc": "2026-06-28T19:05:29Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 28 Jun 2026 1905Z",
+      "text": "MOC watch log 281905ZJUN26. Events: Routine. No significant activity. Units reporting: 3 of 9 on schedule. Watch officer: WO-04. Next watch: 2305Z.",
+      "watch_officer": "WO-07",
+      "units_reporting": 5,
+      "event_summary": "Boarding recovered",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202606-0004",
+      "dtg": "282031ZJUN26",
+      "timestamp_utc": "2026-06-28T20:31:23Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 28 Jun 2026 2031Z",
+      "text": "MOC watch log 282031ZJUN26. Events: FLASH report received — actioned. Units reporting: 5 of 9 on schedule. Watch officer: WO-04. Next watch: 0031Z.",
+      "watch_officer": "WO-01",
+      "units_reporting": 6,
+      "event_summary": "FLASH actioned",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202606-0005",
+      "dtg": "290233ZJUN26",
+      "timestamp_utc": "2026-06-29T02:33:56Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MV JEDDAH CARRIER / Suez Gulf Approach",
+      "text": "Boarding report: UAV OSPREY-01 boarding team boarded MV JEDDAH CARRIER (IMO 9610793) in Suez Gulf Approach. Duration: 176 min. Crew: 22 POB. Finding: NIL FINDS. Disposition: ESCORTED. Report forwarded to J2.",
+      "boarding_unit": "UAV OSPREY-01",
+      "vessel_boarded": {
+        "imo": "9610793",
+        "name": "MV JEDDAH CARRIER",
+        "flag": "Saudi Arabia",
+        "type": "Bulk Carrier",
+        "risk": "LOW"
+      },
+      "duration_minutes": 106,
+      "crew_pob": 22,
+      "finding": "NIL FINDS",
+      "disposition": "ESCORTED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9610793"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202606-0006",
+      "dtg": "291434ZJUN26",
+      "timestamp_utc": "2026-06-29T14:34:07Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP FALCON / SECTOR DELTA",
+      "text": "Patrol report from WARSHIP FALCON covering SECTOR DELTA (Suez Gulf Approach). Duration: 20h. Merchant contacts: 0. Suspicious contacts: 0. AIS anomalies observed: 1. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP FALCON",
+        "pennant": "L-301",
+        "type": "LPD",
+        "nation": "Netherlands",
+        "capability": [
+          "AMPHIB",
+          "BOARDING"
+        ]
+      },
+      "sector": "SECTOR DELTA",
+      "duration_hours": 12,
+      "merchant_contacts": 0,
+      "suspicious_contacts": 0,
+      "ais_anomalies_observed": 2,
+      "area_assessment": "ROUTINE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9741839"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202606-0007",
+      "dtg": "292350ZJUN26",
+      "timestamp_utc": "2026-06-29T23:50:07Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV EASTERN MERCHANT / Suez Gulf Approach",
+      "text": "Contact report: MV EASTERN MERCHANT (IMO 9684720, flag Cyprus, General Cargo) observed by MPA HERON-01 in Suez Gulf Approach. AIS anomaly detected: SPEED_ANOMALY_LOITERING. Risk profile: LOW. Action taken: BOARDING TEAM DISPATCHED.",
+      "reporting_unit": "MPA HERON-01",
+      "vessel": {
+        "imo": "9684720",
+        "name": "MV EASTERN MERCHANT",
+        "flag": "Cyprus",
+        "type": "General Cargo",
+        "risk": "LOW"
+      },
+      "anomaly_detected": "SPEED_ANOMALY_LOITERING",
+      "risk_profile": "LOW",
+      "action_taken": "QUERY BY RADIO",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9684720"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "SPEED_ANOMALY",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202606-0008",
+      "dtg": "300219ZJUN26",
+      "timestamp_utc": "2026-06-30T02:19:48Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT SOUTHERN CROSS / Southern Red Sea",
+      "text": "Contact report: MT SOUTHERN CROSS (IMO 9027764, flag Belize, Products Tanker) observed by UAV OSPREY-01 in Southern Red Sea. AIS anomaly detected: ROUTE_DEVIATION_HIGH_RISK. Risk profile: HIGH. Action taken: QUERY BY RADIO.",
+      "reporting_unit": "UAV OSPREY-01",
+      "vessel": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS",
+        "flag": "Belize",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": "ROUTE_DEVIATION_HIGH_RISK",
+      "risk_profile": "HIGH",
+      "action_taken": "REPORTED TO MOC",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0048",
+        "C2-202606-0053"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "ROUTE_DEVIATION",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0009",
+      "dtg": "010254ZJUL26",
+      "timestamp_utc": "2026-07-01T02:54:16Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 01 Jul 2026 0254Z",
+      "text": "MOC watch log 010254ZJUL26. Events: Boarding team recovered — nil finds. Units reporting: 4 of 9 on schedule. Watch officer: WO-06. Next watch: 0654Z.",
+      "watch_officer": "WO-08",
+      "units_reporting": 8,
+      "event_summary": "Routine",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector",
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0010",
+      "dtg": "011010ZJUL26",
+      "timestamp_utc": "2026-07-01T10:10:29Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 01 Jul 2026 1010Z",
+      "text": "MOC watch log 011010ZJUL26. Events: FLASH report received — actioned. Units reporting: 3 of 9 on schedule. Watch officer: WO-08. Next watch: 1410Z.",
+      "watch_officer": "WO-07",
+      "units_reporting": 4,
+      "event_summary": "Routine",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0011",
+      "dtg": "011100ZJUL26",
+      "timestamp_utc": "2026-07-01T11:00:43Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP BORA / SECTOR ECHO",
+      "text": "Patrol report from WARSHIP BORA covering SECTOR ECHO (Beirut Port Approach, Latakia Port Approach, Port of Tartus Approach). Duration: 11h. Merchant contacts: 4. Suspicious contacts: 1. AIS anomalies observed: 2. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP BORA",
+        "pennant": "F-412",
+        "type": "Frigate",
+        "nation": "Italy",
+        "capability": [
+          "AAW",
+          "ASW"
+        ]
+      },
+      "sector": "SECTOR ECHO",
+      "duration_hours": 20,
+      "merchant_contacts": 4,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 1,
+      "area_assessment": "ROUTINE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Latakia Port Approach",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [
+        "9027764",
+        "9786255"
+      ],
+      "generic_refs": [
+        "C2-202606-0060",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0012",
+      "dtg": "011332ZJUL26",
+      "timestamp_utc": "2026-07-01T13:32:09Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT MIDNIGHT RUNNER / Gaza Maritime Approach",
+      "text": "Boarding report: WARSHIP FALCON boarding team boarded MT MIDNIGHT RUNNER (IMO 9377468) in Gaza Maritime Approach. Duration: 183 min. Crew: 16 POB. Finding: CARGO MANIFEST DISCREPANCY. Disposition: DETAINED FOR FURTHER INSPECTION. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP FALCON",
+      "vessel_boarded": {
+        "imo": "9377468",
+        "name": "MT MIDNIGHT RUNNER",
+        "flag": "Cook Islands",
+        "type": "Crude Oil Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 180,
+      "crew_pob": 20,
+      "finding": "CARGO MANIFEST DISCREPANCY",
+      "disposition": "ESCORTED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0028",
+        "C2-202606-0016"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "ILLICIT_CARGO_TRANSFER",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0013",
+      "dtg": "012112ZJUL26",
+      "timestamp_utc": "2026-07-01T21:12:50Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT SEA WHISPER / Gulf of Aden Corridor",
+      "text": "Contact report: MT SEA WHISPER (IMO 9298313, flag Togo, Products Tanker) observed by MPA KITE-01 in Gulf of Aden Corridor. AIS anomaly detected: SPEED_ANOMALY_LOITERING. Risk profile: HIGH. Action taken: BOARDING TEAM DISPATCHED.",
+      "reporting_unit": "MPA KITE-01",
+      "vessel": {
+        "imo": "9298313",
+        "name": "MT SEA WHISPER",
+        "flag": "Togo",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": "SPEED_ANOMALY_LOITERING",
+      "risk_profile": "HIGH",
+      "action_taken": "REPORTED TO MOC",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0085",
+        "C2-202606-0059"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "SPEED_ANOMALY",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0014",
+      "dtg": "020151ZJUL26",
+      "timestamp_utc": "2026-07-02T01:51:03Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT AMBER FORTUNE / Port of Aden Anchorage",
+      "text": "Boarding report: WARSHIP AJAX boarding team boarded MT AMBER FORTUNE (IMO 9306275) in Port of Aden Anchorage. Duration: 72 min. Crew: 17 POB. Finding: CARGO MANIFEST DISCREPANCY. Disposition: DETAINED FOR FURTHER INSPECTION. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP AJAX",
+      "vessel_boarded": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE",
+        "flag": "Togo",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 115,
+      "crew_pob": 18,
+      "finding": "CARGO MANIFEST DISCREPANCY",
+      "disposition": "ESCORTED",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0068",
+        "C2-202606-0013"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "ILLICIT_CARGO_TRANSFER",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0015",
+      "dtg": "020744ZJUL26",
+      "timestamp_utc": "2026-07-02T07:44:25Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 02 Jul 2026 0744Z",
+      "text": "MOC watch log 020744ZJUL26. Events: Vessel contact at Bab-el-Mandeb queried by radio. Units reporting: 6 of 9 on schedule. Watch officer: WO-02. Next watch: 1144Z.",
+      "watch_officer": "WO-02",
+      "units_reporting": 4,
+      "event_summary": "Routine",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0016",
+      "dtg": "021243ZJUL26",
+      "timestamp_utc": "2026-07-02T12:43:34Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV ASIA BRIDGE / Port of Aden Anchorage",
+      "text": "Contact report: MV ASIA BRIDGE (IMO 9492737, flag Hong Kong, Container Ship) observed by WARSHIP EAGLE in Port of Aden Anchorage. AIS anomaly detected: ROUTE_DEVIATION_HIGH_RISK. Risk profile: LOW. Action taken: LOG AND MONITOR.",
+      "reporting_unit": "WARSHIP EAGLE",
+      "vessel": {
+        "imo": "9492737",
+        "name": "MV ASIA BRIDGE",
+        "flag": "Hong Kong",
+        "type": "Container Ship",
+        "risk": "LOW"
+      },
+      "anomaly_detected": "ROUTE_DEVIATION_HIGH_RISK",
+      "risk_profile": "LOW",
+      "action_taken": "BOARDING TEAM DISPATCHED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "ROUTE_DEVIATION",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0017",
+      "dtg": "021639ZJUL26",
+      "timestamp_utc": "2026-07-02T16:39:06Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV JEDDAH CARRIER / Fujairah OPL Anchorage",
+      "text": "Contact report: MV JEDDAH CARRIER (IMO 9610793, flag Saudi Arabia, Bulk Carrier) observed by WARSHIP BORA in Fujairah OPL Anchorage. AIS anomaly detected: DARK_ACTIVITY_AIS_OFF. Risk profile: LOW. Action taken: REPORTED TO MOC.",
+      "reporting_unit": "WARSHIP BORA",
+      "vessel": {
+        "imo": "9610793",
+        "name": "MV JEDDAH CARRIER",
+        "flag": "Saudi Arabia",
+        "type": "Bulk Carrier",
+        "risk": "LOW"
+      },
+      "anomaly_detected": "DARK_ACTIVITY_AIS_OFF",
+      "risk_profile": "LOW",
+      "action_taken": "BOARDING TEAM DISPATCHED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9610793"
+      ],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "DARK_ACTIVITY",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0018",
+      "dtg": "021759ZJUL26",
+      "timestamp_utc": "2026-07-02T17:59:33Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA KITE-01 / SECTOR FOXTROT",
+      "text": "MPA KITE-01 (ATL2, France) reporting position 16.5245N 52.7093E in SECTOR FOXTROT, vicinity South Tyre / Coastal Route. Speed: 6 kts, heading: 290T. Fuel state: 80%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA KITE-01",
+        "pennant": "ATL2",
+        "type": "Maritime Patrol",
+        "nation": "France",
+        "capability": [
+          "ISR",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 16.5245,
+        "longitude": 52.7093
+      },
+      "sector": "SECTOR FOXTROT",
+      "speed_kts": 15,
+      "heading_deg": 181,
+      "fuel_pct": 35,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-02T21:59:33Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0019",
+      "dtg": "021819ZJUL26",
+      "timestamp_utc": "2026-07-02T18:19:52Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV ASIA BRIDGE / Gaza Maritime Approach",
+      "text": "Contact report: MV ASIA BRIDGE (IMO 9492737, flag Hong Kong, Container Ship) observed by MPA HERON-01 in Gaza Maritime Approach. AIS anomaly detected: DARK_ACTIVITY_AIS_OFF. Risk profile: LOW. Action taken: QUERY BY RADIO.",
+      "reporting_unit": "MPA HERON-01",
+      "vessel": {
+        "imo": "9492737",
+        "name": "MV ASIA BRIDGE",
+        "flag": "Hong Kong",
+        "type": "Container Ship",
+        "risk": "LOW"
+      },
+      "anomaly_detected": "DARK_ACTIVITY_AIS_OFF",
+      "risk_profile": "LOW",
+      "action_taken": "REPORTED TO MOC",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "DARK_ACTIVITY",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0020",
+      "dtg": "021912ZJUL26",
+      "timestamp_utc": "2026-07-02T19:12:23Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT SOUTHERN CROSS / Naqoura Sector / Blue Line",
+      "text": "Boarding report: WARSHIP DALTON boarding team boarded MT SOUTHERN CROSS (IMO 9027764) in Naqoura Sector / Blue Line. Duration: 57 min. Crew: 23 POB. Finding: DOCUMENTS IRREGULAR. Disposition: ESCORTED. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP DALTON",
+      "vessel_boarded": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS",
+        "flag": "Belize",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 176,
+      "crew_pob": 18,
+      "finding": "DOCUMENTS IRREGULAR",
+      "disposition": "ESCORTED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0060",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0021",
+      "dtg": "022032ZJUL26",
+      "timestamp_utc": "2026-07-02T20:32:01Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP FALCON / SECTOR DELTA",
+      "text": "Patrol report from WARSHIP FALCON covering SECTOR DELTA (Suez Gulf Approach). Duration: 24h. Merchant contacts: 5. Suspicious contacts: 2. Boarding conducted: YES. AIS anomalies observed: 3. Area assessment: ELEVATED ACTIVITY.",
+      "unit": {
+        "callsign": "WARSHIP FALCON",
+        "pennant": "L-301",
+        "type": "LPD",
+        "nation": "Netherlands",
+        "capability": [
+          "AMPHIB",
+          "BOARDING"
+        ]
+      },
+      "sector": "SECTOR DELTA",
+      "duration_hours": 6,
+      "merchant_contacts": 5,
+      "suspicious_contacts": 2,
+      "ais_anomalies_observed": 2,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9238117",
+        "9610793"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0022",
+      "dtg": "022318ZJUL26",
+      "timestamp_utc": "2026-07-02T23:18:28Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "COMMS_TRAFFIC",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms traffic log — WARSHIP DALTON",
+      "text": "Communications traffic log. From: WARSHIP DALTON To: MOC-J2. Subject: SITREP. Network: HF PRIMARY. Classification: UNCLASSIFIED. Acknowledged: YES.",
+      "from_unit": "WARSHIP DALTON",
+      "to_unit": "MOC-J2",
+      "message_type": "FUEL_STATE",
+      "network": "LINK16",
+      "acknowledged": true,
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0023",
+      "dtg": "030125ZJUL26",
+      "timestamp_utc": "2026-07-03T01:25:44Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP EAGLE / SECTOR ALPHA",
+      "text": "WARSHIP EAGLE (M-501, Belgium) reporting position 26.0633N 52.3308E in SECTOR ALPHA, vicinity Southern Red Sea. Speed: 16 kts, heading: 252T. Fuel state: 60%. Readiness: FULLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP EAGLE",
+        "pennant": "M-501",
+        "type": "MCM Vessel",
+        "nation": "Belgium",
+        "capability": [
+          "MCM"
+        ]
+      },
+      "position": {
+        "latitude": 26.0633,
+        "longitude": 52.3308
+      },
+      "sector": "SECTOR ALPHA",
+      "speed_kts": 7,
+      "heading_deg": 105,
+      "fuel_pct": 31,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-03T05:25:44Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0024",
+      "dtg": "030531ZJUL26",
+      "timestamp_utc": "2026-07-03T05:31:59Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT MIDNIGHT RUNNER / Beirut Port Approach",
+      "text": "Contact report: MT MIDNIGHT RUNNER (IMO 9377468, flag Cook Islands, Crude Oil Tanker) observed by WARSHIP EAGLE in Beirut Port Approach. No anomaly detected. Risk profile: HIGH. Action taken: BOARDING TEAM DISPATCHED.",
+      "reporting_unit": "WARSHIP EAGLE",
+      "vessel": {
+        "imo": "9377468",
+        "name": "MT MIDNIGHT RUNNER",
+        "flag": "Cook Islands",
+        "type": "Crude Oil Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": null,
+      "risk_profile": "HIGH",
+      "action_taken": "REPORTED TO MOC",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0072",
+        "C2-202606-0098"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS",
+        "MARITIME_ANALYTICS",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0025",
+      "dtg": "031610ZJUL26",
+      "timestamp_utc": "2026-07-03T16:10:14Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP DALTON / SECTOR CHARLIE",
+      "text": "WARSHIP DALTON (DDG-89, USA) reporting position 15.5308N 38.3682E in SECTOR CHARLIE, vicinity Fujairah OPL Anchorage. Speed: 6 kts, heading: 304T. Fuel state: 84%. Readiness: EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "position": {
+        "latitude": 15.5308,
+        "longitude": 38.3682
+      },
+      "sector": "SECTOR CHARLIE",
+      "speed_kts": 9,
+      "heading_deg": 51,
+      "fuel_pct": 80,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-03T20:10:14Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0026",
+      "dtg": "031639ZJUL26",
+      "timestamp_utc": "2026-07-03T16:39:34Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP CYGNET / SECTOR ALPHA",
+      "text": "Patrol report from WARSHIP CYGNET covering SECTOR ALPHA (Southern Red Sea, Bab-el-Mandeb Strait). Duration: 15h. Merchant contacts: 5. Suspicious contacts: 2. Boarding conducted: YES. AIS anomalies observed: 0. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP CYGNET",
+        "pennant": "P-211",
+        "type": "OPV",
+        "nation": "UK",
+        "capability": [
+          "MIO",
+          "BOARDING"
+        ]
+      },
+      "sector": "SECTOR ALPHA",
+      "duration_hours": 23,
+      "merchant_contacts": 5,
+      "suspicious_contacts": 2,
+      "ais_anomalies_observed": 1,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Southern Red Sea",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9238117",
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0027",
+      "dtg": "031708ZJUL26",
+      "timestamp_utc": "2026-07-03T17:08:02Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — UAV OSPREY-01 / SECTOR BRAVO",
+      "text": "UAV OSPREY-01 (MQ-9B, USA) reporting position 15.5012N 55.6826E in SECTOR BRAVO, vicinity Port of Aden Anchorage. Speed: 9 kts, heading: 183T. Fuel state: 49%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "UAV OSPREY-01",
+        "pennant": "MQ-9B",
+        "type": "MALE UAV",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "EW"
+        ]
+      },
+      "position": {
+        "latitude": 15.5012,
+        "longitude": 55.6826
+      },
+      "sector": "SECTOR BRAVO",
+      "speed_kts": 11,
+      "heading_deg": 64,
+      "fuel_pct": 77,
+      "readiness": "PARTIALLY EFFECTIVE",
+      "next_report_utc": "2026-07-03T21:08:02Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0028",
+      "dtg": "032303ZJUL26",
+      "timestamp_utc": "2026-07-03T23:03:53Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA HERON-01 / SECTOR BRAVO",
+      "text": "MPA HERON-01 (P-3C, USA) reporting position 15.8304N 39.3047E in SECTOR BRAVO, vicinity Port of Aden Anchorage. Speed: 14 kts, heading: 090T. Fuel state: 46%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA HERON-01",
+        "pennant": "P-3C",
+        "type": "Maritime Patrol",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "ASW",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 15.8304,
+        "longitude": 39.3047
+      },
+      "sector": "SECTOR BRAVO",
+      "speed_kts": 14,
+      "heading_deg": 300,
+      "fuel_pct": 37,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-04T03:03:53Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0029",
+      "dtg": "032346ZJUL26",
+      "timestamp_utc": "2026-07-03T23:46:45Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "COMMS_TRAFFIC",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms traffic log — WARSHIP CYGNET",
+      "text": "Communications traffic log. From: WARSHIP CYGNET To: MOC-J2. Subject: SITREP. Network: UHF TACTICAL. Classification: UNCLASSIFIED. Acknowledged: YES.",
+      "from_unit": "WARSHIP CYGNET",
+      "to_unit": "MOC-J2",
+      "message_type": "SITREP",
+      "network": "SATCOM",
+      "acknowledged": true,
+      "pir_refs": [],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0030",
+      "dtg": "041016ZJUL26",
+      "timestamp_utc": "2026-07-04T10:16:16Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP EAGLE / SECTOR ALPHA",
+      "text": "WARSHIP EAGLE (M-501, Belgium) reporting position 15.9723N 53.8259E in SECTOR ALPHA, vicinity Southern Red Sea. Speed: 14 kts, heading: 083T. Fuel state: 57%. Readiness: FULLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP EAGLE",
+        "pennant": "M-501",
+        "type": "MCM Vessel",
+        "nation": "Belgium",
+        "capability": [
+          "MCM"
+        ]
+      },
+      "position": {
+        "latitude": 15.9723,
+        "longitude": 53.8259
+      },
+      "sector": "SECTOR ALPHA",
+      "speed_kts": 10,
+      "heading_deg": 16,
+      "fuel_pct": 67,
+      "readiness": "PARTIALLY EFFECTIVE",
+      "next_report_utc": "2026-07-04T14:16:16Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0031",
+      "dtg": "042010ZJUL26",
+      "timestamp_utc": "2026-07-04T20:10:54Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT SOUTHERN CROSS / Suez Gulf Approach",
+      "text": "Boarding report: WARSHIP AJAX boarding team boarded MT SOUTHERN CROSS (IMO 9027764) in Suez Gulf Approach. Duration: 234 min. Crew: 25 POB. Finding: NIL FINDS. Disposition: ESCORTED. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP AJAX",
+      "vessel_boarded": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS",
+        "flag": "Belize",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 65,
+      "crew_pob": 22,
+      "finding": "NIL FINDS",
+      "disposition": "DIVERTED TO PORT",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0047"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0032",
+      "dtg": "042352ZJUL26",
+      "timestamp_utc": "2026-07-04T23:52:21Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 04 Jul 2026 2352Z",
+      "text": "MOC watch log 042352ZJUL26. Events: Vessel contact at Bab-el-Mandeb queried by radio. Units reporting: 9 of 9 on schedule. Watch officer: WO-05. Next watch: 0352Z.",
+      "watch_officer": "WO-08",
+      "units_reporting": 9,
+      "event_summary": "Boarding recovered",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0033",
+      "dtg": "050501ZJUL26",
+      "timestamp_utc": "2026-07-05T05:01:05Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP EAGLE / SECTOR DELTA",
+      "text": "Patrol report from WARSHIP EAGLE covering SECTOR DELTA (Suez Gulf Approach). Duration: 6h. Merchant contacts: 3. Suspicious contacts: 2. AIS anomalies observed: 1. Area assessment: ELEVATED ACTIVITY.",
+      "unit": {
+        "callsign": "WARSHIP EAGLE",
+        "pennant": "M-501",
+        "type": "MCM Vessel",
+        "nation": "Belgium",
+        "capability": [
+          "MCM"
+        ]
+      },
+      "sector": "SECTOR DELTA",
+      "duration_hours": 21,
+      "merchant_contacts": 3,
+      "suspicious_contacts": 2,
+      "ais_anomalies_observed": 2,
+      "area_assessment": "ROUTINE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9027764",
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0034",
+      "dtg": "051627ZJUL26",
+      "timestamp_utc": "2026-07-05T16:27:00Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP FALCON / SECTOR CHARLIE",
+      "text": "WARSHIP FALCON (L-301, Netherlands) reporting position 27.1996N 51.7214E in SECTOR CHARLIE, vicinity Strait of Hormuz. Speed: 18 kts, heading: 192T. Fuel state: 37%. Readiness: FULLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP FALCON",
+        "pennant": "L-301",
+        "type": "LPD",
+        "nation": "Netherlands",
+        "capability": [
+          "AMPHIB",
+          "BOARDING"
+        ]
+      },
+      "position": {
+        "latitude": 27.1996,
+        "longitude": 51.7214
+      },
+      "sector": "SECTOR CHARLIE",
+      "speed_kts": 11,
+      "heading_deg": 236,
+      "fuel_pct": 85,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-05T20:27:00Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0035",
+      "dtg": "060605ZJUL26",
+      "timestamp_utc": "2026-07-06T06:05:16Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP EAGLE / SECTOR DELTA",
+      "text": "Patrol report from WARSHIP EAGLE covering SECTOR DELTA (Suez Gulf Approach). Duration: 14h. Merchant contacts: 4. Suspicious contacts: 2. AIS anomalies observed: 2. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP EAGLE",
+        "pennant": "M-501",
+        "type": "MCM Vessel",
+        "nation": "Belgium",
+        "capability": [
+          "MCM"
+        ]
+      },
+      "sector": "SECTOR DELTA",
+      "duration_hours": 10,
+      "merchant_contacts": 4,
+      "suspicious_contacts": 2,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0003"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0036",
+      "dtg": "070313ZJUL26",
+      "timestamp_utc": "2026-07-07T03:13:23Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — MPA KITE-01 / SECTOR DELTA",
+      "text": "Patrol report from MPA KITE-01 covering SECTOR DELTA (Suez Gulf Approach). Duration: 17h. Merchant contacts: 1. Suspicious contacts: 0. AIS anomalies observed: 0. Area assessment: ELEVATED ACTIVITY.",
+      "unit": {
+        "callsign": "MPA KITE-01",
+        "pennant": "ATL2",
+        "type": "Maritime Patrol",
+        "nation": "France",
+        "capability": [
+          "ISR",
+          "AIS_RELAY"
+        ]
+      },
+      "sector": "SECTOR DELTA",
+      "duration_hours": 4,
+      "merchant_contacts": 1,
+      "suspicious_contacts": 0,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0037",
+      "dtg": "071821ZJUL26",
+      "timestamp_utc": "2026-07-07T18:21:28Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT AMBER FORTUNE / Suez Gulf Approach",
+      "text": "Contact report: MT AMBER FORTUNE (IMO 9306275, flag Togo, Products Tanker) observed by WARSHIP BORA in Suez Gulf Approach. AIS anomaly detected: SPEED_ANOMALY_LOITERING. Risk profile: HIGH. Action taken: REPORTED TO MOC.",
+      "reporting_unit": "WARSHIP BORA",
+      "vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE",
+        "flag": "Togo",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": "SPEED_ANOMALY_LOITERING",
+      "risk_profile": "HIGH",
+      "action_taken": "REPORTED TO MOC",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0048",
+        "C2-202606-0053"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "SPEED_ANOMALY",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0038",
+      "dtg": "072020ZJUL26",
+      "timestamp_utc": "2026-07-07T20:20:12Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP DALTON / SECTOR ALPHA",
+      "text": "WARSHIP DALTON (DDG-89, USA) reporting position 16.8489N 56.6671E in SECTOR ALPHA, vicinity Bab-el-Mandeb Strait. Speed: 18 kts, heading: 153T. Fuel state: 60%. Readiness: FULLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "position": {
+        "latitude": 16.8489,
+        "longitude": 56.6671
+      },
+      "sector": "SECTOR ALPHA",
+      "speed_kts": 12,
+      "heading_deg": 6,
+      "fuel_pct": 47,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-08T00:20:12Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0039",
+      "dtg": "080230ZJUL26",
+      "timestamp_utc": "2026-07-08T02:30:48Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP FALCON / SECTOR BRAVO",
+      "text": "WARSHIP FALCON (L-301, Netherlands) reporting position 17.0201N 52.5115E in SECTOR BRAVO, vicinity Gulf of Aden Corridor. Speed: 9 kts, heading: 049T. Fuel state: 35%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP FALCON",
+        "pennant": "L-301",
+        "type": "LPD",
+        "nation": "Netherlands",
+        "capability": [
+          "AMPHIB",
+          "BOARDING"
+        ]
+      },
+      "position": {
+        "latitude": 17.0201,
+        "longitude": 52.5115
+      },
+      "sector": "SECTOR BRAVO",
+      "speed_kts": 8,
+      "heading_deg": 342,
+      "fuel_pct": 61,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-08T06:30:48Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0040",
+      "dtg": "080651ZJUL26",
+      "timestamp_utc": "2026-07-08T06:51:01Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP FALCON / SECTOR DELTA",
+      "text": "Patrol report from WARSHIP FALCON covering SECTOR DELTA (Suez Gulf Approach). Duration: 4h. Merchant contacts: 5. Suspicious contacts: 1. Boarding conducted: YES. AIS anomalies observed: 2. Area assessment: ELEVATED ACTIVITY.",
+      "unit": {
+        "callsign": "WARSHIP FALCON",
+        "pennant": "L-301",
+        "type": "LPD",
+        "nation": "Netherlands",
+        "capability": [
+          "AMPHIB",
+          "BOARDING"
+        ]
+      },
+      "sector": "SECTOR DELTA",
+      "duration_hours": 24,
+      "merchant_contacts": 5,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9684720"
+      ],
+      "generic_refs": [
+        "C2-202606-0060",
+        "C2-202606-0003"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0041",
+      "dtg": "081152ZJUL26",
+      "timestamp_utc": "2026-07-08T11:52:47Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT SEA WHISPER / Suez Gulf Approach",
+      "text": "Contact report: MT SEA WHISPER (IMO 9298313, flag Togo, Products Tanker) observed by WARSHIP DALTON in Suez Gulf Approach. AIS anomaly detected: SPEED_ANOMALY_LOITERING. Risk profile: HIGH. Action taken: LOG AND MONITOR.",
+      "reporting_unit": "WARSHIP DALTON",
+      "vessel": {
+        "imo": "9298313",
+        "name": "MT SEA WHISPER",
+        "flag": "Togo",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": "SPEED_ANOMALY_LOITERING",
+      "risk_profile": "HIGH",
+      "action_taken": "QUERY BY RADIO",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0026",
+        "C2-202606-0072"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "SPEED_ANOMALY",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0042",
+      "dtg": "090236ZJUL26",
+      "timestamp_utc": "2026-07-09T02:36:03Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV ATLAS CARRIER / Port of Aden Anchorage",
+      "text": "Contact report: MV ATLAS CARRIER (IMO 9786255, flag Greece, Bulk Carrier) observed by MPA HERON-01 in Port of Aden Anchorage. AIS anomaly detected: DARK_ACTIVITY_AIS_OFF. Risk profile: LOW. Action taken: QUERY BY RADIO.",
+      "reporting_unit": "MPA HERON-01",
+      "vessel": {
+        "imo": "9786255",
+        "name": "MV ATLAS CARRIER",
+        "flag": "Greece",
+        "type": "Bulk Carrier",
+        "risk": "LOW"
+      },
+      "anomaly_detected": "DARK_ACTIVITY_AIS_OFF",
+      "risk_profile": "LOW",
+      "action_taken": "BOARDING TEAM DISPATCHED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9786255"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "DARK_ACTIVITY",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0043",
+      "dtg": "100423ZJUL26",
+      "timestamp_utc": "2026-07-10T04:23:59Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP AJAX / SECTOR ECHO",
+      "text": "Patrol report from WARSHIP AJAX covering SECTOR ECHO (Beirut Port Approach, Latakia Port Approach, Port of Tartus Approach). Duration: 20h. Merchant contacts: 5. Suspicious contacts: 1. AIS anomalies observed: 1. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP AJAX",
+        "pennant": "F-301",
+        "type": "Frigate",
+        "nation": "France",
+        "capability": [
+          "AAW",
+          "ASW",
+          "NGFS"
+        ]
+      },
+      "sector": "SECTOR ECHO",
+      "duration_hours": 21,
+      "merchant_contacts": 5,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 0,
+      "area_assessment": "ELEVATED ACTIVITY",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Latakia Port Approach",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0044",
+      "dtg": "101356ZJUL26",
+      "timestamp_utc": "2026-07-10T13:56:08Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA HERON-01 / SECTOR FOXTROT",
+      "text": "MPA HERON-01 (P-3C, USA) reporting position 22.64N 37.519E in SECTOR FOXTROT, vicinity Naqoura Sector / Blue Line. Speed: 11 kts, heading: 267T. Fuel state: 45%. Readiness: FULLY EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA HERON-01",
+        "pennant": "P-3C",
+        "type": "Maritime Patrol",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "ASW",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 22.64,
+        "longitude": 37.519
+      },
+      "sector": "SECTOR FOXTROT",
+      "speed_kts": 11,
+      "heading_deg": 249,
+      "fuel_pct": 45,
+      "readiness": "PARTIALLY EFFECTIVE",
+      "next_report_utc": "2026-07-10T17:56:08Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0045",
+      "dtg": "101618ZJUL26",
+      "timestamp_utc": "2026-07-10T16:18:24Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP AJAX / SECTOR ECHO",
+      "text": "WARSHIP AJAX (F-301, France) reporting position 14.103N 46.9491E in SECTOR ECHO, vicinity Beirut Port Approach. Speed: 14 kts, heading: 084T. Fuel state: 81%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP AJAX",
+        "pennant": "F-301",
+        "type": "Frigate",
+        "nation": "France",
+        "capability": [
+          "AAW",
+          "ASW",
+          "NGFS"
+        ]
+      },
+      "position": {
+        "latitude": 14.103,
+        "longitude": 46.9491
+      },
+      "sector": "SECTOR ECHO",
+      "speed_kts": 8,
+      "heading_deg": 318,
+      "fuel_pct": 66,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-10T20:18:24Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0046",
+      "dtg": "111016ZJUL26",
+      "timestamp_utc": "2026-07-11T10:16:35Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP AJAX / SECTOR ALPHA",
+      "text": "WARSHIP AJAX (F-301, France) reporting position 27.3625N 36.5471E in SECTOR ALPHA, vicinity Bab-el-Mandeb Strait. Speed: 7 kts, heading: 014T. Fuel state: 31%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP AJAX",
+        "pennant": "F-301",
+        "type": "Frigate",
+        "nation": "France",
+        "capability": [
+          "AAW",
+          "ASW",
+          "NGFS"
+        ]
+      },
+      "position": {
+        "latitude": 27.3625,
+        "longitude": 36.5471
+      },
+      "sector": "SECTOR ALPHA",
+      "speed_kts": 13,
+      "heading_deg": 15,
+      "fuel_pct": 60,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-11T14:16:35Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0047",
+      "dtg": "111132ZJUL26",
+      "timestamp_utc": "2026-07-11T11:32:19Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — MPA HERON-01 / SECTOR DELTA",
+      "text": "Patrol report from MPA HERON-01 covering SECTOR DELTA (Suez Gulf Approach). Duration: 23h. Merchant contacts: 2. Suspicious contacts: 2. AIS anomalies observed: 0. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "MPA HERON-01",
+        "pennant": "P-3C",
+        "type": "Maritime Patrol",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "ASW",
+          "AIS_RELAY"
+        ]
+      },
+      "sector": "SECTOR DELTA",
+      "duration_hours": 16,
+      "merchant_contacts": 2,
+      "suspicious_contacts": 2,
+      "ais_anomalies_observed": 1,
+      "area_assessment": "ELEVATED ACTIVITY",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9238117",
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0048",
+      "dtg": "111405ZJUL26",
+      "timestamp_utc": "2026-07-11T14:05:23Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV ASIA BRIDGE / Gulf of Aden Corridor",
+      "text": "Contact report: MV ASIA BRIDGE (IMO 9492737, flag Hong Kong, Container Ship) observed by WARSHIP FALCON in Gulf of Aden Corridor. No anomaly detected. Risk profile: LOW. Action taken: REPORTED TO MOC.",
+      "reporting_unit": "WARSHIP FALCON",
+      "vessel": {
+        "imo": "9492737",
+        "name": "MV ASIA BRIDGE",
+        "flag": "Hong Kong",
+        "type": "Container Ship",
+        "risk": "LOW"
+      },
+      "anomaly_detected": null,
+      "risk_profile": "LOW",
+      "action_taken": "REPORTED TO MOC",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0060",
+        "C2-202606-0047"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS",
+        "MARITIME_ANALYTICS",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0049",
+      "dtg": "111600ZJUL26",
+      "timestamp_utc": "2026-07-11T16:00:18Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP EAGLE / SECTOR ALPHA",
+      "text": "WARSHIP EAGLE (M-501, Belgium) reporting position 27.1151N 40.9087E in SECTOR ALPHA, vicinity Southern Red Sea. Speed: 10 kts, heading: 213T. Fuel state: 78%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP EAGLE",
+        "pennant": "M-501",
+        "type": "MCM Vessel",
+        "nation": "Belgium",
+        "capability": [
+          "MCM"
+        ]
+      },
+      "position": {
+        "latitude": 27.1151,
+        "longitude": 40.9087
+      },
+      "sector": "SECTOR ALPHA",
+      "speed_kts": 7,
+      "heading_deg": 135,
+      "fuel_pct": 33,
+      "readiness": "PARTIALLY EFFECTIVE",
+      "next_report_utc": "2026-07-11T20:00:18Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0050",
+      "dtg": "121055ZJUL26",
+      "timestamp_utc": "2026-07-12T10:55:23Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP EAGLE / SECTOR CHARLIE",
+      "text": "Patrol report from WARSHIP EAGLE covering SECTOR CHARLIE (Strait of Hormuz, Fujairah OPL Anchorage). Duration: 17h. Merchant contacts: 2. Suspicious contacts: 1. AIS anomalies observed: 1. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP EAGLE",
+        "pennant": "M-501",
+        "type": "MCM Vessel",
+        "nation": "Belgium",
+        "capability": [
+          "MCM"
+        ]
+      },
+      "sector": "SECTOR CHARLIE",
+      "duration_hours": 24,
+      "merchant_contacts": 2,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 0,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9684720",
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0051",
+      "dtg": "121421ZJUL26",
+      "timestamp_utc": "2026-07-12T14:21:02Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "COMMS_TRAFFIC",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms traffic log — UAV OSPREY-01",
+      "text": "Communications traffic log. From: UAV OSPREY-01 To: MOC-J2. Subject: TASKING RECEIPT. Network: LINK-11. Classification: UNCLASSIFIED. Acknowledged: YES.",
+      "from_unit": "UAV OSPREY-01",
+      "to_unit": "MOC-J2",
+      "message_type": "POSREP",
+      "network": "LINK11",
+      "acknowledged": true,
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0052",
+      "dtg": "122023ZJUL26",
+      "timestamp_utc": "2026-07-12T20:23:39Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 12 Jul 2026 2023Z",
+      "text": "MOC watch log 122023ZJUL26. Events: Vessel contact at Bab-el-Mandeb queried by radio. Units reporting: 4 of 9 on schedule. Watch officer: WO-07. Next watch: 0023Z.",
+      "watch_officer": "WO-05",
+      "units_reporting": 5,
+      "event_summary": "AIS gap actioned",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal",
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0053",
+      "dtg": "122230ZJUL26",
+      "timestamp_utc": "2026-07-12T22:30:02Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MV ATLAS CARRIER / Bab-el-Mandeb Strait",
+      "text": "Boarding report: WARSHIP DALTON boarding team boarded MV ATLAS CARRIER (IMO 9786255) in Bab-el-Mandeb Strait. Duration: 102 min. Crew: 25 POB. Finding: DOCUMENTS IRREGULAR. Disposition: DETAINED FOR FURTHER INSPECTION. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP DALTON",
+      "vessel_boarded": {
+        "imo": "9786255",
+        "name": "MV ATLAS CARRIER",
+        "flag": "Greece",
+        "type": "Bulk Carrier",
+        "risk": "LOW"
+      },
+      "duration_minutes": 59,
+      "crew_pob": 18,
+      "finding": "DOCUMENTS IRREGULAR",
+      "disposition": "DETAINED FOR FURTHER INSPECTION",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9786255"
+      ],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0054",
+      "dtg": "122308ZJUL26",
+      "timestamp_utc": "2026-07-12T23:08:04Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT CASPIAN DAWN / Southern Red Sea",
+      "text": "Boarding report: MPA KITE-01 boarding team boarded MT CASPIAN DAWN (IMO 9599303) in Southern Red Sea. Duration: 58 min. Crew: 18 POB. Finding: NIL FINDS. Disposition: DETAINED FOR FURTHER INSPECTION. Report forwarded to J2.",
+      "boarding_unit": "MPA KITE-01",
+      "vessel_boarded": {
+        "imo": "9599303",
+        "name": "MT CASPIAN DAWN",
+        "flag": "Cook Islands",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 140,
+      "crew_pob": 25,
+      "finding": "NIL FINDS",
+      "disposition": "ESCORTED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0003"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0055",
+      "dtg": "131020ZJUL26",
+      "timestamp_utc": "2026-07-13T10:20:02Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP DALTON / SECTOR ECHO",
+      "text": "Patrol report from WARSHIP DALTON covering SECTOR ECHO (Beirut Port Approach, Latakia Port Approach, Port of Tartus Approach). Duration: 13h. Merchant contacts: 4. Suspicious contacts: 1. AIS anomalies observed: 3. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "sector": "SECTOR ECHO",
+      "duration_hours": 10,
+      "merchant_contacts": 4,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 2,
+      "area_assessment": "ELEVATED ACTIVITY",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Latakia Port Approach",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [
+        "9298313",
+        "9786255"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0056",
+      "dtg": "132300ZJUL26",
+      "timestamp_utc": "2026-07-13T23:00:51Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP BORA / SECTOR ALPHA",
+      "text": "Patrol report from WARSHIP BORA covering SECTOR ALPHA (Southern Red Sea, Bab-el-Mandeb Strait). Duration: 19h. Merchant contacts: 3. Suspicious contacts: 2. AIS anomalies observed: 2. Area assessment: ELEVATED ACTIVITY.",
+      "unit": {
+        "callsign": "WARSHIP BORA",
+        "pennant": "F-412",
+        "type": "Frigate",
+        "nation": "Italy",
+        "capability": [
+          "AAW",
+          "ASW"
+        ]
+      },
+      "sector": "SECTOR ALPHA",
+      "duration_hours": 23,
+      "merchant_contacts": 3,
+      "suspicious_contacts": 2,
+      "ais_anomalies_observed": 0,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Southern Red Sea",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0057",
+      "dtg": "140334ZJUL26",
+      "timestamp_utc": "2026-07-14T03:34:05Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP CYGNET / SECTOR ALPHA",
+      "text": "Patrol report from WARSHIP CYGNET covering SECTOR ALPHA (Southern Red Sea, Bab-el-Mandeb Strait). Duration: 4h. Merchant contacts: 1. Suspicious contacts: 1. Boarding conducted: YES. AIS anomalies observed: 2. Area assessment: ROUTINE.",
+      "unit": {
+        "callsign": "WARSHIP CYGNET",
+        "pennant": "P-211",
+        "type": "OPV",
+        "nation": "UK",
+        "capability": [
+          "MIO",
+          "BOARDING"
+        ]
+      },
+      "sector": "SECTOR ALPHA",
+      "duration_hours": 23,
+      "merchant_contacts": 1,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 1,
+      "area_assessment": "ELEVATED ACTIVITY",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Southern Red Sea",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9610793"
+      ],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0047"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0058",
+      "dtg": "141408ZJUL26",
+      "timestamp_utc": "2026-07-14T14:08:38Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — UAV OSPREY-01 / SECTOR ECHO",
+      "text": "Patrol report from UAV OSPREY-01 covering SECTOR ECHO (Beirut Port Approach, Latakia Port Approach, Port of Tartus Approach). Duration: 15h. Merchant contacts: 6. Suspicious contacts: 1. AIS anomalies observed: 1. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "UAV OSPREY-01",
+        "pennant": "MQ-9B",
+        "type": "MALE UAV",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "EW"
+        ]
+      },
+      "sector": "SECTOR ECHO",
+      "duration_hours": 14,
+      "merchant_contacts": 6,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 0,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Latakia Port Approach",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0059",
+      "dtg": "151958ZJUL26",
+      "timestamp_utc": "2026-07-15T19:58:57Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP CYGNET / SECTOR CHARLIE",
+      "text": "Patrol report from WARSHIP CYGNET covering SECTOR CHARLIE (Strait of Hormuz, Fujairah OPL Anchorage). Duration: 22h. Merchant contacts: 3. Suspicious contacts: 2. Boarding conducted: YES. AIS anomalies observed: 0. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP CYGNET",
+        "pennant": "P-211",
+        "type": "OPV",
+        "nation": "UK",
+        "capability": [
+          "MIO",
+          "BOARDING"
+        ]
+      },
+      "sector": "SECTOR CHARLIE",
+      "duration_hours": 8,
+      "merchant_contacts": 3,
+      "suspicious_contacts": 2,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9027764",
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0060",
+      "dtg": "152034ZJUL26",
+      "timestamp_utc": "2026-07-15T20:34:10Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "COMMS_TRAFFIC",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms traffic log — WARSHIP AJAX",
+      "text": "Communications traffic log. From: WARSHIP AJAX To: MOC-J2. Subject: PATROL COMPLETE. Network: UHF TACTICAL. Classification: UNCLASSIFIED. Acknowledged: YES.",
+      "from_unit": "WARSHIP AJAX",
+      "to_unit": "MOC-J2",
+      "message_type": "FUEL_STATE",
+      "network": "HF_PRIMARY",
+      "acknowledged": true,
+      "pir_refs": [],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0061",
+      "dtg": "160824ZJUL26",
+      "timestamp_utc": "2026-07-16T08:24:18Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 16 Jul 2026 0824Z",
+      "text": "MOC watch log 160824ZJUL26. Events: Routine. No significant activity. Units reporting: 4 of 9 on schedule. Watch officer: WO-05. Next watch: 1224Z.",
+      "watch_officer": "WO-05",
+      "units_reporting": 3,
+      "event_summary": "FLASH actioned",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0062",
+      "dtg": "162317ZJUL26",
+      "timestamp_utc": "2026-07-16T23:17:53Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — MPA HERON-01 / SECTOR ALPHA",
+      "text": "Patrol report from MPA HERON-01 covering SECTOR ALPHA (Southern Red Sea, Bab-el-Mandeb Strait). Duration: 14h. Merchant contacts: 4. Suspicious contacts: 1. AIS anomalies observed: 2. Area assessment: ELEVATED ACTIVITY.",
+      "unit": {
+        "callsign": "MPA HERON-01",
+        "pennant": "P-3C",
+        "type": "Maritime Patrol",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "ASW",
+          "AIS_RELAY"
+        ]
+      },
+      "sector": "SECTOR ALPHA",
+      "duration_hours": 16,
+      "merchant_contacts": 4,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 1,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Southern Red Sea",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9684720"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0063",
+      "dtg": "170757ZJUL26",
+      "timestamp_utc": "2026-07-17T07:57:58Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT RED SEA EAGLE / Suez Gulf Approach",
+      "text": "Boarding report: WARSHIP FALCON boarding team boarded MT RED SEA EAGLE (IMO 9238117) in Suez Gulf Approach. Duration: 46 min. Crew: 23 POB. Finding: CARGO MANIFEST DISCREPANCY. Disposition: DIVERTED TO PORT. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP FALCON",
+      "vessel_boarded": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE",
+        "flag": "Barbados",
+        "type": "Crude Oil Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 155,
+      "crew_pob": 13,
+      "finding": "CARGO MANIFEST DISCREPANCY",
+      "disposition": "DETAINED FOR FURTHER INSPECTION",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0007",
+        "C2-202606-0028"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "ILLICIT_CARGO_TRANSFER",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0064",
+      "dtg": "170806ZJUL26",
+      "timestamp_utc": "2026-07-17T08:06:31Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT SEA WHISPER / Strait of Hormuz",
+      "text": "Contact report: MT SEA WHISPER (IMO 9298313, flag Togo, Products Tanker) observed by MPA HERON-01 in Strait of Hormuz. No anomaly detected. Risk profile: HIGH. Action taken: BOARDING TEAM DISPATCHED.",
+      "reporting_unit": "MPA HERON-01",
+      "vessel": {
+        "imo": "9298313",
+        "name": "MT SEA WHISPER",
+        "flag": "Togo",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": null,
+      "risk_profile": "HIGH",
+      "action_taken": "QUERY BY RADIO",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0085",
+        "C2-202606-0059"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS",
+        "MARITIME_ANALYTICS",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0065",
+      "dtg": "170849ZJUL26",
+      "timestamp_utc": "2026-07-17T08:49:02Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA KITE-01 / SECTOR FOXTROT",
+      "text": "MPA KITE-01 (ATL2, France) reporting position 19.7237N 45.6372E in SECTOR FOXTROT, vicinity South Tyre / Coastal Route. Speed: 7 kts, heading: 019T. Fuel state: 46%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA KITE-01",
+        "pennant": "ATL2",
+        "type": "Maritime Patrol",
+        "nation": "France",
+        "capability": [
+          "ISR",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 19.7237,
+        "longitude": 45.6372
+      },
+      "sector": "SECTOR FOXTROT",
+      "speed_kts": 14,
+      "heading_deg": 8,
+      "fuel_pct": 89,
+      "readiness": "PARTIALLY EFFECTIVE",
+      "next_report_utc": "2026-07-17T12:49:02Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0066",
+      "dtg": "172218ZJUL26",
+      "timestamp_utc": "2026-07-17T22:18:27Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 17 Jul 2026 2218Z",
+      "text": "MOC watch log 172218ZJUL26. Events: MPA tasked against suspected loitering vessel. Units reporting: 6 of 9 on schedule. Watch officer: WO-02. Next watch: 0218Z.",
+      "watch_officer": "WO-02",
+      "units_reporting": 3,
+      "event_summary": "Vessel queried",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0067",
+      "dtg": "180954ZJUL26",
+      "timestamp_utc": "2026-07-18T09:54:05Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP FALCON / SECTOR ALPHA",
+      "text": "WARSHIP FALCON (L-301, Netherlands) reporting position 19.4215N 41.1481E in SECTOR ALPHA, vicinity Southern Red Sea. Speed: 15 kts, heading: 046T. Fuel state: 45%. Readiness: EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP FALCON",
+        "pennant": "L-301",
+        "type": "LPD",
+        "nation": "Netherlands",
+        "capability": [
+          "AMPHIB",
+          "BOARDING"
+        ]
+      },
+      "position": {
+        "latitude": 19.4215,
+        "longitude": 41.1481
+      },
+      "sector": "SECTOR ALPHA",
+      "speed_kts": 16,
+      "heading_deg": 351,
+      "fuel_pct": 38,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-18T13:54:05Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0068",
+      "dtg": "181935ZJUL26",
+      "timestamp_utc": "2026-07-18T19:35:00Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT SEA WHISPER / Strait of Hormuz",
+      "text": "Boarding report: WARSHIP BORA boarding team boarded MT SEA WHISPER (IMO 9298313) in Strait of Hormuz. Duration: 59 min. Crew: 16 POB. Finding: CREW REFUSED ACCESS. Disposition: RELEASED. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP BORA",
+      "vessel_boarded": {
+        "imo": "9298313",
+        "name": "MT SEA WHISPER",
+        "flag": "Togo",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 205,
+      "crew_pob": 12,
+      "finding": "CREW REFUSED ACCESS",
+      "disposition": "DIVERTED TO PORT",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0069",
+      "dtg": "182201ZJUL26",
+      "timestamp_utc": "2026-07-18T22:01:21Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV IONIAN TRADER / South Tyre / Coastal Route",
+      "text": "Contact report: MV IONIAN TRADER (IMO 9561849, flag Malta, General Cargo) observed by WARSHIP FALCON in South Tyre / Coastal Route. No anomaly detected. Risk profile: LOW. Action taken: QUERY BY RADIO.",
+      "reporting_unit": "WARSHIP FALCON",
+      "vessel": {
+        "imo": "9561849",
+        "name": "MV IONIAN TRADER",
+        "flag": "Malta",
+        "type": "General Cargo",
+        "risk": "LOW"
+      },
+      "anomaly_detected": null,
+      "risk_profile": "LOW",
+      "action_taken": "LOG AND MONITOR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [
+        "9561849"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS",
+        "MARITIME_ANALYTICS",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0070",
+      "dtg": "190628ZJUL26",
+      "timestamp_utc": "2026-07-19T06:28:37Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — MPA KITE-01 / SECTOR FOXTROT",
+      "text": "Patrol report from MPA KITE-01 covering SECTOR FOXTROT (Naqoura Sector / Blue Line, South Tyre / Coastal Route, Gaza Maritime Approach). Duration: 12h. Merchant contacts: 0. Suspicious contacts: 0. AIS anomalies observed: 0. Area assessment: ROUTINE.",
+      "unit": {
+        "callsign": "MPA KITE-01",
+        "pennant": "ATL2",
+        "type": "Maritime Patrol",
+        "nation": "France",
+        "capability": [
+          "ISR",
+          "AIS_RELAY"
+        ]
+      },
+      "sector": "SECTOR FOXTROT",
+      "duration_hours": 10,
+      "merchant_contacts": 0,
+      "suspicious_contacts": 0,
+      "ais_anomalies_observed": 2,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line",
+        "South Tyre / Coastal Route",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0071",
+      "dtg": "190928ZJUL26",
+      "timestamp_utc": "2026-07-19T09:28:31Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT MIDNIGHT RUNNER / Fujairah OPL Anchorage",
+      "text": "Contact report: MT MIDNIGHT RUNNER (IMO 9377468, flag Cook Islands, Crude Oil Tanker) observed by WARSHIP DALTON in Fujairah OPL Anchorage. No anomaly detected. Risk profile: HIGH. Action taken: BOARDING TEAM DISPATCHED.",
+      "reporting_unit": "WARSHIP DALTON",
+      "vessel": {
+        "imo": "9377468",
+        "name": "MT MIDNIGHT RUNNER",
+        "flag": "Cook Islands",
+        "type": "Crude Oil Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": null,
+      "risk_profile": "HIGH",
+      "action_taken": "BOARDING TEAM DISPATCHED",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0059",
+        "C2-202606-0112"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS",
+        "MARITIME_ANALYTICS",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0072",
+      "dtg": "191241ZJUL26",
+      "timestamp_utc": "2026-07-19T12:41:29Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP CYGNET / SECTOR FOXTROT",
+      "text": "WARSHIP CYGNET (P-211, UK) reporting position 16.3846N 39.7186E in SECTOR FOXTROT, vicinity Naqoura Sector / Blue Line. Speed: 13 kts, heading: 107T. Fuel state: 47%. Readiness: EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP CYGNET",
+        "pennant": "P-211",
+        "type": "OPV",
+        "nation": "UK",
+        "capability": [
+          "MIO",
+          "BOARDING"
+        ]
+      },
+      "position": {
+        "latitude": 16.3846,
+        "longitude": 39.7186
+      },
+      "sector": "SECTOR FOXTROT",
+      "speed_kts": 7,
+      "heading_deg": 352,
+      "fuel_pct": 65,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-19T16:41:29Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0073",
+      "dtg": "191833ZJUL26",
+      "timestamp_utc": "2026-07-19T18:33:24Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA KITE-01 / SECTOR FOXTROT",
+      "text": "MPA KITE-01 (ATL2, France) reporting position 12.0534N 52.7551E in SECTOR FOXTROT, vicinity South Tyre / Coastal Route. Speed: 9 kts, heading: 098T. Fuel state: 72%. Readiness: EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA KITE-01",
+        "pennant": "ATL2",
+        "type": "Maritime Patrol",
+        "nation": "France",
+        "capability": [
+          "ISR",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 12.0534,
+        "longitude": 52.7551
+      },
+      "sector": "SECTOR FOXTROT",
+      "speed_kts": 11,
+      "heading_deg": 314,
+      "fuel_pct": 88,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-19T22:33:24Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0074",
+      "dtg": "192135ZJUL26",
+      "timestamp_utc": "2026-07-19T21:35:05Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — UAV OSPREY-01 / SECTOR CHARLIE",
+      "text": "UAV OSPREY-01 (MQ-9B, USA) reporting position 17.4081N 50.1353E in SECTOR CHARLIE, vicinity Strait of Hormuz. Speed: 13 kts, heading: 232T. Fuel state: 64%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "UAV OSPREY-01",
+        "pennant": "MQ-9B",
+        "type": "MALE UAV",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "EW"
+        ]
+      },
+      "position": {
+        "latitude": 17.4081,
+        "longitude": 50.1353
+      },
+      "sector": "SECTOR CHARLIE",
+      "speed_kts": 11,
+      "heading_deg": 40,
+      "fuel_pct": 87,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-20T01:35:05Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0075",
+      "dtg": "200647ZJUL26",
+      "timestamp_utc": "2026-07-20T06:47:25Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 20 Jul 2026 0647Z",
+      "text": "MOC watch log 200647ZJUL26. Events: AIS gap detected — SAR tasked. Units reporting: 8 of 9 on schedule. Watch officer: WO-08. Next watch: 1047Z.",
+      "watch_officer": "WO-06",
+      "units_reporting": 7,
+      "event_summary": "AIS gap actioned",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0076",
+      "dtg": "200743ZJUL26",
+      "timestamp_utc": "2026-07-20T07:43:50Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP CYGNET / SECTOR CHARLIE",
+      "text": "WARSHIP CYGNET (P-211, UK) reporting position 23.4505N 48.7545E in SECTOR CHARLIE, vicinity Strait of Hormuz. Speed: 13 kts, heading: 247T. Fuel state: 74%. Readiness: EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP CYGNET",
+        "pennant": "P-211",
+        "type": "OPV",
+        "nation": "UK",
+        "capability": [
+          "MIO",
+          "BOARDING"
+        ]
+      },
+      "position": {
+        "latitude": 23.4505,
+        "longitude": 48.7545
+      },
+      "sector": "SECTOR CHARLIE",
+      "speed_kts": 15,
+      "heading_deg": 214,
+      "fuel_pct": 86,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-20T11:43:50Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0077",
+      "dtg": "200823ZJUL26",
+      "timestamp_utc": "2026-07-20T08:23:01Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA HERON-01 / SECTOR FOXTROT",
+      "text": "MPA HERON-01 (P-3C, USA) reporting position 12.9843N 52.9363E in SECTOR FOXTROT, vicinity Naqoura Sector / Blue Line. Speed: 11 kts, heading: 214T. Fuel state: 67%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA HERON-01",
+        "pennant": "P-3C",
+        "type": "Maritime Patrol",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "ASW",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 12.9843,
+        "longitude": 52.9363
+      },
+      "sector": "SECTOR FOXTROT",
+      "speed_kts": 6,
+      "heading_deg": 254,
+      "fuel_pct": 60,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-20T12:23:01Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0078",
+      "dtg": "200908ZJUL26",
+      "timestamp_utc": "2026-07-20T09:08:28Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT SOUTHERN CROSS / Gaza Maritime Approach",
+      "text": "Contact report: MT SOUTHERN CROSS (IMO 9027764, flag Belize, Products Tanker) observed by WARSHIP EAGLE in Gaza Maritime Approach. AIS anomaly detected: DARK_ACTIVITY_AIS_OFF. Risk profile: HIGH. Action taken: QUERY BY RADIO.",
+      "reporting_unit": "WARSHIP EAGLE",
+      "vessel": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS",
+        "flag": "Belize",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": "DARK_ACTIVITY_AIS_OFF",
+      "risk_profile": "HIGH",
+      "action_taken": "QUERY BY RADIO",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0112",
+        "C2-202606-0059"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "DARK_ACTIVITY",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0079",
+      "dtg": "201501ZJUL26",
+      "timestamp_utc": "2026-07-20T15:01:04Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP FALCON / SECTOR CHARLIE",
+      "text": "WARSHIP FALCON (L-301, Netherlands) reporting position 13.3213N 48.3866E in SECTOR CHARLIE, vicinity Fujairah OPL Anchorage. Speed: 13 kts, heading: 034T. Fuel state: 87%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP FALCON",
+        "pennant": "L-301",
+        "type": "LPD",
+        "nation": "Netherlands",
+        "capability": [
+          "AMPHIB",
+          "BOARDING"
+        ]
+      },
+      "position": {
+        "latitude": 13.3213,
+        "longitude": 48.3866
+      },
+      "sector": "SECTOR CHARLIE",
+      "speed_kts": 13,
+      "heading_deg": 241,
+      "fuel_pct": 59,
+      "readiness": "PARTIALLY EFFECTIVE",
+      "next_report_utc": "2026-07-20T19:01:04Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0080",
+      "dtg": "202204ZJUL26",
+      "timestamp_utc": "2026-07-20T22:04:59Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV DJIBOUTI STAR / Bab-el-Mandeb Strait",
+      "text": "Contact report: MV DJIBOUTI STAR (IMO 9741839, flag Djibouti, General Cargo) observed by WARSHIP CYGNET in Bab-el-Mandeb Strait. AIS anomaly detected: DARK_ACTIVITY_AIS_OFF. Risk profile: LOW. Action taken: BOARDING TEAM DISPATCHED.",
+      "reporting_unit": "WARSHIP CYGNET",
+      "vessel": {
+        "imo": "9741839",
+        "name": "MV DJIBOUTI STAR",
+        "flag": "Djibouti",
+        "type": "General Cargo",
+        "risk": "LOW"
+      },
+      "anomaly_detected": "DARK_ACTIVITY_AIS_OFF",
+      "risk_profile": "LOW",
+      "action_taken": "QUERY BY RADIO",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9741839"
+      ],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "DARK_ACTIVITY",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0081",
+      "dtg": "202220ZJUL26",
+      "timestamp_utc": "2026-07-20T22:20:01Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "COMMS_TRAFFIC",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms traffic log — WARSHIP CYGNET",
+      "text": "Communications traffic log. From: WARSHIP CYGNET To: MOC-J2. Subject: BOARDING REQUEST. Network: LINK-16. Classification: UNCLASSIFIED. Acknowledged: YES.",
+      "from_unit": "WARSHIP CYGNET",
+      "to_unit": "MOC-J2",
+      "message_type": "SITREP",
+      "network": "HF_PRIMARY",
+      "acknowledged": true,
+      "pir_refs": [],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0082",
+      "dtg": "210242ZJUL26",
+      "timestamp_utc": "2026-07-21T02:42:34Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP BORA / SECTOR BRAVO",
+      "text": "Patrol report from WARSHIP BORA covering SECTOR BRAVO (Gulf of Aden Corridor, Port of Aden Anchorage). Duration: 16h. Merchant contacts: 1. Suspicious contacts: 1. AIS anomalies observed: 0. Area assessment: ROUTINE.",
+      "unit": {
+        "callsign": "WARSHIP BORA",
+        "pennant": "F-412",
+        "type": "Frigate",
+        "nation": "Italy",
+        "capability": [
+          "AAW",
+          "ASW"
+        ]
+      },
+      "sector": "SECTOR BRAVO",
+      "duration_hours": 12,
+      "merchant_contacts": 1,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "ROUTINE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0083",
+      "dtg": "210623ZJUL26",
+      "timestamp_utc": "2026-07-21T06:23:45Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT SEA WHISPER / Suez Gulf Approach",
+      "text": "Contact report: MT SEA WHISPER (IMO 9298313, flag Togo, Products Tanker) observed by MPA KITE-01 in Suez Gulf Approach. No anomaly detected. Risk profile: HIGH. Action taken: LOG AND MONITOR.",
+      "reporting_unit": "MPA KITE-01",
+      "vessel": {
+        "imo": "9298313",
+        "name": "MT SEA WHISPER",
+        "flag": "Togo",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": null,
+      "risk_profile": "HIGH",
+      "action_taken": "REPORTED TO MOC",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0026",
+        "C2-202606-0098"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS",
+        "MARITIME_ANALYTICS",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0084",
+      "dtg": "211007ZJUL26",
+      "timestamp_utc": "2026-07-21T10:07:12Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 21 Jul 2026 1007Z",
+      "text": "MOC watch log 211007ZJUL26. Events: FLASH report received — actioned. Units reporting: 5 of 9 on schedule. Watch officer: WO-04. Next watch: 1407Z.",
+      "watch_officer": "WO-06",
+      "units_reporting": 7,
+      "event_summary": "Boarding recovered",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0085",
+      "dtg": "211032ZJUL26",
+      "timestamp_utc": "2026-07-21T10:32:14Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT SOUTHERN CROSS / Suez Gulf Approach",
+      "text": "Boarding report: WARSHIP CYGNET boarding team boarded MT SOUTHERN CROSS (IMO 9027764) in Suez Gulf Approach. Duration: 126 min. Crew: 16 POB. Finding: DOCUMENTS IRREGULAR. Disposition: ESCORTED. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP CYGNET",
+      "vessel_boarded": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS",
+        "flag": "Belize",
+        "type": "Products Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 182,
+      "crew_pob": 28,
+      "finding": "DOCUMENTS IRREGULAR",
+      "disposition": "DETAINED FOR FURTHER INSPECTION",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0086",
+      "dtg": "211057ZJUL26",
+      "timestamp_utc": "2026-07-21T10:57:55Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 21 Jul 2026 1057Z",
+      "text": "MOC watch log 211057ZJUL26. Events: Routine. No significant activity. Units reporting: 7 of 9 on schedule. Watch officer: WO-04. Next watch: 1457Z.",
+      "watch_officer": "WO-08",
+      "units_reporting": 6,
+      "event_summary": "AIS gap actioned",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0087",
+      "dtg": "212115ZJUL26",
+      "timestamp_utc": "2026-07-21T21:15:51Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA HERON-01 / SECTOR FOXTROT",
+      "text": "MPA HERON-01 (P-3C, USA) reporting position 14.6657N 49.0432E in SECTOR FOXTROT, vicinity Naqoura Sector / Blue Line. Speed: 7 kts, heading: 175T. Fuel state: 50%. Readiness: FULLY EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA HERON-01",
+        "pennant": "P-3C",
+        "type": "Maritime Patrol",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "ASW",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 14.6657,
+        "longitude": 49.0432
+      },
+      "sector": "SECTOR FOXTROT",
+      "speed_kts": 17,
+      "heading_deg": 333,
+      "fuel_pct": 59,
+      "readiness": "PARTIALLY EFFECTIVE",
+      "next_report_utc": "2026-07-22T01:15:51Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0088",
+      "dtg": "220031ZJUL26",
+      "timestamp_utc": "2026-07-22T00:31:14Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP DALTON / SECTOR ALPHA",
+      "text": "Patrol report from WARSHIP DALTON covering SECTOR ALPHA (Southern Red Sea, Bab-el-Mandeb Strait). Duration: 5h. Merchant contacts: 4. Suspicious contacts: 1. AIS anomalies observed: 1. Area assessment: ROUTINE.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "sector": "SECTOR ALPHA",
+      "duration_hours": 6,
+      "merchant_contacts": 4,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 2,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Southern Red Sea",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0089",
+      "dtg": "220256ZJUL26",
+      "timestamp_utc": "2026-07-22T02:56:38Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "COMMS_TRAFFIC",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms traffic log — WARSHIP BORA",
+      "text": "Communications traffic log. From: WARSHIP BORA To: MOC-J2. Subject: TASKING RECEIPT. Network: LINK-16. Classification: UNCLASSIFIED. Acknowledged: YES.",
+      "from_unit": "WARSHIP BORA",
+      "to_unit": "MOC-J2",
+      "message_type": "SITREP",
+      "network": "LINK11",
+      "acknowledged": true,
+      "pir_refs": [],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0090",
+      "dtg": "220946ZJUL26",
+      "timestamp_utc": "2026-07-22T09:46:59Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV ASIA BRIDGE / Beirut Port Approach",
+      "text": "Contact report: MV ASIA BRIDGE (IMO 9492737, flag Hong Kong, Container Ship) observed by MPA HERON-01 in Beirut Port Approach. No anomaly detected. Risk profile: LOW. Action taken: QUERY BY RADIO.",
+      "reporting_unit": "MPA HERON-01",
+      "vessel": {
+        "imo": "9492737",
+        "name": "MV ASIA BRIDGE",
+        "flag": "Hong Kong",
+        "type": "Container Ship",
+        "risk": "LOW"
+      },
+      "anomaly_detected": null,
+      "risk_profile": "LOW",
+      "action_taken": "LOG AND MONITOR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0003"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS",
+        "MARITIME_ANALYTICS",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0091",
+      "dtg": "221026ZJUL26",
+      "timestamp_utc": "2026-07-22T10:26:39Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 22 Jul 2026 1026Z",
+      "text": "MOC watch log 221026ZJUL26. Events: FLASH report received — actioned. Units reporting: 9 of 9 on schedule. Watch officer: WO-04. Next watch: 1426Z.",
+      "watch_officer": "WO-08",
+      "units_reporting": 3,
+      "event_summary": "FLASH actioned",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0092",
+      "dtg": "221548ZJUL26",
+      "timestamp_utc": "2026-07-22T15:48:02Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MV ASIA BRIDGE / Latakia Port Approach",
+      "text": "Contact report: MV ASIA BRIDGE (IMO 9492737, flag Hong Kong, Container Ship) observed by WARSHIP FALCON in Latakia Port Approach. AIS anomaly detected: ROUTE_DEVIATION_HIGH_RISK. Risk profile: LOW. Action taken: QUERY BY RADIO.",
+      "reporting_unit": "WARSHIP FALCON",
+      "vessel": {
+        "imo": "9492737",
+        "name": "MV ASIA BRIDGE",
+        "flag": "Hong Kong",
+        "type": "Container Ship",
+        "risk": "LOW"
+      },
+      "anomaly_detected": "ROUTE_DEVIATION_HIGH_RISK",
+      "risk_profile": "LOW",
+      "action_taken": "REPORTED TO MOC",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0023",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "ROUTE_DEVIATION",
+        "VESSEL_RISK",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0093",
+      "dtg": "230200ZJUL26",
+      "timestamp_utc": "2026-07-23T02:00:37Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP FALCON / SECTOR ALPHA",
+      "text": "WARSHIP FALCON (L-301, Netherlands) reporting position 15.9639N 56.7299E in SECTOR ALPHA, vicinity Bab-el-Mandeb Strait. Speed: 17 kts, heading: 141T. Fuel state: 47%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP FALCON",
+        "pennant": "L-301",
+        "type": "LPD",
+        "nation": "Netherlands",
+        "capability": [
+          "AMPHIB",
+          "BOARDING"
+        ]
+      },
+      "position": {
+        "latitude": 15.9639,
+        "longitude": 56.7299
+      },
+      "sector": "SECTOR ALPHA",
+      "speed_kts": 8,
+      "heading_deg": 116,
+      "fuel_pct": 48,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-23T06:00:37Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0094",
+      "dtg": "231150ZJUL26",
+      "timestamp_utc": "2026-07-23T11:50:08Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP DALTON / SECTOR CHARLIE",
+      "text": "WARSHIP DALTON (DDG-89, USA) reporting position 22.0092N 42.5857E in SECTOR CHARLIE, vicinity Strait of Hormuz. Speed: 9 kts, heading: 123T. Fuel state: 84%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "position": {
+        "latitude": 22.0092,
+        "longitude": 42.5857
+      },
+      "sector": "SECTOR CHARLIE",
+      "speed_kts": 15,
+      "heading_deg": 60,
+      "fuel_pct": 79,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-23T15:50:08Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0095",
+      "dtg": "241003ZJUL26",
+      "timestamp_utc": "2026-07-24T10:03:15Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP DALTON / SECTOR BRAVO",
+      "text": "Patrol report from WARSHIP DALTON covering SECTOR BRAVO (Gulf of Aden Corridor, Port of Aden Anchorage). Duration: 17h. Merchant contacts: 6. Suspicious contacts: 0. AIS anomalies observed: 1. Area assessment: ELEVATED ACTIVITY.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "sector": "SECTOR BRAVO",
+      "duration_hours": 20,
+      "merchant_contacts": 6,
+      "suspicious_contacts": 0,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "ROUTINE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9684720",
+        "9561849"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0096",
+      "dtg": "241358ZJUL26",
+      "timestamp_utc": "2026-07-24T13:58:57Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 24 Jul 2026 1358Z",
+      "text": "MOC watch log 241358ZJUL26. Events: FLASH report received — actioned. Units reporting: 8 of 9 on schedule. Watch officer: WO-02. Next watch: 1758Z.",
+      "watch_officer": "WO-01",
+      "units_reporting": 5,
+      "event_summary": "FLASH actioned",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage",
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0097",
+      "dtg": "250412ZJUL26",
+      "timestamp_utc": "2026-07-25T04:12:12Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP DALTON / SECTOR CHARLIE",
+      "text": "WARSHIP DALTON (DDG-89, USA) reporting position 16.1653N 39.3746E in SECTOR CHARLIE, vicinity Strait of Hormuz. Speed: 17 kts, heading: 007T. Fuel state: 59%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "position": {
+        "latitude": 16.1653,
+        "longitude": 39.3746
+      },
+      "sector": "SECTOR CHARLIE",
+      "speed_kts": 6,
+      "heading_deg": 19,
+      "fuel_pct": 41,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-25T08:12:12Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0098",
+      "dtg": "250751ZJUL26",
+      "timestamp_utc": "2026-07-25T07:51:12Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP DALTON / SECTOR BRAVO",
+      "text": "Patrol report from WARSHIP DALTON covering SECTOR BRAVO (Gulf of Aden Corridor, Port of Aden Anchorage). Duration: 6h. Merchant contacts: 4. Suspicious contacts: 0. AIS anomalies observed: 0. Area assessment: ROUTINE.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "sector": "SECTOR BRAVO",
+      "duration_hours": 18,
+      "merchant_contacts": 4,
+      "suspicious_contacts": 0,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0099",
+      "dtg": "251530ZJUL26",
+      "timestamp_utc": "2026-07-25T15:30:47Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP AJAX / SECTOR ECHO",
+      "text": "WARSHIP AJAX (F-301, France) reporting position 21.9845N 56.2532E in SECTOR ECHO, vicinity Port of Tartus Approach. Speed: 13 kts, heading: 334T. Fuel state: 88%. Readiness: PARTIALLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP AJAX",
+        "pennant": "F-301",
+        "type": "Frigate",
+        "nation": "France",
+        "capability": [
+          "AAW",
+          "ASW",
+          "NGFS"
+        ]
+      },
+      "position": {
+        "latitude": 21.9845,
+        "longitude": 56.2532
+      },
+      "sector": "SECTOR ECHO",
+      "speed_kts": 6,
+      "heading_deg": 260,
+      "fuel_pct": 78,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-25T19:30:47Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0100",
+      "dtg": "260024ZJUL26",
+      "timestamp_utc": "2026-07-26T00:24:11Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "COMMS_TRAFFIC",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms traffic log — MPA HERON-01",
+      "text": "Communications traffic log. From: MPA HERON-01 To: MOC-J2. Subject: BOARDING REQUEST. Network: HF PRIMARY. Classification: UNCLASSIFIED. Acknowledged: YES.",
+      "from_unit": "MPA HERON-01",
+      "to_unit": "MOC-J2",
+      "message_type": "BOARDING_REQUEST",
+      "network": "UHF_TACTICAL",
+      "acknowledged": true,
+      "pir_refs": [],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0101",
+      "dtg": "260900ZJUL26",
+      "timestamp_utc": "2026-07-26T09:00:51Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — MPA HERON-01 / SECTOR BRAVO",
+      "text": "Patrol report from MPA HERON-01 covering SECTOR BRAVO (Gulf of Aden Corridor, Port of Aden Anchorage). Duration: 7h. Merchant contacts: 6. Suspicious contacts: 1. AIS anomalies observed: 3. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "MPA HERON-01",
+        "pennant": "P-3C",
+        "type": "Maritime Patrol",
+        "nation": "USA",
+        "capability": [
+          "ISR",
+          "ASW",
+          "AIS_RELAY"
+        ]
+      },
+      "sector": "SECTOR BRAVO",
+      "duration_hours": 14,
+      "merchant_contacts": 6,
+      "suspicious_contacts": 1,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "NORMAL PATTERN OF LIFE",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9786255",
+        "9741839"
+      ],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0102",
+      "dtg": "261140ZJUL26",
+      "timestamp_utc": "2026-07-26T11:40:55Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "PATROL_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Patrol report — WARSHIP CYGNET / SECTOR BRAVO",
+      "text": "Patrol report from WARSHIP CYGNET covering SECTOR BRAVO (Gulf of Aden Corridor, Port of Aden Anchorage). Duration: 7h. Merchant contacts: 5. Suspicious contacts: 0. AIS anomalies observed: 2. Area assessment: NORMAL PATTERN OF LIFE.",
+      "unit": {
+        "callsign": "WARSHIP CYGNET",
+        "pennant": "P-211",
+        "type": "OPV",
+        "nation": "UK",
+        "capability": [
+          "MIO",
+          "BOARDING"
+        ]
+      },
+      "sector": "SECTOR BRAVO",
+      "duration_hours": 11,
+      "merchant_contacts": 5,
+      "suspicious_contacts": 0,
+      "ais_anomalies_observed": 3,
+      "area_assessment": "ELEVATED ACTIVITY",
+      "pir_refs": [
+        "PIR-01",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9741839",
+        "9561849"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "MARITIME_ANALYTICS",
+        "AIS",
+        "SITUATIONAL_AWARENESS",
+        "COALITION_PATROL",
+        "MARITIME_ZONE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0103",
+      "dtg": "261223ZJUL26",
+      "timestamp_utc": "2026-07-26T12:23:18Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP DALTON / SECTOR FOXTROT",
+      "text": "WARSHIP DALTON (DDG-89, USA) reporting position 24.3546N 36.9466E in SECTOR FOXTROT, vicinity Gaza Maritime Approach. Speed: 15 kts, heading: 193T. Fuel state: 76%. Readiness: FULLY EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP DALTON",
+        "pennant": "DDG-89",
+        "type": "Destroyer",
+        "nation": "USA",
+        "capability": [
+          "AAW",
+          "ASW",
+          "TLM"
+        ]
+      },
+      "position": {
+        "latitude": 24.3546,
+        "longitude": 36.9466
+      },
+      "sector": "SECTOR FOXTROT",
+      "speed_kts": 12,
+      "heading_deg": 49,
+      "fuel_pct": 33,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-26T16:23:18Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0104",
+      "dtg": "261718ZJUL26",
+      "timestamp_utc": "2026-07-26T17:18:14Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MT MIDNIGHT RUNNER / Latakia Port Approach",
+      "text": "Boarding report: MPA HERON-01 boarding team boarded MT MIDNIGHT RUNNER (IMO 9377468) in Latakia Port Approach. Duration: 147 min. Crew: 12 POB. Finding: NIL FINDS. Disposition: DETAINED FOR FURTHER INSPECTION. Report forwarded to J2.",
+      "boarding_unit": "MPA HERON-01",
+      "vessel_boarded": {
+        "imo": "9377468",
+        "name": "MT MIDNIGHT RUNNER",
+        "flag": "Cook Islands",
+        "type": "Crude Oil Tanker",
+        "risk": "HIGH"
+      },
+      "duration_minutes": 219,
+      "crew_pob": 25,
+      "finding": "NIL FINDS",
+      "disposition": "ESCORTED",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0014",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0105",
+      "dtg": "261803ZJUL26",
+      "timestamp_utc": "2026-07-26T18:03:32Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — WARSHIP AJAX / SECTOR BRAVO",
+      "text": "WARSHIP AJAX (F-301, France) reporting position 18.448N 49.7543E in SECTOR BRAVO, vicinity Port of Aden Anchorage. Speed: 13 kts, heading: 257T. Fuel state: 67%. Readiness: EFFECTIVE.",
+      "unit": {
+        "callsign": "WARSHIP AJAX",
+        "pennant": "F-301",
+        "type": "Frigate",
+        "nation": "France",
+        "capability": [
+          "AAW",
+          "ASW",
+          "NGFS"
+        ]
+      },
+      "position": {
+        "latitude": 18.448,
+        "longitude": 49.7543
+      },
+      "sector": "SECTOR BRAVO",
+      "speed_kts": 9,
+      "heading_deg": 297,
+      "fuel_pct": 68,
+      "readiness": "FULLY EFFECTIVE",
+      "next_report_utc": "2026-07-26T22:03:32Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0106",
+      "dtg": "270146ZJUL26",
+      "timestamp_utc": "2026-07-27T01:46:57Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "BOARDING_REPORT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Boarding report — MV IONIAN TRADER / Gaza Maritime Approach",
+      "text": "Boarding report: WARSHIP AJAX boarding team boarded MV IONIAN TRADER (IMO 9561849) in Gaza Maritime Approach. Duration: 181 min. Crew: 23 POB. Finding: DOCUMENTS IRREGULAR. Disposition: DIVERTED TO PORT. Report forwarded to J2.",
+      "boarding_unit": "WARSHIP AJAX",
+      "vessel_boarded": {
+        "imo": "9561849",
+        "name": "MV IONIAN TRADER",
+        "flag": "Malta",
+        "type": "General Cargo",
+        "risk": "LOW"
+      },
+      "duration_minutes": 190,
+      "crew_pob": 13,
+      "finding": "DOCUMENTS IRREGULAR",
+      "disposition": "DETAINED FOR FURTHER INSPECTION",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [
+        "9561849"
+      ],
+      "generic_refs": [
+        "C2-202606-0023",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "COALITION_PATROL",
+        "VESSEL",
+        "MARITIME_ZONE",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0107",
+      "dtg": "270748ZJUL26",
+      "timestamp_utc": "2026-07-27T07:48:01Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "COMMS_TRAFFIC",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms traffic log — UAV OSPREY-01",
+      "text": "Communications traffic log. From: UAV OSPREY-01 To: MOC-J2. Subject: PATROL COMPLETE. Network: LINK-16. Classification: UNCLASSIFIED. Acknowledged: YES.",
+      "from_unit": "UAV OSPREY-01",
+      "to_unit": "MOC-J2",
+      "message_type": "FUEL_STATE",
+      "network": "LINK16",
+      "acknowledged": true,
+      "pir_refs": [],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0108",
+      "dtg": "271119ZJUL26",
+      "timestamp_utc": "2026-07-27T11:19:13Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "WATCH_LOG",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Watch log entry — 27 Jul 2026 1119Z",
+      "text": "MOC watch log 271119ZJUL26. Events: MPA tasked against suspected loitering vessel. Units reporting: 8 of 9 on schedule. Watch officer: WO-03. Next watch: 1519Z.",
+      "watch_officer": "WO-06",
+      "units_reporting": 4,
+      "event_summary": "MPA tasked",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas",
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "MOC_J2",
+        "ORIGINATOR_CELL",
+        "ROUTINE"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0109",
+      "dtg": "271237ZJUL26",
+      "timestamp_utc": "2026-07-27T12:37:44Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "UNIT_POSITION",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Unit position report — MPA KITE-01 / SECTOR BRAVO",
+      "text": "MPA KITE-01 (ATL2, France) reporting position 16.4835N 48.7941E in SECTOR BRAVO, vicinity Port of Aden Anchorage. Speed: 9 kts, heading: 051T. Fuel state: 36%. Readiness: FULLY EFFECTIVE.",
+      "unit": {
+        "callsign": "MPA KITE-01",
+        "pennant": "ATL2",
+        "type": "Maritime Patrol",
+        "nation": "France",
+        "capability": [
+          "ISR",
+          "AIS_RELAY"
+        ]
+      },
+      "position": {
+        "latitude": 16.4835,
+        "longitude": 48.7941
+      },
+      "sector": "SECTOR BRAVO",
+      "speed_kts": 6,
+      "heading_deg": 346,
+      "fuel_pct": 55,
+      "readiness": "EFFECTIVE",
+      "next_report_utc": "2026-07-27T16:37:44Z",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "SITUATIONAL_AWARENESS",
+        "ORIGINATOR_CELL",
+        "MOC_J2"
+      ]
+    },
+    {
+      "doc_id": "MOC-202607-0110",
+      "dtg": "271657ZJUL26",
+      "timestamp_utc": "2026-07-27T16:57:11Z",
+      "persona": "MOC_WATCH_OFFICER",
+      "record_type": "VESSEL_CONTACT",
+      "classification": "UNCLASSIFIED//FOR OFFICIAL USE ONLY",
+      "handling_caveats": [
+        "COALITION TF ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Vessel contact — MT RED SEA EAGLE / Gulf of Aden Corridor",
+      "text": "Contact report: MT RED SEA EAGLE (IMO 9238117, flag Barbados, Crude Oil Tanker) observed by WARSHIP CYGNET in Gulf of Aden Corridor. AIS anomaly detected: ROUTE_DEVIATION_HIGH_RISK. Risk profile: HIGH. Action taken: LOG AND MONITOR.",
+      "reporting_unit": "WARSHIP CYGNET",
+      "vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE",
+        "flag": "Barbados",
+        "type": "Crude Oil Tanker",
+        "risk": "HIGH"
+      },
+      "anomaly_detected": "ROUTE_DEVIATION_HIGH_RISK",
+      "risk_profile": "HIGH",
+      "action_taken": "BOARDING TEAM DISPATCHED",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0026",
+        "C2-202606-0048"
+      ],
+      "concept_ids": [
+        "VESSEL",
+        "AIS_ANOMALY",
+        "ROUTE_DEVIATION",
+        "VESSEL_RISK",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    }
+  ]
+}

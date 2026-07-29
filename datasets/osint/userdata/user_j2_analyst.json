@@ -1,0 +1,4542 @@
+{
+  "dataset": {
+    "name": "user_specific_j2_analyst",
+    "version": "1.0",
+    "persona": "J2 Intelligence Analyst",
+    "primary_report_type": "INTSUM",
+    "generated_utc": "2026-07-28T06:00:00Z",
+    "record_count": 110,
+    "index_type": "USER_SPECIFIC",
+    "classification_of_compilation": "SECRET//REL TO COALITION TF",
+    "note": "Simulated user-specific data. Links to generic dataset via generic_refs and to ontology via concept_ids.",
+    "coverage_window_utc": {
+      "from": "2026-06-28T06:00:00Z",
+      "to": "2026-07-28T06:00:00Z"
+    },
+    "cross_reference_schema": {
+      "generic_refs": "doc_id values from c2_middle_east_multi_source_1000_v3_en.json",
+      "pir_refs": "PIR-01..06 from the dataset pir_register",
+      "location_refs": "location.name values shared with the generic dataset",
+      "concept_ids": "concept_id values from c2_middle_east_business_ontology.yaml",
+      "vessel_refs": "vessel.imo values from the generic dataset vessel registry"
+    }
+  },
+  "records": [
+    {
+      "doc_id": "J2A-202606-0001",
+      "dtg": "280638ZJUN26",
+      "timestamp_utc": "2026-06-28T06:38:48Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-136",
+      "text": "Periodic reliability review for SRC-136. Source reliability maintained at grade D. Reporting on record: 176 reports. Last corroborated report: 17 days ago. Tasking status: RESTRICTED. Next scheduled evaluation: 67 days.",
+      "source_id": "SRC-136",
+      "reliability_grade": "D",
+      "reports_on_record": 138,
+      "days_since_last_report": 12,
+      "evaluation_cycle_days": 81,
+      "tasking_status": "RESTRICTED",
+      "areas_covered": [
+        "Gaza Maritime Approach",
+        "Salalah Port Approach"
+      ],
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route",
+        "Naqoura Sector / Blue Line"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "WALK_IN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202606-0002",
+      "dtg": "290417ZJUN26",
+      "timestamp_utc": "2026-06-29T04:17:17Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0028",
+      "text": "Analyst collateral annotation on generic record C2-202606-0028. Additional context: Matches known TTP of CRIMSON TIDE NETWORK. Analyst: J2-DUTY-04. Action: TASK SOURCE.",
+      "referenced_generic_doc": "C2-202606-0028",
+      "analyst_id": "J2-DUTY-04",
+      "annotation_type": "TTP_MATCH",
+      "action_required": "MONITOR",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0028"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "J2A-202606-0003",
+      "dtg": "291301ZJUN26",
+      "timestamp_utc": "2026-06-29T13:01:23Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-025 / PERSIAN GULF BROKER ",
+      "text": "Entity EOI-025 (PERSIAN GULF BROKER CELL) assessed to be coordinating logistics activity in vicinity of Strait of Hormuz. Associated vessel MT CASPIAN DAWN (IMO 9599303, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-025",
+      "threat_actor": "PERSIAN GULF BROKER CELL",
+      "associated_vessel": {
+        "imo": "9599303",
+        "name": "MT CASPIAN DAWN"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Strait of Hormuz",
+      "track_age_days": 32,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0014",
+        "C2-202606-0060"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202606-0004",
+      "dtg": "301422ZJUN26",
+      "timestamp_utc": "2026-06-30T14:22:42Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0058",
+      "text": "Analyst collateral annotation on generic record C2-202606-0058. Additional context: Corroborated by separate HUMINT stream. Analyst: J2-DUTY-06. Action: ESCALATE.",
+      "referenced_generic_doc": "C2-202606-0058",
+      "analyst_id": "J2-DUTY-04",
+      "annotation_type": "TTP_MATCH",
+      "action_required": "FILE",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0058"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202606-0005",
+      "dtg": "301637ZJUN26",
+      "timestamp_utc": "2026-06-30T16:37:23Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-02 / Port of Bandar Abbas",
+      "text": "J2 analytical assessment for PIR-02: based on fusion of 6 source reports over the past 4 days, assessed that adversary capability in Port of Bandar Abbas remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 42 hours.",
+      "pir_assessed": "PIR-02",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 32,
+      "key_judgement": "No change to assessed threat posture at this time",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas",
+        "Suez Gulf Approach",
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [
+        "9377468",
+        "9599303",
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0098",
+        "C2-202606-0053",
+        "C2-202606-0112",
+        "C2-202606-0059"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202606-0006",
+      "dtg": "301743ZJUN26",
+      "timestamp_utc": "2026-06-30T17:43:11Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-05 / Mocha Coastal Sector",
+      "text": "J2 analytical assessment for PIR-05: based on fusion of 4 source reports over the past 12 days, assessed that adversary capability in Mocha Coastal Sector remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 41 hours.",
+      "pir_assessed": "PIR-05",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 3,
+      "validity_hours": 47,
+      "key_judgement": "Logistics activity suggests resupply operation within 48h",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [
+        "9377468",
+        "9027764",
+        "9684720"
+      ],
+      "generic_refs": [
+        "C2-202606-0028",
+        "C2-202606-0068",
+        "C2-202606-0055",
+        "C2-202606-0016"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "J2A-202606-0007",
+      "dtg": "301808ZJUN26",
+      "timestamp_utc": "2026-06-30T18:08:08Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-006 / RED SEA RELAY NODE",
+      "text": "Entity EOI-006 (RED SEA RELAY NODE) assessed to be coordinating logistics activity in vicinity of Mocha Coastal Sector. Associated vessel MT SOUTHERN CROSS (IMO 9027764, flag Belize) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-006",
+      "threat_actor": "RED SEA RELAY NODE",
+      "associated_vessel": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Mocha Coastal Sector",
+      "track_age_days": 11,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0041",
+        "C2-202606-0028",
+        "C2-202606-0055"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202606-0008",
+      "dtg": "301917ZJUN26",
+      "timestamp_utc": "2026-06-30T19:17:40Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0059",
+      "text": "Analyst collateral annotation on generic record C2-202606-0059. Additional context: Corroborated by separate HUMINT stream. Analyst: J2-DUTY-02. Action: FILE.",
+      "referenced_generic_doc": "C2-202606-0059",
+      "analyst_id": "J2-DUTY-05",
+      "annotation_type": "CONTEXT",
+      "action_required": "TASK SOURCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0059"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202606-0009",
+      "dtg": "302349ZJUN26",
+      "timestamp_utc": "2026-06-30T23:49:42Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0009",
+      "text": "Analyst collateral annotation on generic record C2-202606-0009. Additional context: Matches known TTP of CRIMSON TIDE NETWORK. Analyst: J2-DUTY-04. Action: MONITOR.",
+      "referenced_generic_doc": "C2-202606-0009",
+      "analyst_id": "J2-DUTY-06",
+      "annotation_type": "CONTRADICTION",
+      "action_required": "FILE",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0009"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_UAS_USV_THREAT"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0010",
+      "dtg": "010547ZJUL26",
+      "timestamp_utc": "2026-07-01T05:47:43Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-017 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-017 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of Strait of Hormuz. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-017",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Strait of Hormuz",
+      "track_age_days": 6,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0047",
+        "C2-202606-0023",
+        "C2-202606-0004"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0011",
+      "dtg": "010833ZJUL26",
+      "timestamp_utc": "2026-07-01T08:33:02Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-02 / Bab-el-Mandeb Strait",
+      "text": "J2 analytical assessment for PIR-02: based on fusion of 12 source reports over the past 8 days, assessed that adversary capability in Bab-el-Mandeb Strait remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 60 hours.",
+      "pir_assessed": "PIR-02",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 11,
+      "validity_hours": 48,
+      "key_judgement": "Threat level ELEVATED — immediate reporting recommended",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9492737",
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0053",
+        "C2-202606-0072",
+        "C2-202606-0059",
+        "C2-202606-0112"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0012",
+      "dtg": "010921ZJUL26",
+      "timestamp_utc": "2026-07-01T09:21:25Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-013 / ZAGROS SHIPPING FRON",
+      "text": "Entity EOI-013 (ZAGROS SHIPPING FRONT) assessed to be coordinating logistics activity in vicinity of Port of Bandar Abbas. Associated vessel MT AMBER FORTUNE (IMO 9306275, flag Togo) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-013",
+      "threat_actor": "ZAGROS SHIPPING FRONT",
+      "associated_vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Port of Bandar Abbas",
+      "track_age_days": 37,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0068",
+        "C2-202606-0041",
+        "C2-202606-0007"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0013",
+      "dtg": "011658ZJUL26",
+      "timestamp_utc": "2026-07-01T16:58:05Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-130",
+      "text": "Periodic reliability review for SRC-130. Source reliability maintained at grade A. Reporting on record: 13 reports. Last corroborated report: 6 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 81 days.",
+      "source_id": "SRC-130",
+      "reliability_grade": "A",
+      "reports_on_record": 119,
+      "days_since_last_report": 17,
+      "evaluation_cycle_days": 72,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Port of Aden Anchorage",
+        "Salalah Port Approach",
+        "Port of Tartus Approach",
+        "Southern Red Sea"
+      ],
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0014",
+      "dtg": "011941ZJUL26",
+      "timestamp_utc": "2026-07-01T19:41:08Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 01 Jul 2026",
+      "text": "INTSUM production cycle 01JUL26. Products due: 3 INTSUM, 0 FLASH. Priority PIRs for this cycle: PIR-06, PIR-03. Analyst on duty: J2-DUTY-01. Deadline: 0341Z.",
+      "cycle_date": "2026-07-01",
+      "products_due": {
+        "intsum": 3,
+        "flash": 2
+      },
+      "priority_pirs": [
+        "PIR-04",
+        "PIR-02"
+      ],
+      "analyst_on_duty": "J2-DUTY-04",
+      "deadline_utc": "2026-07-01T22:41:08Z",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-02"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0015",
+      "dtg": "012124ZJUL26",
+      "timestamp_utc": "2026-07-01T21:24:54Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-135",
+      "text": "Periodic reliability review for SRC-135. Source reliability maintained at grade A. Reporting on record: 127 reports. Last corroborated report: 2 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 74 days.",
+      "source_id": "SRC-135",
+      "reliability_grade": "A",
+      "reports_on_record": 86,
+      "days_since_last_report": 17,
+      "evaluation_cycle_days": 39,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Gaza Maritime Approach"
+      ],
+      "pir_refs": [
+        "PIR-03",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Port of Hodeidah",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0016",
+      "dtg": "012321ZJUL26",
+      "timestamp_utc": "2026-07-01T23:21:39Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0098",
+      "text": "Analyst collateral annotation on generic record C2-202606-0098. Additional context: Matches known TTP of CRIMSON TIDE NETWORK. Analyst: J2-DUTY-01. Action: FILE.",
+      "referenced_generic_doc": "C2-202606-0098",
+      "analyst_id": "J2-DUTY-05",
+      "annotation_type": "CONTRADICTION",
+      "action_required": "ESCALATE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0098"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0017",
+      "dtg": "020357ZJUL26",
+      "timestamp_utc": "2026-07-02T03:57:50Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-06 / Port of Hodeidah",
+      "text": "J2 analytical assessment for PIR-06: based on fusion of 8 source reports over the past 10 days, assessed that adversary capability in Port of Hodeidah remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 46 hours.",
+      "pir_assessed": "PIR-06",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 8,
+      "validity_hours": 31,
+      "key_judgement": "Increased probability of STS transfer in next 24h",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [
+        "9238117",
+        "9306275",
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0021",
+        "C2-202606-0022",
+        "C2-202606-0001",
+        "C2-202606-0058"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0018",
+      "dtg": "021233ZJUL26",
+      "timestamp_utc": "2026-07-02T12:33:23Z",
+      "persona": "J2_ANALYST",
+      "record_type": "REQUIREMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collection requirement — PIR-02 / Port of Aden Anchora",
+      "text": "Formal collection requirement raised against PIR-02. Gap identified: AIS dark period unaccounted for. Tasked to: MOC-J2 MARITIME. Priority: PRIORITY. Deadline: 66h.",
+      "requirement_id": "CR-2902",
+      "gap_type": "GEOSPATIAL_GAP",
+      "tasked_to": "J2 OSINT",
+      "deadline_hours": 80,
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SOURCE_DOMAIN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0019",
+      "dtg": "021811ZJUL26",
+      "timestamp_utc": "2026-07-02T18:11:19Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-125",
+      "text": "Periodic reliability review for SRC-125. Source reliability maintained at grade B. Reporting on record: 87 reports. Last corroborated report: 8 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 82 days.",
+      "source_id": "SRC-125",
+      "reliability_grade": "B",
+      "reports_on_record": 177,
+      "days_since_last_report": 1,
+      "evaluation_cycle_days": 68,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Strait of Hormuz",
+        "Fujairah OPL Anchorage",
+        "Port of Tartus Approach",
+        "South Tyre / Coastal Route"
+      ],
+      "pir_refs": [
+        "PIR-01",
+        "PIR-04",
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0020",
+      "dtg": "022107ZJUL26",
+      "timestamp_utc": "2026-07-02T21:07:25Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 02 Jul 2026",
+      "text": "INTSUM production cycle 02JUL26. Products due: 2 INTSUM, 2 FLASH. Priority PIRs for this cycle: PIR-05, PIR-04. Analyst on duty: J2-DUTY-02. Deadline: 0007Z.",
+      "cycle_date": "2026-07-02",
+      "products_due": {
+        "intsum": 1,
+        "flash": 2
+      },
+      "priority_pirs": [
+        "PIR-06",
+        "PIR-05"
+      ],
+      "analyst_on_duty": "J2-DUTY-04",
+      "deadline_utc": "2026-07-03T02:07:25Z",
+      "pir_refs": [
+        "PIR-02",
+        "PIR-03"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0021",
+      "dtg": "030054ZJUL26",
+      "timestamp_utc": "2026-07-03T00:54:28Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-101",
+      "text": "Periodic reliability review for SRC-101. Source reliability maintained at grade C. Reporting on record: 160 reports. Last corroborated report: 15 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 35 days.",
+      "source_id": "SRC-101",
+      "reliability_grade": "C",
+      "reports_on_record": 38,
+      "days_since_last_report": 17,
+      "evaluation_cycle_days": 77,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "South Tyre / Coastal Route"
+      ],
+      "pir_refs": [
+        "PIR-04",
+        "PIR-06",
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line",
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "WALK_IN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0022",
+      "dtg": "031341ZJUL26",
+      "timestamp_utc": "2026-07-03T13:41:26Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0008",
+      "text": "Analyst collateral annotation on generic record C2-202606-0008. Additional context: Inconsistent with declared merchant transit routing. Analyst: J2-DUTY-03. Action: MONITOR.",
+      "referenced_generic_doc": "C2-202606-0008",
+      "analyst_id": "J2-DUTY-01",
+      "annotation_type": "CONTEXT",
+      "action_required": "TASK SOURCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0023",
+      "dtg": "031800ZJUL26",
+      "timestamp_utc": "2026-07-03T18:00:32Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-01 / Southern Red Sea",
+      "text": "J2 analytical assessment for PIR-01: based on fusion of 3 source reports over the past 11 days, assessed that adversary capability in Southern Red Sea remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 26 hours.",
+      "pir_assessed": "PIR-01",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 5,
+      "validity_hours": 66,
+      "key_judgement": "Threat level ELEVATED — immediate reporting recommended",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea",
+        "South Tyre / Coastal Route",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9599303",
+        "9238117",
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0008",
+        "C2-202606-0035",
+        "C2-202606-0047"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0024",
+      "dtg": "032331ZJUL26",
+      "timestamp_utc": "2026-07-03T23:31:10Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-137",
+      "text": "Periodic reliability review for SRC-137. Source reliability maintained at grade D. Reporting on record: 39 reports. Last corroborated report: 20 days ago. Tasking status: RESTRICTED. Next scheduled evaluation: 87 days.",
+      "source_id": "SRC-137",
+      "reliability_grade": "D",
+      "reports_on_record": 12,
+      "days_since_last_report": 10,
+      "evaluation_cycle_days": 40,
+      "tasking_status": "RESTRICTED",
+      "areas_covered": [
+        "Port of Aden Anchorage",
+        "Beirut Port Approach",
+        "Strait of Hormuz",
+        "Latakia Port Approach"
+      ],
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach",
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "WALK_IN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0025",
+      "dtg": "040322ZJUL26",
+      "timestamp_utc": "2026-07-04T03:22:41Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-05 / Kharg Island Terminal",
+      "text": "J2 analytical assessment for PIR-05: based on fusion of 12 source reports over the past 11 days, assessed that adversary capability in Kharg Island Terminal remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 56 hours.",
+      "pir_assessed": "PIR-05",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 10,
+      "validity_hours": 36,
+      "key_judgement": "Pattern consistent with pre-attack reconnaissance",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0007",
+        "C2-202606-0055",
+        "C2-202606-0020",
+        "C2-202606-0013"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0026",
+      "dtg": "040601ZJUL26",
+      "timestamp_utc": "2026-07-04T06:01:40Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-06 / Port of Aden Anchorage",
+      "text": "J2 analytical assessment for PIR-06: based on fusion of 4 source reports over the past 6 days, assessed that adversary capability in Port of Aden Anchorage remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 30 hours.",
+      "pir_assessed": "PIR-06",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 4,
+      "validity_hours": 32,
+      "key_judgement": "Threat level ELEVATED — immediate reporting recommended",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage",
+        "Bab-el-Mandeb Strait"
+      ],
+      "vessel_refs": [
+        "9561849",
+        "9238117",
+        "9610793"
+      ],
+      "generic_refs": [
+        "C2-202606-0046",
+        "C2-202606-0021",
+        "C2-202606-0022",
+        "C2-202606-0033"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0027",
+      "dtg": "041910ZJUL26",
+      "timestamp_utc": "2026-07-04T19:10:02Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-011 / HODEIDAH PORT AUTHOR",
+      "text": "Entity EOI-011 (HODEIDAH PORT AUTHORITY (ADVERSARY ELEMENT)) assessed to be coordinating logistics activity in vicinity of Strait of Hormuz. Associated vessel MT SOUTHERN CROSS (IMO 9027764, flag Belize) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-011",
+      "threat_actor": "HODEIDAH PORT AUTHORITY (ADVERSARY ELEMENT)",
+      "associated_vessel": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS"
+      },
+      "track_status": "WATCHLISTED",
+      "last_confirmed_location": "Strait of Hormuz",
+      "track_age_days": 41,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0013",
+        "C2-202606-0016",
+        "C2-202606-0068"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0028",
+      "dtg": "050623ZJUL26",
+      "timestamp_utc": "2026-07-05T06:23:51Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-016 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-016 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of Port of Aden Anchorage. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-016",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Port of Aden Anchorage",
+      "track_age_days": 15,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0026",
+        "C2-202606-0112",
+        "C2-202606-0098"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0029",
+      "dtg": "050941ZJUL26",
+      "timestamp_utc": "2026-07-05T09:41:39Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-02 / Kharg Island Terminal",
+      "text": "J2 analytical assessment for PIR-02: based on fusion of 4 source reports over the past 4 days, assessed that adversary capability in Kharg Island Terminal remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 72 hours.",
+      "pir_assessed": "PIR-02",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 9,
+      "validity_hours": 27,
+      "key_judgement": "Increased probability of STS transfer in next 24h",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal",
+        "Strait of Hormuz",
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0085",
+        "C2-202606-0098",
+        "C2-202606-0059",
+        "C2-202606-0026"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0030",
+      "dtg": "051147ZJUL26",
+      "timestamp_utc": "2026-07-05T11:47:25Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-004 / RED SEA RELAY NODE",
+      "text": "Entity EOI-004 (RED SEA RELAY NODE) assessed to be coordinating logistics activity in vicinity of Southern Red Sea. Associated vessel MT CASPIAN DAWN (IMO 9599303, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-004",
+      "threat_actor": "RED SEA RELAY NODE",
+      "associated_vessel": {
+        "imo": "9599303",
+        "name": "MT CASPIAN DAWN"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Southern Red Sea",
+      "track_age_days": 14,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0060",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0031",
+      "dtg": "051957ZJUL26",
+      "timestamp_utc": "2026-07-05T19:57:19Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-014 / BANDAR ABBAS TRANSHI",
+      "text": "Entity EOI-014 (BANDAR ABBAS TRANSHIPMENT HUB) assessed to be coordinating logistics activity in vicinity of Latakia Port Approach. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-014",
+      "threat_actor": "BANDAR ABBAS TRANSHIPMENT HUB",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "WATCHLISTED",
+      "last_confirmed_location": "Latakia Port Approach",
+      "track_age_days": 9,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0023",
+        "C2-202606-0060",
+        "C2-202606-0047"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0032",
+      "dtg": "061425ZJUL26",
+      "timestamp_utc": "2026-07-06T14:25:06Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-130",
+      "text": "Periodic reliability review for SRC-130. Source reliability maintained at grade C. Reporting on record: 151 reports. Last corroborated report: 7 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 74 days.",
+      "source_id": "SRC-130",
+      "reliability_grade": "C",
+      "reports_on_record": 125,
+      "days_since_last_report": 14,
+      "evaluation_cycle_days": 32,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Bab-el-Mandeb Strait"
+      ],
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "WALK_IN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0033",
+      "dtg": "061531ZJUL26",
+      "timestamp_utc": "2026-07-06T15:31:52Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-125",
+      "text": "Periodic reliability review for SRC-125. Source reliability maintained at grade B. Reporting on record: 66 reports. Last corroborated report: 11 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 52 days.",
+      "source_id": "SRC-125",
+      "reliability_grade": "B",
+      "reports_on_record": 35,
+      "days_since_last_report": 4,
+      "evaluation_cycle_days": 63,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Latakia Port Approach",
+        "Suez Gulf Approach",
+        "Fujairah OPL Anchorage"
+      ],
+      "pir_refs": [
+        "PIR-01",
+        "PIR-06",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Hodeidah",
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0034",
+      "dtg": "062234ZJUL26",
+      "timestamp_utc": "2026-07-06T22:34:51Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-009 / CRIMSON TIDE NETWORK",
+      "text": "Entity EOI-009 (CRIMSON TIDE NETWORK) assessed to be coordinating logistics activity in vicinity of Fujairah OPL Anchorage. Associated vessel MT CASPIAN DAWN (IMO 9599303, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-009",
+      "threat_actor": "CRIMSON TIDE NETWORK",
+      "associated_vessel": {
+        "imo": "9599303",
+        "name": "MT CASPIAN DAWN"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Fujairah OPL Anchorage",
+      "track_age_days": 38,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0026",
+        "C2-202606-0085",
+        "C2-202606-0059"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0035",
+      "dtg": "071606ZJUL26",
+      "timestamp_utc": "2026-07-07T16:06:41Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-117",
+      "text": "Periodic reliability review for SRC-117. Source reliability maintained at grade B. Reporting on record: 33 reports. Last corroborated report: 19 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 45 days.",
+      "source_id": "SRC-117",
+      "reliability_grade": "B",
+      "reports_on_record": 146,
+      "days_since_last_report": 8,
+      "evaluation_cycle_days": 66,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Port of Tartus Approach",
+        "Port of Hodeidah",
+        "Bab-el-Mandeb Strait"
+      ],
+      "pir_refs": [
+        "PIR-06",
+        "PIR-01",
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0036",
+      "dtg": "071641ZJUL26",
+      "timestamp_utc": "2026-07-07T16:41:57Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-127",
+      "text": "Periodic reliability review for SRC-127. Source reliability maintained at grade B. Reporting on record: 160 reports. Last corroborated report: 4 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 82 days.",
+      "source_id": "SRC-127",
+      "reliability_grade": "B",
+      "reports_on_record": 107,
+      "days_since_last_report": 3,
+      "evaluation_cycle_days": 31,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Port of Tartus Approach",
+        "Gaza Maritime Approach",
+        "Strait of Hormuz"
+      ],
+      "pir_refs": [
+        "PIR-06",
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0037",
+      "dtg": "071916ZJUL26",
+      "timestamp_utc": "2026-07-07T19:16:27Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-121",
+      "text": "Periodic reliability review for SRC-121. Source reliability maintained at grade D. Reporting on record: 75 reports. Last corroborated report: 3 days ago. Tasking status: RESTRICTED. Next scheduled evaluation: 83 days.",
+      "source_id": "SRC-121",
+      "reliability_grade": "D",
+      "reports_on_record": 51,
+      "days_since_last_report": 13,
+      "evaluation_cycle_days": 46,
+      "tasking_status": "RESTRICTED",
+      "areas_covered": [
+        "Port of Tartus Approach",
+        "Port of Bandar Abbas",
+        "Bab-el-Mandeb Strait"
+      ],
+      "pir_refs": [
+        "PIR-03",
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "WALK_IN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0038",
+      "dtg": "080338ZJUL26",
+      "timestamp_utc": "2026-07-08T03:38:08Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-014 / PERSIAN GULF BROKER ",
+      "text": "Entity EOI-014 (PERSIAN GULF BROKER CELL) assessed to be coordinating logistics activity in vicinity of Kharg Island Terminal. Associated vessel MT MIDNIGHT RUNNER (IMO 9377468, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-014",
+      "threat_actor": "PERSIAN GULF BROKER CELL",
+      "associated_vessel": {
+        "imo": "9377468",
+        "name": "MT MIDNIGHT RUNNER"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Kharg Island Terminal",
+      "track_age_days": 17,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0004",
+        "C2-202606-0003",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0039",
+      "dtg": "080613ZJUL26",
+      "timestamp_utc": "2026-07-08T06:13:20Z",
+      "persona": "J2_ANALYST",
+      "record_type": "REQUIREMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collection requirement — PIR-06 / Salalah Port Approac",
+      "text": "Formal collection requirement raised against PIR-06. Gap identified: No optical confirmation of STS event. Tasked to: MOC-J2 MARITIME. Priority: IMMEDIATE. Deadline: 71h.",
+      "requirement_id": "CR-9555",
+      "gap_type": "HUMINT_GAP",
+      "tasked_to": "J2 OSINT",
+      "deadline_hours": 86,
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "PIR_FORCE_POSTURE",
+        "SOURCE_DOMAIN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0040",
+      "dtg": "081331ZJUL26",
+      "timestamp_utc": "2026-07-08T13:31:48Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-01 / Port of Aden Anchorage",
+      "text": "J2 analytical assessment for PIR-01: based on fusion of 5 source reports over the past 4 days, assessed that adversary capability in Port of Aden Anchorage remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 28 hours.",
+      "pir_assessed": "PIR-01",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 4,
+      "validity_hours": 56,
+      "key_judgement": "Increased probability of STS transfer in next 24h",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage",
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9306275",
+        "9610793",
+        "9741839"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0035",
+        "C2-202606-0060",
+        "C2-202606-0014"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0041",
+      "dtg": "090048ZJUL26",
+      "timestamp_utc": "2026-07-09T00:48:18Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-138",
+      "text": "Periodic reliability review for SRC-138. Source reliability maintained at grade B. Reporting on record: 157 reports. Last corroborated report: 13 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 75 days.",
+      "source_id": "SRC-138",
+      "reliability_grade": "B",
+      "reports_on_record": 76,
+      "days_since_last_report": 15,
+      "evaluation_cycle_days": 74,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Port of Bandar Abbas",
+        "Southern Red Sea"
+      ],
+      "pir_refs": [
+        "PIR-02",
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0042",
+      "dtg": "090507ZJUL26",
+      "timestamp_utc": "2026-07-09T05:07:52Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-04 / Beirut Port Approach",
+      "text": "J2 analytical assessment for PIR-04: based on fusion of 12 source reports over the past 13 days, assessed that adversary capability in Beirut Port Approach remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 63 hours.",
+      "pir_assessed": "PIR-04",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 4,
+      "validity_hours": 61,
+      "key_judgement": "Increased probability of STS transfer in next 24h",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0042",
+        "C2-202606-0135",
+        "C2-202606-0107",
+        "C2-202606-0054"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0043",
+      "dtg": "100149ZJUL26",
+      "timestamp_utc": "2026-07-10T01:49:27Z",
+      "persona": "J2_ANALYST",
+      "record_type": "REQUIREMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collection requirement — PIR-02 / Port of Bandar Abbas",
+      "text": "Formal collection requirement raised against PIR-02. Gap identified: Air defence order of battle incomplete. Tasked to: J2X HUMINT. Priority: IMMEDIATE. Deadline: 25h.",
+      "requirement_id": "CR-7777",
+      "gap_type": "HUMINT_GAP",
+      "tasked_to": "MOC-J2 MARITIME",
+      "deadline_hours": 56,
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage",
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SOURCE_DOMAIN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0044",
+      "dtg": "101316ZJUL26",
+      "timestamp_utc": "2026-07-10T13:16:26Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-024 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-024 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of South Tyre / Coastal Route. Associated vessel MT AMBER FORTUNE (IMO 9306275, flag Togo) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-024",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "South Tyre / Coastal Route",
+      "track_age_days": 16,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0016",
+        "C2-202606-0013",
+        "C2-202606-0068"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0045",
+      "dtg": "101822ZJUL26",
+      "timestamp_utc": "2026-07-10T18:22:55Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0066",
+      "text": "Analyst collateral annotation on generic record C2-202606-0066. Additional context: Corroborated by separate HUMINT stream. Analyst: J2-DUTY-05. Action: TASK SOURCE.",
+      "referenced_generic_doc": "C2-202606-0066",
+      "analyst_id": "J2-DUTY-06",
+      "annotation_type": "CONTEXT",
+      "action_required": "ESCALATE",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0066"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0046",
+      "dtg": "101854ZJUL26",
+      "timestamp_utc": "2026-07-10T18:54:22Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-02 / Southern Red Sea",
+      "text": "J2 analytical assessment for PIR-02: based on fusion of 7 source reports over the past 7 days, assessed that adversary capability in Southern Red Sea remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 64 hours.",
+      "pir_assessed": "PIR-02",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 12,
+      "validity_hours": 26,
+      "key_judgement": "Logistics activity suggests resupply operation within 48h",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9684720",
+        "9298313",
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0112",
+        "C2-202606-0048",
+        "C2-202606-0053",
+        "C2-202606-0072"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0047",
+      "dtg": "110707ZJUL26",
+      "timestamp_utc": "2026-07-11T07:07:19Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-009 / AL-MIRAJ LOGISTICS G",
+      "text": "Entity EOI-009 (AL-MIRAJ LOGISTICS GROUP) assessed to be coordinating logistics activity in vicinity of Port of Tartus Approach. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-009",
+      "threat_actor": "AL-MIRAJ LOGISTICS GROUP",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Port of Tartus Approach",
+      "track_age_days": 36,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0047",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0048",
+      "dtg": "111350ZJUL26",
+      "timestamp_utc": "2026-07-11T13:50:00Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 11 Jul 2026",
+      "text": "INTSUM production cycle 11JUL26. Products due: 1 INTSUM, 1 FLASH. Priority PIRs for this cycle: PIR-06, PIR-04. Analyst on duty: J2-DUTY-04. Deadline: 1550Z.",
+      "cycle_date": "2026-07-11",
+      "products_due": {
+        "intsum": 4,
+        "flash": 1
+      },
+      "priority_pirs": [
+        "PIR-05",
+        "PIR-04"
+      ],
+      "analyst_on_duty": "J2-DUTY-03",
+      "deadline_utc": "2026-07-11T20:50:00Z",
+      "pir_refs": [
+        "PIR-03",
+        "PIR-05"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0049",
+      "dtg": "111441ZJUL26",
+      "timestamp_utc": "2026-07-11T14:41:01Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 11 Jul 2026",
+      "text": "INTSUM production cycle 11JUL26. Products due: 4 INTSUM, 1 FLASH. Priority PIRs for this cycle: PIR-06, PIR-05. Analyst on duty: J2-DUTY-05. Deadline: 1941Z.",
+      "cycle_date": "2026-07-11",
+      "products_due": {
+        "intsum": 3,
+        "flash": 2
+      },
+      "priority_pirs": [
+        "PIR-06",
+        "PIR-04"
+      ],
+      "analyst_on_duty": "J2-DUTY-04",
+      "deadline_utc": "2026-07-11T18:41:01Z",
+      "pir_refs": [
+        "PIR-05",
+        "PIR-04"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0050",
+      "dtg": "111622ZJUL26",
+      "timestamp_utc": "2026-07-11T16:22:18Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-04 / South Tyre / Coastal Route",
+      "text": "J2 analytical assessment for PIR-04: based on fusion of 3 source reports over the past 9 days, assessed that adversary capability in South Tyre / Coastal Route remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 43 hours.",
+      "pir_assessed": "PIR-04",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 31,
+      "key_judgement": "Logistics activity suggests resupply operation within 48h",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route",
+        "Kharg Island Terminal",
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9377468",
+        "9306275",
+        "9561849"
+      ],
+      "generic_refs": [
+        "C2-202606-0093",
+        "C2-202606-0066",
+        "C2-202606-0054",
+        "C2-202606-0107"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0051",
+      "dtg": "120705ZJUL26",
+      "timestamp_utc": "2026-07-12T07:05:25Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-003 / PERSIAN GULF BROKER ",
+      "text": "Entity EOI-003 (PERSIAN GULF BROKER CELL) assessed to be coordinating logistics activity in vicinity of Kharg Island Terminal. Associated vessel MT AMBER FORTUNE (IMO 9306275, flag Togo) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-003",
+      "threat_actor": "PERSIAN GULF BROKER CELL",
+      "associated_vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Kharg Island Terminal",
+      "track_age_days": 35,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0016",
+        "C2-202606-0028",
+        "C2-202606-0013"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0052",
+      "dtg": "121257ZJUL26",
+      "timestamp_utc": "2026-07-12T12:57:08Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-134",
+      "text": "Periodic reliability review for SRC-134. Source reliability maintained at grade B. Reporting on record: 136 reports. Last corroborated report: 6 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 62 days.",
+      "source_id": "SRC-134",
+      "reliability_grade": "B",
+      "reports_on_record": 141,
+      "days_since_last_report": 19,
+      "evaluation_cycle_days": 30,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Gaza Maritime Approach",
+        "Port of Tartus Approach",
+        "Port of Bandar Abbas"
+      ],
+      "pir_refs": [
+        "PIR-04",
+        "PIR-05",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0053",
+      "dtg": "121616ZJUL26",
+      "timestamp_utc": "2026-07-12T16:16:13Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-101",
+      "text": "Periodic reliability review for SRC-101. Source reliability maintained at grade B. Reporting on record: 173 reports. Last corroborated report: 1 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 49 days.",
+      "source_id": "SRC-101",
+      "reliability_grade": "B",
+      "reports_on_record": 151,
+      "days_since_last_report": 17,
+      "evaluation_cycle_days": 84,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Port of Hodeidah",
+        "Port of Bandar Abbas"
+      ],
+      "pir_refs": [
+        "PIR-06",
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage",
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0054",
+      "dtg": "122053ZJUL26",
+      "timestamp_utc": "2026-07-12T20:53:15Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-005 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-005 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of Suez Gulf Approach. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-005",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Suez Gulf Approach",
+      "track_age_days": 29,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0003",
+        "C2-202606-0047",
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0055",
+      "dtg": "130243ZJUL26",
+      "timestamp_utc": "2026-07-13T02:43:36Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0019",
+      "text": "Analyst collateral annotation on generic record C2-202606-0019. Additional context: Inconsistent with declared merchant transit routing. Analyst: J2-DUTY-04. Action: TASK SOURCE.",
+      "referenced_generic_doc": "C2-202606-0019",
+      "analyst_id": "J2-DUTY-05",
+      "annotation_type": "CONTEXT",
+      "action_required": "ESCALATE",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0019"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_UAS_USV_THREAT"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0056",
+      "dtg": "130354ZJUL26",
+      "timestamp_utc": "2026-07-13T03:54:03Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-019 / ZAGROS SHIPPING FRON",
+      "text": "Entity EOI-019 (ZAGROS SHIPPING FRONT) assessed to be coordinating logistics activity in vicinity of Latakia Port Approach. Associated vessel MT CASPIAN DAWN (IMO 9599303, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-019",
+      "threat_actor": "ZAGROS SHIPPING FRONT",
+      "associated_vessel": {
+        "imo": "9599303",
+        "name": "MT CASPIAN DAWN"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Latakia Port Approach",
+      "track_age_days": 28,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0014",
+        "C2-202606-0003"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0057",
+      "dtg": "130527ZJUL26",
+      "timestamp_utc": "2026-07-13T05:27:56Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-117",
+      "text": "Periodic reliability review for SRC-117. Source reliability maintained at grade C. Reporting on record: 26 reports. Last corroborated report: 15 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 54 days.",
+      "source_id": "SRC-117",
+      "reliability_grade": "C",
+      "reports_on_record": 117,
+      "days_since_last_report": 12,
+      "evaluation_cycle_days": 85,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Salalah Port Approach",
+        "Naqoura Sector / Blue Line",
+        "South Tyre / Coastal Route",
+        "Suez Gulf Approach"
+      ],
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Naqoura Sector / Blue Line",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "WALK_IN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0058",
+      "dtg": "130920ZJUL26",
+      "timestamp_utc": "2026-07-13T09:20:07Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0008",
+      "text": "Analyst collateral annotation on generic record C2-202606-0008. Additional context: Cross-reference with EOI database recommended. Analyst: J2-DUTY-05. Action: TASK SOURCE.",
+      "referenced_generic_doc": "C2-202606-0008",
+      "analyst_id": "J2-DUTY-04",
+      "annotation_type": "CONTEXT",
+      "action_required": "MONITOR",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0059",
+      "dtg": "131150ZJUL26",
+      "timestamp_utc": "2026-07-13T11:50:30Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 13 Jul 2026",
+      "text": "INTSUM production cycle 13JUL26. Products due: 3 INTSUM, 1 FLASH. Priority PIRs for this cycle: PIR-01, PIR-06. Analyst on duty: J2-DUTY-01. Deadline: 1650Z.",
+      "cycle_date": "2026-07-13",
+      "products_due": {
+        "intsum": 3,
+        "flash": 0
+      },
+      "priority_pirs": [
+        "PIR-03",
+        "PIR-02"
+      ],
+      "analyst_on_duty": "J2-DUTY-05",
+      "deadline_utc": "2026-07-13T17:50:30Z",
+      "pir_refs": [
+        "PIR-02",
+        "PIR-04"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0060",
+      "dtg": "131636ZJUL26",
+      "timestamp_utc": "2026-07-13T16:36:53Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 13 Jul 2026",
+      "text": "INTSUM production cycle 13JUL26. Products due: 1 INTSUM, 2 FLASH. Priority PIRs for this cycle: PIR-05, PIR-02. Analyst on duty: J2-DUTY-02. Deadline: 1836Z.",
+      "cycle_date": "2026-07-13",
+      "products_due": {
+        "intsum": 1,
+        "flash": 0
+      },
+      "priority_pirs": [
+        "PIR-06",
+        "PIR-02"
+      ],
+      "analyst_on_duty": "J2-DUTY-04",
+      "deadline_utc": "2026-07-14T00:36:53Z",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-02"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0061",
+      "dtg": "131711ZJUL26",
+      "timestamp_utc": "2026-07-13T17:11:14Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-022 / AL-MIRAJ LOGISTICS G",
+      "text": "Entity EOI-022 (AL-MIRAJ LOGISTICS GROUP) assessed to be coordinating logistics activity in vicinity of Southern Red Sea. Associated vessel MT SEA WHISPER (IMO 9298313, flag Togo) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-022",
+      "threat_actor": "AL-MIRAJ LOGISTICS GROUP",
+      "associated_vessel": {
+        "imo": "9298313",
+        "name": "MT SEA WHISPER"
+      },
+      "track_status": "WATCHLISTED",
+      "last_confirmed_location": "Southern Red Sea",
+      "track_age_days": 44,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0053",
+        "C2-202606-0059",
+        "C2-202606-0048"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0062",
+      "dtg": "140142ZJUL26",
+      "timestamp_utc": "2026-07-14T01:42:27Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-02 / Mocha Coastal Sector",
+      "text": "J2 analytical assessment for PIR-02: based on fusion of 11 source reports over the past 5 days, assessed that adversary capability in Mocha Coastal Sector remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 49 hours.",
+      "pir_assessed": "PIR-02",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 11,
+      "validity_hours": 42,
+      "key_judgement": "Logistics activity suggests resupply operation within 48h",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0098",
+        "C2-202606-0026",
+        "C2-202606-0053",
+        "C2-202606-0112"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0063",
+      "dtg": "140656ZJUL26",
+      "timestamp_utc": "2026-07-14T06:56:49Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0071",
+      "text": "Analyst collateral annotation on generic record C2-202606-0071. Additional context: Previous pattern observed 14 days prior in same AOR. Analyst: J2-DUTY-04. Action: ESCALATE.",
+      "referenced_generic_doc": "C2-202606-0071",
+      "analyst_id": "J2-DUTY-05",
+      "annotation_type": "CONTRADICTION",
+      "action_required": "FILE",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0071"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0064",
+      "dtg": "141309ZJUL26",
+      "timestamp_utc": "2026-07-14T13:09:46Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-014 / HODEIDAH PORT AUTHOR",
+      "text": "Entity EOI-014 (HODEIDAH PORT AUTHORITY (ADVERSARY ELEMENT)) assessed to be coordinating logistics activity in vicinity of Kharg Island Terminal. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-014",
+      "threat_actor": "HODEIDAH PORT AUTHORITY (ADVERSARY ELEMENT)",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Kharg Island Terminal",
+      "track_age_days": 2,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0013",
+        "C2-202606-0068",
+        "C2-202606-0055"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0065",
+      "dtg": "150334ZJUL26",
+      "timestamp_utc": "2026-07-15T03:34:01Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-011 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-011 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of Latakia Port Approach. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-011",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Latakia Port Approach",
+      "track_age_days": 1,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0035",
+        "C2-202606-0047"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0066",
+      "dtg": "150908ZJUL26",
+      "timestamp_utc": "2026-07-15T09:08:31Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-004 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-004 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of Fujairah OPL Anchorage. Associated vessel MT MIDNIGHT RUNNER (IMO 9377468, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-004",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9377468",
+        "name": "MT MIDNIGHT RUNNER"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Fujairah OPL Anchorage",
+      "track_age_days": 44,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0028",
+        "C2-202606-0020",
+        "C2-202606-0007"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0067",
+      "dtg": "151144ZJUL26",
+      "timestamp_utc": "2026-07-15T11:44:38Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-014 / PERSIAN GULF BROKER ",
+      "text": "Entity EOI-014 (PERSIAN GULF BROKER CELL) assessed to be coordinating logistics activity in vicinity of Strait of Hormuz. Associated vessel MT SOUTHERN CROSS (IMO 9027764, flag Belize) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-014",
+      "threat_actor": "PERSIAN GULF BROKER CELL",
+      "associated_vessel": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Strait of Hormuz",
+      "track_age_days": 24,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0053",
+        "C2-202606-0072",
+        "C2-202606-0059"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0068",
+      "dtg": "151152ZJUL26",
+      "timestamp_utc": "2026-07-15T11:52:03Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-02 / Mocha Coastal Sector",
+      "text": "J2 analytical assessment for PIR-02: based on fusion of 7 source reports over the past 8 days, assessed that adversary capability in Mocha Coastal Sector remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 50 hours.",
+      "pir_assessed": "PIR-02",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 11,
+      "validity_hours": 69,
+      "key_judgement": "No change to assessed threat posture at this time",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0059",
+        "C2-202606-0072",
+        "C2-202606-0085",
+        "C2-202606-0098"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0069",
+      "dtg": "151637ZJUL26",
+      "timestamp_utc": "2026-07-15T16:37:22Z",
+      "persona": "J2_ANALYST",
+      "record_type": "REQUIREMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collection requirement — PIR-01 / Bab-el-Mandeb Strait",
+      "text": "Formal collection requirement raised against PIR-01. Gap identified: No HUMINT coverage of northern approach. Tasked to: NATIONAL ASSET. Priority: ROUTINE. Deadline: 88h.",
+      "requirement_id": "CR-5653",
+      "gap_type": "TEMPORAL_GAP",
+      "tasked_to": "MOC-J2 MARITIME",
+      "deadline_hours": 90,
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SOURCE_DOMAIN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0070",
+      "dtg": "160602ZJUL26",
+      "timestamp_utc": "2026-07-16T06:02:58Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-06 / Latakia Port Approach",
+      "text": "J2 analytical assessment for PIR-06: based on fusion of 9 source reports over the past 6 days, assessed that adversary capability in Latakia Port Approach remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 54 hours.",
+      "pir_assessed": "PIR-06",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 10,
+      "validity_hours": 29,
+      "key_judgement": "Threat level ELEVATED — immediate reporting recommended",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Latakia Port Approach",
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [
+        "9561849",
+        "9238117",
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0021",
+        "C2-202606-0033",
+        "C2-202606-0046",
+        "C2-202606-0022"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0071",
+      "dtg": "161543ZJUL26",
+      "timestamp_utc": "2026-07-16T15:43:50Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0042",
+      "text": "Analyst collateral annotation on generic record C2-202606-0042. Additional context: Matches known TTP of CRIMSON TIDE NETWORK. Analyst: J2-DUTY-01. Action: ESCALATE.",
+      "referenced_generic_doc": "C2-202606-0042",
+      "analyst_id": "J2-DUTY-06",
+      "annotation_type": "CONTEXT",
+      "action_required": "TASK SOURCE",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0042"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0072",
+      "dtg": "170555ZJUL26",
+      "timestamp_utc": "2026-07-17T05:55:24Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-018 / RED SEA RELAY NODE",
+      "text": "Entity EOI-018 (RED SEA RELAY NODE) assessed to be coordinating logistics activity in vicinity of Port of Hodeidah. Associated vessel MT CASPIAN DAWN (IMO 9599303, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-018",
+      "threat_actor": "RED SEA RELAY NODE",
+      "associated_vessel": {
+        "imo": "9599303",
+        "name": "MT CASPIAN DAWN"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Port of Hodeidah",
+      "track_age_days": 37,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Port of Hodeidah"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0016",
+        "C2-202606-0041",
+        "C2-202606-0013"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0073",
+      "dtg": "172008ZJUL26",
+      "timestamp_utc": "2026-07-17T20:08:31Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-04 / Strait of Hormuz",
+      "text": "J2 analytical assessment for PIR-04: based on fusion of 10 source reports over the past 9 days, assessed that adversary capability in Strait of Hormuz remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 65 hours.",
+      "pir_assessed": "PIR-04",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 48,
+      "key_judgement": "Pattern consistent with pre-attack reconnaissance",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Strait of Hormuz",
+        "Southern Red Sea",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9492737",
+        "9377468",
+        "9610793"
+      ],
+      "generic_refs": [
+        "C2-202606-0042",
+        "C2-202606-0054",
+        "C2-202606-0121",
+        "C2-202606-0135"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0074",
+      "dtg": "180441ZJUL26",
+      "timestamp_utc": "2026-07-18T04:41:31Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-005 / ZAGROS SHIPPING FRON",
+      "text": "Entity EOI-005 (ZAGROS SHIPPING FRONT) assessed to be coordinating logistics activity in vicinity of Port of Tartus Approach. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-005",
+      "threat_actor": "ZAGROS SHIPPING FRONT",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Port of Tartus Approach",
+      "track_age_days": 24,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0004",
+        "C2-202606-0003"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0075",
+      "dtg": "180540ZJUL26",
+      "timestamp_utc": "2026-07-18T05:40:05Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-03 / Port of Aden Anchorage",
+      "text": "J2 analytical assessment for PIR-03: based on fusion of 10 source reports over the past 4 days, assessed that adversary capability in Port of Aden Anchorage remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 35 hours.",
+      "pir_assessed": "PIR-03",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 40,
+      "key_judgement": "Threat level ELEVATED — immediate reporting recommended",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9610793"
+      ],
+      "generic_refs": [
+        "C2-202606-0002",
+        "C2-202606-0057",
+        "C2-202606-0019",
+        "C2-202606-0009"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_UAS_USV_THREAT"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0076",
+      "dtg": "180627ZJUL26",
+      "timestamp_utc": "2026-07-18T06:27:37Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 18 Jul 2026",
+      "text": "INTSUM production cycle 18JUL26. Products due: 4 INTSUM, 1 FLASH. Priority PIRs for this cycle: PIR-03, PIR-02. Analyst on duty: J2-DUTY-06. Deadline: 0927Z.",
+      "cycle_date": "2026-07-18",
+      "products_due": {
+        "intsum": 1,
+        "flash": 2
+      },
+      "priority_pirs": [
+        "PIR-02",
+        "PIR-03"
+      ],
+      "analyst_on_duty": "J2-DUTY-03",
+      "deadline_utc": "2026-07-18T09:27:37Z",
+      "pir_refs": [
+        "PIR-03",
+        "PIR-04"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0077",
+      "dtg": "180802ZJUL26",
+      "timestamp_utc": "2026-07-18T08:02:26Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-009 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-009 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of South Tyre / Coastal Route. Associated vessel MT CASPIAN DAWN (IMO 9599303, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-009",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9599303",
+        "name": "MT CASPIAN DAWN"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "South Tyre / Coastal Route",
+      "track_age_days": 31,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [
+        "9599303"
+      ],
+      "generic_refs": [
+        "C2-202606-0055",
+        "C2-202606-0016",
+        "C2-202606-0041"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0078",
+      "dtg": "190103ZJUL26",
+      "timestamp_utc": "2026-07-19T01:03:41Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-005 / CRIMSON TIDE NETWORK",
+      "text": "Entity EOI-005 (CRIMSON TIDE NETWORK) assessed to be coordinating logistics activity in vicinity of Port of Bandar Abbas. Associated vessel MT MIDNIGHT RUNNER (IMO 9377468, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-005",
+      "threat_actor": "CRIMSON TIDE NETWORK",
+      "associated_vessel": {
+        "imo": "9377468",
+        "name": "MT MIDNIGHT RUNNER"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Port of Bandar Abbas",
+      "track_age_days": 27,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0048",
+        "C2-202606-0112",
+        "C2-202606-0053"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0079",
+      "dtg": "190124ZJUL26",
+      "timestamp_utc": "2026-07-19T01:24:47Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0033",
+      "text": "Analyst collateral annotation on generic record C2-202606-0033. Additional context: Matches known TTP of CRIMSON TIDE NETWORK. Analyst: J2-DUTY-02. Action: TASK SOURCE.",
+      "referenced_generic_doc": "C2-202606-0033",
+      "analyst_id": "J2-DUTY-05",
+      "annotation_type": "CONTRADICTION",
+      "action_required": "MONITOR",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0033"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0080",
+      "dtg": "190424ZJUL26",
+      "timestamp_utc": "2026-07-19T04:24:47Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0023",
+      "text": "Analyst collateral annotation on generic record C2-202606-0023. Additional context: Inconsistent with declared merchant transit routing. Analyst: J2-DUTY-02. Action: ESCALATE.",
+      "referenced_generic_doc": "C2-202606-0023",
+      "analyst_id": "J2-DUTY-01",
+      "annotation_type": "TTP_MATCH",
+      "action_required": "TASK SOURCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0023"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0081",
+      "dtg": "190955ZJUL26",
+      "timestamp_utc": "2026-07-19T09:55:30Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-019 / RED SEA RELAY NODE",
+      "text": "Entity EOI-019 (RED SEA RELAY NODE) assessed to be coordinating logistics activity in vicinity of Strait of Hormuz. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-019",
+      "threat_actor": "RED SEA RELAY NODE",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Strait of Hormuz",
+      "track_age_days": 40,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0059",
+        "C2-202606-0053",
+        "C2-202606-0098"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0082",
+      "dtg": "191348ZJUL26",
+      "timestamp_utc": "2026-07-19T13:48:55Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0028",
+      "text": "Analyst collateral annotation on generic record C2-202606-0028. Additional context: Inconsistent with declared merchant transit routing. Analyst: J2-DUTY-06. Action: MONITOR.",
+      "referenced_generic_doc": "C2-202606-0028",
+      "analyst_id": "J2-DUTY-02",
+      "annotation_type": "CONTEXT",
+      "action_required": "TASK SOURCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Strait of Hormuz"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0028"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_WEAPONS_TRANSHIPMENT"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0083",
+      "dtg": "191628ZJUL26",
+      "timestamp_utc": "2026-07-19T16:28:00Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-02 / Beirut Port Approach",
+      "text": "J2 analytical assessment for PIR-02: based on fusion of 6 source reports over the past 12 days, assessed that adversary capability in Beirut Port Approach remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 72 hours.",
+      "pir_assessed": "PIR-02",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 8,
+      "validity_hours": 49,
+      "key_judgement": "No change to assessed threat posture at this time",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Port of Tartus Approach",
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [
+        "9027764",
+        "9306275",
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0085",
+        "C2-202606-0053",
+        "C2-202606-0059",
+        "C2-202606-0112"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0084",
+      "dtg": "191741ZJUL26",
+      "timestamp_utc": "2026-07-19T17:41:34Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-137",
+      "text": "Periodic reliability review for SRC-137. Source reliability maintained at grade D. Reporting on record: 152 reports. Last corroborated report: 14 days ago. Tasking status: RESTRICTED. Next scheduled evaluation: 62 days.",
+      "source_id": "SRC-137",
+      "reliability_grade": "D",
+      "reports_on_record": 31,
+      "days_since_last_report": 19,
+      "evaluation_cycle_days": 74,
+      "tasking_status": "RESTRICTED",
+      "areas_covered": [
+        "Suez Gulf Approach",
+        "Naqoura Sector / Blue Line",
+        "Southern Red Sea",
+        "Port of Bandar Abbas"
+      ],
+      "pir_refs": [
+        "PIR-03",
+        "PIR-05",
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "WALK_IN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0085",
+      "dtg": "191805ZJUL26",
+      "timestamp_utc": "2026-07-19T18:05:52Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-131",
+      "text": "Periodic reliability review for SRC-131. Source reliability maintained at grade A. Reporting on record: 85 reports. Last corroborated report: 6 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 62 days.",
+      "source_id": "SRC-131",
+      "reliability_grade": "A",
+      "reports_on_record": 117,
+      "days_since_last_report": 11,
+      "evaluation_cycle_days": 46,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Strait of Hormuz",
+        "Bab-el-Mandeb Strait"
+      ],
+      "pir_refs": [
+        "PIR-05",
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Salalah Port Approach",
+        "Kharg Island Terminal"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0086",
+      "dtg": "192254ZJUL26",
+      "timestamp_utc": "2026-07-19T22:54:10Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-004 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-004 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of South Tyre / Coastal Route. Associated vessel MT RED SEA EAGLE (IMO 9238117, flag Barbados) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-004",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9238117",
+        "name": "MT RED SEA EAGLE"
+      },
+      "track_status": "WATCHLISTED",
+      "last_confirmed_location": "South Tyre / Coastal Route",
+      "track_age_days": 18,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "South Tyre / Coastal Route"
+      ],
+      "vessel_refs": [
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0020",
+        "C2-202606-0068",
+        "C2-202606-0028"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0087",
+      "dtg": "200053ZJUL26",
+      "timestamp_utc": "2026-07-20T00:53:41Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 20 Jul 2026",
+      "text": "INTSUM production cycle 20JUL26. Products due: 1 INTSUM, 0 FLASH. Priority PIRs for this cycle: PIR-05, PIR-02. Analyst on duty: J2-DUTY-06. Deadline: 0253Z.",
+      "cycle_date": "2026-07-20",
+      "products_due": {
+        "intsum": 1,
+        "flash": 2
+      },
+      "priority_pirs": [
+        "PIR-04",
+        "PIR-02"
+      ],
+      "analyst_on_duty": "J2-DUTY-02",
+      "deadline_utc": "2026-07-20T02:53:41Z",
+      "pir_refs": [
+        "PIR-04",
+        "PIR-02"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0088",
+      "dtg": "200639ZJUL26",
+      "timestamp_utc": "2026-07-20T06:39:45Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-117",
+      "text": "Periodic reliability review for SRC-117. Source reliability maintained at grade B. Reporting on record: 150 reports. Last corroborated report: 8 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 68 days.",
+      "source_id": "SRC-117",
+      "reliability_grade": "B",
+      "reports_on_record": 11,
+      "days_since_last_report": 2,
+      "evaluation_cycle_days": 54,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Port of Tartus Approach",
+        "Naqoura Sector / Blue Line",
+        "Gaza Maritime Approach",
+        "Kharg Island Terminal"
+      ],
+      "pir_refs": [
+        "PIR-01",
+        "PIR-04",
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach",
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0089",
+      "dtg": "200801ZJUL26",
+      "timestamp_utc": "2026-07-20T08:01:24Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-04 / Beirut Port Approach",
+      "text": "J2 analytical assessment for PIR-04: based on fusion of 9 source reports over the past 9 days, assessed that adversary capability in Beirut Port Approach remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 53 hours.",
+      "pir_assessed": "PIR-04",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 12,
+      "validity_hours": 45,
+      "key_judgement": "Increased probability of STS transfer in next 24h",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9741839",
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0121",
+        "C2-202606-0107",
+        "C2-202606-0042",
+        "C2-202606-0093"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0090",
+      "dtg": "201216ZJUL26",
+      "timestamp_utc": "2026-07-20T12:16:58Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-016 / PERSIAN GULF BROKER ",
+      "text": "Entity EOI-016 (PERSIAN GULF BROKER CELL) assessed to be coordinating logistics activity in vicinity of Gulf of Aden Corridor. Associated vessel MT AMBER FORTUNE (IMO 9306275, flag Togo) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-016",
+      "threat_actor": "PERSIAN GULF BROKER CELL",
+      "associated_vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Gulf of Aden Corridor",
+      "track_age_days": 33,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0041",
+        "C2-202606-0016",
+        "C2-202606-0013"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0091",
+      "dtg": "201631ZJUL26",
+      "timestamp_utc": "2026-07-20T16:31:03Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-002 / RED SEA RELAY NODE",
+      "text": "Entity EOI-002 (RED SEA RELAY NODE) assessed to be coordinating logistics activity in vicinity of Port of Bandar Abbas. Associated vessel MT AMBER FORTUNE (IMO 9306275, flag Togo) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-002",
+      "threat_actor": "RED SEA RELAY NODE",
+      "associated_vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE"
+      },
+      "track_status": "WATCHLISTED",
+      "last_confirmed_location": "Port of Bandar Abbas",
+      "track_age_days": 35,
+      "confidence": "HIGH CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0041",
+        "C2-202606-0028",
+        "C2-202606-0016"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0092",
+      "dtg": "202144ZJUL26",
+      "timestamp_utc": "2026-07-20T21:44:50Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-06 / Fujairah OPL Anchorage",
+      "text": "J2 analytical assessment for PIR-06: based on fusion of 8 source reports over the past 11 days, assessed that adversary capability in Fujairah OPL Anchorage remains elevated. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 64 hours.",
+      "pir_assessed": "PIR-06",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 9,
+      "validity_hours": 55,
+      "key_judgement": "Increased probability of STS transfer in next 24h",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage",
+        "Naqoura Sector / Blue Line",
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [
+        "9684720",
+        "9377468",
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0022",
+        "C2-202606-0021",
+        "C2-202606-0001",
+        "C2-202606-0071"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0093",
+      "dtg": "211702ZJUL26",
+      "timestamp_utc": "2026-07-21T17:02:41Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-118",
+      "text": "Periodic reliability review for SRC-118. Source reliability maintained at grade D. Reporting on record: 156 reports. Last corroborated report: 8 days ago. Tasking status: RESTRICTED. Next scheduled evaluation: 77 days.",
+      "source_id": "SRC-118",
+      "reliability_grade": "D",
+      "reports_on_record": 159,
+      "days_since_last_report": 19,
+      "evaluation_cycle_days": 62,
+      "tasking_status": "RESTRICTED",
+      "areas_covered": [
+        "Port of Tartus Approach",
+        "Port of Aden Anchorage",
+        "Mocha Coastal Sector",
+        "Salalah Port Approach"
+      ],
+      "pir_refs": [
+        "PIR-01",
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Southern Red Sea",
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "WALK_IN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0094",
+      "dtg": "220933ZJUL26",
+      "timestamp_utc": "2026-07-22T09:33:17Z",
+      "persona": "J2_ANALYST",
+      "record_type": "COLLATERAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral note — ref C2-202606-0002",
+      "text": "Analyst collateral annotation on generic record C2-202606-0002. Additional context: Cross-reference with EOI database recommended. Analyst: J2-DUTY-06. Action: ESCALATE.",
+      "referenced_generic_doc": "C2-202606-0002",
+      "analyst_id": "J2-DUTY-06",
+      "annotation_type": "CONTRADICTION",
+      "action_required": "FILE",
+      "pir_refs": [
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [
+        "C2-202606-0002"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "PIR_UAS_USV_THREAT"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0095",
+      "dtg": "221715ZJUL26",
+      "timestamp_utc": "2026-07-22T17:15:22Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-011 / CRIMSON TIDE NETWORK",
+      "text": "Entity EOI-011 (CRIMSON TIDE NETWORK) assessed to be coordinating logistics activity in vicinity of Fujairah OPL Anchorage. Associated vessel MT SOUTHERN CROSS (IMO 9027764, flag Belize) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-011",
+      "threat_actor": "CRIMSON TIDE NETWORK",
+      "associated_vessel": {
+        "imo": "9027764",
+        "name": "MT SOUTHERN CROSS"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Fujairah OPL Anchorage",
+      "track_age_days": 7,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Fujairah OPL Anchorage"
+      ],
+      "vessel_refs": [
+        "9027764"
+      ],
+      "generic_refs": [
+        "C2-202606-0072",
+        "C2-202606-0098",
+        "C2-202606-0112"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0096",
+      "dtg": "231139ZJUL26",
+      "timestamp_utc": "2026-07-23T11:39:45Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-021 / CRIMSON TIDE NETWORK",
+      "text": "Entity EOI-021 (CRIMSON TIDE NETWORK) assessed to be coordinating logistics activity in vicinity of Gaza Maritime Approach. Associated vessel MT AMBER FORTUNE (IMO 9306275, flag Togo) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-021",
+      "threat_actor": "CRIMSON TIDE NETWORK",
+      "associated_vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE"
+      },
+      "track_status": "WATCHLISTED",
+      "last_confirmed_location": "Gaza Maritime Approach",
+      "track_age_days": 20,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Gaza Maritime Approach"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0060",
+        "C2-202606-0004",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0097",
+      "dtg": "232342ZJUL26",
+      "timestamp_utc": "2026-07-23T23:42:40Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-01 / Port of Tartus Approach",
+      "text": "J2 analytical assessment for PIR-01: based on fusion of 12 source reports over the past 11 days, assessed that adversary capability in Port of Tartus Approach remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 29 hours.",
+      "pir_assessed": "PIR-01",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 11,
+      "validity_hours": 38,
+      "key_judgement": "Pattern consistent with pre-attack reconnaissance",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [
+        "9238117",
+        "9306275",
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0035",
+        "C2-202606-0060",
+        "C2-202606-0023",
+        "C2-202606-0008"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0098",
+      "dtg": "241154ZJUL26",
+      "timestamp_utc": "2026-07-24T11:54:42Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-016 / SHADOW FLEET COORDIN",
+      "text": "Entity EOI-016 (SHADOW FLEET COORDINATOR ALPHA) assessed to be coordinating logistics activity in vicinity of Port of Tartus Approach. Associated vessel MT AMBER FORTUNE (IMO 9306275, flag Togo) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-016",
+      "threat_actor": "SHADOW FLEET COORDINATOR ALPHA",
+      "associated_vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Port of Tartus Approach",
+      "track_age_days": 30,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0098",
+        "C2-202606-0072",
+        "C2-202606-0085"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0099",
+      "dtg": "241222ZJUL26",
+      "timestamp_utc": "2026-07-24T12:22:37Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-008 / ZAGROS SHIPPING FRON",
+      "text": "Entity EOI-008 (ZAGROS SHIPPING FRONT) assessed to be coordinating logistics activity in vicinity of Mocha Coastal Sector. Associated vessel MT SEA WHISPER (IMO 9298313, flag Togo) remains of interest. Activity pattern consistent with PIR-02 indicators. Confidence level: LOW CONFIDENCE.",
+      "entity_id": "EOI-008",
+      "threat_actor": "ZAGROS SHIPPING FRONT",
+      "associated_vessel": {
+        "imo": "9298313",
+        "name": "MT SEA WHISPER"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Mocha Coastal Sector",
+      "track_age_days": 45,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Mocha Coastal Sector"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0048",
+        "C2-202606-0098",
+        "C2-202606-0053"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_SANCTIONS_EVASION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0100",
+      "dtg": "241237ZJUL26",
+      "timestamp_utc": "2026-07-24T12:37:21Z",
+      "persona": "J2_ANALYST",
+      "record_type": "REQUIREMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collection requirement — PIR-05 / Bab-el-Mandeb Strait",
+      "text": "Formal collection requirement raised against PIR-05. Gap identified: No HUMINT coverage of northern approach. Tasked to: J2X HUMINT. Priority: ROUTINE. Deadline: 38h.",
+      "requirement_id": "CR-2149",
+      "gap_type": "TECHNICAL_GAP",
+      "tasked_to": "J2X HUMINT",
+      "deadline_hours": 74,
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Gulf of Aden Corridor",
+        "Port of Tartus Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "PIR",
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SOURCE_DOMAIN"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0101",
+      "dtg": "241307ZJUL26",
+      "timestamp_utc": "2026-07-24T13:07:27Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-01 / Port of Bandar Abbas",
+      "text": "J2 analytical assessment for PIR-01: based on fusion of 10 source reports over the past 7 days, assessed that adversary capability in Port of Bandar Abbas remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 41 hours.",
+      "pir_assessed": "PIR-01",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 12,
+      "validity_hours": 43,
+      "key_judgement": "Logistics activity suggests resupply operation within 48h",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Port of Bandar Abbas"
+      ],
+      "vessel_refs": [
+        "9684720"
+      ],
+      "generic_refs": [
+        "C2-202606-0023",
+        "C2-202606-0003",
+        "C2-202606-0060",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_MARITIME_INTERDICTION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0102",
+      "dtg": "250041ZJUL26",
+      "timestamp_utc": "2026-07-25T00:41:54Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-021 / RED SEA RELAY NODE",
+      "text": "Entity EOI-021 (RED SEA RELAY NODE) assessed to be coordinating logistics activity in vicinity of Southern Red Sea. Associated vessel MT AMBER FORTUNE (IMO 9306275, flag Togo) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-021",
+      "threat_actor": "RED SEA RELAY NODE",
+      "associated_vessel": {
+        "imo": "9306275",
+        "name": "MT AMBER FORTUNE"
+      },
+      "track_status": "WATCHLISTED",
+      "last_confirmed_location": "Southern Red Sea",
+      "track_age_days": 37,
+      "confidence": "LOW CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9306275"
+      ],
+      "generic_refs": [
+        "C2-202606-0028",
+        "C2-202606-0007",
+        "C2-202606-0020"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0103",
+      "dtg": "250050ZJUL26",
+      "timestamp_utc": "2026-07-25T00:50:22Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-012 / AL-MIRAJ LOGISTICS G",
+      "text": "Entity EOI-012 (AL-MIRAJ LOGISTICS GROUP) assessed to be coordinating logistics activity in vicinity of Beirut Port Approach. Associated vessel MT MIDNIGHT RUNNER (IMO 9377468, flag Cook Islands) remains of interest. Activity pattern consistent with PIR-01 indicators. Confidence level: MEDIUM CONFIDENCE.",
+      "entity_id": "EOI-012",
+      "threat_actor": "AL-MIRAJ LOGISTICS GROUP",
+      "associated_vessel": {
+        "imo": "9377468",
+        "name": "MT MIDNIGHT RUNNER"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Beirut Port Approach",
+      "track_age_days": 11,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-01"
+      ],
+      "location_refs": [
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9377468"
+      ],
+      "generic_refs": [
+        "C2-202606-0008",
+        "C2-202606-0047",
+        "C2-202606-0035"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_MARITIME_INTERDICTION",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0104",
+      "dtg": "251324ZJUL26",
+      "timestamp_utc": "2026-07-25T13:24:13Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-019 / CRIMSON TIDE NETWORK",
+      "text": "Entity EOI-019 (CRIMSON TIDE NETWORK) assessed to be coordinating logistics activity in vicinity of Latakia Port Approach. Associated vessel MT SEA WHISPER (IMO 9298313, flag Togo) remains of interest. Activity pattern consistent with PIR-05 indicators. Confidence level: HIGH CONFIDENCE.",
+      "entity_id": "EOI-019",
+      "threat_actor": "CRIMSON TIDE NETWORK",
+      "associated_vessel": {
+        "imo": "9298313",
+        "name": "MT SEA WHISPER"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Latakia Port Approach",
+      "track_age_days": 18,
+      "confidence": "MEDIUM CONFIDENCE",
+      "pir_refs": [
+        "PIR-05"
+      ],
+      "location_refs": [
+        "Latakia Port Approach"
+      ],
+      "vessel_refs": [
+        "9298313"
+      ],
+      "generic_refs": [
+        "C2-202606-0007",
+        "C2-202606-0028",
+        "C2-202606-0041"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "PIR_WEAPONS_TRANSHIPMENT",
+        "SANCTIONS_EXPOSURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0105",
+      "dtg": "251607ZJUL26",
+      "timestamp_utc": "2026-07-25T16:07:11Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-02 / Bab-el-Mandeb Strait",
+      "text": "J2 analytical assessment for PIR-02: based on fusion of 11 source reports over the past 5 days, assessed that adversary capability in Bab-el-Mandeb Strait remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 61 hours.",
+      "pir_assessed": "PIR-02",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 4,
+      "validity_hours": 56,
+      "key_judgement": "Increased probability of STS transfer in next 24h",
+      "pir_refs": [
+        "PIR-02"
+      ],
+      "location_refs": [
+        "Bab-el-Mandeb Strait",
+        "Beirut Port Approach"
+      ],
+      "vessel_refs": [
+        "9238117",
+        "9610793",
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0098",
+        "C2-202606-0059",
+        "C2-202606-0048",
+        "C2-202606-0072"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0106",
+      "dtg": "252112ZJUL26",
+      "timestamp_utc": "2026-07-25T21:12:53Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 25 Jul 2026",
+      "text": "INTSUM production cycle 25JUL26. Products due: 2 INTSUM, 0 FLASH. Priority PIRs for this cycle: PIR-04, PIR-05. Analyst on duty: J2-DUTY-05. Deadline: 2312Z.",
+      "cycle_date": "2026-07-25",
+      "products_due": {
+        "intsum": 2,
+        "flash": 0
+      },
+      "priority_pirs": [
+        "PIR-02",
+        "PIR-05"
+      ],
+      "analyst_on_duty": "J2-DUTY-04",
+      "deadline_utc": "2026-07-26T04:12:53Z",
+      "pir_refs": [
+        "PIR-06",
+        "PIR-05"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0107",
+      "dtg": "252331ZJUL26",
+      "timestamp_utc": "2026-07-25T23:31:53Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-04 / Beirut Port Approach",
+      "text": "J2 analytical assessment for PIR-04: based on fusion of 3 source reports over the past 8 days, assessed that adversary capability in Beirut Port Approach remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 31 hours.",
+      "pir_assessed": "PIR-04",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 3,
+      "validity_hours": 50,
+      "key_judgement": "No change to assessed threat posture at this time",
+      "pir_refs": [
+        "PIR-04"
+      ],
+      "location_refs": [
+        "Beirut Port Approach",
+        "Gulf of Aden Corridor",
+        "Suez Gulf Approach"
+      ],
+      "vessel_refs": [
+        "9238117",
+        "9492737"
+      ],
+      "generic_refs": [
+        "C2-202606-0121",
+        "C2-202606-0054",
+        "C2-202606-0066",
+        "C2-202606-0093"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_AIR_DEFENCE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0108",
+      "dtg": "260140ZJUL26",
+      "timestamp_utc": "2026-07-26T01:40:53Z",
+      "persona": "J2_ANALYST",
+      "record_type": "ASSESSMENT",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytical assessment — PIR-06 / Southern Red Sea",
+      "text": "J2 analytical assessment for PIR-06: based on fusion of 7 source reports over the past 8 days, assessed that adversary capability in Southern Red Sea remains moderate. Key indicators include AIS anomalies, HUMINT reporting and OSINT corroboration. Assessment validity: 37 hours.",
+      "pir_assessed": "PIR-06",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 12,
+      "validity_hours": 49,
+      "key_judgement": "Pattern consistent with pre-attack reconnaissance",
+      "pir_refs": [
+        "PIR-06"
+      ],
+      "location_refs": [
+        "Southern Red Sea"
+      ],
+      "vessel_refs": [
+        "9786255",
+        "9238117"
+      ],
+      "generic_refs": [
+        "C2-202606-0021",
+        "C2-202606-0046",
+        "C2-202606-0071",
+        "C2-202606-0058"
+      ],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ADMIRALTY_EVALUATION",
+        "PIR_FORCE_POSTURE"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0109",
+      "dtg": "260340ZJUL26",
+      "timestamp_utc": "2026-07-26T03:40:03Z",
+      "persona": "J2_ANALYST",
+      "record_type": "PRODUCTION",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Production schedule entry — 26 Jul 2026",
+      "text": "INTSUM production cycle 26JUL26. Products due: 4 INTSUM, 1 FLASH. Priority PIRs for this cycle: PIR-02, PIR-04. Analyst on duty: J2-DUTY-03. Deadline: 0640Z.",
+      "cycle_date": "2026-07-26",
+      "products_due": {
+        "intsum": 1,
+        "flash": 2
+      },
+      "priority_pirs": [
+        "PIR-06",
+        "PIR-01"
+      ],
+      "analyst_on_duty": "J2-DUTY-03",
+      "deadline_utc": "2026-07-26T09:40:03Z",
+      "pir_refs": [
+        "PIR-02",
+        "PIR-01"
+      ],
+      "location_refs": [],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "INTELLIGENCE",
+        "INTSUM",
+        "ORIGINATOR_CELL"
+      ]
+    },
+    {
+      "doc_id": "J2A-202607-0110",
+      "dtg": "271046ZJUL26",
+      "timestamp_utc": "2026-07-27T10:46:50Z",
+      "persona": "J2_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "SECRET//REL TO COALITION TF",
+      "handling_caveats": [
+        "ORCON",
+        "NOFORN"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation record — SRC-134",
+      "text": "Periodic reliability review for SRC-134. Source reliability maintained at grade B. Reporting on record: 137 reports. Last corroborated report: 4 days ago. Tasking status: ACTIVE. Next scheduled evaluation: 72 days.",
+      "source_id": "SRC-134",
+      "reliability_grade": "B",
+      "reports_on_record": 91,
+      "days_since_last_report": 6,
+      "evaluation_cycle_days": 37,
+      "tasking_status": "ACTIVE",
+      "areas_covered": [
+        "Port of Tartus Approach",
+        "Port of Bandar Abbas"
+      ],
+      "pir_refs": [
+        "PIR-02",
+        "PIR-03"
+      ],
+      "location_refs": [
+        "Port of Aden Anchorage",
+        "Salalah Port Approach"
+      ],
+      "vessel_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT",
+        "SOURCE_RELIABILITY",
+        "ADMIRALTY_EVALUATION",
+        "RECRUITED_ASSET"
+      ]
+    }
+  ]
+}

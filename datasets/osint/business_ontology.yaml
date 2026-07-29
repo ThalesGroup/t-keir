@@ -1,0 +1,1780 @@
+# C2 Middle East Multi-Source — Business Ontology for dual-hybrid query expansion.
+# Extends business_ontology v1.1.0 (C4ISR / INTELLIGENCE / OPERATIONS spine).
+# All concept_ids are grounded in field values present in
+#   c2_middle_east_multi_source_1000_v3_en.json
+# Pass as `business_ontology` on POST /search or /rag/query.
+# version: 1.0.0
+# dataset_version: 3.0-corrected-EN
+# generated_utc: 2026-07-28
+
+# ---------------------------------------------------------------------------
+# HIERARCHY OVERVIEW
+#
+#  C4ISR
+#  ├─ SITUATIONAL_AWARENESS  (COP / maritime picture)
+#  │   ├─ AIS                (kinematic track)
+#  │   │   ├─ AIS_ANOMALY
+#  │   │   │   ├─ DARK_ACTIVITY
+#  │   │   │   ├─ ROUTE_DEVIATION
+#  │   │   │   ├─ SPEED_ANOMALY
+#  │   │   │   └─ GPS_SPOOFING
+#  │   │   └─ STS_TRANSFER
+#  │   ├─ MARITIME_ZONE
+#  │   │   ├─ HIGH_SEAS
+#  │   │   ├─ TRANSIT_PASSAGE
+#  │   │   ├─ TERRITORIAL_WATERS
+#  │   │   └─ DISPUTED_WATERS
+#  │   └─ VESSEL
+#  │       ├─ VESSEL_TYPE
+#  │       │   ├─ CRUDE_OIL_TANKER
+#  │       │   ├─ PRODUCTS_TANKER
+#  │       │   ├─ CHEMICAL_TANKER
+#  │       │   ├─ BULK_CARRIER
+#  │       │   ├─ GENERAL_CARGO
+#  │       │   ├─ CONTAINER_SHIP
+#  │       │   └─ RORO_CARGO
+#  │       └─ VESSEL_RISK
+#  │           ├─ SHADOW_FLEET
+#  │           └─ SANCTIONS_EXPOSURE
+#  │
+#  ├─ INTELLIGENCE
+#  │   ├─ INTSUM
+#  │   ├─ SOURCE_DOMAIN
+#  │   │   ├─ HUMINT
+#  │   │   │   ├─ SPOTREP
+#  │   │   │   └─ SOURCE_CATEGORY
+#  │   │   │       ├─ RECRUITED_ASSET
+#  │   │   │       ├─ COALITION_PATROL
+#  │   │   │       ├─ LIAISON_SERVICE
+#  │   │   │       └─ WALK_IN
+#  │   │   ├─ OSINT_SOCMINT
+#  │   │   │   ├─ SOCIAL_MEDIA_SOURCE
+#  │   │   │   └─ PUBLICATION_SOURCE
+#  │   │   └─ MARITIME_ANALYTICS
+#  │   ├─ ACTIVITY_TYPE
+#  │   │   ├─ ILLICIT_CARGO_TRANSFER
+#  │   │   ├─ SMALL_CRAFT_LAUNCH
+#  │   │   ├─ PORT_ACCESS_RESTRICTION
+#  │   │   ├─ SECURITY_CORDON
+#  │   │   ├─ MILITARY_CONVOY
+#  │   │   ├─ OBSERVATION_POST
+#  │   │   ├─ AIR_DEFENCE_RADAR
+#  │   │   ├─ UAV_GROUND_ACTIVITY
+#  │   │   ├─ FUEL_TRANSFER
+#  │   │   └─ PERSONNEL_MOVEMENT
+#  │   ├─ ADMIRALTY_EVALUATION
+#  │   │   ├─ SOURCE_RELIABILITY
+#  │   │   └─ INFO_CREDIBILITY
+#  │   └─ PIR
+#  │       ├─ PIR_MARITIME_INTERDICTION
+#  │       ├─ PIR_SANCTIONS_EVASION
+#  │       ├─ PIR_UAS_USV_THREAT
+#  │       ├─ PIR_AIR_DEFENCE
+#  │       ├─ PIR_WEAPONS_TRANSHIPMENT
+#  │       └─ PIR_FORCE_POSTURE
+#  │
+#  └─ OPERATIONS
+#      ├─ ORIGINATOR_CELL
+#      │   ├─ MOC_J2
+#      │   ├─ J2X_HUMINT
+#      │   └─ J2_OSINT
+#      ├─ MESSAGE_PRECEDENCE
+#      │   ├─ FLASH
+#      │   ├─ IMMEDIATE
+#      │   ├─ PRIORITY
+#      │   └─ ROUTINE
+#      └─ CLASSIFICATION_LEVEL
+#          ├─ SECRET_REL
+#          ├─ FOUO
+#          └─ UNCLASSIFIED_PAI
+# ---------------------------------------------------------------------------
+
+concepts:
+
+  # =========================================================================
+  # ROOT — inherits from upstream ontology; re-declared with dataset bindings
+  # =========================================================================
+
+  - concept_id: C4ISR
+    preferred_label: C4ISR
+    synonyms:
+      - "command control communications computers intelligence surveillance reconnaissance"
+    surface_forms:
+      - C4I
+      - C2ISR
+      - "C2 maritime"
+    dataset_fields: []
+    broader: []
+    narrower:
+      - SITUATIONAL_AWARENESS
+      - INTELLIGENCE
+      - OPERATIONS
+    related:
+      - C2SIM
+      - NATOPUB
+
+  - concept_id: C2SIM
+    preferred_label: C2SIM
+    synonyms:
+      - "Command and Control Simulation"
+      - "SISO C2SIM"
+    surface_forms:
+      - "C2 Sim"
+      - C2-SIM
+    dataset_fields: []
+    broader: []
+    narrower: []
+    related:
+      - C4ISR
+      - OPORD
+      - SPOTREP
+
+  - concept_id: NATOPUB
+    preferred_label: "NATO publication"
+    synonyms:
+      - NATOPUB
+      - STANAG
+      - "STANAG 2511"
+      - "AJP-2.1"
+    surface_forms:
+      - "NATO pub"
+      - "Allied Joint Publication"
+    dataset_fields:
+      - "evaluation.standard"
+    broader: []
+    narrower: []
+    related:
+      - C4ISR
+      - ADMIRALTY_EVALUATION
+
+  # =========================================================================
+  # SITUATIONAL AWARENESS branch
+  # =========================================================================
+
+  - concept_id: SITUATIONAL_AWARENESS
+    preferred_label: "situational awareness"
+    synonyms:
+      - SA
+      - "common operational picture"
+      - "maritime common operational picture"
+    surface_forms:
+      - COP
+      - MCOP
+      - "operational picture"
+    dataset_fields:
+      - domain
+      - "collection.position_source"
+    broader:
+      - C4ISR
+    narrower:
+      - AIS
+      - MARITIME_ZONE
+      - VESSEL
+    related:
+      - INTELLIGENCE
+      - MARITIME_ANALYTICS
+
+  # ---- AIS & anomalies ----
+
+  - concept_id: AIS
+    preferred_label: "Automatic Identification System"
+    synonyms:
+      - AIS
+      - "maritime AIS"
+      - "vessel tracking"
+    surface_forms:
+      - "AIS track"
+      - "AIS transmission"
+      - "AIS gap"
+      - "AIS kinematic"
+    dataset_fields:
+      - "collection.position_source"      # values: AIS, AIS_AND_OPTICAL
+      - "collection.primary_method"       # AIS kinematic analysis …
+      - "collection.ais_position_usable"
+      - anomaly_type
+    broader:
+      - SITUATIONAL_AWARENESS
+    narrower:
+      - AIS_ANOMALY
+      - STS_TRANSFER
+    related:
+      - ADSB
+      - MARITIME_ANALYTICS
+      - GPS_SPOOFING
+
+  - concept_id: ADSB
+    preferred_label: ADS-B
+    synonyms:
+      - ADS-B
+      - "Automatic Dependent Surveillance-Broadcast"
+    surface_forms:
+      - ADSB
+    dataset_fields: []
+    broader:
+      - SITUATIONAL_AWARENESS
+    narrower: []
+    related:
+      - AIS
+
+  - concept_id: AIS_ANOMALY
+    preferred_label: "AIS anomaly"
+    synonyms:
+      - "vessel anomaly"
+      - "maritime anomaly"
+      - "behavioural anomaly"
+    surface_forms:
+      - "anomaly type"
+      - "AIS alert"
+    dataset_fields:
+      - anomaly_type
+      - tags
+    broader:
+      - AIS
+    narrower:
+      - DARK_ACTIVITY
+      - ROUTE_DEVIATION
+      - SPEED_ANOMALY
+      - GPS_SPOOFING
+    related:
+      - STS_TRANSFER
+      - PIR_SANCTIONS_EVASION
+
+  - concept_id: DARK_ACTIVITY
+    preferred_label: "AIS dark activity"
+    synonyms:
+      - "AIS off"
+      - "AIS gap"
+      - "AIS blackout"
+      - "dark vessel"
+    surface_forms:
+      - DARK_ACTIVITY_AIS_OFF
+      - "dark_activity_ais_off"
+      - "AIS transmitter disabled"
+    dataset_fields:
+      - anomaly_type                      # value: DARK_ACTIVITY_AIS_OFF
+      - tags                              # value: dark_activity_ais_off
+    broader:
+      - AIS_ANOMALY
+    narrower: []
+    related:
+      - STS_TRANSFER
+      - SANCTIONS_EXPOSURE
+
+  - concept_id: ROUTE_DEVIATION
+    preferred_label: "route deviation"
+    synonyms:
+      - "course alteration"
+      - "high-risk heading"
+      - "unauthorised course change"
+    surface_forms:
+      - ROUTE_DEVIATION_HIGH_RISK
+      - "route_deviation_high_risk"
+      - "altered heading"
+    dataset_fields:
+      - anomaly_type                      # value: ROUTE_DEVIATION_HIGH_RISK
+      - tags
+    broader:
+      - AIS_ANOMALY
+    narrower: []
+    related:
+      - GPS_SPOOFING
+      - PIR_MARITIME_INTERDICTION
+
+  - concept_id: SPEED_ANOMALY
+    preferred_label: "speed anomaly"
+    synonyms:
+      - "loitering"
+      - "loiter"
+      - "slow-steaming anomaly"
+      - "dwell"
+    surface_forms:
+      - SPEED_ANOMALY_LOITERING
+      - "speed_anomaly_loitering"
+      - "loitering at reduced speed"
+    dataset_fields:
+      - anomaly_type                      # value: SPEED_ANOMALY_LOITERING
+      - tags
+    broader:
+      - AIS_ANOMALY
+    narrower: []
+    related:
+      - STS_TRANSFER
+      - DARK_ACTIVITY
+
+  - concept_id: GPS_SPOOFING
+    preferred_label: "GPS spoofing"
+    synonyms:
+      - "GNSS spoofing"
+      - "GNSS manipulation"
+      - "position falsification"
+      - "AIS position manipulation"
+    surface_forms:
+      - GPS_SPOOFING_DETECTED
+      - "gps_spoofing_detected"
+      - "spoofed position"
+      - "broadcast track assessed as manipulated"
+    dataset_fields:
+      - anomaly_type                      # value: GPS_SPOOFING_DETECTED
+      - tags
+      - "collection.ais_position_usable"  # false when spoofed
+      - "location.reported_ais_position"  # contains spoofed fix
+    broader:
+      - AIS_ANOMALY
+    narrower: []
+    related:
+      - DARK_ACTIVITY
+      - SANCTIONS_EXPOSURE
+
+  - concept_id: STS_TRANSFER
+    preferred_label: "ship-to-ship transfer"
+    synonyms:
+      - "STS transfer"
+      - "ship-to-ship"
+      - "lightering"
+      - "transhipment at sea"
+    surface_forms:
+      - STS_TRANSFER_SUSPECTED
+      - "sts_transfer_suspected"
+      - "STS"
+      - "STS activity hub"
+    dataset_fields:
+      - anomaly_type                      # value: STS_TRANSFER_SUSPECTED
+      - tags
+      - "location.maritime_zone"          # Off-port-limits anchorage - STS activity hub
+    broader:
+      - AIS
+    narrower: []
+    related:
+      - DARK_ACTIVITY
+      - PIR_SANCTIONS_EVASION
+      - ILLICIT_CARGO_TRANSFER
+
+  # ---- Maritime zones ----
+
+  - concept_id: MARITIME_ZONE
+    preferred_label: "maritime zone"
+    synonyms:
+      - "maritime jurisdiction"
+      - "sea area"
+    surface_forms:
+      - "maritime_zone"
+      - "UNCLOS zone"
+    dataset_fields:
+      - "location.maritime_zone"
+      - "location.jurisdiction"
+    broader:
+      - SITUATIONAL_AWARENESS
+    narrower:
+      - HIGH_SEAS
+      - TRANSIT_PASSAGE
+      - TERRITORIAL_WATERS
+      - DISPUTED_WATERS
+    related:
+      - VESSEL
+      - PIR_MARITIME_INTERDICTION
+
+  - concept_id: HIGH_SEAS
+    preferred_label: "high seas"
+    synonyms:
+      - "international waters"
+      - "open ocean"
+    surface_forms:
+      - "HIGH_SEAS"
+      - "international waters - Red Sea shipping corridor"
+      - "International Recommended Transit Corridor"
+      - IRTC
+    dataset_fields:
+      - "location.jurisdiction"           # value: HIGH_SEAS
+      - "location.maritime_zone"
+    broader:
+      - MARITIME_ZONE
+    narrower: []
+    related:
+      - TRANSIT_PASSAGE
+
+  - concept_id: TRANSIT_PASSAGE
+    preferred_label: "strait transit passage"
+    synonyms:
+      - "transit passage"
+      - "international strait"
+      - "UNCLOS Part III"
+    surface_forms:
+      - "TRANSIT_PASSAGE"
+      - "Bab-el-Mandeb"
+      - "Strait of Hormuz"
+      - "transit passage regime"
+    dataset_fields:
+      - "location.jurisdiction"           # value: TRANSIT_PASSAGE
+      - "location.maritime_zone"
+    broader:
+      - MARITIME_ZONE
+    narrower: []
+    related:
+      - HIGH_SEAS
+      - PIR_MARITIME_INTERDICTION
+
+  - concept_id: TERRITORIAL_WATERS
+    preferred_label: "territorial sea"
+    synonyms:
+      - "territorial waters"
+      - "12 nm zone"
+      - "internal waters"
+      - "port limits"
+    surface_forms:
+      - "TERRITORIAL"
+      - "territorial sea - 12nm"
+      - "internal waters - port limits"
+      - "Anchorage - port limits"
+    dataset_fields:
+      - "location.jurisdiction"           # value: TERRITORIAL
+      - "location.maritime_zone"
+    broader:
+      - MARITIME_ZONE
+    narrower: []
+    related:
+      - DISPUTED_WATERS
+
+  - concept_id: DISPUTED_WATERS
+    preferred_label: "disputed maritime space"
+    synonyms:
+      - "contested waters"
+      - "contested maritime space"
+    surface_forms:
+      - "DISPUTED"
+      - "Gaza Maritime Approach"
+      - "Israeli naval control"
+    dataset_fields:
+      - "location.jurisdiction"           # value: DISPUTED
+      - "location.maritime_zone"
+    broader:
+      - MARITIME_ZONE
+    narrower: []
+    related:
+      - TERRITORIAL_WATERS
+
+  # ---- Vessel taxonomy ----
+
+  - concept_id: VESSEL
+    preferred_label: vessel
+    synonyms:
+      - ship
+      - "tracked hull"
+      - "maritime contact"
+    surface_forms:
+      - "vessel details"
+      - hull
+      - "IMO number"
+    dataset_fields:
+      - vessel
+      - "vessel.imo"
+      - "vessel.mmsi"
+      - "vessel.flag_state"
+    broader:
+      - SITUATIONAL_AWARENESS
+    narrower:
+      - VESSEL_TYPE
+      - VESSEL_RISK
+    related:
+      - AIS
+      - STS_TRANSFER
+
+  - concept_id: VESSEL_TYPE
+    preferred_label: "vessel type"
+    synonyms:
+      - "ship type"
+      - "hull category"
+    surface_forms:
+      - "vessel_type"
+    dataset_fields:
+      - "vessel.vessel_type"
+    broader:
+      - VESSEL
+    narrower:
+      - CRUDE_OIL_TANKER
+      - PRODUCTS_TANKER
+      - CHEMICAL_TANKER
+      - BULK_CARRIER
+      - GENERAL_CARGO
+      - CONTAINER_SHIP
+      - RORO_CARGO
+    related: []
+
+  - concept_id: CRUDE_OIL_TANKER
+    preferred_label: "crude oil tanker"
+    synonyms:
+      - "VLCC"
+      - "crude tanker"
+    surface_forms:
+      - "Crude Oil Tanker"
+      - "crude carrier"
+    dataset_fields:
+      - "vessel.vessel_type"              # value: Crude Oil Tanker
+    broader:
+      - VESSEL_TYPE
+    narrower: []
+    related:
+      - SANCTIONS_EXPOSURE
+      - STS_TRANSFER
+
+  - concept_id: PRODUCTS_TANKER
+    preferred_label: "products tanker"
+    synonyms:
+      - "product tanker"
+      - "clean tanker"
+      - "dirty tanker"
+    surface_forms:
+      - "Products Tanker"
+    dataset_fields:
+      - "vessel.vessel_type"              # value: Products Tanker
+    broader:
+      - VESSEL_TYPE
+    narrower: []
+    related:
+      - FUEL_TRANSFER
+
+  - concept_id: CHEMICAL_TANKER
+    preferred_label: "chemical tanker"
+    synonyms:
+      - "chemical/oil tanker"
+      - "parcel tanker"
+    surface_forms:
+      - "Chemical/Oil Tanker"
+    dataset_fields:
+      - "vessel.vessel_type"              # value: Chemical/Oil Tanker
+    broader:
+      - VESSEL_TYPE
+    narrower: []
+    related:
+      - SANCTIONS_EXPOSURE
+
+  - concept_id: BULK_CARRIER
+    preferred_label: "bulk carrier"
+    synonyms:
+      - "bulker"
+      - "dry bulk vessel"
+    surface_forms:
+      - "Bulk Carrier"
+    dataset_fields:
+      - "vessel.vessel_type"              # value: Bulk Carrier
+    broader:
+      - VESSEL_TYPE
+    narrower: []
+    related: []
+
+  - concept_id: GENERAL_CARGO
+    preferred_label: "general cargo ship"
+    synonyms:
+      - "general cargo"
+      - "breakbulk"
+    surface_forms:
+      - "General Cargo"
+    dataset_fields:
+      - "vessel.vessel_type"              # value: General Cargo
+    broader:
+      - VESSEL_TYPE
+    narrower: []
+    related:
+      - ILLICIT_CARGO_TRANSFER
+
+  - concept_id: CONTAINER_SHIP
+    preferred_label: "container ship"
+    synonyms:
+      - "containership"
+      - "box ship"
+    surface_forms:
+      - "Container Ship"
+    dataset_fields:
+      - "vessel.vessel_type"              # value: Container Ship
+    broader:
+      - VESSEL_TYPE
+    narrower: []
+    related: []
+
+  - concept_id: RORO_CARGO
+    preferred_label: "ro-ro cargo vessel"
+    synonyms:
+      - "roll-on roll-off"
+      - "RoRo"
+    surface_forms:
+      - "Ro-Ro Cargo"
+    dataset_fields:
+      - "vessel.vessel_type"              # value: Ro-Ro Cargo
+    broader:
+      - VESSEL_TYPE
+    narrower: []
+    related: []
+
+  - concept_id: VESSEL_RISK
+    preferred_label: "vessel risk profile"
+    synonyms:
+      - "risk rating"
+      - "sanctions risk"
+    surface_forms:
+      - "risk_profile"
+      - "HIGH risk"
+      - "shadow fleet"
+    dataset_fields:
+      - "vessel.risk_profile"
+      - "vessel.sanctions_exposure"
+      - "vessel.pi_club_cover"
+      - "vessel.beneficial_owner_transparency"
+    broader:
+      - VESSEL
+    narrower:
+      - SHADOW_FLEET
+      - SANCTIONS_EXPOSURE
+    related:
+      - PIR_SANCTIONS_EVASION
+
+  - concept_id: SHADOW_FLEET
+    preferred_label: "shadow fleet"
+    synonyms:
+      - "dark fleet"
+      - "grey fleet"
+      - "evasion fleet"
+      - "high-risk vessel"
+    surface_forms:
+      - "risk_profile: HIGH"
+      - "opaque ownership"
+      - "NOT CONFIRMED P&I"
+      - "reflagged"
+      - "flag history"
+    dataset_fields:
+      - "vessel.risk_profile"             # value: HIGH
+      - "vessel.registry_notes"           # Reflagged within last 24 months
+      - "vessel.pi_club_cover"            # NOT CONFIRMED
+      - "vessel.beneficial_owner_transparency"  # OPAQUE
+      - "vessel.flag_history"
+    broader:
+      - VESSEL_RISK
+    narrower: []
+    related:
+      - SANCTIONS_EXPOSURE
+      - DARK_ACTIVITY
+      - STS_TRANSFER
+
+  - concept_id: SANCTIONS_EXPOSURE
+    preferred_label: "sanctions exposure"
+    synonyms:
+      - "under sanctions"
+      - "sanctions-exposed vessel"
+      - "designated entity"
+    surface_forms:
+      - "sanctions_exposure"
+      - "sanctions evasion"
+    dataset_fields:
+      - "vessel.sanctions_exposure"       # boolean
+      - tags                              # value: sanctions_evasion
+    broader:
+      - VESSEL_RISK
+    narrower: []
+    related:
+      - SHADOW_FLEET
+      - PIR_SANCTIONS_EVASION
+
+  # =========================================================================
+  # INTELLIGENCE branch
+  # =========================================================================
+
+  - concept_id: INTELLIGENCE
+    preferred_label: intelligence
+    synonyms:
+      - INT
+      - "ISR product"
+      - "fused intelligence"
+    surface_forms:
+      - "intel summary"
+      - "intelligence report"
+    dataset_fields:
+      - domain
+    broader:
+      - C4ISR
+    narrower:
+      - INTSUM
+      - SOURCE_DOMAIN
+      - ACTIVITY_TYPE
+      - ADMIRALTY_EVALUATION
+      - PIR
+    related:
+      - SITUATIONAL_AWARENESS
+      - ORIGINATOR_CELL
+
+  - concept_id: INTSUM
+    preferred_label: "intelligence summary"
+    synonyms:
+      - INTSUM
+      - INTSUMREP
+      - "J2 fusion product"
+    surface_forms:
+      - "intelligence summary"
+      - "INTSUM"
+    dataset_fields: []
+    broader:
+      - INTELLIGENCE
+    narrower: []
+    related:
+      - SPOTREP
+      - PIR
+
+  # ---- Source domains ----
+
+  - concept_id: SOURCE_DOMAIN
+    preferred_label: "intelligence source domain"
+    synonyms:
+      - "collection domain"
+      - "INT discipline"
+    surface_forms:
+      - domain
+    dataset_fields:
+      - domain
+      - source_category
+    broader:
+      - INTELLIGENCE
+    narrower:
+      - HUMINT
+      - OSINT_SOCMINT
+      - MARITIME_ANALYTICS
+    related: []
+
+  - concept_id: HUMINT
+    preferred_label: HUMINT
+    synonyms:
+      - "human intelligence"
+      - "human INT"
+      - "field reporting"
+    surface_forms:
+      - "HUMINT_SPOTREP"
+      - "J2X HUMINT OPS CELL"
+      - "field observation"
+      - "human intelligence - field observation"
+    dataset_fields:
+      - domain                            # value: HUMINT_SPOTREP
+      - source_type                       # value: Human intelligence - field observation
+      - originator                        # value: J2X HUMINT OPS CELL
+    broader:
+      - SOURCE_DOMAIN
+    narrower:
+      - SPOTREP
+      - SOURCE_CATEGORY
+    related:
+      - OSINT_SOCMINT
+      - ADMIRALTY_EVALUATION
+
+  - concept_id: SPOTREP
+    preferred_label: "spot report"
+    synonyms:
+      - SPOTREP
+      - SALUTE
+      - "field observation report"
+    surface_forms:
+      - "SPOTREP"
+      - "spotrep"
+      - "situation report"
+      - SITREP
+    dataset_fields:
+      - domain                            # value: HUMINT_SPOTREP
+      - title                             # starts with "SPOTREP -"
+      - tags                              # value: spotrep
+    broader:
+      - HUMINT
+    narrower: []
+    related:
+      - INTSUM
+      - ACTIVITY_TYPE
+      - OBSERVATION_CONDITIONS
+
+  - concept_id: SOURCE_CATEGORY
+    preferred_label: "HUMINT source category"
+    synonyms:
+      - "source type"
+      - "collection asset"
+    surface_forms:
+      - source_category
+    dataset_fields:
+      - source_category
+    broader:
+      - HUMINT
+    narrower:
+      - RECRUITED_ASSET
+      - COALITION_PATROL
+      - LIAISON_SERVICE
+      - WALK_IN
+    related:
+      - ADMIRALTY_EVALUATION
+
+  - concept_id: RECRUITED_ASSET
+    preferred_label: "recruited local asset"
+    synonyms:
+      - "local asset"
+      - "clandestine source"
+      - "agent"
+      - "standing tasking source"
+    surface_forms:
+      - "RECRUITED_LOCAL_ASSET"
+      - "Recruited local asset with standing tasking"
+    dataset_fields:
+      - source_category                   # value: RECRUITED_LOCAL_ASSET
+      - "source.source_category"
+    broader:
+      - SOURCE_CATEGORY
+    narrower: []
+    related:
+      - LIAISON_SERVICE
+
+  - concept_id: COALITION_PATROL
+    preferred_label: "coalition patrol"
+    synonyms:
+      - "patrol report"
+      - "boarding team"
+      - "organic collection"
+      - "ground patrol observation"
+    surface_forms:
+      - "COALITION_PATROL"
+      - "Coalition ground/boarding patrol observation"
+    dataset_fields:
+      - source_category                   # value: COALITION_PATROL
+      - "source.source_category"
+    broader:
+      - SOURCE_CATEGORY
+    narrower: []
+    related:
+      - RECRUITED_ASSET
+
+  - concept_id: LIAISON_SERVICE
+    preferred_label: "partner-nation liaison service"
+    synonyms:
+      - "liaison report"
+      - "partner service"
+      - "third-party intelligence"
+      - "exchange intelligence"
+    surface_forms:
+      - "LIAISON_SERVICE"
+      - "Partner-nation liaison service report"
+      - "dissemination caveats"
+    dataset_fields:
+      - source_category                   # value: LIAISON_SERVICE
+      - "source.source_category"
+      - "source.handling_status"          # partner service, dissemination caveats apply
+    broader:
+      - SOURCE_CATEGORY
+    narrower: []
+    related:
+      - RECRUITED_ASSET
+
+  - concept_id: WALK_IN
+    preferred_label: "walk-in source"
+    synonyms:
+      - "unvetted volunteer"
+      - "unsolicited source"
+      - "untested source"
+    surface_forms:
+      - "WALK_IN"
+      - "Unvetted volunteer source"
+      - "under evaluation"
+    dataset_fields:
+      - source_category                   # value: WALK_IN
+      - "source.source_category"
+      - "source.handling_status"          # UNDER EVALUATION
+    broader:
+      - SOURCE_CATEGORY
+    narrower: []
+    related:
+      - ADMIRALTY_EVALUATION
+
+  - concept_id: OSINT_SOCMINT
+    preferred_label: "OSINT / SOCMINT"
+    synonyms:
+      - OSINT
+      - SOCMINT
+      - "open-source intelligence"
+      - "social media intelligence"
+      - "media monitoring"
+    surface_forms:
+      - "OSINT_SOCMINT"
+      - "J2 OSINT CELL"
+      - "Open-source collection"
+      - "OSINT Report"
+    dataset_fields:
+      - domain                            # value: OSINT_SOCMINT
+      - source_type
+      - originator                        # value: J2 OSINT CELL
+      - tags                              # values: osint, socmint, media_monitoring
+    broader:
+      - SOURCE_DOMAIN
+    narrower:
+      - SOCIAL_MEDIA_SOURCE
+      - PUBLICATION_SOURCE
+    related:
+      - HUMINT
+      - MARITIME_ANALYTICS
+
+  - concept_id: SOCIAL_MEDIA_SOURCE
+    preferred_label: "social media source"
+    synonyms:
+      - "social account"
+      - "online account"
+      - "X post"
+      - "Telegram channel"
+    surface_forms:
+      - "SOCIAL_ACCOUNT"
+      - "X (Twitter)"
+      - "Telegram channel"
+      - "SOCIAL_MEDIA"
+    dataset_fields:
+      - "account.type"                    # value: SOCIAL_ACCOUNT
+      - source_category                   # value: SOCIAL_MEDIA
+      - "account.platform"
+      - "account.automation_indicator"
+      - "account.prior_reporting_accuracy"
+    broader:
+      - OSINT_SOCMINT
+    narrower: []
+    related:
+      - PUBLICATION_SOURCE
+
+  - concept_id: PUBLICATION_SOURCE
+    preferred_label: "analytic publication"
+    synonyms:
+      - "OSINT blog"
+      - "regional news agency"
+      - "wire service"
+      - "media outlet"
+    surface_forms:
+      - "PUBLICATION"
+      - "OSINT analyst blog"
+      - "Regional news agency"
+      - "ANALYTIC_PUBLICATION"
+      - "MEDIA_WIRE"
+    dataset_fields:
+      - "account.type"                    # value: PUBLICATION
+      - source_category                   # values: ANALYTIC_PUBLICATION, MEDIA_WIRE
+      - "account.editorial_control"
+      - "account.known_alignment"
+    broader:
+      - OSINT_SOCMINT
+    narrower: []
+    related:
+      - SOCIAL_MEDIA_SOURCE
+
+  - concept_id: MARITIME_ANALYTICS
+    preferred_label: "maritime analytics platform"
+    synonyms:
+      - "commercial maritime intelligence"
+      - "Windward"
+      - "vessel analytics"
+      - "satellite maritime surveillance"
+    surface_forms:
+      - "MARITIME_ANALYTICS"
+      - "MOC-J2 MARITIME FUSION CELL"
+      - "Commercial maritime AI analytics platform"
+      - "TECHNICAL_COMMERCIAL"
+    dataset_fields:
+      - domain                            # value: MARITIME_ANALYTICS
+      - source_type                       # value: Commercial maritime AI analytics platform
+      - source_category                   # value: TECHNICAL_COMMERCIAL
+      - originator                        # value: MOC-J2 MARITIME FUSION CELL
+    broader:
+      - SOURCE_DOMAIN
+    narrower: []
+    related:
+      - AIS
+      - AIS_ANOMALY
+      - SITUATIONAL_AWARENESS
+
+  # ---- Activity types ----
+
+  - concept_id: ACTIVITY_TYPE
+    preferred_label: "observed activity type"
+    synonyms:
+      - "threat activity"
+      - "observed event"
+      - "tactical activity"
+    surface_forms:
+      - activity_type
+    dataset_fields:
+      - activity_type
+      - tags
+    broader:
+      - INTELLIGENCE
+    narrower:
+      - ILLICIT_CARGO_TRANSFER
+      - SMALL_CRAFT_LAUNCH
+      - PORT_ACCESS_RESTRICTION
+      - SECURITY_CORDON
+      - MILITARY_CONVOY
+      - OBSERVATION_POST
+      - AIR_DEFENCE_RADAR
+      - UAV_GROUND_ACTIVITY
+      - FUEL_TRANSFER
+      - PERSONNEL_MOVEMENT
+    related:
+      - PIR
+      - SPOTREP
+
+  - concept_id: ILLICIT_CARGO_TRANSFER
+    preferred_label: "illicit cargo transfer"
+    synonyms:
+      - "cargo transhipment"
+      - "unmarked crates"
+      - "dhow offload"
+      - "weapons transfer"
+    surface_forms:
+      - "Cargo transfer / suspected illicit transhipment"
+      - "dhow_offload"
+      - "offloading of unmarked crates"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: dhow_offload
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - STS_TRANSFER
+      - PIR_WEAPONS_TRANSHIPMENT
+      - PIR_SANCTIONS_EVASION
+
+  - concept_id: SMALL_CRAFT_LAUNCH
+    preferred_label: "small craft launch"
+    synonyms:
+      - "skiff launch"
+      - "fast boat"
+      - "FIAC"
+      - "fast inshore attack craft"
+      - "high-speed skiff"
+    surface_forms:
+      - "Small craft launch / potential maritime threat"
+      - "skiff_launch"
+      - "high-speed skiffs"
+      - "fast craft activity"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: skiff_launch
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - PIR_MARITIME_INTERDICTION
+      - PIR_UAS_USV_THREAT
+
+  - concept_id: PORT_ACCESS_RESTRICTION
+    preferred_label: "port access restriction"
+    synonyms:
+      - "port closure"
+      - "berth exclusion"
+      - "jetty denial"
+    surface_forms:
+      - "Port access restriction"
+      - "port_closure"
+      - "berths cleared of commercial traffic"
+      - "armed guard"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: port_closure
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - SECURITY_CORDON
+      - PIR_FORCE_POSTURE
+
+  - concept_id: SECURITY_CORDON
+    preferred_label: "security cordon"
+    synonyms:
+      - "access control"
+      - "armed cordon"
+      - "checkpoint"
+    surface_forms:
+      - "Access control / security cordon"
+      - "port_cordon"
+      - "unusual security cordon"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: port_cordon
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - PORT_ACCESS_RESTRICTION
+      - PIR_FORCE_POSTURE
+
+  - concept_id: MILITARY_CONVOY
+    preferred_label: "military convoy"
+    synonyms:
+      - "convoy movement"
+      - "military transport"
+      - "logistics convoy"
+    surface_forms:
+      - "Military convoy movement"
+      - "convoy"
+      - "covered military transport trucks"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: convoy
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - PIR_FORCE_POSTURE
+      - LOGSIT
+
+  - concept_id: OBSERVATION_POST
+    preferred_label: "observation post"
+    synonyms:
+      - OP
+      - "OP establishment"
+      - "surveillance position"
+    surface_forms:
+      - "Observation post established"
+      - "op_established"
+      - "observation post overlooking coastal approach"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: op_established
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - PIR_MARITIME_INTERDICTION
+      - PIR_FORCE_POSTURE
+
+  - concept_id: AIR_DEFENCE_RADAR
+    preferred_label: "air defence radar deployment"
+    synonyms:
+      - "SAM radar"
+      - "AD radar"
+      - "mobile air-defence radar"
+      - "SHORAD"
+    surface_forms:
+      - "Air defence radar deployment"
+      - "sam_radar"
+      - "mobile air-defence radar"
+      - "temporary firing position"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: sam_radar
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - UAV_GROUND_ACTIVITY
+      - PIR_AIR_DEFENCE
+
+  - concept_id: UAV_GROUND_ACTIVITY
+    preferred_label: "UAV ground activity"
+    synonyms:
+      - "drone preparation"
+      - "UAS ground crew"
+      - "fixed-wing UAV"
+      - "drone launch"
+    surface_forms:
+      - "UAV ground activity"
+      - "uav_ground"
+      - "fixed-wing UAV"
+      - "launch rail assembled"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: uav_ground
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - AIR_DEFENCE_RADAR
+      - PIR_UAS_USV_THREAT
+
+  - concept_id: FUEL_TRANSFER
+    preferred_label: "fuel transfer"
+    synonyms:
+      - "bunkering"
+      - "fuel offload"
+      - "road tanker loading"
+      - "unlicensed jetty"
+    surface_forms:
+      - "Fuel transfer / logistics"
+      - "fuel_transfer"
+      - "road tankers loading"
+      - "unlicensed jetty"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: fuel_transfer
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - PIR_SANCTIONS_EVASION
+      - PRODUCTS_TANKER
+
+  - concept_id: PERSONNEL_MOVEMENT
+    preferred_label: "personnel movement"
+    synonyms:
+      - "covert movement"
+      - "night movement"
+      - "personnel transfer"
+    surface_forms:
+      - "Personnel movement"
+      - "night_transfer"
+      - "without navigation lights"
+      - "civilian dress boarding"
+    dataset_fields:
+      - activity_type
+      - tags                              # value: night_transfer
+    broader:
+      - ACTIVITY_TYPE
+    narrower: []
+    related:
+      - PIR_FORCE_POSTURE
+      - PIR_WEAPONS_TRANSHIPMENT
+
+  # ---- Source evaluation ----
+
+  - concept_id: ADMIRALTY_EVALUATION
+    preferred_label: "Admiralty evaluation"
+    synonyms:
+      - "source evaluation"
+      - "NATO evaluation"
+      - "reliability and credibility rating"
+    surface_forms:
+      - evaluation
+      - "Admiralty System"
+      - "STANAG 2511"
+    dataset_fields:
+      - evaluation
+      - "evaluation.code"
+      - "evaluation.source_reliability"
+      - "evaluation.info_credibility"
+      - "evaluation.standard"
+    broader:
+      - INTELLIGENCE
+    narrower:
+      - SOURCE_RELIABILITY
+      - INFO_CREDIBILITY
+    related:
+      - NATOPUB
+      - SOURCE_CATEGORY
+
+  - concept_id: SOURCE_RELIABILITY
+    preferred_label: "source reliability"
+    synonyms:
+      - "reliability rating"
+      - "source grade"
+      - "Admiralty letter"
+    surface_forms:
+      - "source_reliability"
+      - "A - completely reliable"
+      - "B - usually reliable"
+      - "C - fairly reliable"
+      - "D - not usually reliable"
+      - "E - unreliable"
+      - "F - reliability cannot be judged"
+    dataset_fields:
+      - "evaluation.source_reliability"  # values: A B C D E F
+      - "evaluation.source_reliability_desc"
+    broader:
+      - ADMIRALTY_EVALUATION
+    narrower: []
+    related:
+      - INFO_CREDIBILITY
+
+  - concept_id: INFO_CREDIBILITY
+    preferred_label: "information credibility"
+    synonyms:
+      - "credibility rating"
+      - "information grade"
+      - "Admiralty digit"
+    surface_forms:
+      - "info_credibility"
+      - "1 - confirmed by other sources"
+      - "2 - probably true"
+      - "3 - possibly true"
+      - "4 - doubtful"
+      - "5 - improbable"
+      - "6 - truth cannot be judged"
+    dataset_fields:
+      - "evaluation.info_credibility"    # values: 1 2 3 4 5 6
+      - "evaluation.info_credibility_desc"
+    broader:
+      - ADMIRALTY_EVALUATION
+    narrower: []
+    related:
+      - SOURCE_RELIABILITY
+
+  # ---- Priority Intelligence Requirements ----
+
+  - concept_id: PIR
+    preferred_label: "priority intelligence requirement"
+    synonyms:
+      - PIR
+      - "intelligence requirement"
+      - "commander's critical information requirement"
+      - CCIR
+    surface_forms:
+      - "pir_ref"
+      - "PIR-0"
+    dataset_fields:
+      - pir_ref
+    broader:
+      - INTELLIGENCE
+    narrower:
+      - PIR_MARITIME_INTERDICTION
+      - PIR_SANCTIONS_EVASION
+      - PIR_UAS_USV_THREAT
+      - PIR_AIR_DEFENCE
+      - PIR_WEAPONS_TRANSHIPMENT
+      - PIR_FORCE_POSTURE
+    related:
+      - INTSUM
+      - ORIGINATOR_CELL
+
+  - concept_id: PIR_MARITIME_INTERDICTION
+    preferred_label: "PIR-01 maritime interdiction indicators"
+    synonyms:
+      - "maritime interdiction"
+      - "attack on shipping"
+      - "merchant vessel threat"
+    surface_forms:
+      - "PIR-01"
+      - "maritime interdiction or attack against merchant shipping"
+    dataset_fields:
+      - pir_ref                           # value: PIR-01
+    broader:
+      - PIR
+    narrower: []
+    related:
+      - SMALL_CRAFT_LAUNCH
+      - ROUTE_DEVIATION
+      - OBSERVATION_POST
+      - PIR_UAS_USV_THREAT
+
+  - concept_id: PIR_SANCTIONS_EVASION
+    preferred_label: "PIR-02 sanctions evasion"
+    synonyms:
+      - "sanctions evasion"
+      - "AIS manipulation"
+      - "illicit transhipment"
+    surface_forms:
+      - "PIR-02"
+      - "Sanctions-evasion activity"
+      - "STS transfers"
+      - "AIS manipulation"
+      - "reflagging"
+    dataset_fields:
+      - pir_ref                           # value: PIR-02
+      - tags                              # value: sanctions_evasion
+    broader:
+      - PIR
+    narrower: []
+    related:
+      - STS_TRANSFER
+      - DARK_ACTIVITY
+      - GPS_SPOOFING
+      - SHADOW_FLEET
+      - FUEL_TRANSFER
+
+  - concept_id: PIR_UAS_USV_THREAT
+    preferred_label: "PIR-03 UAS and USV threat"
+    synonyms:
+      - "drone threat"
+      - "UAV threat"
+      - "USV"
+      - "unmanned surface vehicle"
+      - "anti-ship drone"
+    surface_forms:
+      - "PIR-03"
+      - "Anti-ship missile"
+      - "UAS"
+      - "USV deployment"
+      - "near the littoral"
+    dataset_fields:
+      - pir_ref                           # value: PIR-03
+    broader:
+      - PIR
+    narrower: []
+    related:
+      - UAV_GROUND_ACTIVITY
+      - SMALL_CRAFT_LAUNCH
+      - PIR_MARITIME_INTERDICTION
+
+  - concept_id: PIR_AIR_DEFENCE
+    preferred_label: "PIR-04 air defence coverage"
+    synonyms:
+      - "air defence threat"
+      - "SAM threat"
+      - "coalition air operations threat"
+    surface_forms:
+      - "PIR-04"
+      - "Air-defence coverage affecting coalition air operations"
+    dataset_fields:
+      - pir_ref                           # value: PIR-04
+    broader:
+      - PIR
+    narrower: []
+    related:
+      - AIR_DEFENCE_RADAR
+      - UAV_GROUND_ACTIVITY
+
+  - concept_id: PIR_WEAPONS_TRANSHIPMENT
+    preferred_label: "PIR-05 illicit weapons transhipment"
+    synonyms:
+      - "weapons smuggling"
+      - "arms transfer"
+      - "illicit cargo"
+    surface_forms:
+      - "PIR-05"
+      - "Illicit weapons transhipment through regional ports"
+    dataset_fields:
+      - pir_ref                           # value: PIR-05
+    broader:
+      - PIR
+    narrower: []
+    related:
+      - ILLICIT_CARGO_TRANSFER
+      - PERSONNEL_MOVEMENT
+      - PORT_ACCESS_RESTRICTION
+
+  - concept_id: PIR_FORCE_POSTURE
+    preferred_label: "PIR-06 non-state actor force posture"
+    synonyms:
+      - "force posture"
+      - "armed group activity"
+      - "non-state actor"
+      - "coastal militia"
+    surface_forms:
+      - "PIR-06"
+      - "Force posture changes by non-state armed groups"
+      - "coastal belt"
+    dataset_fields:
+      - pir_ref                           # value: PIR-06
+    broader:
+      - PIR
+    narrower: []
+    related:
+      - SECURITY_CORDON
+      - MILITARY_CONVOY
+      - OBSERVATION_POST
+      - PERSONNEL_MOVEMENT
+      - PORT_ACCESS_RESTRICTION
+
+  # ---- Observation conditions ----
+
+  - concept_id: OBSERVATION_CONDITIONS
+    preferred_label: "observation conditions"
+    synonyms:
+      - "collection conditions"
+      - "visibility conditions"
+      - "tactical visibility"
+    surface_forms:
+      - observation_conditions
+      - "range_metres"
+      - "duration_minutes"
+    dataset_fields:
+      - observation_conditions
+      - "observation_conditions.visibility"
+      - "observation_conditions.range_metres"
+      - "observation_conditions.duration_minutes"
+    broader:
+      - INTELLIGENCE
+    narrower: []
+    related:
+      - SPOTREP
+      - INFO_CREDIBILITY
+
+  # =========================================================================
+  # OPERATIONS branch
+  # =========================================================================
+
+  - concept_id: OPERATIONS
+    preferred_label: operations
+    synonyms:
+      - ops
+      - "tactical operations"
+      - "maritime operations"
+    surface_forms:
+      - "operations cell"
+    dataset_fields: []
+    broader:
+      - C4ISR
+    narrower:
+      - ORIGINATOR_CELL
+      - MESSAGE_PRECEDENCE
+      - CLASSIFICATION_LEVEL
+      - LOGSIT
+      - OPORD
+      - AAR
+    related:
+      - PIR
+      - INTELLIGENCE
+
+  - concept_id: ORIGINATOR_CELL
+    preferred_label: "originator cell"
+    synonyms:
+      - "reporting cell"
+      - "production cell"
+      - "J2 cell"
+    surface_forms:
+      - originator
+      - "J2 OSINT CELL"
+      - "J2X HUMINT OPS CELL"
+      - "MOC-J2 MARITIME FUSION CELL"
+    dataset_fields:
+      - originator
+    broader:
+      - OPERATIONS
+    narrower:
+      - MOC_J2
+      - J2X_HUMINT
+      - J2_OSINT
+    related:
+      - PIR
+
+  - concept_id: MOC_J2
+    preferred_label: "MOC J2 Maritime Fusion Cell"
+    synonyms:
+      - "maritime operations centre"
+      - "MOC"
+      - "maritime fusion"
+    surface_forms:
+      - "MOC-J2 MARITIME FUSION CELL"
+    dataset_fields:
+      - originator                        # value: MOC-J2 MARITIME FUSION CELL
+    broader:
+      - ORIGINATOR_CELL
+    narrower: []
+    related:
+      - MARITIME_ANALYTICS
+
+  - concept_id: J2X_HUMINT
+    preferred_label: "J2X HUMINT Ops Cell"
+    synonyms:
+      - "J2X"
+      - "HUMINT operations"
+    surface_forms:
+      - "J2X HUMINT OPS CELL"
+    dataset_fields:
+      - originator                        # value: J2X HUMINT OPS CELL
+    broader:
+      - ORIGINATOR_CELL
+    narrower: []
+    related:
+      - HUMINT
+
+  - concept_id: J2_OSINT
+    preferred_label: "J2 OSINT Cell"
+    synonyms:
+      - "J2 OSINT"
+      - "open-source cell"
+    surface_forms:
+      - "J2 OSINT CELL"
+    dataset_fields:
+      - originator                        # value: J2 OSINT CELL
+    broader:
+      - ORIGINATOR_CELL
+    narrower: []
+    related:
+      - OSINT_SOCMINT
+
+  - concept_id: MESSAGE_PRECEDENCE
+    preferred_label: "message precedence"
+    synonyms:
+      - "transmission precedence"
+      - "message priority"
+      - "traffic precedence"
+    surface_forms:
+      - precedence
+    dataset_fields:
+      - precedence
+    broader:
+      - OPERATIONS
+    narrower:
+      - FLASH
+      - IMMEDIATE
+      - PRIORITY
+      - ROUTINE
+    related:
+      - ADMIRALTY_EVALUATION
+
+  - concept_id: FLASH
+    preferred_label: "FLASH precedence"
+    synonyms:
+      - FLASH
+      - "highest precedence"
+    surface_forms:
+      - "precedence: FLASH"
+    dataset_fields:
+      - precedence                        # value: FLASH
+    broader:
+      - MESSAGE_PRECEDENCE
+    narrower: []
+    related:
+      - IMMEDIATE
+
+  - concept_id: IMMEDIATE
+    preferred_label: "IMMEDIATE precedence"
+    synonyms:
+      - IMMEDIATE
+    surface_forms:
+      - "precedence: IMMEDIATE"
+    dataset_fields:
+      - precedence                        # value: IMMEDIATE
+    broader:
+      - MESSAGE_PRECEDENCE
+    narrower: []
+    related:
+      - FLASH
+      - PRIORITY
+
+  - concept_id: PRIORITY
+    preferred_label: "PRIORITY precedence"
+    synonyms:
+      - PRIORITY
+    surface_forms:
+      - "precedence: PRIORITY"
+    dataset_fields:
+      - precedence                        # value: PRIORITY
+    broader:
+      - MESSAGE_PRECEDENCE
+    narrower: []
+    related:
+      - IMMEDIATE
+      - ROUTINE
+
+  - concept_id: ROUTINE
+    preferred_label: "ROUTINE precedence"
+    synonyms:
+      - ROUTINE
+    surface_forms:
+      - "precedence: ROUTINE"
+    dataset_fields:
+      - precedence                        # value: ROUTINE
+    broader:
+      - MESSAGE_PRECEDENCE
+    narrower: []
+    related:
+      - PRIORITY
+
+  - concept_id: CLASSIFICATION_LEVEL
+    preferred_label: "classification level"
+    synonyms:
+      - classification
+      - "security classification"
+      - "information security marking"
+    surface_forms:
+      - classification
+      - "handling caveats"
+      - ORCON
+      - FOUO
+    dataset_fields:
+      - classification
+      - handling_caveats
+    broader:
+      - OPERATIONS
+    narrower:
+      - SECRET_REL
+      - FOUO
+      - UNCLASSIFIED_PAI
+    related:
+      - ORIGINATOR_CELL
+
+  - concept_id: SECRET_REL
+    preferred_label: "SECRET REL TO COALITION TF"
+    synonyms:
+      - SECRET
+      - "releasable to coalition"
+      - "REL TO"
+      - ORCON
+    surface_forms:
+      - "SECRET//REL TO COALITION TF"
+      - "ORCON"
+      - "SOURCE IDENTITY PROTECTED"
+      - "NOT RELEASABLE TO CONTRACTORS"
+    dataset_fields:
+      - classification                    # value: SECRET//REL TO COALITION TF
+      - handling_caveats                  # values: ORCON, SOURCE IDENTITY PROTECTED…
+    broader:
+      - CLASSIFICATION_LEVEL
+    narrower: []
+    related:
+      - FOUO
+
+  - concept_id: FOUO
+    preferred_label: "FOR OFFICIAL USE ONLY"
+    synonyms:
+      - FOUO
+      - "official use only"
+      - "commercial proprietary"
+    surface_forms:
+      - "UNCLASSIFIED//FOR OFFICIAL USE ONLY"
+      - "COMMERCIAL PROPRIETARY - REDISTRIBUTION RESTRICTED"
+    dataset_fields:
+      - classification                    # value: UNCLASSIFIED//FOR OFFICIAL USE ONLY
+      - handling_caveats                  # value: COMMERCIAL PROPRIETARY…
+    broader:
+      - CLASSIFICATION_LEVEL
+    narrower: []
+    related:
+      - SECRET_REL
+      - UNCLASSIFIED_PAI
+
+  - concept_id: UNCLASSIFIED_PAI
+    preferred_label: "UNCLASSIFIED publicly available information"
+    synonyms:
+      - "publicly available"
+      - PAI
+      - "open source"
+    surface_forms:
+      - "UNCLASSIFIED//PUBLICLY AVAILABLE INFORMATION"
+      - "OPEN SOURCE - NO SOURCE PROTECTION REQUIRED"
+    dataset_fields:
+      - classification                    # value: UNCLASSIFIED//PUBLICLY AVAILABLE INFORMATION
+      - handling_caveats                  # value: OPEN SOURCE…
+    broader:
+      - CLASSIFICATION_LEVEL
+    narrower: []
+    related:
+      - OSINT_SOCMINT
+
+  # ---- Inherited ops concepts ----
+
+  - concept_id: OPORD
+    preferred_label: "operation order"
+    synonyms:
+      - OPORD
+      - OPORDER
+    surface_forms:
+      - "operations order"
+    dataset_fields: []
+    broader:
+      - OPERATIONS
+    narrower: []
+    related:
+      - PIR
+      - C2SIM
+
+  - concept_id: AAR
+    preferred_label: "after action report"
+    synonyms:
+      - AAR
+      - "after-action review"
+    surface_forms:
+      - "after action review"
+    dataset_fields: []
+    broader:
+      - OPERATIONS
+    narrower: []
+    related:
+      - OPORD
+
+  - concept_id: LOGSIT
+    preferred_label: "logistics situation"
+    synonyms:
+      - LOGSIT
+      - LOGSTAT
+    surface_forms:
+      - "logistics status"
+    dataset_fields:
+      - activity_type                     # value: Fuel transfer / logistics
+      - tags                              # value: fuel_transfer
+    broader:
+      - OPERATIONS
+    narrower: []
+    related:
+      - MILITARY_CONVOY
+      - FUEL_TRANSFER

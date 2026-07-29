@@ -25,7 +25,7 @@ endif
 	docs docs-build docs-pdf pipeline quickstart ci-deps ci pre-commit clean devcontainer \
 	sync pull-models pull-bge-model pull-vespa start init bootstrap vespa-check test-vespa test-vespa-py \
 	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
-	beir-eval beir-smoke eval eval-smoke clean-db vespa-clean logs \
+	beir-eval beir-smoke generate-eval rag-eval beir-rag-eval eval eval-smoke clean-db vespa-clean logs \
 	images images-push images-sign \
 	compose-up compose-down compose-bootstrap compose-logs compose-smoke audit-report audit-verify audit-archive \
 	governor-flags governor-kill rollback-index check-secrets-staged \
@@ -35,6 +35,7 @@ endif
 	keycloak-export-realm seal kubeflow-install kubeflow-uninstall kubeflow-register-models kubeflow-run-ingest \
 	lineage-report audit-evidence annex-iv \
 	datasets datasets-ontologies datasets-download datasets-ingest datasets-ingest-user datasets-ingest-admin \
+	scidocs-download \
 	datasets-ingest-web datasets-demo datasets-clean \
 	schemas schemas-check
 
@@ -103,13 +104,26 @@ BEIR_DATASETS_DIR ?= $(ROOT)/datasets
 BEIR_REPORT ?=
 # Space-separated BEIR dataset names. One dataset example:
 #   make beir-eval BEIR_DATASETS=scifact
-BEIR_DATASETS ?= scifact fiqa arguana
+BEIR_DATASETS ?= scifact fiqa arguana scidocs
 BEIR_DENSE_MODEL ?= bge-m3
 # Dedicated Vespa volume so BEIR reindex does not wipe the primary corpus.
 BEIR_VESPA_NAME ?= vespa
 BEIR_VESPA_VOLUME ?= beir_eval_data:/opt/vespa/var
 # Extra CLI flags for beir_eval, e.g. BEIR_EXTRA=--skip-dense
 BEIR_EXTRA ?=
+
+# Generation eval (datasets/rag_benchmarks) — oracle evidence → LLM.
+#   make generate-eval GEN_DATASETS=multihop
+#   make generate-eval GEN_DATASETS="covidqa pubmedqa" GEN_EXTRA="--max-queries 5 --dump-prompts"
+GEN_BENCHMARKS_DIR ?= $(ROOT)/datasets/rag_benchmarks
+GEN_DATASETS ?= covidqa pubmedqa finqa tatqa multihop
+GEN_REPORT ?=
+GEN_EXTRA ?=
+# Deprecated aliases
+RAG_BENCHMARKS_DIR ?= $(GEN_BENCHMARKS_DIR)
+RAG_DATASETS ?= $(GEN_DATASETS)
+RAG_REPORT ?= $(GEN_REPORT)
+RAG_EXTRA ?= $(GEN_EXTRA)
 
 ENVIRONMENT      ?= local
 SMOKE_TARGET_URL ?= http://localhost:8090
@@ -273,13 +287,14 @@ init-models: install ## Build tkeir_mwe.pkl from annotation resources (skip if p
 			--output resources/modeling/tokenizer/en/tkeir_mwe.pkl; \
 	fi
 
-setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3 → Vespa image)
+setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3 → Vespa → SciDocs)
 	$(MAKE) install
 	$(MAKE) install-spacy-models
 	$(MAKE) install-tesseract
 	$(MAKE) init-models
 	$(MAKE) pull-bge-model
 	$(MAKE) pull-vespa
+	$(MAKE) scidocs-download
 	$(Q)echo ""
 	$(Q)echo "Setup complete."
 	$(Q)echo "  Run pipeline: make pipeline"
@@ -1185,6 +1200,10 @@ datasets-ontologies: ## [datasets] Generate C2SIM/C4ISR + business ontologies / 
 
 datasets-download: datasets ## [datasets] Alias for 'make datasets' (generate + download)
 
+scidocs-download: ## [datasets] Download BEIR SciDocs corpus into datasets/scidocs/ (gitignored bulk)
+	$(Q)chmod +x "$(ROOT)/datasets/scidocs/download.sh"
+	$(Q)bash "$(ROOT)/datasets/scidocs/download.sh"
+
 # Process-time OWL/TTL for OSINT ingest (ingest API stays dataset-agnostic).
 # Override with DATASETS_ONTOLOGIES=a.ttl,b.owl or DATASETS_ONTOLOGY_DIR=/other/dir
 DATASETS_ONTOLOGY_DIR ?= $(DATASETS_OUT)/osint/ontologies
@@ -1337,6 +1356,24 @@ beir-eval: install-spacy-models ## [eval] Full BEIR IR eval (thot.tools.eval.bei
 		--dense-model "$(BEIR_DENSE_MODEL)" \
 		$(if $(strip $(BEIR_REPORT)),--report "$(BEIR_REPORT)",) \
 		$(BEIR_EXTRA)
+
+generate-eval: install-spacy-models ## [eval] Oracle-evidence generation eval (thot.tools.eval.generate_eval)
+	cd $(TKEIR_DIR) && UV_HTTP_TIMEOUT="$(UV_HTTP_TIMEOUT)" \
+		$(UV) sync --group models --python $(PYTHON)
+	cd $(TKEIR_DIR) && \
+		$(UV) run --no-sync --python $(PYTHON) --group models \
+		python -m thot.tools.eval.generate_eval \
+		--datasets $(GEN_DATASETS) \
+		--rag-dir "$(GEN_BENCHMARKS_DIR)" \
+		$(if $(strip $(GEN_REPORT)),--report "$(GEN_REPORT)",) \
+		$(GEN_EXTRA)
+
+rag-eval beir-rag-eval: ## [eval] Deprecated aliases for generate-eval
+	@$(MAKE) generate-eval \
+		GEN_DATASETS="$(RAG_DATASETS)" \
+		GEN_BENCHMARKS_DIR="$(RAG_BENCHMARKS_DIR)" \
+		GEN_REPORT="$(RAG_REPORT)" \
+		GEN_EXTRA="$(RAG_EXTRA)"
 
 beir-smoke: install-spacy-models ## [eval] Fast BEIR smoke (thot.tools.eval.beir_smoke)
 	cd $(TKEIR_DIR) && UV_HTTP_TIMEOUT="$(UV_HTTP_TIMEOUT)" \

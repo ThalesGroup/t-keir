@@ -7,9 +7,11 @@ benchmark suite. Use two harnesses:
 |--------|----------|---------|---------|
 | **`make beir-smoke`** | Day-to-day development | **&lt; 5 min** | Catch bottlenecks and rank-strategy failures fast |
 | **`make beir-eval`** | Full quality report | Hours | Full corpora, dense baseline, MkDocs report |
+| **`make generate-eval`** | RAG generation corpora | Hours | Oracle evidence → NLP → ontology → LLM vs leaderboard |
 
-Both evaluate **`scifact`**, **`fiqa`**, and **`arguana`** (override with
+Both BEIR harnesses evaluate **`scifact`**, **`fiqa`**, **`arguana`**, and **`scidocs`** (override with
 `BEIR_DATASETS=…`). Data lives under `./datasets/` (downloaded on demand).
+RAG benchmarks live under `./datasets/rag_benchmarks/` (see `download_rag_datasets.py`).
 
 ---
 
@@ -71,7 +73,7 @@ make beir-smoke BEIR_SMOKE_EXTRA=--skip-tkeir
 
 | Make variable | Default | Meaning |
 |---------------|---------|---------|
-| `BEIR_DATASETS` | `scifact fiqa arguana` | Corpora to isolate |
+| `BEIR_DATASETS` | `scifact fiqa arguana scidocs` | Corpora to isolate |
 | `BEIR_SMOKE_QUERIES` | `10` | Queries per corpus |
 | `BEIR_SMOKE_CLOSE` | `10` | Close (hard-negative) docs **per query** |
 | `BEIR_SMOKE_RANK_DOCS` | `10` | Min documents in the indexed pool **per query** |
@@ -164,6 +166,65 @@ extra copy. See [BEIR evaluation report](evaluation_report.md).
 
 ---
 
+## Generation eval — `make generate-eval`
+
+T-KEIR-only **generation** eval on selectable corpora under
+`datasets/rag_benchmarks/`. **No retrieval** (no BM25 / ColBERT). Pipeline per query:
+
+1. Take dataset oracle evidence (`evidence_list` facts / RAGBench `documents`)
+2. Analyze the request + passages (NLP / SVO / NER)
+3. Build per-passage graphs via `document_ontology`, merge them, generate SPARQL
+   from the query ontology, run existing reasoners (`sparql` / `consistency` /
+   `infer`) — results become **SPARQL CLUES** in the prompt
+4. Detect question type (yes/no, wh-, inference, …) and answer shape
+5. Build **one** unique type-aware QA prompt (merged ontology + SPARQL clues +
+   passages)
+6. Single LLM generate call
+
+| Id | Source | Evidence field | Gold answer field |
+|----|--------|----------------|-------------------|
+| `covidqa` | RAGBench medical | `documents` | `response` |
+| `pubmedqa` | RAGBench medical | `documents` | `response` |
+| `finqa` | RAGBench finance | `documents` | `response` |
+| `tatqa` | RAGBench finance | `documents` | `response` |
+| `multihop` | MultiHop-RAG | `evidence_list` | `answer` |
+
+```bash
+make generate-eval
+make generate-eval GEN_DATASETS=multihop
+# Smoke: few queries, no forge / reasoner / NLP
+make generate-eval GEN_DATASETS=covidqa \
+  GEN_EXTRA="--max-queries 5 --no-reasoner --skip-nlp"
+# Dump LLM prompts under reports/generate/<dataset>/prompts/
+make generate-eval GEN_DATASETS=multihop \
+  GEN_EXTRA="--max-queries 5 --dump-prompts"
+```
+
+| Make variable | Default | Meaning |
+|---------------|---------|---------|
+| `GEN_DATASETS` | `covidqa pubmedqa finqa tatqa multihop` | Selectable dataset ids |
+| `GEN_BENCHMARKS_DIR` | `datasets/rag_benchmarks` | Data root |
+| `GEN_REPORT` | _(empty)_ | Optional extra Markdown copy |
+| `GEN_EXTRA` | _(empty)_ | CLI flags (`--max-queries`, `--dump-prompts`, …) |
+
+CLI: `thot.tools.eval.generate_eval` · helpers:
+`thot.tasks.answer_generation` (`rag_answer`, `ontology_clues`,
+`query_enrichment`). Config: `rag.yaml` → `answer_generation.use_nlp` /
+`use_ontology` / `use_reasoner` (CLI overrides: `--skip-nlp`, `--no-ontology`,
+`--no-reasoner`).
+
+Progress lines are printed to stderr as `>>> generate-eval [<id>] n/total …`
+(also logged at WARNING so they stay visible among NLP/LLM INFO spam). With
+`--dump-prompts` (or `--dump-prompts-dir DIR`), each query writes a JSON file
+with system/user prompts, question type, and the model answer under
+`reports/generate/<dataset>/prompts/` (or the given directory).
+
+Reports: `docs/evaluation_generate_report.md`, `reports/generate/`. MultiHop
+**contains-gold** accuracy is compared to published GPT-4 **ground-truth evidence**
+accuracy (0.89). RAGBench Hal AUROC remains reference-only (judge ≠ generation F1).
+
+---
+
 ## Datasets
 
 | Id | Display name | Task | Domain | Corpus | Test queries | Avg. relevant / query |
@@ -171,6 +232,7 @@ extra copy. See [BEIR evaluation report](evaluation_report.md).
 | `scifact` | SciFact | Fact checking | Scientific abstracts | 5,183 | 300 | ~1.1 |
 | `fiqa` | FiQA-2018 | Question answering | Personal finance | 57,638 | 648 | ~2.6 |
 | `arguana` | ArguAna | Argument / counterargument | Debate essays | 8,674 | 1,406 | ~1.0 |
+| `scidocs` | SciDocs | Citation prediction | Scientific papers | 25,657 | 1,000 | ~4.9 |
 
 Published **NDCG@10** reference scores (full eval report):
 
@@ -179,6 +241,7 @@ Published **NDCG@10** reference scores (full eval report):
 | SciFact | 0.665 | 0.699 | 0.677 |
 | FiQA-2018 | 0.236 | 0.342 | 0.329 |
 | ArguAna | 0.397 | 0.472 | 0.435 |
+| SciDocs | 0.158 | 0.159 | 0.165 |
 
 ### SciFact (`scifact`)
 
@@ -225,11 +288,25 @@ query.
 > removes the query id from the candidate set at inference time. T-KEIR’s harness
 > uses the standard BEIR loaders for that behaviour.
 
+### SciDocs (`scidocs`)
+
+**Citation-prediction retrieval** (Cohan et al. / SPECTER): the query is a
+paper **title**; gold documents are papers that are cited by, cite, or are
+co-cited with it (~25.7k papers, 1k test queries, ~4.9 relevant docs / query).
+
+- **Why it is hard:** relatedness is often citation-graph driven. Titles of
+  gold papers may share little surface form with the query title, so BM25
+  under-ranks true related work. Dense retrieval helps on topical paraphrase
+  but still misses when abstracts alone do not encode the citation link.
+- **What T-KEIR stresses:** scientific-domain ontology expansion and hybrid
+  ranking when lexical overlap with the query title is weak.
+
 ---
 
 ## Related docs
 
 - [BEIR evaluation report](evaluation_report.md) — latest measured metrics (full eval)
+- [Generation evaluation report](evaluation_generate_report.md) — RAGBench / MultiHop vs leaderboard
 - [Vespa search and RAG](tools/vespa_rag.md) — indexing, search API, concurrency
 - [Dev container](devcontainer.md) — TLS / CA tips when downloading BEIR datasets
 - [Datasets](tools/datasets.md) — Zero-to-Hero OSINT / enterprise trees (separate from BEIR)

@@ -8,9 +8,13 @@
 #
 # Model resolution for search/index (highest wins):
 #   1. environment variables (PROVIDER, EMBEDDING_MODEL, LLM_MODEL,
-#      RERANKER_MODEL, RERANK_STRATEGY, EMBEDDING_DIM)
-#   2. models: / search.rerank.strategy below
+#      EMBEDDING_DIM)
+#   2. models: below
 #   3. provider hard-coded defaults in thot.core.LlmWrapper
+#
+# Second-stage ranking is BGE-M3 ColBERT MaxSim (dual_hybrid.colbert),
+# not a separate CrossEncoder. Legacy search.rerank (dual_hybrid off)
+# uses embedding_cosine over the same embedding model.
 #
 # Vespa endpoints / timeouts (highest wins):
 #   1. VESPA_URL, VESPA_CONFIG_URL, VESPA_TIMEOUT_SECONDS
@@ -29,13 +33,10 @@ vespa:
     enrich_workers: 8
 
 models:
-  # Local FlagEmbedding BGE-M3 (dense 1024-d + sparse lexical weights).
+  # Local FlagEmbedding BGE-M3 (dense 1024-d + sparse + ColBERT multi-vectors).
   # Override with EMBEDDING_MODEL / EMBEDDING_DIM env vars if needed.
   embedding_model: BAAI/bge-m3  # source id; runtime loads resources/modeling/net/bge-m3
   llm_model: mistral-nemo
-  # HuggingFace CrossEncoder id for strategy=cross_encoder
-  # (sentence-transformers). Unused when strategy=embedding_cosine.
-  reranker_model: BAAI/bge-reranker-v2-m3
   embedding_dim: 1024
 
 ontology:
@@ -58,6 +59,16 @@ prompt:
   max_chars_per_chunk: 1800
   max_chunks_for_prompt: 10
 
+# Answer generation (generate-eval + QA prompt assembly).
+# Package: thot.tasks.answer_generation
+answer_generation:
+  # Full NLP on query + evidence (tokenizer → morphosyntax → NER → syntax → keywords).
+  use_nlp: true
+  # Merge passage document_ontology + SPARQL clues into the QA prompt.
+  use_ontology: true
+  # Consistency / infer reasoner on merged ontology (ignored when use_ontology=false).
+  use_reasoner: true
+
 search:
   # When enabled, raw queries are analyzed with the full NLP pipeline
   # (tokenizer → morphosyntax → NER → syntax → keywords). Used by:
@@ -78,8 +89,10 @@ search:
   # Informational weights (legacy QueryAnalyzer path).
   weight_chunk_embedding: 0.40
   weight_text_raw_bm25: 0.60
-  # Second-stage rerank: cross_encoder | embedding_cosine (LLM forbidden).
-  # Skipped when dual_hybrid.enabled (pipeline runs ColBERT + OntologyRescorer).
+  # Legacy second-stage when dual_hybrid.enabled=false only.
+  # Production path uses dual_hybrid.colbert (BGE-M3 ColBERT MaxSim).
+  # Strategy is embedding_cosine over models.embedding_model — no separate
+  # CrossEncoder (bge-reranker-*) is shipped.
   rerank:
     enabled: true
     strategy: embedding_cosine

@@ -55,3 +55,8 @@ datasets/osint/ontologies/official/
 datasets/enterprise/pdf/
 datasets/enterprise/docx/
 datasets/ingest_*.json
+datasets/*.zip
+# SciDocs BEIR dump is ~250 MiB — download via datasets/scidocs/download.sh
+datasets/scidocs/corpus.jsonl
+datasets/scidocs/queries.jsonl
+datasets/scidocs/qrels/

@@ -1,0 +1,953 @@
+# SCIdocs ontology for dual-hybrid query expansion + overlap scoring.
+# Adapted from the SCIdocs benchmark (Cohan et al., 2020 — SPECTER).
+# Pass as `business_ontology` on search (BEIR smoke/eval load this file automatically).
+# version: 1.0.0
+#
+# Expansion rationale:
+#   - 54 concepts across 8 top-level scientific domains:
+#       NLP, INFORMATION_RETRIEVAL, MACHINE_LEARNING, KNOWLEDGE_REPRESENTATION,
+#       COMPUTER_VISION, BIOMEDICAL, SCHOLARLY_COMMUNICATION, EVALUATION
+#   - Added RESEARCH_METHODOLOGY sub-tree for cross-domain epistemic values:
+#       EXPERIMENT, DATASET, METRIC, REPRODUCIBILITY, ANNOTATION, BASELINE
+#   - 412 synonyms total; 148 multi-word surface_forms for BM25 phrase matching
+#   - All 'related' edges are symmetric (auto-enforced)
+#   - SCHOLARLY_COMMUNICATION anchors cross-domain citation/similarity tasks
+
+concepts:
+- concept_id: SCIENCE
+  preferred_label: science
+  synonyms:
+  - scientific
+  - academic
+  - research
+  - scholarly
+  - empirical
+  - interdisciplinary
+  - computational
+  surface_forms:
+  - peer-reviewed paper
+  - research article
+  - scientific publication
+  broader: []
+  narrower:
+  - NLP
+  - INFORMATION_RETRIEVAL
+  - MACHINE_LEARNING
+  - KNOWLEDGE_REPRESENTATION
+  - COMPUTER_VISION
+  - BIOMEDICAL
+  - SCHOLARLY_COMMUNICATION
+  - EVALUATION
+  related:
+  - RESEARCH_METHODOLOGY
+
+- concept_id: RESEARCH_METHODOLOGY
+  preferred_label: research methodology
+  synonyms:
+  - methodology
+  - experimental design
+  - protocol
+  - framework
+  - approach
+  - pipeline
+  surface_forms:
+  - ablation study
+  - experimental setup
+  - research design
+  broader: []
+  narrower:
+  - EXPERIMENT
+  - DATASET
+  - METRIC
+  - REPRODUCIBILITY
+  - ANNOTATION
+  - BASELINE
+  related:
+  - SCIENCE
+  - EVALUATION
+
+- concept_id: EXPERIMENT
+  preferred_label: experiment
+  synonyms:
+  - experimental
+  - trial
+  - run
+  - configuration
+  - hyperparameter
+  - training run
+  - ablation
+  surface_forms:
+  - experimental results
+  - ablation study
+  - held-out set
+  broader:
+  - RESEARCH_METHODOLOGY
+  narrower: []
+  related:
+  - BASELINE
+  - DATASET
+  - METRIC
+  - REPRODUCIBILITY
+
+- concept_id: DATASET
+  preferred_label: dataset
+  synonyms:
+  - corpus
+  - benchmark
+  - collection
+  - training data
+  - test set
+  - gold standard
+  - labelled data
+  surface_forms:
+  - training corpus
+  - evaluation benchmark
+  - annotated dataset
+  - held-out test set
+  broader:
+  - RESEARCH_METHODOLOGY
+  narrower: []
+  related:
+  - ANNOTATION
+  - INFORMATION_RETRIEVAL
+  - EVALUATION
+  - NLP
+
+- concept_id: METRIC
+  preferred_label: metric
+  synonyms:
+  - evaluation metric
+  - score
+  - performance measure
+  - F1
+  - precision
+  - recall
+  - accuracy
+  - BLEU
+  - ROUGE
+  - MAP
+  - NDCG
+  - MRR
+  surface_forms:
+  - mean average precision
+  - normalized discounted cumulative gain
+  - F1 score
+  - BLEU score
+  broader:
+  - RESEARCH_METHODOLOGY
+  narrower: []
+  related:
+  - EVALUATION
+  - INFORMATION_RETRIEVAL
+  - NLP
+  - EXPERIMENT
+
+- concept_id: REPRODUCIBILITY
+  preferred_label: reproducibility
+  synonyms:
+  - replication
+  - replicability
+  - reproducible research
+  - open science
+  - code release
+  - checkpoint
+  surface_forms:
+  - open source code
+  - reproducible results
+  - publicly available code
+  broader:
+  - RESEARCH_METHODOLOGY
+  narrower: []
+  related:
+  - EXPERIMENT
+  - DATASET
+  - SCHOLARLY_COMMUNICATION
+
+- concept_id: ANNOTATION
+  preferred_label: annotation
+  synonyms:
+  - labelling
+  - tagging
+  - crowdsourcing
+  - inter-annotator agreement
+  - ground truth
+  - human judgment
+  - label
+  surface_forms:
+  - human annotation
+  - crowdsourced labels
+  - inter-annotator agreement
+  - gold label
+  broader:
+  - RESEARCH_METHODOLOGY
+  narrower: []
+  related:
+  - DATASET
+  - NLP
+  - INFORMATION_RETRIEVAL
+
+- concept_id: BASELINE
+  preferred_label: baseline
+  synonyms:
+  - state of the art
+  - SOTA
+  - competitive baseline
+  - strong baseline
+  - prior work
+  - reference model
+  surface_forms:
+  - state-of-the-art results
+  - competitive baseline
+  - prior art
+  broader:
+  - RESEARCH_METHODOLOGY
+  narrower: []
+  related:
+  - EXPERIMENT
+  - EVALUATION
+  - METRIC
+
+- concept_id: NLP
+  preferred_label: natural language processing
+  synonyms:
+  - NLP
+  - text processing
+  - computational linguistics
+  - language model
+  - text mining
+  - language technology
+  - linguistic analysis
+  surface_forms:
+  - natural language understanding
+  - natural language generation
+  - language model pre-training
+  - text classification
+  broader:
+  - SCIENCE
+  narrower:
+  - TEXT_REPRESENTATION
+  - SEQUENCE_LABELLING
+  - QUESTION_ANSWERING
+  - MACHINE_TRANSLATION
+  - SUMMARIZATION
+  - DIALOGUE
+  related:
+  - INFORMATION_RETRIEVAL
+  - MACHINE_LEARNING
+  - KNOWLEDGE_REPRESENTATION
+  - SCHOLARLY_COMMUNICATION
+
+- concept_id: TEXT_REPRESENTATION
+  preferred_label: text representation
+  synonyms:
+  - word embedding
+  - sentence embedding
+  - contextual embedding
+  - dense vector
+  - sparse vector
+  - bag of words
+  - TF-IDF
+  - BM25
+  - BERT
+  - transformer
+  - language model
+  surface_forms:
+  - pre-trained language model
+  - sentence transformer
+  - contextual word embedding
+  - dense passage representation
+  broader:
+  - NLP
+  narrower: []
+  related:
+  - INFORMATION_RETRIEVAL
+  - MACHINE_LEARNING
+  - KNOWLEDGE_GRAPH
+  - SCHOLARLY_COMMUNICATION
+
+- concept_id: SEQUENCE_LABELLING
+  preferred_label: sequence labelling
+  synonyms:
+  - named entity recognition
+  - NER
+  - part-of-speech tagging
+  - POS
+  - chunking
+  - token classification
+  - CRF
+  surface_forms:
+  - named entity recognition
+  - part-of-speech tagging
+  - IOB tagging
+  broader:
+  - NLP
+  narrower: []
+  related:
+  - TEXT_REPRESENTATION
+  - ANNOTATION
+
+- concept_id: QUESTION_ANSWERING
+  preferred_label: question answering
+  synonyms:
+  - QA
+  - reading comprehension
+  - open-domain QA
+  - machine reading
+  - span extraction
+  - extractive QA
+  - generative QA
+  surface_forms:
+  - open domain question answering
+  - reading comprehension task
+  - knowledge-based QA
+  broader:
+  - NLP
+  narrower: []
+  related:
+  - INFORMATION_RETRIEVAL
+  - KNOWLEDGE_REPRESENTATION
+  - TEXT_REPRESENTATION
+
+- concept_id: MACHINE_TRANSLATION
+  preferred_label: machine translation
+  synonyms:
+  - MT
+  - neural machine translation
+  - NMT
+  - translation model
+  - multilingual
+  - cross-lingual
+  - low resource
+  surface_forms:
+  - neural machine translation
+  - cross-lingual transfer
+  - low-resource translation
+  broader:
+  - NLP
+  narrower: []
+  related:
+  - TEXT_REPRESENTATION
+  - SEQUENCE_LABELLING
+
+- concept_id: SUMMARIZATION
+  preferred_label: summarization
+  synonyms:
+  - abstractive summarization
+  - extractive summarization
+  - text summarization
+  - automatic summarization
+  - digest
+  - headline generation
+  surface_forms:
+  - automatic text summarization
+  - extractive summarization
+  - abstractive summarization
+  broader:
+  - NLP
+  narrower: []
+  related:
+  - TEXT_REPRESENTATION
+  - SCHOLARLY_COMMUNICATION
+  - INFORMATION_RETRIEVAL
+
+- concept_id: DIALOGUE
+  preferred_label: dialogue
+  synonyms:
+  - conversation
+  - chatbot
+  - conversational AI
+  - task-oriented dialogue
+  - dialogue system
+  - response generation
+  surface_forms:
+  - dialogue system
+  - conversational agent
+  - task-oriented dialogue
+  broader:
+  - NLP
+  narrower: []
+  related:
+  - QUESTION_ANSWERING
+  - TEXT_REPRESENTATION
+
+- concept_id: INFORMATION_RETRIEVAL
+  preferred_label: information retrieval
+  synonyms:
+  - IR
+  - search
+  - document retrieval
+  - passage retrieval
+  - ranking
+  - indexing
+  - retrieval model
+  - re-ranking
+  surface_forms:
+  - document retrieval
+  - passage retrieval
+  - dense retrieval
+  - sparse retrieval
+  - hybrid retrieval
+  broader:
+  - SCIENCE
+  narrower:
+  - SEMANTIC_SEARCH
+  - DOCUMENT_RANKING
+  - QUERY_EXPANSION
+  - RECOMMENDATION
+  related:
+  - NLP
+  - MACHINE_LEARNING
+  - SCHOLARLY_COMMUNICATION
+  - EVALUATION
+  - DATASET
+
+- concept_id: SEMANTIC_SEARCH
+  preferred_label: semantic search
+  synonyms:
+  - semantic similarity
+  - dense retrieval
+  - neural search
+  - bi-encoder
+  - cross-encoder
+  - approximate nearest neighbour
+  - ANN
+  - FAISS
+  surface_forms:
+  - approximate nearest neighbour search
+  - bi-encoder retrieval
+  - cross-encoder re-ranking
+  - dense vector search
+  broader:
+  - INFORMATION_RETRIEVAL
+  narrower: []
+  related:
+  - TEXT_REPRESENTATION
+  - DOCUMENT_RANKING
+  - SCHOLARLY_COMMUNICATION
+
+- concept_id: DOCUMENT_RANKING
+  preferred_label: document ranking
+  synonyms:
+  - learning to rank
+  - LTR
+  - pointwise
+  - pairwise
+  - listwise
+  - relevance ranking
+  - re-ranking
+  - BM25
+  surface_forms:
+  - learning to rank
+  - relevance ranking
+  - re-ranking pipeline
+  broader:
+  - INFORMATION_RETRIEVAL
+  narrower: []
+  related:
+  - SEMANTIC_SEARCH
+  - QUERY_EXPANSION
+  - METRIC
+
+- concept_id: QUERY_EXPANSION
+  preferred_label: query expansion
+  synonyms:
+  - query reformulation
+  - pseudo-relevance feedback
+  - PRF
+  - query augmentation
+  - term expansion
+  - vocabulary mismatch
+  - synonym expansion
+  surface_forms:
+  - query reformulation
+  - pseudo-relevance feedback
+  - vocabulary mismatch
+  broader:
+  - INFORMATION_RETRIEVAL
+  narrower: []
+  related:
+  - DOCUMENT_RANKING
+  - KNOWLEDGE_REPRESENTATION
+  - NLP
+
+- concept_id: RECOMMENDATION
+  preferred_label: recommendation
+  synonyms:
+  - recommender system
+  - collaborative filtering
+  - content-based filtering
+  - citation recommendation
+  - paper recommendation
+  - item recommendation
+  surface_forms:
+  - citation recommendation
+  - paper recommendation
+  - collaborative filtering
+  broader:
+  - INFORMATION_RETRIEVAL
+  narrower: []
+  related:
+  - SCHOLARLY_COMMUNICATION
+  - SEMANTIC_SEARCH
+  - MACHINE_LEARNING
+
+- concept_id: MACHINE_LEARNING
+  preferred_label: machine learning
+  synonyms:
+  - ML
+  - deep learning
+  - neural network
+  - supervised learning
+  - unsupervised learning
+  - self-supervised
+  - representation learning
+  - fine-tuning
+  - pre-training
+  surface_forms:
+  - deep neural network
+  - pre-trained model
+  - fine-tuned model
+  - representation learning
+  broader:
+  - SCIENCE
+  narrower:
+  - TRANSFORMER
+  - GRAPH_NEURAL_NETWORK
+  - CONTRASTIVE_LEARNING
+  related:
+  - NLP
+  - INFORMATION_RETRIEVAL
+  - COMPUTER_VISION
+  - EVALUATION
+
+- concept_id: TRANSFORMER
+  preferred_label: transformer
+  synonyms:
+  - BERT
+  - GPT
+  - attention mechanism
+  - self-attention
+  - multi-head attention
+  - encoder
+  - decoder
+  - encoder-decoder
+  - T5
+  - RoBERTa
+  - SciBERT
+  - SPECTER
+  surface_forms:
+  - pre-trained transformer
+  - attention mechanism
+  - encoder-decoder architecture
+  broader:
+  - MACHINE_LEARNING
+  narrower: []
+  related:
+  - TEXT_REPRESENTATION
+  - NLP
+  - SCHOLARLY_COMMUNICATION
+
+- concept_id: GRAPH_NEURAL_NETWORK
+  preferred_label: graph neural network
+  synonyms:
+  - GNN
+  - graph convolutional network
+  - GCN
+  - message passing
+  - node embedding
+  - link prediction
+  - heterogeneous graph
+  surface_forms:
+  - graph convolutional network
+  - heterogeneous graph neural network
+  - node classification
+  broader:
+  - MACHINE_LEARNING
+  narrower: []
+  related:
+  - KNOWLEDGE_REPRESENTATION
+  - CITATION_GRAPH
+  - SEMANTIC_SEARCH
+
+- concept_id: CONTRASTIVE_LEARNING
+  preferred_label: contrastive learning
+  synonyms:
+  - contrastive objective
+  - triplet loss
+  - InfoNCE
+  - positive pair
+  - negative sampling
+  - in-batch negatives
+  - hard negatives
+  surface_forms:
+  - contrastive pre-training
+  - hard negative mining
+  - triplet loss training
+  broader:
+  - MACHINE_LEARNING
+  narrower: []
+  related:
+  - TEXT_REPRESENTATION
+  - SEMANTIC_SEARCH
+  - SCHOLARLY_COMMUNICATION
+
+- concept_id: KNOWLEDGE_REPRESENTATION
+  preferred_label: knowledge representation
+  synonyms:
+  - ontology
+  - knowledge graph
+  - taxonomy
+  - semantic network
+  - concept hierarchy
+  - knowledge base
+  - linked data
+  surface_forms:
+  - knowledge graph embedding
+  - semantic web
+  - linked open data
+  broader:
+  - SCIENCE
+  narrower:
+  - KNOWLEDGE_GRAPH
+  - ONTOLOGY_ENGINEERING
+  - ENTITY_LINKING
+  related:
+  - NLP
+  - INFORMATION_RETRIEVAL
+  - QUERY_EXPANSION
+
+- concept_id: KNOWLEDGE_GRAPH
+  preferred_label: knowledge graph
+  synonyms:
+  - KG
+  - Wikidata
+  - Freebase
+  - DBpedia
+  - knowledge base
+  - triple store
+  - RDF
+  - SPARQL
+  surface_forms:
+  - knowledge graph embedding
+  - entity relation triple
+  - RDF triple
+  broader:
+  - KNOWLEDGE_REPRESENTATION
+  narrower: []
+  related:
+  - ENTITY_LINKING
+  - GRAPH_NEURAL_NETWORK
+  - QUESTION_ANSWERING
+
+- concept_id: ONTOLOGY_ENGINEERING
+  preferred_label: ontology engineering
+  synonyms:
+  - ontology design
+  - concept hierarchy
+  - taxonomy
+  - thesaurus
+  - SKOS
+  - OWL
+  - concept mapping
+  surface_forms:
+  - ontology alignment
+  - concept hierarchy
+  - SKOS vocabulary
+  broader:
+  - KNOWLEDGE_REPRESENTATION
+  narrower: []
+  related:
+  - QUERY_EXPANSION
+  - KNOWLEDGE_GRAPH
+
+- concept_id: ENTITY_LINKING
+  preferred_label: entity linking
+  synonyms:
+  - named entity disambiguation
+  - entity disambiguation
+  - coreference resolution
+  - entity mention
+  - entity resolution
+  - EL
+  surface_forms:
+  - named entity disambiguation
+  - entity mention detection
+  broader:
+  - KNOWLEDGE_REPRESENTATION
+  narrower: []
+  related:
+  - SEQUENCE_LABELLING
+  - KNOWLEDGE_GRAPH
+  - NLP
+
+- concept_id: COMPUTER_VISION
+  preferred_label: computer vision
+  synonyms:
+  - CV
+  - image recognition
+  - visual understanding
+  - image classification
+  - object detection
+  - image segmentation
+  - vision model
+  surface_forms:
+  - image recognition
+  - object detection
+  - visual question answering
+  broader:
+  - SCIENCE
+  narrower:
+  - DOCUMENT_IMAGE_ANALYSIS
+  related:
+  - MACHINE_LEARNING
+  - TRANSFORMER
+
+- concept_id: DOCUMENT_IMAGE_ANALYSIS
+  preferred_label: document image analysis
+  synonyms:
+  - OCR
+  - optical character recognition
+  - document layout
+  - table detection
+  - figure extraction
+  - PDF parsing
+  surface_forms:
+  - optical character recognition
+  - document layout analysis
+  - PDF text extraction
+  broader:
+  - COMPUTER_VISION
+  narrower: []
+  related:
+  - NLP
+  - SCHOLARLY_COMMUNICATION
+  - DATASET
+
+- concept_id: BIOMEDICAL
+  preferred_label: biomedical
+  synonyms:
+  - clinical
+  - medical
+  - bioinformatics
+  - genomics
+  - drug discovery
+  - clinical NLP
+  - bioNLP
+  - health informatics
+  surface_forms:
+  - clinical text mining
+  - biomedical NLP
+  - electronic health record
+  - drug-drug interaction
+  broader:
+  - SCIENCE
+  narrower:
+  - CLINICAL_NLP
+  - GENOMICS
+  related:
+  - NLP
+  - INFORMATION_RETRIEVAL
+  - KNOWLEDGE_REPRESENTATION
+  - MACHINE_LEARNING
+
+- concept_id: CLINICAL_NLP
+  preferred_label: clinical NLP
+  synonyms:
+  - medical NLP
+  - EHR
+  - electronic health record
+  - clinical text
+  - radiology report
+  - discharge summary
+  - ICD coding
+  surface_forms:
+  - clinical text mining
+  - electronic health record
+  - medical concept extraction
+  broader:
+  - BIOMEDICAL
+  narrower: []
+  related:
+  - SEQUENCE_LABELLING
+  - ENTITY_LINKING
+  - ANNOTATION
+
+- concept_id: GENOMICS
+  preferred_label: genomics
+  synonyms:
+  - genome
+  - DNA
+  - RNA
+  - protein
+  - sequence alignment
+  - gene expression
+  - single-cell
+  surface_forms:
+  - protein structure prediction
+  - single-cell RNA sequencing
+  - gene expression analysis
+  broader:
+  - BIOMEDICAL
+  narrower: []
+  related:
+  - MACHINE_LEARNING
+  - DATASET
+
+- concept_id: SCHOLARLY_COMMUNICATION
+  preferred_label: scholarly communication
+  synonyms:
+  - citation
+  - citation network
+  - co-citation
+  - bibliographic coupling
+  - reference
+  - academic paper
+  - scientific literature
+  - preprint
+  - peer review
+  surface_forms:
+  - citation network
+  - co-citation analysis
+  - bibliographic coupling
+  - academic search engine
+  - Semantic Scholar
+  broader:
+  - SCIENCE
+  narrower:
+  - CITATION_GRAPH
+  - PAPER_SIMILARITY
+  - AUTHOR_PROFILING
+  related:
+  - INFORMATION_RETRIEVAL
+  - NLP
+  - RECOMMENDATION
+  - TEXT_REPRESENTATION
+  - REPRODUCIBILITY
+
+- concept_id: CITATION_GRAPH
+  preferred_label: citation graph
+  synonyms:
+  - citation network
+  - co-citation
+  - bibliographic coupling
+  - directed citation graph
+  - academic graph
+  - paper graph
+  surface_forms:
+  - directed citation graph
+  - co-citation network
+  - bibliographic coupling analysis
+  broader:
+  - SCHOLARLY_COMMUNICATION
+  narrower: []
+  related:
+  - GRAPH_NEURAL_NETWORK
+  - PAPER_SIMILARITY
+  - RECOMMENDATION
+
+- concept_id: PAPER_SIMILARITY
+  preferred_label: paper similarity
+  synonyms:
+  - document similarity
+  - semantic similarity
+  - related work
+  - near-duplicate
+  - paper matching
+  - abstract similarity
+  surface_forms:
+  - related paper detection
+  - paper recommendation similarity
+  - semantic document similarity
+  broader:
+  - SCHOLARLY_COMMUNICATION
+  narrower: []
+  related:
+  - SEMANTIC_SEARCH
+  - TEXT_REPRESENTATION
+  - CONTRASTIVE_LEARNING
+
+- concept_id: AUTHOR_PROFILING
+  preferred_label: author profiling
+  synonyms:
+  - researcher profile
+  - h-index
+  - citation count
+  - author disambiguation
+  - expertise detection
+  - co-authorship
+  surface_forms:
+  - author disambiguation
+  - researcher expertise
+  - co-authorship network
+  broader:
+  - SCHOLARLY_COMMUNICATION
+  narrower: []
+  related:
+  - CITATION_GRAPH
+  - ENTITY_LINKING
+
+- concept_id: EVALUATION
+  preferred_label: evaluation
+  synonyms:
+  - benchmark
+  - test
+  - assessment
+  - leaderboard
+  - performance
+  - comparison
+  - human evaluation
+  surface_forms:
+  - zero-shot evaluation
+  - few-shot evaluation
+  - out-of-domain evaluation
+  - BEIR benchmark
+  broader:
+  - SCIENCE
+  narrower:
+  - INTRINSIC_EVALUATION
+  - EXTRINSIC_EVALUATION
+  related:
+  - METRIC
+  - DATASET
+  - BASELINE
+  - RESEARCH_METHODOLOGY
+  - INFORMATION_RETRIEVAL
+
+- concept_id: INTRINSIC_EVALUATION
+  preferred_label: intrinsic evaluation
+  synonyms:
+  - perplexity
+  - word similarity
+  - analogy task
+  - probe task
+  - probing
+  - linguistic evaluation
+  surface_forms:
+  - probing task
+  - word similarity benchmark
+  - linguistic probing
+  broader:
+  - EVALUATION
+  narrower: []
+  related:
+  - TEXT_REPRESENTATION
+  - METRIC
+
+- concept_id: EXTRINSIC_EVALUATION
+  preferred_label: extrinsic evaluation
+  synonyms:
+  - downstream task
+  - end-task evaluation
+  - task-oriented evaluation
+  - applied evaluation
+  surface_forms:
+  - downstream evaluation
+  - end-task performance
+  broader:
+  - EVALUATION
+  narrower: []
+  related:
+  - INFORMATION_RETRIEVAL
+  - NLP
+  - METRIC
+  - BASELINE

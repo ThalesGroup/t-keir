@@ -23,7 +23,7 @@ from typing import Any, Protocol
 LOGGER = logging.getLogger(__name__)
 
 _ALLOWED_STRATEGIES = frozenset({"cross_encoder", "embedding_cosine"})
-_DEFAULT_STRATEGY = "cross_encoder"
+_DEFAULT_STRATEGY = "embedding_cosine"
 
 DEFAULT_COLBERT_TOP_M = 40
 DEFAULT_FIRST_STAGE_WEIGHT = 0.55

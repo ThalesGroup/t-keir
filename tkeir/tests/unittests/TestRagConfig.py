@@ -31,6 +31,10 @@ def test_load_rag_config_reads_min_keyword_length():
     assert config.prompt.passages.max_chars >= 200
     assert config.prompt.passages.context_sentences >= 0
     assert isinstance(config.search.enabled, bool)
+    assert isinstance(config.answer_generation.use_nlp, bool)
+    assert config.answer_generation.use_nlp is True
+    assert config.answer_generation.use_ontology is True
+    assert config.answer_generation.use_reasoner is True
     assert config.search.ranking_profile in {
         "auto",
         "hybrid_2_level",
@@ -46,7 +50,8 @@ def test_load_rag_config_reads_min_keyword_length():
         "embedding_cosine",
     }
     assert config.models.embedding_model
-    assert config.models.reranker_model
+    assert config.models.reranker_model in (None, "")
+    assert config.search.rerank.strategy == "embedding_cosine"
     assert config.vespa.url.startswith("http")
     assert config.vespa.config_url.startswith("http")
     assert config.vespa.timeout_seconds >= 1.0

@@ -109,7 +109,37 @@ def _query_starts_with_interrogative(analysis: dict[str, Any] | None) -> bool:
     if not morph:
         return False
     first_pos = str(morph[0].get("pos", "")).upper()
-    return first_pos in {"PRON", "ADV", "DET"}
+    first_text = str(morph[0].get("text", "")).strip().lower()
+    if first_pos in {"PRON", "ADV", "DET", "AUX", "MD"}:
+        return True
+    return first_text in {
+        "who",
+        "whom",
+        "whose",
+        "what",
+        "when",
+        "where",
+        "why",
+        "how",
+        "which",
+        "is",
+        "are",
+        "was",
+        "were",
+        "do",
+        "does",
+        "did",
+        "can",
+        "could",
+        "will",
+        "would",
+        "should",
+        "has",
+        "have",
+        "had",
+        "may",
+        "might",
+    }
 
 
 def _focal_entity_from_query(
@@ -166,24 +196,272 @@ def detect_generation_intent(
         ... )
         'question_answer'
     """
+    # Direct questions always win over entity-report heuristics.
     if _query_starts_with_interrogative(analysis):
+        return "question_answer"
+    query = (query_text or "").strip()
+    if query.endswith("?"):
+        return "question_answer"
+    first = query.split(None, 1)[0].lower().strip("¿¡") if query else ""
+    if first in {
+        "who",
+        "what",
+        "when",
+        "where",
+        "why",
+        "how",
+        "which",
+        "is",
+        "are",
+        "was",
+        "were",
+        "do",
+        "does",
+        "did",
+        "can",
+        "could",
+        "will",
+        "would",
+        "should",
+        "has",
+        "have",
+        "had",
+    }:
         return "question_answer"
 
     focal = _focal_entity_from_query(query_text, analysis)
     if focal and analysis:
         morph = analysis.get("morphosyntax") or []
-        if morph:
-            if _entity_after_adp(morph):
-                return "entity_report"
-            lemmas = (
-                analysis.get("lemmas") or analysis.get("search_terms") or []
+        lemmas = analysis.get("lemmas") or analysis.get("search_terms") or []
+        lemma_l = {str(item).lower() for item in lemmas}
+        report_lemmas = {
+            "generate",
+            "report",
+            "summarize",
+            "summary",
+            "profile",
+            "biography",
+            "write",
+        }
+        if morph and _entity_after_adp(morph) and lemma_l & report_lemmas:
+            return "entity_report"
+        if analysis.get("ner_entities") and lemma_l & report_lemmas:
+            return "entity_report"
+        if any(
+            token in query.lower()
+            for token in (
+                "report about",
+                "profile of",
+                "biography of",
+                "summary of",
             )
-            if analysis.get("ner_entities") and len(lemmas) >= 2:
-                return "entity_report"
-        elif analysis.get("ner_entities"):
+        ):
             return "entity_report"
 
     return "general"
+
+
+def detect_question_type(
+    query_text: str,
+    analysis: dict[str, Any] | None = None,
+) -> str:
+    """Fine-grained QA type for sharp SHORT_ANSWER shaping.
+
+    Returns one of: ``yes_no``, ``definition``, ``who``, ``what``, ``when``,
+    ``where``, ``why``, ``how``, ``which``, ``list``, ``comparison``,
+    ``factoid``, ``inference``, ``entity_report``, ``other``.
+
+    Interrogative / yes-no patterns are classified **before** entity_report.
+
+    Example:
+        >>> detect_question_type(
+        ...     "Who founded Acme?",
+        ...     {"morphosyntax": [{"text": "Who", "pos": "PRON"}]},
+        ... )
+        'who'
+        >>> detect_question_type(
+        ...     "Does the article claim X?",
+        ...     {"morphosyntax": [{"text": "Does", "pos": "AUX"}],
+        ...      "ner_entities": [{"text": "X", "label": "MISC"}]},
+        ... )
+        'yes_no'
+    """
+    query = (query_text or "").strip()
+    lower = query.lower()
+    morph = (analysis or {}).get("morphosyntax") or []
+    first_text = ""
+    first_pos = ""
+    if morph:
+        first_text = str(morph[0].get("text") or "").strip().lower()
+        first_pos = str(morph[0].get("pos") or "").strip().upper()
+    if not first_text and query:
+        first_text = query.split(None, 1)[0].lower().strip("¿¡")
+
+    yes_no_openers = {
+        "is",
+        "are",
+        "was",
+        "were",
+        "do",
+        "does",
+        "did",
+        "can",
+        "could",
+        "will",
+        "would",
+        "should",
+        "has",
+        "have",
+        "had",
+        "may",
+        "might",
+    }
+    if first_text in yes_no_openers or (
+        first_pos in {"AUX", "MD"}
+        and first_text
+        not in {"who", "what", "when", "where", "why", "how", "which"}
+    ):
+        return "yes_no"
+
+    # Inverted / mid-clause yes-no (e.g. "Between A and B, was there …?")
+    if re.search(
+        r"\b(is|are|was|were|do|does|did|can|could|will|would|should|"
+        r"has|have|had)\s+(there|it|this|that|he|she|they)\b",
+        lower,
+    ) or re.search(
+        r"\b(is|are|was|were)\s+\w+\s+(true|false|correct|consistent|"
+        r"inconsistent|accurate)\b",
+        lower,
+    ):
+        return "yes_no"
+
+    wh_map = {
+        "who": "who",
+        "whom": "who",
+        "whose": "who",
+        "what": "what",
+        "when": "when",
+        "where": "where",
+        "why": "why",
+        "how": "how",
+        "which": "which",
+    }
+    if first_text in wh_map:
+        qtype = wh_map[first_text]
+        if qtype == "what" and (
+            lower.startswith("what is ")
+            or lower.startswith("what are ")
+            or lower.startswith("what does ")
+            or " mean" in lower
+            or "definition" in lower
+        ):
+            return "definition"
+        if qtype in {"what", "which", "who"} and any(
+            token in lower
+            for token in (
+                " which of ",
+                " list ",
+                " name all ",
+                " name the ",
+                " what are the ",
+                " which are ",
+            )
+        ):
+            return "list"
+        return qtype
+
+    if any(
+        token in lower
+        for token in (
+            "compare ",
+            " vs ",
+            " versus ",
+            "difference between",
+            "differ from",
+            "in contrast",
+        )
+    ):
+        return "comparison"
+
+    if any(
+        token in lower for token in ("list ", "enumerate ", "name all ", "all of the ")
+    ):
+        return "list"
+
+    ner = (analysis or {}).get("ner_entities") or []
+    if len(ner) >= 2 and (
+        " and " in lower
+        or "," in query
+        or " according to " in lower
+        or " reported by " in lower
+        or " in contrast " in lower
+        or " both " in lower
+    ):
+        return "inference"
+    if query.count("?") >= 1 and len(query.split()) >= 25:
+        return "inference"
+
+    if detect_generation_intent(query_text, analysis) == "entity_report":
+        return "entity_report"
+
+    if _query_starts_with_interrogative(analysis) or query.endswith("?"):
+        return "factoid"
+    return "other"
+
+
+def question_type_short_answer_spec(question_type: str, *, language: str = "en") -> str:
+    """Return SHORT_ANSWER shape instructions for a question type."""
+    lang = (language or "en").lower()
+    specs_en = {
+        "yes_no": (
+            "SHORT_ANSWER must be Yes or No (optionally one short justifying clause). "
+            "Do not hedge with both."
+        ),
+        "definition": (
+            "SHORT_ANSWER must define the term in 1–2 precise sentences "
+            "(genus + distinguishing properties)."
+        ),
+        "who": "SHORT_ANSWER must name the person/organization (plus a brief role if needed).",
+        "what": "SHORT_ANSWER must name the thing/event/result directly.",
+        "when": "SHORT_ANSWER must give the date, year, or time span explicitly.",
+        "where": "SHORT_ANSWER must give the place/location explicitly.",
+        "why": "SHORT_ANSWER must state the cause/reason in 1–2 sentences.",
+        "how": "SHORT_ANSWER must state the manner/mechanism in 1–3 sentences.",
+        "which": "SHORT_ANSWER must select the matching option(s) from the evidence.",
+        "list": (
+            "SHORT_ANSWER must be a compact enumeration (comma-separated or short bullets)."
+        ),
+        "comparison": (
+            "SHORT_ANSWER must contrast the compared entities on the asked dimension."
+        ),
+        "factoid": "SHORT_ANSWER must be a concise factual span answering the question.",
+        "inference": (
+            "SHORT_ANSWER must combine evidence across passages into one grounded conclusion."
+        ),
+        "entity_report": (
+            "SHORT_ANSWER must summarize the entity in 2–4 factual sentences."
+        ),
+        "other": "SHORT_ANSWER must answer the question directly and concisely.",
+    }
+    specs_fr = {
+        "yes_no": "SHORT_ANSWER doit être Oui ou Non (clause justificative courte optionnelle).",
+        "definition": "SHORT_ANSWER doit définir le terme en 1–2 phrases précises.",
+        "who": "SHORT_ANSWER doit nommer la personne/organisation.",
+        "what": "SHORT_ANSWER doit nommer directement la chose/l'événement.",
+        "when": "SHORT_ANSWER doit donner la date, l'année ou la période.",
+        "where": "SHORT_ANSWER doit donner le lieu explicitement.",
+        "why": "SHORT_ANSWER doit énoncer la cause en 1–2 phrases.",
+        "how": "SHORT_ANSWER doit décrire le mécanisme en 1–3 phrases.",
+        "which": "SHORT_ANSWER doit sélectionner la/les option(s) pertinentes.",
+        "list": "SHORT_ANSWER doit être une énumération compacte.",
+        "comparison": "SHORT_ANSWER doit comparer les entités sur le critère demandé.",
+        "factoid": "SHORT_ANSWER doit être une réponse factuelle concise.",
+        "inference": "SHORT_ANSWER doit combiner les preuves en une conclusion fondée.",
+        "entity_report": "SHORT_ANSWER doit résumer l'entité en 2–4 phrases.",
+        "other": "SHORT_ANSWER doit répondre directement et concisément.",
+    }
+    table = specs_fr if lang == "fr" else specs_en
+    return table.get(question_type) or table["other"]
 
 
 def is_entity_report_query(
@@ -221,10 +499,17 @@ def format_generation_guidance(
         True
     """
     intent = detect_generation_intent(query_text, analysis)
+    qtype = detect_question_type(query_text, analysis)
+    short_spec = question_type_short_answer_spec(qtype, language=language)
     focal = _focal_entity_from_query(query_text, analysis)
     lang = (language or "en").lower()
+    type_header = (
+        f"QUESTION TYPE: {qtype}\n- {short_spec}"
+        if lang != "fr"
+        else f"TYPE DE QUESTION : {qtype}\n- {short_spec}"
+    )
 
-    if intent == "entity_report":
+    if intent == "entity_report" or qtype == "entity_report":
         subject = focal or (
             "la personne ou le sujet nommé dans la question"
             if lang == "fr"
@@ -232,6 +517,7 @@ def format_generation_guidance(
         )
         if lang == "fr":
             return (
+                f"{type_header}\n"
                 "MODE DE GÉNÉRATION : rapport sur une entité\n"
                 f"- Rédigez un rapport factuel sur **{subject}** en utilisant "
                 "TOUS les faits pertinents des PASSAGES CLÉS, faits SVO et extraits.\n"
@@ -246,6 +532,7 @@ def format_generation_guidance(
                 f"- Ne répondez pas indisponible si un passage contient des faits sur {subject}."
             )
         return (
+            f"{type_header}\n"
             "GENERATION MODE: entity report\n"
             f"- Write a factual report about **{subject}** using ALL relevant facts "
             "from KEY PASSAGES, SVO facts, and any supplementary excerpts below.\n"
@@ -267,18 +554,21 @@ def format_generation_guidance(
             f"- Do NOT reply unavailable if any passage contains facts about {subject}."
         )
 
-    if intent == "question_answer":
+    if intent == "question_answer" or qtype not in {"other", "entity_report"}:
         if lang == "fr":
             return (
+                f"{type_header}\n"
                 "MODE DE GÉNÉRATION : réponse directe\n"
-                "- SHORT_ANSWER : réponse directe en 1–3 phrases.\n"
+                "- Alignez la réponse sur la structure SVO de la question.\n"
                 "- DETAILED_REPORT : explication appuyée par les passages "
                 "(noms, dates, événements).\n"
                 "- Privilégiez les PASSAGES CLÉS aux lignes SVO isolées."
             )
         return (
+            f"{type_header}\n"
             "GENERATION MODE: direct question answering\n"
-            "- SHORT_ANSWER: answer the question directly in 1–3 sentences.\n"
+            "- Align the answer with the question's SVO structure "
+            "(subject / verb / object from SEARCH QUERY ANALYSIS).\n"
             "- DETAILED_REPORT: explain the answer with supporting facts from the "
             "passages; cite names, dates, and events explicitly.\n"
             "- Prefer KEY PASSAGES over isolated SVO lines when they conflict."
@@ -286,12 +576,14 @@ def format_generation_guidance(
 
     if lang == "fr":
         return (
+            f"{type_header}\n"
             "MODE DE GÉNÉRATION : synthèse générale\n"
             "- SHORT_ANSWER : réponse concise ancrée dans les passages.\n"
             "- DETAILED_REPORT : synthèse markdown structurée.\n"
             "- Phrases complètes avec noms, dates et rôles."
         )
     return (
+        f"{type_header}\n"
         "GENERATION MODE: general synthesis\n"
         "- SHORT_ANSWER: concise factual answer grounded in the passages.\n"
         "- DETAILED_REPORT: structured markdown synthesis of all relevant facts.\n"
@@ -396,6 +688,9 @@ def format_query_analysis_for_prompt(
             f"- Lexical search query: {(lexical_query or raw_query).strip()}",
         ]
     )
+    if analysis:
+        qtype = detect_question_type(raw_query, analysis)
+        lines.append(f"- Question type: {qtype}")
     if not analysis:
         return "\n".join(lines)
 

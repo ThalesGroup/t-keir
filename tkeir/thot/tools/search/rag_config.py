@@ -39,7 +39,7 @@ _DEFAULT_FOCUS_CONTEXT_SENTENCES = _DEFAULT_PASSAGE_CONTEXT_SENTENCES
 _ALLOWED_CHUNK_CONTEXT_MODES = frozenset({"chunk_excerpts", "svo_ontology"})
 _DEFAULT_RERANK_ENABLED = True
 _DEFAULT_RERANK_CANDIDATES = 50
-_DEFAULT_RERANK_STRATEGY = "cross_encoder"
+_DEFAULT_RERANK_STRATEGY = "embedding_cosine"
 _ALLOWED_RERANK_STRATEGIES = frozenset(
     {"cross_encoder", "embedding_cosine"}
 )
@@ -191,6 +191,15 @@ class RagOntologyConfig:
 
 
 @dataclass(frozen=True)
+class RagAnswerGenerationConfig:
+    """QA answer-generation toggles (generate-eval + prompt assembly)."""
+
+    use_nlp: bool = True
+    use_ontology: bool = True
+    use_reasoner: bool = True
+
+
+@dataclass(frozen=True)
 class RagConfig:
     """Runtime configuration for the Vespa RAG API."""
 
@@ -200,6 +209,7 @@ class RagConfig:
     models: RagModelsConfig = RagModelsConfig()
     vespa: RagVespaConfig = RagVespaConfig()
     dual_hybrid: DualHybridConfig = DualHybridConfig()
+    answer_generation: RagAnswerGenerationConfig = RagAnswerGenerationConfig()
 
 
 def _normalize_chunk_context_mode(value: object) -> str:
@@ -305,14 +315,15 @@ def _rerank_config_from_mapping(
 ) -> RagRerankConfig:
     """Build :class:`RagRerankConfig` from ``search.rerank`` YAML.
 
-    Allowed strategies: ``cross_encoder``, ``embedding_cosine``.
-    LLM / generative aliases fall back to ``cross_encoder``.
+    Allowed strategies: ``cross_encoder`` (opt-in via ``RERANKER_MODEL``),
+    ``embedding_cosine``. LLM / generative aliases fall back to
+    ``embedding_cosine``. Production dual-hybrid uses BGE-M3 ColBERT instead.
 
     Example:
         >>> _rerank_config_from_mapping(
-        ...     {"enabled": False, "candidates": 20, "strategy": "cross_encoder"}
+        ...     {"enabled": False, "candidates": 20, "strategy": "embedding_cosine"}
         ... )
-        RagRerankConfig(enabled=False, candidates=20, strategy='cross_encoder')
+        RagRerankConfig(enabled=False, candidates=20, strategy='embedding_cosine')
     """
     cfg = mapping if isinstance(mapping, dict) else {}
     strategy = (
@@ -441,6 +452,23 @@ def _search_config_from_mapping(
     )
 
 
+def _answer_generation_config_from_mapping(
+    mapping: dict[str, Any] | None,
+) -> RagAnswerGenerationConfig:
+    """Build :class:`RagAnswerGenerationConfig` from YAML.
+
+    Example:
+        >>> _answer_generation_config_from_mapping({"use_nlp": False}).use_nlp
+        False
+    """
+    cfg = mapping if isinstance(mapping, dict) else {}
+    return RagAnswerGenerationConfig(
+        use_nlp=_as_bool(cfg.get("use_nlp"), True),
+        use_ontology=_as_bool(cfg.get("use_ontology"), True),
+        use_reasoner=_as_bool(cfg.get("use_reasoner"), True),
+    )
+
+
 def load_rag_config() -> RagConfig:
     """Load RAG settings from ``configs/rag.yaml``.
 
@@ -485,6 +513,10 @@ def load_rag_config() -> RagConfig:
     if not isinstance(dual_cfg, dict):
         dual_cfg = {}
 
+    answer_cfg = payload.get("answer_generation") or {}
+    if not isinstance(answer_cfg, dict):
+        answer_cfg = {}
+
     return RagConfig(
         ontology=RagOntologyConfig(
             min_keyword_length=max(1, min_keyword_length),
@@ -523,6 +555,7 @@ def load_rag_config() -> RagConfig:
         models=_models_config_from_mapping(models_cfg),
         vespa=_vespa_config_from_mapping(vespa_cfg),
         dual_hybrid=dual_hybrid_from_mapping(dual_cfg),
+        answer_generation=_answer_generation_config_from_mapping(answer_cfg),
     )
 
 

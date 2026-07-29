@@ -280,7 +280,7 @@ make pipeline \
 | `LLM_MODEL` | provider-specific | Generation model (e.g. `mistral-nemo`) |
 | `RAG_QUERY` | `Who is Rob Brown?` | Query for `make rag-query` |
 | `RAG_URL` | `http://localhost:8090` | RAG API base URL |
-| `BEIR_DATASETS` | `scifact fiqa arguana` | Space-separated datasets; one: `BEIR_DATASETS=scifact` |
+| `BEIR_DATASETS` | `scifact fiqa arguana scidocs` | Space-separated datasets; one: `BEIR_DATASETS=scifact` |
 | `BEIR_EXTRA` | _(empty)_ | Extra flags, e.g. `--skip-dense` |
 | `BEIR_REPORT` | _(empty)_ | Optional extra report copy (docs report always written) |
 

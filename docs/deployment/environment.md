@@ -72,8 +72,8 @@ Resolved by `UnifiedLLMWrapper` (`PROVIDER` → provider-specific defaults).
 | `EMBEDDING_MODEL` | ollama: `bge-m3`; openai: `text-embedding-3-small`; vllm: `bge-small-en-v1.5` | Embedding model id |
 | `LLM_MODEL` | ollama/vllm: `mistral-nemo`; openai: `gpt-4o` | Chat / generation |
 | `EMBEDDING_DIM` | `1024` | Must match Vespa `dense_vector` dim (BGE-M3) |
-| `RERANKER_MODEL` | `BAAI/bge-reranker-v2-m3` | Cross-encoder |
-| `RERANK_STRATEGY` | `embedding_cosine` (see `rag.yaml`) | `cross_encoder` \| `embedding_cosine` |
+| `RERANKER_MODEL` | unset | Optional CrossEncoder HF id (only if `RERANK_STRATEGY=cross_encoder`). Not used for dual-hybrid ColBERT |
+| `RERANK_STRATEGY` | `embedding_cosine` | Legacy path: `embedding_cosine` \| `cross_encoder`. Production second stage is BGE-M3 ColBERT |
 | `HTTP_TIMEOUT_SECONDS` | `120` | Provider HTTP timeout |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` (Compose often `http://host.docker.internal:11434`) | Ollama |
 | `OPENAI_API_KEY` | unset | OpenAI / compatible key |

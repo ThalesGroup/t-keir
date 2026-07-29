@@ -47,14 +47,15 @@ DEFAULT_LLM_MODELS = {
     Provider.OLLAMA: "mistral-nemo",
     Provider.VLLM: "mistral-nemo",
 }
-# HuggingFace CrossEncoder id (sentence-transformers).
-DEFAULT_RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
+# No separate CrossEncoder is shipped. Production second stage is BGE-M3
+# ColBERT (dual_hybrid.colbert). Legacy path defaults to embedding cosine.
+DEFAULT_RERANKER_MODEL = ""
 DEFAULT_RERANKER_MODELS = {
     Provider.OPENAI: DEFAULT_RERANKER_MODEL,
     Provider.OLLAMA: DEFAULT_RERANKER_MODEL,
     Provider.VLLM: DEFAULT_RERANKER_MODEL,
 }
-DEFAULT_RERANK_STRATEGY = RerankStrategy.CROSS_ENCODER
+DEFAULT_RERANK_STRATEGY = RerankStrategy.EMBEDDING_COSINE
 _ALLOWED_RERANK_STRATEGIES = frozenset(
     {
         RerankStrategy.CROSS_ENCODER.value,
@@ -157,14 +158,15 @@ def _normalize_rerank_strategy(value: object) -> str:
     """Normalize a rerank strategy name.
 
     Allowed: ``cross_encoder``, ``embedding_cosine``.
-    LLM / generative aliases are forbidden and fall back to the default.
+    LLM / generative aliases are forbidden and fall back to the default
+    (``embedding_cosine``). CrossEncoder is opt-in via ``RERANKER_MODEL``.
 
     Example:
         >>> from thot.core.LlmWrapper import _normalize_rerank_strategy
         >>> _normalize_rerank_strategy("embedding_cosine")
         'embedding_cosine'
         >>> _normalize_rerank_strategy("llm_judge")
-        'cross_encoder'
+        'embedding_cosine'
     """
     strategy = str(value or DEFAULT_RERANK_STRATEGY.value).strip().lower()
     if strategy in _FORBIDDEN_LLM_RERANK_STRATEGIES:
@@ -277,9 +279,8 @@ class WrapperConfig:
             reranker_model=_first_non_empty(
                 os.getenv("RERANKER_MODEL"),
                 file_cfg.get("reranker_model"),
-                DEFAULT_RERANKER_MODELS[provider],
             )
-            or DEFAULT_RERANKER_MODELS[provider],
+            or "",
             rerank_strategy=_normalize_rerank_strategy(
                 _first_non_empty(
                     os.getenv("RERANK_STRATEGY"),
@@ -597,6 +598,16 @@ class UnifiedLLMWrapper:
         chosen = _normalize_rerank_strategy(
             strategy if strategy is not None else self._config.rerank_strategy
         )
+        if (
+            chosen == RerankStrategy.CROSS_ENCODER.value
+            and not str(self._config.reranker_model or "").strip()
+        ):
+            ThotLogger.warning(
+                "RERANK_STRATEGY=cross_encoder but no RERANKER_MODEL set; "
+                "falling back to embedding_cosine (BGE-M3 ColBERT is the "
+                "production second stage via dual_hybrid.colbert)"
+            )
+            chosen = RerankStrategy.EMBEDDING_COSINE.value
         if chosen == RerankStrategy.EMBEDDING_COSINE.value:
             return await self._embedding_cosine_rerank(
                 query, documents, top_n=keep

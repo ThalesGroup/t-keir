@@ -12,11 +12,13 @@ Companion prompt file: [`rag-prompts.yaml`](#rag-promptsyaml).
 
 ## Override order
 
-### Models (`PROVIDER`, embedding, LLM, reranker)
+### Models (`PROVIDER`, embedding, LLM)
 
-1. Environment variables: `PROVIDER`, `EMBEDDING_MODEL`, `LLM_MODEL`, `RERANKER_MODEL`, `RERANK_STRATEGY`, `EMBEDDING_DIM`
+1. Environment variables: `PROVIDER`, `EMBEDDING_MODEL`, `LLM_MODEL`, `EMBEDDING_DIM`
+   (`RERANKER_MODEL` / `RERANK_STRATEGY` are legacy-only opt-ins)
 2. `models:` / `search.rerank.strategy` in this file
-3. Hard-coded defaults in `thot.core.LlmWrapper`
+3. Hard-coded defaults in `thot.core.LlmWrapper` (no CrossEncoder by default;
+   second stage is BGE-M3 ColBERT via `dual_hybrid.colbert`)
 
 ### Vespa endpoints / timeout
 
@@ -70,9 +72,9 @@ Embeddings are always process-wide serialized (local Ollama/vLLM stalls under pa
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `embedding_model` | string | Source id (e.g. `BAAI/bge-m3`). Runtime FlagEmbedding loads **`tkeir/resources/modeling/net/bge-m3`** (`make pull-bge-model`) |
+| `embedding_model` | string | Source id (e.g. `BAAI/bge-m3`). Runtime FlagEmbedding loads **`tkeir/resources/modeling/net/bge-m3`** (`make pull-bge-model`). Same weights provide dense, sparse, and **ColBERT** multi-vectors |
 | `llm_model` | string | Generation model for `/rag/query` (often Ollama) |
-| `reranker_model` | string | HuggingFace CrossEncoder id when strategy is `cross_encoder` |
+| `reranker_model` | string \| null | **Optional / unused by default.** Separate HuggingFace CrossEncoder only if `search.rerank.strategy=cross_encoder` and `RERANKER_MODEL` is set. Production second stage is `dual_hybrid.colbert` (BGE-M3), not `bge-reranker-*` |
 | `embedding_dim` | int | Must equal `global.sd` / `user.sd` tensor `x[N]` (default **1024**) |
 
 ### `ontology` (HMI / RAG export)
@@ -99,6 +101,18 @@ Keep `min_keyword_length` aligned with `keywords.yaml` → `min-keyword-length`.
 | `max_chars_per_chunk` | int | `1800` | Cap in `chunk_excerpts` mode |
 | `max_chunks_for_prompt` | int | `10` | Max chunks kept for generation |
 
+### `answer_generation`
+
+Package: `thot.tasks.answer_generation` (used by `make generate-eval` and offline
+retrieve enrichment). CLI flags `--skip-nlp` / `--no-ontology` / `--no-reasoner`
+override these defaults.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `use_nlp` | bool | `true` | Full NLP on query + evidence (tokenizer → morphosyntax → NER → syntax → keywords) |
+| `use_ontology` | bool | `true` | Merge passage `document_ontology` graphs, generate SPARQL clues, inject into QA prompt |
+| `use_reasoner` | bool | `true` | Consistency / infer on merged ontology (ignored when `use_ontology` is false) |
+
 ### `search` (legacy single-arm path)
 
 Used when `dual_hybrid.enabled: false`. QueryAnalyzer builds one YQL against `user`.
@@ -114,9 +128,9 @@ Used when `dual_hybrid.enabled: false`. QueryAnalyzer builds one YQL against `us
 | `max_yql_terms` | int | `48` | Cap OR terms in QueryAnalyzer YQL |
 | `weight_chunk_embedding` | float | `0.40` | Informational |
 | `weight_text_raw_bm25` | float | `0.60` | Informational |
-| `rerank.enabled` | bool | `true` | Second-stage rerank (skipped if `dual_hybrid.enabled`) |
-| `rerank.strategy` | enum | `cross_encoder` | `cross_encoder` \| `embedding_cosine` (**LLM forbidden**) |
-| `rerank.candidates` | int | `50` | First-stage hits sent to reranker |
+| `rerank.enabled` | bool | `true` | Legacy second-stage rerank (skipped if `dual_hybrid.enabled`) |
+| `rerank.strategy` | enum | `embedding_cosine` | `embedding_cosine` (default) \| `cross_encoder` (opt-in via `RERANKER_MODEL`; **LLM forbidden**). Production uses `dual_hybrid.colbert` |
+| `rerank.candidates` | int | `50` | First-stage hits sent to legacy reranker |
 
 ---
 
@@ -227,7 +241,7 @@ Not loaded from disk in the API.
 | `nlp_seed_expansion.min_sentences` | int | `2` | Or when the query has ≥ this many sentence spans (`.?!`) |
 
 Additionally, **structural identifier stems** (language-agnostic: e.g. `FoxO3a` → `foxo`) are always added with weight `0.75` (`relation: stem`), capped to 12 stems.  
-When `nlp_seed_expansion` is off, or the query is below both thresholds, expansion uses the raw query only (plus stems). Offline BEIR retrieve applies the same gate via `thot.tools.eval.query_enrichment`.  
+When `nlp_seed_expansion` is off, or the query is below both thresholds, expansion uses the raw query only (plus stems). Offline BEIR retrieve applies the same gate via `thot.tasks.answer_generation.query_enrichment` (also gated by `answer_generation.use_nlp` / `use_ontology`).  
 Implementation: `thot.tools.search.query_expander.QueryExpander` + `lexical_signal.token_stems`.
 
 ### `rrf` — Reciprocal Rank Fusion
@@ -344,7 +358,7 @@ Loaded alongside `rag.yaml` by the RAG FastAPI app. Edit strings carefully: they
 | Generation prompts | `thot.tools.search.generation_prompt` |
 | Eval | `thot.tools.eval.beir_eval` / `beir_smoke` / `beir_tkeir` |
 | RRF / fusion | `thot.tools.search.fusion` |
-| Lexical gates | `thot.tools.search.lexical_signal` |
+| Token stems (expand / ontology index) | `thot.tools.search.lexical_signal` |
 | Expansion | `thot.tools.search.query_expander` |
 | Ontology overlap | `thot.tools.search.ontology_scorer` |
 | Schema gen | `scripts/generate_vespa_schemas.py` |

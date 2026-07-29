@@ -194,7 +194,11 @@ models:
     provider_default: ollama
     sha256: null
   reranker:
-    name: BAAI/bge-reranker-v2-m3
-    strategy: cross_encoder
+    name: null
+    strategy: embedding_cosine
     sha256: null
-    note: "HuggingFace CrossEncoder via sentence-transformers (not an Ollama pull)"
+    note: >
+      No separate CrossEncoder (bge-reranker-*) is shipped. Production second
+      stage is FlagEmbedding BGE-M3 ColBERT (dual_hybrid.colbert). Legacy
+      search.rerank uses embedding_cosine over the same embedding model.
+      Opt-in CrossEncoder only via RERANKER_MODEL + RERANK_STRATEGY=cross_encoder.

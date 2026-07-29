@@ -115,7 +115,13 @@ def score_bm25(
     top_k: int = DEFAULT_POOL,
 ) -> dict[str, dict[str, float]]:
     """In-memory BM25Okapi over title+text (BEIR baseline / hybrid arm)."""
-    from rank_bm25 import BM25Okapi
+    try:
+        from rank_bm25 import BM25Okapi
+    except ImportError as exc:  # pragma: no cover - env dependent
+        raise ImportError(
+            "Missing dependency 'rank-bm25' (T-KEIR hybrid retrieve / BM25 arm). "
+            "Install with: cd tkeir && uv sync --group beir --group models"
+        ) from exc
 
     doc_ids = list(corpus.keys())
     tokenized = [tokenize(document_text(corpus[did])) for did in doc_ids]
@@ -326,7 +332,9 @@ def retrieve_hybrid(
     fused = rrf_fuse_runs(bge_run, bm25_run, k=rrf_k, top_k=pool_n)
 
     if ontology_payload:
-        from thot.tools.eval.query_enrichment import enrich_first_stage_runs
+        from thot.tasks.answer_generation.query_enrichment import (
+            enrich_first_stage_runs,
+        )
 
         fused = enrich_first_stage_runs(
             corpus,

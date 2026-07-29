@@ -113,7 +113,7 @@ Docs: [Agents](docs/tools/agents.md), [MCP](docs/tools/mcp.md),
 ## Evaluation (BEIR)
 
 ```bash
-make eval                                   # alias: beir-eval (scifact fiqa arguana)
+make eval                                   # alias: beir-eval (scifact fiqa arguana scidocs)
 make eval-smoke                             # alias: beir-smoke (< 5 min)
 make beir-eval BEIR_DATASETS=scifact
 ```

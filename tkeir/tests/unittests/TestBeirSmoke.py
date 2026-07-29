@@ -39,7 +39,7 @@ def test_ensure_golden_chunks_for_index_synthesizes_when_missing():
 
 
 def test_load_beir_business_ontologies():
-    for name in ("scifact", "fiqa", "arguana", "osint", "enterprise"):
+    for name in ("scifact", "fiqa", "arguana", "scidocs", "osint", "enterprise"):
         payload = load_beir_business_ontology_payload(name)
         assert payload is not None, name
         assert payload.get("concepts"), name

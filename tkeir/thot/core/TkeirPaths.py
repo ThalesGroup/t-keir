@@ -197,6 +197,27 @@ def evaluation_report_path() -> str:
     return os.path.join(docs_dir(), "evaluation_report.md")
 
 
+def evaluation_generate_report_path() -> str:
+    """Return the generation-eval report path under documentation.
+
+    Returns:
+        Absolute path to ``docs/evaluation_generate_report.md``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import evaluation_generate_report_path
+        >>> evaluation_generate_report_path().endswith(
+        ...     "docs/evaluation_generate_report.md"
+        ... )
+        True
+    """
+    return os.path.join(docs_dir(), "evaluation_generate_report.md")
+
+
+def evaluation_rag_report_path() -> str:
+    """Deprecated alias for :func:`evaluation_generate_report_path`."""
+    return evaluation_generate_report_path()
+
+
 def resolve_path(path: str) -> str:
     """Expand a path relative to the ``tkeir`` package root.
 

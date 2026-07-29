@@ -31,9 +31,9 @@ def _config(provider: Provider, **overrides: object) -> WrapperConfig:
         embedding_model=str(overrides.get("embedding_model", "embed-model")),
         llm_model=str(overrides.get("llm_model", "llm-model")),
         reranker_model=str(
-            overrides.get("reranker_model", "BAAI/bge-reranker-v2-m3")
+            overrides.get("reranker_model", "")
         ),
-        rerank_strategy=str(overrides.get("rerank_strategy", "cross_encoder")),
+        rerank_strategy=str(overrides.get("rerank_strategy", "embedding_cosine")),
         embedding_dim=cast(int, overrides.get("embedding_dim", 3)),
         timeout_seconds=cast(float, overrides.get("timeout_seconds", 5.0)),
         openai_api_key=cast(str | None, overrides.get("openai_api_key")),
@@ -246,7 +246,8 @@ def test_wrapper_config_from_env_example(monkeypatch):
     monkeypatch.setenv("PROVIDER", "vllm")
     cfg = WrapperConfig.from_env(file_models={})
     assert cfg.provider is Provider.VLLM
-    assert cfg.reranker_model
+    assert cfg.reranker_model == ""
+    assert cfg.rerank_strategy == "embedding_cosine"
 
 
 def test_wrapper_config_env_overrides_file_models(monkeypatch):
@@ -292,16 +293,16 @@ def test_rerank_embedding_cosine_uses_embeddings(monkeypatch):
 
 
 def test_rerank_rejects_llm_strategy(monkeypatch):
-    class _FakeEncoder:
-        def predict(self, pairs, show_progress_bar=False):
-            del show_progress_bar
-            return [0.1, 0.9]
-
     wrapper = UnifiedLLMWrapper(
-        _config(Provider.OPENAI, rerank_strategy="cross_encoder"),
+        _config(Provider.OPENAI, rerank_strategy="embedding_cosine"),
         client=AsyncMock(),
     )
-    wrapper._cross_encoder = _FakeEncoder()
+
+    async def _fake_embed_batch(texts: list[str]) -> list[list[float]]:
+        del texts
+        return [[1.0, 0.0], [0.0, 1.0], [1.0, 0.0]]
+
+    monkeypatch.setattr(wrapper, "embed_batch", _fake_embed_batch)
 
     async def _run() -> list[dict]:
         return await wrapper.rerank(
@@ -309,8 +310,9 @@ def test_rerank_rejects_llm_strategy(monkeypatch):
         )
 
     ranked = asyncio.run(_run())
-    # Forbidden LLM strategy falls back to cross-encoder
-    assert ranked[0] == {"index": 1, "relevance_score": 0.9}
+    # Forbidden LLM strategy falls back to embedding_cosine
+    assert len(ranked) == 2
+    assert {row["index"] for row in ranked} == {0, 1}
 
 
 def test_cross_encoder_rerank_uses_sentence_transformers(monkeypatch):
@@ -321,7 +323,11 @@ def test_cross_encoder_rerank_uses_sentence_transformers(monkeypatch):
             return [0.1, 0.9]
 
     wrapper = UnifiedLLMWrapper(
-        _config(Provider.OLLAMA, rerank_strategy="cross_encoder"),
+        _config(
+            Provider.OLLAMA,
+            rerank_strategy="cross_encoder",
+            reranker_model="BAAI/fake-cross-encoder",
+        ),
         client=AsyncMock(),
     )
     wrapper._cross_encoder = _FakeEncoder()

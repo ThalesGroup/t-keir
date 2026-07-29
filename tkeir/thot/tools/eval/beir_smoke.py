@@ -1,6 +1,6 @@
 """Title: BEIR smoke evaluation (dev, <5 min)
 
-Fast development harness: for each BEIR corpus (scifact, fiqa, arguana)
+Fast development harness: for each BEIR corpus (scifact, fiqa, arguana, scidocs)
 isolate a tiny index — gold docs for a few selected queries plus noise —
 measure BM25 vs T-KEIR dual-hybrid timing/quality, flag rank failures, then
 wipe Vespa.
@@ -78,8 +78,9 @@ EVAL_REPORT_FOCUS_QUERIES: dict[str, tuple[str, ...]] = {
         "549",
         "585",
     ),
-    # ArguAna not yet covered in the latest evaluation_report.md.
+    # ArguAna / SciDocs not yet covered in the latest evaluation_report.md.
     "arguana": (),
+    "scidocs": (),
 }
 
 _TOKEN_RE = re.compile(r"[a-z0-9]+", re.IGNORECASE)
@@ -184,8 +185,9 @@ _ALERT_FOCUS: dict[str, tuple[str, str]] = {
     ),
     "slow_stage_lexical": (
         "low",
-        "Lexical overlap scoring cost — `lexical_signal.py` on large "
-        "candidate sets; reduce `rrf.top_n_after_fusion`.",
+        "Lexical/normalize cost — `query_expander.py` / "
+        "`text_normalizer.py` on large candidate sets; reduce "
+        "`rrf.top_n_after_fusion`.",
     ),
     "slow_stage_expand": (
         "low",
@@ -1433,7 +1435,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--datasets",
         nargs="+",
         default=list(DEFAULT_DATASETS),
-        help="BEIR dataset ids (default: scifact fiqa arguana)",
+        help=f"BEIR dataset ids (default: {' '.join(DEFAULT_DATASETS)})",
     )
     parser.add_argument(
         "--datasets-dir",

@@ -1,6 +1,6 @@
 """Title: BEIR retrieval evaluation: BM25, BGE-M3, and T-KEIR vs leaderboard.
 
-Downloads SciFact, FiQA, and ArguAna when missing under ``./datasets/``, runs
+Downloads SciFact, FiQA, ArguAna, and SciDocs when missing under ``./datasets/``, runs
 lexical (BM25), **BGE-M3 dense+sparse** (FlagEmbedding from
 ``resources/modeling/net/bge-m3``, same path as beir-smoke), and the T-KEIR
 **retrieval** stack (NLP index + PassageRetrievalPipeline on Vespa
@@ -37,7 +37,7 @@ LOGGER = logging.getLogger(__name__)
 BEIR_BASE_URL = (
     "https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets"
 )
-DEFAULT_DATASETS = ("scifact", "fiqa", "arguana")
+DEFAULT_DATASETS = ("scifact", "fiqa", "arguana", "scidocs")
 # Local FlagEmbedding BGE-M3 (same weights as T-KEIR indexing / retrieval).
 DEFAULT_DENSE_MODEL = "bge-m3"
 TOP_K = 100
@@ -48,12 +48,15 @@ LEADERBOARD_NDCG10: dict[str, dict[str, float]] = {
     "scifact": {"BM25": 0.665, "SPLADE": 0.699, "Contriever": 0.677},
     "fiqa": {"BM25": 0.236, "SPLADE": 0.342, "Contriever": 0.329},
     "arguana": {"BM25": 0.397, "SPLADE": 0.472, "Contriever": 0.435},
+    # Thakur et al. / BEIR resource paper (nDCG@10).
+    "scidocs": {"BM25": 0.158, "SPLADE": 0.159, "Contriever": 0.165},
 }
 
 DATASET_DISPLAY: dict[str, str] = {
     "scifact": "SciFact",
     "fiqa": "FiQA-2018",
     "arguana": "ArguAna",
+    "scidocs": "SciDocs",
 }
 
 QUALITATIVE_NOTES: dict[str, str] = {
@@ -84,6 +87,15 @@ QUALITATIVE_NOTES: dict[str, str] = {
         "some lexical gaps, but stance polarity and argumentative structure "
         "are not encoded strongly by generic sentence embeddings, so many "
         "gold counterarguments remain buried outside the top ranks."
+    ),
+    "scidocs": (
+        "SciDocs is citation-prediction retrieval: given a paper title (query), "
+        "rank papers that are cited by / cite / co-cited with it. Gold documents "
+        "often share topical vocabulary but not the query title string, so BM25 "
+        "under-ranks true related work when titles use different naming. Dense "
+        "retrieval helps on topical paraphrase, yet still struggles when "
+        "relatedness is citation-graph driven rather than lexical or semantic "
+        "overlap in the title/abstract alone."
     ),
 }
 
@@ -202,15 +214,29 @@ def ensure_dataset(name: str, datasets_dir: Path) -> Path | None:
         return target
 
     datasets_dir.mkdir(parents=True, exist_ok=True)
+    zip_path = datasets_dir / f"{name}.zip"
     url = f"{BEIR_BASE_URL}/{name}.zip"
     LOGGER.info("Downloading BEIR dataset '%s' from %s", name, url)
     try:
         data_path = util.download_and_unzip(url, str(datasets_dir))
     except Exception as exc:  # noqa: BLE001 — soft-fail downloads
         LOGGER.error("Failed to download '%s': %s", name, exc)
-        return None
+        # Zip may already exist from a partial run — try unzipping it.
+        if zip_path.is_file() and not marker.is_file():
+            LOGGER.info("Attempting local unzip of %s", zip_path)
+            try:
+                import zipfile
 
-    path = Path(data_path)
+                with zipfile.ZipFile(zip_path, "r") as zf:
+                    zf.extractall(datasets_dir)
+            except Exception as unzip_exc:  # noqa: BLE001
+                LOGGER.error("Local unzip of '%s' failed: %s", name, unzip_exc)
+                return None
+        else:
+            return None
+        data_path = str(target)
+
+    path = Path(data_path) if data_path else target
     if not (path / "corpus.jsonl").is_file():
         # download_and_unzip may return the parent or the dataset folder
         candidate = datasets_dir / name

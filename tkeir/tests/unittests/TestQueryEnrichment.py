@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from unittest.mock import patch
 
-from thot.tools.eval.query_enrichment import enrich_first_stage_runs
+from thot.tasks.answer_generation.query_enrichment import enrich_first_stage_runs
+from thot.tools.search.rag_config import load_rag_config
 
 
 class _Fold:
@@ -70,12 +72,20 @@ def test_enrich_runs_expander_and_rescorer_for_long_query():
         ]
     }
 
+    base = load_rag_config()
+    scoring = replace(base.dual_hybrid.ontology_scoring, enabled=True)
+    dual = replace(base.dual_hybrid, ontology_scoring=scoring)
+    cfg = replace(base, dual_hybrid=dual)
+
     with patch(
-        "thot.tools.eval.query_enrichment._load_query_pipeline_runner",
+        "thot.tasks.answer_generation.query_enrichment._load_query_pipeline_runner",
         return_value=None,
     ), patch(
         "thot.tools.search.text_normalizer.normalizer_for_language",
         return_value=_Fold(),
+    ), patch(
+        "thot.tools.search.rag_config.load_rag_config",
+        return_value=cfg,
     ):
         out = enrich_first_stage_runs(
             corpus,

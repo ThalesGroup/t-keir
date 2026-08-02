@@ -106,9 +106,34 @@ Override with `INDEX_INPUT=/path/to/json/dir make index`.
 
 Details: [vespa/README.md](vespa/README.md), [docs/tools/vespa_rag.md](docs/tools/vespa_rag.md)
 
-### 4. Web UI (HMI)
+### 4. Hybrid demo — `./start_services.sh` (recommended)
 
-With Vespa indexed and `make rag` running:
+One-command launcher for the full local stack in **tmux**: Vespa + Keycloak +
+SPIRE (Docker), then ingest, RAG, governor, audit, OKF, agent, and HMI on the
+host, with health gates between windows.
+
+```bash
+# Prerequisites: make setup (+ make pull-vespa), Docker, tmux, Ollama on host
+./start_services.sh
+# or: bash start_services.sh --no-attach
+```
+
+| Shortcut | Action |
+|---|---|
+| `TAB` | Next tmux window |
+| `CTRL+R` | Restart the active pane |
+| `ESC` | `make down` + kill session (`KEEP_DATA=1` keeps DBs) |
+
+Open [http://localhost:3000](http://localhost:3000) when the `[HMI]` window is
+ready. Skip the install gate with `--skip-check-install` if the toolchain is
+already verified.
+
+Details: [docs/deployment/start_services.md](docs/deployment/start_services.md),
+[Zero to Hero §5.2.a](docs/zero_to_hero.md#52a-hybrid-demo-vespa--keycloak--spire-infra-host-services)
+
+### 5. Web UI (HMI) only
+
+With Vespa indexed and `make rag` running (or after `./start_services.sh`):
 
 ```bash
 cd tkeir-hmi

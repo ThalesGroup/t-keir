@@ -7,31 +7,36 @@ import {
   type QueryResponse,
 } from "@/lib/types";
 import { MIN_KEYWORD_LENGTH } from "@/lib/constants";
+import { filterHighlightSurfaces } from "@/lib/highlight";
 
 export function extractHighlightEntities(ontology: FusedOntology): string[] {
-  return [...ontology.entities]
-    .sort(
-      (a, b) =>
-        b.chunk_ids.length - a.chunk_ids.length ||
-        a.label.localeCompare(b.label),
-    )
-    .slice(0, 20)
-    .map((entity) => entity.label);
+  return filterHighlightSurfaces(
+    [...ontology.entities]
+      .sort(
+        (a, b) =>
+          b.chunk_ids.length - a.chunk_ids.length ||
+          a.label.localeCompare(b.label),
+      )
+      .slice(0, 20)
+      .map((entity) => entity.label),
+  );
 }
 
 export function extractHighlightKeywords(
   ontology: FusedOntology,
   minKeywordLength = MIN_KEYWORD_LENGTH,
 ): string[] {
-  return [...ontology.keywords]
-    .filter((keyword) => keyword.label.trim().length >= minKeywordLength)
-    .sort(
-      (a, b) =>
-        b.chunk_ids.length - a.chunk_ids.length ||
-        a.label.localeCompare(b.label),
-    )
-    .slice(0, 15)
-    .map((keyword) => keyword.label);
+  return filterHighlightSurfaces(
+    [...ontology.keywords]
+      .filter((keyword) => keyword.label.trim().length >= minKeywordLength)
+      .sort(
+        (a, b) =>
+          b.chunk_ids.length - a.chunk_ids.length ||
+          a.label.localeCompare(b.label),
+      )
+      .slice(0, 15)
+      .map((keyword) => keyword.label),
+  );
 }
 
 function ontologySection(
@@ -173,13 +178,15 @@ export function enrichQueryResponse(
 } {
   const highlightEntities =
     raw.highlight_entities && raw.highlight_entities.length > 0
-      ? raw.highlight_entities
+      ? filterHighlightSurfaces(raw.highlight_entities)
       : extractHighlightEntities(raw.ontology);
   const highlightKeywords =
     raw.highlight_keywords && raw.highlight_keywords.length > 0
-      ? raw.highlight_keywords
+      ? filterHighlightSurfaces(raw.highlight_keywords)
       : extractHighlightKeywords(raw.ontology);
-  const highlightQueryTerms = raw.highlight_query_terms ?? [];
+  const highlightQueryTerms = filterHighlightSurfaces(
+    raw.highlight_query_terms ?? [],
+  );
   const reportMarkdown =
     raw.report_markdown?.trim() ||
     buildClientReportMarkdown(raw, query, language);

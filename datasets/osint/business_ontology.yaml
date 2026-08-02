@@ -222,9 +222,12 @@ concepts:
       - "vessel anomaly"
       - "maritime anomaly"
       - "behavioural anomaly"
+      - "behavioral anomaly"
     surface_forms:
       - "anomaly type"
       - "AIS alert"
+      - "critical behavioural anomaly"
+      - "critical behavioral anomaly"
     dataset_fields:
       - anomaly_type
       - tags
@@ -248,6 +251,7 @@ concepts:
       - "dark vessel"
     surface_forms:
       - DARK_ACTIVITY_AIS_OFF
+      - DARK_ACTIVITY
       - "dark_activity_ais_off"
       - "AIS transmitter disabled"
     dataset_fields:
@@ -965,6 +969,8 @@ concepts:
       - "satellite maritime surveillance"
     surface_forms:
       - "MARITIME_ANALYTICS"
+      - "MARITIME ANALYTICS"
+      - "MARITIME ANALYTICS ALERT"
       - "MOC-J2 MARITIME FUSION CELL"
       - "Commercial maritime AI analytics platform"
       - "TECHNICAL_COMMERCIAL"
@@ -1625,8 +1631,12 @@ concepts:
     preferred_label: "PRIORITY precedence"
     synonyms:
       - PRIORITY
+      - "B1"
+      - "B1 PRIORITY"
     surface_forms:
       - "precedence: PRIORITY"
+      - "Evaluation: B1"
+      - "B1 — PRIORITY"
     dataset_fields:
       - precedence                        # value: PRIORITY
     broader:

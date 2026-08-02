@@ -1,0 +1,60 @@
+name: otan_commander_brief
+version: 1
+title: OTAN / NATO Commander's Briefing
+description: >
+  Decision-oriented Commander's Briefing for CTF Commander (ROE / CCIR).
+slots:
+  - name: situation
+    type: freeform_grounded
+    description: SITUATION synthesis across indexes.
+    constraints: { required: true }
+  - name: pir_status
+    type: freeform_grounded
+    description: PIR STATUS and open CCIRs.
+    constraints: { required: false }
+  - name: prior_decisions
+    type: freeform_grounded
+    description: PRIOR DECISIONS from personal decision log.
+    constraints: { required: false }
+  - name: decisions_required
+    type: freeform_grounded
+    description: DECISIONS REQUIRED NOW with ROE basis.
+    constraints: { required: true }
+  - name: constraints
+    type: freeform_grounded
+    description: CONSTRAINTS — ROE, LAO, force availability.
+    constraints: { required: false }
+markdown_template: |
+  # COMMANDER'S BRIEFING — {{ topic or "untitled" }}
+  Classification: SECRET // REL TO COALITION TF
+  Form: OTAN Commander's Briefing
+
+  {% if situation %}
+  ## SITUATION
+
+  {{ situation }}
+  {% endif %}
+
+  {% if pir_status %}
+  ## PIR STATUS
+
+  {{ pir_status }}
+  {% endif %}
+
+  {% if prior_decisions %}
+  ## PRIOR DECISIONS
+
+  {{ prior_decisions }}
+  {% endif %}
+
+  {% if decisions_required %}
+  ## DECISIONS REQUIRED NOW
+
+  {{ decisions_required }}
+  {% endif %}
+
+  {% if constraints %}
+  ## CONSTRAINTS
+
+  {{ constraints }}
+  {% endif %}

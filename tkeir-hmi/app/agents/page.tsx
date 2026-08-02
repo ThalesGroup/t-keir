@@ -1,61 +1,86 @@
 import Link from "next/link";
 
 import { AgentRunMonitor } from "@/components/agent-run-monitor";
+import { RequireRole } from "@/src/auth/RequireRole";
 
 /**
  * Minimal agent / workflow run monitor (Phase E).
  */
 export default function AgentsPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 py-10">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-          T-KEIR
-        </p>
-        <h1 className="text-2xl font-bold tracking-tight">Agent runs</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Start a workflow, poll status / handoffs / compose output, and publish
-          through the approval-gated re-ingest path.
-        </p>
-      </div>
+    <RequireRole
+      allowedRoles={[
+        "c2-j2-analyst",
+        "c2-moc-watch",
+        "c2-j2x-humint",
+        "c2-ctf-commander",
+        "c2-admin",
+        "tkeir-admin",
+      ]}
+    >
+      <div className="mx-auto max-w-3xl space-y-6 px-4 py-10">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+            T-KEIR
+          </p>
+          <h1 className="text-2xl font-bold tracking-tight">Agent runs</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Start a workflow, poll status / handoffs / compose output, and publish
+            through the approval-gated re-ingest path.
+          </p>
+        </div>
 
-      <AgentRunMonitor />
+        <AgentRunMonitor />
 
-      <div className="rounded-xl border bg-card p-4 text-sm shadow-sm">
-        <h2 className="font-semibold">Workflow cards</h2>
-        <ul className="mt-2 space-y-2 text-muted-foreground">
-          <li>
-            <span className="font-medium text-foreground">content_brief</span> —
-            researcher → analyst → synthesis_note
-          </li>
-          <li>
-            <span className="font-medium text-foreground">okf_wiki_brief</span> —
-            scoped OKF export → okf_curator → synthesis_note (shows{" "}
-            <code>bundle_id</code> when present)
-          </li>
-        </ul>
-      </div>
+        <div className="rounded-xl border bg-card p-4 text-sm shadow-sm">
+          <h2 className="font-semibold">Workflow cards</h2>
+          <ul className="mt-2 space-y-2 text-muted-foreground">
+            <li>
+              <span className="font-medium text-foreground">persona_*</span> —
+              default per Keycloak persona (analyse → review → write → OTAN
+              compose):{" "}
+              <code>persona_j2_analyst</code>, <code>persona_moc_watch</code>,{" "}
+              <code>persona_j2x_humint</code>,{" "}
+              <code>persona_ctf_commander</code>, <code>persona_admin</code>
+            </li>
+            <li>
+              <span className="font-medium text-foreground">llm_wiki</span> —
+              scoped OKF export → iterative persona wiki (
+              <code>*_prompt</code>)
+            </li>
+            <li>
+              <span className="font-medium text-foreground">otan_c2_brief</span>{" "}
+              — shared OTAN + LLM Wiki pipeline (researcher → reviewer →
+              wiki_writer)
+            </li>
+            <li>
+              <span className="font-medium text-foreground">okf_wiki_brief</span>{" "}
+              — scoped OKF export → okf_curator → synthesis_note
+            </li>
+          </ul>
+        </div>
 
-      <div className="flex gap-4 text-sm">
-        <Link
-          href="/"
-          className="text-primary underline-offset-2 hover:underline"
-        >
-          ← Search
-        </Link>
-        <Link
-          href="/okf"
-          className="text-primary underline-offset-2 hover:underline"
-        >
-          OKF Bundles
-        </Link>
-        <Link
-          href="/admin"
-          className="text-primary underline-offset-2 hover:underline"
-        >
-          Admin / approvals
-        </Link>
+        <div className="flex gap-4 text-sm">
+          <Link
+            href="/"
+            className="text-primary underline-offset-2 hover:underline"
+          >
+            ← Search
+          </Link>
+          <Link
+            href="/?mode=wiki"
+            className="text-primary underline-offset-2 hover:underline"
+          >
+            LLM Wiki
+          </Link>
+          <Link
+            href="/admin"
+            className="text-primary underline-offset-2 hover:underline"
+          >
+            Admin / approvals
+          </Link>
+        </div>
       </div>
-    </div>
+    </RequireRole>
   );
 }

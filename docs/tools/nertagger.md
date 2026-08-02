@@ -68,10 +68,10 @@ The NER tagger comes with unit and functional testing.
 ### NERTagger Unit tests
 
 ```shell
-python3 -m pytest tkeir/tests/unittests/TestNERTaggerConfiguration.py
+python3 -m pytest tests/unittests/TestNERTaggerConfiguration.py
 ```
 ### NER Tagger Functional tests
 
 ```shell
-python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
+python3 -m pytest tests/functional_tests/TestPipeline.py
 ```

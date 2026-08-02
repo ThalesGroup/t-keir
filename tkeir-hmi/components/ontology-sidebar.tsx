@@ -1,7 +1,7 @@
 "use client";
 
 import { Filter, FileJson, Network, Tag, Wand2, X } from "lucide-react";
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 
 import { OntologyReasonGraph } from "@/components/ontology-reason-graph";
 import { Badge } from "@/components/ui/badge";
@@ -12,13 +12,14 @@ import { MIN_KEYWORD_LENGTH } from "@/lib/constants";
 import {
   groupEntitiesByType,
   type FusedOntology,
-  type OntologyReasonerEngine,
   type OntologyReasonerOperation,
   type OntologyReasonerResponse,
+  type ProposedOntologyQuery,
   type SemanticEntity,
   type SemanticKeyword,
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/src/auth/AuthProvider";
 
 interface OntologySidebarProps {
   ontology: FusedOntology | null;
@@ -31,6 +32,8 @@ interface OntologySidebarProps {
   /** When true, skip outer Card chrome (used inside accordion). */
   embedded?: boolean;
 }
+
+type ReasonFamily = "coherence" | "expression" | "sparql";
 
 function EntityButton({
   entity,
@@ -86,32 +89,47 @@ function KeywordButton({
   );
 }
 
-const REASONER_OPS: { value: OntologyReasonerOperation; label: string }[] = [
-  { value: "sparql", label: "SPARQL" },
+const COHERENCE_OPS: { value: OntologyReasonerOperation; label: string }[] = [
+  { value: "consistency", label: "Coherence check" },
   { value: "subclasses", label: "Subclasses" },
   { value: "superclasses", label: "Superclasses" },
   { value: "instances", label: "Instances" },
   { value: "types", label: "Types" },
-  { value: "consistency", label: "Consistency" },
-];
-
-const REASONER_ENGINES: {
-  value: OntologyReasonerEngine;
-  label: string;
-  hint: string;
-}[] = [
-  { value: "rdflib", label: "rdflib (local)", hint: "No Java — RDFS / SPARQL" },
-  { value: "HermiT", label: "HermiT", hint: "OWLAPY + Java" },
-  { value: "Pellet", label: "Pellet", hint: "OWLAPY + Java" },
-  { value: "ELK", label: "ELK", hint: "OWLAPY + Java" },
-  { value: "JFact", label: "JFact", hint: "OWLAPY + Java" },
-  { value: "Openllet", label: "Openllet", hint: "OWLAPY + Java" },
-  { value: "Structural", label: "Structural", hint: "OWLAPY structural" },
+  { value: "infer", label: "Hierarchy infer" },
 ];
 
 const DEFAULT_SPARQL = `SELECT ?s ?p ?o WHERE {
   ?s ?p ?o .
 } LIMIT 25`;
+
+const DEFAULT_EXPRESSION = "VESSEL";
+
+function ProposalChips({
+  items,
+  onPick,
+}: {
+  items: ProposedOntologyQuery[];
+  onPick: (item: ProposedOntologyQuery) => void;
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {items.map((item) => (
+        <button
+          key={`${item.kind}-${item.title}-${item.query.slice(0, 40)}`}
+          type="button"
+          title={item.description || item.query}
+          onClick={() => onPick(item)}
+          className="rounded-md border bg-muted/50 px-2 py-1 text-left text-[11px] leading-snug hover:border-primary hover:bg-muted"
+        >
+          <span className="font-medium">{item.title}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export const OntologySidebar = memo(function OntologySidebar({
   ontology,
@@ -123,6 +141,7 @@ export const OntologySidebar = memo(function OntologySidebar({
   onClearFilter,
   embedded = false,
 }: OntologySidebarProps) {
+  const { runtimeConfig } = useAuth();
   const entityGroups = useMemo(
     () =>
       ontology
@@ -150,19 +169,50 @@ export const OntologySidebar = memo(function OntologySidebar({
     }
   }, [ontology?.json_ld]);
 
+  const proposed = ontology?.proposed_queries ?? [];
+  const sparqlProposals = useMemo(
+    () => proposed.filter((item) => item.kind === "sparql").slice(0, 3),
+    [proposed],
+  );
+  const expressionProposals = useMemo(
+    () => proposed.filter((item) => item.kind === "expression"),
+    [proposed],
+  );
+  const hierarchyProposals = useMemo(
+    () =>
+      proposed.filter((item) =>
+        ["coherence", "subclasses", "superclasses", "instances"].includes(
+          item.kind,
+        ),
+      ),
+    [proposed],
+  );
+
+  const [family, setFamily] = useState<ReasonFamily>("sparql");
   const [operation, setOperation] =
-    useState<OntologyReasonerOperation>("subclasses");
-  const [reasoner, setReasoner] = useState<OntologyReasonerEngine>("rdflib");
+    useState<OntologyReasonerOperation>("consistency");
   const [classIri, setClassIri] = useState(
-    "http://tkeir.local/ontology/Organization",
+    "http://tkeir.local/ontology/DefinedTerm",
   );
   const [individualIri, setIndividualIri] = useState("");
   const [sparql, setSparql] = useState(DEFAULT_SPARQL);
+  const [expression, setExpression] = useState(DEFAULT_EXPRESSION);
   const [reasonBusy, setReasonBusy] = useState(false);
   const [reasonError, setReasonError] = useState<string | null>(null);
   const [reasonResult, setReasonResult] =
     useState<OntologyReasonerResponse | null>(null);
-  const [resultView, setResultView] = useState<"graph" | "jsonld">("graph");
+  const [resultView, setResultView] = useState<"graph" | "jsonld" | "rows">(
+    "rows",
+  );
+
+  useEffect(() => {
+    if (sparqlProposals[0]?.query) {
+      setSparql(sparqlProposals[0].query);
+    }
+    if (expressionProposals[0]?.query) {
+      setExpression(expressionProposals[0].query);
+    }
+  }, [ontology?.json_ld]); // eslint-disable-line react-hooks/exhaustive-deps -- refresh chips when fused graph changes
 
   const formattedReasonJsonLd = useMemo(() => {
     const raw = reasonResult?.json_ld?.trim();
@@ -182,6 +232,8 @@ export const OntologySidebar = memo(function OntologySidebar({
     (ontology.triple_count != null || ontology.source_count != null)
       ? `${ontology.triple_count ?? 0} triples · ${ontology.source_count ?? 0} source graph(s)`
       : null;
+  const boDataset =
+    runtimeConfig?.businessOntologyDataset?.trim() || "osint";
 
   async function runReasoner() {
     if (!ontology?.json_ld?.trim()) {
@@ -191,18 +243,31 @@ export const OntologySidebar = memo(function OntologySidebar({
     setReasonBusy(true);
     setReasonError(null);
     try {
-      const result = await queryOntologyReasoner({
-        json_ld: ontology.json_ld,
-        operation,
-        reasoner,
-        prefer_owlapy: reasoner !== "rdflib",
-        class_iri: classIri.trim() || undefined,
-        individual_iri: individualIri.trim() || undefined,
-        sparql: operation === "sparql" ? sparql : undefined,
-        limit: 50,
-      });
+      const op: OntologyReasonerOperation | string =
+        family === "expression"
+          ? "expression"
+          : family === "sparql"
+            ? "sparql"
+            : operation;
+      const result = await queryOntologyReasoner(
+        {
+          json_ld: ontology.json_ld,
+          operation: op,
+          reasoner: "python",
+          class_iri: classIri.trim() || undefined,
+          individual_iri: individualIri.trim() || undefined,
+          sparql: family === "sparql" ? sparql : undefined,
+          expression: family === "expression" ? expression : undefined,
+          limit: 50,
+        },
+        runtimeConfig,
+      );
       setReasonResult(result);
-      setResultView("graph");
+      setResultView(
+        Array.isArray(result.results) && result.results.length > 0
+          ? "rows"
+          : "graph",
+      );
     } catch (error) {
       setReasonResult(null);
       setReasonError(
@@ -214,6 +279,33 @@ export const OntologySidebar = memo(function OntologySidebar({
       );
     } finally {
       setReasonBusy(false);
+    }
+  }
+
+  function applyProposal(item: ProposedOntologyQuery) {
+    if (item.kind === "sparql") {
+      setFamily("sparql");
+      setSparql(item.query);
+      return;
+    }
+    if (item.kind === "expression") {
+      setFamily("expression");
+      setExpression(item.query);
+      return;
+    }
+    if (
+      item.kind === "subclasses" ||
+      item.kind === "superclasses" ||
+      item.kind === "instances"
+    ) {
+      setFamily("coherence");
+      setOperation(item.kind);
+      setClassIri(item.query);
+      return;
+    }
+    if (item.kind === "coherence") {
+      setFamily("coherence");
+      setOperation("consistency");
     }
   }
 
@@ -363,7 +455,7 @@ export const OntologySidebar = memo(function OntologySidebar({
                 <>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <FileJson className="h-3 w-3" />
-                    Merged RDF from Vespa parent json_ld fields
+                    Fused RDF from analyzed ingest documents + business ontology
                   </div>
                   <pre className="max-h-[50vh] overflow-auto rounded-md border bg-muted/40 p-3 text-[11px] leading-relaxed">
                     <code>{formattedJsonLd}</code>
@@ -375,67 +467,129 @@ export const OntologySidebar = memo(function OntologySidebar({
             <TabsContent value="reason" className="mt-4 space-y-3">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Wand2 className="h-3 w-3" />
-                Query the merged ontology; results render as JSON-LD graph
+                Pure Python reasoner · business ontology: {boDataset}
               </div>
+
+              {sparqlProposals.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-[11px] font-medium text-muted-foreground">
+                    Suggested SPARQL (from your RAG query)
+                  </p>
+                  <ProposalChips
+                    items={sparqlProposals}
+                    onPick={applyProposal}
+                  />
+                </div>
+              )}
+
               <label className="block space-y-1 text-xs">
-                <span className="text-muted-foreground">Reasoner</span>
+                <span className="text-muted-foreground">Request type</span>
                 <select
                   className="w-full rounded-md border bg-background px-2 py-1.5 text-sm"
-                  value={reasoner}
+                  value={family}
                   onChange={(event) =>
-                    setReasoner(event.target.value as OntologyReasonerEngine)
+                    setFamily(event.target.value as ReasonFamily)
                   }
                 >
-                  {REASONER_ENGINES.map((engine) => (
-                    <option key={engine.value} value={engine.value}>
-                      {engine.label} — {engine.hint}
-                    </option>
-                  ))}
+                  <option value="coherence">
+                    A · Coherence / hierarchy
+                  </option>
+                  <option value="expression">
+                    B · Class expression (e.g. Person and age &gt; 20)
+                  </option>
+                  <option value="sparql">SPARQL SELECT</option>
                 </select>
               </label>
-              <label className="block space-y-1 text-xs">
-                <span className="text-muted-foreground">Operation</span>
-                <select
-                  className="w-full rounded-md border bg-background px-2 py-1.5 text-sm"
-                  value={operation}
-                  onChange={(event) =>
-                    setOperation(
-                      event.target.value as OntologyReasonerOperation,
-                    )
-                  }
-                >
-                  {REASONER_OPS.map((op) => (
-                    <option key={op.value} value={op.value}>
-                      {op.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {(operation === "subclasses" ||
-                operation === "superclasses" ||
-                operation === "instances") && (
-                <label className="block space-y-1 text-xs">
-                  <span className="text-muted-foreground">Class IRI</span>
-                  <input
-                    className="w-full rounded-md border bg-background px-2 py-1.5 text-sm"
-                    value={classIri}
-                    onChange={(event) => setClassIri(event.target.value)}
-                    placeholder="http://tkeir.local/ontology/Organization"
-                  />
-                </label>
+
+              {family === "coherence" && (
+                <>
+                  {hierarchyProposals.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-[11px] font-medium text-muted-foreground">
+                        Ontology hierarchy chips
+                      </p>
+                      <ProposalChips
+                        items={hierarchyProposals}
+                        onPick={applyProposal}
+                      />
+                    </div>
+                  )}
+                  <label className="block space-y-1 text-xs">
+                    <span className="text-muted-foreground">Operation</span>
+                    <select
+                      className="w-full rounded-md border bg-background px-2 py-1.5 text-sm"
+                      value={operation}
+                      onChange={(event) =>
+                        setOperation(
+                          event.target.value as OntologyReasonerOperation,
+                        )
+                      }
+                    >
+                      {COHERENCE_OPS.map((op) => (
+                        <option key={op.value} value={op.value}>
+                          {op.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {(operation === "subclasses" ||
+                    operation === "superclasses" ||
+                    operation === "instances") && (
+                    <label className="block space-y-1 text-xs">
+                      <span className="text-muted-foreground">Class IRI</span>
+                      <input
+                        className="w-full rounded-md border bg-background px-2 py-1.5 text-sm"
+                        value={classIri}
+                        onChange={(event) => setClassIri(event.target.value)}
+                        placeholder="http://tkeir.local/ontology/Organization"
+                      />
+                    </label>
+                  )}
+                  {operation === "types" && (
+                    <label className="block space-y-1 text-xs">
+                      <span className="text-muted-foreground">
+                        Individual IRI
+                      </span>
+                      <input
+                        className="w-full rounded-md border bg-background px-2 py-1.5 text-sm"
+                        value={individualIri}
+                        onChange={(event) =>
+                          setIndividualIri(event.target.value)
+                        }
+                        placeholder="http://tkeir.local/doc/…"
+                      />
+                    </label>
+                  )}
+                </>
               )}
-              {operation === "types" && (
-                <label className="block space-y-1 text-xs">
-                  <span className="text-muted-foreground">Individual IRI</span>
-                  <input
-                    className="w-full rounded-md border bg-background px-2 py-1.5 text-sm"
-                    value={individualIri}
-                    onChange={(event) => setIndividualIri(event.target.value)}
-                    placeholder="http://tkeir.local/doc/…"
-                  />
-                </label>
+
+              {family === "expression" && (
+                <>
+                  {expressionProposals.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-[11px] font-medium text-muted-foreground">
+                        Adapted expressions
+                      </p>
+                      <ProposalChips
+                        items={expressionProposals}
+                        onPick={applyProposal}
+                      />
+                    </div>
+                  )}
+                  <label className="block space-y-1 text-xs">
+                    <span className="text-muted-foreground">
+                      Expression (Class or Class and prop &gt; N)
+                    </span>
+                    <textarea
+                      className="h-16 w-full rounded-md border bg-background px-2 py-1.5 font-mono text-[11px]"
+                      value={expression}
+                      onChange={(event) => setExpression(event.target.value)}
+                    />
+                  </label>
+                </>
               )}
-              {operation === "sparql" && (
+
+              {family === "sparql" && (
                 <label className="block space-y-1 text-xs">
                   <span className="text-muted-foreground">SPARQL SELECT</span>
                   <textarea
@@ -445,6 +599,7 @@ export const OntologySidebar = memo(function OntologySidebar({
                   />
                 </label>
               )}
+
               <Button
                 type="button"
                 size="sm"
@@ -459,14 +614,27 @@ export const OntologySidebar = memo(function OntologySidebar({
               {reasonResult && (
                 <div className="space-y-2 text-xs">
                   <p className="text-muted-foreground">
-                    {reasonResult.reasoner || reasoner} · {reasonResult.backend}
-                    {reasonResult.owlapy_available ? " · owlapy ready" : ""}
+                    {reasonResult.reasoner || "python"} · {reasonResult.backend}
                     {reasonResult.count != null
                       ? ` · ${reasonResult.count} hit(s)`
                       : ""}
                     {reasonResult.note ? ` · ${reasonResult.note}` : ""}
                   </p>
+                  {reasonResult.sparql && (
+                    <pre className="max-h-24 overflow-auto rounded-md border bg-muted/30 p-2 font-mono text-[10px]">
+                      {reasonResult.sparql}
+                    </pre>
+                  )}
                   <div className="flex gap-1">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={resultView === "rows" ? "default" : "outline"}
+                      className="h-7"
+                      onClick={() => setResultView("rows")}
+                    >
+                      Results
+                    </Button>
                     <Button
                       type="button"
                       size="sm"
@@ -486,7 +654,50 @@ export const OntologySidebar = memo(function OntologySidebar({
                       JSON-LD
                     </Button>
                   </div>
-                  {resultView === "graph" ? (
+                  {resultView === "rows" ? (
+                    reasonResult.results?.length ? (
+                      <div className="max-h-[40vh] overflow-auto rounded-md border">
+                        <table className="w-full border-collapse text-left text-[10px]">
+                          <thead className="sticky top-0 bg-muted">
+                            <tr>
+                              {Object.keys(reasonResult.results[0] || {}).map(
+                                (key) => (
+                                  <th
+                                    key={key}
+                                    className="border-b px-2 py-1 font-medium"
+                                  >
+                                    {key}
+                                  </th>
+                                ),
+                              )}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {reasonResult.results.map((row, index) => (
+                              <tr
+                                key={`row-${index}`}
+                                className="odd:bg-muted/20"
+                              >
+                                {Object.keys(reasonResult.results[0] || {}).map(
+                                  (key) => (
+                                    <td
+                                      key={`${index}-${key}`}
+                                      className="max-w-[12rem] truncate border-b px-2 py-1 align-top"
+                                      title={row[key] || ""}
+                                    >
+                                      {row[key] || ""}
+                                    </td>
+                                  ),
+                                )}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">No tabular rows.</p>
+                    )
+                  ) : resultView === "graph" ? (
                     <OntologyReasonGraph jsonLd={reasonResult.json_ld} />
                   ) : formattedReasonJsonLd ? (
                     <pre className="max-h-[40vh] overflow-auto rounded-md border bg-muted/40 p-3 text-[11px] leading-relaxed">

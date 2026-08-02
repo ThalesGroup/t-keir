@@ -39,7 +39,9 @@ tool-using research, ontology-driven document composition, and governed publicat
 | Templates (compose) | [tools/templates.md](tools/templates.md) |
 | HMI | [hmi.md](hmi.md) |
 | Python API examples | [tools/api_reference.md](tools/api_reference.md) |
+| **CI, reports & Actions** | [ci/index.md](ci/index.md) |
 | EU compliance (OPA) | [compliance/eu-audit.md](compliance/eu-audit.md) |
+| Quality dashboard | [quality/index.md](quality/index.md) |
 
 ## Source
 

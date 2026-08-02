@@ -100,9 +100,7 @@ class BusinessOntology:
         """Resolve an already-normalized string."""
         return self._label_index.get(normalized) if normalized else None
 
-    def parents_within(
-        self, concept_id: str, max_depth: int
-    ) -> set[str]:
+    def parents_within(self, concept_id: str, max_depth: int) -> set[str]:
         """Collect ancestor concept ids up to ``max_depth``."""
         found: set[str] = set()
         frontier = [concept_id]
@@ -158,9 +156,7 @@ def _paraphrase_bridges(raw: dict[str, Any]) -> list[ParaphraseBridge]:
     for row in raw.get("paraphrase_bridges") or []:
         if not isinstance(row, dict):
             continue
-        claim = str(
-            row.get("claim") or row.get("claim_form") or ""
-        ).strip()
+        claim = str(row.get("claim") or row.get("claim_form") or "").strip()
         document = str(
             row.get("document") or row.get("document_form") or ""
         ).strip()
@@ -173,11 +169,11 @@ def _concept_from_mapping(raw: dict[str, Any]) -> BusinessConcept:
     return BusinessConcept(
         concept_id=str(raw["concept_id"]),
         preferred_label=str(raw.get("preferred_label") or raw["concept_id"]),
-        synonyms=[str(x) for x in (raw.get("synonyms") or [])],
-        surface_forms=[str(x) for x in (raw.get("surface_forms") or [])],
-        broader=[str(x) for x in (raw.get("broader") or [])],
-        narrower=[str(x) for x in (raw.get("narrower") or [])],
-        related=[str(x) for x in (raw.get("related") or [])],
+        synonyms=[str(x) for x in raw.get("synonyms") or []],
+        surface_forms=[str(x) for x in raw.get("surface_forms") or []],
+        broader=[str(x) for x in raw.get("broader") or []],
+        narrower=[str(x) for x in raw.get("narrower") or []],
+        related=[str(x) for x in raw.get("related") or []],
         paraphrase_bridges=_paraphrase_bridges(raw),
     )
 
@@ -206,7 +202,9 @@ def business_ontology_from_data(data: Any) -> BusinessOntology:
     elif isinstance(data, dict) and data.get("concept_id"):
         rows = [data]
     else:
-        LOGGER.warning("Unrecognized business ontology payload type=%s", type(data))
+        LOGGER.warning(
+            "Unrecognized business ontology payload type=%s", type(data)
+        )
         return BusinessOntology([])
     concepts = [
         _concept_from_mapping(row)
@@ -246,7 +244,9 @@ def dataset_business_ontology_path(
     """Return ``datasets/<dataset>/business_ontology.yaml``."""
     from thot.core.TkeirPaths import repo_root
 
-    root = Path(datasets_dir) if datasets_dir else Path(repo_root()) / "datasets"
+    root = (
+        Path(datasets_dir) if datasets_dir else Path(repo_root()) / "datasets"
+    )
     return root / str(dataset).strip() / "business_ontology.yaml"
 
 
@@ -279,6 +279,133 @@ def load_dataset_business_ontology_payload(
         LOGGER.warning("Empty or invalid business ontology at %s", path)
         return None
     return data
+
+
+def _concepts_list(payload: Any) -> list[dict[str, Any]]:
+    """Normalize a request payload to a list of concept dicts."""
+    if payload is None:
+        return []
+    if isinstance(payload, list):
+        return [row for row in payload if isinstance(row, dict)]
+    if isinstance(payload, dict):
+        rows = payload.get("concepts")
+        if isinstance(rows, list):
+            return [row for row in rows if isinstance(row, dict)]
+    return []
+
+
+def merge_business_ontology_payloads(
+    *payloads: Any,
+) -> dict[str, Any] | None:
+    """Merge concept lists by ``concept_id`` (later payloads override)."""
+    by_id: dict[str, dict[str, Any]] = {}
+    for payload in payloads:
+        for row in _concepts_list(payload):
+            cid = str(row.get("concept_id") or "").strip()
+            if cid:
+                by_id[cid] = dict(row)
+    if not by_id:
+        return None
+    return {"concepts": list(by_id.values())}
+
+
+def resolve_search_business_ontology(
+    *,
+    dataset: str | None = None,
+    request_payload: Any = None,
+    search_enabled: bool = True,
+    datasets_dir: Path | str | None = None,
+) -> dict[str, Any] | None:
+    """Load dataset YAML (default ``osint``) and merge with request payload.
+
+    Used by ``/search`` and ``/rag/query`` so live demos always expand against
+    ``datasets/<dataset>/business_ontology.yaml`` unless search is disabled.
+    """
+    name = (dataset or "osint").strip() or "osint"
+    file_payload = (
+        load_dataset_business_ontology_payload(name, datasets_dir)
+        if search_enabled
+        else None
+    )
+    return merge_business_ontology_payloads(file_payload, request_payload)
+
+
+def business_ontology_to_json_ld(payload: Any) -> str:
+    """Serialize business-ontology concepts as OWL/SKOS JSON-LD.
+
+    Emits ``owl:Class`` nodes with ``rdfs:label``, ``rdfs:subClassOf`` (from
+    ``broader``), and SKOS ``broader`` / ``narrower`` / ``related`` links so
+    the fused navigator graph and Python reasoner can walk the taxonomy.
+    """
+    concepts = _concepts_list(payload)
+    if not concepts:
+        return "[]"
+
+    def _concept_iri(cid: str) -> str:
+        return f"http://tkeir.local/concept/{cid}"
+
+    context: dict[str, Any] = {
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "schema": "http://schema.org/",
+        "name": "rdfs:label",
+        "alternateName": "schema:alternateName",
+        "identifier": "schema:identifier",
+        "broader": {"@id": "skos:broader", "@type": "@id"},
+        "narrower": {"@id": "skos:narrower", "@type": "@id"},
+        "related": {"@id": "skos:related", "@type": "@id"},
+        "subClassOf": {"@id": "rdfs:subClassOf", "@type": "@id"},
+        "DefinedTerm": "http://schema.org/DefinedTerm",
+    }
+
+    nodes: list[dict[str, Any]] = []
+    for raw in concepts:
+        cid = str(raw.get("concept_id") or "").strip()
+        preferred = str(raw.get("preferred_label") or cid).strip()
+        if not cid or not preferred:
+            continue
+        broader_iris = [
+            {"@id": _concept_iri(str(x).strip())}
+            for x in raw.get("broader") or []
+            if str(x).strip()
+        ]
+        node: dict[str, Any] = {
+            "@id": _concept_iri(cid),
+            "@type": ["DefinedTerm", "owl:Class"],
+            "name": preferred,
+            "identifier": cid,
+            "schema:provenance": "business_ontology",
+        }
+        synonyms = [str(x).strip() for x in raw.get("synonyms") or [] if x]
+        surfaces = [
+            str(x).strip() for x in raw.get("surface_forms") or [] if x
+        ]
+        alt = list(dict.fromkeys([*synonyms, *surfaces]))
+        if alt:
+            node["alternateName"] = alt
+        if broader_iris:
+            node["broader"] = broader_iris
+            # OWL hierarchy: concept ⊑ broader parent
+            node["subClassOf"] = broader_iris
+        narrower_iris = [
+            {"@id": _concept_iri(str(x).strip())}
+            for x in raw.get("narrower") or []
+            if str(x).strip()
+        ]
+        if narrower_iris:
+            node["narrower"] = narrower_iris
+        related_iris = [
+            {"@id": _concept_iri(str(x).strip())}
+            for x in raw.get("related") or []
+            if str(x).strip()
+        ]
+        if related_iris:
+            node["related"] = related_iris
+        nodes.append(node)
+    return json.dumps(
+        {"@context": context, "@graph": nodes}, ensure_ascii=False
+    )
 
 
 def infer_dataset_name(
@@ -360,6 +487,124 @@ def _parse_json_ld_graph(json_ld: Any) -> list[dict[str, Any]]:
             return [row for row in graph if isinstance(row, dict)]
         return [data]
     return []
+
+
+def _json_ld_was_array(json_ld: Any) -> bool:
+    """True when the stored json_ld is a top-level array (NLP pipeline shape)."""
+    if isinstance(json_ld, list):
+        return True
+    if isinstance(json_ld, str):
+        return json_ld.lstrip().startswith("[")
+    return False
+
+
+def _json_ld_node_labels(node: dict[str, Any]) -> list[str]:
+    """Collect human labels from a JSON-LD node (schema.org or RDF)."""
+    labels: list[str] = []
+    for key in (
+        "name",
+        "preferred_label",
+        "identifier",
+        "http://www.w3.org/2000/01/rdf-schema#label",
+        "rdfs:label",
+    ):
+        raw = node.get(key)
+        if isinstance(raw, str) and raw.strip():
+            labels.append(raw.strip())
+        elif isinstance(raw, list):
+            for item in raw:
+                if isinstance(item, dict):
+                    val = item.get("@value")
+                    if val:
+                        labels.append(str(val).strip())
+                elif item:
+                    labels.append(str(item).strip())
+    return [lab for lab in labels if lab]
+
+
+def _enrich_nlp_nodes_with_ontology_paths(
+    graph: list[dict[str, Any]],
+    *,
+    matched_ids: list[str],
+    matched_paths: list[list[str]],
+    matched_labels: list[str],
+    matched_surfaces: list[str],
+    by_id: dict[str, dict[str, Any]],
+) -> None:
+    """Stamp ontology paths onto NLP mention/keyword nodes that match BO terms.
+
+    Pipeline ``document_ontology.json_ld`` uses RDF-style nodes (e.g. Misc for
+    ``DARK_ACTIVITY_AIS_OFF``). Attach the broader path so the returned ontology
+    shows ``C4ISR/…/DARK_ACTIVITY`` on that same mention.
+    """
+    path_by_norm: dict[str, tuple[str, list[str], list[str], str]] = {}
+    for cid, path, preferred, surface in zip(
+        matched_ids,
+        matched_paths,
+        matched_labels,
+        matched_surfaces,
+        strict=True,
+    ):
+        labels = _path_labels(path, by_id)
+        compact = "/".join(path)
+        payload = (cid, path, labels, compact)
+        for candidate in (
+            cid,
+            preferred,
+            surface,
+            cid.replace("_", " "),
+            *[str(x) for x in (by_id.get(cid) or {}).get("synonyms") or []],
+            *[
+                str(x)
+                for x in (by_id.get(cid) or {}).get("surface_forms") or []
+            ],
+        ):
+            norm = _normalize_for_ontology_match(candidate)
+            if norm:
+                path_by_norm[norm] = payload
+
+    path_pred = "http://tkeir.local/ontology/ontologyPath"
+    concept_pred = "http://tkeir.local/ontology/mapsToConcept"
+    path_ids_pred = "http://tkeir.local/ontology/ontologyPathIds"
+    for node in graph:
+        if not isinstance(node, dict):
+            continue
+        node_labels = _json_ld_node_labels(node)
+        hit: tuple[str, list[str], list[str], str] | None = None
+        for lab in node_labels:
+            hit = path_by_norm.get(_normalize_for_ontology_match(lab))
+            if hit:
+                break
+        if hit is None:
+            continue
+        cid, path, labels, compact = hit
+        node["ontology_path"] = list(path)
+        node["ontology_path_labels"] = list(labels)
+        node["ontology_path_text"] = " > ".join(labels)
+        node["ontology_path_compact"] = compact
+        node["maps_to_concept"] = cid
+        # Reinforce: map NLP nodes onto BO without rebranding them as
+        # external-only (external DefinedTerms keep provenance=external).
+        existing_prov = str(node.get("provenance") or "").strip().lower()
+        if existing_prov in {"", "document"}:
+            node["provenance"] = "document+external"
+        elif existing_prov == "external":
+            node["provenance"] = "external"
+        # else keep document+external / other combined tags
+        node[path_pred] = [{"@value": compact}]
+        node[path_ids_pred] = [
+            {"@value": json.dumps(path, ensure_ascii=False)}
+        ]
+        node[concept_pred] = [{"@id": f"http://tkeir.local/concept/{cid}"}]
+
+
+def _serialize_document_json_ld(
+    graph: list[dict[str, Any]], *, as_array: bool
+) -> str:
+    """Serialize graph preserving NLP array shape when that was the input."""
+    if as_array:
+        return json.dumps(graph, ensure_ascii=False)
+    return json.dumps({"@graph": graph}, ensure_ascii=False)
 
 
 def _document_entity_labels(document: dict[str, Any]) -> list[str]:
@@ -444,12 +689,12 @@ def select_core_concepts(
     try:
         from collections import Counter
 
+        from thot.tasks.document_ontology.label_vectorizer import (
+            vectorize_labels_tfidf,
+        )
         from thot.tasks.document_ontology.OntologyAlignment import (
             _canonical_class_label,
             _cluster_labels,
-        )
-        from thot.tasks.document_ontology.label_vectorizer import (
-            vectorize_labels_tfidf,
         )
 
         vectors = vectorize_labels_tfidf(cleaned)
@@ -468,9 +713,7 @@ def select_core_concepts(
                 continue
             center_seen.add(key)
             centers.append(canonical)
-        counts = Counter(
-            mapping.get(lab, lab).casefold() for lab in cleaned
-        )
+        counts = Counter(mapping.get(lab, lab).casefold() for lab in cleaned)
         centers.sort(
             key=lambda lab: (-counts.get(lab.casefold(), 0), lab.casefold())
         )
@@ -478,6 +721,163 @@ def select_core_concepts(
     except Exception as exc:  # noqa: BLE001
         LOGGER.debug("core-concept clustering skipped: %s", exc)
         return _rows(cleaned)
+
+
+def _concept_broader_paths(
+    concept_id: str,
+    by_id: dict[str, dict[str, Any]],
+    *,
+    max_depth: int = 32,
+) -> list[list[str]]:
+    """Return all root→leaf ``concept_id`` paths via ``broader`` links.
+
+    Each path ends with ``concept_id``. Cycles / missing parents are skipped.
+    """
+    cid = str(concept_id or "").strip()
+    if not cid:
+        return []
+    if cid not in by_id:
+        return [[cid]]
+
+    collected: list[list[str]] = []
+
+    def _walk(node: str, ascending: list[str]) -> None:
+        # ascending is node … → leaf (cid), built while walking up.
+        if len(ascending) > max_depth:
+            collected.append(list(reversed(ascending)))
+            return
+        parents = [
+            str(p).strip()
+            for p in (by_id.get(node) or {}).get("broader") or []
+            if str(p).strip()
+            and str(p).strip() in by_id
+            and str(p).strip() not in ascending
+        ]
+        if not parents:
+            collected.append(list(reversed(ascending)))
+            return
+        for parent in parents:
+            _walk(parent, [*ascending, parent])
+
+    _walk(cid, [cid])
+    uniq: dict[tuple[str, ...], list[str]] = {
+        tuple(path): path for path in collected if path and path[-1] == cid
+    }
+    return sorted(uniq.values(), key=lambda path: (-len(path), path)) or [
+        [cid]
+    ]
+
+
+def _path_labels(
+    path: list[str], by_id: dict[str, dict[str, Any]]
+) -> list[str]:
+    """Map a concept_id path to preferred labels."""
+    labels: list[str] = []
+    for cid in path:
+        raw = by_id.get(cid) or {}
+        labels.append(str(raw.get("preferred_label") or cid).strip() or cid)
+    return labels
+
+
+def _defined_term_node(
+    *,
+    concept_id: str,
+    preferred_label: str,
+    ontology_path: list[str] | None = None,
+    ontology_path_labels: list[str] | None = None,
+    role: str | None = None,
+    matched: bool = False,
+) -> dict[str, Any]:
+    """Build a DefinedTerm JSON-LD node for an external business concept."""
+    node: dict[str, Any] = {
+        "@type": "DefinedTerm",
+        "name": preferred_label,
+        "identifier": concept_id,
+        "preferred_label": preferred_label,
+        "provenance": "external",
+    }
+    if ontology_path:
+        node["ontology_path"] = list(ontology_path)
+        node["ontology_path_compact"] = "/".join(ontology_path)
+        node["skos:broader"] = (
+            list(ontology_path[:-1]) if len(ontology_path) > 1 else []
+        )
+    if ontology_path_labels:
+        node["ontology_path_labels"] = list(ontology_path_labels)
+        node["ontology_path_text"] = " > ".join(ontology_path_labels)
+    if role:
+        node["role"] = role
+    if matched:
+        node["matched_in_text"] = True
+    return node
+
+
+def _normalize_for_ontology_match(text: str) -> str:
+    """Normalize text for ontology label matching.
+
+    Underscores, hyphens, and punctuation become spaces so
+    ``DARK_ACTIVITY_AIS_OFF`` matches ``DARK_ACTIVITY AIS_OFF`` and
+    ``MARITIME_ANALYTICS`` matches ``MARITIME ANALYTICS``.
+    """
+    import re
+    import unicodedata
+
+    value = unicodedata.normalize("NFKC", str(text or "")).lower()
+    value = value.replace("—", " ").replace("–", " ").replace("−", " ")
+    value = re.sub(r"[_\-/\\|]+", " ", value)
+    value = re.sub(r"[^\w\s]", " ", value, flags=re.UNICODE)
+    value = re.sub(r"\s+", " ", value).strip()
+    # Common UK/US spelling so ontology synonyms still hit pipeline text.
+    value = value.replace("behavioural", "behavioral")
+    value = value.replace("behaviour", "behavior")
+    return value
+
+
+def _ontology_match_labels(raw: dict[str, Any], concept_id: str) -> list[str]:
+    """Collect all surface labels used to detect a concept in text."""
+    preferred = str(raw.get("preferred_label") or concept_id).strip()
+    labels = [preferred, concept_id]
+    # Spaced / underscored concept id variants.
+    if "_" in concept_id:
+        labels.append(concept_id.replace("_", " "))
+    labels.extend(str(x) for x in raw.get("synonyms") or [] if x)
+    labels.extend(str(x) for x in raw.get("surface_forms") or [] if x)
+    for bridge in raw.get("paraphrase_bridges") or []:
+        if not isinstance(bridge, dict):
+            continue
+        for key in ("claim", "document", "claim_form", "document_form"):
+            val = bridge.get(key)
+            if val:
+                labels.append(str(val))
+    # De-dupe while preserving order.
+    seen: set[str] = set()
+    out: list[str] = []
+    for label in labels:
+        key = label.strip()
+        if not key:
+            continue
+        fold = key.casefold()
+        if fold in seen:
+            continue
+        seen.add(fold)
+        out.append(key)
+    return out
+
+
+def _label_hits_haystack(label: str, haystack_norm: str) -> bool:
+    """True when normalized ``label`` appears as a whole phrase in haystack."""
+    import re
+
+    needle = _normalize_for_ontology_match(label)
+    if len(needle) < 2:
+        return False
+    # Allow short all-caps codes (AIS, B1) but skip ultra-generic 1-char noise.
+    if len(needle) < 3 and " " not in needle and not needle.isalnum():
+        return False
+    pattern = re.compile(
+        r"(?<![a-z0-9])" + re.escape(needle) + r"(?![a-z0-9])"
+    )
+    return pattern.search(haystack_norm) is not None
 
 
 def annotate_document_with_business_ontology(
@@ -488,9 +888,10 @@ def annotate_document_with_business_ontology(
 
     - Merges into existing ``document_ontology.json_ld`` (does not wipe NLP).
     - Marks external DefinedTerm nodes with ``provenance: \"external\"``.
-    - Appends KG triples (``rel:has_concept`` / ``rel:related_to``) with
-      ``provenance: \"external\"``; existing document triples keep/get
-      ``provenance: \"document\"``.
+    - For each matched term, also attaches the **complete broader path**
+      (root → … → matched concept) and inserts every ancestor DefinedTerm.
+    - Appends KG triples (``rel:has_concept`` / ``rel:broader`` /
+      ``rel:related_to``) with ``provenance: \"external\"``.
     - Selects ``core_concepts`` (cluster centers) always attached on the doc.
 
     Args:
@@ -501,8 +902,6 @@ def annotate_document_with_business_ontology(
     Returns:
         Document with merged ontology, KG provenance, and ``core_concepts``.
     """
-    import re
-
     concepts = ontology_payload.get("concepts") or []
     if not concepts:
         return document
@@ -518,57 +917,48 @@ def annotate_document_with_business_ontology(
         str(chunk.get("text_raw") or chunk.get("search_vector_payload") or "")
         for chunk in chunks
     )
-    haystack = f"{title} {body} {chunk_text}".lower()
-    if not haystack.strip():
+    haystack_norm = _normalize_for_ontology_match(
+        f"{title} {body} {chunk_text}"
+    )
+    if not haystack_norm:
         return document
 
     by_id: dict[str, dict[str, Any]] = {}
-    matched_rows: list[dict[str, Any]] = []
-    matched_ids: list[str] = []
-    matched_labels: list[str] = []
-
     for raw in concepts:
         if not isinstance(raw, dict):
             continue
         cid = str(raw.get("concept_id") or "").strip()
+        if cid:
+            by_id[cid] = raw
+
+    matched_ids: list[str] = []
+    matched_labels: list[str] = []
+    matched_paths: list[list[str]] = []
+    matched_surfaces: list[str] = []
+    path_concept_ids: set[str] = set()
+
+    for cid, raw in by_id.items():
         preferred = str(raw.get("preferred_label") or cid).strip()
-        if not cid or not preferred:
+        if not preferred:
             continue
-        by_id[cid] = raw
-        labels = [preferred]
-        labels.extend(str(x) for x in (raw.get("synonyms") or []) if x)
-        labels.extend(str(x) for x in (raw.get("surface_forms") or []) if x)
-        for bridge in raw.get("paraphrase_bridges") or []:
-            if not isinstance(bridge, dict):
-                continue
-            for key in ("claim", "document", "claim_form", "document_form"):
-                val = bridge.get(key)
-                if val:
-                    labels.append(str(val))
-        hit = False
+        labels = _ontology_match_labels(raw, cid)
+        hit_label = ""
         for label in labels:
-            label = label.strip()
-            if len(label) < 3:
-                continue
-            pattern = re.compile(
-                r"(?<![a-z0-9])" + re.escape(label.lower()) + r"(?![a-z0-9])"
-            )
-            if pattern.search(haystack):
-                hit = True
+            if _label_hits_haystack(label, haystack_norm):
+                hit_label = label
                 break
-        if not hit:
+        if not hit_label:
             continue
+        paths = _concept_broader_paths(cid, by_id)
+        primary_path = paths[0] if paths else [cid]
         matched_ids.append(cid)
         matched_labels.append(preferred)
-        matched_rows.append(
-            {
-                "@type": "DefinedTerm",
-                "name": preferred,
-                "identifier": cid,
-                "preferred_label": preferred,
-                "provenance": "external",
-            }
-        )
+        matched_paths.append(primary_path)
+        matched_surfaces.append(hit_label)
+        path_concept_ids.update(primary_path)
+
+    if not matched_ids:
+        return document
 
     document = dict(document)
 
@@ -578,7 +968,7 @@ def annotate_document_with_business_ontology(
         if isinstance(triple, dict) and not triple.get("provenance"):
             triple["provenance"] = "document"
 
-    # External concept triples + related links among matched concepts.
+    # External concept triples + broader path edges + related links.
     source_ref = str(
         document.get("source_doc_id") or document.get("source") or "document"
     )
@@ -592,7 +982,9 @@ def annotate_document_with_business_ontology(
         if isinstance(t, dict)
         and str(t.get("provenance") or "").lower() == "external"
     }
-    for cid, preferred in zip(matched_ids, matched_labels, strict=True):
+    for cid, preferred, path in zip(
+        matched_ids, matched_labels, matched_paths, strict=True
+    ):
         key = (source_ref, "rel:has_concept", cid)
         if key not in existing_ext:
             kg.append(
@@ -605,6 +997,27 @@ def annotate_document_with_business_ontology(
                 )
             )
             existing_ext.add(key)
+        # Path edges: parent --broader--> child (SKOS sense: child broader parent
+        # is stored as child→parent; here rel:broader means "has broader").
+        for idx in range(len(path) - 1):
+            parent_id = path[idx]
+            child_id = path[idx + 1]
+            parent_lab = str(
+                (by_id.get(parent_id) or {}).get("preferred_label")
+                or parent_id
+            )
+            bro_key = (child_id, "rel:broader", parent_id)
+            if bro_key not in existing_ext:
+                kg.append(
+                    _kg_triple(
+                        subject=child_id,
+                        predicate="rel:broader",
+                        obj=parent_id,
+                        provenance="external",
+                        object_label=parent_lab,
+                    )
+                )
+                existing_ext.add(bro_key)
         raw = by_id.get(cid) or {}
         for related_id in raw.get("related") or []:
             rid = str(related_id).strip()
@@ -622,17 +1035,17 @@ def annotate_document_with_business_ontology(
                     predicate="rel:related_to",
                     obj=rid,
                     provenance="external",
-                    object_label=str(
-                        other.get("preferred_label") or rid
-                    ),
+                    object_label=str(other.get("preferred_label") or rid),
                 )
             )
             existing_ext.add(rel_key)
     document["kg"] = kg
 
-    # Merge json_ld graph: keep document nodes, add external DefinedTerms.
+    # Merge json_ld graph: keep document nodes, add matched + ancestor terms.
     existing_ont = dict(document.get("document_ontology") or {})
-    graph = _parse_json_ld_graph(existing_ont.get("json_ld"))
+    raw_json_ld = existing_ont.get("json_ld")
+    as_array = _json_ld_was_array(raw_json_ld)
+    graph = _parse_json_ld_graph(raw_json_ld)
     for node in graph:
         if "provenance" not in node:
             node["provenance"] = "document"
@@ -640,19 +1053,99 @@ def annotate_document_with_business_ontology(
         str(node.get("identifier") or node.get("@id") or "").strip()
         for node in graph
     }
-    for row in matched_rows:
-        cid = str(row.get("identifier") or "").strip()
-        if cid and cid in seen_ids:
-            continue
-        graph.append(row)
-        if cid:
-            seen_ids.add(cid)
 
-    # Core concepts = cluster centers over matched + document entities.
-    entity_labels = matched_labels + _document_entity_labels(document)
-    entity_ids = matched_ids + [""] * (
-        len(entity_labels) - len(matched_ids)
+    matched_rows: list[dict[str, Any]] = []
+    ontology_paths: list[dict[str, Any]] = []
+    for cid, preferred, path, surface in zip(
+        matched_ids,
+        matched_labels,
+        matched_paths,
+        matched_surfaces,
+        strict=True,
+    ):
+        labels = _path_labels(path, by_id)
+        compact = "/".join(path)
+        # Insert ancestors first (without matched flag).
+        for ancestor_id in path[:-1]:
+            if ancestor_id in seen_ids:
+                continue
+            anc = by_id.get(ancestor_id) or {}
+            anc_label = str(anc.get("preferred_label") or ancestor_id).strip()
+            anc_paths = _concept_broader_paths(ancestor_id, by_id)
+            anc_path = anc_paths[0] if anc_paths else [ancestor_id]
+            anc_labels = _path_labels(anc_path, by_id)
+            graph.append(
+                _defined_term_node(
+                    concept_id=ancestor_id,
+                    preferred_label=anc_label,
+                    ontology_path=anc_path,
+                    ontology_path_labels=anc_labels,
+                    role="ontology_path",
+                    matched=False,
+                )
+            )
+            seen_ids.add(ancestor_id)
+        row = _defined_term_node(
+            concept_id=cid,
+            preferred_label=preferred,
+            ontology_path=path,
+            ontology_path_labels=labels,
+            role="matched_term",
+            matched=True,
+        )
+        row["ontology_path_compact"] = compact
+        row["matched_surface"] = surface
+        matched_rows.append(row)
+        ontology_paths.append(
+            {
+                "concept_id": cid,
+                "preferred_label": preferred,
+                "matched_surface": surface,
+                "ontology_path": path,
+                "ontology_path_labels": labels,
+                "ontology_path_text": " > ".join(labels),
+                "ontology_path_compact": compact,
+            }
+        )
+        if cid not in seen_ids:
+            graph.append(row)
+            seen_ids.add(cid)
+        else:
+            # Enrich an already-present node with the path.
+            for node in graph:
+                if str(node.get("identifier") or "").strip() == cid:
+                    node.update(
+                        {
+                            "ontology_path": path,
+                            "ontology_path_labels": labels,
+                            "ontology_path_text": " > ".join(labels),
+                            "ontology_path_compact": compact,
+                            "matched_in_text": True,
+                            "matched_surface": surface,
+                            "provenance": "external",
+                        }
+                    )
+                    break
+
+    # Stamp paths onto NLP Misc/Keyword mentions (e.g. DARK_ACTIVITY_AIS_OFF).
+    _enrich_nlp_nodes_with_ontology_paths(
+        graph,
+        matched_ids=matched_ids,
+        matched_paths=matched_paths,
+        matched_labels=matched_labels,
+        matched_surfaces=matched_surfaces,
+        by_id=by_id,
     )
+
+    # Core concepts = document NLP labels first, then BO matches — reinforce
+    # kg/NER rather than letting external ids monopolize the cluster centers.
+    doc_labels = _document_entity_labels(document)
+    entity_labels = doc_labels + matched_labels
+    entity_ids = [""] * len(doc_labels) + matched_ids
+    # Pad if lengths drift (matched_labels should align with matched_ids).
+    if len(entity_ids) < len(entity_labels):
+        entity_ids.extend([""] * (len(entity_labels) - len(entity_ids)))
+    entity_ids = entity_ids[: len(entity_labels)]
     core = select_core_concepts(
         entity_labels,
         concept_ids=entity_ids,
@@ -665,8 +1158,8 @@ def annotate_document_with_business_ontology(
         lab = str(row.get("label") or "").strip()
         if not cid and not lab:
             continue
-        key = cid or lab
-        if key in seen_ids:
+        core_key = cid or lab
+        if core_key in seen_ids:
             continue
         graph.append(
             {
@@ -678,18 +1171,24 @@ def annotate_document_with_business_ontology(
                 "role": "cluster_center",
             }
         )
-        seen_ids.add(key)
+        seen_ids.add(core_key)
 
     status = str(existing_ont.get("shacl_status") or "").strip()
     if matched_rows:
         status = status or "dataset-ontology"
-        if status and status != "dataset-ontology" and "external" not in status:
+        if (
+            status
+            and status != "dataset-ontology"
+            and "external" not in status
+        ):
             status = f"{status}+external"
     document["document_ontology"] = {
         **existing_ont,
-        "json_ld": json.dumps({"@graph": graph}, ensure_ascii=False),
+        "json_ld": _serialize_document_json_ld(graph, as_array=as_array),
         "shacl_status": status or ("dataset-ontology" if matched_rows else ""),
         "external_concept_ids": list(matched_ids),
+        "external_ontology_path_ids": sorted(path_concept_ids),
+        "external_ontology_paths": ontology_paths,
         "core_concepts": core,
     }
     return document

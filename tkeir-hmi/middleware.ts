@@ -1,30 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { auth } from "@/auth";
-
 /**
- * When AUTH_ENABLED=true, require a session for interactive pages (not
- * `/api/healthz` or Auth.js routes). P0 leaves AUTH_ENABLED unset/false.
+ * Auth enforcement is handled client-side via keycloak-js + RequireRole.
+ *
+ * The Next.js middleware is kept as a no-op so we don't conflict with
+ * keycloak-js redirects / token refresh.
  */
-export default auth((request) => {
-  if (process.env.AUTH_ENABLED !== "true") {
-    return NextResponse.next();
-  }
-  const { pathname } = request.nextUrl;
-  if (
-    pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/api/healthz") ||
-    pathname === "/login"
-  ) {
-    return NextResponse.next();
-  }
-  if (!request.auth) {
-    const login = new URL("/api/auth/signin", request.nextUrl.origin);
-    login.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(login);
-  }
+export default function middleware() {
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],

@@ -12,6 +12,7 @@ import gc
 import json
 import os
 import pickle
+import re
 import traceback
 
 from spacy.tokens import Span
@@ -24,6 +25,9 @@ from thot.core.Utils import ThotTokenizerToSpacy
 from thot.tasks.ner import __date_ner__, __version_ner__
 from thot.tasks.ner.NERTaggerConfiguration import NERTaggerConfiguration
 from thot.tasks.TaskInfo import TaskInfo
+
+# Underscore-joined identifiers (e.g. DARK_ACTIVITY_AIS_OFF) → misc.
+_UNDERSCORE_TOKEN_RE = re.compile(r"^[A-Za-z0-9]+(?:_[A-Za-z0-9]+)+$")
 
 
 class SpacyNERFromMWE:
@@ -178,9 +182,11 @@ class NERTagger:
             self._entities_mapping = {
                 "PERSON": "person",
                 "PER": "person",
+                "person": "person",
                 "ORG": "organization",
                 "LOC": "location",
                 "MISC": "misc",
+                "misc": "misc",
                 "url": "url",
                 "email": "email",
                 "cite_person": "cite_person",
@@ -197,6 +203,7 @@ class NERTagger:
             self._entities_mapping = {
                 "PER": "person",
                 "PERSON": "person",
+                "person": "person",
                 "ORG": "organization",
                 "GPE": "location",
                 "LOC": "location",
@@ -207,6 +214,8 @@ class NERTagger:
                 "QUANTITY": "quantity",
                 "DATE": "date",
                 "TIME": "time",
+                "MISC": "misc",
+                "misc": "misc",
                 "url": "url",
                 "email": "email",
                 "cite_person": "cite_person",
@@ -256,7 +265,12 @@ class NERTagger:
         self._count_run = 0
         if "entity_ruler" in self._nlp.pipe_names:
             self._nlp.remove_pipe("entity_ruler")
-        ruler = self._nlp.add_pipe("entity_ruler")
+        # After statistical NER so rule patterns win on overlaps
+        # (e.g. DARK_ACTIVITY_AIS_OFF must be misc, not PERSON).
+        ruler = self._nlp.add_pipe(
+            "entity_ruler",
+            config={"overwrite_ents": True},
+        )
         ruler.add_patterns(patterns)
 
     def discard_ner(self, ent_i, doc, with_mapping=True):
@@ -332,11 +346,18 @@ class NERTagger:
                 continue
             if self.discard_ner(ent_i, doc):
                 continue
+            label = self._entities_mapping[ent_i.label_]
+            # Force misc for underscore-joined tokens even if the statistical
+            # model (or a stale ruler without overwrite) tagged them otherwise.
+            if (ent_i.end - ent_i.start) == 1 and _UNDERSCORE_TOKEN_RE.match(
+                ent_i.text
+            ):
+                label = "misc"
             entities.append(
                 {
                     "start": ent_i.start,
                     "end": ent_i.end,
-                    "label": self._entities_mapping[ent_i.label_],
+                    "label": label,
                     "text": ent_i.text,
                 }
             )

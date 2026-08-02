@@ -75,7 +75,11 @@ def resolve_bge_m3_path(model_id: str | None = None) -> str:
         if os.path.isdir(candidate) and local_bge_m3_ready(candidate):
             return os.path.abspath(candidate)
         return local
-    if candidate and os.path.isdir(candidate) and local_bge_m3_ready(candidate):
+    if (
+        candidate
+        and os.path.isdir(candidate)
+        and local_bge_m3_ready(candidate)
+    ):
         return os.path.abspath(candidate)
     raise FileNotFoundError(
         f"BGE-M3 model not found at {local}. "
@@ -351,8 +355,7 @@ def content_sparse_from_text(
     max_tf = max(counts.values())
     base = float(weight)
     out = {
-        tok: base * (0.5 + 0.5 * (tf / max_tf))
-        for tok, tf in counts.items()
+        tok: base * (0.5 + 0.5 * (tf / max_tf)) for tok, tf in counts.items()
     }
     return merge_sparse(out, max_tokens=max_tokens)
 
@@ -378,9 +381,13 @@ def enrich_sparse(
     """
     return merge_sparse(
         base,
-        content_sparse_from_text(text, weight=content_weight, max_tokens=max_tokens)
-        if text
-        else None,
+        (
+            content_sparse_from_text(
+                text, weight=content_weight, max_tokens=max_tokens
+            )
+            if text
+            else None
+        ),
         terms_to_sparse(ontology_labels or [], weight=ontology_weight),
         terms_to_sparse(expansion_terms or [], weight=expansion_weight),
         max_tokens=max_tokens,

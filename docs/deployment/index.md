@@ -30,6 +30,7 @@ charts/Compose services with stricter value presets.
 | Topic | Doc |
 |-------|-----|
 | Environment variables | [Environment variables](environment.md) |
+| Hybrid demo (tmux launcher) | [start_services.sh](start_services.md) |
 | ActionRecord hot store + WORM | [Audit store](audit.md) |
 | Kill switch, budgets, approvals, tokens | [Governor](governor.md) |
 | Agent workload identity | [SPIRE / SPIFFE](spire.md) |

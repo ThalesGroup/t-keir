@@ -68,12 +68,12 @@ The syntactic tagger comes with unit and functional testing.
 ### Syntactic Tagger Unit tests
 
 ```shell
-python3 -m pytest tkeir/tests/unittests/TestSyntacticTaggerConfiguration.py
-python3 -m pytest tkeir/tests/unittests/TestSyntacticTagger.py
+python3 -m pytest tests/unittests/TestSyntacticTaggerConfiguration.py
+python3 -m pytest tests/unittests/TestSyntacticTagger.py
 ```
 
 ### Syntactic tagger Functional tests
 
 ```shell
-python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
+python3 -m pytest tests/functional_tests/TestPipeline.py
 ```

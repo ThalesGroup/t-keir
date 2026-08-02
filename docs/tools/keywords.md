@@ -70,12 +70,12 @@ The keywords extractor comes with unit and functional testing.
 ### Keywords Unit tests
 
 ```shell
-python3 -m pytest tkeir/tests/unittests/TestKeywordsConfiguration.py
-python3 -m pytest tkeir/tests/unittests/TestKeywordsExtractor.py
+python3 -m pytest tests/unittests/TestKeywordsConfiguration.py
+python3 -m pytest tests/unittests/TestKeywordsExtractor.py
 ```
 
 ### Keywords extractor Functional tests
 
 ```shell
-python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
+python3 -m pytest tests/functional_tests/TestPipeline.py
 ```

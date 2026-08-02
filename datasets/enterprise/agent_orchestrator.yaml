@@ -1,0 +1,43 @@
+# Agent orchestrator settings for the enterprise / C-suite usecase.
+# Loaded by thot.agent.orchestrator_config (not hardcoded in orchestrator.py).
+name: enterprise
+default_report_form: risk_summary
+
+# Maps HMI / workflow report_form aliases → compose template names.
+# Templates may live under tkeir/configs/templates/ or dataset packs.
+report_form_templates:
+  risk_summary: ent_risk_summary
+  field_report: ent_field_report
+  board_sitrep: ent_board_sitrep
+  decision_brief: ent_decision_brief
+  ent_risk_summary: ent_risk_summary
+  ent_field_report: ent_field_report
+  ent_board_sitrep: ent_board_sitrep
+  ent_decision_brief: ent_decision_brief
+
+# Slot hints injected into persona writer goals as {report_form_slots}.
+report_form_slot_hints:
+  risk_summary: >-
+    ent_risk_summary slots: situation (required), entity_tracking,
+    evaluation, recommendation, supporting_keywords
+  field_report: >-
+    ent_field_report slots: coverage_analysis (required), recommended_source,
+    suggested_tasking, supporting_keywords
+  board_sitrep: >-
+    ent_board_sitrep slots: situation (required), entities_in_scope,
+    kri_activated, recommended_action, supporting_keywords
+  decision_brief: >-
+    ent_decision_brief slots: situation (required), kri_status,
+    prior_decisions, decisions_required (required), constraints
+  ent_risk_summary: >-
+    ent_risk_summary slots: situation (required), entity_tracking,
+    evaluation, recommendation, supporting_keywords
+  ent_field_report: >-
+    ent_field_report slots: coverage_analysis (required), recommended_source,
+    suggested_tasking, supporting_keywords
+  ent_board_sitrep: >-
+    ent_board_sitrep slots: situation (required), entities_in_scope,
+    kri_activated, recommended_action, supporting_keywords
+  ent_decision_brief: >-
+    ent_decision_brief slots: situation (required), kri_status,
+    prior_decisions, decisions_required (required), constraints

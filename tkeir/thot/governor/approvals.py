@@ -25,8 +25,13 @@ class ApprovalQueue:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
-        if not self.path.is_file():
+        if not self.path.is_file() or self.path.stat().st_size == 0:
             self._write([])
+        else:
+            try:
+                self._read()
+            except (json.JSONDecodeError, ValueError, OSError, TypeError):
+                self._write([])
 
     def _read(self) -> list[ApprovalItem]:
         raw = json.loads(self.path.read_text(encoding="utf-8"))

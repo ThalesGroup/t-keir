@@ -39,8 +39,8 @@ compliance/opa/oscal/poam/*
 # Root-only copy; the tracked report lives in docs/evaluation_report.md
 /evaluation_report.md
 output/
-!tkeir/tests/indexing/output/
-!tkeir/tests/indexing/output/**
+!tests/indexing/output/
+!tests/indexing/output/**
 .env
 deploy/compose/.env
 # Helm dependency packages (regenerate: make helm-deps)
@@ -60,3 +60,6 @@ datasets/*.zip
 datasets/scidocs/corpus.jsonl
 datasets/scidocs/queries.jsonl
 datasets/scidocs/qrels/
+# RAG eval corpora — download via datasets/download_rag_datasets.py
+datasets/rag_benchmarks/
+node_modules/

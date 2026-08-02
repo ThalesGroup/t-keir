@@ -10,6 +10,72 @@ Implementation: `thot.tasks.document_ontology`.
 
 ---
 
+## Hypergraph shape: Document → Chunk → Sub-ontology
+
+The document RDF is a **hypergraph**, not a flat bag of triples. Each golden
+chunk owns a **sub-ontology**; concepts and statements can be **shared** across
+chunks (set intersection). That structure is what search fuse, SPARQL
+reasoning, and the HMI layered view consume.
+
+```text
+Document
+  └── hasChunk → DocumentChunk  (= SubOntology container)
+                    ├── hasMention / mentionedIn → Concept   (shared identity across chunks)
+                    ├── hasStatement → Statement
+                    │                    ├── subject / predicate / object
+                    │                    └── inChunk → this chunk
+                    └── sharedConceptCount  (concepts with support ≥ 2)
+
+Concept
+  ├── chunkSupport          (# chunks that mention it)
+  └── S --P--> O            (materialized SPO for reasoners)
+
+Document.intersectionWeight  (sum of sharedConceptCount over chunks)
+```
+
+| Layer | RDF types / edges | Role |
+|-------|-------------------|------|
+| **Document** | `tkeir:Document`, `hasChunk` | Parent container; optional aggregate `hasStatement` |
+| **Chunk sub-ontology** | `DocumentChunk` + `SubOntology`, `hasSubOntology` | Scope of NER/SVO evidenced in that token range |
+| **Statement** | `tkeir:Statement`, `subject` / `predicate` / `object`, `inChunk` | Reified SPO with chunk provenance |
+| **Concept** | typed individuals, `mentionedIn` | Shared nodes; multi-chunk membership = **intersection** |
+| **Materialized SPO** | `S --verb--> O` | Kept for SPARQL / python reasoner (not only reified) |
+
+**How chunk scoping works.** `OntologyBuilder` maps kg token `positions` onto
+golden-chunk `metadata.token_start` / `token_end`. Matching statements hang
+under those chunks. The same concept URI is reused when the surface form
+repeats, so two chunks that both evidence “Widget Pro” share one node with
+`chunkSupport ≥ 2`.
+
+**Weights (technical, not ontological display).**
+
+| Predicate | On | Meaning |
+|-----------|-----|---------|
+| `chunkSupport` | Concept | Number of chunks that mention the concept |
+| `sharedConceptCount` | Chunk | Concepts with support ≥ 2 in that chunk |
+| `intersectionWeight` | Document | Sum of `sharedConceptCount` over chunks |
+
+These literals are used for fuse ranking and query/rescoring. Search export
+strips them from analyst-facing JSON-LD (same policy as `importanceScore`):
+they must not appear as ontological edges in the HMI.
+
+**Query and reasoning impact.**
+
+- Fuse (`build_hmi_ontology`) walks `hasMention`, reified `Statement`, and
+  `mentionedIn` to attach entities to retrieved `chunk_ids`.
+- Relation weights prefer concepts with higher `chunkSupport`.
+- Compose KG (`chunk_ids_for_node`) resolves chunk membership via the same
+  incidence edges.
+- Ontology navigator proposes SPARQL for **shared concepts across chunks**
+  (sub-ontology intersection).
+- HMI: **SPO concepts** view shows verbal S–P–O only; **Doc → chunk → ontology**
+  shows containment + shared hubs.
+
+Re-ingest (or rebuild document ontology) is required for staging dumps built
+before this hypergraph shape.
+
+---
+
 ## Document ontology vs external ontology
 
 | Graph | What it is | Namespace / origin |
@@ -52,10 +118,12 @@ used in two complementary ways:
 
 1. **Vocabulary alignment** — cluster synonymous labels from the document
    (`OntologyAlignment` / TF-IDF).
-2. **`build_document_graph`** — SVO, NER, keywords → RDF under the T-KEIR
-   namespace (classes, individuals, properties, metrics).
+2. **`build_document_graph`** — hypergraph Document → Chunk (SubOntology) →
+   reified Statements + shared concepts (SVO / NER / keywords); see
+   [Hypergraph shape](#hypergraph-shape-document--chunk--sub-ontology).
 3. **Graph alignment** — rewrite synonymous class/property URIs to a canonical
-   vocabulary inside the document graph.
+   vocabulary inside the document graph (structural / hypergraph predicates
+   such as `hasChunk`, `mentionedIn`, `inChunk` are left intact).
 
 At this point the graph is **document-only**. External URIs are not yet present
 unless they already appeared as literal labels in the text.
@@ -221,7 +289,7 @@ is `false` (builder flips settings on when paths are present).
 | Module | Role in merge / use |
 |--------|---------------------|
 | `OntologyLexicon` | External labels → `concept` NER spans (upstream) |
-| `OntologyBuilder` | Text analysis → document RDF |
+| `OntologyBuilder` | Text analysis → document RDF **hypergraph** (Document → Chunk → Statement / shared concepts) |
 | `OntologyAlignment` | Intra-document synonym clustering |
 | `OntologyDerivation` | Load references, score labels, write bridge triples |
 | `DocumentOntologyBuilder` | Orchestrates build → align → derive → SHACL → JSON-LD |

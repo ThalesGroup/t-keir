@@ -61,7 +61,7 @@ export const SearchHeader = memo(function SearchHeader({
               id="rag-query"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder='e.g. "What did Acme launch?"'
+              placeholder="Report what the shared corpus knows about MT RED SEA EAGLE."
               className="pl-10"
               disabled={loading}
             />

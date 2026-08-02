@@ -166,7 +166,7 @@ services:
       TKEIR_SERVICE: tkeir-hmi
       API_URL: http://tkeir-api:8090
       AGENT_URL: ${AGENT_URL:-http://tkeir-agent:8092}
-      OKF_URL: ${OKF_URL:-http://tkeir-okf:8094}
+      OKF_URL: ${OKF_URL:-http://tkeir-okf:8095}
       API_PROXY_TIMEOUT_MS: ${API_PROXY_TIMEOUT_MS:-300000}
       AUTH_ENABLED: ${AUTH_ENABLED:-true}
       AUTH_SECRET: ${AUTH_SECRET:-dev-auth-secret-change-me-in-production-32b}
@@ -307,11 +307,11 @@ services:
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      # Dev/demo: plain HTTP on the host-mapped port (Keycloak 26 hostname v2).
       KC_HTTP_ENABLED: "true"
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: "8082"
+      KC_HOSTNAME: http://localhost:8082
+      KC_HOSTNAME_ADMIN: http://localhost:8082
       KC_HOSTNAME_STRICT: "false"
-      KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_HEALTH_ENABLED: "true"
     volumes:
       - ../keycloak/realm-tkeir.json:/opt/keycloak/data/import/realm-tkeir.json:ro
@@ -552,6 +552,9 @@ services:
       AGENT_HOST: "0.0.0.0"
       AGENT_PORT: "8092"
       AGENT_ROOT: /var/tkeir/agent
+      TKEIR_WORKSPACE: /workspace
+      # Report-form maps: packs/<usecase>/agent_orchestrator.yaml (default osint)
+      TKEIR_AGENT_USECASE: ${TKEIR_AGENT_USECASE:-osint}
       VESPA_URL: http://vespa:8080
       VESPA_CONFIG_URL: http://vespa:19071
       VESPA_USER_SPACE: ${VESPA_USER_SPACE:-dev@tkeir}
@@ -572,6 +575,7 @@ services:
       - "8092:8092"
     volumes:
       - agent_data:/var/tkeir/agent
+      - ${TKEIR_WORKSPACE_HOST:-../../workspace}:/workspace
       - governor_state:/var/tkeir/governor
       - spire_agent_sockets:/run/spire/sockets:ro
     # required: false so `PROFILES=spire,agents` validates without core;
@@ -599,8 +603,8 @@ services:
       TKEIR_SERVICE: tkeir-okf
       TKEIR_ENV: ${TKEIR_ENV:-dev}
       OKF_HOST: "0.0.0.0"
-      OKF_PORT: "8094"
-      OKF_ROOT: /var/tkeir/okf
+      OKF_PORT: "8095"
+      TKEIR_WORKSPACE: /workspace
       VESPA_URL: http://vespa:8080
       VESPA_CONFIG_URL: http://vespa:19071
       VESPA_USER_SPACE: ${VESPA_USER_SPACE:-dev@tkeir}
@@ -610,9 +614,9 @@ services:
       GOVERNOR_URL: ${GOVERNOR_URL:-http://tkeir-governor:8094}
       AUTH_ENABLED: ${AUTH_ENABLED:-false}
     ports:
-      - "8094:8094"
+      - "8095:8095"
     volumes:
-      - okf_data:/var/tkeir/okf
+      - ${TKEIR_WORKSPACE_HOST:-../../workspace}:/workspace
       - governor_state:/var/tkeir/governor
     depends_on:
       vespa:
@@ -632,8 +636,16 @@ services:
       - spire_server_data:/run/spire/data/server
       - spire_server_sockets:/run/spire/sockets
     networks: [tkeir]
+    # Distroless image: no /bin/sh — use the built-in CLI healthcheck.
     healthcheck:
-      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8081'"]
+      test:
+        [
+          "CMD",
+          "/opt/spire/bin/spire-server",
+          "healthcheck",
+          "-socketPath",
+          "/tmp/spire-server/private/api.sock",
+        ]
       interval: 10s
       timeout: 5s
       retries: 30
@@ -645,9 +657,15 @@ services:
     container_name: tkeir-spire-agent
     hostname: spire-agent
     user: "0:0"
-    command: ["-config", "/opt/spire/conf/agent/agent.conf"]
+    # Join token is minted by `make spire-up` and passed via SPIRE_JOIN_TOKEN.
+    command:
+      [
+        "-config",
+        "/opt/spire/conf/agent/agent.conf",
+        "-joinToken",
+        "${SPIRE_JOIN_TOKEN:-}",
+      ]
     environment:
-      # Operator must create a join token and set SPIRE_JOIN_TOKEN before first start.
       SPIRE_JOIN_TOKEN: ${SPIRE_JOIN_TOKEN:-}
     volumes:
       - ../spire/agent.conf:/opt/spire/conf/agent/agent.conf:ro
@@ -657,6 +675,8 @@ services:
       spire-server:
         condition: service_healthy
     networks: [tkeir]
+    # Distroless image: no /bin/sh. Agent may be unhealthy until joined;
+    # do not gate other services on this check.
 
 networks:
   tkeir:
@@ -671,7 +691,6 @@ volumes:
   audit_worm:
   governor_state:
   agent_data:
-  okf_data:
   minio_data:
   prometheus_data:
   loki_data:

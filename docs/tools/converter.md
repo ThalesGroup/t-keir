@@ -86,14 +86,14 @@ The converter service come with unit and functional testing.
 Unittest allows to test Converters classes only.
 
 ```shell
-python3 -m pytest tkeir/tests/unittests/TestConverterConfiguration.py
-python3 -m pytest tkeir/tests/unittests/TestConverter.py
-python3 -m pytest tkeir/tests/unittests/TestMarkItDownConverter.py
-python3 -m pytest tkeir/tests/unittests/TestRawConverter.py
+python3 -m pytest tests/unittests/TestConverterConfiguration.py
+python3 -m pytest tests/unittests/TestConverter.py
+python3 -m pytest tests/unittests/TestMarkItDownConverter.py
+python3 -m pytest tests/unittests/TestRawConverter.py
 ```
 
 ### Converter Functional tests
 
 ```shell
-python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
+python3 -m pytest tests/functional_tests/TestPipeline.py
 ```

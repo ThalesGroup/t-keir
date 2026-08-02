@@ -81,6 +81,23 @@ class OkfHttpExportBody(BaseModel):
     output_dir: str | None = None
 
 
+class OkfPublishWikiBody(BaseModel):
+    """HTTP body for ``POST /okf/bundles/{id}/publish-wiki``."""
+
+    path: str | None = None
+    """Optional workspace-relative path (default ``wiki/<slug>.md``)."""
+
+    markdown: str | None = None
+    """Optional edited wiki markdown; when set, saved to the bundle before publish."""
+
+
+class OkfWikiUpdateBody(BaseModel):
+    """HTTP body for ``PUT /okf/bundles/{id}/wiki``."""
+
+    markdown: str
+    """Full ``wiki.md`` contents (YAML frontmatter + Markdown body)."""
+
+
 class OkfExportResult(BaseModel):
     """Result of a full or scoped export."""
 

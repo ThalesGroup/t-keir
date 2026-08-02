@@ -12,6 +12,18 @@ export interface QueryRequest {
   max_chars_per_passage?: number;
   /** Override rag.yaml prompt.passages.context_sentences */
   focus_context_sentences?: number;
+  /** Merged with datasets/<dataset>/business_ontology.yaml */
+  business_ontology?: Record<string, unknown> | Record<string, unknown>[];
+  /** Dataset folder under datasets/ (default: osint) */
+  business_ontology_dataset?: string;
+  /** Server path to ingest dump root (staging/ + source_refs.json) */
+  analyzed_documents_path?: string;
+  /** Extra JSON-LD merged into fused response ontology */
+  ontology_json_ld?: string;
+  /** Dual-hybrid: auto | global | user | both */
+  search_mode?: "auto" | "global" | "user" | "both" | string;
+  /** Restrict retrieval to these workspace/Vespa source_ref values */
+  source_refs?: string[];
 }
 
 export interface RetrievedChunk {
@@ -25,23 +37,50 @@ export interface SemanticEntity {
   label: string;
   type: string;
   chunk_ids: string[];
+  /** Text-importance weight (chunk coverage + summed text hits). */
+  weight?: number;
+  mention_count?: number;
+  text_hits?: number;
 }
 
 export interface SemanticKeyword {
   label: string;
   chunk_ids: string[];
+  /** Text-importance weight (chunk coverage + summed text hits). */
+  weight?: number;
+  mention_count?: number;
+  text_hits?: number;
+}
+
+export interface OntologyRelation {
+  source: string;
+  predicate: string;
+  target: string;
+  /** Fuse-summed occurrence weight across chunk/parent ontologies. */
+  weight: number;
+}
+
+export interface ProposedOntologyQuery {
+  kind: "sparql" | "expression" | "coherence" | string;
+  title: string;
+  query: string;
+  description?: string;
 }
 
 export interface FusedOntology {
   entities: SemanticEntity[];
   keywords: SemanticKeyword[];
   json_ld: string;
+  /** Weighted relations summed across fused chunk ontologies */
+  relations?: OntologyRelation[];
   /** RDF triple count in the fused graph */
   triple_count?: number;
   /** Number of unique Vespa parent ontology payloads merged */
   source_count?: number;
   /** Parent document ids that contributed ontology */
   document_ids?: string[];
+  /** SPARQL / expression / coherence chips for the Reason tab */
+  proposed_queries?: ProposedOntologyQuery[];
 }
 
 export type OntologyReasonerOperation =
@@ -51,16 +90,11 @@ export type OntologyReasonerOperation =
   | "instances"
   | "types"
   | "sparql"
+  | "expression"
   | "infer";
 
-export type OntologyReasonerEngine =
-  | "HermiT"
-  | "Pellet"
-  | "ELK"
-  | "JFact"
-  | "Openllet"
-  | "Structural"
-  | "rdflib";
+/** Single pure-Python reasoner. */
+export type OntologyReasonerEngine = "python";
 
 export interface OntologyReasonerRequest {
   json_ld: string;
@@ -68,10 +102,12 @@ export interface OntologyReasonerRequest {
   class_iri?: string;
   individual_iri?: string;
   sparql?: string;
+  expression?: string;
   reasoner?: OntologyReasonerEngine | string;
   direct?: boolean;
   limit?: number;
-  prefer_owlapy?: boolean;
+  business_ontology?: Record<string, unknown> | Record<string, unknown>[];
+  business_ontology_dataset?: string;
 }
 
 export interface OntologyReasonerResponse {
@@ -82,10 +118,11 @@ export interface OntologyReasonerResponse {
   count: number;
   consistent?: boolean | null;
   triple_count: number;
-  owlapy_available: boolean;
   note?: string | null;
   /** JSON-LD graph of the reasoner answer (for display / graph view) */
   json_ld?: string | null;
+  expression?: string | null;
+  sparql?: string | null;
 }
 
 export interface QueryResponse {
@@ -138,11 +175,23 @@ export interface SearchResponse {
   documents: SearchDocumentHit[];
   vespa_hits: number;
   ranking_profile?: string | null;
+  /** Global fused ontology from retrieved chunk/parent documents. */
   ontology?: FusedOntology | null;
+  /** Query NLP (+ matched external BO) ontology. */
+  query_ontology?: FusedOntology | null;
+  /** Union of query_ontology and ontology. */
+  merged_ontology?: FusedOntology | null;
   timings?: SearchTimings | null;
 }
 
-export type WorkspaceMode = "search" | "rag" | "agent";
+export type WorkspaceMode =
+  | "search"
+  | "rag"
+  | "reporter"
+  | "wiki"
+  | "agent"
+  | "files"
+  | "ingest";
 
 export interface DocumentGroup {
   parentDocId: string;

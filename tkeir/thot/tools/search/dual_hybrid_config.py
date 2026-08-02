@@ -83,7 +83,9 @@ def _default_spacy_models() -> dict[str, SpacyModelEntry]:
     }
 
 
-def _warn_if_not_unit(name: str, weights: dict[str, float], tol: float = 0.05) -> None:
+def _warn_if_not_unit(
+    name: str, weights: dict[str, float], tol: float = 0.05
+) -> None:
     total = sum(weights.values())
     if abs(total - 1.0) > tol:
         LOGGER.warning(
@@ -134,16 +136,13 @@ class DualRetrievalArms:
 class NlpSeedExpansionConfig:
     """NLP-seeded ontology resolve + neighborhood expansion.
 
-    When enabled, applies if the query has at least ``min_tokens`` whitespace
-    tokens **or** at least ``min_sentences`` sentence-like spans (so
-    multi-sentence claims qualify even when shorter than ``min_tokens``).
+    When enabled, analyzed request labels (NER / keywords / kg SVO) are always
+    resolved against the business ontology and expanded (synonym / narrower /
+    related / broader) into Vespa ``ontology_concepts`` OR clauses and BM25
+    probe terms — expand recall, never filter.
 
-    NER / keyword / SVO labels from the linguistic pipeline are then resolved
-    against the business ontology and expanded (synonym / narrower / related /
-    broader) into Vespa ``ontology_concepts`` and BM25 probe terms.
-
-    Short single-sentence queries still get raw-query expansion when
-    ``query_expansion.enabled``.
+    ``min_tokens`` / ``min_sentences`` are retained for compatibility; they
+    no longer gate whether seeds are applied.
     """
 
     enabled: bool = True
@@ -246,6 +245,9 @@ class BusinessOntologyConfig:
     # Load and pass the YAML payload on each search request (expansion /
     # scoring still respect query_expansion.enabled / ontology_scoring.enabled).
     search_enabled: bool = True
+    # Dataset folder under ``datasets/`` auto-loaded on ``/search`` / ``/rag/query``
+    # when the client omits a full payload (OSINT demo default).
+    default_dataset: str = "osint"
 
 
 @dataclass(frozen=True)
@@ -271,7 +273,9 @@ class DualHybridConfig:
 
     enabled: bool = False
     search_mode: str = "auto"  # auto | global | user | both
-    preprocessing: PreprocessingConfig = field(default_factory=PreprocessingConfig)
+    preprocessing: PreprocessingConfig = field(
+        default_factory=PreprocessingConfig
+    )
     retrieval: DualRetrievalArms = field(default_factory=DualRetrievalArms)
     rank_profiles: dict[str, Any] = field(default_factory=dict)
     average_field_length: dict[str, Any] = field(default_factory=dict)
@@ -279,9 +283,13 @@ class DualHybridConfig:
         default_factory=BusinessOntologyConfig
     )
     index_dump: IndexDumpConfig = field(default_factory=IndexDumpConfig)
-    query_expansion: QueryExpansionConfig = field(default_factory=QueryExpansionConfig)
+    query_expansion: QueryExpansionConfig = field(
+        default_factory=QueryExpansionConfig
+    )
     rrf: RrfConfig = field(default_factory=RrfConfig)
-    ontology_scoring: OntologyScoringYaml = field(default_factory=OntologyScoringYaml)
+    ontology_scoring: OntologyScoringYaml = field(
+        default_factory=OntologyScoringYaml
+    )
     colbert: ColbertYaml = field(default_factory=ColbertYaml)
     final_fusion: FinalFusionYaml = field(default_factory=FinalFusionYaml)
     fallback: FallbackYaml = field(default_factory=FallbackYaml)
@@ -349,15 +357,17 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
         QueryExpansionConfig().weights,
         **(qe.get("weights") or {}),
     )
-    rrf_weights = dict(RrfConfig().arm_weights, **(rrf.get("arm_weights") or {}))
+    rrf_weights = dict(
+        RrfConfig().arm_weights, **(rrf.get("arm_weights") or {})
+    )
     match_weights = dict(
         OntologyScoringYaml().match_weights, **(ont.get("match_weights") or {})
     )
 
     _warn_if_not_unit("rrf.arm_weights", rrf_weights)
-    for profile_name, profile in (cfg.get("rank_profiles") or {}).get(
-        "passage", {}
-    ).items():
+    for profile_name, profile in (
+        (cfg.get("rank_profiles") or {}).get("passage", {}).items()
+    ):
         if isinstance(profile, dict):
             weight_keys = {
                 key: float(value)
@@ -400,12 +410,15 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
         business_ontology=BusinessOntologyConfig(
             index_enabled=bool(bo.get("index_enabled", True)),
             search_enabled=bool(bo.get("search_enabled", True)),
+            default_dataset=str(
+                bo.get("default_dataset")
+                or BusinessOntologyConfig.default_dataset
+            ).strip()
+            or BusinessOntologyConfig.default_dataset,
         ),
         index_dump=IndexDumpConfig(
             enabled=bool(dump.get("enabled", True)),
-            path=str(
-                dump.get("path") or IndexDumpConfig().path
-            ).strip()
+            path=str(dump.get("path") or IndexDumpConfig().path).strip()
             or IndexDumpConfig().path,
             save_document=bool(dump.get("save_document", True)),
         ),
@@ -415,9 +428,7 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
             weights=qe_weights,
             nlp_seed_expansion=NlpSeedExpansionConfig(
                 enabled=bool(
-                    nlp_seed.get(
-                        "enabled", NlpSeedExpansionConfig().enabled
-                    )
+                    nlp_seed.get("enabled", NlpSeedExpansionConfig().enabled)
                 ),
                 min_tokens=max(
                     1,

@@ -41,8 +41,12 @@ class RuntimeFlagsStore:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
-        if self.path.is_file():
-            self._flags = self._read()
+        if self.path.is_file() and self.path.stat().st_size > 0:
+            try:
+                self._flags = self._read()
+            except (json.JSONDecodeError, ValueError, OSError):
+                self._flags = _default_flags()
+                self._write(self._flags)
         else:
             self._flags = _default_flags()
             self._write(self._flags)

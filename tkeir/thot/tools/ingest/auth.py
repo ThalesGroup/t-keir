@@ -24,6 +24,8 @@ from thot.tools.search.user_space import (
 )
 
 INGEST_SCOPE = "intent:ingest"
+ADMIN_ROLES = frozenset({"c2-admin", "tkeir-admin"})
+VALID_INDEX_TARGETS = frozenset({"global", "user", "both"})
 
 
 def _decode_jwt_payload(token: str) -> dict[str, Any]:
@@ -55,6 +57,118 @@ def _token_has_ingest_scope(payload: dict[str, Any]) -> bool:
             if isinstance(roles, list) and "ingest" in roles:
                 return True
     return False
+
+
+def _roles_from_payload(payload: dict[str, Any]) -> frozenset[str]:
+    roles: set[str] = set()
+    realm = payload.get("realm_access")
+    if isinstance(realm, dict):
+        raw = realm.get("roles")
+        if isinstance(raw, list):
+            roles.update(str(r) for r in raw if r)
+    # Mis-nested Keycloak claim sometimes seen as a literal key.
+    dotted = payload.get("realm_access.roles")
+    if isinstance(dotted, list):
+        roles.update(str(r) for r in dotted if r)
+    resource_access = payload.get("resource_access")
+    if isinstance(resource_access, dict):
+        for client in resource_access.values():
+            if not isinstance(client, dict):
+                continue
+            raw = client.get("roles")
+            if isinstance(raw, list):
+                roles.update(str(r) for r in raw if r)
+    return frozenset(roles)
+
+
+def roles_from_authorization(authorization: str | None) -> frozenset[str]:
+    """Extract realm/client roles from a Bearer access token (empty if none)."""
+    if not authorization or not authorization.startswith("Bearer "):
+        return frozenset()
+    token = authorization.removeprefix("Bearer ").strip()
+    settings = ingest_settings()
+    if settings.dev_token and token == settings.dev_token:
+        return frozenset(ADMIN_ROLES)
+    try:
+        payload = _decode_jwt_payload(token)
+    except (ValueError, json.JSONDecodeError):
+        return frozenset()
+    return _roles_from_payload(payload)
+
+
+def is_ingest_admin(authorization: str | None) -> bool:
+    """True when the caller has an admin ingest role (or auth is disabled).
+
+    When ``INGEST_AUTH_ENABLED`` is false (local demos), global corpus tools
+    remain usable; personal ``/workspace/*`` endpoints still force ``user``.
+    """
+    settings = ingest_settings()
+    if not settings.auth_enabled:
+        return True
+    return bool(ADMIN_ROLES & roles_from_authorization(authorization))
+
+
+def resolve_allowed_index_target(
+    requested: str | None,
+    *,
+    authorization: str | None,
+    default: str = "user",
+    admin_default: str = "global",
+    require_admin_for_global: bool = True,
+) -> str:
+    """Resolve ``index_target`` under the personal-vs-global policy.
+
+    - Non-admin (auth on): forced to ``user``; ``global``/``both`` → 403.
+    - Admin (or auth off): may choose ``global`` / ``user`` / ``both``.
+    - ``require_admin_for_global``: when True and auth on, non-admins may not
+      select a shared index (used by ``/ingest/json-records``).
+    """
+    raw = (requested or "").strip().lower() or None
+    admin = is_ingest_admin(authorization)
+    settings = ingest_settings()
+
+    if settings.auth_enabled and require_admin_for_global and not admin:
+        if raw in {"global", "both"}:
+            raise HTTPException(
+                status_code=403,
+                detail=(
+                    "Non-admin principals may only ingest into their personal "
+                    "Vespa user streaming index (index_target=user)"
+                ),
+            )
+        target = "user"
+    elif admin:
+        target = raw or admin_default
+    else:
+        target = raw or default
+
+    if target not in VALID_INDEX_TARGETS:
+        raise HTTPException(
+            status_code=400,
+            detail="index_target must be global|user|both",
+        )
+    if settings.auth_enabled and not admin and target != "user":
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                "Non-admin principals may only ingest into their personal "
+                "Vespa user streaming index (index_target=user)"
+            ),
+        )
+    return target
+
+
+def require_admin_ingest(
+    authorization: str | None = Header(default=None),
+) -> str:
+    """Require an admin role for global corpus ingest endpoints."""
+    actor = verify_ingest_authorization(authorization)
+    if not is_ingest_admin(authorization):
+        raise HTTPException(
+            status_code=403,
+            detail="Admin role (c2-admin or tkeir-admin) required",
+        )
+    return actor
 
 
 def verify_ingest_authorization(authorization: str | None) -> str:

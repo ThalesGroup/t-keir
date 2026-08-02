@@ -1,0 +1,28 @@
+name: llm_wiki
+version: 4
+description: >
+  LLM Wiki workflow: build a minimal OKF bundle from Reporter Grab chunks
+  (params.chunks) when present — skipping slow /rag/query export — then fold
+  those chunks into a DETAILED wiki.md in a single iterative LLM pass
+  (Answer / Evidence / Sources / Gaps + persona Structured facts).
+  Grab/export MUST use dual-index search_mode=both (global + user Vespa).
+  params.prompt_name / wiki_agent selects a persona *_prompt agent whose
+  wiki_structured_facts_seed + wiki_merge_system_prompt drive the fold
+  (Google OKF core when omitted). Caps at max_wiki_chunks (default 6, hard max 12).
+  Legacy llm_wiki_{analyser,reviewer,writer} tool-loop agents are unused.
+template: synthesis_note
+budgets:
+  llm_tokens: 200000
+  tool_calls: 20
+  wall_seconds: 900
+steps:
+  - id: scope_bundle
+    builtin: okf_scoped_export
+    params_from: [query, topic, chunks, max_docs, prompt_name, wiki_agent]
+    output_key: bundle_id
+
+  - id: iterative_wiki
+    builtin: okf_iterative_wiki
+    params_from:
+      [query, topic, bundle_id, chunks, max_wiki_chunks, prompt_name, wiki_agent]
+    output_key: wiki_markdown

@@ -2,7 +2,7 @@
 
 Vespa retrieval and RAG search tools (not indexing or evaluation).
 
-Indexing: ``thot.tools.ingest``  
+Indexing: ``thot.tools.ingest``
 Evaluation: ``thot.tools.eval``
 
 Author: Eric Blaudez

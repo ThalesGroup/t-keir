@@ -377,7 +377,7 @@ class VespaConfig:
            ``VESPA_USER_SPACE``, ``EMBEDDING_DIM``
         2. ``configs/rag.yaml`` ``vespa:`` / ``models.embedding_dim``
         3. ``http://localhost:8080``, ``:19071``, ``60s``, space ``dev@tkeir``,
-           dim ``384``
+           dim ``1024``
 
         Returns:
             Frozen configuration for :class:`VespaClient`.
@@ -386,7 +386,7 @@ class VespaConfig:
             >>> from thot.tools.search.vespa_client import VespaConfig
             >>> cfg = VespaConfig.from_env()
             >>> cfg.embedding_dim
-            384
+            1024
             >>> bool(cfg.user_space)
             True
         """
@@ -633,6 +633,121 @@ class VespaClient:
             "default", "user", key, payload, user_space=space
         )
 
+    async def delete_user_passage(
+        self,
+        passage_id: str,
+        *,
+        user_space: str | None = None,
+    ) -> bool:
+        """Delete one ``user`` (streaming) passage by logical ``chunk_id``."""
+        space = normalize_user_space(user_space or self._config.user_space)
+        return await self.delete_document_ref(
+            user_vespa_id(passage_id, user_space=space)
+        )
+
+    async def delete_document_ref(self, doc_ref: str) -> bool:
+        """Delete a Vespa document by full ``id:…`` reference. False if missing."""
+        namespace, schema, group, key = _parse_vespa_id(doc_ref)
+        if group:
+            url = (
+                f"{self._config.document_api_url}/{namespace}/{schema}/"
+                f"group/{quote(group, safe='')}/{quote(key, safe='')}"
+            )
+        else:
+            url = (
+                f"{self._config.document_api_url}/{namespace}/{schema}/"
+                f"docid/{quote(key, safe='')}"
+            )
+        response = await self._client.delete(url)
+        if response.status_code == 404:
+            return False
+        if response.is_error:
+            detail = response.text.strip()
+            raise httpx.HTTPStatusError(
+                f"{response.status_code} for {url}: {detail}",
+                request=response.request,
+                response=response,
+            )
+        return True
+
+    async def find_user_vespa_ids_by_source_ref(
+        self,
+        source_ref: str,
+        *,
+        user_space: str | None = None,
+        hits: int = 200,
+    ) -> list[str]:
+        """Return Vespa document ids in the user group for ``source_ref``."""
+        space = normalize_user_space(user_space or self._config.user_space)
+        ref = sanitize_vespa_string(source_ref)
+        if not ref:
+            return []
+        escaped = ref.replace("\\", "\\\\").replace('"', '\\"')
+        payload: dict[str, Any] = {
+            "yql": (
+                f"select source_ref from user where "
+                f'source_ref contains "{escaped}" limit {max(1, int(hits))}'
+            ),
+            "hits": max(1, int(hits)),
+            "ranking.profile": "unranked",
+            "streaming.groupname": space,
+        }
+        response = await self.search(payload)
+        children = (
+            ((response.get("root") or {}).get("children"))
+            if isinstance(response, dict)
+            else None
+        ) or []
+        out: list[str] = []
+        seen: set[str] = set()
+        for child in children:
+            if not isinstance(child, dict):
+                continue
+            fields = child.get("fields") or {}
+            if (
+                isinstance(fields, dict)
+                and str(fields.get("source_ref") or "") != ref
+            ):
+                continue
+            raw_id = str(child.get("id") or "").strip()
+            if raw_id.startswith("id:") and raw_id not in seen:
+                seen.add(raw_id)
+                out.append(raw_id)
+        return out
+
+    async def delete_user_passages_by_source_ref(
+        self,
+        source_ref: str,
+        *,
+        user_space: str | None = None,
+        passage_ids: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Delete streaming passages for a source_ref (catalog and/or search)."""
+        space = normalize_user_space(user_space or self._config.user_space)
+        deleted = 0
+        missing = 0
+        refs: list[str] = []
+        for passage_id in passage_ids or []:
+            refs.append(user_vespa_id(passage_id, user_space=space))
+        if not refs:
+            refs = await self.find_user_vespa_ids_by_source_ref(
+                source_ref, user_space=space
+            )
+        for doc_ref in refs:
+            ok = await self.delete_document_ref(doc_ref)
+            if ok:
+                deleted += 1
+            else:
+                missing += 1
+        return {
+            "source_ref": source_ref,
+            "user_space": space,
+            "requested": len(refs),
+            "deleted": deleted,
+            "missing": missing,
+            "vespa_ids": refs,
+        }
+
     async def upsert_document(
         self,
         fields: dict[str, Any],
@@ -653,9 +768,7 @@ class VespaClient:
         user_space: str | None = None,
     ) -> None:
         """Compatibility shim → :meth:`upsert_user_passage`."""
-        await self.upsert_user_passage(
-            fields, chunk_id, user_space=user_space
-        )
+        await self.upsert_user_passage(fields, chunk_id, user_space=user_space)
 
     async def get_document_by_ref(self, doc_ref: str) -> dict[str, Any]:
         """Fetch passage fields by Vespa document reference (global or user)."""
@@ -683,7 +796,7 @@ class VespaClient:
         Example:
             >>> from thot.tools.search.vespa_client import VespaClient
             >>> VespaClient().config.embedding_dim
-            384
+            1024
         """
         return self._config
 

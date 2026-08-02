@@ -1,0 +1,3613 @@
+{
+  "dataset": {
+    "name": "user_specific_ceo_watch",
+    "version": "1.0",
+    "persona": "CEO — Chief Executive Officer",
+    "role_description": "Board-level situational awareness — real-time KRI dashboard, entity contacts, due diligence escalation",
+    "primary_report_type": "BOARD_SITREP",
+    "generated_utc": "2026-07-28T06:00:00Z",
+    "record_count": 110,
+    "index_type": "USER_SPECIFIC",
+    "classification_of_compilation": "CONFIDENTIAL — C-SUITE",
+    "note": "Simulated CEO personal index. Not real data.",
+    "coverage_window_utc": {
+      "from": "2026-06-28T06:00:00Z",
+      "to": "2026-07-28T05:45:00Z"
+    },
+    "cross_reference_schema": {
+      "generic_refs": "doc_id values from enterprise_intelligence_corpus.json",
+      "kri_refs": "KRI-01..06",
+      "location_refs": "jurisdiction.name values"
+    }
+  },
+  "records": [
+    {
+      "doc_id": "CEO-202606-0007",
+      "dtg": "281203ZJUN26",
+      "timestamp_utc": "2026-06-28T12:03:47Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — FORENSIC TEAM DELTA / Malta",
+      "text": "FORENSIC TEAM DELTA reporting position in Malta, monitoring NKOSI TRADING & BROKERAGE (Lagos). Activity level: CRITICAL. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "FORENSIC TEAM DELTA",
+        "type": "COMPLIANCE",
+        "jurisdiction": "Malta",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0104",
+      "dtg": "281254ZJUN26",
+      "timestamp_utc": "2026-06-28T12:54:01Z",
+      "persona": "CEO_WATCH",
+      "record_type": "COMMS_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms log — LEGAL TASK FORCE GAMMA",
+      "text": "Communications log. From: LEGAL TASK FORCE GAMMA To: CEO Dashboard. Subject: BOARD SITREP. Channel: SECURE EMAIL. Acknowledged: YES.",
+      "from_unit": "LEGAL TASK FORCE GAMMA",
+      "to": "CEO DASHBOARD",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0035",
+      "dtg": "281617ZJUN26",
+      "timestamp_utc": "2026-06-28T16:17:39Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Geneva",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Geneva. Duration: 6h. Entity contacts: 1. Suspicious activity observed: 0. Anomalies flagged: 0. Area assessment: ROUTINE.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 16,
+      "entity_contacts": 1,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0039",
+      "dtg": "281809ZJUN26",
+      "timestamp_utc": "2026-06-28T18:09:25Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — COMPLIANCE TEAM BRAVO / Dubai Free Zone",
+      "text": "Surveillance report from COMPLIANCE TEAM BRAVO covering Dubai Free Zone. Duration: 18h. Entity contacts: 1. Suspicious activity observed: 3. Anomalies flagged: 4. Area assessment: CRITICAL.",
+      "unit": "COMPLIANCE TEAM BRAVO",
+      "coverage_hours": 21,
+      "entity_contacts": 1,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "MSC"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0061",
+      "dtg": "290758ZJUN26",
+      "timestamp_utc": "2026-06-29T07:58:23Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — NEXUS ENERGY HOLDINGS (Cayman) / Lagos",
+      "text": "Contact report: NEXUS ENERGY HOLDINGS (Cayman) observed by AUDIT UNIT ALPHA in Lagos. Transaction anomaly flagged: VELOCITY_SPIKE. Risk profile: MEDIUM. Finding: NIL ADVERSE FINDING. Action: ESCALATE TO CDO.",
+      "entity_observed": "NEH",
+      "observing_unit": "AUDIT UNIT ALPHA",
+      "finding": "NIL ADVERSE FINDING",
+      "risk_profile": "MEDIUM",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0058",
+      "dtg": "291228ZJUN26",
+      "timestamp_utc": "2026-06-29T12:28:34Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — VOYAGER PETROCHEMICALS LTD (Ma / Nicosia",
+      "text": "Contact report: VOYAGER PETROCHEMICALS LTD (Malta) observed by AUDIT UNIT ALPHA in Nicosia. Transaction anomaly flagged: COMMODITY_MISMATCH. Risk profile: MEDIUM. Finding: BENEFICIAL_OWNER_DISCREPANCY. Action: ESCALATE TO CDO.",
+      "entity_observed": "VPL",
+      "observing_unit": "AUDIT UNIT ALPHA",
+      "finding": "BENEFICIAL_OWNER_DISCREPANCY",
+      "risk_profile": "HIGH",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0018",
+      "dtg": "291642ZJUN26",
+      "timestamp_utc": "2026-06-29T16:42:39Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — LEGAL TASK FORCE GAMMA / Cayman Islands",
+      "text": "LEGAL TASK FORCE GAMMA reporting position in Cayman Islands, monitoring NEXUS ENERGY HOLDINGS (Cayman). Activity level: ELEVATED. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "LEGAL TASK FORCE GAMMA",
+        "type": "FORENSIC",
+        "jurisdiction": "Cayman Islands",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0077",
+      "dtg": "291648ZJUN26",
+      "timestamp_utc": "2026-06-29T16:48:27Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 29 Jun 2026 1648Z",
+      "text": "Dashboard log 291648ZJUN26. Events: Routine. KRI alerts active: 3. Units reporting: 5 of 6 on schedule. Dashboard officer: DO-02. Next review: 2048Z.",
+      "events": "ROUTINE",
+      "kri_alerts_active": 1,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0102",
+      "dtg": "291937ZJUN26",
+      "timestamp_utc": "2026-06-29T19:37:32Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — NKOSI TRADING & BROKERAGE (Lag / Geneva",
+      "text": "Due diligence report: LEGAL TASK FORCE GAMMA completed review of NKOSI TRADING & BROKERAGE (Lagos) in Geneva. Duration: 105 minutes. Review scope: 411 documents. Finding: FICTITIOUS_RECEIVABLE_SUSPECTED. Disposition: HELD PENDING AUDIT. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "LEGAL TASK FORCE GAMMA",
+      "entity_reviewed": "NTB",
+      "finding": "FICTITIOUS_RECEIVABLE_SUSPECTED",
+      "duration_minutes": 105,
+      "documents_reviewed": 370,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [
+        "ENT-202606-0861"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0010",
+      "dtg": "292048ZJUN26",
+      "timestamp_utc": "2026-06-29T20:48:15Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — FORENSIC TEAM DELTA / BVI",
+      "text": "FORENSIC TEAM DELTA reporting position in BVI, monitoring NEH Geneva Trading SA. Activity level: CRITICAL. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "FORENSIC TEAM DELTA",
+        "type": "LEGAL",
+        "jurisdiction": "BVI",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0037",
+      "dtg": "300116ZJUN26",
+      "timestamp_utc": "2026-06-30T01:16:01Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — COMPLIANCE TEAM BRAVO / Cayman Islands",
+      "text": "Surveillance report from COMPLIANCE TEAM BRAVO covering Cayman Islands. Duration: 6h. Entity contacts: 1. Suspicious activity observed: 0. Anomalies flagged: 3. Area assessment: ELEVATED.",
+      "unit": "COMPLIANCE TEAM BRAVO",
+      "coverage_hours": 5,
+      "entity_contacts": 1,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0038",
+      "dtg": "300515ZJUN26",
+      "timestamp_utc": "2026-06-30T05:15:52Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — FORENSIC TEAM DELTA / Singapore Freeport",
+      "text": "Surveillance report from FORENSIC TEAM DELTA covering Singapore Freeport. Duration: 20h. Entity contacts: 6. Suspicious activity observed: 2. Anomalies flagged: 4. Area assessment: ELEVATED.",
+      "unit": "FORENSIC TEAM DELTA",
+      "coverage_hours": 20,
+      "entity_contacts": 6,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0062",
+      "dtg": "300557ZJUN26",
+      "timestamp_utc": "2026-06-30T05:57:02Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — CARACAS VENTURE ENERGIA (Venez / Geneva",
+      "text": "Contact report: CARACAS VENTURE ENERGIA (Venezuela) observed by AUDIT UNIT ALPHA in Geneva. Transaction anomaly flagged: ROUND_TRIP_TRADE. Risk profile: MEDIUM. Finding: BENEFICIAL_OWNER_DISCREPANCY. Action: ESCALATE TO CDO.",
+      "entity_observed": "CVE",
+      "observing_unit": "AUDIT UNIT ALPHA",
+      "finding": "BENEFICIAL_OWNER_DISCREPANCY",
+      "risk_profile": "MEDIUM",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0083",
+      "dtg": "300817ZJUN26",
+      "timestamp_utc": "2026-06-30T08:17:34Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 30 Jun 2026 0817Z",
+      "text": "Dashboard log 300817ZJUN26. Events: Critical. KRI alerts active: 1. Units reporting: 4 of 8 on schedule. Dashboard officer: DO-03. Next review: 1217Z.",
+      "events": "ELEVATED",
+      "kri_alerts_active": 0,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0012",
+      "dtg": "300924ZJUN26",
+      "timestamp_utc": "2026-06-30T09:24:16Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / Nicosia",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in Nicosia, monitoring TERRACINA MARITIME LTD (Nassau). Activity level: ROUTINE. Team readiness: STANDBY. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "LEGAL",
+        "jurisdiction": "Nicosia",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0067",
+      "dtg": "301745ZJUN26",
+      "timestamp_utc": "2026-06-30T17:45:38Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — CARACAS VENTURE ENERGIA (Venez / Cayman Islands",
+      "text": "Contact report: CARACAS VENTURE ENERGIA (Venezuela) observed by LEGAL TASK FORCE GAMMA in Cayman Islands. Transaction anomaly flagged: VELOCITY_SPIKE. Risk profile: MEDIUM. Finding: DOCUMENT_IRREGULARITY. Action: ESCALATE TO CDO.",
+      "entity_observed": "CVE",
+      "observing_unit": "LEGAL TASK FORCE GAMMA",
+      "finding": "DOCUMENT_IRREGULARITY",
+      "risk_profile": "LOW",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0065",
+      "dtg": "010111ZJUL26",
+      "timestamp_utc": "2026-07-01T01:11:58Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — NEH Geneva Trading SA / Lagos",
+      "text": "Contact report: NEH Geneva Trading SA observed by COMPLIANCE TEAM BRAVO in Lagos. Transaction anomaly flagged: REPORTING_GAP. Risk profile: LOW. Finding: UNDISCLOSED_COUNTERPARTY. Action: LEGAL REVIEW.",
+      "entity_observed": "NEH-G",
+      "observing_unit": "COMPLIANCE TEAM BRAVO",
+      "finding": "UNDISCLOSED_COUNTERPARTY",
+      "risk_profile": "MEDIUM",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0026",
+      "dtg": "010326ZJUL26",
+      "timestamp_utc": "2026-07-01T03:26:55Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / Nicosia",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in Nicosia, monitoring ARCADIA CLEARING HOUSE (Nicosia). Activity level: ELEVATED. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "FORENSIC",
+        "jurisdiction": "Nicosia",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0040",
+      "dtg": "010353ZJUL26",
+      "timestamp_utc": "2026-07-01T03:53:50Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — COMPLIANCE TEAM BRAVO / Malta",
+      "text": "Surveillance report from COMPLIANCE TEAM BRAVO covering Malta. Duration: 6h. Entity contacts: 3. Suspicious activity observed: 3. Anomalies flagged: 3. Area assessment: ELEVATED.",
+      "unit": "COMPLIANCE TEAM BRAVO",
+      "coverage_hours": 15,
+      "entity_contacts": 3,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0027",
+      "dtg": "011105ZJUL26",
+      "timestamp_utc": "2026-07-01T11:05:13Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / Nicosia",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in Nicosia, monitoring MERIDIAN STAR CAPITAL (Cayman). Activity level: CRITICAL. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "COMPLIANCE",
+        "jurisdiction": "Nicosia",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "MSC"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0089",
+      "dtg": "011554ZJUL26",
+      "timestamp_utc": "2026-07-01T15:54:25Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 01 Jul 2026 1554Z",
+      "text": "Dashboard log 011554ZJUL26. Events: Routine. KRI alerts active: 0. Units reporting: 3 of 6 on schedule. Dashboard officer: DO-04. Next review: 1954Z.",
+      "events": "ELEVATED",
+      "kri_alerts_active": 1,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0045",
+      "dtg": "011634ZJUL26",
+      "timestamp_utc": "2026-07-01T16:34:58Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — FORENSIC TEAM DELTA / Malta",
+      "text": "Surveillance report from FORENSIC TEAM DELTA covering Malta. Duration: 20h. Entity contacts: 7. Suspicious activity observed: 0. Anomalies flagged: 1. Area assessment: ROUTINE.",
+      "unit": "FORENSIC TEAM DELTA",
+      "coverage_hours": 16,
+      "entity_contacts": 7,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0095",
+      "dtg": "011742ZJUL26",
+      "timestamp_utc": "2026-07-01T17:42:27Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — PETROSERV ASIA PTE (Singapore) / Singapore Freeport",
+      "text": "Due diligence report: COMPLIANCE TEAM BRAVO completed review of PETROSERV ASIA PTE (Singapore) in Singapore Freeport. Duration: 385 minutes. Review scope: 205 documents. Finding: BENEFICIAL_OWNER_DISCREPANCY. Disposition: CLEARED. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "COMPLIANCE TEAM BRAVO",
+      "entity_reviewed": "PSA",
+      "finding": "BENEFICIAL_OWNER_DISCREPANCY",
+      "duration_minutes": 385,
+      "documents_reviewed": 76,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [
+        "ENT-202606-0572"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0107",
+      "dtg": "011753ZJUL26",
+      "timestamp_utc": "2026-07-01T17:53:38Z",
+      "persona": "CEO_WATCH",
+      "record_type": "COMMS_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms log — LEGAL TASK FORCE GAMMA",
+      "text": "Communications log. From: LEGAL TASK FORCE GAMMA To: CEO Dashboard. Subject: KRI ALERT UPDATE. Channel: SECURE EMAIL. Acknowledged: YES.",
+      "from_unit": "LEGAL TASK FORCE GAMMA",
+      "to": "CEO DASHBOARD",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0071",
+      "dtg": "012045ZJUL26",
+      "timestamp_utc": "2026-07-01T20:45:22Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — CARACAS VENTURE ENERGIA (Venez / Lagos",
+      "text": "Contact report: CARACAS VENTURE ENERGIA (Venezuela) observed by LEGAL TASK FORCE GAMMA in Lagos. Transaction anomaly flagged: REPORTING_GAP. Risk profile: MEDIUM. Finding: DOCUMENT_IRREGULARITY. Action: HOLD FOR AUDIT.",
+      "entity_observed": "CVE",
+      "observing_unit": "LEGAL TASK FORCE GAMMA",
+      "finding": "DOCUMENT_IRREGULARITY",
+      "risk_profile": "MEDIUM",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0013",
+      "dtg": "012110ZJUL26",
+      "timestamp_utc": "2026-07-01T21:10:28Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — AUDIT UNIT ALPHA / Dubai Free Zone",
+      "text": "AUDIT UNIT ALPHA reporting position in Dubai Free Zone, monitoring NEXUS ENERGY HOLDINGS (Cayman). Activity level: ELEVATED. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "AUDIT UNIT ALPHA",
+        "type": "LEGAL",
+        "jurisdiction": "Dubai Free Zone",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0051",
+      "dtg": "021353ZJUL26",
+      "timestamp_utc": "2026-07-02T13:53:20Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Nicosia",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Nicosia. Duration: 10h. Entity contacts: 7. Suspicious activity observed: 2. Anomalies flagged: 2. Area assessment: ROUTINE.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 7,
+      "entity_contacts": 7,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0108",
+      "dtg": "021426ZJUL26",
+      "timestamp_utc": "2026-07-02T14:26:11Z",
+      "persona": "CEO_WATCH",
+      "record_type": "COMMS_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms log — AUDIT UNIT ALPHA",
+      "text": "Communications log. From: AUDIT UNIT ALPHA To: CEO Dashboard. Subject: UNIT POSTURE REPORT. Channel: SECURE EMAIL. Acknowledged: YES.",
+      "from_unit": "AUDIT UNIT ALPHA",
+      "to": "CEO DASHBOARD",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0002",
+      "dtg": "022032ZJUL26",
+      "timestamp_utc": "2026-07-02T20:32:58Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — LEGAL TASK FORCE GAMMA / Nicosia",
+      "text": "LEGAL TASK FORCE GAMMA reporting position in Nicosia, monitoring NEH Dubai Commodities DMCC. Activity level: ELEVATED. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "LEGAL TASK FORCE GAMMA",
+        "type": "AUDIT",
+        "jurisdiction": "Nicosia",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0064",
+      "dtg": "030349ZJUL26",
+      "timestamp_utc": "2026-07-03T03:49:22Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — NEH Singapore Pte Ltd / Cayman Islands",
+      "text": "Contact report: NEH Singapore Pte Ltd observed by COMPLIANCE TEAM BRAVO in Cayman Islands. Transaction anomaly flagged: REPORTING_GAP. Risk profile: LOW. Finding: COMMODITY_MISMATCH. Action: REPORT FORWARDED.",
+      "entity_observed": "NEH-S",
+      "observing_unit": "COMPLIANCE TEAM BRAVO",
+      "finding": "COMMODITY_MISMATCH",
+      "risk_profile": "LOW",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0041",
+      "dtg": "030728ZJUL26",
+      "timestamp_utc": "2026-07-03T07:28:04Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Malta",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Malta. Duration: 23h. Entity contacts: 1. Suspicious activity observed: 0. Anomalies flagged: 4. Area assessment: CRITICAL.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 14,
+      "entity_contacts": 1,
+      "area_assessment": "CRITICAL",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0066",
+      "dtg": "030959ZJUL26",
+      "timestamp_utc": "2026-07-03T09:59:27Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — ORYX POWER GROUP (Abu Dhabi) / BVI",
+      "text": "Contact report: ORYX POWER GROUP (Abu Dhabi) observed by COMPLIANCE TEAM BRAVO in BVI. Transaction anomaly flagged: VELOCITY_SPIKE. Risk profile: HIGH. Finding: NIL ADVERSE FINDING. Action: ESCALATE TO CDO.",
+      "entity_observed": "OPG",
+      "observing_unit": "COMPLIANCE TEAM BRAVO",
+      "finding": "NIL ADVERSE FINDING",
+      "risk_profile": "LOW",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0048",
+      "dtg": "032236ZJUL26",
+      "timestamp_utc": "2026-07-03T22:36:07Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — FORENSIC TEAM DELTA / Cayman Islands",
+      "text": "Surveillance report from FORENSIC TEAM DELTA covering Cayman Islands. Duration: 17h. Entity contacts: 3. Suspicious activity observed: 0. Anomalies flagged: 1. Area assessment: ROUTINE.",
+      "unit": "FORENSIC TEAM DELTA",
+      "coverage_hours": 15,
+      "entity_contacts": 3,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0074",
+      "dtg": "040203ZJUL26",
+      "timestamp_utc": "2026-07-04T02:03:48Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — DESERT FALCON ENERGY (Dubai) / Lagos",
+      "text": "Contact report: DESERT FALCON ENERGY (Dubai) observed by AUDIT UNIT ALPHA in Lagos. Transaction anomaly flagged: VELOCITY_SPIKE. Risk profile: LOW. Finding: UNDISCLOSED_COUNTERPARTY. Action: LEGAL REVIEW.",
+      "entity_observed": "DFE",
+      "observing_unit": "AUDIT UNIT ALPHA",
+      "finding": "UNDISCLOSED_COUNTERPARTY",
+      "risk_profile": "MEDIUM",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0094",
+      "dtg": "041026ZJUL26",
+      "timestamp_utc": "2026-07-04T10:26:47Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — VOYAGER PETROCHEMICALS LTD (Ma / Geneva",
+      "text": "Due diligence report: AUDIT UNIT ALPHA completed review of VOYAGER PETROCHEMICALS LTD (Malta) in Geneva. Duration: 166 minutes. Review scope: 291 documents. Finding: FICTITIOUS_RECEIVABLE_SUSPECTED. Disposition: ESCALATE TO CFO. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "AUDIT UNIT ALPHA",
+      "entity_reviewed": "VPL",
+      "finding": "FICTITIOUS_RECEIVABLE_SUSPECTED",
+      "duration_minutes": 166,
+      "documents_reviewed": 455,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0161"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0014",
+      "dtg": "041809ZJUL26",
+      "timestamp_utc": "2026-07-04T18:09:52Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — FORENSIC TEAM DELTA / Malta",
+      "text": "FORENSIC TEAM DELTA reporting position in Malta, monitoring PETROSERV ASIA PTE (Singapore). Activity level: ELEVATED. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "FORENSIC TEAM DELTA",
+        "type": "FORENSIC",
+        "jurisdiction": "Malta",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0011",
+      "dtg": "042226ZJUL26",
+      "timestamp_utc": "2026-07-04T22:26:07Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — LEGAL TASK FORCE GAMMA / Dubai Free Zone",
+      "text": "LEGAL TASK FORCE GAMMA reporting position in Dubai Free Zone, monitoring ORYX POWER GROUP (Abu Dhabi). Activity level: CRITICAL. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "LEGAL TASK FORCE GAMMA",
+        "type": "LEGAL",
+        "jurisdiction": "Dubai Free Zone",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0021",
+      "dtg": "042300ZJUL26",
+      "timestamp_utc": "2026-07-04T23:00:17Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / BVI",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in BVI, monitoring PETROSERV ASIA PTE (Singapore). Activity level: ROUTINE. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "FORENSIC",
+        "jurisdiction": "BVI",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0087",
+      "dtg": "050000ZJUL26",
+      "timestamp_utc": "2026-07-05T00:00:11Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 05 Jul 2026 0000Z",
+      "text": "Dashboard log 050000ZJUL26. Events: Routine. KRI alerts active: 2. Units reporting: 3 of 6 on schedule. Dashboard officer: DO-03. Next review: 0400Z.",
+      "events": "ELEVATED",
+      "kri_alerts_active": 4,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0092",
+      "dtg": "050628ZJUL26",
+      "timestamp_utc": "2026-07-05T06:28:36Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — GOLDEN EAGLE FUND LP (BVI) / Nicosia",
+      "text": "Due diligence report: COMPLIANCE TEAM BRAVO completed review of GOLDEN EAGLE FUND LP (BVI) in Nicosia. Duration: 179 minutes. Review scope: 434 documents. Finding: BENEFICIAL_OWNER_DISCREPANCY. Disposition: HELD PENDING AUDIT. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "COMPLIANCE TEAM BRAVO",
+      "entity_reviewed": "GEF",
+      "finding": "BENEFICIAL_OWNER_DISCREPANCY",
+      "duration_minutes": 179,
+      "documents_reviewed": 289,
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [
+        "ENT-202606-0037"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0050",
+      "dtg": "051137ZJUL26",
+      "timestamp_utc": "2026-07-05T11:37:12Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — FORENSIC TEAM DELTA / Cayman Islands",
+      "text": "Surveillance report from FORENSIC TEAM DELTA covering Cayman Islands. Duration: 16h. Entity contacts: 4. Suspicious activity observed: 1. Anomalies flagged: 0. Area assessment: ROUTINE.",
+      "unit": "FORENSIC TEAM DELTA",
+      "coverage_hours": 10,
+      "entity_contacts": 4,
+      "area_assessment": "CRITICAL",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0004",
+      "dtg": "052049ZJUL26",
+      "timestamp_utc": "2026-07-05T20:49:24Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / Dubai Free Zone",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in Dubai Free Zone, monitoring TERRACINA MARITIME LTD (Nassau). Activity level: ELEVATED. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "LEGAL",
+        "jurisdiction": "Dubai Free Zone",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0096",
+      "dtg": "060622ZJUL26",
+      "timestamp_utc": "2026-07-06T06:22:55Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — ARCADIA CLEARING HOUSE (Nicosi / Dubai Free Zone",
+      "text": "Due diligence report: LEGAL TASK FORCE GAMMA completed review of ARCADIA CLEARING HOUSE (Nicosia) in Dubai Free Zone. Duration: 352 minutes. Review scope: 141 documents. Finding: DOCUMENT_IRREGULARITY. Disposition: CLEARED. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "LEGAL TASK FORCE GAMMA",
+      "entity_reviewed": "ACH",
+      "finding": "DOCUMENT_IRREGULARITY",
+      "duration_minutes": 352,
+      "documents_reviewed": 340,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0779"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0053",
+      "dtg": "061206ZJUL26",
+      "timestamp_utc": "2026-07-06T12:06:21Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / BVI",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering BVI. Duration: 6h. Entity contacts: 2. Suspicious activity observed: 1. Anomalies flagged: 2. Area assessment: CRITICAL.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 14,
+      "entity_contacts": 2,
+      "area_assessment": "CRITICAL",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0075",
+      "dtg": "062139ZJUL26",
+      "timestamp_utc": "2026-07-06T21:39:34Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — GOLDEN NILE LOGISTICS (BVI) / Lagos",
+      "text": "Contact report: GOLDEN NILE LOGISTICS (BVI) observed by COMPLIANCE TEAM BRAVO in Lagos. Transaction anomaly flagged: ROUND_TRIP_TRADE. Risk profile: MEDIUM. Finding: NIL ADVERSE FINDING. Action: HOLD FOR AUDIT.",
+      "entity_observed": "GNL",
+      "observing_unit": "COMPLIANCE TEAM BRAVO",
+      "finding": "NIL ADVERSE FINDING",
+      "risk_profile": "LOW",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0046",
+      "dtg": "062248ZJUL26",
+      "timestamp_utc": "2026-07-06T22:48:25Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — FORENSIC TEAM DELTA / Singapore Freeport",
+      "text": "Surveillance report from FORENSIC TEAM DELTA covering Singapore Freeport. Duration: 23h. Entity contacts: 7. Suspicious activity observed: 3. Anomalies flagged: 4. Area assessment: ROUTINE.",
+      "unit": "FORENSIC TEAM DELTA",
+      "coverage_hours": 4,
+      "entity_contacts": 7,
+      "area_assessment": "CRITICAL",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0070",
+      "dtg": "070248ZJUL26",
+      "timestamp_utc": "2026-07-07T02:48:24Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — NEH Singapore Pte Ltd / Dubai Free Zone",
+      "text": "Contact report: NEH Singapore Pte Ltd observed by LEGAL TASK FORCE GAMMA in Dubai Free Zone. Transaction anomaly flagged: COMMODITY_MISMATCH. Risk profile: LOW. Finding: NIL ADVERSE FINDING. Action: ESCALATE TO CDO.",
+      "entity_observed": "NEH-S",
+      "observing_unit": "LEGAL TASK FORCE GAMMA",
+      "finding": "NIL ADVERSE FINDING",
+      "risk_profile": "LOW",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0030",
+      "dtg": "070302ZJUL26",
+      "timestamp_utc": "2026-07-07T03:02:05Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — LEGAL TASK FORCE GAMMA / Cayman Islands",
+      "text": "LEGAL TASK FORCE GAMMA reporting position in Cayman Islands, monitoring CARACAS VENTURE ENERGIA (Venezuela). Activity level: ROUTINE. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "LEGAL TASK FORCE GAMMA",
+        "type": "AUDIT",
+        "jurisdiction": "Cayman Islands",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0025",
+      "dtg": "070407ZJUL26",
+      "timestamp_utc": "2026-07-07T04:07:55Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / Malta",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in Malta, monitoring GOLDEN EAGLE FUND LP (BVI). Activity level: ROUTINE. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "FORENSIC",
+        "jurisdiction": "Malta",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0101",
+      "dtg": "071025ZJUL26",
+      "timestamp_utc": "2026-07-07T10:25:57Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — MERIDIAN STAR CAPITAL (Cayman) / Malta",
+      "text": "Due diligence report: FORENSIC TEAM DELTA completed review of MERIDIAN STAR CAPITAL (Cayman) in Malta. Duration: 273 minutes. Review scope: 276 documents. Finding: FICTITIOUS_RECEIVABLE_SUSPECTED. Disposition: CLEARED. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "FORENSIC TEAM DELTA",
+      "entity_reviewed": "MSC",
+      "finding": "FICTITIOUS_RECEIVABLE_SUSPECTED",
+      "duration_minutes": 273,
+      "documents_reviewed": 489,
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "MSC"
+      ],
+      "generic_refs": [
+        "ENT-202606-0063"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0009",
+      "dtg": "080121ZJUL26",
+      "timestamp_utc": "2026-07-08T01:21:05Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — LEGAL TASK FORCE GAMMA / Geneva",
+      "text": "LEGAL TASK FORCE GAMMA reporting position in Geneva, monitoring TERRACINA MARITIME LTD (Nassau). Activity level: ELEVATED. Team readiness: STANDBY. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "LEGAL TASK FORCE GAMMA",
+        "type": "AUDIT",
+        "jurisdiction": "Geneva",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0036",
+      "dtg": "080125ZJUL26",
+      "timestamp_utc": "2026-07-08T01:25:34Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — FORENSIC TEAM DELTA / BVI",
+      "text": "Surveillance report from FORENSIC TEAM DELTA covering BVI. Duration: 18h. Entity contacts: 3. Suspicious activity observed: 0. Anomalies flagged: 3. Area assessment: ROUTINE.",
+      "unit": "FORENSIC TEAM DELTA",
+      "coverage_hours": 10,
+      "entity_contacts": 3,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0052",
+      "dtg": "080231ZJUL26",
+      "timestamp_utc": "2026-07-08T02:31:46Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — COMPLIANCE TEAM BRAVO / Nicosia",
+      "text": "Surveillance report from COMPLIANCE TEAM BRAVO covering Nicosia. Duration: 11h. Entity contacts: 6. Suspicious activity observed: 3. Anomalies flagged: 1. Area assessment: ROUTINE.",
+      "unit": "COMPLIANCE TEAM BRAVO",
+      "coverage_hours": 17,
+      "entity_contacts": 6,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0020",
+      "dtg": "080815ZJUL26",
+      "timestamp_utc": "2026-07-08T08:15:00Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — AUDIT UNIT ALPHA / Cayman Islands",
+      "text": "AUDIT UNIT ALPHA reporting position in Cayman Islands, monitoring NEXUS ENERGY HOLDINGS (Cayman). Activity level: ELEVATED. Team readiness: STANDBY. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "AUDIT UNIT ALPHA",
+        "type": "AUDIT",
+        "jurisdiction": "Cayman Islands",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0068",
+      "dtg": "081224ZJUL26",
+      "timestamp_utc": "2026-07-08T12:24:58Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — VOYAGER PETROCHEMICALS LTD (Ma / Cayman Islands",
+      "text": "Contact report: VOYAGER PETROCHEMICALS LTD (Malta) observed by COMPLIANCE TEAM BRAVO in Cayman Islands. Transaction anomaly flagged: ROUND_TRIP_TRADE. Risk profile: HIGH. Finding: COMMODITY_MISMATCH. Action: ESCALATE TO CDO.",
+      "entity_observed": "VPL",
+      "observing_unit": "COMPLIANCE TEAM BRAVO",
+      "finding": "COMMODITY_MISMATCH",
+      "risk_profile": "MEDIUM",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0054",
+      "dtg": "081342ZJUL26",
+      "timestamp_utc": "2026-07-08T13:42:03Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — COMPLIANCE TEAM BRAVO / Cayman Islands",
+      "text": "Surveillance report from COMPLIANCE TEAM BRAVO covering Cayman Islands. Duration: 8h. Entity contacts: 2. Suspicious activity observed: 1. Anomalies flagged: 1. Area assessment: ELEVATED.",
+      "unit": "COMPLIANCE TEAM BRAVO",
+      "coverage_hours": 5,
+      "entity_contacts": 2,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0033",
+      "dtg": "081641ZJUL26",
+      "timestamp_utc": "2026-07-08T16:41:52Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — COMPLIANCE TEAM BRAVO / Dubai Free Zone",
+      "text": "Surveillance report from COMPLIANCE TEAM BRAVO covering Dubai Free Zone. Duration: 16h. Entity contacts: 8. Suspicious activity observed: 2. Anomalies flagged: 3. Area assessment: CRITICAL.",
+      "unit": "COMPLIANCE TEAM BRAVO",
+      "coverage_hours": 17,
+      "entity_contacts": 8,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0006",
+      "dtg": "090818ZJUL26",
+      "timestamp_utc": "2026-07-09T08:18:19Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — LEGAL TASK FORCE GAMMA / Dubai Free Zone",
+      "text": "LEGAL TASK FORCE GAMMA reporting position in Dubai Free Zone, monitoring DESERT FALCON ENERGY (Dubai). Activity level: ELEVATED. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "LEGAL TASK FORCE GAMMA",
+        "type": "COMPLIANCE",
+        "jurisdiction": "Dubai Free Zone",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0019",
+      "dtg": "090904ZJUL26",
+      "timestamp_utc": "2026-07-09T09:04:32Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — FORENSIC TEAM DELTA / Singapore Freeport",
+      "text": "FORENSIC TEAM DELTA reporting position in Singapore Freeport, monitoring NKOSI TRADING & BROKERAGE (Lagos). Activity level: ELEVATED. Team readiness: STANDBY. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "FORENSIC TEAM DELTA",
+        "type": "LEGAL",
+        "jurisdiction": "Singapore Freeport",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0110",
+      "dtg": "091120ZJUL26",
+      "timestamp_utc": "2026-07-09T11:20:25Z",
+      "persona": "CEO_WATCH",
+      "record_type": "COMMS_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms log — LEGAL TASK FORCE GAMMA",
+      "text": "Communications log. From: LEGAL TASK FORCE GAMMA To: CEO Dashboard. Subject: UNIT POSTURE REPORT. Channel: ENCRYPTED SIGNAL. Acknowledged: YES.",
+      "from_unit": "LEGAL TASK FORCE GAMMA",
+      "to": "CEO DASHBOARD",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0073",
+      "dtg": "091137ZJUL26",
+      "timestamp_utc": "2026-07-09T11:37:08Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — NKOSI TRADING & BROKERAGE (Lag / Lagos",
+      "text": "Contact report: NKOSI TRADING & BROKERAGE (Lagos) observed by COMPLIANCE TEAM BRAVO in Lagos. Transaction anomaly flagged: VELOCITY_SPIKE. Risk profile: HIGH. Finding: UNDISCLOSED_COUNTERPARTY. Action: LEGAL REVIEW.",
+      "entity_observed": "NTB",
+      "observing_unit": "COMPLIANCE TEAM BRAVO",
+      "finding": "UNDISCLOSED_COUNTERPARTY",
+      "risk_profile": "HIGH",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0022",
+      "dtg": "100738ZJUL26",
+      "timestamp_utc": "2026-07-10T07:38:24Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — FORENSIC TEAM DELTA / Geneva",
+      "text": "FORENSIC TEAM DELTA reporting position in Geneva, monitoring ARCADIA CLEARING HOUSE (Nicosia). Activity level: ROUTINE. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "FORENSIC TEAM DELTA",
+        "type": "LEGAL",
+        "jurisdiction": "Geneva",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0032",
+      "dtg": "100818ZJUL26",
+      "timestamp_utc": "2026-07-10T08:18:14Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — FORENSIC TEAM DELTA / Lagos",
+      "text": "Surveillance report from FORENSIC TEAM DELTA covering Lagos. Duration: 19h. Entity contacts: 1. Suspicious activity observed: 0. Anomalies flagged: 2. Area assessment: ELEVATED.",
+      "unit": "FORENSIC TEAM DELTA",
+      "coverage_hours": 9,
+      "entity_contacts": 1,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0044",
+      "dtg": "101604ZJUL26",
+      "timestamp_utc": "2026-07-10T16:04:33Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Lagos",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Lagos. Duration: 21h. Entity contacts: 7. Suspicious activity observed: 1. Anomalies flagged: 4. Area assessment: ROUTINE.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 16,
+      "entity_contacts": 7,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0078",
+      "dtg": "101707ZJUL26",
+      "timestamp_utc": "2026-07-10T17:07:02Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 10 Jul 2026 1707Z",
+      "text": "Dashboard log 101707ZJUL26. Events: Elevated. KRI alerts active: 3. Units reporting: 6 of 8 on schedule. Dashboard officer: DO-03. Next review: 2107Z.",
+      "events": "ROUTINE",
+      "kri_alerts_active": 3,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0049",
+      "dtg": "110445ZJUL26",
+      "timestamp_utc": "2026-07-11T04:45:34Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Malta",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Malta. Duration: 8h. Entity contacts: 3. Suspicious activity observed: 0. Anomalies flagged: 2. Area assessment: ROUTINE.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 12,
+      "entity_contacts": 3,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0091",
+      "dtg": "110659ZJUL26",
+      "timestamp_utc": "2026-07-11T06:59:35Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — VOYAGER PETROCHEMICALS LTD (Ma / Singapore Freeport",
+      "text": "Due diligence report: AUDIT UNIT ALPHA completed review of VOYAGER PETROCHEMICALS LTD (Malta) in Singapore Freeport. Duration: 296 minutes. Review scope: 435 documents. Finding: DOCUMENT_IRREGULARITY. Disposition: ESCALATE TO CFO. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "AUDIT UNIT ALPHA",
+      "entity_reviewed": "VPL",
+      "finding": "DOCUMENT_IRREGULARITY",
+      "duration_minutes": 296,
+      "documents_reviewed": 162,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0619"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0060",
+      "dtg": "110715ZJUL26",
+      "timestamp_utc": "2026-07-11T07:15:01Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — TERRACINA MARITIME LTD (Nassau / Nicosia",
+      "text": "Contact report: TERRACINA MARITIME LTD (Nassau) observed by AUDIT UNIT ALPHA in Nicosia. Transaction anomaly flagged: ROUND_TRIP_TRADE. Risk profile: MEDIUM. Finding: UNDISCLOSED_COUNTERPARTY. Action: HOLD FOR AUDIT.",
+      "entity_observed": "TML",
+      "observing_unit": "AUDIT UNIT ALPHA",
+      "finding": "UNDISCLOSED_COUNTERPARTY",
+      "risk_profile": "HIGH",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0085",
+      "dtg": "111252ZJUL26",
+      "timestamp_utc": "2026-07-11T12:52:05Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 11 Jul 2026 1252Z",
+      "text": "Dashboard log 111252ZJUL26. Events: Critical. KRI alerts active: 4. Units reporting: 3 of 10 on schedule. Dashboard officer: DO-01. Next review: 1652Z.",
+      "events": "ELEVATED",
+      "kri_alerts_active": 3,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0081",
+      "dtg": "111326ZJUL26",
+      "timestamp_utc": "2026-07-11T13:26:19Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 11 Jul 2026 1326Z",
+      "text": "Dashboard log 111326ZJUL26. Events: Elevated. KRI alerts active: 4. Units reporting: 2 of 9 on schedule. Dashboard officer: DO-05. Next review: 1726Z.",
+      "events": "ROUTINE",
+      "kri_alerts_active": 4,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0090",
+      "dtg": "120555ZJUL26",
+      "timestamp_utc": "2026-07-12T05:55:47Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 12 Jul 2026 0555Z",
+      "text": "Dashboard log 120555ZJUL26. Events: Routine. KRI alerts active: 4. Units reporting: 4 of 10 on schedule. Dashboard officer: DO-05. Next review: 0955Z.",
+      "events": "CRITICAL",
+      "kri_alerts_active": 3,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0034",
+      "dtg": "121727ZJUL26",
+      "timestamp_utc": "2026-07-12T17:27:55Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — FORENSIC TEAM DELTA / BVI",
+      "text": "Surveillance report from FORENSIC TEAM DELTA covering BVI. Duration: 19h. Entity contacts: 3. Suspicious activity observed: 2. Anomalies flagged: 1. Area assessment: ROUTINE.",
+      "unit": "FORENSIC TEAM DELTA",
+      "coverage_hours": 21,
+      "entity_contacts": 3,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0088",
+      "dtg": "130245ZJUL26",
+      "timestamp_utc": "2026-07-13T02:45:32Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 13 Jul 2026 0245Z",
+      "text": "Dashboard log 130245ZJUL26. Events: Routine. KRI alerts active: 1. Units reporting: 2 of 9 on schedule. Dashboard officer: DO-02. Next review: 0645Z.",
+      "events": "CRITICAL",
+      "kri_alerts_active": 1,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0024",
+      "dtg": "132135ZJUL26",
+      "timestamp_utc": "2026-07-13T21:35:21Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — LEGAL TASK FORCE GAMMA / Geneva",
+      "text": "LEGAL TASK FORCE GAMMA reporting position in Geneva, monitoring GOLDEN EAGLE FUND LP (BVI). Activity level: ELEVATED. Team readiness: DEGRADED. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "LEGAL TASK FORCE GAMMA",
+        "type": "COMPLIANCE",
+        "jurisdiction": "Geneva",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0031",
+      "dtg": "140408ZJUL26",
+      "timestamp_utc": "2026-07-14T04:08:29Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — COMPLIANCE TEAM BRAVO / Geneva",
+      "text": "Surveillance report from COMPLIANCE TEAM BRAVO covering Geneva. Duration: 14h. Entity contacts: 4. Suspicious activity observed: 2. Anomalies flagged: 3. Area assessment: ROUTINE.",
+      "unit": "COMPLIANCE TEAM BRAVO",
+      "coverage_hours": 21,
+      "entity_contacts": 4,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0103",
+      "dtg": "141405ZJUL26",
+      "timestamp_utc": "2026-07-14T14:05:14Z",
+      "persona": "CEO_WATCH",
+      "record_type": "COMMS_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms log — AUDIT UNIT ALPHA",
+      "text": "Communications log. From: AUDIT UNIT ALPHA To: CEO Dashboard. Subject: KRI ALERT UPDATE. Channel: BOARD PORTAL. Acknowledged: YES.",
+      "from_unit": "AUDIT UNIT ALPHA",
+      "to": "CEO DASHBOARD",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0080",
+      "dtg": "141614ZJUL26",
+      "timestamp_utc": "2026-07-14T16:14:02Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 14 Jul 2026 1614Z",
+      "text": "Dashboard log 141614ZJUL26. Events: Critical. KRI alerts active: 4. Units reporting: 3 of 9 on schedule. Dashboard officer: DO-01. Next review: 2014Z.",
+      "events": "ELEVATED",
+      "kri_alerts_active": 4,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0029",
+      "dtg": "142057ZJUL26",
+      "timestamp_utc": "2026-07-14T20:57:19Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / Cayman Islands",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in Cayman Islands, monitoring DESERT FALCON ENERGY (Dubai). Activity level: CRITICAL. Team readiness: STANDBY. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "COMPLIANCE",
+        "jurisdiction": "Cayman Islands",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0099",
+      "dtg": "150133ZJUL26",
+      "timestamp_utc": "2026-07-15T01:33:25Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — NEXUS ENERGY HOLDINGS (Cayman) / Cayman Islands",
+      "text": "Due diligence report: AUDIT UNIT ALPHA completed review of NEXUS ENERGY HOLDINGS (Cayman) in Cayman Islands. Duration: 291 minutes. Review scope: 482 documents. Finding: COMMODITY_MISMATCH. Disposition: REFERRED TO LEGAL. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "AUDIT UNIT ALPHA",
+      "entity_reviewed": "NEH",
+      "finding": "COMMODITY_MISMATCH",
+      "duration_minutes": 291,
+      "documents_reviewed": 260,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0458"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0106",
+      "dtg": "150956ZJUL26",
+      "timestamp_utc": "2026-07-15T09:56:45Z",
+      "persona": "CEO_WATCH",
+      "record_type": "COMMS_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms log — COMPLIANCE TEAM BRAVO",
+      "text": "Communications log. From: COMPLIANCE TEAM BRAVO To: CEO Dashboard. Subject: UNIT POSTURE REPORT. Channel: ENCRYPTED SIGNAL. Acknowledged: YES.",
+      "from_unit": "COMPLIANCE TEAM BRAVO",
+      "to": "CEO DASHBOARD",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0008",
+      "dtg": "151348ZJUL26",
+      "timestamp_utc": "2026-07-15T13:48:53Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — AUDIT UNIT ALPHA / Dubai Free Zone",
+      "text": "AUDIT UNIT ALPHA reporting position in Dubai Free Zone, monitoring NEH Dubai Commodities DMCC. Activity level: ELEVATED. Team readiness: STANDBY. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "AUDIT UNIT ALPHA",
+        "type": "LEGAL",
+        "jurisdiction": "Dubai Free Zone",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0042",
+      "dtg": "152349ZJUL26",
+      "timestamp_utc": "2026-07-15T23:49:06Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Cayman Islands",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Cayman Islands. Duration: 13h. Entity contacts: 6. Suspicious activity observed: 2. Anomalies flagged: 1. Area assessment: ROUTINE.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 6,
+      "entity_contacts": 6,
+      "area_assessment": "ELEVATED",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0055",
+      "dtg": "160542ZJUL26",
+      "timestamp_utc": "2026-07-16T05:42:28Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Malta",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Malta. Duration: 24h. Entity contacts: 7. Suspicious activity observed: 3. Anomalies flagged: 4. Area assessment: ELEVATED.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 13,
+      "entity_contacts": 7,
+      "area_assessment": "CRITICAL",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0003",
+      "dtg": "160604ZJUL26",
+      "timestamp_utc": "2026-07-16T06:04:24Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — AUDIT UNIT ALPHA / Dubai Free Zone",
+      "text": "AUDIT UNIT ALPHA reporting position in Dubai Free Zone, monitoring ORYX POWER GROUP (Abu Dhabi). Activity level: CRITICAL. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "AUDIT UNIT ALPHA",
+        "type": "FORENSIC",
+        "jurisdiction": "Dubai Free Zone",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0023",
+      "dtg": "161211ZJUL26",
+      "timestamp_utc": "2026-07-16T12:11:49Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / Nicosia",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in Nicosia, monitoring NEH Singapore Pte Ltd. Activity level: ROUTINE. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "FORENSIC",
+        "jurisdiction": "Nicosia",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0063",
+      "dtg": "161340ZJUL26",
+      "timestamp_utc": "2026-07-16T13:40:05Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — GOLDEN NILE LOGISTICS (BVI) / Geneva",
+      "text": "Contact report: GOLDEN NILE LOGISTICS (BVI) observed by AUDIT UNIT ALPHA in Geneva. Transaction anomaly flagged: VELOCITY_SPIKE. Risk profile: HIGH. Finding: NIL ADVERSE FINDING. Action: ESCALATE TO CDO.",
+      "entity_observed": "GNL",
+      "observing_unit": "AUDIT UNIT ALPHA",
+      "finding": "NIL ADVERSE FINDING",
+      "risk_profile": "MEDIUM",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0100",
+      "dtg": "171925ZJUL26",
+      "timestamp_utc": "2026-07-17T19:25:33Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — NEH Geneva Trading SA / BVI",
+      "text": "Due diligence report: AUDIT UNIT ALPHA completed review of NEH Geneva Trading SA in BVI. Duration: 92 minutes. Review scope: 277 documents. Finding: COMMODITY_MISMATCH. Disposition: CLEARED. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "AUDIT UNIT ALPHA",
+      "entity_reviewed": "NEH-G",
+      "finding": "COMMODITY_MISMATCH",
+      "duration_minutes": 92,
+      "documents_reviewed": 189,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0793"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0056",
+      "dtg": "180152ZJUL26",
+      "timestamp_utc": "2026-07-18T01:52:25Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — GOLDEN EAGLE FUND LP (BVI) / BVI",
+      "text": "Contact report: GOLDEN EAGLE FUND LP (BVI) observed by AUDIT UNIT ALPHA in BVI. Transaction anomaly flagged: REPORTING_GAP. Risk profile: MEDIUM. Finding: COMMODITY_MISMATCH. Action: HOLD FOR AUDIT.",
+      "entity_observed": "GEF",
+      "observing_unit": "AUDIT UNIT ALPHA",
+      "finding": "COMMODITY_MISMATCH",
+      "risk_profile": "LOW",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0001",
+      "dtg": "180923ZJUL26",
+      "timestamp_utc": "2026-07-18T09:23:24Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — FORENSIC TEAM DELTA / Nicosia",
+      "text": "FORENSIC TEAM DELTA reporting position in Nicosia, monitoring PETROSERV ASIA PTE (Singapore). Activity level: ELEVATED. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "FORENSIC TEAM DELTA",
+        "type": "AUDIT",
+        "jurisdiction": "Nicosia",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0076",
+      "dtg": "181307ZJUL26",
+      "timestamp_utc": "2026-07-18T13:07:30Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 18 Jul 2026 1307Z",
+      "text": "Dashboard log 181307ZJUL26. Events: Routine. KRI alerts active: 4. Units reporting: 3 of 7 on schedule. Dashboard officer: DO-03. Next review: 1707Z.",
+      "events": "CRITICAL",
+      "kri_alerts_active": 3,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0043",
+      "dtg": "182352ZJUL26",
+      "timestamp_utc": "2026-07-18T23:52:45Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Geneva",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Geneva. Duration: 12h. Entity contacts: 4. Suspicious activity observed: 3. Anomalies flagged: 4. Area assessment: ELEVATED.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 8,
+      "entity_contacts": 4,
+      "area_assessment": "CRITICAL",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0105",
+      "dtg": "190310ZJUL26",
+      "timestamp_utc": "2026-07-19T03:10:31Z",
+      "persona": "CEO_WATCH",
+      "record_type": "COMMS_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms log — LEGAL TASK FORCE GAMMA",
+      "text": "Communications log. From: LEGAL TASK FORCE GAMMA To: CEO Dashboard. Subject: BOARD SITREP. Channel: BOARD PORTAL. Acknowledged: YES.",
+      "from_unit": "LEGAL TASK FORCE GAMMA",
+      "to": "CEO DASHBOARD",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0082",
+      "dtg": "191213ZJUL26",
+      "timestamp_utc": "2026-07-19T12:13:44Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 19 Jul 2026 1213Z",
+      "text": "Dashboard log 191213ZJUL26. Events: Critical. KRI alerts active: 4. Units reporting: 5 of 6 on schedule. Dashboard officer: DO-05. Next review: 1613Z.",
+      "events": "ELEVATED",
+      "kri_alerts_active": 2,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0072",
+      "dtg": "201309ZJUL26",
+      "timestamp_utc": "2026-07-20T13:09:24Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — NEH Geneva Trading SA / Cayman Islands",
+      "text": "Contact report: NEH Geneva Trading SA observed by LEGAL TASK FORCE GAMMA in Cayman Islands. Transaction anomaly flagged: VELOCITY_SPIKE. Risk profile: MEDIUM. Finding: BENEFICIAL_OWNER_DISCREPANCY. Action: LEGAL REVIEW.",
+      "entity_observed": "NEH-G",
+      "observing_unit": "LEGAL TASK FORCE GAMMA",
+      "finding": "BENEFICIAL_OWNER_DISCREPANCY",
+      "risk_profile": "LOW",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0086",
+      "dtg": "211758ZJUL26",
+      "timestamp_utc": "2026-07-21T17:58:05Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 21 Jul 2026 1758Z",
+      "text": "Dashboard log 211758ZJUL26. Events: Routine. KRI alerts active: 2. Units reporting: 4 of 7 on schedule. Dashboard officer: DO-01. Next review: 2158Z.",
+      "events": "ROUTINE",
+      "kri_alerts_active": 2,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0047",
+      "dtg": "220029ZJUL26",
+      "timestamp_utc": "2026-07-22T00:29:28Z",
+      "persona": "CEO_WATCH",
+      "record_type": "BOARD_SURVEILLANCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board surveillance report — AUDIT UNIT ALPHA / Cayman Islands",
+      "text": "Surveillance report from AUDIT UNIT ALPHA covering Cayman Islands. Duration: 5h. Entity contacts: 3. Suspicious activity observed: 2. Anomalies flagged: 0. Area assessment: ROUTINE.",
+      "unit": "AUDIT UNIT ALPHA",
+      "coverage_hours": 10,
+      "entity_contacts": 3,
+      "area_assessment": "ROUTINE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE",
+        "TRADE_REPORTING"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0017",
+      "dtg": "220312ZJUL26",
+      "timestamp_utc": "2026-07-22T03:12:14Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — COMPLIANCE TEAM BRAVO / Lagos",
+      "text": "COMPLIANCE TEAM BRAVO reporting position in Lagos, monitoring PETROSERV ASIA PTE (Singapore). Activity level: ELEVATED. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "COMPLIANCE TEAM BRAVO",
+        "type": "FORENSIC",
+        "jurisdiction": "Lagos",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0109",
+      "dtg": "220857ZJUL26",
+      "timestamp_utc": "2026-07-22T08:57:54Z",
+      "persona": "CEO_WATCH",
+      "record_type": "COMMS_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Comms log — LEGAL TASK FORCE GAMMA",
+      "text": "Communications log. From: LEGAL TASK FORCE GAMMA To: CEO Dashboard. Subject: DUE DILIGENCE SUMMARY. Channel: BOARD PORTAL. Acknowledged: YES.",
+      "from_unit": "LEGAL TASK FORCE GAMMA",
+      "to": "CEO DASHBOARD",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0005",
+      "dtg": "221144ZJUL26",
+      "timestamp_utc": "2026-07-22T11:44:56Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — LEGAL TASK FORCE GAMMA / Nicosia",
+      "text": "LEGAL TASK FORCE GAMMA reporting position in Nicosia, monitoring VOYAGER PETROCHEMICALS LTD (Malta). Activity level: ELEVATED. Team readiness: STANDBY. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "LEGAL TASK FORCE GAMMA",
+        "type": "FORENSIC",
+        "jurisdiction": "Nicosia",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0057",
+      "dtg": "221555ZJUL26",
+      "timestamp_utc": "2026-07-22T15:55:35Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — PETROSERV ASIA PTE (Singapore) / Lagos",
+      "text": "Contact report: PETROSERV ASIA PTE (Singapore) observed by AUDIT UNIT ALPHA in Lagos. Transaction anomaly flagged: COMMODITY_MISMATCH. Risk profile: HIGH. Finding: NIL ADVERSE FINDING. Action: REPORT FORWARDED.",
+      "entity_observed": "PSA",
+      "observing_unit": "AUDIT UNIT ALPHA",
+      "finding": "NIL ADVERSE FINDING",
+      "risk_profile": "MEDIUM",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0015",
+      "dtg": "221724ZJUL26",
+      "timestamp_utc": "2026-07-22T17:24:51Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — AUDIT UNIT ALPHA / BVI",
+      "text": "AUDIT UNIT ALPHA reporting position in BVI, monitoring ARCADIA CLEARING HOUSE (Nicosia). Activity level: CRITICAL. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "AUDIT UNIT ALPHA",
+        "type": "LEGAL",
+        "jurisdiction": "BVI",
+        "readiness": "DEGRADED"
+      },
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0069",
+      "dtg": "221849ZJUL26",
+      "timestamp_utc": "2026-07-22T18:49:52Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — ARCADIA CLEARING HOUSE (Nicosi / Singapore Freeport",
+      "text": "Contact report: ARCADIA CLEARING HOUSE (Nicosia) observed by LEGAL TASK FORCE GAMMA in Singapore Freeport. Transaction anomaly flagged: ROUND_TRIP_TRADE. Risk profile: HIGH. Finding: DOCUMENT_IRREGULARITY. Action: LEGAL REVIEW.",
+      "entity_observed": "ACH",
+      "observing_unit": "LEGAL TASK FORCE GAMMA",
+      "finding": "DOCUMENT_IRREGULARITY",
+      "risk_profile": "LOW",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0016",
+      "dtg": "241840ZJUL26",
+      "timestamp_utc": "2026-07-24T18:40:32Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — AUDIT UNIT ALPHA / Geneva",
+      "text": "AUDIT UNIT ALPHA reporting position in Geneva, monitoring GOLDEN EAGLE FUND LP (BVI). Activity level: ELEVATED. Team readiness: STANDBY. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "AUDIT UNIT ALPHA",
+        "type": "AUDIT",
+        "jurisdiction": "Geneva",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0059",
+      "dtg": "250648ZJUL26",
+      "timestamp_utc": "2026-07-25T06:48:10Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_CONTACT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity contact — PETROSERV ASIA PTE (Singapore) / Malta",
+      "text": "Contact report: PETROSERV ASIA PTE (Singapore) observed by COMPLIANCE TEAM BRAVO in Malta. Transaction anomaly flagged: REPORTING_GAP. Risk profile: MEDIUM. Finding: DOCUMENT_IRREGULARITY. Action: HOLD FOR AUDIT.",
+      "entity_observed": "PSA",
+      "observing_unit": "COMPLIANCE TEAM BRAVO",
+      "finding": "DOCUMENT_IRREGULARITY",
+      "risk_profile": "HIGH",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "TRANSACTION_ANOMALY",
+        "COUNTERPARTY"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0097",
+      "dtg": "251239ZJUL26",
+      "timestamp_utc": "2026-07-25T12:39:41Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — TERRACINA MARITIME LTD (Nassau / Nicosia",
+      "text": "Due diligence report: AUDIT UNIT ALPHA completed review of TERRACINA MARITIME LTD (Nassau) in Nicosia. Duration: 181 minutes. Review scope: 301 documents. Finding: DOCUMENT_IRREGULARITY. Disposition: CLEARED. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "AUDIT UNIT ALPHA",
+      "entity_reviewed": "TML",
+      "finding": "DOCUMENT_IRREGULARITY",
+      "duration_minutes": 181,
+      "documents_reviewed": 424,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [
+        "ENT-202606-0560"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0098",
+      "dtg": "260210ZJUL26",
+      "timestamp_utc": "2026-07-26T02:10:35Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — NKOSI TRADING & BROKERAGE (Lag / Singapore Freeport",
+      "text": "Due diligence report: LEGAL TASK FORCE GAMMA completed review of NKOSI TRADING & BROKERAGE (Lagos) in Singapore Freeport. Duration: 312 minutes. Review scope: 404 documents. Finding: COMMODITY_MISMATCH. Disposition: REFERRED TO LEGAL. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "LEGAL TASK FORCE GAMMA",
+      "entity_reviewed": "NTB",
+      "finding": "COMMODITY_MISMATCH",
+      "duration_minutes": 312,
+      "documents_reviewed": 440,
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [
+        "ENT-202606-0030"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0084",
+      "dtg": "260901ZJUL26",
+      "timestamp_utc": "2026-07-26T09:01:42Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 26 Jul 2026 0901Z",
+      "text": "Dashboard log 260901ZJUL26. Events: Elevated. KRI alerts active: 1. Units reporting: 5 of 7 on schedule. Dashboard officer: DO-05. Next review: 1301Z.",
+      "events": "ROUTINE",
+      "kri_alerts_active": 2,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0093",
+      "dtg": "260921ZJUL26",
+      "timestamp_utc": "2026-07-26T09:21:59Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DUE_DILIGENCE_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Due diligence report — NEH Singapore Pte Ltd / BVI",
+      "text": "Due diligence report: LEGAL TASK FORCE GAMMA completed review of NEH Singapore Pte Ltd in BVI. Duration: 381 minutes. Review scope: 394 documents. Finding: COMMODITY_MISMATCH. Disposition: REFERRED TO LEGAL. Report forwarded to CDO and CFO.",
+      "reviewing_unit": "LEGAL TASK FORCE GAMMA",
+      "entity_reviewed": "NEH-S",
+      "finding": "COMMODITY_MISMATCH",
+      "duration_minutes": 381,
+      "documents_reviewed": 248,
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [
+        "ENT-202606-0972"
+      ],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "ACTIVITY_TYPE",
+        "MARKET_SURVEILLANCE"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0079",
+      "dtg": "262208ZJUL26",
+      "timestamp_utc": "2026-07-26T22:08:19Z",
+      "persona": "CEO_WATCH",
+      "record_type": "DASHBOARD_LOG",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CEO dashboard log — 26 Jul 2026 2208Z",
+      "text": "Dashboard log 262208ZJUL26. Events: Routine. KRI alerts active: 2. Units reporting: 3 of 7 on schedule. Dashboard officer: DO-02. Next review: 0208Z.",
+      "events": "CRITICAL",
+      "kri_alerts_active": 3,
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD"
+      ]
+    },
+    {
+      "doc_id": "CEO-202606-0028",
+      "dtg": "272322ZJUL26",
+      "timestamp_utc": "2026-07-27T23:22:01Z",
+      "persona": "CEO_WATCH",
+      "record_type": "ENTITY_POSTURE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity posture report — AUDIT UNIT ALPHA / Malta",
+      "text": "AUDIT UNIT ALPHA reporting position in Malta, monitoring PETROSERV ASIA PTE (Singapore). Activity level: ELEVATED. Team readiness: EFFECTIVE. Reporting to CEO Dashboard.",
+      "unit": {
+        "name": "AUDIT UNIT ALPHA",
+        "type": "FORENSIC",
+        "jurisdiction": "Malta",
+        "readiness": "EFFECTIVE"
+      },
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CEO_DASHBOARD",
+        "MARKET_SURVEILLANCE"
+      ]
+    }
+  ]
+}

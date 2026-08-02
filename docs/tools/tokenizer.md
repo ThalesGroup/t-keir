@@ -79,12 +79,12 @@ The converter service come with unit and functional testing.
 Unittest allows to test Tokenizer classes only.
 
 ```shell
-python3 -m pytest tkeir/tests/unittests/TestTokenizerConfiguration.py
-python3 -m pytest tkeir/tests/unittests/TestTokenizerMultilingual.py
+python3 -m pytest tests/unittests/TestTokenizerConfiguration.py
+python3 -m pytest tests/unittests/TestTokenizerMultilingual.py
 ```
 
 ### Tokenizer Functional tests
 
 ```shell
-python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
+python3 -m pytest tests/functional_tests/TestPipeline.py
 ```

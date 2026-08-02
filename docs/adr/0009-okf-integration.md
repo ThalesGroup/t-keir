@@ -19,9 +19,8 @@ bundle format consumable by any LLM agent without an SDK.
 3. New agent `okf_curator` — grounded enrichment of OKF concepts from the corpus.
 4. New workflow `okf_wiki_brief` — Query→Bundle→Curate→Compose, using a new builtin
    step type in the Orchestrator.
-5. Compose profile `okf` + service `tkeir-okf` (:8094). Port 8094 is shared with
-   `tkeir-governor` only when both Compose profiles are enabled; prefer
-   `PROFILES=core,okf` or `PROFILES=governor` separately on a single host.
+5. Compose profile `okf` + service `tkeir-okf` (:8095). Governor remains on
+   :8094 so both can run together on the same host.
 6. HMI `/okf` bundle browser.
 7. T-KEIR producer extensions (`tkeir_*` frontmatter) remain in
    `tkeir_okf_version:"0.1"` namespace; OKF consumers ignore unknown keys per §9

@@ -9,10 +9,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { MarkdownContent } from "@/components/markdown-content";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { highlightText } from "@/lib/highlight";
 import {
   chunkMatchesFilter,
   groupChunksByDocument,
@@ -45,22 +45,6 @@ const ChunkBlock = memo(function ChunkBlock({
   highlightKeywords: string[];
   highlightQueryTerms: string[];
 }) {
-  const renderedText = useMemo(
-    () =>
-      highlightText(
-        chunk.text_raw,
-        highlightEntities,
-        highlightKeywords,
-        highlightQueryTerms,
-      ),
-    [
-      chunk.text_raw,
-      highlightEntities,
-      highlightKeywords,
-      highlightQueryTerms,
-    ],
-  );
-
   return (
     <div
       id={`chunk-${chunk.chunk_id}`}
@@ -82,9 +66,13 @@ const ChunkBlock = memo(function ChunkBlock({
           </Badge>
         )}
       </div>
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-        {renderedText}
-      </p>
+      <MarkdownContent
+        content={chunk.text_raw}
+        className="rounded-md bg-background/60 p-1"
+        highlightEntities={highlightEntities}
+        highlightKeywords={highlightKeywords}
+        highlightQueryTerms={highlightQueryTerms}
+      />
     </div>
   );
 });

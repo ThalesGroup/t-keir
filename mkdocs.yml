@@ -25,6 +25,7 @@ nav:
         - Profiles: 'deployment/index.md'
         - Environment variables: 'deployment/environment.md'
         - Compose (P1): 'deployment/compose.md'
+        - Hybrid demo launcher (tmux): 'deployment/start_services.md'
         - Kubernetes (P2): 'deployment/k8s.md'
         - Token exchange (RFC 8693): 'deployment/token-exchange.md'
         - Ingestion (Phase 3): 'deployment/ingest.md'
@@ -60,6 +61,7 @@ nav:
     - Compliance:
         - Overview: 'compliance/index.md'
         - EU Compliance OPA Audit: 'compliance/eu-audit.md'
+        - Compliance status (one page): 'compliance/status.md'
         - Latest audit results: 'compliance/latest-results.md'
         - Legal / reviewer checklist: 'compliance/legal-review-checklist.md'
         - CI and evidence pipeline: 'compliance/ci-evidence.md'
@@ -69,6 +71,11 @@ nav:
         - DORA: 'compliance/dora.md'
         - GDPR: 'compliance/gdpr.md'
         - PLD: 'compliance/pld.md'
+    - CI & reports:
+        - Overview: 'ci/index.md'
+        - GitHub Actions workflows: 'ci/workflows.md'
+        - Reports catalog: 'ci/reports-catalog.md'
+        - Quality gates: 'ci/gates.md'
     - Quality:
         - Code quality dashboard: 'quality/index.md'
     - Runbooks:
@@ -95,6 +102,9 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - md_in_html
+  - tables
+  - attr_list
 
 # Article tables are snippet sources only (included into regulation pages).
 # ADRs stay in the repo for engineering but are not published until 2.0.0.

@@ -40,10 +40,21 @@ def _env_bool(name: str, default: bool) -> bool:
 @lru_cache(maxsize=1)
 def audit_settings() -> AuditSettings:
     """Load audit settings once per process."""
-    worm_root = Path(os.getenv("AUDIT_WORM_ROOT", "/var/tkeir/audit/worm"))
+    from thot.core.TkeirPaths import repo_root
+
+    workspace_env = os.getenv("TKEIR_WORKSPACE") or os.getenv("WORKSPACE")
+    host_root = (
+        Path(workspace_env).expanduser().resolve() / "audit"
+        if workspace_env
+        else Path(repo_root()) / "workspace" / "audit"
+    )
+    # Containers / production set AUDIT_* explicitly (see Dockerfile.tkeir-audit).
+    # Host Make defaults to workspace/audit — avoid requiring /var/tkeir.
+    worm_root = Path(os.getenv("AUDIT_WORM_ROOT", str(host_root / "worm")))
     keys_path = Path(
         os.getenv(
-            "AUDIT_SUBJECT_KEYS_PATH", "/var/tkeir/audit/subject_keys.db"
+            "AUDIT_SUBJECT_KEYS_PATH",
+            str(host_root / "subject_keys.db"),
         )
     )
     hot_url = os.getenv("AUDIT_HOT_STORE_URL") or None

@@ -1,0 +1,50 @@
+name: otan_spotrep
+version: 1
+title: OTAN / NATO HUMINT SPOTREP + tasking
+description: >
+  Coverage / gap analysis and tasking recommendation for J2X HUMINT.
+slots:
+  - name: coverage_analysis
+    type: freeform_grounded
+    description: COVERAGE ANALYSIS — gap vs known HUMINT/OSINT.
+    constraints: { required: true }
+  - name: recommended_source
+    type: freeform_grounded
+    description: RECOMMENDED SOURCE — access, reliability, status.
+    constraints: { required: false }
+  - name: suggested_tasking
+    type: freeform_grounded
+    description: SUGGESTED TASKING — deadline, priority, PIR.
+    constraints: { required: false }
+  - name: supporting_keywords
+    type: keyword
+    description: Collection keywords
+    constraints: { min_items: 0, max_items: 12, required: false }
+markdown_template: |
+  # COVERAGE ANALYSIS / SPOTREP — {{ topic or "untitled" }}
+  Classification: SECRET // REL TO COALITION TF
+  Form: OTAN SPOTREP + Tasking
+
+  {% if coverage_analysis %}
+  ## COVERAGE ANALYSIS
+
+  {{ coverage_analysis }}
+  {% endif %}
+
+  {% if recommended_source %}
+  ## RECOMMENDED SOURCE
+
+  {{ recommended_source }}
+  {% endif %}
+
+  {% if suggested_tasking %}
+  ## SUGGESTED TASKING
+
+  {{ suggested_tasking }}
+  {% endif %}
+
+  {% if supporting_keywords %}
+  ## Keywords
+
+  {{ supporting_keywords | join(", ") }}
+  {% endif %}

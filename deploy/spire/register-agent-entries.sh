@@ -11,11 +11,12 @@ echo "Registering agent workload entries on ${SPIRE_SERVER} (trust=${TRUST_DOMAI
 
 # Parent entry for the SPIRE agent node (join_token path is operator-driven).
 # Workload entries use unix uid selector as a Compose-friendly default.
+# Parent matches `make spire-up` token generate -spiffeID.
 for name in tkeir-agent researcher supervisor writer; do
   "${BIN}" entry create \
-    -socketPath /run/spire/sockets/server.sock \
+    -socketPath /tmp/spire-server/private/api.sock \
     -spiffeID "spiffe://${TRUST_DOMAIN}/agent/${name}" \
-    -parentID "spiffe://${TRUST_DOMAIN}/spire/agent/join_token/tkeir" \
+    -parentID "spiffe://${TRUST_DOMAIN}/spire-agent" \
     -selector unix:uid:0 \
     -ttl 3600 \
     || true

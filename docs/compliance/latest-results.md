@@ -10,7 +10,8 @@ Source of truth for the machine artefacts remains under
 always reflects the last CI / audit run.
 
 See [EU Compliance OPA Audit](eu-audit.md) for the result model and how to
-re-run the audit. For GDPR/CRA items that only a human can close, see the
-[Legal / reviewer checklist](legal-review-checklist.md).
+re-run the audit. For a single colored table (status · criticality ·
+remediation) see [Compliance status](status.md). For GDPR/CRA items that only
+a human can close, see the [Legal / reviewer checklist](legal-review-checklist.md).
 
 --8<-- "./docs/compliance/generated/latest_results.md"

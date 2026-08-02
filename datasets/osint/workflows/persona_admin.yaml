@@ -1,0 +1,73 @@
+name: persona_admin
+version: 1
+description: >
+  C2 System Administrator OTAN workflow (Operation RED HORIZON).
+  When Reporter Phase 3 supplies an edited LLM Wiki, treat it as the primary
+  fact base and reshape into otan_intsum. Otherwise dual-index.
+  Example goal: Report what the shared corpus knows about MT RED SEA EAGLE.
+template: otan_intsum
+budgets:
+  llm_tokens: 90000
+  tool_calls: 60
+  wall_seconds: 900
+steps:
+  - id: analyse
+    agent: admin_analyser
+    goal_template: >
+      Produce grounded findings for C2 System Administrator OTAN intsum on: {goal}.
+      Topic: {topic}. report_form={report_form}. has_llm_wiki={has_llm_wiki}.
+      bundle_id={bundle_id}.
+
+      IF has_llm_wiki is true OR wiki_markdown / wiki_excerpt is non-empty:
+        PRIMARY SOURCE is the Phase-2 LLM Wiki (also in the agent prompt).
+        Call okf_bundle_get when bundle_id is set. Extract atomic findings from
+        Answer + Evidence; preserve chunk_ids. Use search/rag_query
+        (search_mode="both") only to verify citations or fill Gaps — do not
+        rebuild research from scratch.
+        FULL WIKI:
+        -----
+        {wiki_markdown}
+        -----
+      ELSE:
+        HARD REQUIREMENT: dual-index search_mode="both" on rag_query and search.
+        Never invent facts absent from chunks.
+
+      Never invent builders, flags, EOIs, or assessments absent from wiki/chunks.
+    tools:
+      - search
+      - rag_query
+      - ontology_query
+      - document_get
+      - workspace_wiki_list
+      - workspace_wiki_get
+      - okf_bundle_get
+    max_steps: 14
+
+  - id: review
+    agent: admin_reviewer
+    goal_template: >
+      Review C2 System Administrator findings for OTAN intsum on: {goal}.
+      Prior findings JSON: {prior_findings_json}
+      Prefer claims grounded in the LLM Wiki / cited chunk_ids.
+      Reject uncited or world-knowledge claims. Return accepted findings only.
+    tools: []
+    max_steps: 2
+
+  - id: write
+    agent: admin_writer
+    goal_template: >
+      Write persona OTAN report claims for: {goal}.
+      Use reviewed findings only: {prior_findings_json}
+      Keep chunk_ids; do not add facts.
+      Follow the OTAN report TEMPLATE embedded in your system prompt
+      (slots + markdown skeleton for {report_form} / {report_form_slots}).
+      Emit one finding per filled slot with claim prefixed by [slot_name],
+      e.g. "[situation] …". Compose maps tagged claims into the template.
+
+    tools: []
+    max_steps: 2
+
+  - id: deliverable
+    compose:
+      template: otan_intsum
+      topic_from: topic

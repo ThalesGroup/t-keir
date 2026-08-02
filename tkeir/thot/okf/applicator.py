@@ -22,7 +22,11 @@ from typing import Any
 import yaml
 
 from thot.agent.models import GroundedFindings
-from thot.okf.models import OkfEnrichment, OkfEnrichmentFinding, OkfEnrichmentPayload
+from thot.okf.models import (
+    OkfEnrichment,
+    OkfEnrichmentFinding,
+    OkfEnrichmentPayload,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -74,7 +78,11 @@ def enrichments_from_grounded(
     AgentLoop keeps ``claim`` + ``chunk_ids`` only; the curator embeds the full
     enrichment payload as JSON in ``notes`` (or ``notes.enrichments``).
     """
-    notes = raw_notes if raw_notes is not None else (result.notes if result else "")
+    notes = (
+        raw_notes
+        if raw_notes is not None
+        else (result.notes if result else "")
+    )
     findings: list[OkfEnrichmentFinding] = []
     unfilled: list[str] = list(result.unfilled) if result else []
     parsed: dict[str, Any] | None = None
@@ -118,7 +126,9 @@ def enrichments_from_grounded(
                     ),
                 )
             )
-    return OkfEnrichment(findings=findings, unfilled=unfilled, notes=notes or "")
+    return OkfEnrichment(
+        findings=findings, unfilled=unfilled, notes=notes or ""
+    )
 
 
 class OkfEnrichmentApplicator:
@@ -145,7 +155,9 @@ class OkfEnrichmentApplicator:
         """Apply one finding; return True when a file was updated."""
         path = self._concept_path(finding.concept_id)
         if not path.is_file():
-            LOGGER.info("okf applicator: missing concept %s", finding.concept_id)
+            LOGGER.info(
+                "okf applicator: missing concept %s", finding.concept_id
+            )
             return False
         text = path.read_text(encoding="utf-8")
         frontmatter, body = parse_concept_file(text)
@@ -177,7 +189,9 @@ class OkfEnrichmentApplicator:
             for heading, content in sections.items():
                 parts.extend([f"### {heading}", "", str(content).rstrip(), ""])
             body = "\n".join(parts)
-        path.write_text(render_concept_file(frontmatter, body), encoding="utf-8")
+        path.write_text(
+            render_concept_file(frontmatter, body), encoding="utf-8"
+        )
         return True
 
     def apply(self, enrichment: OkfEnrichment) -> dict[str, Any]:

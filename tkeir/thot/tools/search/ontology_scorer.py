@@ -60,7 +60,9 @@ class OntologyScorer:
         self.config = config
         self._doc_cache: dict[str, list[str]] = {}
 
-    def extract_document_concepts(self, json_ld: str | dict[str, Any]) -> list[str]:
+    def extract_document_concepts(
+        self, json_ld: str | dict[str, Any]
+    ) -> list[str]:
         """Extract concept ids / normalized strings from document json_ld."""
         if isinstance(json_ld, str):
             if not json_ld.strip():
@@ -226,9 +228,9 @@ class OntologyRescorer:
                 query_concept_ids,
                 list(doc_concepts or []),
             )
-            blended[doc_id] = (1.0 - self.weight) * first_n + self.weight * float(
-                ont
-            )
+            blended[doc_id] = (
+                1.0 - self.weight
+            ) * first_n + self.weight * float(ont)
         return sorted(blended.items(), key=lambda item: item[1], reverse=True)
 
 

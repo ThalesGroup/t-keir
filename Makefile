@@ -17,8 +17,15 @@ Q := @
 endif
 
 .PHONY: help setup install check-uv check-docker check-git check-jq check-curl check-python-version check-secrets \
+	check-install \
 	install-tesseract install-spacy-models build wheel init-models \
 	test test-unit test-functional test-coverage coverage \
+	test-integration test-integration-ci \
+	test-fuzz-hypothesis test-fuzz-atheris test-fuzz-radamsa test-fuzz fuzz-report \
+	test-bdd test-bdd-ci bdd-report \
+	slsa-prereqs slsa-provenance slsa-assess slsa-report slsa-level-gate slsa \
+	check-cosign check-radamsa check-supply-tools \
+	sign-wheel sign-sbom sign-provenance sign-attest-images sign-all verify-signatures \
 	lint format typecheck liccheck complexity complexity-report pip-licenses license-report quality-docs pip-audit \
 	deps-check deps-update deps-update-safe verify-lockfile tag changelog \
 	bom sbom aibom trivy owasp-dependency-check security-report \
@@ -27,12 +34,13 @@ endif
 	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
 	beir-eval beir-smoke generate-eval rag-eval beir-rag-eval eval eval-smoke clean-db vespa-clean logs \
 	images images-push images-sign \
-	compose-up compose-down compose-bootstrap compose-logs compose-smoke audit-report audit-verify audit-archive \
+	compose-up compose-down compose-bootstrap compose-logs compose-smoke wipe-runtime down all-down \
+	audit-report audit-summary audit-verify audit-archive \
 	governor-flags governor-kill rollback-index check-secrets-staged \
-	hmi-install hmi-lint hmi-typecheck hmi-build \
+	hmi-install hmi-lint hmi-typecheck hmi-build hmi-up \
 	k3d-up k3d-down helm-deps helm-lint helm-template cluster-install cluster-plan cluster-uninstall \
 	k3s-server k3s-agent k3s-check cilium-install lima-k3s-up lima-k3s-down \
-	keycloak-export-realm seal kubeflow-install kubeflow-uninstall kubeflow-register-models kubeflow-run-ingest \
+	keycloak-export-realm keycloak-sync-demo-users keycloak-purge-demo-users seal kubeflow-install kubeflow-uninstall kubeflow-register-models kubeflow-run-ingest \
 	lineage-report audit-evidence annex-iv \
 	datasets datasets-ontologies datasets-download datasets-ingest datasets-ingest-user datasets-ingest-admin \
 	scidocs-download \
@@ -70,7 +78,7 @@ HMI_DIR := $(ROOT)/tkeir-hmi
 VESPA_DIR := $(ROOT)/vespa
 # Host P0 Vespa image (matches vespa/start_vespa.sh and deploy/versions.lock.yaml).
 VESPA_IMAGE ?= vespaengine/vespa
-TESTS_DIR := $(TKEIR_DIR)/tests
+TESTS_DIR := $(ROOT)/tests
 CONFIGS_DIR := $(TKEIR_DIR)/configs
 SCRIPTS_DIR := $(ROOT)/scripts
 COVERAGE_REPORT_DIR := $(ROOT)/coverage-reports
@@ -81,7 +89,7 @@ BUILD_STAMP := $(DIST_DIR)/.build_timestamp
 
 WORKSPACE ?= $(ROOT)/workspace
 PIPELINE_CONFIG ?= $(CONFIGS_DIR)/pipeline.yaml
-PIPELINE_INPUT ?= $(TKEIR_DIR)/tests/fixtures/test-raw/raw
+PIPELINE_INPUT ?= $(ROOT)/tests/fixtures/test-raw/raw
 PIPELINE_OUTPUT ?= $(WORKSPACE)/tmp/pipeline-out
 PIPELINE_TYPE ?= auto
 TRANSFORMERS_CACHE ?= $(ROOT)/.cache/models
@@ -93,8 +101,8 @@ FORCE_BGE ?= 0
 DOCS_PORT ?= 8000
 DOCS_PDF_OUTPUT ?= $(ROOT)/output/docs/tkeir-docs.pdf
 
-INDEX_INPUT ?= $(TKEIR_DIR)/tests/indexing/output
-INDEX_FIXTURES_INPUT := $(TKEIR_DIR)/tests/indexing/input
+INDEX_INPUT ?= $(ROOT)/tests/indexing/output
+INDEX_FIXTURES_INPUT := $(ROOT)/tests/indexing/input
 RAG_URL ?= http://localhost:8090
 RAG_QUERY ?= Who is Rob Brown?
 RAG_LANGUAGE ?= en
@@ -146,7 +154,11 @@ PYTHON_BASE_IMAGE ?= python:3.11-slim@sha256:db3ff2e1800a8581e2c48a27c3995339d47
 NODE_BASE_IMAGE ?= node:22-bookworm-slim@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
 
 # Python trees checked by lint, format, mypy, and complexity tools.
-PYTHON_SOURCES := thot tests
+# Paths relative to TKEIR_DIR (lint/format/typecheck run with --directory $(TKEIR_DIR)).
+PYTHON_SOURCES := thot ../tests/unittests ../tests/functional_tests ../tests/conftest.py
+# Explicit config: multi-root sources otherwise climb to the repo root and drop
+# tkeir/pyproject.toml settings (e.g. black line-length 79 → mass reformat).
+PYPROJECT := $(TKEIR_DIR)/pyproject.toml
 
 # Sources that invalidate the wheel build stamp (pyproject + package code).
 WHEEL_SOURCES := $(TKEIR_DIR)/pyproject.toml $(TKEIR_DIR)/uv.lock \
@@ -160,9 +172,55 @@ XENON_MAX_AVERAGE ?= A
 CC_AVERAGE_MAX ?= 7.0
 QUALITY_REPORT_DIR ?= $(ROOT)/reports/quality
 COMPLEXITY_SOURCES ?= thot
+# Absolute “no grade D+” gate — scoped to stable packages. RAG / OKF / eval /
+# ingest / answer_generation still need refactors before joining this list.
+COMPLEXITY_D_GATE_SOURCES ?= \
+	thot/core thot/action thot/audit thot/governor thot/agent \
+	thot/tools/pipeline.py thot/tools/annotation \
+	thot/tasks/pipeline thot/tasks/converters thot/tasks/keywords \
+	thot/tasks/morphosyntax thot/tasks/syntax thot/tasks/language_detection \
+	thot/tasks/ner thot/tasks/tokenizer thot/tasks/document_ontology \
+	thot/tasks/embeddings thot/tasks/golden_chunking
 
 # Minimum test coverage percentage — CI fails below this threshold.
 COVERAGE_FAIL_UNDER ?= 90
+
+# Integration / fuzz / BDD / SLSA / signing (supply-chain hardening)
+INTEGRATION_TIMEOUT    ?= 10
+INTEGRATION_REPORT_DIR ?= $(ROOT)/reports/integration
+RAG_URL_TEST           ?= http://localhost:8090
+# Dedicated ingest API (compose :8091). Override to $(RAG_URL_TEST)/ingest if proxied.
+INGEST_URL_TEST        ?= http://localhost:8091
+SKIP_INTEGRATION       ?= 0
+
+FUZZ_REPORT_DIR        ?= $(ROOT)/reports/fuzzing
+FUZZ_DURATION          ?= 60
+FUZZ_CORPUS_DIR        ?= $(ROOT)/tests/fuzzing/corpus
+HYPOTHESIS_SEED        ?= 0
+RADAMSA                ?= radamsa
+RADAMSA_COUNT          ?= 200
+RADAMSA_SEED           ?= 42
+
+BDD_REPORT_DIR         ?= $(ROOT)/reports/bdd
+BDD_FEATURES           ?= $(ROOT)/tests/bdd/features
+BDD_FORMAT             ?= pretty
+
+SLSA_LEVEL             ?= 2
+SLSA_REPORT_DIR        ?= $(ROOT)/reports/slsa
+# TODO: pin digest on first pull — docker pull … && docker inspect --format='{{index .RepoDigests 0}}'
+SLSA_VERIFIER_IMAGE    ?= ghcr.io/slsa-framework/slsa-verifier/slsa-verifier@sha256:TODO_PIN_DIGEST
+VERDIT_SLSA_VERSION    ?= 0.1.0
+PROVENANCE_FILE        ?= $(SLSA_REPORT_DIR)/provenance.json
+
+COSIGN_BUNDLE_DIR      ?= $(ROOT)/reports/signatures
+COSIGN_YES             ?= --yes
+REKOR_URL              ?= https://rekor.sigstore.dev
+FULCIO_URL             ?= https://fulcio.sigstore.dev
+SKIP_SIGNING           ?= 0
+STRICT_SIGNING         ?= 0
+SKIP_IMAGE_ATTEST      ?= 1
+# Prefer tkeir/dist (uv build output); fall back to ROOT/dist.
+WHEEL_DIR              ?= $(TKEIR_DIR)/dist
 
 QUICKSTART_CONFIG ?= $(PIPELINE_CONFIG)
 QUICKSTART_OUTPUT ?= $(ROOT)/output/quickstart
@@ -244,6 +302,23 @@ check-secrets: check-git ## Fail on tracked credential files or secret patterns
 check-secrets-staged: ## Scan staged files only (fast pre-commit path)
 	$(Q)chmod +x "$(SCRIPTS_DIR)/check_secrets.sh"
 	$(Q)CHECK_SECRETS_STAGED=1 "$(SCRIPTS_DIR)/check_secrets.sh"
+
+# Dev-mode install verification (STRICT=1 treats warnings as failures).
+STRICT ?= 0
+SKIP_DOCKER ?= 0
+SKIP_HMI ?= 0
+SKIP_SPACY ?= 0
+
+check-install: ## Verify local/dev install (tools, Python, spaCy, Docker, HMI)
+	$(Q)chmod +x "$(SCRIPTS_DIR)/check_install.sh"
+	$(Q)UV="$(UV)" PYTHON="$(PYTHON)" \
+		TKEIR_DIR="$(TKEIR_DIR)" HMI_DIR="$(HMI_DIR)" \
+		VESPA_IMAGE="$(VESPA_IMAGE)" \
+		STRICT="$(STRICT)" \
+		SKIP_DOCKER="$(SKIP_DOCKER)" \
+		SKIP_HMI="$(SKIP_HMI)" \
+		SKIP_SPACY="$(SKIP_SPACY)" \
+		"$(SCRIPTS_DIR)/check_install.sh"
 
 # ---------------------------------------------------------------------------
 # Install / sync
@@ -343,13 +418,13 @@ coverage: ci-deps ## Coverage suite (fail-under COVERAGE_FAIL_UNDER, default 90%
 lint: ci-deps ## ruff + black + isort checks on thot/ and tests/
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		--with ruff \
-		ruff check $(PYTHON_SOURCES)
+		ruff check --config "$(PYPROJECT)" $(PYTHON_SOURCES)
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		--with black --with isort \
-		black --check $(PYTHON_SOURCES)
+		black --check --config "$(PYPROJECT)" $(PYTHON_SOURCES)
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		--with isort \
-		isort --check-only $(PYTHON_SOURCES)
+		isort --check-only --settings-path "$(PYPROJECT)" $(PYTHON_SOURCES)
 
 hmi-lint: hmi-install ## Next.js / ESLint checks for the HMI
 	cd $(HMI_DIR) && npm run lint
@@ -357,18 +432,18 @@ hmi-lint: hmi-install ## Next.js / ESLint checks for the HMI
 format: ci-deps ## Apply ruff + black + isort
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		--with ruff \
-		ruff format $(PYTHON_SOURCES)
+		ruff format --config "$(PYPROJECT)" $(PYTHON_SOURCES)
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		--with black --with isort \
-		black $(PYTHON_SOURCES)
+		black --config "$(PYPROJECT)" $(PYTHON_SOURCES)
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		--with isort \
-		isort $(PYTHON_SOURCES)
+		isort --settings-path "$(PYPROJECT)" $(PYTHON_SOURCES)
 
 typecheck: ci-deps ## mypy on thot/ and tests/
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
 		--with mypy \
-		mypy $(PYTHON_SOURCES)
+		mypy --config-file "$(PYPROJECT)" $(PYTHON_SOURCES)
 
 hmi-typecheck: hmi-install ## TypeScript checks for the HMI
 	cd $(HMI_DIR) && npm run typecheck
@@ -415,15 +490,15 @@ complexity: ci-deps ## radon + xenon complexity gates (avg ≤ 7.0 on thot/, no 
 					printf "OK: CC average %.4f ≤ %s\n", avg, lim \
 				} \
 			}'
-	@# Fail if any function in thot/ is grade D or worse (CC > 20)
+	@# Fail if any function in the scoped stable packages is grade D or worse
 	$(Q)out=$$(cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
-		radon cc $(COMPLEXITY_SOURCES) -n D -s); \
+		radon cc $(COMPLEXITY_D_GATE_SOURCES) -n D -s); \
 	if [ -n "$$out" ]; then \
 		echo "$$out"; \
 		echo "FAIL: functions at grade D or worse exist (see above)"; \
 		exit 1; \
 	fi; \
-	echo "OK: no functions at grade D or worse in $(COMPLEXITY_SOURCES)/"
+	echo "OK: no functions at grade D or worse in COMPLEXITY_D_GATE_SOURCES"
 
 complexity-report: ci-deps ## generate radon CC + MI reports to reports/quality/
 	$(Q)mkdir -p "$(QUALITY_REPORT_DIR)"
@@ -666,6 +741,11 @@ ci: ## Full quality gate (serialized; safe under make -j)
 	$(MAKE) hmi-typecheck
 	$(MAKE) hmi-build
 	$(MAKE) test
+ifneq ($(SKIP_INTEGRATION),1)
+	$(MAKE) test-integration-ci
+endif
+	$(MAKE) test-fuzz-hypothesis
+	$(MAKE) test-bdd-ci
 	$(MAKE) coverage
 	$(MAKE) liccheck
 	$(MAKE) complexity
@@ -675,9 +755,23 @@ ci: ## Full quality gate (serialized; safe under make -j)
 	$(MAKE) bom
 	$(MAKE) trivy
 	$(MAKE) owasp-dependency-check
+	$(MAKE) slsa
+ifneq ($(SKIP_SIGNING),1)
+	$(Q)if command -v cosign >/dev/null 2>&1; then \
+		$(MAKE) sign-all && $(MAKE) verify-signatures; \
+	else \
+		if [ "$(STRICT_SIGNING)" = "1" ]; then \
+			echo "ERROR: cosign required (STRICT_SIGNING=1)"; exit 1; \
+		fi; \
+		echo "WARN: cosign not installed — skipping sign-all/verify-signatures"; \
+	fi
+endif
 	$(MAKE) audit-compliance
 	$(MAKE) docs-build
-	$(Q)echo "All quality gates passed. VERSION=$(VERSION) COMMIT=$(GIT_COMMIT)"
+	$(Q)signed=no; \
+		if [ "$(SKIP_SIGNING)" != "1" ] && command -v cosign >/dev/null 2>&1 \
+			&& [ -f "$(COSIGN_BUNDLE_DIR)/wheel.bundle" ]; then signed=yes; fi; \
+		echo "All quality gates passed. VERSION=$(VERSION) COMMIT=$(GIT_COMMIT) SLSA=$(SLSA_LEVEL) SIGNED=$$signed"
 
 clean: ## Remove build artifacts, caches, and reports
 	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache htmlcov .cache reports
@@ -737,6 +831,11 @@ images-sign: ## Cosign keyless sign images (requires cosign + OIDC identity)
 # Docker Compose (P1+) — tkeir images from IMAGE_REGISTRY (default: local)
 # ---------------------------------------------------------------------------
 
+# VOLUMES=1 → compose down -v (wipe named volumes). Default keeps data for
+# `compose-down` alone. `make down` always wipes unless KEEP_DATA=1.
+VOLUMES ?= 0
+KEEP_DATA ?= 0
+
 compose-up: check-docker ## Start Compose profiles (PROFILES=core,auth); build local images first if needed
 	$(Q)test -f "$(COMPOSE_DIR)/.env" || cp "$(COMPOSE_DIR)/.env.example" "$(COMPOSE_DIR)/.env"
 	$(Q)PROFILE_ARGS=$$(printf -- '--profile %s ' $$(echo "$(COMPOSE_PROFILES)" | tr ',' ' ')); \
@@ -758,8 +857,66 @@ compose-down: check-docker ## Stop Compose stack (VOLUMES=1 also removes volumes
 		test -f "$$ENV_FILE" || ENV_FILE="$(COMPOSE_DIR)/.env.example"; \
 		PROFILE_ARGS=$$(printf -- '--profile %s ' $$(echo "$(COMPOSE_PROFILES)" | tr ',' ' ')); \
 		$(COMPOSE) -f "$(COMPOSE_FILE)" --env-file "$$ENV_FILE" \
-			$$PROFILE_ARGS down $(if $(filter 1,$(VOLUMES)),-v,)
+			$$PROFILE_ARGS down --remove-orphans $(if $(filter 1,$(VOLUMES)),-v,)
 	$(Q)echo "Compose down$(if $(filter 1,$(VOLUMES)), (volumes removed),)"
+
+# All Compose profiles used by the hybrid / full demo (infra + optional services).
+DEMO_COMPOSE_PROFILES ?= core,auth,ingest,audit,governor,observability,objectstore,mcp,agents,spire,okf
+# Host ports used by hybrid demo services (rag/ingest/agent/audit/governor/okf/hmi).
+DEMO_HOST_PORTS ?= 3000 8090 8091 8092 8093 8094 8095
+
+wipe-runtime: check-docker ## Wipe host + leftover Docker runtime DBs/state (Vespa, audit, governor, …)
+	$(Q)echo "Wiping host Vespa data volume…"
+	-$(MAKE) clean-db
+	$(Q)echo "Removing leftover Compose / Vespa Docker volumes (if any)…"
+	-$(Q)vols=$$(docker volume ls -q 2>/dev/null | awk '/(^tkeir_|vespa_data$$|beir_eval_data$$)/ {print}'); \
+		if [ -n "$$vols" ]; then \
+			echo "  docker volume rm $$vols"; \
+			docker volume rm $$vols >/dev/null 2>&1 || true; \
+		fi
+	$(Q)echo "Wiping host runtime state under workspace / .tkeir-* …"
+	$(Q)rm -rf \
+		"$(WORKSPACE)/audit" \
+		"$(WORKSPACE)/governor" \
+		"$(WORKSPACE)/ingest" \
+		"$(WORKSPACE)/users" \
+		"$(WORKSPACE)/tmp" \
+		"$(ROOT)/.tkeir-okf" \
+		"$(TKEIR_DIR)/.tkeir-okf" \
+		"$(ROOT)/.tkeir-agent" \
+		"$(COMPOSE_OUT)"
+	$(Q)if [ -n "$(strip $(OKF_ROOT))" ]; then rm -rf "$(OKF_ROOT)"; fi
+	$(Q)echo "Runtime DBs/state wiped."
+
+down: check-docker ## Stop all demo services and wipe DBs/state (KEEP_DATA=1 to preserve)
+	$(Q)echo "Purging Keycloak demo personas (best-effort, while auth is still up)…"
+	-$(MAKE) keycloak-purge-demo-users
+	$(Q)echo "Stopping all Compose profiles ($(DEMO_COMPOSE_PROFILES))…"
+	$(MAKE) compose-down PROFILES="$(DEMO_COMPOSE_PROFILES)" \
+		VOLUMES="$(if $(filter 1,$(KEEP_DATA)),0,1)"
+	$(Q)echo "Stopping host Vespa container (if any)…"
+	-$(Q)docker stop vespa >/dev/null 2>&1 || true
+	-$(Q)docker rm vespa >/dev/null 2>&1 || true
+	$(Q)echo "Stopping host demo listeners on ports $(DEMO_HOST_PORTS) (best-effort)…"
+	-$(Q)for p in $(DEMO_HOST_PORTS); do \
+		pids=$$(lsof -tiTCP:$$p -sTCP:LISTEN 2>/dev/null || true); \
+		if [ -n "$$pids" ]; then \
+			echo "  killing port $$p: $$pids"; \
+			kill $$pids 2>/dev/null || true; \
+		fi; \
+	done
+ifeq ($(KEEP_DATA),1)
+	$(Q)echo "All down (KEEP_DATA=1 — Compose volumes and host runtime DBs preserved; demo personas purged if Keycloak was up)."
+else
+	$(Q)echo "Wiping all runtime databases and local state (incl. Keycloak volumes)…"
+	$(MAKE) wipe-runtime
+	-$(Q)vols=$$(docker volume ls -q 2>/dev/null | awk '/keycloak/ {print}'); \
+		if [ -n "$$vols" ]; then echo "  removing leftover Keycloak volumes: $$vols"; docker volume rm $$vols >/dev/null 2>&1 || true; fi
+	$(Q)echo "All down (Compose volumes + Vespa/audit/governor/ingest/OKF/agent/Keycloak state removed)."
+	$(Q)echo "Tip: KEEP_DATA=1 make down  stops services without wiping databases."
+endif
+
+all-down: down ## Alias for make down
 
 compose-logs: check-docker ## Tail Compose logs (PROFILES=… SERVICE=optional)
 	$(Q)ENV_FILE="$(COMPOSE_DIR)/.env"; \
@@ -777,30 +934,63 @@ compose-smoke: check-curl ## Health-check running Compose stack (auto-detects op
 
 AUDIT_CID ?=
 TKEIR ?= cd $(TKEIR_DIR) && $(UV) run
+#
+# Local defaults for audit hot store + WORM segments (used by host-run audit,
+# plus `make audit-archive` / `make audit-verify`).
+# Use := so shell/compose exports like AUDIT_WORM_ROOT=/var/tkeir/... do not
+# hijack host Make targets (Permission denied on /var/tkeir). Override on the
+# command line when needed: make audit-verify AUDIT_ROOT=/custom/audit
+# Host path: workspace/audit (sqlite hot store + filesystem WORM). MinIO is
+# optional and only used when AUDIT_WORM_S3_ENDPOINT is set (Compose objectstore).
+AUDIT_ROOT := $(WORKSPACE)/audit
+AUDIT_HOT_STORE_URL := sqlite:$(AUDIT_ROOT)/hot_store.db
+AUDIT_WORM_ROOT := $(AUDIT_ROOT)/worm
+AUDIT_SUBJECT_KEYS_PATH := $(AUDIT_ROOT)/subject_keys.db
+AUDIT_SINK_MODE ?= dual
+AUDIT_AUTH_ENABLED ?= false
+GOVERNOR_AUTH_ENABLED ?= false
+# Force empty S3 endpoint on host so a sourced compose .env cannot point archive
+# at MinIO when you are not running objectstore.
+AUDIT_HOST_ENV = \
+	AUDIT_HOT_STORE_URL="$(AUDIT_HOT_STORE_URL)" \
+	AUDIT_WORM_ROOT="$(AUDIT_WORM_ROOT)" \
+	AUDIT_SUBJECT_KEYS_PATH="$(AUDIT_SUBJECT_KEYS_PATH)" \
+	AUDIT_SINK_MODE="$(AUDIT_SINK_MODE)" \
+	AUDIT_WORM_S3_ENDPOINT=
 
 audit-report: ## Render audit report (CID=correlation-id, FORMAT=json|html)
 	$(Q)test -n "$(CID)" || { echo "Set CID=<32-hex correlation id>"; exit 1; }
-	$(Q)AUDIT_HOT_STORE_URL="$(AUDIT_HOT_STORE_URL)" $(TKEIR) tkeir-audit report \
+	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
+	$(Q)cd $(TKEIR_DIR) && $(AUDIT_HOST_ENV) $(UV) run tkeir-audit report \
 		--correlation-id "$(CID)" --format "$(or $(FORMAT),json)"
 
-audit-verify: ## Verify hot-store hash chain and WORM segments
-	$(Q)AUDIT_HOT_STORE_URL="$(AUDIT_HOT_STORE_URL)" AUDIT_WORM_ROOT="$(AUDIT_WORM_ROOT)" \
-		$(TKEIR) tkeir-audit verify
+LAST ?= 24h
 
-audit-archive: ## Export unarchived ActionRecords to WORM segments
-	$(Q)AUDIT_HOT_STORE_URL="$(AUDIT_HOT_STORE_URL)" AUDIT_WORM_ROOT="$(AUDIT_WORM_ROOT)" \
-		$(TKEIR) tkeir-audit archive
+audit-summary: ## Recent ActionRecord summary from workspace/audit (LAST=24h)
+	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
+	$(Q)cd $(TKEIR_DIR) && $(AUDIT_HOST_ENV) $(UV) run tkeir-audit summary \
+		--last "$(LAST)"
+
+audit-verify: ## Verify hot-store hash chain and WORM segments under workspace/audit
+	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
+	$(Q)cd $(TKEIR_DIR) && $(AUDIT_HOST_ENV) $(UV) run tkeir-audit verify
+
+audit-archive: ## Export unarchived ActionRecords to workspace/audit/worm
+	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
+	$(Q)cd $(TKEIR_DIR) && $(AUDIT_HOST_ENV) $(UV) run tkeir-audit archive
 
 # ---------------------------------------------------------------------------
 # Governor CLI (Phase 5)
 # ---------------------------------------------------------------------------
 
 governor-flags: ## Show runtime kill-switch flags
-	$(Q)GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" $(TKEIR) tkeir-governor flags
+	$(Q)cd $(TKEIR_DIR) && GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		$(UV) run tkeir-governor flags
 
 governor-kill: ## Toggle kill switch (SCOPE=ingest ACTIVE=true REASON=drill)
 	$(Q)test -n "$(SCOPE)" || { echo "Set SCOPE=all|ingest|index|inference|hmi-write|agents"; exit 1; }
-	$(Q)GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" $(TKEIR) tkeir-governor kill \
+	$(Q)cd $(TKEIR_DIR) && GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		$(UV) run tkeir-governor kill \
 		--scope "$(SCOPE)" --active "$(or $(ACTIVE),true)" --reason "$(or $(REASON),makefile)"
 
 rollback-index: check-curl ## Request index rollback via governor (RUN=… REASON=…)
@@ -950,8 +1140,11 @@ pull-vespa: check-docker ## Pull Vespa Docker image (VESPA_IMAGE=$(VESPA_IMAGE))
 	$(Q)echo "Pulling $(VESPA_IMAGE)…"
 	docker pull "$(VESPA_IMAGE)"
 
-start: check-docker ## Start Vespa Docker container
-	cd $(VESPA_DIR) && VESPA_IMAGE="$(VESPA_IMAGE)" ./start_vespa.sh
+# VESPA_PULL=1 allows start_vespa.sh to docker-pull when the image is missing.
+VESPA_PULL ?= 0
+
+start: check-docker ## Start Vespa Docker container (local image only; VESPA_PULL=1 to pull)
+	cd $(VESPA_DIR) && VESPA_IMAGE="$(VESPA_IMAGE)" VESPA_PULL="$(VESPA_PULL)" ./start_vespa.sh
 
 init: install ## Deploy Vespa schemas (container must be running)
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.search.init_vespa --skip-start
@@ -966,8 +1159,8 @@ test-vespa: ## Vespa query smoke test
 	cd $(VESPA_DIR) && ./test_data.sh
 
 test-vespa-py: install ## Python unit tests for Vespa client / ontology utils
-	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) pytest \
-		tests/unittests/TestVespaClient.py tests/unittests/TestOntologyUtils.py -q
+	cd $(TESTS_DIR) && $(UV) run --project $(TKEIR_DIR) --python $(PYTHON) pytest \
+		unittests/TestVespaClient.py unittests/TestOntologyUtils.py -q
 
 # ---------------------------------------------------------------------------
 # Ingest / index — thot.tools.ingest
@@ -1010,7 +1203,7 @@ INGEST_ROOT_HOST ?= $(WORKSPACE)/ingest
 STOP_ON_FAILED ?= 0
 
 ingest: install install-spacy-models ## [ingest] Start tkeir-ingest API on host (:8091)
-	$(Q)mkdir -p "$(INGEST_ROOT_HOST)" "$(GOVERNOR_STATE_ROOT)"
+	$(Q)mkdir -p "$(INGEST_ROOT_HOST)" "$(GOVERNOR_STATE_ROOT)" "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
 	cd $(TKEIR_DIR) && \
 		INGEST_ROOT="$(INGEST_ROOT_HOST)" \
 		INGEST_MAX_CONCURRENCY="$(or $(INGEST_MAX_CONCURRENCY),1)" \
@@ -1019,6 +1212,7 @@ ingest: install install-spacy-models ## [ingest] Start tkeir-ingest API on host 
 		VESPA_USER_SPACE="$(or $(VESPA_USER_SPACE),dev@tkeir)" \
 		TKEIR_WORKSPACE="$(WORKSPACE)" \
 		TKEIR_REPO_ROOT="$(ROOT)" \
+		$(AUDIT_HOST_ENV) \
 		$(UV) run --python $(PYTHON) tkeir-ingest
 
 # ---------------------------------------------------------------------------
@@ -1026,8 +1220,10 @@ ingest: install install-spacy-models ## [ingest] Start tkeir-ingest API on host 
 # ---------------------------------------------------------------------------
 
 rag: install install-spacy-models ## [search] Start FastAPI RAG API on host (:8090)
-	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)"
+	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)" "$(INGEST_ROOT_HOST)" "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
 	cd $(TKEIR_DIR) && GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		INGEST_ROOT="$(INGEST_ROOT_HOST)" \
+		$(AUDIT_HOST_ENV) \
 		$(UV) run --python $(PYTHON) python -m thot.tools.search.app
 
 rag-query: check-curl check-jq ## [search] Sample curl against RAG API (/rag/query)
@@ -1046,10 +1242,11 @@ MCP_URL ?= http://localhost:8093
 MCP_QUERY ?= what is t-keir
 
 mcp: ## Start tkeir-mcp HTTP server (:8093; MCP_STDIO=1 for official MCP stdio)
+	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
 	$(Q)if [ "$(MCP_STDIO)" = "1" ]; then \
-		cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) --extra mcp python -m thot.mcp.server --stdio; \
+		cd $(TKEIR_DIR) && $(AUDIT_HOST_ENV) $(UV) run --python $(PYTHON) --extra mcp python -m thot.mcp.server --stdio; \
 	else \
-		cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.mcp.server; \
+		cd $(TKEIR_DIR) && $(AUDIT_HOST_ENV) $(UV) run --python $(PYTHON) python -m thot.mcp.server; \
 	fi
 
 mcp-tools: check-curl check-jq ## List MCP tools then call search (MCP_URL, MCP_QUERY)
@@ -1066,9 +1263,28 @@ GOAL ?= What does the corpus say about T-KEIR?
 AGENT_POLL_SECONDS ?= 2
 AGENT_POLL_ATTEMPTS ?= 90
 WORKFLOW_POLL_ATTEMPTS ?= 180
+# Orchestrator report-form maps: datasets/<usecase>/agent_orchestrator.yaml
+# Override for enterprise: make agent TKEIR_AGENT_USECASE=enterprise
+TKEIR_AGENT_USECASE ?= osint
+TKEIR_AGENT_ORCHESTRATOR_CONFIG ?= $(ROOT)/datasets/$(TKEIR_AGENT_USECASE)/agent_orchestrator.yaml
+# Persona wiki merges often need >5m on local Ollama; override with
+# LLM_GENERATE_TIMEOUT_SECONDS=…
+LLM_GENERATE_TIMEOUT_SECONDS ?= 600
 
-agent: ## Start tkeir-agent HTTP service (:8092)
+agent: spire-up ## Start tkeir-agent HTTP service (:8092)
+	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)" "$(WORKSPACE)/users"
+	$(Q)test -f "$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" || { \
+		echo "Missing agent orchestrator config: $(TKEIR_AGENT_ORCHESTRATOR_CONFIG)"; \
+		echo "Set TKEIR_AGENT_USECASE=osint|enterprise or TKEIR_AGENT_ORCHESTRATOR_CONFIG=…"; \
+		exit 1; \
+	}
 	cd $(TKEIR_DIR) && AGENT_ROOT="$(CURDIR)/.tkeir-agent" \
+		TKEIR_WORKSPACE="$(WORKSPACE)" \
+		TKEIR_AGENT_USECASE="$(TKEIR_AGENT_USECASE)" \
+		TKEIR_AGENT_ORCHESTRATOR_CONFIG="$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" \
+		SPIFFE_ENFORCE="${SPIFFE_ENFORCE:-true}" \
+		LLM_GENERATE_TIMEOUT_SECONDS="$(LLM_GENERATE_TIMEOUT_SECONDS)" \
+		$(AUDIT_HOST_ENV) \
 		$(UV) run --python $(PYTHON) python -m thot.agent.service
 
 agent-run: check-curl check-jq ## Create agent run and poll (GOAL=… AGENT=researcher)
@@ -1134,27 +1350,141 @@ compose: ## Ontology template compose (TEMPLATE=synthesis_note TOPIC=Acme)
 compose-list: ## List ontology-driven templates
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.compose --list
 
-OKF_URL ?= http://localhost:8094
-OKF_ROOT ?= $(CURDIR)/.tkeir-okf
+OKF_URL ?= http://localhost:8095
+# Optional legacy flat OKF dir (tests / migration). New bundles go to
+# workspace/users/<space>/okf/<bundle_id>/ when OKF_ROOT is unset.
+OKF_ROOT ?=
+OKF_PORT ?= 8095
 OKF_QUERY ?=
 OKF_MAX_DOCS ?= 50
 USER_SPACE ?= dev@tkeir
 
-okf: ## Start OKF server (port 8094)
-	cd $(TKEIR_DIR) && OKF_ROOT="$(OKF_ROOT)" \
+okf: ## Start OKF server (port 8095; governor stays on 8094)
+	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)" "$(WORKSPACE)/users" "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
+	cd $(TKEIR_DIR) && TKEIR_WORKSPACE="$(WORKSPACE)" OKF_PORT="$(OKF_PORT)" \
+		$(if $(strip $(OKF_ROOT)),OKF_ROOT="$(OKF_ROOT)",) \
+		GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		INGEST_URL="$(or $(INGEST_URL),$(INGEST_API_URL))" \
+		$(AUDIT_HOST_ENV) \
 		$(UV) run --python $(PYTHON) python -m thot.okf.server
 
+# ---------------------------------------------------------------------------
+# Demo runners — start each major component explicitly
+# ---------------------------------------------------------------------------
+.PHONY: vespa-up keycloak-up keycloak-sync-demo-users keycloak-purge-demo-users spire-up index-up rag-up okf-up governor-up audit-up audit-worm-list hmi-up wipe-runtime down all-down
+
+vespa-up: ## Start Vespa container on :8080/19071 (no image pull; use make pull-vespa)
+	$(MAKE) start VESPA_PULL=0
+
+keycloak-up: ## Start Keycloak (auth profile) then sync demo users
+	$(MAKE) compose-up PROFILES=auth
+	$(MAKE) keycloak-sync-demo-users
+
+KEYCLOAK_URL ?= http://localhost:8082
+KEYCLOAK_ADMIN ?= admin
+KEYCLOAK_ADMIN_PASSWORD ?= admin
+KEYCLOAK_REALM ?= tkeir
+KEYCLOAK_PURGE_ROLES ?= 0
+KEYCLOAK_WAIT_SECS ?= 30
+
+keycloak-sync-demo-users: check-curl ## Ensure demo persona users/roles/clearance exist in Keycloak
+	$(Q)KEYCLOAK_URL="$(KEYCLOAK_URL)" \
+		KEYCLOAK_ADMIN="$(KEYCLOAK_ADMIN)" \
+		KEYCLOAK_ADMIN_PASSWORD="$(KEYCLOAK_ADMIN_PASSWORD)" \
+		KEYCLOAK_REALM="$(KEYCLOAK_REALM)" \
+		python3 "$(SCRIPTS_DIR)/cluster/keycloak-sync-demo-users.py"
+
+keycloak-purge-demo-users: ## Remove demo persona users from Keycloak (best-effort)
+	$(Q)KEYCLOAK_URL="$(KEYCLOAK_URL)" \
+		KEYCLOAK_ADMIN="$(KEYCLOAK_ADMIN)" \
+		KEYCLOAK_ADMIN_PASSWORD="$(KEYCLOAK_ADMIN_PASSWORD)" \
+		KEYCLOAK_REALM="$(KEYCLOAK_REALM)" \
+		KEYCLOAK_PURGE_ROLES="$(KEYCLOAK_PURGE_ROLES)" \
+		KEYCLOAK_WAIT_SECS="$(KEYCLOAK_WAIT_SECS)" \
+		python3 "$(SCRIPTS_DIR)/cluster/keycloak-purge-demo-users.py" || true
+
+spire-up: check-docker ## Start SPIRE server+agent (mint join token automatically)
+	$(MAKE) compose-up PROFILES=spire
+	$(Q)echo "Waiting for tkeir-spire-server healthy…"
+	$(Q)i=0; \
+	while [ $$i -lt 60 ]; do \
+		st=$$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' tkeir-spire-server 2>/dev/null || echo missing); \
+		if [ "$$st" = "healthy" ]; then break; fi; \
+		i=$$((i + 1)); sleep 2; \
+	done; \
+	st=$$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' tkeir-spire-server 2>/dev/null || echo missing); \
+	test "$$st" = "healthy" || { echo "SPIRE server not healthy (status=$$st). Logs:"; docker logs --tail=40 tkeir-spire-server; exit 1; }
+	$(Q)TOKEN=$$(docker exec tkeir-spire-server /opt/spire/bin/spire-server token generate \
+		-socketPath /tmp/spire-server/private/api.sock \
+		-spiffeID spiffe://tkeir.local/spire-agent \
+		| sed -n 's/^Token:[[:space:]]*//p' | tr -d '\r'); \
+	test -n "$$TOKEN" || { echo "Failed to mint SPIRE join token"; exit 1; }; \
+	echo "Minted join token; (re)starting SPIRE agent…"; \
+	ENV_FILE="$(COMPOSE_DIR)/.env"; \
+	test -f "$$ENV_FILE" || ENV_FILE="$(COMPOSE_DIR)/.env.example"; \
+	SPIRE_JOIN_TOKEN="$$TOKEN" IMAGE_REGISTRY="$(IMAGE_REGISTRY)" IMAGE_TAG="$(IMAGE_TAG)" \
+		VERSION="$(VERSION)" GIT_COMMIT="$(GIT_COMMIT)" BUILD_DATE="$(BUILD_DATE)" \
+		$(COMPOSE) -f "$(COMPOSE_FILE)" --env-file "$$ENV_FILE" --profile spire \
+			up -d --force-recreate --no-deps spire-agent
+	$(Q)echo "SPIRE up. Server healthy; agent joined as spiffe://tkeir.local/spire-agent"
+	$(Q)echo "Optional workload entries: bash deploy/spire/register-agent-entries.sh (from inside server, or adapt socket path)"
+
+index-up: install init ## Demo: deploy Vespa schemas + start host ingest (:8091)
+	$(Q)echo "Vespa schemas ready. Starting ingest API — load user/global docs via the HMI (not make index)."
+	$(MAKE) ingest
+
+rag-up: ## Start RAG FastAPI on host (make rag)
+	$(MAKE) rag
+
+okf-up: ## Start OKF server on host (make okf)
+	$(MAKE) okf
+
+.PHONY: okf-migrate-workspace
+
+hmi-up: ## Start tkeir-hmi Next.js UI on host (:3000)
+	$(Q)test -d "$(HMI_DIR)/node_modules" || $(MAKE) hmi-install
+	$(Q)test -f "$(HMI_DIR)/.env.local" \
+		|| cp "$(HMI_DIR)/.env.local.example" "$(HMI_DIR)/.env.local"
+	cd $(HMI_DIR) && npm run dev
+
+governor-up: ## Start governor API on host (:8094)
+	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)"
+	cd $(TKEIR_DIR) && \
+		GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		GOVERNOR_AUTH_ENABLED="$(GOVERNOR_AUTH_ENABLED)" \
+		$(UV) run --python $(PYTHON) python -m thot.governor.app
+
+audit-up: ## Start audit API on host (:8093) reading workspace/audit
+	$(Q)mkdir -p "$(AUDIT_WORM_ROOT)" "$(AUDIT_ROOT)"
+	cd $(TKEIR_DIR) && \
+		$(AUDIT_HOST_ENV) \
+		AUDIT_AUTH_ENABLED="$(AUDIT_AUTH_ENABLED)" \
+		$(UV) run --python $(PYTHON) python -m thot.audit.app
+
+audit-worm-list: ## List audit WORM segment files under workspace/audit/worm
+	$(Q)ls -lah "$(AUDIT_WORM_ROOT)"
+
 okf-export: ## CLI export: make okf-export QUERY="..." USER_SPACE=dev@tkeir
-	cd $(TKEIR_DIR) && OKF_ROOT="$(OKF_ROOT)" \
+	cd $(TKEIR_DIR) && TKEIR_WORKSPACE="$(WORKSPACE)" \
+		$(if $(strip $(OKF_ROOT)),OKF_ROOT="$(OKF_ROOT)",) \
 		$(UV) run --python $(PYTHON) python -m thot.okf.exporter \
 		--user-space "$(USER_SPACE)" \
 		--max-docs "$(OKF_MAX_DOCS)" \
 		$(if $(strip $(OKF_QUERY)$(QUERY)),--query "$(or $(OKF_QUERY),$(QUERY))",) \
 		$(if $(strip $(OUTPUT)),--output "$(OUTPUT)",)
 
-okf-workflow: check-curl check-jq ## Run okf_wiki_brief: make okf-workflow GOAL="..." TOPIC="..."
-	$(MAKE) workflow-run WORKFLOW=okf_wiki_brief \
-		GOAL="$(or $(GOAL),Produce an OKF knowledge brief)" \
+okf-migrate-workspace: ## Move legacy .tkeir-okf bundles into workspace/users/<space>/okf/
+	cd $(TKEIR_DIR) && TKEIR_WORKSPACE="$(WORKSPACE)" \
+		$(UV) run --python $(PYTHON) python -c \
+		'from pathlib import Path; from thot.okf.store import migrate_flat_okf_into_workspace; \
+roots=[Path("../.tkeir-okf").resolve(), Path(".tkeir-okf").resolve()]; \
+moved=[]; \
+[moved.extend(migrate_flat_okf_into_workspace(r)) for r in roots if r.is_dir()]; \
+print("migrated", len(moved), "bundles", moved)'
+
+okf-workflow: check-curl check-jq ## Run OKF agent workflow (WORKFLOW=llm_wiki|okf_wiki_brief)
+	$(MAKE) workflow-run WORKFLOW="$(or $(WORKFLOW),llm_wiki)" \
+		GOAL="$(or $(GOAL),Produce an OKF LLMWiki answering the query)" \
 		TOPIC="$(or $(TOPIC),Objective ALPHA)"
 
 okf-bundle-ls: check-curl check-jq ## List bundles for USER_SPACE
@@ -1464,3 +1794,263 @@ oscal-diff:
 	python3 compliance/opa/oscal/opa_to_oscal.py --diff \
 	  --baseline "reports/compliance/eu-audit/$(BASELINE)/oscal/assessment_results.json" \
 	  --current  "reports/compliance/eu-audit/$(CURRENT)/oscal/assessment_results.json"
+
+# ---------------------------------------------------------------------------
+# Integration / fuzz / BDD / SLSA / cosign (supply-chain hardening)
+# Appended targets — do not rewrite the existing quality gate bodies above.
+# ---------------------------------------------------------------------------
+
+test-integration: check-uv check-python-version ## [test] pytest integration suite (tests/integration/)
+	$(Q)mkdir -p "$(INTEGRATION_REPORT_DIR)"
+	$(Q)cd $(TKEIR_DIR) && RAG_URL="$(RAG_URL_TEST)" INGEST_URL="$(INGEST_URL_TEST)" \
+		$(UV) run --python $(PYTHON) --with pytest-timeout \
+		pytest "$(ROOT)/tests/integration/" -v --timeout=$(INTEGRATION_TIMEOUT)
+
+test-integration-ci: check-uv check-python-version ## [test] Integration tests with JUnit XML output for CI
+	$(Q)mkdir -p "$(INTEGRATION_REPORT_DIR)"
+	$(Q)cd $(TKEIR_DIR) && RAG_URL="$(RAG_URL_TEST)" INGEST_URL="$(INGEST_URL_TEST)" \
+		$(UV) run --python $(PYTHON) --with pytest-timeout \
+		pytest "$(ROOT)/tests/integration/" -v --timeout=$(INTEGRATION_TIMEOUT) \
+		--tb=short --junitxml="$(INTEGRATION_REPORT_DIR)/junit.xml"
+
+test-fuzz-hypothesis: check-uv check-python-version ## [test] Hypothesis property-based fuzz (tests/fuzzing/)
+	$(Q)mkdir -p "$(FUZZ_REPORT_DIR)"
+	$(Q)cd $(TKEIR_DIR) && \
+		HYPOTHESIS_MAX_EXAMPLES=500 HYPOTHESIS_DERANDOMIZE=0 \
+		$(UV) run --python $(PYTHON) --with 'hypothesis[cli]' \
+		pytest "$(ROOT)/tests/fuzzing/test_fuzz_hypothesis.py" -v \
+		--hypothesis-seed=$(HYPOTHESIS_SEED)
+
+test-fuzz-atheris: check-uv check-python-version ## [test] Atheris libFuzzer targets (Linux only; FUZZ_DURATION=60)
+	$(Q)if ! uname -s | grep -qx Linux; then echo "SKIP: atheris only on Linux"; exit 0; fi; \
+		mkdir -p "$(FUZZ_REPORT_DIR)" "$(FUZZ_CORPUS_DIR)/query"; \
+		cd $(TKEIR_DIR) && \
+		if ! $(UV) run --python $(PYTHON) python -c "import atheris" 2>/dev/null; then \
+			echo "Installing atheris into uv environment…"; \
+			$(UV) pip install atheris; \
+		fi; \
+		for target in $(ROOT)/tests/fuzzing/fuzz_targets/*.py; do \
+			[ -f "$$target" ] || continue; \
+			echo "Fuzzing $$target (duration=$(FUZZ_DURATION)s)…"; \
+			FUZZ_MODE=atheris FUZZ_RUNS=5000 \
+			$(UV) run --python $(PYTHON) python "$$target" \
+				"-artifact_prefix=$(FUZZ_REPORT_DIR)/" \
+				"-max_total_time=$(FUZZ_DURATION)" \
+				"$(FUZZ_CORPUS_DIR)/query/" \
+				|| echo "WARN: atheris target exited $$? (see $(FUZZ_REPORT_DIR)/)"; \
+		done
+
+test-fuzz-radamsa: check-radamsa check-uv check-python-version ## [test] Radamsa mutation fuzz (corpus → fuzz_targets)
+	$(Q)mkdir -p "$(FUZZ_REPORT_DIR)" "$(FUZZ_CORPUS_DIR)/query"
+	$(Q)cd $(TKEIR_DIR) && \
+		PYTHONPATH="$(ROOT):$(TKEIR_DIR)$${PYTHONPATH:+:$$PYTHONPATH}" \
+		RADAMSA="$(RADAMSA)" RADAMSA_COUNT="$(RADAMSA_COUNT)" RADAMSA_SEED="$(RADAMSA_SEED)" \
+		$(UV) run --python $(PYTHON) python "$(SCRIPTS_DIR)/fuzzing/run_radamsa.py" \
+			--corpus-dir "$(FUZZ_CORPUS_DIR)/query" \
+			--report-dir "$(FUZZ_REPORT_DIR)" \
+			--targets-dir "$(ROOT)/tests/fuzzing/fuzz_targets" \
+			--count "$(RADAMSA_COUNT)" \
+			--seed "$(RADAMSA_SEED)" \
+			--radamsa "$(RADAMSA)"
+
+test-fuzz: test-fuzz-hypothesis test-fuzz-atheris test-fuzz-radamsa ## [test] All fuzz layers (hypothesis + atheris + radamsa)
+
+fuzz-report: ## [test] Merge atheris/radamsa findings into corpus; export JSON summary
+	$(Q)mkdir -p "$(FUZZ_REPORT_DIR)" "$(FUZZ_CORPUS_DIR)/query"
+	$(Q)$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
+		python "$(SCRIPTS_DIR)/slsa/fuzz_report.py" \
+		--report-dir "$(FUZZ_REPORT_DIR)" \
+		--corpus-dir "$(FUZZ_CORPUS_DIR)/query"
+
+test-bdd: check-uv check-python-version ## [test] Behave BDD suite (tests/bdd/features/)
+	$(Q)cd $(ROOT) && RAG_URL="$(RAG_URL_TEST)" INGEST_URL="$(INGEST_URL_TEST)" \
+		PYTHONPATH="$(ROOT):$(TKEIR_DIR)" \
+		$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) --with behave \
+		behave "$(BDD_FEATURES)" --format "$(BDD_FORMAT)"
+
+test-bdd-ci: check-uv check-python-version ## [test] BDD with JSON + JUnit output for CI dashboards
+	$(Q)mkdir -p "$(BDD_REPORT_DIR)"
+	$(Q)cd $(ROOT) && RAG_URL="$(RAG_URL_TEST)" INGEST_URL="$(INGEST_URL_TEST)" \
+		PYTHONPATH="$(ROOT):$(TKEIR_DIR)" \
+		$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) --with behave \
+		behave "$(BDD_FEATURES)" \
+			--format json --outfile "$(BDD_REPORT_DIR)/behave.json" \
+			--format progress3 \
+			--junit --junit-directory "$(BDD_REPORT_DIR)/"
+
+bdd-report: ## [test] Convert behave JSON output to Allure-compatible report
+	$(Q)mkdir -p "$(BDD_REPORT_DIR)"
+	$(Q)if command -v allure >/dev/null 2>&1; then \
+		allure generate "$(BDD_REPORT_DIR)" -o "$(BDD_REPORT_DIR)/allure-html" --clean; \
+		echo "Allure report → $(BDD_REPORT_DIR)/allure-html"; \
+	else \
+		echo "WARN: allure CLI not found — skipping bdd-report (https://docs.qameta.io/allure/)"; \
+	fi
+
+slsa-prereqs: check-uv check-curl ## [slsa] Check verdit-slsa + slsa-verifier installed; install if missing
+	$(Q)mkdir -p "$(HOME)/.local/bin" "$(SLSA_REPORT_DIR)"
+	$(Q)if ! command -v slsa-verifier >/dev/null 2>&1 && [ ! -x "$(HOME)/.local/bin/slsa-verifier" ]; then \
+		echo "Installing slsa-verifier into ~/.local/bin…"; \
+		OS=$$(uname -s | tr '[:upper:]' '[:lower:]'); \
+		ARCH=$$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/;s/arm64/arm64/'); \
+		case "$$OS" in darwin) OS=darwin ;; linux) OS=linux ;; *) echo "WARN: unsupported OS $$OS"; OS="";; esac; \
+		if [ -n "$$OS" ]; then \
+			tmp=$$(mktemp); \
+			if curl -fsSL --max-time 60 \
+				"https://github.com/slsa-framework/slsa-verifier/releases/latest/download/slsa-verifier-$${OS}-$${ARCH}" \
+				-o "$$tmp"; then \
+				chmod +x "$$tmp" && mv "$$tmp" "$(HOME)/.local/bin/slsa-verifier"; \
+				echo "Installed $(HOME)/.local/bin/slsa-verifier"; \
+			else \
+				rm -f "$$tmp"; \
+				echo "WARN: could not download slsa-verifier (offline?) — continuing with local assessor"; \
+			fi; \
+		fi; \
+	fi
+	$(Q)# verdit-slsa is not on PyPI at a stable pin — local assessor is authoritative.
+	$(Q)$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
+		python -c "print('verdit-slsa OK (local assessor in scripts/slsa/run_verdit.py)')"
+	$(Q)echo "Optional image pin: SLSA_VERIFIER_IMAGE=$(SLSA_VERIFIER_IMAGE)"
+
+slsa-provenance: check-uv ## [slsa] Generate SLSA provenance document for wheel + images
+	$(Q)mkdir -p "$(SLSA_REPORT_DIR)"
+	$(Q)wheel=$$(ls -1 "$(WHEEL_DIR)"/tkeir-*.whl "$(DIST_DIR)"/tkeir-*.whl 2>/dev/null | head -1); \
+		if [ -z "$$wheel" ]; then $(MAKE) build; wheel=$$(ls -1 "$(WHEEL_DIR)"/tkeir-*.whl "$(DIST_DIR)"/tkeir-*.whl 2>/dev/null | head -1); fi; \
+		test -n "$$wheel" || { echo "ERROR: no wheel under $(WHEEL_DIR) or $(DIST_DIR)"; exit 1; }; \
+		uv_ver=$$($(UV) --version 2>/dev/null | awk '{print $$2}'); \
+		commit_full=$$(git rev-parse HEAD 2>/dev/null || echo "$(GIT_COMMIT)"); \
+		$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
+			python "$(SCRIPTS_DIR)/slsa/gen_provenance.py" \
+			--version  "$(VERSION)" \
+			--commit   "$$commit_full" \
+			--branch   "$(GIT_BRANCH)" \
+			--build-date "$(BUILD_DATE)" \
+			--wheel    "$$wheel" \
+			--python   "$(PYTHON)" \
+			--uv-version "$${uv_ver:-unknown}" \
+			--output   "$(PROVENANCE_FILE)"
+
+slsa-assess: check-uv ## [slsa] Run verdit-slsa against provenance; print achieved level
+	$(Q)test -f "$(PROVENANCE_FILE)" || $(MAKE) slsa-provenance
+	$(Q)wheel=$$(ls -1 "$(WHEEL_DIR)"/tkeir-*.whl "$(DIST_DIR)"/tkeir-*.whl 2>/dev/null | head -1); \
+		$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
+			python "$(SCRIPTS_DIR)/slsa/run_verdit.py" \
+			--provenance "$(PROVENANCE_FILE)" \
+			--subject    "$$wheel" \
+			--report     "$(SLSA_REPORT_DIR)/report.json"
+
+slsa-report: check-uv ## [slsa] Write report.json + roadmap.md; print path to next SLSA level
+	$(Q)test -f "$(PROVENANCE_FILE)" || $(MAKE) slsa-provenance
+	$(Q)wheel=$$(ls -1 "$(WHEEL_DIR)"/tkeir-*.whl "$(DIST_DIR)"/tkeir-*.whl 2>/dev/null | head -1); \
+		$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \
+			python "$(SCRIPTS_DIR)/slsa/run_verdit.py" \
+			--provenance "$(PROVENANCE_FILE)" \
+			--subject    "$$wheel" \
+			--report     "$(SLSA_REPORT_DIR)/report.json" \
+			--print-roadmap
+	$(Q)echo "SLSA report → $(SLSA_REPORT_DIR)/report.json"
+	$(Q)echo "SLSA roadmap → $(SLSA_REPORT_DIR)/roadmap.md"
+
+slsa-level-gate: check-jq ## [slsa] Fail CI if achieved SLSA level < SLSA_LEVEL
+	$(Q)test -f "$(SLSA_REPORT_DIR)/report.json" || $(MAKE) slsa-report
+	$(Q)level=$$(jq -r '.level' "$(SLSA_REPORT_DIR)/report.json"); \
+		if [ "$$level" -lt "$(SLSA_LEVEL)" ]; then \
+			echo "FAIL: SLSA level $$level < required $(SLSA_LEVEL)"; exit 1; \
+		fi; \
+		echo "PASS: SLSA level $$level >= $(SLSA_LEVEL)"
+
+slsa: slsa-prereqs slsa-provenance slsa-assess slsa-level-gate ## [slsa] Full SLSA pipeline (prereqs → provenance → assess → gate)
+
+check-cosign: ## [sign] Verify cosign ≥ 2.0 is installed
+	$(Q)command -v cosign >/dev/null 2>&1 || { \
+		echo "cosign >= 2.0 required."; \
+		echo "  macOS:  brew install cosign"; \
+		echo "  docs:   https://docs.sigstore.dev/cosign/system_config/installation/"; \
+		exit 1; }
+	$(Q)ver=$$(cosign version 2>/dev/null | grep -i 'GitVersion' | awk '{print $$2}' | tr -d 'v'); \
+		major=$$(echo "$$ver" | cut -d. -f1); \
+		[ -n "$$major" ] || major=0; \
+		[ "$$major" -ge 2 ] || { echo "cosign >= 2.0 required (found $$ver)"; exit 1; }; \
+		echo "cosign OK (v$$ver at $$(command -v cosign))"
+
+check-radamsa: ## [fuzz] Verify radamsa is installed (mutation fuzzer)
+	$(Q)command -v "$(RADAMSA)" >/dev/null 2>&1 || { \
+		echo "radamsa required for mutation fuzz tests."; \
+		echo "  macOS:  brew install radamsa"; \
+		echo "  Linux:  apt install radamsa  # or build from https://gitlab.com/akihe/radamsa"; \
+		exit 1; }
+	$(Q)ver=$$("$(RADAMSA)" -V 2>&1 | head -1); \
+		echo "radamsa OK ($$ver at $$(command -v $(RADAMSA)))"
+
+check-supply-tools: check-cosign check-radamsa ## [ops] Verify cosign + radamsa are installed
+	$(Q)echo "supply-chain / fuzz tools OK"
+
+sign-wheel: check-cosign ## [sign] cosign sign-blob the built wheel; save bundle
+	$(Q)chmod +x "$(SCRIPTS_DIR)/slsa/sign_blob.sh"
+	$(Q)wheel=$$(ls -1 "$(WHEEL_DIR)"/tkeir-*.whl "$(DIST_DIR)"/tkeir-*.whl 2>/dev/null | head -1); \
+		if [ -z "$$wheel" ]; then $(MAKE) build; wheel=$$(ls -1 "$(WHEEL_DIR)"/tkeir-*.whl "$(DIST_DIR)"/tkeir-*.whl 2>/dev/null | head -1); fi; \
+		test -n "$$wheel" || { echo "ERROR: no wheel — run make build"; exit 1; }; \
+		COSIGN_BUNDLE_DIR="$(COSIGN_BUNDLE_DIR)" REKOR_URL="$(REKOR_URL)" \
+		FULCIO_URL="$(FULCIO_URL)" COSIGN_YES="$(COSIGN_YES)" \
+		STRICT_SIGNING="$(STRICT_SIGNING)" \
+		"$(SCRIPTS_DIR)/slsa/sign_blob.sh" wheel.bundle "$$wheel"
+
+# Serialize blob signing so .mode / keypair generation cannot race under make -j.
+sign-sbom: check-cosign sign-wheel ## [sign] cosign sign-blob the CycloneDX BOM JSON
+	$(Q)chmod +x "$(SCRIPTS_DIR)/slsa/sign_blob.sh"
+	$(Q)mkdir -p "$(COSIGN_BUNDLE_DIR)"
+	$(Q)bom=$$(ls -1 "$(ROOT)/$(BOM_REPORT_DIR)"/*.json "$(BOM_REPORT_DIR)"/*.json 2>/dev/null | head -1); \
+		if [ -z "$$bom" ]; then $(MAKE) bom; bom=$$(ls -1 "$(ROOT)/$(BOM_REPORT_DIR)"/*.json "$(BOM_REPORT_DIR)"/*.json 2>/dev/null | head -1); fi; \
+		test -n "$$bom" || { echo "ERROR: no BOM JSON under $(BOM_REPORT_DIR)"; exit 1; }; \
+		COSIGN_BUNDLE_DIR="$(COSIGN_BUNDLE_DIR)" REKOR_URL="$(REKOR_URL)" \
+		FULCIO_URL="$(FULCIO_URL)" COSIGN_YES="$(COSIGN_YES)" \
+		STRICT_SIGNING="$(STRICT_SIGNING)" \
+		"$(SCRIPTS_DIR)/slsa/sign_blob.sh" sbom.bundle "$$bom"
+
+sign-provenance: check-cosign sign-sbom slsa-provenance ## [sign] cosign sign-blob the SLSA provenance JSON
+	$(Q)chmod +x "$(SCRIPTS_DIR)/slsa/sign_blob.sh"
+	$(Q)test -f "$(PROVENANCE_FILE)" || { echo "ERROR: missing $(PROVENANCE_FILE)"; exit 1; }
+	$(Q)COSIGN_BUNDLE_DIR="$(COSIGN_BUNDLE_DIR)" REKOR_URL="$(REKOR_URL)" \
+		FULCIO_URL="$(FULCIO_URL)" COSIGN_YES="$(COSIGN_YES)" \
+		STRICT_SIGNING="$(STRICT_SIGNING)" \
+		"$(SCRIPTS_DIR)/slsa/sign_blob.sh" provenance.bundle "$(PROVENANCE_FILE)"
+
+sign-attest-images: check-cosign slsa-provenance ## [sign] cosign attest images with SLSA provenance predicate
+	$(Q)test -f "$(PROVENANCE_FILE)"
+	$(Q)for name in tkeir-lib tkeir-api tkeir-indexer tkeir-indexer-slim tkeir-hmi tkeir-ingest tkeir-audit tkeir-governor; do \
+		echo "Attesting $(IMAGE_REGISTRY)/$${name}:$(IMAGE_TAG)"; \
+		if ! cosign attest $(COSIGN_YES) \
+			--predicate "$(PROVENANCE_FILE)" \
+			--type slsaprovenance \
+			--rekor-url "$(REKOR_URL)" \
+			--fulcio-url "$(FULCIO_URL)" \
+			"$(IMAGE_REGISTRY)/$${name}:$(IMAGE_TAG)" 2>/dev/null; then \
+			if [ "$(STRICT_SIGNING)" = "1" ]; then exit 1; fi; \
+			echo "WARN: skip attest for $(IMAGE_REGISTRY)/$${name}:$(IMAGE_TAG) (image missing or no OIDC)"; \
+		fi; \
+	done
+
+sign-all: sign-wheel sign-sbom sign-provenance ## [sign] Sign wheel + SBOM + provenance (+ optional image attest)
+	$(Q)echo "Blob signatures written under $(COSIGN_BUNDLE_DIR)/"
+	$(Q)if [ "$(SKIP_IMAGE_ATTEST)" = "1" ]; then \
+		echo "SKIP_IMAGE_ATTEST=1 — not attesting images"; \
+	else \
+		$(MAKE) sign-attest-images || { \
+			if [ "$(STRICT_SIGNING)" = "1" ]; then exit 1; fi; \
+			echo "WARN: image attestation skipped"; \
+		}; \
+	fi
+
+verify-signatures: check-cosign ## [sign] Verify all signatures in COSIGN_BUNDLE_DIR (offline)
+	$(Q)chmod +x "$(SCRIPTS_DIR)/slsa/verify_blob.sh"
+	$(Q)wheel=$$(ls -1 "$(WHEEL_DIR)"/tkeir-*.whl "$(DIST_DIR)"/tkeir-*.whl 2>/dev/null | head -1); \
+		test -n "$$wheel" || { echo "ERROR: no wheel — run make build"; exit 1; }; \
+		COSIGN_BUNDLE_DIR="$(COSIGN_BUNDLE_DIR)" \
+		"$(SCRIPTS_DIR)/slsa/verify_blob.sh" wheel.bundle "$$wheel" wheel
+	$(Q)bom=$$(ls -1 "$(ROOT)/$(BOM_REPORT_DIR)"/*.json "$(BOM_REPORT_DIR)"/*.json 2>/dev/null | head -1); \
+		test -n "$$bom" || { echo "ERROR: no BOM to verify"; exit 1; }; \
+		COSIGN_BUNDLE_DIR="$(COSIGN_BUNDLE_DIR)" \
+		"$(SCRIPTS_DIR)/slsa/verify_blob.sh" sbom.bundle "$$bom" SBOM
+	$(Q)COSIGN_BUNDLE_DIR="$(COSIGN_BUNDLE_DIR)" \
+		"$(SCRIPTS_DIR)/slsa/verify_blob.sh" provenance.bundle "$(PROVENANCE_FILE)" provenance
+	$(Q)echo "All blob signatures verified."

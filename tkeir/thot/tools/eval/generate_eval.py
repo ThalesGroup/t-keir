@@ -104,7 +104,13 @@ class GenMetrics:
     def as_dict(self) -> dict[str, float]:
         """Return JSON-serializable averages."""
         if self.n <= 0:
-            return {"n": 0, "em": 0.0, "f1": 0.0, "contains": 0.0, "errors": self.errors}
+            return {
+                "n": 0,
+                "em": 0.0,
+                "f1": 0.0,
+                "contains": 0.0,
+                "errors": self.errors,
+            }
         return {
             "n": float(self.n),
             "em": self.em / self.n,
@@ -150,7 +156,7 @@ def reports_generate_dir() -> Path:
 
 def _emit_progress(message: str) -> None:
     """Write a high-visibility progress line (stderr + WARNING log)."""
-    line = f">>> {message}"
+    line = f"[gen-eval] {message}"
     print(line, file=sys.stderr, flush=True)
     # WARNING so it cuts through dense INFO NLP/LLM logs.
     LOGGER.warning("%s", message)
@@ -379,12 +385,9 @@ def _delta(ours: float | None, baseline: float | None) -> str:
 
 def _multihop_gen_best(board: dict[str, Any]) -> tuple[str, float] | None:
     """Prefer GPT-4 *ground-truth evidence* accuracy (matches oracle path)."""
-    gen = (
-        ((board.get("datasets") or {}).get("multihop_rag") or {}).get(
-            "generation"
-        )
-        or {}
-    )
+    gen = ((board.get("datasets") or {}).get("multihop_rag") or {}).get(
+        "generation"
+    ) or {}
     models = gen.get("models") or {}
     gpt4 = models.get("GPT-4") or {}
     gt = gpt4.get("accuracy_ground_truth")
@@ -405,11 +408,8 @@ def _ragbench_hal_best(
     board: dict[str, Any], subset: str
 ) -> tuple[str, float] | None:
     by_subset = (
-        ((board.get("best_published") or {}).get("ragbench") or {}).get(
-            "by_subset"
-        )
-        or {}
-    )
+        (board.get("best_published") or {}).get("ragbench") or {}
+    ).get("by_subset") or {}
     entry = by_subset.get(subset) or {}
     score = entry.get("score")
     if isinstance(score, (int, float)):
@@ -631,7 +631,9 @@ async def _evaluate_dataset_async(
 
     from thot.tools.eval.beir_tkeir import load_pipeline_runner
 
-    runner = None if skip_nlp else await asyncio.to_thread(load_pipeline_runner)
+    runner = (
+        None if skip_nlp else await asyncio.to_thread(load_pipeline_runner)
+    )
     llm = build_llm_wrapper()
 
     metrics = GenMetrics()
@@ -687,7 +689,8 @@ async def _evaluate_dataset_async(
             contains = answer_contains_gold(answer.short_answer, gold_text)
             f1 = max(f1, token_f1(answer.detailed_report, gold_text))
             contains = max(
-                contains, answer_contains_gold(answer.detailed_report, gold_text)
+                contains,
+                answer_contains_gold(answer.detailed_report, gold_text),
             )
             metrics.em += em
             metrics.f1 += f1
@@ -847,7 +850,9 @@ def main(argv: list[str] | None = None) -> int:
     """CLI entry: T-KEIR generation eval + leaderboard report."""
     args = parse_args(argv)
     setup_logging(args.verbose)
-    rag_dir = Path(args.rag_dir) if args.rag_dir else default_rag_benchmarks_dir()
+    rag_dir = (
+        Path(args.rag_dir) if args.rag_dir else default_rag_benchmarks_dir()
+    )
     leaderboard = load_leaderboard(
         Path(args.leaderboard)
         if args.leaderboard

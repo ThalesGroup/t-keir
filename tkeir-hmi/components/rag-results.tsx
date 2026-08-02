@@ -72,7 +72,8 @@ export const RagResults = memo(function RagResults({
 
       <p className="flex items-center gap-2 text-xs text-muted-foreground">
         <Network className="h-3.5 w-3.5" />
-        Ontology navigator is shared with Search (below).
+        Use the ontology navigator below to filter entities/keywords and
+        highlight matching chunks.
       </p>
 
       <TechnicalDetails

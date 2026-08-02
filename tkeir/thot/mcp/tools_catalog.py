@@ -41,9 +41,9 @@ TOOLS: tuple[ToolSpec, ...] = (
     ToolSpec(
         name="search",
         description=(
-            "Hybrid retrieval over the caller's Vespa streaming group "
-            "(BM25 + ANN). Returns chunks and aggregated documents. "
-            "Tenant isolation is enforced server-side."
+            "Hybrid retrieval over the caller's indexes (BM25 + ANN). "
+            "Pass search_mode='both' to fuse shared global corpus AND "
+            "personal user space. Tenant isolation is enforced server-side."
         ),
         intent="search",
         handler="search",
@@ -65,6 +65,14 @@ TOOLS: tuple[ToolSpec, ...] = (
                     "type": "string",
                     "description": "Optional language hint (e.g. en, fr)",
                 },
+                "search_mode": {
+                    "type": "string",
+                    "enum": ["auto", "global", "user", "both"],
+                    "description": (
+                        "Dual-hybrid index mode. Use 'both' to search "
+                        "shared global corpus AND personal user space."
+                    ),
+                },
             },
             "required": ["query"],
             "additionalProperties": False,
@@ -75,7 +83,8 @@ TOOLS: tuple[ToolSpec, ...] = (
         description=(
             "Retrieval-augmented generation scoped to the caller's "
             "user_space. Returns answer, report_markdown, ontology summary, "
-            "and grounded chunks when the RAG backend is available."
+            "and grounded chunks when the RAG backend is available. "
+            "Pass search_mode='both' to fuse global + user indexes."
         ),
         intent="search",
         handler="rag_query",
@@ -94,6 +103,13 @@ TOOLS: tuple[ToolSpec, ...] = (
                     "type": "boolean",
                     "default": True,
                     "description": "If false, return retrieval-only results",
+                },
+                "search_mode": {
+                    "type": "string",
+                    "enum": ["auto", "global", "user", "both"],
+                    "description": (
+                        "Dual-hybrid index mode. Use 'both' for global + user."
+                    ),
                 },
             },
             "required": ["query"],
@@ -193,6 +209,74 @@ TOOLS: tuple[ToolSpec, ...] = (
                 },
             },
             "required": ["bundle_id"],
+            "additionalProperties": False,
+        },
+    ),
+    ToolSpec(
+        name="workspace_wiki_list",
+        description=(
+            "List LLM Wiki markdown files under the caller's personal "
+            "workspace (typically wiki/). Optional prior context for agents."
+        ),
+        intent="search",
+        handler="workspace_wiki_list",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "default": "wiki",
+                    "description": (
+                        "Workspace-relative directory (default wiki)"
+                    ),
+                },
+            },
+            "additionalProperties": False,
+        },
+    ),
+    ToolSpec(
+        name="workspace_wiki_get",
+        description=(
+            "Read one LLM Wiki markdown file from the caller's personal "
+            "workspace by relative path."
+        ),
+        intent="search",
+        handler="workspace_wiki_get",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": (
+                        "Workspace-relative path (e.g. wiki/foo.md)"
+                    ),
+                },
+            },
+            "required": ["path"],
+            "additionalProperties": False,
+        },
+    ),
+    ToolSpec(
+        name="okf_wiki_put",
+        description=(
+            "Write or overwrite the LLMWiki page (wiki.md) for an OKF bundle "
+            "owned by the caller. Markdown must be grounded in prior findings."
+        ),
+        intent="search",
+        handler="okf_wiki_put",
+        input_schema={
+            "type": "object",
+            "properties": {
+                "bundle_id": {
+                    "type": "string",
+                    "description": "OKF bundle identifier",
+                },
+                "markdown": {
+                    "type": "string",
+                    "description": "Full LLMWiki markdown (type: Wiki)",
+                },
+            },
+            "required": ["bundle_id", "markdown"],
             "additionalProperties": False,
         },
     ),

@@ -56,6 +56,7 @@ def main(args: list[str] | None = None) -> None:
 
     parsed = parser.parse_args(args)
     from thot.core.StructuredLogging import configure_text_logging
+
     configure_text_logging(level=logging.INFO, force=True)
 
     settings = ingest_settings()

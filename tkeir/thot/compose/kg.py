@@ -35,6 +35,8 @@ _STRUCTURAL_TYPES = frozenset(
     {
         str(TKEIR.Document),
         str(TKEIR.DocumentChunk),
+        str(TKEIR.SubOntology),
+        str(TKEIR.Statement),
         str(TKEIR.Keyword),
         str(TKEIR.Tag),
         str(TKEIR.Entity),
@@ -394,7 +396,7 @@ class UserSpaceKG:
         return out
 
     def chunk_ids_for_node(self, node: Any) -> list[str]:
-        """Resolve DocumentChunk labels linked via ``hasMention`` / ``hasStatement``."""
+        """Resolve DocumentChunk labels linked via mention / statement incidence."""
         if self.is_empty() or self._entry is None:
             return []
         if not isinstance(node, (URIRef, str)):
@@ -402,21 +404,34 @@ class UserSpaceKG:
         graph = self._entry.graph
         uri = URIRef(str(node)) if not isinstance(node, URIRef) else node
         chunks: set[str] = set()
+
+        def _add_chunk(chunk: Any) -> None:
+            lab = graph.value(chunk, RDFS.label)
+            if lab is not None:
+                chunks.add(str(lab))
+
         for chunk in graph.subjects(TKEIR.hasMention, uri):
-            lab = graph.value(chunk, RDFS.label)
-            if lab is not None:
-                chunks.add(str(lab))
+            _add_chunk(chunk)
+        for chunk in graph.objects(uri, TKEIR.mentionedIn):
+            _add_chunk(chunk)
         for chunk in graph.subjects(TKEIR.hasStatement, uri):
-            lab = graph.value(chunk, RDFS.label)
-            if lab is not None:
-                chunks.add(str(lab))
+            _add_chunk(chunk)
+        # Reified statements that reference this node as subject/object.
+        for stmt in graph.subjects(TKEIR.subject, uri):
+            for chunk in graph.objects(stmt, TKEIR.inChunk):
+                _add_chunk(chunk)
+            for chunk in graph.subjects(TKEIR.hasStatement, stmt):
+                _add_chunk(chunk)
+        for stmt in graph.subjects(TKEIR.object, uri):
+            for chunk in graph.objects(stmt, TKEIR.inChunk):
+                _add_chunk(chunk)
+            for chunk in graph.subjects(TKEIR.hasStatement, stmt):
+                _add_chunk(chunk)
         # Document-level: any chunk under docs that mention this entity
         for doc in graph.subjects(TKEIR.hasMention, uri):
             if (doc, RDF.type, TKEIR.Document) in graph:
                 for chunk in graph.objects(doc, TKEIR.hasChunk):
-                    lab = graph.value(chunk, RDFS.label)
-                    if lab is not None:
-                        chunks.add(str(lab))
+                    _add_chunk(chunk)
         return sorted(chunks)
 
     def document_ids_for_node(self, node: Any) -> list[str]:

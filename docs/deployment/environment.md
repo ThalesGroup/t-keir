@@ -22,6 +22,7 @@ to `deploy/compose/.env` (never commit secrets). Deep tables also live on
 | 8092 | Agent |
 | 8093 | **Audit** *or* **MCP** (same default — remap if both profiles) |
 | 8094 | Governor |
+| 8095 | OKF |
 | 11434 | Ollama (often on the host) |
 
 ## Cross-cutting
@@ -74,7 +75,8 @@ Resolved by `UnifiedLLMWrapper` (`PROVIDER` → provider-specific defaults).
 | `EMBEDDING_DIM` | `1024` | Must match Vespa `dense_vector` dim (BGE-M3) |
 | `RERANKER_MODEL` | unset | Optional CrossEncoder HF id (only if `RERANK_STRATEGY=cross_encoder`). Not used for dual-hybrid ColBERT |
 | `RERANK_STRATEGY` | `embedding_cosine` | Legacy path: `embedding_cosine` \| `cross_encoder`. Production second stage is BGE-M3 ColBERT |
-| `HTTP_TIMEOUT_SECONDS` | `120` | Provider HTTP timeout |
+| `HTTP_TIMEOUT_SECONDS` | `120` | Provider HTTP timeout (embeddings / default client) |
+| `LLM_GENERATE_TIMEOUT_SECONDS` | `max(HTTP_TIMEOUT, 600)` | Chat/completions timeout (persona wiki merges, agent loops). Raise further for slow local Ollama (e.g. `900`). |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` (Compose often `http://host.docker.internal:11434`) | Ollama |
 | `OPENAI_API_KEY` | unset | OpenAI / compatible key |
 | `OPENAI_BASE_URL` | `https://api.openai.com/v1` | OpenAI-compatible base |
@@ -192,6 +194,7 @@ Resolved by `UnifiedLLMWrapper` (`PROVIDER` → provider-specific defaults).
 | `API_PROXY_TIMEOUT_MS` | `300000` | Upstream timeout (ms) |
 | `AGENT_URL` | `http://localhost:8092` | Agent proxy |
 | `GOVERNOR_URL` | `http://localhost:8094` | Governor proxy |
+| `OKF_URL` | `http://localhost:8095` | OKF proxy |
 | `AUDIT_URL` | `http://localhost:8093` | Audit proxy |
 
 Plus Auth / Keycloak variables above.

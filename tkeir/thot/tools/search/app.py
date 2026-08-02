@@ -15,10 +15,11 @@ import logging
 import os
 import time
 from contextlib import asynccontextmanager
-from typing import Any
+from pathlib import Path
+from typing import Any, cast
 
 import yaml
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, File, Form, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
@@ -27,24 +28,34 @@ from rdflib import Graph
 from thot import __version__ as TKEIR_VERSION
 from thot.action.correlation import current_correlation_id
 from thot.action.middleware import ActionCorrelationMiddleware
+from thot.action.models import new_action_id
 from thot.action.readiness import readiness_report
 from thot.core.LlmWrapper import UnifiedLLMWrapper
 from thot.core.StructuredLogging import configure_json_logging
 from thot.core.ThotLogger import ThotLogger
 from thot.core.ThotMetrics import ThotMetrics
-from thot.core.TkeirPaths import configs_dir, rag_prompts_path
+from thot.core.TkeirPaths import configs_dir, rag_prompts_path, repo_root
 from thot.governor.wiring import wire_governor_middleware
 from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
+from thot.tools.search.business_ontology import (
+    business_ontology_to_json_ld,
+    resolve_search_business_ontology,
+)
+from thot.tools.search.generation_prompt import (
+    build_focus_query_text,
+    format_generation_guidance,
+    format_query_analysis_for_prompt,
+    is_entity_report_query,
+)
 from thot.tools.search.ontology_reasoner import (
     DEFAULT_REASONER,
     SUPPORTED_OPERATIONS,
-    SUPPORTED_REASONERS,
-    owlapy_available,
     query_merged_ontology,
 )
 from thot.tools.search.ontology_utils import (
     build_hmi_ontology,
+    enrich_hmi_ontology_from_analyzed_documents,
     extract_focus_passages,
     filter_query_relevant_chunks,
     format_svo_ontology_context,
@@ -52,12 +63,6 @@ from thot.tools.search.ontology_utils import (
     prioritize_chunks_by_query_match,
     summarize_graph_for_prompt,
     truncate_for_prompt,
-)
-from thot.tools.search.generation_prompt import (
-    build_focus_query_text,
-    format_generation_guidance,
-    format_query_analysis_for_prompt,
-    is_entity_report_query,
 )
 from thot.tools.search.query_analyzer import (
     QueryAnalyzerTask,
@@ -105,8 +110,28 @@ class QueryRequest(BaseModel):
     business_ontology: list[dict[str, Any]] | dict[str, Any] | None = Field(
         default=None,
         description=(
-            "Per-request business ontology concepts for query expansion "
-            "(list of concepts or {concepts: [...]}); not stored server-side"
+            "Per-request business ontology concepts merged with "
+            "datasets/<business_ontology_dataset>/business_ontology.yaml"
+        ),
+    )
+    business_ontology_dataset: str | None = Field(
+        default=None,
+        description=(
+            "Dataset folder under datasets/ whose business_ontology.yaml is "
+            "auto-loaded (default: rag.yaml dual_hybrid.business_ontology.default_dataset)"
+        ),
+    )
+    analyzed_documents_path: str | None = Field(
+        default=None,
+        description=(
+            "Filesystem path to the ingest dump root (directory with staging/ "
+            "and source_refs.json) used to load analyzed_document.json RDF"
+        ),
+    )
+    ontology_json_ld: str | None = Field(
+        default=None,
+        description=(
+            "Optional extra JSON-LD ontology merged into the fused response graph"
         ),
     )
     max_passages: int | None = Field(
@@ -127,6 +152,20 @@ class QueryRequest(BaseModel):
         le=10,
         description="Override prompt.passages.context_sentences from rag.yaml",
     )
+    search_mode: str | None = Field(
+        default=None,
+        description=(
+            "Dual-hybrid retrieval mode: auto | global | user | both. "
+            "When set, overrides rag.yaml dual_hybrid.search_mode."
+        ),
+    )
+    source_refs: list[str] | None = Field(
+        default=None,
+        description=(
+            "Restrict retrieval to these Vespa/workspace source_ref values "
+            "(typically user:<space>:<path>). Forces search_mode=user."
+        ),
+    )
 
 
 class RetrievedChunk(BaseModel):
@@ -146,8 +185,42 @@ class SearchRequest(BaseModel):
     business_ontology: list[dict[str, Any]] | dict[str, Any] | None = Field(
         default=None,
         description=(
-            "Per-request business ontology concepts for query expansion "
-            "(list of concepts or {concepts: [...]}); not stored server-side"
+            "Per-request business ontology concepts merged with "
+            "datasets/<business_ontology_dataset>/business_ontology.yaml"
+        ),
+    )
+    business_ontology_dataset: str | None = Field(
+        default=None,
+        description=(
+            "Dataset folder under datasets/ whose business_ontology.yaml is "
+            "auto-loaded (default: rag.yaml dual_hybrid.business_ontology.default_dataset)"
+        ),
+    )
+    analyzed_documents_path: str | None = Field(
+        default=None,
+        description=(
+            "Filesystem path to the ingest dump root (directory with staging/ "
+            "and source_refs.json) used to load analyzed_document.json RDF"
+        ),
+    )
+    ontology_json_ld: str | None = Field(
+        default=None,
+        description=(
+            "Optional extra JSON-LD ontology merged into the fused response graph"
+        ),
+    )
+    search_mode: str | None = Field(
+        default=None,
+        description=(
+            "Dual-hybrid retrieval mode: auto | global | user | both. "
+            "When set, overrides rag.yaml dual_hybrid.search_mode."
+        ),
+    )
+    source_refs: list[str] | None = Field(
+        default=None,
+        description=(
+            "Restrict retrieval to these Vespa/workspace source_ref values "
+            "(typically user:<space>:<path>). Forces search_mode=user."
         ),
     )
 
@@ -176,11 +249,37 @@ class SemanticEntity(BaseModel):
     label: str
     type: str
     chunk_ids: list[str] = Field(default_factory=list)
+    # Text-importance weight (chunk coverage + summed text hits).
+    weight: float = 0.0
+    mention_count: int = 0
+    text_hits: int = 0
 
 
 class SemanticKeyword(BaseModel):
     label: str
     chunk_ids: list[str] = Field(default_factory=list)
+    # Text-importance weight (chunk coverage + summed text hits).
+    weight: float = 0.0
+    mention_count: int = 0
+    text_hits: int = 0
+
+
+class OntologyRelation(BaseModel):
+    """Weighted relation summed across fused chunk/parent ontologies."""
+
+    source: str
+    predicate: str
+    target: str
+    weight: float = 1.0
+
+
+class ProposedOntologyQuery(BaseModel):
+    """Suggested SPARQL / expression / coherence query for the Navigator."""
+
+    kind: str
+    title: str
+    query: str
+    description: str = ""
 
 
 class FusedOntology(BaseModel):
@@ -189,9 +288,12 @@ class FusedOntology(BaseModel):
     entities: list[SemanticEntity]
     keywords: list[SemanticKeyword]
     json_ld: str = ""
+    # Weighted SVO / ontology links (fuse-summed across source payloads).
+    relations: list[OntologyRelation] = Field(default_factory=list)
     triple_count: int = 0
     source_count: int = 0
     document_ids: list[str] = Field(default_factory=list)
+    proposed_queries: list[ProposedOntologyQuery] = Field(default_factory=list)
 
 
 class SearchTimings(BaseModel):
@@ -216,7 +318,12 @@ class SearchResponse(BaseModel):
     documents: list[SearchDocument]
     vespa_hits: int
     ranking_profile: str | None = None
+    # Global = merged parent/chunk document ontologies (degree hubs on left).
     ontology: FusedOntology | None = None
+    # Query NLP (+ matched external BO) document ontology.
+    query_ontology: FusedOntology | None = None
+    # Union of query_ontology + chunk-fused ontology.
+    merged_ontology: FusedOntology | None = None
     timings: SearchTimings | None = None
 
 
@@ -259,17 +366,30 @@ class OntologyReasonerRequest(BaseModel):
         default=None,
         description="SPARQL SELECT for operation=sparql",
     )
+    expression: str | None = Field(
+        default=None,
+        description=(
+            "Manchester-like expression for operation=expression "
+            "(e.g. 'Person and age > 20')"
+        ),
+    )
     reasoner: str = Field(
         default=DEFAULT_REASONER,
-        description=(
-            "Reasoner engine: "
-            + ", ".join(SUPPORTED_REASONERS)
-            + " (rdflib = no Java)"
-        ),
+        description=f"Reasoner engine (only {DEFAULT_REASONER!r})",
     )
     direct: bool = False
     limit: int = Field(default=50, ge=1, le=500)
-    prefer_owlapy: bool = True
+    business_ontology: list[dict[str, Any]] | dict[str, Any] | None = Field(
+        default=None,
+        description="Optional business ontology payload merged before reasoning",
+    )
+    business_ontology_dataset: str | None = Field(
+        default=None,
+        description=(
+            "Dataset folder under datasets/ whose business_ontology.yaml is "
+            "merged into the reasoner graph"
+        ),
+    )
 
 
 class OntologyReasonerResponse(BaseModel):
@@ -280,9 +400,10 @@ class OntologyReasonerResponse(BaseModel):
     count: int = 0
     consistent: bool | None = None
     triple_count: int = 0
-    owlapy_available: bool = False
     note: str | None = None
     json_ld: str | None = None
+    expression: str | None = None
+    sparql: str | None = None
 
 
 class AppState:
@@ -638,12 +759,404 @@ def _extract_parent_rdf(parent_fields: dict[str, Any]) -> str:
         value = parent_fields.get(key)
         if isinstance(value, str) and value.strip():
             return value
+    ontology = parent_fields.get("document_ontology")
+    if isinstance(ontology, dict):
+        for key in ("json_ld", "rdf_graph_serialized"):
+            value = ontology.get(key)
+            if isinstance(value, str) and value.strip():
+                return value
     return ""
+
+
+def _resolve_analyzed_documents_root(
+    analyzed_documents_path: str | None = None,
+) -> Path:
+    """Resolve ingest dump root for analyzed_document.json lookups.
+
+    Preference order:
+    1. Explicit ``analyzed_documents_path`` request parameter
+    2. ``INGEST_ROOT`` (``ingest_settings().root``)
+    3. ``<repo>/workspace/ingest``
+    """
+    candidates: list[Path] = []
+    if analyzed_documents_path and str(analyzed_documents_path).strip():
+        raw = Path(str(analyzed_documents_path).strip()).expanduser()
+        candidates.append(
+            raw if raw.is_absolute() else Path(repo_root()) / raw
+        )
+    try:
+        from thot.tools.ingest.config import ingest_settings
+
+        candidates.append(Path(ingest_settings().root))
+    except Exception:  # noqa: BLE001
+        pass
+    candidates.append(Path(repo_root()) / "workspace" / "ingest")
+
+    seen: set[str] = set()
+    for path in candidates:
+        key = str(path.resolve()) if path.exists() else str(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        if path.is_dir():
+            return path
+    return candidates[0]
+
+
+def _ingest_store_parent(
+    source_ref: str,
+    *,
+    analyzed_documents_path: str | None = None,
+) -> dict[str, Any]:
+    """Fallback analyzed document lookup from ingest staging by ``source_ref``."""
+    if not source_ref.strip():
+        return {}
+    try:
+        from thot.tools.ingest.store import IngestStore
+
+        store = IngestStore(
+            _resolve_analyzed_documents_root(analyzed_documents_path)
+        )
+        doc = store.read_analyzed_document_by_source_ref(source_ref)
+        if not isinstance(doc, dict):
+            return {}
+        return doc
+    except Exception:
+        LOGGER.warning(
+            "Unable to load analyzed ingest document for %s", source_ref
+        )
+        return {}
+
+
+def _collect_source_ref_rdf_payloads(
+    source_refs: list[str] | None,
+    *,
+    analyzed_documents_path: str | None = None,
+) -> list[str]:
+    """Load JSON-LD from analyzed documents for every basket ``source_ref``.
+
+    Used so My-files brief / ontology fusion does not depend solely on which
+    passages Vespa returned — indexed docs still contribute their NLP graphs.
+    """
+    payloads: list[str] = []
+    seen: set[str] = set()
+    for ref in _normalize_source_refs(source_refs):
+        doc = _ingest_store_parent(
+            ref,
+            analyzed_documents_path=analyzed_documents_path,
+        )
+        rdf = _extract_parent_rdf(doc)
+        if not rdf or rdf in seen:
+            continue
+        seen.add(rdf)
+        payloads.append(rdf)
+    return payloads
+
+
+def _merge_rdf_payload_lists(*lists: list[str]) -> list[str]:
+    """Concatenate RDF JSON-LD strings with de-duplication."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for group in lists:
+        for item in group:
+            text = (item or "").strip()
+            if not text or text in seen:
+                continue
+            seen.add(text)
+            out.append(text)
+    return out
+
+
+def _resolve_request_business_ontology(
+    state: AppState,
+    *,
+    business_ontology: Any = None,
+    business_ontology_dataset: str | None = None,
+) -> dict[str, Any] | None:
+    """Load default dataset YAML and merge with the request payload."""
+    bo_cfg = state.rag_config.dual_hybrid.business_ontology
+    dataset = (
+        (business_ontology_dataset or "").strip()
+        or (bo_cfg.default_dataset or "osint").strip()
+        or "osint"
+    )
+    return resolve_search_business_ontology(
+        dataset=dataset,
+        request_payload=business_ontology,
+        search_enabled=bo_cfg.search_enabled,
+    )
+
+
+def _empty_fused_ontology() -> FusedOntology:
+    """Return an empty HMI ontology payload."""
+    return FusedOntology(entities=[], keywords=[], json_ld="[]")
+
+
+def _build_query_ontology(
+    state: AppState,
+    *,
+    query_text: str,
+    language: str | None,
+    query_analysis: dict[str, Any] | None,
+    business_ontology_payload: dict[str, Any] | None = None,
+) -> FusedOntology:
+    """Run document_ontology on the query NLP doc (+ matched external BO).
+
+    Prefers ``query_analysis['_pipeline_doc']`` from
+    :class:`PassageRetrievalPipeline` so we do not re-run NLP.
+    """
+    from thot.tasks.answer_generation.ontology_clues import (
+        build_document_ontology_json_ld,
+    )
+    from thot.tools.search.business_ontology import (
+        annotate_document_with_business_ontology,
+    )
+    from thot.tools.search.query_analyzer import run_linguistic_pipeline
+
+    analysis = query_analysis if isinstance(query_analysis, dict) else {}
+    document: dict[str, Any] | None = None
+    pipeline_doc = analysis.get("_pipeline_doc")
+    if isinstance(pipeline_doc, dict) and pipeline_doc:
+        document = dict(pipeline_doc)
+    else:
+        lang = (language or "en").strip() or "en"
+        runner = _pipeline_runner_for_language(state, lang)
+        if runner is not None and (query_text or "").strip():
+            try:
+                document = run_linguistic_pipeline(
+                    runner, query_text, language=lang
+                )
+            except Exception as exc:  # noqa: BLE001
+                LOGGER.warning("Query ontology NLP failed: %s", exc)
+                document = None
+    if not document:
+        # Minimal fallback from analysis surfaces (no full pipeline doc).
+        document = {
+            "content": [query_text],
+            "content_ner": [
+                {
+                    "text": str(row.get("text") or ""),
+                    "label": str(row.get("label") or "entity"),
+                }
+                for row in analysis.get("ner_entities") or []
+                if isinstance(row, dict) and str(row.get("text") or "").strip()
+            ],
+            "keywords": list(analysis.get("keywords") or []),
+        }
+        if language:
+            document["language-detection"] = {"language": language}
+
+    document.setdefault("source_doc_id", "query://search")
+    document.setdefault("source", "query://search")
+    if language and "language-detection" not in document:
+        document["language-detection"] = {"language": language}
+
+    try:
+        json_ld = build_document_ontology_json_ld(document)
+        document["document_ontology"] = {"json_ld": json_ld}
+        if business_ontology_payload:
+            document = annotate_document_with_business_ontology(
+                document, business_ontology_payload
+            )
+        ontology_block = document.get("document_ontology") or {}
+        final_ld = str(ontology_block.get("json_ld") or json_ld or "[]")
+    except Exception as exc:  # noqa: BLE001
+        LOGGER.warning("Query ontology build failed: %s", exc)
+        return _empty_fused_ontology()
+
+    if not final_ld.strip() or final_ld.strip() == "[]":
+        return _empty_fused_ontology()
+
+    hmi = build_hmi_ontology(
+        [final_ld],
+        [],
+        document_ids=["query://search"],
+        max_entities=state.rag_config.ontology.max_entities,
+        max_keywords=state.rag_config.ontology.max_keywords,
+        min_keyword_length=state.rag_config.ontology.min_keyword_length,
+    )
+    # Query graphs often lack DocumentChunk anchors — backfill surfaces from NLP.
+    if not hmi.get("entities"):
+        entities = []
+        for row in analysis.get("ner_entities") or []:
+            if not isinstance(row, dict):
+                continue
+            label = str(row.get("text") or "").strip()
+            if not label:
+                continue
+            entities.append(
+                {
+                    "label": label,
+                    "type": str(row.get("label") or "entity"),
+                    "chunk_ids": ["query://search"],
+                }
+            )
+        hmi["entities"] = entities[: state.rag_config.ontology.max_entities]
+    if not hmi.get("keywords"):
+        keywords = []
+        for raw in analysis.get("keywords") or []:
+            if isinstance(raw, dict):
+                label = str(raw.get("text") or raw.get("label") or "").strip()
+            else:
+                label = str(raw or "").strip()
+            if len(label) >= state.rag_config.ontology.min_keyword_length:
+                keywords.append(
+                    {"label": label, "chunk_ids": ["query://search"]}
+                )
+        hmi["keywords"] = keywords[: state.rag_config.ontology.max_keywords]
+    return FusedOntology.model_validate(hmi)
+
+
+def _fuse_response_ontology(
+    state: AppState,
+    *,
+    rdf_payloads: list[str],
+    retrieved_chunks: list[RetrievedChunk],
+    business_ontology_payload: dict[str, Any] | None = None,
+    ontology_json_ld: str | None = None,
+    document_ids: list[str] | None = None,
+    include_full_business_ontology: bool = False,
+    analyzed_documents_path: str | None = None,
+) -> FusedOntology:
+    """Merge document RDF (+ optional request JSON-LD) for HMI display.
+
+    By default the full business-ontology catalog is **not** dumped into the
+    fused graph — that swamps degree ranking with taxonomy hubs. Matched BO
+    concepts already live on parent/query ``document_ontology`` via annotate.
+    Set ``include_full_business_ontology=True`` for reasoner-only callers that
+    still need the catalog.
+
+    ``document_ids`` (e.g. basket ``source_refs``) anchors entity export when
+    Vespa returned no chunks but analyzed dumps were fused by source_ref.
+
+    After RDF export, ``kg`` / ``content_ner`` / ``keywords`` are re-read from
+    each parent ``analyzed_document.json`` (index-time dump) and merged in so
+    NLP signals stay visible without changing ingest.
+    """
+    fused_docs = list(rdf_payloads)
+    if include_full_business_ontology and business_ontology_payload:
+        business_json_ld = business_ontology_to_json_ld(
+            business_ontology_payload
+        )
+        if business_json_ld and business_json_ld != "[]":
+            fused_docs.append(business_json_ld)
+    extra = (ontology_json_ld or "").strip()
+    if extra:
+        fused_docs.append(extra)
+    parent_ids = [
+        chunk.parent_doc_id
+        for chunk in retrieved_chunks
+        if chunk.parent_doc_id
+    ]
+    if document_ids:
+        parent_ids = list(document_ids) + parent_ids
+    hmi_ontology = build_hmi_ontology(
+        fused_docs,
+        [chunk.chunk_id for chunk in retrieved_chunks],
+        chunk_texts={
+            chunk.chunk_id: chunk.text_raw for chunk in retrieved_chunks
+        },
+        document_ids=parent_ids,
+        max_entities=state.rag_config.ontology.max_entities,
+        max_keywords=state.rag_config.ontology.max_keywords,
+        min_keyword_length=state.rag_config.ontology.min_keyword_length,
+    )
+
+    # Search/RAG-time reinforce: load TKEIR analyzed dumps for retrieved chunks.
+    analyzed_by_parent: dict[str, dict[str, Any]] = {}
+    chunk_parent_ids: dict[str, str] = {}
+    for chunk in retrieved_chunks:
+        parent = str(chunk.parent_doc_id or "").strip()
+        cid = str(chunk.chunk_id or "").strip()
+        if not cid:
+            continue
+        if parent:
+            chunk_parent_ids[cid] = parent
+            if parent not in analyzed_by_parent:
+                doc = _ingest_store_parent(
+                    parent,
+                    analyzed_documents_path=analyzed_documents_path,
+                )
+                if doc:
+                    analyzed_by_parent[parent] = doc
+                    # Also index by source_doc_id / source for lookups.
+                    alt = str(doc.get("source_doc_id") or "").strip()
+                    if alt and alt not in analyzed_by_parent:
+                        analyzed_by_parent[alt] = doc
+                    src = str(doc.get("source") or "").strip()
+                    if src and src not in analyzed_by_parent:
+                        analyzed_by_parent[src] = doc
+    if analyzed_by_parent and chunk_parent_ids:
+        hmi_ontology = enrich_hmi_ontology_from_analyzed_documents(
+            hmi_ontology,
+            analyzed_documents=analyzed_by_parent,
+            chunk_parent_ids=chunk_parent_ids,
+            chunk_texts={
+                chunk.chunk_id: chunk.text_raw for chunk in retrieved_chunks
+            },
+            max_entities=state.rag_config.ontology.max_entities,
+            max_keywords=state.rag_config.ontology.max_keywords,
+            min_keyword_length=state.rag_config.ontology.min_keyword_length,
+        )
+
+    return FusedOntology.model_validate(hmi_ontology)
+
+
+def _attach_proposed_queries(
+    ontology: FusedOntology,
+    *,
+    query: str,
+    query_analysis: dict[str, Any] | None = None,
+) -> FusedOntology:
+    """Attach SPARQL / expression / coherence proposals for the Navigator."""
+    from thot.tasks.answer_generation.ontology_clues import (
+        propose_queries_for_navigator,
+    )
+
+    analysis = query_analysis if isinstance(query_analysis, dict) else {}
+    entity_types = sorted(
+        {entity.type for entity in ontology.entities if entity.type}
+    )
+    chunk_entities = [
+        {
+            "label": entity.label,
+            "type": entity.type,
+            "chunk_ids": list(entity.chunk_ids),
+        }
+        for entity in ontology.entities
+    ]
+    chunk_keywords = [
+        {
+            "label": keyword.label,
+            "chunk_ids": list(keyword.chunk_ids),
+        }
+        for keyword in ontology.keywords
+    ]
+    try:
+        raw = propose_queries_for_navigator(
+            analysis,
+            query,
+            ontology_json_ld=ontology.json_ld,
+            entity_types=entity_types,
+            chunk_entities=chunk_entities,
+            chunk_keywords=chunk_keywords,
+        )
+    except Exception:  # noqa: BLE001
+        LOGGER.exception("Failed to build ontology navigator proposals")
+        return ontology
+    proposals = [
+        ProposedOntologyQuery.model_validate(item)
+        for item in raw
+        if isinstance(item, dict)
+    ]
+    return ontology.model_copy(update={"proposed_queries": proposals})
 
 
 async def _enrich_hits(
     state: AppState,
     parsed_hits: list[tuple[dict[str, Any], float | None]],
+    *,
+    analyzed_documents_path: str | None = None,
 ) -> tuple[list[RetrievedChunk], list[str]]:
     """Attach parent document metadata to Vespa chunk hits.
 
@@ -657,24 +1170,47 @@ async def _enrich_hits(
     """
     parent_cache: dict[str, dict[str, Any]] = {}
     doc_refs = {
-        str(fields.get("doc_ref") or "")
+        str(
+            fields.get("doc_ref")
+            or fields.get("source_doc_id")
+            or fields.get("source_ref")
+            or ""
+        )
         for fields, _ in parsed_hits
         if fields.get("doc_ref")
+        or fields.get("source_doc_id")
+        or fields.get("source_ref")
     }
     workers = max(1, state.rag_config.vespa.concurrency.enrich_workers)
     semaphore = asyncio.Semaphore(workers)
 
+    def _load_ingest(doc_ref: str) -> dict[str, Any]:
+        return _ingest_store_parent(
+            doc_ref,
+            analyzed_documents_path=analyzed_documents_path,
+        )
+
     async def _fetch_parent(doc_ref: str) -> tuple[str, dict[str, Any]]:
         if state.vespa is None:
-            return doc_ref, {}
+            return doc_ref, _load_ingest(doc_ref)
         async with semaphore:
             try:
-                return doc_ref, await state.vespa.get_document_by_ref(doc_ref)
+                # Passage schemas use source_ref, not a Vespa parent doc id —
+                # try Vespa only when the id looks like id:…; else load analyzed.
+                if doc_ref.startswith("id:"):
+                    parent = await state.vespa.get_document_by_ref(doc_ref)
+                    if isinstance(parent, dict) and _extract_parent_rdf(
+                        parent
+                    ):
+                        return doc_ref, parent
+                    fallback = _load_ingest(doc_ref)
+                    return doc_ref, fallback or parent
+                return doc_ref, _load_ingest(doc_ref)
             except Exception:
                 LOGGER.warning("Unable to fetch parent document %s", doc_ref)
-                return doc_ref, {}
+                return doc_ref, _load_ingest(doc_ref)
 
-    if doc_refs and state.vespa is not None:
+    if doc_refs:
         fetched = await asyncio.gather(
             *(_fetch_parent(doc_ref) for doc_ref in doc_refs)
         )
@@ -684,22 +1220,28 @@ async def _enrich_hits(
     rdf_payloads: list[str] = []
     for fields, relevance in parsed_hits:
         chunk_id = str(fields.get("chunk_id") or "")
-        text_raw = str(fields.get("text_raw") or "")
-        doc_ref = str(fields.get("doc_ref") or "")
+        text_raw = str(
+            fields.get("text_raw") or fields.get("chunk_text") or ""
+        )
         if not chunk_id or not text_raw:
             continue
 
-        parent_fields = parent_cache.get(doc_ref, {}) if doc_ref else {}
+        parent_key = str(
+            fields.get("doc_ref")
+            or fields.get("source_doc_id")
+            or fields.get("source_ref")
+            or ""
+        )
+        parent_fields = parent_cache.get(parent_key, {}) if parent_key else {}
         parent_doc_id = str(
             fields.get("source_doc_id")
+            or fields.get("source_ref")
             or parent_fields.get("source_doc_id")
-            or doc_ref
+            or parent_key
             or ""
         )
         title = str(
-            fields.get("title")
-            or parent_fields.get("title")
-            or ""
+            fields.get("title") or parent_fields.get("title") or ""
         ).strip()
         # Prefer json_ld already on the hit (dual hybrid) over a parent fetch.
         rdf_source = fields if fields.get("json_ld") else parent_fields
@@ -725,6 +1267,7 @@ async def _retrieve_and_rerank(
     hits: int,
     user_space: str | None = None,
     business_ontology: Any | None = None,
+    search_mode: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any] | None, dict[str, Any] | None, str]:
     """Run query analysis, Vespa search, and optional second-stage rerank.
 
@@ -736,9 +1279,17 @@ async def _retrieve_and_rerank(
     """
     assert state.vespa is not None
     space = user_space or state.vespa.config.user_space
+    query_analysis: dict[str, Any] | None = None
     dual_cfg = state.rag_config.dual_hybrid
     if dual_cfg.enabled:
-        from thot.tools.search.passage_retrieval import PassageRetrievalPipeline
+        from thot.tools.search.passage_retrieval import (
+            PassageRetrievalPipeline,
+            SearchMode,
+        )
+
+        pipeline_mode: SearchMode | None = None
+        if search_mode in ("global", "user", "both", "auto"):
+            pipeline_mode = cast(SearchMode, search_mode)
 
         pipeline = PassageRetrievalPipeline(
             dual_cfg,
@@ -750,10 +1301,11 @@ async def _retrieve_and_rerank(
             user_space=space,
             language=language,
             business_ontology=business_ontology,
-            mode=None,
+            mode=pipeline_mode,
             top_k=hits,
         )
         # Shape as Vespa-like response for downstream enrichers.
+        # Must include chunk_id — _enrich_hits skips hits without it.
         children = []
         for hit in result.hits[:hits]:
             children.append(
@@ -761,8 +1313,10 @@ async def _retrieve_and_rerank(
                     "id": hit.passage_id,
                     "relevance": hit.score,
                     "fields": {
+                        "chunk_id": hit.passage_id,
                         "source_ref": hit.source_ref,
                         "source_doc_id": hit.source_ref,
+                        "doc_ref": hit.source_ref,
                         "chunk_text": hit.chunk_text,
                         "text_raw": hit.chunk_text,
                         "ontology_concepts": hit.ontology_concepts,
@@ -774,7 +1328,9 @@ async def _retrieve_and_rerank(
         timings_ms = dict(result.timings_ms or {})
         query_analysis = {
             "raw_query": query_text,
-            "lexical_query": " ".join(result.expansion_terms[:12]) or query_text,
+            "lexical_query": (
+                " ".join(result.expansion_terms[:12]) or query_text
+            ),
             "ranking_profile": f"passage/{result.mode}",
             "dual_hybrid": {
                 "timings_ms": timings_ms,
@@ -794,7 +1350,6 @@ async def _retrieve_and_rerank(
 
     pipeline_runner = _pipeline_runner_for_language(state, language)
     search_query_text = query_text
-    query_analysis: dict[str, Any] | None = None
     vespa_payload: dict[str, Any] | None = None
     rerank_cfg = state.rag_config.search.rerank
     first_stage_hits = hits
@@ -894,6 +1449,71 @@ def _parse_hits(
         relevance = child.get("relevance")
         parsed.append((fields, relevance))
     return parsed
+
+
+def _normalize_source_refs(source_refs: list[str] | None) -> list[str]:
+    """Deduplicate non-empty ``source_ref`` values preserving order."""
+    if not source_refs:
+        return []
+    seen: set[str] = set()
+    out: list[str] = []
+    for raw in source_refs:
+        ref = str(raw or "").strip()
+        if not ref or ref in seen:
+            continue
+        seen.add(ref)
+        out.append(ref)
+    return out
+
+
+def _fields_source_ref(fields: dict[str, Any]) -> str:
+    """Best-effort source_ref from a Vespa hit fields dict."""
+    return str(
+        fields.get("source_ref")
+        or fields.get("source_doc_id")
+        or fields.get("doc_ref")
+        or fields.get("parent_doc_id")
+        or ""
+    ).strip()
+
+
+def _filter_hits_by_source_refs(
+    parsed_hits: list[tuple[dict[str, Any], float | None]],
+    source_refs: list[str] | None,
+) -> list[tuple[dict[str, Any], float | None]]:
+    """Keep only hits whose source_ref is in the allowed basket set."""
+    allowed = set(_normalize_source_refs(source_refs))
+    if not allowed:
+        return parsed_hits
+    filtered: list[tuple[dict[str, Any], float | None]] = []
+    for fields, relevance in parsed_hits:
+        ref = _fields_source_ref(fields)
+        if not ref:
+            continue
+        if ref in allowed or any(
+            ref.startswith(f"{prefix}#") or ref.startswith(f"{prefix}/")
+            for prefix in allowed
+        ):
+            filtered.append((fields, relevance))
+    return filtered
+
+
+def _resolve_search_mode_for_refs(
+    search_mode: str | None,
+    source_refs: list[str] | None,
+) -> str | None:
+    """Force user-arm retrieval when restricting to workspace source_refs."""
+    if _normalize_source_refs(source_refs):
+        return "user"
+    return search_mode
+
+
+def _retrieve_hits_budget(hits: int, source_refs: list[str] | None) -> int:
+    """Over-fetch when post-filtering by source_refs so enough evidence remains."""
+    refs = _normalize_source_refs(source_refs)
+    if not refs:
+        return hits
+    return min(100, max(hits, len(refs) * 8, 40))
 
 
 def _load_pipeline_configuration() -> PipelineConfiguration:
@@ -1095,6 +1715,164 @@ async def metrics() -> Response:
     )
 
 
+@app.get("/documents/analyzed")
+async def get_analyzed_document(
+    source_ref: str,
+    analyzed_documents_path: str | None = None,
+) -> dict[str, Any]:
+    """Return one analyzed ingest document by ``source_ref``."""
+    payload = _ingest_store_parent(
+        source_ref,
+        analyzed_documents_path=analyzed_documents_path,
+    )
+    if not payload:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No analyzed document found for source_ref={source_ref}",
+        )
+    return payload
+
+
+@app.post("/business-ontology/parse")
+async def parse_business_ontology_file(
+    business_ontology: UploadFile = File(
+        ...,
+        description="business_ontology.yaml (or JSON) to parse",
+    ),
+) -> dict[str, Any]:
+    """Parse an uploaded business ontology file into the concepts payload.
+
+    Used by My-files basket brief / index so the same YAML can be passed as
+    ``business_ontology`` on ``/search``, ``/rag/query``, and workspace index.
+    """
+    merged = await _parse_analyze_business_ontology_file(business_ontology)
+    if merged is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Empty or invalid business_ontology file",
+        )
+    concepts = merged.get("concepts") if isinstance(merged, dict) else None
+    return {
+        "business_ontology": merged,
+        "concept_count": len(concepts) if isinstance(concepts, list) else 0,
+        "filename": getattr(business_ontology, "filename", None),
+    }
+
+
+@app.post("/documents/analyze")
+async def analyze_document(
+    file: UploadFile = File(..., description="Document bytes to analyze"),
+    language: str = Form(default="en"),
+    datatype: str = Form(
+        default="raw",
+        description="Converter datatype (default: raw UTF-8 text)",
+    ),
+    business_ontology: UploadFile | None = File(
+        default=None,
+        description=(
+            "Optional business_ontology.yaml (or JSON) file to apply "
+            "during analysis"
+        ),
+    ),
+) -> dict[str, Any]:
+    """Run converter + NLP pipeline on an uploaded file; return analyzed JSON.
+
+    Does **not** index into Vespa. Default ``datatype=raw`` uses
+    :class:`~thot.tasks.converters.RawTextConverter.RawTextConverter`.
+
+    Optionally upload a ``business_ontology.yaml`` as multipart field
+    ``business_ontology`` to annotate matched concepts onto the result.
+    """
+    state: AppState = app.state.rag
+    runner = _pipeline_runner_for_language(state, language)
+    if runner is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Pipeline runners not initialized",
+        )
+
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="Empty file")
+    filename = file.filename or "upload.txt"
+    correlation_id = current_correlation_id() or new_action_id()
+    resolved_datatype = (datatype or "raw").strip().lower() or "raw"
+    bo_payload = await _parse_analyze_business_ontology_file(business_ontology)
+
+    def _run() -> dict[str, Any]:
+        from thot.tools.ingest.worker import run_pipeline_on_bytes
+        from thot.tools.search.business_ontology import (
+            annotate_document_with_business_ontology,
+        )
+
+        analyzed = run_pipeline_on_bytes(
+            runner,
+            content,
+            filename,
+            correlation_id,
+            datatype=resolved_datatype,
+            document_extras={
+                "source": f"upload://{correlation_id}/{filename}",
+                "source_doc_id": f"upload://{correlation_id}/{filename}",
+            },
+        )
+        if bo_payload:
+            analyzed = annotate_document_with_business_ontology(
+                analyzed, bo_payload
+            )
+            analyzed["business_ontology_applied"] = {
+                "filename": getattr(business_ontology, "filename", None),
+                "concept_count": len(bo_payload.get("concepts") or []),
+            }
+        return analyzed
+
+    try:
+        return await asyncio.to_thread(_run)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:  # noqa: BLE001
+        LOGGER.exception("Document analyze failed for %s", filename)
+        raise HTTPException(
+            status_code=502,
+            detail=f"Analyze failed: {exc}",
+        ) from exc
+
+
+async def _parse_analyze_business_ontology_file(
+    business_ontology: UploadFile | None,
+) -> dict[str, Any] | None:
+    """Parse an uploaded ``business_ontology.yaml`` / JSON multipart file."""
+    import yaml
+
+    from thot.tools.search.business_ontology import (
+        merge_business_ontology_payloads,
+    )
+
+    if business_ontology is None:
+        return None
+    raw_bytes = await business_ontology.read()
+    if not raw_bytes:
+        return None
+    text = raw_bytes.decode("utf-8", errors="replace")
+    try:
+        parsed = yaml.safe_load(text)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid business_ontology file: {exc}",
+        ) from exc
+    merged = merge_business_ontology_payloads(parsed)
+    if merged is None:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "business_ontology file must contain a concepts list "
+                "(YAML/JSON like business_ontology.yaml)"
+            ),
+        )
+    return merged
+
+
 def _extract_ranking_profile(
     vespa_payload: Any,
     query_analysis: Any,
@@ -1124,9 +1902,7 @@ def _build_search_chunks(
     title_by_chunk = {
         str(fields.get("chunk_id") or ""): (
             str(
-                fields.get("title")
-                or fields.get("parent_title")
-                or ""
+                fields.get("title") or fields.get("parent_title") or ""
             ).strip()
         )
         for fields, _ in parsed_hits
@@ -1150,6 +1926,8 @@ def _assemble_search_response(
     parsed_hits: list[tuple[dict[str, Any], float | None]],
     ranking_profile: str | None,
     ontology: FusedOntology,
+    query_ontology: FusedOntology | None = None,
+    merged_ontology: FusedOntology | None = None,
     timings: SearchTimings | None = None,
 ) -> SearchResponse:
     """Aggregate chunks into documents and build SearchResponse."""
@@ -1180,6 +1958,8 @@ def _assemble_search_response(
         vespa_hits=len(parsed_hits),
         ranking_profile=ranking_profile,
         ontology=ontology,
+        query_ontology=query_ontology,
+        merged_ontology=merged_ontology,
         timings=timings,
     )
 
@@ -1208,6 +1988,16 @@ async def search(
     user_space = resolve_vespa_user_space(authorization)
     query_text = request.query.strip()
     request_started = time.perf_counter()
+    source_refs = _normalize_source_refs(request.source_refs)
+    search_mode = _resolve_search_mode_for_refs(
+        request.search_mode, source_refs
+    )
+    retrieve_hits = _retrieve_hits_budget(request.hits, source_refs)
+    business_ontology_payload = _resolve_request_business_ontology(
+        state,
+        business_ontology=request.business_ontology,
+        business_ontology_dataset=request.business_ontology_dataset,
+    )
     try:
         (
             search_response,
@@ -1218,12 +2008,28 @@ async def search(
             state,
             query_text=query_text,
             language=request.language,
-            hits=request.hits,
+            hits=retrieve_hits,
             user_space=user_space,
-            business_ontology=request.business_ontology,
+            business_ontology=business_ontology_payload,
+            search_mode=search_mode,
         )
-        parsed_hits = _parse_hits(search_response)
-        retrieved_chunks, rdf_payloads = await _enrich_hits(state, parsed_hits)
+        parsed_hits = _filter_hits_by_source_refs(
+            _parse_hits(search_response),
+            source_refs,
+        )[: request.hits]
+        retrieved_chunks, rdf_payloads = await _enrich_hits(
+            state,
+            parsed_hits,
+            analyzed_documents_path=request.analyzed_documents_path,
+        )
+        if source_refs:
+            rdf_payloads = _merge_rdf_payload_lists(
+                rdf_payloads,
+                _collect_source_ref_rdf_payloads(
+                    source_refs,
+                    analyzed_documents_path=request.analyzed_documents_path,
+                ),
+            )
     except Exception as error:
         LOGGER.exception("Search failed")
         raise HTTPException(
@@ -1233,18 +2039,56 @@ async def search(
     search_chunks = _build_search_chunks(retrieved_chunks, parsed_hits)
     ranking_profile = _extract_ranking_profile(vespa_payload, query_analysis)
 
-    hmi_ontology = build_hmi_ontology(
-        rdf_payloads,
-        [chunk.chunk_id for chunk in retrieved_chunks],
-        chunk_texts={
-            chunk.chunk_id: chunk.text_raw for chunk in retrieved_chunks
-        },
-        document_ids=[chunk.parent_doc_id for chunk in retrieved_chunks],
-        max_entities=state.rag_config.ontology.max_entities,
-        max_keywords=state.rag_config.ontology.max_keywords,
-        min_keyword_length=state.rag_config.ontology.min_keyword_length,
+    # Global = all retrieved parent/chunk document ontologies (not full BO dump).
+    ontology = _fuse_response_ontology(
+        state,
+        rdf_payloads=rdf_payloads,
+        retrieved_chunks=retrieved_chunks,
+        business_ontology_payload=business_ontology_payload,
+        ontology_json_ld=request.ontology_json_ld,
+        document_ids=source_refs or None,
+        include_full_business_ontology=False,
+        analyzed_documents_path=request.analyzed_documents_path,
     )
-    ontology = FusedOntology.model_validate(hmi_ontology)
+    query_ontology = _build_query_ontology(
+        state,
+        query_text=query_text,
+        language=request.language,
+        query_analysis=(
+            query_analysis if isinstance(query_analysis, dict) else None
+        ),
+        business_ontology_payload=business_ontology_payload,
+    )
+    query_ld = (query_ontology.json_ld or "").strip()
+    merged_docs = list(rdf_payloads)
+    if query_ld and query_ld != "[]":
+        merged_docs.append(query_ld)
+    extra_ld = (request.ontology_json_ld or "").strip()
+    if extra_ld:
+        merged_docs.append(extra_ld)
+    merged_ontology = _fuse_response_ontology(
+        state,
+        rdf_payloads=merged_docs,
+        retrieved_chunks=retrieved_chunks,
+        ontology_json_ld=None,
+        document_ids=(source_refs or []) + ["query://search"],
+        include_full_business_ontology=False,
+        analyzed_documents_path=request.analyzed_documents_path,
+    )
+    ontology = _attach_proposed_queries(
+        ontology,
+        query=query_text,
+        query_analysis=(
+            query_analysis if isinstance(query_analysis, dict) else None
+        ),
+    )
+    merged_ontology = _attach_proposed_queries(
+        merged_ontology,
+        query=query_text,
+        query_analysis=(
+            query_analysis if isinstance(query_analysis, dict) else None
+        ),
+    )
     dual_timings = None
     if isinstance(query_analysis, dict):
         dual = query_analysis.get("dual_hybrid") or {}
@@ -1260,6 +2104,8 @@ async def search(
         parsed_hits=parsed_hits,
         ranking_profile=ranking_profile,
         ontology=ontology,
+        query_ontology=query_ontology,
+        merged_ontology=merged_ontology,
         timings=timings,
     )
 
@@ -1289,14 +2135,26 @@ async def ontology_reasoner_query(
     """Query the fused ontology returned by ``/search`` or ``/rag/query``.
 
     Pass the previous response's ``ontology.json_ld`` and choose an operation
-    (SPARQL, subclasses, instances, types, consistency, …). Uses OWLAPY
-    SyncReasoner when installed (``uv sync --extra owl``); otherwise rdflib.
+    (SPARQL, subclasses, instances, types, consistency, expression, …).
+    Uses the single pure-Python reasoner. Optionally re-merge
+    ``business_ontology_dataset`` so follow-up queries see the same BO.
 
     Example:
         >>> import inspect
         >>> inspect.iscoroutinefunction(ontology_reasoner_query)
         True
     """
+    state: AppState = app.state.rag
+    business_ontology_payload = _resolve_request_business_ontology(
+        state,
+        business_ontology=request.business_ontology,
+        business_ontology_dataset=request.business_ontology_dataset,
+    )
+    extra_json_ld_raw = business_ontology_to_json_ld(business_ontology_payload)
+    extra_json_ld: str | None = (
+        None if extra_json_ld_raw == "[]" else extra_json_ld_raw
+    )
+
     try:
         payload = query_merged_ontology(
             request.json_ld,
@@ -1304,10 +2162,11 @@ async def ontology_reasoner_query(
             class_iri=request.class_iri,
             individual_iri=request.individual_iri,
             sparql=request.sparql,
+            expression=request.expression,
             reasoner=request.reasoner,
             direct=request.direct,
             limit=request.limit,
-            prefer_owlapy=request.prefer_owlapy,
+            extra_json_ld=extra_json_ld,
         )
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
@@ -1326,11 +2185,15 @@ async def ontology_reasoner_query(
         count=int(payload.get("count") or len(payload.get("results") or [])),
         consistent=payload.get("consistent"),
         triple_count=int(payload.get("triple_count") or 0),
-        owlapy_available=bool(
-            payload.get("owlapy_available", owlapy_available())
-        ),
         note=payload.get("note"),
         json_ld=payload.get("json_ld"),
+        expression=request.expression
+        or (
+            str(payload.get("expression"))
+            if payload.get("expression")
+            else None
+        ),
+        sparql=(str(payload.get("sparql")) if payload.get("sparql") else None),
     )
 
 
@@ -1394,6 +2257,7 @@ def _build_rag_prompt_bundle(
     focus_query_text: str,
     query_analysis_context: str,
     svo_match_query: str,
+    business_ontology_payload: dict[str, Any] | None = None,
 ) -> tuple[
     str,
     str,
@@ -1424,18 +2288,22 @@ def _build_rag_prompt_bundle(
             svo_match_query,
             max_triples=_DEFAULT_MAX_TRIPLES_FOR_PROMPT,
         )
-    hmi_ontology = build_hmi_ontology(
-        rdf_payloads,
-        [chunk.chunk_id for chunk in retrieved_chunks],
-        chunk_texts={
-            chunk.chunk_id: chunk.text_raw for chunk in retrieved_chunks
-        },
-        document_ids=[chunk.parent_doc_id for chunk in retrieved_chunks],
-        max_entities=state.rag_config.ontology.max_entities,
-        max_keywords=state.rag_config.ontology.max_keywords,
-        min_keyword_length=state.rag_config.ontology.min_keyword_length,
+    ontology = _fuse_response_ontology(
+        state,
+        rdf_payloads=rdf_payloads,
+        retrieved_chunks=retrieved_chunks,
+        business_ontology_payload=business_ontology_payload,
+        ontology_json_ld=request.ontology_json_ld,
+        document_ids=_normalize_source_refs(request.source_refs) or None,
+        analyzed_documents_path=request.analyzed_documents_path,
     )
-    ontology = FusedOntology.model_validate(hmi_ontology)
+    ontology = _attach_proposed_queries(
+        ontology,
+        query=query_text,
+        query_analysis=(
+            query_analysis if isinstance(query_analysis, dict) else None
+        ),
+    )
 
     prompt_cfg = _language_prompt_cfg(state.prompts, request.language)
     unavailable_answer = _unavailable_answer(prompt_cfg, request.language)
@@ -1471,7 +2339,19 @@ def _build_rag_prompt_bundle(
         max_passages=passage_settings.count,
         context_sentences=passage_settings.context_sentences,
         max_chars_per_passage=passage_settings.max_chars,
+        analysis=query_analysis,
     )
+    # When SVO ontology context is empty but we have passages, inject chunk
+    # excerpts so "what happened at X" questions still get narrative evidence.
+    if svo_only_prompt and prompt_chunks:
+        no_chunks_message = _no_chunks_message(prompt_cfg)
+        if not chunk_excerpts.strip() or chunk_excerpts == no_chunks_message:
+            chunk_excerpts = _format_chunk_excerpts(
+                prompt_chunks,
+                empty_message=no_chunks_message,
+                max_chars_per_chunk=state.rag_config.prompt.max_chars_per_chunk,
+                max_chunks=state.rag_config.prompt.max_chunks_for_prompt,
+            )
     generation_guidance = format_generation_guidance(
         query_text,
         query_analysis,
@@ -1511,8 +2391,45 @@ def _build_rag_prompt_bundle(
     )
 
 
+def _resolve_highlight_labels(
+    *,
+    state: AppState,
+    ontology: FusedOntology,
+    query_text: str,
+    retrieved_chunks: list[RetrievedChunk],
+    language: str,
+    query_analysis: dict[str, Any] | None = None,
+) -> tuple[list[str], list[str], list[str]]:
+    """Build entity / keyword / query highlight labels with NLP POS filtering."""
+    from thot.tools.search.query_analyzer import (
+        content_terms_from_morphosyntax,
+    )
+
+    analysis = query_analysis if isinstance(query_analysis, dict) else {}
+    morph = analysis.get("morphosyntax")
+    morph_list = morph if isinstance(morph, list) else None
+    content_terms = (
+        content_terms_from_morphosyntax(morph_list) if morph_list else set()
+    )
+    runner = _pipeline_runner_for_language(state, language)
+    entity_labels, keyword_labels = extract_highlight_labels(
+        ontology,
+        morphosyntax=morph_list,
+        content_terms=content_terms or None,
+        pipeline_runner=runner,
+    )
+    query_term_labels = query_highlight_terms(
+        query_text,
+        retrieved_chunks,
+        content_terms=content_terms or None,
+        morphosyntax=morph_list,
+    )
+    return entity_labels, keyword_labels, query_term_labels
+
+
 def _build_rag_unavailable_response(
     *,
+    state: AppState,
     query_text: str,
     request: QueryRequest,
     retrieved_chunks: list[RetrievedChunk],
@@ -1525,10 +2442,19 @@ def _build_rag_unavailable_response(
     vespa_query_json: str,
     step_started: float,
     request_started: float,
+    query_analysis: dict[str, Any] | None = None,
 ) -> QueryResponse:
     """Return the standard unavailable response when retrieval is empty."""
-    entity_labels, keyword_labels = extract_highlight_labels(ontology)
-    query_term_labels = query_highlight_terms(query_text, retrieved_chunks)
+    entity_labels, keyword_labels, query_term_labels = (
+        _resolve_highlight_labels(
+            state=state,
+            ontology=ontology,
+            query_text=query_text,
+            retrieved_chunks=retrieved_chunks,
+            language=request.language,
+            query_analysis=query_analysis,
+        )
+    )
     report_markdown = assemble_report_markdown(
         query=query_text,
         language=request.language,
@@ -1576,6 +2502,8 @@ async def _generate_rag_answer(
     unavailable_answer: str,
     focus_passages: str,
     chunk_excerpts: str,
+    language: str = "en",
+    query_analysis: dict[str, Any] | None = None,
 ) -> tuple[str, str, bool]:
     """Run LLM generation and apply chunk-evidence fallback when needed."""
     if state.llm is None:
@@ -1597,6 +2525,20 @@ async def _generate_rag_answer(
         raw_generation,
         unavailable_answer=unavailable_answer,
     )
+    analysis = query_analysis if isinstance(query_analysis, dict) else {}
+    query_content_terms: set[str] = set()
+    for key in ("lemmas", "search_terms"):
+        for term in analysis.get(key) or []:
+            cleaned = str(term).strip().lower()
+            if cleaned:
+                query_content_terms.add(cleaned)
+    for entity in analysis.get("ner_entities") or []:
+        if isinstance(entity, dict):
+            cleaned = str(entity.get("text") or "").strip().lower()
+        else:
+            cleaned = str(entity or "").strip().lower()
+        if cleaned:
+            query_content_terms.add(cleaned)
     short_answer, detailed_report, used_chunk_evidence = (
         apply_chunk_evidence_fallback(
             query_text=query_text,
@@ -1604,6 +2546,9 @@ async def _generate_rag_answer(
             detailed_report=detailed_report,
             chunks=prompt_chunks,
             unavailable_answer=unavailable_answer,
+            language=language,
+            pipeline_runner=_pipeline_runner_for_language(state, language),
+            query_content_terms=query_content_terms or None,
         )
     )
     if not detailed_report.strip():
@@ -1616,6 +2561,7 @@ async def _generate_rag_answer(
 
 def _build_rag_success_response(
     *,
+    state: AppState,
     query_text: str,
     request: QueryRequest,
     retrieved_chunks: list[RetrievedChunk],
@@ -1627,10 +2573,19 @@ def _build_rag_success_response(
     short_answer: str,
     detailed_report: str,
     used_chunk_evidence: bool,
+    query_analysis: dict[str, Any] | None = None,
 ) -> QueryResponse:
     """Build the successful ``QueryResponse`` after generation."""
-    entity_labels, keyword_labels = extract_highlight_labels(ontology)
-    query_term_labels = query_highlight_terms(query_text, retrieved_chunks)
+    entity_labels, keyword_labels, query_term_labels = (
+        _resolve_highlight_labels(
+            state=state,
+            ontology=ontology,
+            query_text=query_text,
+            retrieved_chunks=retrieved_chunks,
+            language=request.language,
+            query_analysis=query_analysis,
+        )
+    )
     report_markdown = assemble_report_markdown(
         query=query_text,
         language=request.language,
@@ -1683,6 +2638,16 @@ async def rag_query(
     user_space = resolve_vespa_user_space(authorization)
     query_text = request.query.strip()
     request_started = time.perf_counter()
+    source_refs = _normalize_source_refs(request.source_refs)
+    search_mode = _resolve_search_mode_for_refs(
+        request.search_mode, source_refs
+    )
+    retrieve_hits = _retrieve_hits_budget(request.hits, source_refs)
+    business_ontology_payload = _resolve_request_business_ontology(
+        state,
+        business_ontology=request.business_ontology,
+        business_ontology_dataset=request.business_ontology_dataset,
+    )
 
     step_started = time.perf_counter()
     try:
@@ -1695,9 +2660,10 @@ async def rag_query(
             state,
             query_text=query_text,
             language=request.language,
-            hits=request.hits,
+            hits=retrieve_hits,
             user_space=user_space,
-            business_ontology=request.business_ontology,
+            business_ontology=business_ontology_payload,
+            search_mode=search_mode,
         )
     except Exception as error:
         LOGGER.exception("Query generation failed")
@@ -1732,8 +2698,23 @@ async def rag_query(
 
     step_started = time.perf_counter()
     try:
-        parsed_hits = _parse_hits(search_response)
-        retrieved_chunks, rdf_payloads = await _enrich_hits(state, parsed_hits)
+        parsed_hits = _filter_hits_by_source_refs(
+            _parse_hits(search_response),
+            source_refs,
+        )[: request.hits]
+        retrieved_chunks, rdf_payloads = await _enrich_hits(
+            state,
+            parsed_hits,
+            analyzed_documents_path=request.analyzed_documents_path,
+        )
+        if source_refs:
+            rdf_payloads = _merge_rdf_payload_lists(
+                rdf_payloads,
+                _collect_source_ref_rdf_payloads(
+                    source_refs,
+                    analyzed_documents_path=request.analyzed_documents_path,
+                ),
+            )
     except Exception as error:
         LOGGER.exception("Retrieval failed")
         raise HTTPException(
@@ -1771,10 +2752,12 @@ async def rag_query(
         focus_query_text=focus_query_text,
         query_analysis_context=query_analysis_context,
         svo_match_query=svo_match_query,
+        business_ontology_payload=business_ontology_payload,
     )
 
     if not retrieved_chunks:
         return _build_rag_unavailable_response(
+            state=state,
             query_text=query_text,
             request=request,
             retrieved_chunks=retrieved_chunks,
@@ -1787,6 +2770,9 @@ async def rag_query(
             vespa_query_json=vespa_query_json,
             step_started=step_started,
             request_started=request_started,
+            query_analysis=(
+                query_analysis if isinstance(query_analysis, dict) else None
+            ),
         )
 
     (
@@ -1802,6 +2788,8 @@ async def rag_query(
         unavailable_answer=unavailable_answer,
         focus_passages=focus_passages,
         chunk_excerpts=chunk_excerpts,
+        language=request.language,
+        query_analysis=query_analysis,
     )
 
     _log_rag_step(
@@ -1813,6 +2801,7 @@ async def rag_query(
     _log_rag_step("rag-query-total", request_started, query=repr(query_text))
 
     return _build_rag_success_response(
+        state=state,
         query_text=query_text,
         request=request,
         retrieved_chunks=retrieved_chunks,
@@ -1824,6 +2813,9 @@ async def rag_query(
         short_answer=short_answer,
         detailed_report=detailed_report,
         used_chunk_evidence=used_chunk_evidence,
+        query_analysis=(
+            query_analysis if isinstance(query_analysis, dict) else None
+        ),
     )
 
 
@@ -1838,6 +2830,7 @@ def main() -> None:
     import uvicorn
 
     from thot.core.StructuredLogging import configure_text_logging
+
     configure_text_logging(level=logging.INFO, force=True)
     uvicorn.run(
         "thot.tools.search.app:app",

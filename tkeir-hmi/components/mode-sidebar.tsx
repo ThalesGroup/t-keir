@@ -1,11 +1,12 @@
 "use client";
 
 import {
-  Bot,
   ChevronLeft,
   ChevronRight,
-  FileText,
+  FolderOpen,
+  Newspaper,
   Search,
+  Upload,
 } from "lucide-react";
 
 import {
@@ -18,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import type { WorkspaceMode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const MODES: Array<{
+const BASE_MODES: Array<{
   id: WorkspaceMode;
   title: string;
   blurb: string;
@@ -27,30 +28,43 @@ const MODES: Array<{
   {
     id: "search",
     title: "Search",
-    blurb: "Simple retrieval — documents and chunks, Google-style results.",
+    blurb:
+      "Hybrid retrieval with a grounded structured answer, evidence chunks, and ontology navigator.",
     icon: Search,
   },
   {
-    id: "rag",
-    title: "RAG",
-    blurb: "Ask a question and generate a grounded markdown report.",
-    icon: FileText,
+    id: "reporter",
+    title: "Reporter",
+    blurb:
+      "Retrieve data, generate an editable persona wiki (OKF + ontology), save to My files or send to commander.",
+    icon: Newspaper,
   },
   {
-    id: "agent",
-    title: "Agent",
+    id: "files",
+    title: "My files",
     blurb:
-      "Dialog with researcher / workflows to explore data and compose a custom report.",
-    icon: Bot,
+      "Import and manage your private documents (indexed to your streaming user space).",
+    icon: FolderOpen,
   },
 ];
+
+const INGEST_MODE = {
+  id: "ingest" as const,
+  title: "Ingest",
+  blurb:
+    "Queue global corpus ingest (JSON records → NLP → Vespa). Visible to c2-admin.",
+  icon: Upload,
+};
 
 interface ModeSidebarProps {
   mode: WorkspaceMode;
   onModeChange: (mode: WorkspaceMode) => void;
   collapsed: boolean;
   onCollapsedChange: (collapsed: boolean) => void;
+  /** Disable Reporter when agent service is down (phases 2–3 need it). */
   agentAvailable: boolean;
+  /** Show Ingest next to Search/RAG/Reporter/My files (admin roles). */
+  showIngest?: boolean;
 }
 
 export function ModeSidebar({
@@ -59,7 +73,10 @@ export function ModeSidebar({
   collapsed,
   onCollapsedChange,
   agentAvailable,
+  showIngest = false,
 }: ModeSidebarProps) {
+  const modes = showIngest ? [...BASE_MODES, INGEST_MODE] : BASE_MODES;
+
   return (
     <aside
       className={cn(
@@ -95,9 +112,9 @@ export function ModeSidebar({
 
       {collapsed ? (
         <nav className="flex flex-col items-center gap-1 p-2" aria-label="Modes">
-          {MODES.map((item) => {
+          {modes.map((item) => {
             const Icon = item.icon;
-            const disabled = item.id === "agent" && !agentAvailable;
+            const disabled = false;
             return (
               <Button
                 key={item.id}
@@ -106,11 +123,7 @@ export function ModeSidebar({
                 size="icon"
                 className="h-10 w-10"
                 disabled={disabled}
-                title={
-                  disabled
-                    ? "Agent service unavailable (make agent)"
-                    : item.title
-                }
+                title={item.title}
                 aria-label={item.title}
                 aria-current={mode === item.id ? "page" : undefined}
                 onClick={() => onModeChange(item.id)}
@@ -126,27 +139,21 @@ export function ModeSidebar({
           collapsible
           value={mode}
           onValueChange={(value) => {
-            if (value === "search" || value === "rag" || value === "agent") {
-              if (value === "agent" && !agentAvailable) {
-                return;
-              }
-              onModeChange(value);
+            const allowed = new Set(modes.map((m) => m.id));
+            if (!allowed.has(value as WorkspaceMode)) {
+              return;
             }
+            onModeChange(value as WorkspaceMode);
           }}
           className="flex-1 overflow-y-auto px-2 py-1"
         >
-          {MODES.map((item) => {
+          {modes.map((item) => {
             const Icon = item.icon;
-            const disabled = item.id === "agent" && !agentAvailable;
             return (
               <AccordionItem
                 key={item.id}
                 value={item.id}
-                disabled={disabled}
-                className={cn(
-                  "border-b-0",
-                  disabled && "opacity-50",
-                )}
+                className="border-b-0"
               >
                 <AccordionTrigger
                   className={cn(
@@ -161,9 +168,9 @@ export function ModeSidebar({
                 </AccordionTrigger>
                 <AccordionContent className="px-2 pb-3 text-xs leading-relaxed text-muted-foreground">
                   {item.blurb}
-                  {disabled && (
-                    <p className="mt-2 text-destructive">
-                      Start the agent service with{" "}
+                  {item.id === "reporter" && !agentAvailable && (
+                    <p className="mt-2 text-amber-700 dark:text-amber-400">
+                      Wiki/report phases need{" "}
                       <code className="rounded bg-muted px-1">make agent</code>.
                     </p>
                   )}

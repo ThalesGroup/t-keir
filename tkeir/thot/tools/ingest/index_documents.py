@@ -50,7 +50,9 @@ async def index_directory(
     del max_workers  # sequential: FlagEmbedding + Vespa
     paths = sorted(input_dir.glob(pattern))
     if not paths:
-        LOGGER.warning("No pipeline files found in %s (%s)", input_dir, pattern)
+        LOGGER.warning(
+            "No pipeline files found in %s (%s)", input_dir, pattern
+        )
         return 0, 0
 
     document_count = 0
@@ -86,9 +88,7 @@ async def _async_main(args: argparse.Namespace) -> int:
 
     async with VespaClient() as vespa:
         if not await vespa.health():
-            raise SystemExit(
-                "Vespa is not ready. Run: make bootstrap"
-            )
+            raise SystemExit("Vespa is not ready. Run: make bootstrap")
         documents, passages = await index_directory(
             input_dir,
             pattern=args.pattern,

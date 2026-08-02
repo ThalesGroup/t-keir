@@ -47,6 +47,7 @@ def enrich_first_stage_runs(
     if not ontology_payload or not (ontology_payload.get("concepts") or []):
         return first_stage
 
+    from thot.tools.eval.hybrid_retrieve import document_text
     from thot.tools.search.business_ontology import business_ontology_from_data
     from thot.tools.search.chunk_ontology import match_external_concepts
     from thot.tools.search.ontology_scorer import (
@@ -59,11 +60,12 @@ def enrich_first_stage_runs(
         _nlp_seed_expansion_applies,
         _nlp_seed_labels,
     )
-    from thot.tools.search.query_expander import ExpansionWeights, QueryExpander
+    from thot.tools.search.query_expander import (
+        ExpansionWeights,
+        QueryExpander,
+    )
     from thot.tools.search.rag_config import load_rag_config
     from thot.tools.search.text_normalizer import normalizer_for_language
-
-    from thot.tools.eval.hybrid_retrieve import document_text
 
     rag = load_rag_config()
     answer_gen = rag.answer_generation
@@ -76,9 +78,7 @@ def enrich_first_stage_runs(
     dual = rag.dual_hybrid
     if not dual.business_ontology.search_enabled:
         return first_stage
-    if not (
-        dual.query_expansion.enabled or dual.ontology_scoring.enabled
-    ):
+    if not (dual.query_expansion.enabled or dual.ontology_scoring.enabled):
         return first_stage
 
     nlp_cfg = dual.query_expansion.nlp_seed_expansion
@@ -180,7 +180,9 @@ def enrich_first_stage_runs(
                 ),
             ),
         )
-        weight = float(getattr(dual.ontology_scoring, "rescore_weight", 0.13) or 0.13)
+        weight = float(
+            getattr(dual.ontology_scoring, "rescore_weight", 0.13) or 0.13
+        )
         rescorer = OntologyRescorer(scorer, weight=weight)
 
     out = {qid: dict(hits) for qid, hits in first_stage.items()}
@@ -261,24 +263,21 @@ def _analyze_query_nlp(
         )
         from thot.tools.search.rag_config import load_rag_config
 
-        processed = run_linguistic_pipeline(
-            runner, query, language=language
-        )
+        processed = run_linguistic_pipeline(runner, query, language=language)
         analysis = analyze_query_document(
             processed,
             query,
             language=language,
             config=load_rag_config().search,
         )
-        terms = [t for t in (analysis.search_terms or []) if t][:48]
+        terms = [t for t in analysis.search_terms or [] if t][:48]
         payload = {
             "raw_query": analysis.raw_query,
             "search_terms": list(analysis.search_terms or []),
             "lemmas": list(analysis.lemmas or []),
             "keywords": list(analysis.keywords or []),
             "ner_entities": [
-                getattr(e, "text", str(e))
-                for e in (analysis.ner_entities or [])
+                getattr(e, "text", str(e)) for e in analysis.ner_entities or []
             ],
             "language": analysis.language,
         }

@@ -25,6 +25,7 @@ from thot.tools.search.ontology_utils import (
     highlight_query_terms_in_chunks,
     prioritize_chunks_by_query_match,
 )
+from thot.tools.search.query_analyzer import content_terms_for_grounding
 from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
 
 if TYPE_CHECKING:
@@ -69,6 +70,8 @@ def is_unavailable_short_answer(
 def chunks_matching_query(
     chunks: list[RetrievedChunk],
     query_text: str,
+    *,
+    content_terms: set[str] | list[str] | None = None,
 ) -> list[RetrievedChunk]:
     """Return retrieved chunks whose body contains at least one query term.
 
@@ -85,12 +88,16 @@ def chunks_matching_query(
     return [
         chunk
         for chunk in chunks
-        if chunk_text_matches_query(query_text, chunk.text_raw)
+        if chunk_text_matches_query(
+            query_text,
+            chunk.text_raw,
+            content_terms=content_terms,
+        )
     ]
 
 
 def _answer_terms(short_answer: str) -> set[str]:
-    """Extract salient tokens from a short answer for chunk cross-checking.
+    """Extract salient surface tokens from a short answer (no language lists).
 
     Example:
         >>> _answer_terms('George Harrison') == {'george', 'harrison'}
@@ -100,11 +107,16 @@ def _answer_terms(short_answer: str) -> set[str]:
     for token in re.findall(
         r"[A-Za-z0-9][A-Za-z0-9'._-]{2,}", short_answer.lower()
     ):
-        terms.add(token)
+        terms.add(token.strip("._-"))
     for word in re.findall(r"[A-Za-z][A-Za-z'._-]+", short_answer):
         if word[0].isupper():
-            terms.add(word.lower())
-    return terms
+            terms.add(word.lower().strip("._-"))
+    return {term for term in terms if term}
+
+
+def _year_tokens(text: str) -> set[str]:
+    """Return four-digit year tokens (1500–2099) from ``text``."""
+    return set(re.findall(r"\b((?:1[5-9]|20)\d{2})\b", text or ""))
 
 
 def answer_supported_by_matching_chunks(
@@ -113,8 +125,16 @@ def answer_supported_by_matching_chunks(
     query_text: str,
     *,
     unavailable_answer: str = "",
+    language: str | None = None,
+    pipeline_runner: Any | None = None,
+    answer_morphosyntax: list[dict[str, Any]] | None = None,
+    query_morphosyntax: list[dict[str, Any]] | None = None,
+    query_content_terms: set[str] | None = None,
 ) -> bool:
-    """Return whether the answer names content present in query-matching chunks.
+    """Return whether the answer is grounded in query-matching chunks.
+
+    Content terms come from UD morphosyntax (language-agnostic POS), not from
+    language-specific stopword lists.
 
     Example:
         >>> from thot.tools.search.app import RetrievedChunk
@@ -127,38 +147,92 @@ def answer_supported_by_matching_chunks(
         ...     "George Harrison",
         ...     [chunk],
         ...     'Who liked "Something in the Way She Moves"',
+        ...     answer_morphosyntax=[
+        ...         {"text": "George", "lemma": "George", "pos": "PROPN"},
+        ...         {"text": "Harrison", "lemma": "Harrison", "pos": "PROPN"},
+        ...     ],
         ... )
         True
     """
     if is_unavailable_short_answer(short_answer, unavailable_answer):
         return False
 
-    matching = chunks_matching_query(chunks, query_text)
+    matching = chunks_matching_query(
+        chunks, query_text, content_terms=query_content_terms
+    )
     if not matching or not short_answer.strip():
         return False
 
+    corpus = "\n".join(chunk.text_raw.lower() for chunk in matching)
+    query_lower = (query_text or "").lower()
+
+    # Years in the answer must appear in passages (or already in the query).
+    for year in _year_tokens(short_answer):
+        if year not in corpus and year not in query_lower:
+            return False
+
     passage_answer = _passage_based_short_answer(query_text, matching)
     short_clean = short_answer.strip().lower()
+    # When a compact who/what extract exists (e.g. a person name), longer LLM
+    # answers that diverge must ground *every* novel content term — partial
+    # overlap with the song/title still allows "name + invented detail".
+    require_full_novel_grounding = False
     if passage_answer:
         passage_clean = passage_answer.strip().lower()
         if short_clean == passage_clean:
             return True
-        # Compact passage answers (e.g. an extracted person name) must match
-        # exactly. A longer LLM answer that merely mentions the name can still
-        # invent unsupported facts (wrong song, wrong album, etc.).
         is_compact_passage = (
             len(passage_clean.split()) <= 4
             and len(passage_answer.strip()) <= 48
         )
         if is_compact_passage:
+            require_full_novel_grounding = True
+
+    answer_content = content_terms_for_grounding(
+        short_answer,
+        morphosyntax=answer_morphosyntax,
+        language=language,
+        pipeline_runner=pipeline_runner,
+        min_length=3,
+    )
+    if query_content_terms is not None:
+        query_content = {t.lower() for t in query_content_terms}
+    else:
+        query_content = content_terms_for_grounding(
+            query_text,
+            morphosyntax=query_morphosyntax,
+            language=language,
+            pipeline_runner=pipeline_runner,
+            min_length=3,
+        )
+
+    must_ground = sorted(answer_content - query_content)
+    if must_ground:
+        grounded = sum(1 for term in must_ground if term in corpus)
+        threshold = 1.0 if require_full_novel_grounding else 0.85
+        if grounded / len(must_ground) < threshold:
+            # Soft accept only when overlap is already moderate and the answer
+            # names a distinctive query entity present in passages. Blocks
+            # near-zero overlap hallucinations (e.g. 1956 Suez Crisis).
+            distinctive = {
+                term
+                for term in query_content
+                if len(term) >= 4 and term in corpus and term in short_clean
+            }
+            if (
+                distinctive
+                and not require_full_novel_grounding
+                and grounded / len(must_ground) >= 0.5
+            ):
+                return True
             return False
-        if passage_clean in short_clean or short_clean in passage_clean:
-            return True
+        return True
 
     answer_terms = _answer_terms(short_answer)
-    if len(answer_terms) > 6:
+    if not answer_terms:
         return False
-    corpus = "\n".join(chunk.text_raw.lower() for chunk in matching)
+    if len(answer_terms) > 12:
+        return False
     return any(term in corpus for term in answer_terms)
 
 
@@ -450,12 +524,15 @@ def _passage_based_short_answer(
 def build_chunk_evidence_answer(
     query_text: str,
     chunks: list[RetrievedChunk],
+    *,
+    content_terms: set[str] | list[str] | None = None,
 ) -> tuple[str, str] | None:
     """Build a chunk-grounded answer when the LLM returned unavailable.
 
     Args:
         query_text: Original user question.
         chunks: Retrieved chunks from Vespa.
+        content_terms: Optional NLP content terms for matching (preferred).
 
     Returns:
         ``(short_answer, detailed_report)`` when query terms appear in chunks,
@@ -472,7 +549,9 @@ def build_chunk_evidence_answer(
         >>> "doc.pdf" in short
         True
     """
-    matching = chunks_matching_query(chunks, query_text)
+    matching = chunks_matching_query(
+        chunks, query_text, content_terms=content_terms
+    )
     if not matching:
         return None
 
@@ -553,10 +632,16 @@ def should_apply_chunk_evidence(
     unavailable_answer: str,
     *,
     detailed_report: str = "",
+    language: str | None = None,
+    pipeline_runner: Any | None = None,
+    answer_morphosyntax: list[dict[str, Any]] | None = None,
+    query_morphosyntax: list[dict[str, Any]] | None = None,
+    query_content_terms: set[str] | None = None,
 ) -> bool:
     """Return whether to replace the LLM answer with chunk-grounded evidence.
 
-    Uses query tokens extracted from the user question — no hardcoded word list.
+    A long DETAILED_REPORT is not a grounding signal — only passage overlap is.
+    ``detailed_report`` is kept for call-site compatibility.
 
     Example:
         >>> from thot.tools.search.app import RetrievedChunk
@@ -573,46 +658,27 @@ def should_apply_chunk_evidence(
         ... )
         True
     """
-    matching = chunks_matching_query(chunks, query_text)
+    _ = detailed_report
+    matching = chunks_matching_query(
+        chunks, query_text, content_terms=query_content_terms
+    )
     if not matching:
         return False
     if is_unavailable_short_answer(short_answer, unavailable_answer):
         return True
-
-    if detailed_report.strip() and len(detailed_report.strip()) >= 80:
-        return False
-
     if answer_supported_by_matching_chunks(
         short_answer,
         chunks,
         query_text,
         unavailable_answer=unavailable_answer,
+        language=language,
+        pipeline_runner=pipeline_runner,
+        answer_morphosyntax=answer_morphosyntax,
+        query_morphosyntax=query_morphosyntax,
+        query_content_terms=query_content_terms,
     ):
         return False
-
-    short_lower = short_answer.strip().lower()
-    if not short_lower:
-        return True
-
-    highlight_terms = highlight_query_terms_in_chunks(
-        query_text,
-        [chunk.text_raw for chunk in chunks],
-    )
-    mentions_terms = any(
-        term.lower() in short_lower for term in highlight_terms
-    )
-    if not mentions_terms:
-        return True
-
-    matching_doc_names = {
-        _format_document_name(chunk.parent_doc_id).lower()
-        for chunk in matching
-    }
-    cites_document = any(
-        name in short_lower for name in matching_doc_names if name
-    ) or any(chunk.parent_doc_id.lower() in short_lower for chunk in matching)
-
-    return not cites_document
+    return True
 
 
 def apply_chunk_evidence_fallback(
@@ -622,6 +688,11 @@ def apply_chunk_evidence_fallback(
     detailed_report: str,
     chunks: list[RetrievedChunk],
     unavailable_answer: str,
+    language: str | None = None,
+    pipeline_runner: Any | None = None,
+    answer_morphosyntax: list[dict[str, Any]] | None = None,
+    query_morphosyntax: list[dict[str, Any]] | None = None,
+    query_content_terms: set[str] | None = None,
 ) -> tuple[str, str, bool]:
     """Replace weak LLM answers when retrieved chunks contain query terms.
 
@@ -651,10 +722,19 @@ def apply_chunk_evidence_fallback(
         query_text,
         unavailable_answer,
         detailed_report=detailed_report,
+        language=language,
+        pipeline_runner=pipeline_runner,
+        answer_morphosyntax=answer_morphosyntax,
+        query_morphosyntax=query_morphosyntax,
+        query_content_terms=query_content_terms,
     ):
         return short_answer, detailed_report, False
 
-    evidence = build_chunk_evidence_answer(query_text, chunks)
+    evidence = build_chunk_evidence_answer(
+        query_text,
+        chunks,
+        content_terms=query_content_terms,
+    )
     if evidence is None:
         return short_answer, detailed_report, False
     short, detailed = evidence
@@ -664,8 +744,14 @@ def apply_chunk_evidence_fallback(
 def query_highlight_terms(
     query_text: str,
     chunks: list[RetrievedChunk],
+    *,
+    content_terms: set[str] | list[str] | None = None,
+    morphosyntax: list[dict[str, Any]] | None = None,
 ) -> list[str]:
     """Return query labels present in retrieved chunks for UI highlighting.
+
+    Closed-class POS tokens (DET, PRON, CCONJ, …) are dropped when
+    ``morphosyntax`` / ``content_terms`` from the NLP pipeline are provided.
 
     Example:
         >>> from thot.tools.search.app import RetrievedChunk
@@ -680,6 +766,8 @@ def query_highlight_terms(
     return highlight_query_terms_in_chunks(
         query_text,
         [chunk.text_raw for chunk in chunks],
+        content_terms=content_terms,
+        morphosyntax=morphosyntax,
     )
 
 
@@ -772,8 +860,15 @@ def extract_highlight_labels(
     *,
     max_entities: int = 20,
     max_keywords: int = 15,
+    morphosyntax: list[dict[str, Any]] | None = None,
+    content_terms: set[str] | list[str] | None = None,
+    pipeline_runner: Any | None = None,
 ) -> tuple[list[str], list[str]]:
     """Return the most representative entity and keyword labels for highlighting.
+
+    Single-token closed-class labels (DET / PRON / CCONJ / … such as ``and``)
+    are dropped using UD morphosyntax from the query or a light NLP pass on
+    the label itself.
 
     Example:
         >>> labels = extract_highlight_labels({
@@ -783,6 +878,12 @@ def extract_highlight_labels(
         >>> labels[0]
         ['Acme']
     """
+    from thot.tools.search.query_analyzer import (
+        content_terms_from_morphosyntax,
+        morphosyntax_for_text,
+    )
+    from thot.tools.search.query_refiner import CLOSED_CLASS_POS
+
     entities = (
         ontology.get("entities", [])
         if isinstance(ontology, dict)
@@ -793,6 +894,53 @@ def extract_highlight_labels(
         if isinstance(ontology, dict)
         else ontology.keywords
     )
+
+    allowed: set[str] = {
+        str(term).strip().lower()
+        for term in content_terms or []
+        if str(term).strip()
+    }
+    if morphosyntax:
+        allowed |= {
+            term.lower()
+            for term in content_terms_from_morphosyntax(morphosyntax)
+        }
+
+    def _keep_label(raw: str) -> bool:
+        label = raw.strip()
+        if not label:
+            return False
+        parts = [
+            part for part in re.findall(r"[A-Za-z0-9][A-Za-z0-9'._-]*", label)
+        ]
+        if not parts:
+            return False
+        # Multi-token phrases are kept (content spans).
+        if len(parts) > 1:
+            return True
+        token = parts[0]
+        key = token.lower()
+        if allowed and key in allowed:
+            return True
+        # NLP pass on the label itself (DET/PRON/CCONJ → drop).
+        label_morph = morphosyntax_for_text(
+            token,
+            pipeline_runner=pipeline_runner,
+        )
+        if label_morph:
+            pos = str((label_morph[0] or {}).get("pos") or "").upper()
+            if pos in CLOSED_CLASS_POS:
+                return False
+            return bool(content_terms_from_morphosyntax(label_morph))
+        if (
+            allowed
+            and key not in allowed
+            and token.isalpha()
+            and token.islower()
+        ):
+            # Query morphosyntax saw this surface as non-content (e.g. "and").
+            return False
+        return True
 
     ranked_entities = sorted(
         entities,
@@ -825,20 +973,24 @@ def extract_highlight_labels(
         str(
             item.get("label", "") if isinstance(item, dict) else item.label
         ).strip()
-        for item in ranked_entities[:max_entities]
-        if str(
-            item.get("label", "") if isinstance(item, dict) else item.label
-        ).strip()
-    ]
+        for item in ranked_entities
+        if _keep_label(
+            str(
+                item.get("label", "") if isinstance(item, dict) else item.label
+            )
+        )
+    ][:max_entities]
     keyword_labels = [
         str(
             item.get("label", "") if isinstance(item, dict) else item.label
         ).strip()
-        for item in ranked_keywords[:max_keywords]
-        if str(
-            item.get("label", "") if isinstance(item, dict) else item.label
-        ).strip()
-    ]
+        for item in ranked_keywords
+        if _keep_label(
+            str(
+                item.get("label", "") if isinstance(item, dict) else item.label
+            )
+        )
+    ][:max_keywords]
     return entity_labels, keyword_labels
 
 

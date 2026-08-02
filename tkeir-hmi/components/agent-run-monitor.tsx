@@ -5,6 +5,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  orderWorkflowNames,
+  resolvePersonaWorkflowPreset,
+} from "@/lib/persona-workflows";
+import { apiFetch } from "@/src/auth/useApiClient";
+import { useAuth } from "@/src/auth/AuthProvider";
 
 type RunPayload = {
   run?: {
@@ -37,10 +43,18 @@ type RunPayload = {
 };
 
 export function AgentRunMonitor() {
-  const [goal, setGoal] = useState("Profile Acme");
-  const [topic, setTopic] = useState("Acme");
-  const [workflow, setWorkflow] = useState("content_brief");
-  const [workflows, setWorkflows] = useState<string[]>(["content_brief"]);
+  const { roles, activePersonaId } = useAuth();
+  const preset = useMemo(
+    () => resolvePersonaWorkflowPreset({ roles, activePersonaId }),
+    [roles, activePersonaId],
+  );
+
+  const [goal, setGoal] = useState(preset.goal);
+  const [topic, setTopic] = useState(preset.topic);
+  const [reportForm, setReportForm] = useState(preset.reportForm);
+  const [useExistingWiki, setUseExistingWiki] = useState(false);
+  const [workflow, setWorkflow] = useState(preset.workflow);
+  const [workflows, setWorkflows] = useState<string[]>([preset.workflow]);
   const [runId, setRunId] = useState<string | null>(null);
   const [payload, setPayload] = useState<RunPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -49,22 +63,36 @@ export function AgentRunMonitor() {
   const [approvalId, setApprovalId] = useState<string | null>(null);
 
   useEffect(() => {
-    void fetch("/api/agent/agent/workflows", { cache: "no-store" })
+    setGoal(preset.goal);
+    setTopic(preset.topic);
+    setReportForm(preset.reportForm);
+    setWorkflow(preset.workflow);
+  }, [preset]);
+
+  useEffect(() => {
+    void apiFetch("/api/agent/agent/workflows", { cache: "no-store" })
       .then(async (res) => {
         if (!res.ok) {
           return;
         }
         const body = (await res.json()) as { workflows?: string[] };
         if (body.workflows?.length) {
-          setWorkflows(body.workflows);
-          setWorkflow(body.workflows[0]);
+          const ordered = orderWorkflowNames(body.workflows, preset.workflow);
+          setWorkflows(ordered);
+          if (body.workflows.includes(preset.workflow)) {
+            setWorkflow(preset.workflow);
+          } else if (body.workflows.includes("otan_c2_brief")) {
+            setWorkflow("otan_c2_brief");
+          } else {
+            setWorkflow(ordered[0]);
+          }
         }
       })
       .catch(() => undefined);
-  }, []);
+  }, [preset.workflow]);
 
   const refresh = useCallback(async (id: string) => {
-    const res = await fetch(`/api/agent/agent/runs/${encodeURIComponent(id)}`, {
+    const res = await apiFetch(`/api/agent/agent/runs/${encodeURIComponent(id)}`, {
       cache: "no-store",
     });
     if (!res.ok) {
@@ -106,13 +134,17 @@ export function AgentRunMonitor() {
     setApprovalId(null);
     setPayload(null);
     try {
-      const res = await fetch("/api/agent/agent/runs", {
+      const res = await apiFetch("/api/agent/agent/runs", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           workflow,
           goal: goal.trim(),
-          params: { topic: topic.trim() || goal.trim() },
+          params: {
+            topic: topic.trim() || goal.trim(),
+            report_form: reportForm,
+            use_existing_wiki: useExistingWiki ? "true" : "false",
+          },
         }),
       });
       const body = (await res.json()) as {
@@ -219,6 +251,35 @@ export function AgentRunMonitor() {
               ))}
             </select>
           </label>
+          {workflow === "otan_c2_brief" || workflow.startsWith("persona_") ? (
+            <>
+              <label className="space-y-1 text-sm">
+                <span className="text-muted-foreground">OTAN report form</span>
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={reportForm}
+                  onChange={(e) => setReportForm(e.target.value)}
+                  disabled={busy || workflow.startsWith("persona_")}
+                >
+                  <option value="intsum">INTSUM (J2 Analyst)</option>
+                  <option value="sitrep">SITREP (MOC Watch)</option>
+                  <option value="spotrep">SPOTREP + Tasking (HUMINT)</option>
+                  <option value="commander_brief">
+                    Commander&apos;s Briefing
+                  </option>
+                </select>
+              </label>
+              <label className="flex items-center gap-2 text-sm sm:pt-6">
+                <input
+                  type="checkbox"
+                  checked={useExistingWiki}
+                  onChange={(e) => setUseExistingWiki(e.target.checked)}
+                  disabled={busy}
+                />
+                <span>Use existing LLM Wiki from My files (optional)</span>
+              </label>
+            </>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => void startRun()} disabled={busy || !goal.trim()}>
@@ -290,7 +351,7 @@ export function AgentRunMonitor() {
                 <dt className="text-muted-foreground">OKF bundle_id</dt>
                 <dd className="font-mono text-xs">
                   <Link
-                    href="/okf"
+                    href="/?mode=wiki"
                     className="underline underline-offset-2"
                   >
                     {payload.run.params.bundle_id}

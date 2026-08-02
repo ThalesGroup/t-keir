@@ -93,7 +93,7 @@ class JsonLogFormatter(logging.Formatter):
             ),
             "actor": getattr(record, "actor", None) or "",
             "file": record.filename,
-            "function": record.funcName,
+            "function": record.funcName or "",
             "line": record.lineno,
             "logger": record.name,
             "msg": record.getMessage(),

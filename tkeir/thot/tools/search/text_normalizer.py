@@ -202,7 +202,7 @@ def normalize_document_fields(
     if isinstance(content, str):
         segments = [content]
     else:
-        segments = [str(part) for part in (content or [])]
+        segments = [str(part) for part in content or []]
     nlp = normalizer or normalizer_for_language(language)
     title_lem = nlp.normalize(title or "")
     content_lem = nlp.normalize_many(segments)

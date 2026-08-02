@@ -28,6 +28,11 @@ COPY tkeir/pyproject.toml tkeir/uv.lock tkeir/README.md ./
 COPY tkeir/thot ./thot
 COPY tkeir/configs ./configs
 COPY tkeir/resources ./resources
+# Dataset agent/workflow packs (OSINT personas, llm_wiki, …) — not full corpora.
+COPY datasets/osint/agents ./packs/osint/agents
+COPY datasets/osint/workflows ./packs/osint/workflows
+COPY datasets/osint/agent_orchestrator.yaml ./packs/osint/agent_orchestrator.yaml
+COPY datasets/enterprise/agent_orchestrator.yaml ./packs/enterprise/agent_orchestrator.yaml
 
 # audit (psycopg) + models (spaCy) are shared so ingest can run the pipeline
 # in-container without a second sync. Indexer still builds its own tree.

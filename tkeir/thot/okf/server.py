@@ -1,4 +1,4 @@
-"""Title: tkeir-okf FastAPI service (:8094).
+"""Title: tkeir-okf FastAPI service (:8095).
 
 OKF bundle export / browse / download / DSR delete.
 
@@ -18,6 +18,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
+import httpx
 from fastapi import BackgroundTasks, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
@@ -42,8 +43,15 @@ from thot.core.StructuredLogging import configure_json_logging
 from thot.core.ThotMetrics import ThotMetrics
 from thot.governor.wiring import wire_governor_middleware
 from thot.okf.exporter import export_full, export_scoped, tar_bundle
-from thot.okf.models import OkfExportRequest, OkfExportResult, OkfHttpExportBody
+from thot.okf.models import (
+    OkfExportRequest,
+    OkfExportResult,
+    OkfHttpExportBody,
+    OkfPublishWikiBody,
+    OkfWikiUpdateBody,
+)
 from thot.okf.store import OkfBundleStore
+from thot.okf.wiki import suggested_workspace_wiki_path, write_llm_wiki
 from thot.tools.search.user_space import resolve_vespa_user_space
 
 LOGGER = logging.getLogger(__name__)
@@ -150,6 +158,15 @@ async def okf_bundles(
     }
 
 
+def _bundle_missing(space: str, bundle_id: str) -> HTTPException:
+    return HTTPException(
+        status_code=404,
+        detail=(
+            f"bundle not found for user_space={space} (id={bundle_id[:8]}…)"
+        ),
+    )
+
+
 @app.get("/okf/bundles/{bundle_id}")
 async def okf_bundle_get(
     bundle_id: str,
@@ -161,7 +178,7 @@ async def okf_bundle_get(
         bundle_id, space, concept_id=concept_id
     )
     if payload is None:
-        raise HTTPException(status_code=404, detail="bundle not found")
+        raise _bundle_missing(space, bundle_id)
     return payload
 
 
@@ -174,7 +191,7 @@ async def okf_bundle_download(
     space = _space(authorization)
     bundle = _store(app).get_bundle(bundle_id, space)
     if bundle is None:
-        raise HTTPException(status_code=404, detail="bundle not found")
+        raise _bundle_missing(space, bundle_id)
     tmp = Path(tempfile.mkdtemp(prefix="okf-")) / f"{bundle_id}.tar.gz"
     archive = tar_bundle(Path(bundle.path), dest=tmp)
 
@@ -193,6 +210,134 @@ async def okf_bundle_download(
     )
 
 
+@app.put("/okf/bundles/{bundle_id}/wiki")
+async def okf_wiki_put(
+    bundle_id: str,
+    body: OkfWikiUpdateBody,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    """Save an edited LLMWiki page into the bundle (``wiki.md``)."""
+    ThotMetrics.increment_counter(
+        short_name="okf_http",
+        method="PUT",
+        path="/okf/bundles/{bundle_id}/wiki",
+        status=200,
+    )
+    space = _space(authorization)
+    store = _store(app)
+    try:
+        path = store.put_wiki(bundle_id, space, body.markdown)
+    except FileNotFoundError as exc:
+        raise _bundle_missing(space, bundle_id) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "bundle_id": bundle_id,
+        "wiki_path": "wiki.md",
+        "path": path,
+        "bytes": len(body.markdown.encode("utf-8")),
+        "user_space": space,
+    }
+
+
+@app.post("/okf/bundles/{bundle_id}/publish-wiki")
+async def okf_publish_wiki(
+    bundle_id: str,
+    body: OkfPublishWikiBody | None = None,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    """Copy the bundle LLMWiki page into the user's personal workspace and index it.
+
+    Requires ingest at ``INGEST_URL`` (default ``http://127.0.0.1:8091``).
+    """
+    ThotMetrics.increment_counter(
+        short_name="okf_http",
+        method="POST",
+        path="/okf/bundles/{bundle_id}/publish-wiki",
+        status=200,
+    )
+    space = _space(authorization)
+    store = _store(app)
+    bundle = store.get_bundle(bundle_id, space)
+    if bundle is None:
+        raise _bundle_missing(space, bundle_id)
+
+    root = Path(bundle.path)
+    wiki_path = root / "wiki.md"
+    if body and body.markdown and body.markdown.strip():
+        try:
+            store.put_wiki(bundle_id, space, body.markdown)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+    elif not wiki_path.is_file():
+        # Backfill for older scoped bundles that only have query_context.
+        query = (bundle.query or "").strip() or bundle_id
+        qc = root / "query_context.md"
+        answer = ""
+        if qc.is_file():
+            answer = qc.read_text(encoding="utf-8")
+        write_llm_wiki(
+            root,
+            query=query,
+            user_space=space,
+            rag_payload={"answer": answer},
+            concept_ids=store.list_concepts(bundle_id, space),
+            bundle_id=bundle_id,
+        )
+    if not wiki_path.is_file():
+        raise HTTPException(
+            status_code=404, detail="wiki.md not found in bundle"
+        )
+
+    wiki_bytes = wiki_path.read_bytes()
+    dest = (
+        body.path if body and body.path else None
+    ) or suggested_workspace_wiki_path(bundle.query or bundle_id)
+    dest = dest.strip().lstrip("/")
+    if not dest.lower().endswith(".md"):
+        dest = f"{dest}.md"
+
+    ingest_url = os.getenv("INGEST_URL", "http://127.0.0.1:8091").rstrip("/")
+    headers: dict[str, str] = {}
+    if authorization:
+        headers["Authorization"] = authorization
+    filename = Path(dest).name
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            upload = await client.post(
+                f"{ingest_url}/workspace/upload",
+                headers=headers,
+                files={
+                    "file": (filename, wiki_bytes, "text/markdown"),
+                },
+                data={"path": dest},
+            )
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"ingest unreachable at {ingest_url}: {exc}",
+        ) from exc
+    if upload.status_code >= 400:
+        detail: Any
+        try:
+            detail = upload.json()
+        except Exception:  # noqa: BLE001
+            detail = upload.text
+        raise HTTPException(status_code=upload.status_code, detail=detail)
+
+    payload = upload.json() if upload.content else {}
+    return {
+        "bundle_id": bundle_id,
+        "wiki_path": "wiki.md",
+        "workspace_path": payload.get("path") or dest,
+        "source_ref": payload.get("source_ref"),
+        "ingest_id": payload.get("ingest_id"),
+        "status": payload.get("status"),
+        "user_space": space,
+        "index_target": "user",
+    }
+
+
 @app.delete("/okf/bundles/{bundle_id}")
 async def okf_bundle_delete(
     bundle_id: str,
@@ -203,7 +348,7 @@ async def okf_bundle_delete(
     store = _store(app)
     bundle = store.get_bundle(bundle_id, space)
     if bundle is None:
-        raise HTTPException(status_code=404, detail="bundle not found")
+        raise _bundle_missing(space, bundle_id)
     record = ActionRecord(
         correlation_id=sha256_hex(bundle_id)[:32],
         actor=ActorInfo(type="service", id=space),
@@ -221,7 +366,7 @@ async def okf_bundle_delete(
             status="success",
         ),
         result=ResultInfo(doc_ids=[bundle_id]),
-        impact=ImpactInfo(class_="destructive"),
+        impact=ImpactInfo.model_validate({"class": "destructive"}),
         ext={
             "action_kind": "okf.export.delete",
             "bundle_id": bundle_id,
@@ -241,7 +386,7 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover
     parser = argparse.ArgumentParser(prog="tkeir-okf")
     parser.add_argument("--host", default=os.getenv("OKF_HOST", "0.0.0.0"))
     parser.add_argument(
-        "--port", type=int, default=int(os.getenv("OKF_PORT", "8094"))
+        "--port", type=int, default=int(os.getenv("OKF_PORT", "8095"))
     )
     args = parser.parse_args(argv)
     import uvicorn

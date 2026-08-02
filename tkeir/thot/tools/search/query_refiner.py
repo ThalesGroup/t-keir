@@ -32,6 +32,9 @@ _POS_TO_SUPPRESS = frozenset(
     }
 )
 
+# Public alias for highlight / keyword filters (UD closed-class POS).
+CLOSED_CLASS_POS = _POS_TO_SUPPRESS
+
 
 def meaningful_tokens_from_morphosyntax(morphosyntax: list[dict]) -> list[str]:
     """Keep surface tokens whose spaCy POS tags carry lexical meaning.

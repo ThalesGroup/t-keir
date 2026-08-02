@@ -25,7 +25,7 @@ Task configuration files under `tkeir/configs/` contain only `logger` settings a
 Load and test configuration parsing:
 
 ```shell
-python3 -m pytest tkeir/tests/unittests/TestPipelineConfiguration.py
+python3 -m pytest tests/unittests/TestPipelineConfiguration.py
 ```
 
 ## Observability

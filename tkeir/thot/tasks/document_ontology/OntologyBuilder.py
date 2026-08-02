@@ -516,17 +516,77 @@ def _add_svo_to_graph(
         >>> callable(_add_svo_to_graph)
         True
     """
+    _add_svo_hypergraph(
+        graph=graph,
+        entity_node=entity_node,
+        entity_index=entity_index,
+        subject_text=subject_text,
+        verb_text=verb_text,
+        object_text=object_text,
+        vocabulary=vocabulary,
+        doc_uri=doc_uri,
+        chunk_uris=(),
+        doc_key="",
+    )
+
+
+def _statement_uri(
+    doc_key: str,
+    subject_text: str,
+    verb_text: str,
+    object_text: str,
+) -> URIRef:
+    """Stable URI for a reified SPO statement within a document."""
+    digest = hashlib.sha256(
+        f"{subject_text}\0{verb_text}\0{object_text}".encode("utf-8")
+    ).hexdigest()[:16]
+    return TKEIRDOC[f"{doc_key}/Statement/{digest}"]
+
+
+def _link_concept_to_chunk(
+    graph: Graph,
+    chunk_uri: URIRef,
+    concept_uri: URIRef,
+) -> None:
+    """Attach a shared concept to a chunk sub-ontology (hyperedge incidence)."""
+    graph.add((chunk_uri, TKEIR.hasMention, concept_uri))
+    graph.add((concept_uri, TKEIR.mentionedIn, chunk_uri))
+
+
+def _add_svo_hypergraph(
+    graph: Graph,
+    entity_node: Callable[..., URIRef],
+    entity_index: dict[str, str],
+    subject_text: str,
+    verb_text: str,
+    object_text: str,
+    *,
+    vocabulary: OntologyVocabulary | None = None,
+    doc_uri: URIRef | None = None,
+    chunk_uris: Iterable[URIRef] = (),
+    doc_key: str = "",
+) -> URIRef | None:
+    """Materialize SPO and reify it under chunk sub-ontologies.
+
+    Hyper-graph shape:
+
+    - Shared concept nodes (S/O) reused across chunks (set intersection).
+    - ``Statement`` nodes carry (subject, predicate, object) and ``inChunk``.
+    - Each ``DocumentChunk`` is a sub-ontology: ``hasStatement`` / ``hasMention``.
+    - Direct ``S --P--> O`` edges remain for reasoners / SPARQL.
+    """
     subject_text = str(subject_text).strip()
     verb_text = str(verb_text).strip()
     object_text = str(object_text).strip()
     if not subject_text or not verb_text:
-        return
+        return None
 
     vocab = vocabulary or OntologyVocabulary.empty()
     subject_uri = entity_node(subject_text, role="subject")
     predicate_uri = _predicate_uri(verb_text, vocab)
-    graph.add((doc_uri, TKEIR.hasStatement, subject_uri))
 
+    object_uri: URIRef | Literal
+    object_node: URIRef | None = None
     if object_text:
         object_class = _lookup_class(
             object_text,
@@ -535,10 +595,12 @@ def _add_svo_to_graph(
             role="object",
         )
         if vocab.is_node_class(object_class):
-            object_uri = entity_node(object_text, role="object")
-            graph.add((subject_uri, predicate_uri, object_uri))
+            object_node = entity_node(object_text, role="object")
+            object_uri = object_node
+            graph.add((subject_uri, predicate_uri, object_node))
         else:
-            graph.add((subject_uri, predicate_uri, Literal(object_text)))
+            object_uri = Literal(object_text)
+            graph.add((subject_uri, predicate_uri, object_uri))
             if object_class == METRIC_CLASS:
                 numeric = object_text.replace(",", "").replace("%", "").strip()
                 if NUMERIC_RE.match(numeric):
@@ -550,7 +612,154 @@ def _add_svo_to_graph(
                         )
                     )
     else:
-        graph.add((subject_uri, predicate_uri, Literal("")))
+        object_uri = Literal("")
+        graph.add((subject_uri, predicate_uri, object_uri))
+
+    key = doc_key or "document"
+    stmt_uri = _statement_uri(key, subject_text, verb_text, object_text)
+    graph.add((stmt_uri, RDF.type, TKEIR.Statement))
+    graph.add((stmt_uri, TKEIR.subject, subject_uri))
+    graph.add((stmt_uri, TKEIR.predicate, predicate_uri))
+    graph.add((stmt_uri, TKEIR.object, object_uri))
+    graph.add(
+        (
+            stmt_uri,
+            RDFS.label,
+            Literal(f"{subject_text} {verb_text} {object_text}".strip()),
+        )
+    )
+
+    chunk_list = [uri for uri in chunk_uris if uri is not None]
+    if not chunk_list and doc_uri is not None:
+        # No chunk scope yet — hang the statement on the document aggregate.
+        graph.add((doc_uri, TKEIR.hasStatement, stmt_uri))
+        # Legacy sugar: document → subject (older fuse paths).
+        graph.add((doc_uri, TKEIR.hasStatement, subject_uri))
+        return stmt_uri
+
+    for chunk_uri in chunk_list:
+        graph.add((chunk_uri, TKEIR.hasStatement, stmt_uri))
+        # Legacy sugar for consumers that still expect hasStatement → subject.
+        graph.add((chunk_uri, TKEIR.hasStatement, subject_uri))
+        graph.add((stmt_uri, TKEIR.inChunk, chunk_uri))
+        _link_concept_to_chunk(graph, chunk_uri, subject_uri)
+        if object_node is not None:
+            _link_concept_to_chunk(graph, chunk_uri, object_node)
+
+    if doc_uri is not None:
+        graph.add((doc_uri, TKEIR.hasStatement, stmt_uri))
+
+    return stmt_uri
+
+
+def _iter_chunk_scopes(
+    document: dict,
+    doc_key: str,
+) -> list[tuple[URIRef, str, int, int]]:
+    """Return ``(chunk_uri, chunk_id, token_start, token_end)`` from golden chunks."""
+    scopes: list[tuple[URIRef, str, int, int]] = []
+    for index, chunk in enumerate(document.get("golden_chunks") or []):
+        chunk_id = str(chunk.get("chunk_id") or f"chunk-{index}")
+        chunk_uri = TKEIRDOC[f"{doc_key}/Chunk/{_slug(chunk_id)}"]
+        metadata = chunk.get("metadata") or {}
+        start = metadata.get("token_start")
+        end = metadata.get("token_end")
+        if start is None or end is None:
+            # Fall back to full-document span when ranges are missing.
+            start, end = 0, 10**9
+        scopes.append((chunk_uri, chunk_id, int(start), int(end)))
+    return scopes
+
+
+def _chunk_uris_for_positions(
+    positions: set[int],
+    scopes: list[tuple[URIRef, str, int, int]],
+    *,
+    unmatched_to_all: bool = False,
+) -> list[URIRef]:
+    """Map token positions to owning chunk URIs (sub-ontology containers)."""
+    if not scopes:
+        return []
+    if not positions:
+        return [scope[0] for scope in scopes] if unmatched_to_all else []
+    matched: list[URIRef] = []
+    seen: set[URIRef] = set()
+    for chunk_uri, _chunk_id, start, end in scopes:
+        if any(start <= pos < end for pos in positions):
+            if chunk_uri not in seen:
+                matched.append(chunk_uri)
+                seen.add(chunk_uri)
+    return matched
+
+
+def _ensure_chunk_nodes(
+    graph: Graph,
+    doc_uri: URIRef,
+    scopes: list[tuple[URIRef, str, int, int]],
+) -> None:
+    """Create DocumentChunk nodes and document→chunk containment."""
+    for chunk_uri, chunk_id, _start, _end in scopes:
+        graph.add((chunk_uri, RDF.type, TKEIR.DocumentChunk))
+        # Chunk node is the sub-ontology container for its statements/concepts.
+        graph.add((chunk_uri, RDF.type, TKEIR.SubOntology))
+        graph.add((chunk_uri, RDFS.label, Literal(chunk_id)))
+        graph.add((doc_uri, TKEIR.hasChunk, chunk_uri))
+        graph.add((chunk_uri, TKEIR.hasSubOntology, chunk_uri))
+
+
+def _annotate_hypergraph_support(graph: Graph, doc_uri: URIRef) -> None:
+    """Weight concepts/chunks/document by cross-chunk sub-ontology intersection.
+
+    - ``chunkSupport`` on concepts: number of chunks that mention them
+    - ``sharedConceptCount`` on chunks: concepts with support ≥ 2
+    - ``intersectionWeight`` on document: sum of sharedConceptCount
+    """
+    concept_chunks: dict[URIRef, set[URIRef]] = {}
+    for concept, _pred, chunk in graph.triples(
+        (None, TKEIR.mentionedIn, None)
+    ):
+        if not isinstance(concept, URIRef) or not isinstance(chunk, URIRef):
+            continue
+        concept_chunks.setdefault(concept, set()).add(chunk)
+
+    for concept, chunks in concept_chunks.items():
+        support = len(chunks)
+        graph.set(
+            (
+                concept,
+                TKEIR.chunkSupport,
+                Literal(support, datatype=XSD.integer),
+            )
+        )
+
+    shared_by_chunk: dict[URIRef, int] = {}
+    for concept, chunks in concept_chunks.items():
+        if len(chunks) < 2:
+            continue
+        for chunk in chunks:
+            shared_by_chunk[chunk] = shared_by_chunk.get(chunk, 0) + 1
+
+    intersection_weight = 0
+    for chunk in graph.objects(doc_uri, TKEIR.hasChunk):
+        if not isinstance(chunk, URIRef):
+            continue
+        shared = shared_by_chunk.get(chunk, 0)
+        graph.set(
+            (
+                chunk,
+                TKEIR.sharedConceptCount,
+                Literal(shared, datatype=XSD.integer),
+            )
+        )
+        intersection_weight += shared
+
+    graph.set(
+        (
+            doc_uri,
+            TKEIR.intersectionWeight,
+            Literal(intersection_weight, datatype=XSD.integer),
+        )
+    )
 
 
 def _add_keyword_to_graph(
@@ -611,26 +820,42 @@ def _enrich_field_analysis(
     settings: OntologyBuildSettings,
     seen_keywords: set[str],
     vocabulary: OntologyVocabulary | None = None,
+    *,
+    scopes: list[tuple[URIRef, str, int, int]] | None = None,
 ) -> None:
     morphosyntax = document.get(spec.morph_key) or []
+    chunk_scopes = scopes or []
 
     for span in document.get(spec.ner_key) or []:
         text = str(span.get("text", "")).strip()
-        if text:
-            graph.add((doc_uri, TKEIR.hasMention, entity_node(text)))
+        if not text:
+            continue
+        concept = entity_node(text)
+        graph.add((doc_uri, TKEIR.hasMention, concept))
+        # Project NER onto chunk sub-ontologies when token spans overlap.
+        positions: set[int] = set()
+        start = span.get("start")
+        end = span.get("end")
+        if start is not None and end is not None:
+            positions = set(range(int(start), int(end)))
+        for chunk_uri in _chunk_uris_for_positions(positions, chunk_scopes):
+            _link_concept_to_chunk(graph, chunk_uri, concept)
 
     for subject_text, verb_text, object_text in _dependency_relations(
         document.get(spec.deps_key) or []
     ):
-        _add_svo_to_graph(
+        # Dep edges lack token spans — keep on the document aggregate only.
+        _add_svo_hypergraph(
             graph=graph,
-            doc_uri=doc_uri,
             entity_node=entity_node,
             entity_index=entity_index,
             subject_text=subject_text,
             verb_text=verb_text,
             object_text=object_text,
             vocabulary=vocabulary,
+            doc_uri=doc_uri,
+            chunk_uris=(),
+            doc_key=doc_key,
         )
 
     for keyword in keywords:
@@ -673,35 +898,28 @@ def _enrich_golden_chunks(
     entity_node: Callable[..., URIRef],
     entity_index: dict[str, str],
     vocabulary: OntologyVocabulary | None = None,
+    *,
+    scopes: list[tuple[URIRef, str, int, int]] | None = None,
 ) -> None:
+    """Create chunk sub-ontologies and attach NER mentions.
+
+    SPO triples are attached earlier via position-mapped ``kg`` (hypergraph).
+    Golden-chunk ``svo_triplets`` are skipped here to avoid duplicate Statements.
+    """
+    chunk_scopes = (
+        scopes if scopes is not None else _iter_chunk_scopes(document, doc_key)
+    )
+    _ensure_chunk_nodes(graph, doc_uri, chunk_scopes)
+
     for index, chunk in enumerate(document.get("golden_chunks") or []):
         chunk_id = str(chunk.get("chunk_id") or f"chunk-{index}")
         chunk_uri = TKEIRDOC[f"{doc_key}/Chunk/{_slug(chunk_id)}"]
-
-        graph.add((chunk_uri, RDF.type, TKEIR.DocumentChunk))
-        graph.add((chunk_uri, RDFS.label, Literal(chunk_id)))
-        graph.add((doc_uri, TKEIR.hasChunk, chunk_uri))
-
         metadata = chunk.get("metadata") or {}
         for entities in (metadata.get("primary_entities") or {}).values():
             for entity_text in entities:
                 text = str(entity_text).strip()
                 if text:
-                    graph.add((chunk_uri, TKEIR.hasMention, entity_node(text)))
-
-        for triplet in metadata.get("svo_triplets") or []:
-            if len(triplet) < 3:
-                continue
-            _add_svo_to_graph(
-                graph=graph,
-                doc_uri=chunk_uri,
-                entity_node=entity_node,
-                entity_index=entity_index,
-                subject_text=str(triplet[0]).strip(),
-                verb_text=str(triplet[1]).strip(),
-                object_text=str(triplet[2]).strip(),
-                vocabulary=vocabulary,
-            )
+                    _link_concept_to_chunk(graph, chunk_uri, entity_node(text))
 
 
 def _enrich_graph_from_analysis(
@@ -713,6 +931,8 @@ def _enrich_graph_from_analysis(
     entity_index: dict[str, str],
     settings: OntologyBuildSettings,
     vocabulary: OntologyVocabulary | None = None,
+    *,
+    scopes: list[tuple[URIRef, str, int, int]] | None = None,
 ) -> None:
     """Enrich graph from analysis helper.
 
@@ -723,6 +943,9 @@ def _enrich_graph_from_analysis(
     """
     keywords = document.get("keywords") or []
     seen_keywords: set[str] = set()
+    chunk_scopes = (
+        scopes if scopes is not None else _iter_chunk_scopes(document, doc_key)
+    )
 
     for spec in _field_specs(settings):
         if not spec.include:
@@ -739,6 +962,7 @@ def _enrich_graph_from_analysis(
             settings=settings,
             seen_keywords=seen_keywords,
             vocabulary=vocabulary,
+            scopes=chunk_scopes,
         )
 
     _enrich_tags(graph, doc_uri, doc_key, document)
@@ -752,6 +976,7 @@ def _enrich_graph_from_analysis(
             entity_node,
             entity_index,
             vocabulary,
+            scopes=chunk_scopes,
         )
 
 
@@ -879,19 +1104,32 @@ def build_document_graph(
             graph.add((node, RDFS.label, Literal(clean_text)))
         return seen_nodes[cache_key]
 
+    # 1) Chunk sub-ontology containers (Document → Chunk).
+    scopes = _iter_chunk_scopes(document, doc_key)
+    if settings.include_content_triples:
+        _ensure_chunk_nodes(graph, doc_uri, scopes)
+
+    # 2) kg SPO → chunk-scoped Statements (shared concepts across chunks).
     for triple in _iter_included_kg_triples(document, settings):
         subject_text, verb_text, object_text = _triple_parts(triple)
-        _add_svo_to_graph(
+        chunk_uris = _chunk_uris_for_positions(
+            _triple_positions(triple),
+            scopes,
+        )
+        _add_svo_hypergraph(
             graph=graph,
-            doc_uri=doc_uri,
             entity_node=entity_node,
             entity_index=entity_index,
             subject_text=subject_text,
             verb_text=verb_text,
             object_text=object_text,
             vocabulary=vocabulary,
+            doc_uri=doc_uri,
+            chunk_uris=chunk_uris,
+            doc_key=doc_key,
         )
 
+    # 3) NER / keywords / tags / chunk mentions.
     _enrich_graph_from_analysis(
         graph=graph,
         document=document,
@@ -901,6 +1139,10 @@ def build_document_graph(
         entity_index=entity_index,
         settings=settings,
         vocabulary=vocabulary,
+        scopes=scopes,
     )
+
+    # 4) Intersection weights for query / fuse ranking.
+    _annotate_hypergraph_support(graph, doc_uri)
 
     return graph

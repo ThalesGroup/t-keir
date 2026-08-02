@@ -1,0 +1,60 @@
+name: otan_sitrep
+version: 1
+title: OTAN / NATO sector SITREP
+description: >
+  Sector Situation Report for MOC Watch — geospatial / COP fusion.
+slots:
+  - name: situation
+    type: freeform_grounded
+    description: SITUATION timeline of contacts and alerts in sector.
+    constraints: { required: true }
+  - name: units_in_sector
+    type: freeform_grounded
+    description: UNITS IN SECTOR with platforms and fuel/state if known.
+    constraints: { required: false }
+  - name: pir_activated
+    type: freeform_grounded
+    description: PIRs activated via ontology resolution.
+    constraints: { required: false }
+  - name: recommended_action
+    type: freeform_grounded
+    description: RECOMMENDED ACTION / escalation.
+    constraints: { required: false }
+  - name: supporting_keywords
+    type: keyword
+    description: Sector keywords
+    constraints: { min_items: 0, max_items: 12, required: false }
+markdown_template: |
+  # SECTOR SITREP — {{ topic or "untitled" }}
+  Classification: SECRET // REL TO COALITION TF
+  Form: OTAN SITREP
+
+  {% if situation %}
+  ## SITUATION
+
+  {{ situation }}
+  {% endif %}
+
+  {% if units_in_sector %}
+  ## UNITS IN SECTOR
+
+  {{ units_in_sector }}
+  {% endif %}
+
+  {% if pir_activated %}
+  ## PIRs ACTIVATED
+
+  {{ pir_activated }}
+  {% endif %}
+
+  {% if recommended_action %}
+  ## RECOMMENDED ACTION
+
+  {{ recommended_action }}
+  {% endif %}
+
+  {% if supporting_keywords %}
+  ## Keywords
+
+  {{ supporting_keywords | join(", ") }}
+  {% endif %}

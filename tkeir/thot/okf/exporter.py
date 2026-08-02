@@ -99,7 +99,7 @@ class VespaOkfBackend:
     ) -> list[dict[str, Any]]:
         space = normalize_user_space(user_space)
         wanted = (
-            {normalize_user_space(d) for d in (doc_ids or [])}
+            {normalize_user_space(d) for d in doc_ids or []}
             if doc_ids
             else None
         )
@@ -122,7 +122,11 @@ class VespaOkfBackend:
             fields = dict((child or {}).get("fields") or {})
             fields["_vespa_id"] = str((child or {}).get("id") or "")
             doc_space = normalize_user_space(
-                str(fields.get("userspace_id") or fields.get("user_space") or space)
+                str(
+                    fields.get("userspace_id")
+                    or fields.get("user_space")
+                    or space
+                )
             )
             if doc_space != space:
                 continue
@@ -168,10 +172,7 @@ class VespaOkfBackend:
         space = normalize_user_space(user_space)
         needle = parent_source_id or doc_ref
         lit = _yql_escape(needle)
-        yql = (
-            f'select * from user where source_ref contains "{lit}" '
-            f"limit 200"
-        )
+        yql = f'select * from user where source_ref contains "{lit}" limit 200'
         payload: dict[str, Any] = {
             "yql": yql,
             "hits": 200,
@@ -196,7 +197,11 @@ class VespaOkfBackend:
         for child in children:
             fields = (child or {}).get("fields") or {}
             chunk_space = normalize_user_space(
-                str(fields.get("userspace_id") or fields.get("user_space") or space)
+                str(
+                    fields.get("userspace_id")
+                    or fields.get("user_space")
+                    or space
+                )
             )
             if chunk_space != space:
                 continue
@@ -216,7 +221,9 @@ class VespaOkfBackend:
                 {
                     "chunk_id": cid,
                     "text_raw": str(
-                        fields.get("chunk_text") or fields.get("text_raw") or ""
+                        fields.get("chunk_text")
+                        or fields.get("text_raw")
+                        or ""
                     )[:240],
                 }
             )
@@ -228,11 +235,48 @@ def _yql_escape(value: str) -> str:
 
 
 def default_okf_root() -> Path:
-    """Return ``OKF_ROOT`` or ``.tkeir-okf`` under CWD."""
+    """Return legacy flat ``OKF_ROOT`` when set (tests / migration only).
+
+    New durable bundles belong under ``workspace/users/<space>/okf/`` via
+    :func:`user_okf_root`. Prefer that path for writes.
+    """
     raw = os.getenv("OKF_ROOT", "").strip()
     if raw:
         return Path(raw).expanduser().resolve()
-    return (Path.cwd() / ".tkeir-okf").resolve()
+    cwd = Path.cwd().resolve()
+    if cwd.name == "tkeir":
+        return (cwd.parent / ".tkeir-okf").resolve()
+    return (cwd / ".tkeir-okf").resolve()
+
+
+def user_okf_root(
+    user_space: str, *, workspace: Path | str | None = None
+) -> Path:
+    """Per-user OKF directory: ``workspace/users/<space>/okf`` (MinIO-ready)."""
+    from thot.tools.ingest.user_workspace import UserWorkspace
+
+    return UserWorkspace(user_space, root=workspace).ensure_okf_layout()
+
+
+def resolve_bundle_dir(
+    user_space: str,
+    bundle_id: str,
+    *,
+    output_dir: str | Path | None = None,
+    workspace: Path | str | None = None,
+) -> Path:
+    """Resolve where a new OKF bundle directory should be written.
+
+    Preference:
+      1. Explicit ``output_dir``
+      2. Flat ``OKF_ROOT/<bundle_id>`` when ``OKF_ROOT`` is set (tests/legacy)
+      3. ``workspace/users/<space>/okf/<bundle_id>`` (default demo layout)
+    """
+    if output_dir is not None and str(output_dir).strip():
+        return Path(output_dir).expanduser().resolve()
+    if os.getenv("OKF_ROOT", "").strip():
+        return default_okf_root() / bundle_id
+    return user_okf_root(user_space, workspace=workspace) / bundle_id
 
 
 def first_sentence(text: str, *, language: str = "en") -> str:
@@ -281,7 +325,9 @@ def _content_text(fields: dict[str, Any]) -> str:
     return ""
 
 
-def _keywords_from_fields(fields: dict[str, Any], limit: int = 10) -> list[str]:
+def _keywords_from_fields(
+    fields: dict[str, Any], limit: int = 10
+) -> list[str]:
     tags: list[str] = []
     for key in ("title_keywords", "content_keywords", "keywords"):
         raw = fields.get(key)
@@ -390,7 +436,7 @@ def _emit_export_action(
             status=status,  # type: ignore[arg-type]
         ),
         result=ResultInfo(doc_ids=doc_ids, error=error),
-        impact=ImpactInfo(class_="write"),
+        impact=ImpactInfo.model_validate({"class": "write"}),
         ext={
             "action_kind": kind,
             "bundle_id": bundle_id,
@@ -402,7 +448,9 @@ def _emit_export_action(
     return record.action_id
 
 
-def _write_concept_file(path: Path, fm: OkfConceptFrontmatter, body: str) -> None:
+def _write_concept_file(
+    path: Path, fm: OkfConceptFrontmatter, body: str
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         render_frontmatter(fm) + "\n" + body.lstrip() + "\n", encoding="utf-8"
@@ -423,11 +471,15 @@ async def _build_concept_markdown(
     chunk_stubs: list[dict[str, Any]],
     kg: UserSpaceKG,
 ) -> tuple[OkfConceptFrontmatter, str, bool]:
-    source = str(fields.get("source_doc_id") or fields.get("_vespa_id") or "unknown")
+    source = str(
+        fields.get("source_doc_id") or fields.get("_vespa_id") or "unknown"
+    )
     title = str(fields.get("title") or source)
     content = _content_text(fields)
     description = first_sentence(content)
-    json_ld = str(fields.get("json_ld") or fields.get("document_ontology") or "")
+    json_ld = str(
+        fields.get("json_ld") or fields.get("document_ontology") or ""
+    )
     if isinstance(fields.get("document_ontology"), dict):
         ont = fields["document_ontology"]
         json_ld = str(ont.get("json_ld") or json_ld)
@@ -502,10 +554,10 @@ async def export_full(
     backend: OkfVespaClient = vespa_client or VespaOkfBackend()
     space = normalize_user_space(request.user_space)
     bundle_id = str(uuid.uuid4())
-    root = (
-        Path(request.output_dir).expanduser().resolve()
-        if request.output_dir
-        else default_okf_root() / bundle_id
+    root = resolve_bundle_dir(
+        space,
+        bundle_id,
+        output_dir=request.output_dir,
     )
     root.mkdir(parents=True, exist_ok=True)
     (root / "concepts").mkdir(exist_ok=True)
@@ -524,7 +576,9 @@ async def export_full(
 
     for fields in parents:
         source = str(
-            fields.get("source_doc_id") or fields.get("_vespa_id") or f"doc-{written}"
+            fields.get("source_doc_id")
+            or fields.get("_vespa_id")
+            or f"doc-{written}"
         )
         doc_ref = str(
             fields.get("_vespa_id")
@@ -574,7 +628,9 @@ async def export_full(
                 f"Parent: [{concept_rel}](../{concept_rel}.md)\n\n"
                 f"{excerpt}\n"
             )
-            _write_concept_file(root / "chunks" / f"{cid}.md", chunk_fm, chunk_body)
+            _write_concept_file(
+                root / "chunks" / f"{cid}.md", chunk_fm, chunk_body
+            )
         batch_ids.append(source)
         written += 1
         if len(batch_ids) >= BATCH_SIZE:
@@ -611,8 +667,10 @@ async def export_full(
     for cid in concept_ids:
         index_lines.append(f"- [{cid}]({cid}.md)")
     if request.query:
-        index_lines.extend(["", f"- [query_context](query_context.md)"])
-    (root / "index.md").write_text("\n".join(index_lines) + "\n", encoding="utf-8")
+        index_lines.extend(["", "- [query_context](query_context.md)"])
+    (root / "index.md").write_text(
+        "\n".join(index_lines) + "\n", encoding="utf-8"
+    )
     log_entry = (
         f"# OKF Log\n\n"
         f"- {utc_now_rfc3339()} — export "
@@ -638,13 +696,18 @@ async def export_full(
         json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    last_action_id = _emit_export_action(
-        sink=sink,
-        user_space=space,
-        kind="okf.export.full" if not request.query else "okf.export.scoped",
-        doc_ids=[c.split("/", 1)[-1] for c in concept_ids],
-        bundle_id=bundle_id,
-    ) or last_action_id
+    last_action_id = (
+        _emit_export_action(
+            sink=sink,
+            user_space=space,
+            kind=(
+                "okf.export.full" if not request.query else "okf.export.scoped"
+            ),
+            doc_ids=[c.split("/", 1)[-1] for c in concept_ids],
+            bundle_id=bundle_id,
+        )
+        or last_action_id
+    )
     return OkfExportResult(
         bundle=bundle,
         unfilled_docs=unfilled,
@@ -680,7 +743,12 @@ class HttpOkfRagClient:
         async with httpx.AsyncClient(timeout=120.0) as client:
             response = await client.post(
                 f"{self.base_url}/rag/query",
-                json={"query": query, "hits": hits},
+                json={
+                    "query": query,
+                    "hits": hits,
+                    # Dual Vespa schemas (global + user) — same as persona agents.
+                    "search_mode": "both",
+                },
                 headers={"X-Tkeir-User-Space": user_space},
             )
             if response.is_error:
@@ -695,7 +763,9 @@ class HttpOkfRagClient:
             return data if isinstance(data, dict) else {}
 
 
-def _document_ids_from_rag(payload: dict[str, Any], *, max_docs: int) -> list[str]:
+def _document_ids_from_rag(
+    payload: dict[str, Any], *, max_docs: int
+) -> list[str]:
     ids: list[str] = []
     for key in ("document_ids", "documents"):
         raw = payload.get(key)
@@ -704,7 +774,12 @@ def _document_ids_from_rag(payload: dict[str, Any], *, max_docs: int) -> list[st
                 if isinstance(item, str) and item.strip():
                     ids.append(item.strip())
                 elif isinstance(item, dict):
-                    for k in ("document_id", "parent_doc_id", "source_doc_id", "id"):
+                    for k in (
+                        "document_id",
+                        "parent_doc_id",
+                        "source_doc_id",
+                        "id",
+                    ):
                         val = item.get(k)
                         if val:
                             ids.append(str(val))
@@ -767,9 +842,7 @@ async def export_scoped(
     )
     root = Path(result.bundle.path)
     answer = str(
-        rag_payload.get("answer")
-        or rag_payload.get("short_answer")
-        or ""
+        rag_payload.get("answer") or rag_payload.get("short_answer") or ""
     ).strip()
     concept_links = []
     meta_path = root / ".tkeir-meta.json"
@@ -819,6 +892,41 @@ async def export_scoped(
                 text.rstrip() + "\n\n- [query_context](query_context.md)\n",
                 encoding="utf-8",
             )
+    # Persist full chunk texts + thin wiki seed for iterative chunk-by-chunk
+    # LLM merge (okf_iterative_wiki). Avoid stuffing the RAG answer / query
+    # into wiki.md — that starved corpus evidence in analyst runs.
+    from thot.okf.iterative_wiki import (
+        seed_iterative_wiki,
+        write_evidence_chunks,
+    )
+
+    payload = rag_payload if isinstance(rag_payload, dict) else {}
+    write_evidence_chunks(root, list(payload.get("chunks") or []))
+    # Write wiki.md on the export root directly — OkfBundleStore looks under
+    # OKF_ROOT / user workspace and misses custom output_dir / just-created trees.
+    wiki_text = seed_iterative_wiki(query=request.query or "")
+    wiki_path = root / "wiki.md"
+    try:
+        wiki_path.write_text(
+            wiki_text if wiki_text.endswith("\n") else wiki_text + "\n",
+            encoding="utf-8",
+        )
+        index_path = root / "index.md"
+        if index_path.is_file():
+            index_text = index_path.read_text(encoding="utf-8")
+            if "wiki.md" not in index_text:
+                index_path.write_text(
+                    index_text.rstrip()
+                    + "\n\n## LLMWiki\n\n"
+                    + "- [wiki](wiki.md) — iterative evidence wiki\n",
+                    encoding="utf-8",
+                )
+    except Exception:  # noqa: BLE001
+        LOGGER.warning(
+            "Failed to seed iterative wiki for bundle %s",
+            result.bundle.bundle_id,
+            exc_info=True,
+        )
     result.bundle.query = request.query
     result.bundle.concept_count = len(concept_ids) + 1
     return result
@@ -829,7 +937,11 @@ def tar_bundle(bundle_path: Path, dest: Path | None = None) -> Path:
     root = bundle_path.resolve()
     out = dest or root.with_suffix(".tar.gz")
     if out.suffixes[-2:] != [".tar", ".gz"]:
-        out = Path(str(out) + ".tar.gz") if not str(out).endswith(".tar.gz") else out
+        out = (
+            Path(str(out) + ".tar.gz")
+            if not str(out).endswith(".tar.gz")
+            else out
+        )
     with tarfile.open(out, "w:gz") as archive:
         archive.add(root, arcname=root.name)
     return out
@@ -850,9 +962,13 @@ def delete_bundle(bundle_path: Path) -> None:
 def cli_main(argv: list[str] | None = None) -> int:
     """CLI entry: ``tkeir-okf-export``."""
     parser = argparse.ArgumentParser(prog="tkeir-okf-export")
-    parser.add_argument("--user-space", default=os.getenv("VESPA_USER_SPACE", "dev@tkeir"))
+    parser.add_argument(
+        "--user-space", default=os.getenv("VESPA_USER_SPACE", "dev@tkeir")
+    )
     parser.add_argument("--query", default=None)
-    parser.add_argument("--output", default=None, help="Bundle output directory")
+    parser.add_argument(
+        "--output", default=None, help="Bundle output directory"
+    )
     parser.add_argument("--max-docs", type=int, default=200)
     args = parser.parse_args(argv)
     request = OkfExportRequest(

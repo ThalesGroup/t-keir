@@ -34,7 +34,11 @@ class StopCondition(BaseModel):
 
 
 class AgentSpec(BaseModel):
-    """Loaded from ``tkeir/configs/agents/*.yaml``."""
+    """Loaded from ``tkeir/configs/agents/*.yaml`` or ``datasets/*/agents/``.
+
+    Persona ``*_prompt`` agents may set wiki generation fields used by the
+    ``okf_iterative_wiki`` builtin (HMI passes ``prompt_name`` / ``wiki_agent``).
+    """
 
     name: str
     version: int = 1
@@ -46,6 +50,29 @@ class AgentSpec(BaseModel):
     stop: StopCondition = Field(default_factory=StopCondition)
     output_contract: str = "grounded_findings_v1"
     temperature: float = 0.1
+    # --- OKF wiki generation (persona prompt agents) ---
+    wiki_structured_facts_seed: str = Field(
+        default="",
+        description=(
+            "Optional markdown section injected into the OKF wiki.md seed "
+            "(e.g. Structured facts checklist). Empty = Google OKF core only "
+            "(Answer / Evidence / Sources)."
+        ),
+    )
+    wiki_merge_system_prompt: str = Field(
+        default="",
+        description=(
+            "System prompt for the OKF wiki single-pass fold LLM call. "
+            "Empty = generic OKF merge system (no form-specific checklist)."
+        ),
+    )
+    wiki_information_priority_keys: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Optional priority substrings for compact_information_for_prompt "
+            "when ranking ## Information metadata lines."
+        ),
+    )
 
 
 class GroundedFinding(BaseModel):
@@ -179,7 +206,7 @@ class WorkflowStep(BaseModel):
 
 
 class WorkflowSpec(BaseModel):
-    """Loaded from ``tkeir/configs/workflows/*.yaml``."""
+    """Loaded from ``tkeir/configs/workflows/*.yaml`` or ``datasets/*/workflows/``."""
 
     name: str
     version: int = 1

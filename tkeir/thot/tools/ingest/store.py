@@ -73,8 +73,14 @@ class IngestStore:
     def manifest_path(self, doc_id: str) -> Path:
         return self.staging_path(doc_id) / "ingest.manifest.json"
 
+    def analyzed_document_path(self, doc_id: str) -> Path:
+        return self.staging_path(doc_id) / "analyzed_document.json"
+
     def source_path(self, doc_id: str, filename: str) -> Path:
         return self.staging_path(doc_id) / filename
+
+    def source_ref_index_path(self) -> Path:
+        return self.root / "source_refs.json"
 
     def job_path(self, ingest_id: str) -> Path:
         return self.jobs_dir / f"{ingest_id}.json"
@@ -147,6 +153,64 @@ class IngestStore:
         dest = self.source_path(doc_id, filename)
         write_upload(content, dest=dest)
         return dest
+
+    def write_analyzed_document(
+        self,
+        doc_id: str,
+        document: dict[str, Any],
+        *,
+        source_ref: str | None = None,
+    ) -> Path:
+        path = self.analyzed_document_path(doc_id)
+        _atomic_write_json(path, document)
+        if source_ref:
+            self.put_source_ref_record(source_ref, doc_id=doc_id)
+        return path
+
+    def read_analyzed_document(self, doc_id: str) -> dict[str, Any] | None:
+        path = self.analyzed_document_path(doc_id)
+        if not path.is_file():
+            return None
+        return _read_json(path)
+
+    def get_source_ref_record(self, source_ref: str) -> dict[str, Any] | None:
+        path = self.source_ref_index_path()
+        if not path.is_file():
+            return None
+        data = _read_json(path)
+        refs = data.get("refs")
+        if not isinstance(refs, dict):
+            return None
+        record = refs.get(source_ref)
+        return record if isinstance(record, dict) else None
+
+    def put_source_ref_record(self, source_ref: str, *, doc_id: str) -> None:
+        self.ensure_layout()
+        path = self.source_ref_index_path()
+        if path.is_file():
+            data = _read_json(path)
+        else:
+            data = {"refs": {}}
+        refs = data.setdefault("refs", {})
+        if not isinstance(refs, dict):
+            refs = {}
+            data["refs"] = refs
+        refs[source_ref] = {
+            "doc_id": doc_id,
+            "updated_at": utc_now_rfc3339(),
+        }
+        _atomic_write_json(path, data)
+
+    def read_analyzed_document_by_source_ref(
+        self, source_ref: str
+    ) -> dict[str, Any] | None:
+        record = self.get_source_ref_record(source_ref)
+        if not record:
+            return None
+        doc_id = record.get("doc_id")
+        if not isinstance(doc_id, str) or not doc_id.strip():
+            return None
+        return self.read_analyzed_document(doc_id.strip())
 
     def get_idempotency_record(self, key: str) -> dict[str, Any] | None:
         if not self.idempotency_path.is_file():

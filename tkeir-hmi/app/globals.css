@@ -10,6 +10,10 @@
     @apply scroll-mt-20 text-foreground;
   }
 
+  .prose p {
+    @apply mb-3 leading-relaxed last:mb-0;
+  }
+
   .prose ul {
     @apply my-3 list-disc space-y-1 pl-5;
   }
@@ -18,8 +22,29 @@
     @apply my-3 list-decimal space-y-1 pl-5;
   }
 
+  .prose blockquote {
+    @apply my-3 border-l-4 border-primary/40 bg-muted/40 py-2 pl-4 italic;
+  }
+
   .prose code {
     @apply rounded bg-muted px-1 py-0.5 text-[0.85em];
+  }
+
+  .prose pre {
+    @apply my-3 overflow-x-auto rounded-md border bg-muted/50 p-3;
+  }
+
+  .prose a {
+    @apply font-medium text-primary underline underline-offset-2;
+  }
+
+  .prose table {
+    @apply w-full border-collapse text-left text-sm;
+  }
+
+  .prose th,
+  .prose td {
+    @apply border border-border px-2 py-1.5;
   }
 }
 

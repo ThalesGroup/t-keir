@@ -4,10 +4,11 @@
   "private": true,
   "description": "T-KEIR Human-Machine Interface — 2-level RAG search UI",
   "scripts": {
+    "postinstall": "node scripts/patch-react-types.js",
     "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start --port 3000",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -17,8 +18,9 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "keycloak-js": "^26.2.4",
     "lucide-react": "^0.525.0",
-    "next": "^15.5.22",
+    "next": "^16.2.12",
     "next-auth": "^5.0.0-beta.32",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -33,12 +35,13 @@
     "@types/react-dom": "^19.1.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.31.0",
-    "eslint-config-next": "^15.5.22",
+    "eslint-config-next": "^16.2.12",
     "postcss": "^8.5.18",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3"
   },
   "overrides": {
-    "postcss": "^8.5.18"
+    "postcss": "^8.5.18",
+    "sharp": "^0.35.3"
   }
 }

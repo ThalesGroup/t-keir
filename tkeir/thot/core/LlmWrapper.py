@@ -208,6 +208,7 @@ class WrapperConfig:
     rerank_strategy: str
     embedding_dim: int
     timeout_seconds: float
+    generate_timeout_seconds: float
     openai_api_key: str | None
     openai_base_url: str
     ollama_base_url: str
@@ -262,6 +263,14 @@ class WrapperConfig:
             file_cfg.get("embedding_dim"),
             str(DEFAULT_EMBEDDING_DIM),
         )
+        http_timeout = float(os.getenv("HTTP_TIMEOUT_SECONDS", "120"))
+        generate_timeout_raw = os.getenv("LLM_GENERATE_TIMEOUT_SECONDS")
+        generate_timeout = (
+            float(generate_timeout_raw)
+            if generate_timeout_raw
+            # Persona wiki merges (detailed OKF fold) often need >5m on local Ollama.
+            else max(http_timeout, 600.0)
+        )
         return cls(
             provider=provider,
             embedding_model=_first_non_empty(
@@ -289,7 +298,9 @@ class WrapperConfig:
                 )
             ),
             embedding_dim=int(embedding_dim_raw or DEFAULT_EMBEDDING_DIM),
-            timeout_seconds=float(os.getenv("HTTP_TIMEOUT_SECONDS", "120")),
+            timeout_seconds=http_timeout,
+            # Wiki / agent merges routinely exceed the embed timeout; default ≥10m.
+            generate_timeout_seconds=generate_timeout,
             openai_api_key=os.getenv("OPENAI_API_KEY"),
             openai_base_url=os.getenv(
                 "OPENAI_BASE_URL", "https://api.openai.com/v1"
@@ -487,11 +498,15 @@ class UnifiedLLMWrapper:
         if self._config.provider is not Provider.OLLAMA:
             return
         file_cfg = _load_file_model_overrides()
-        backend = str(
-            file_cfg.get("embedding_backend")
-            or os.getenv("EMBEDDING_BACKEND")
-            or ""
-        ).strip().lower()
+        backend = (
+            str(
+                file_cfg.get("embedding_backend")
+                or os.getenv("EMBEDDING_BACKEND")
+                or ""
+            )
+            .strip()
+            .lower()
+        )
         names: list[str] = [self._config.llm_model]
         if backend not in {
             "flagembedding",
@@ -612,9 +627,7 @@ class UnifiedLLMWrapper:
             return await self._embedding_cosine_rerank(
                 query, documents, top_n=keep
             )
-        return await self._cross_encoder_rerank(
-            query, documents, top_n=keep
-        )
+        return await self._cross_encoder_rerank(query, documents, top_n=keep)
 
     def _get_cross_encoder(self):
         """Lazily load the sentence-transformers CrossEncoder.
@@ -792,6 +805,14 @@ class UnifiedLLMWrapper:
                     temperature=temperature,
                 )
             return result
+        except httpx.TimeoutException as exc:
+            limit = self._config.generate_timeout_seconds
+            raise TimeoutError(
+                f"LLM generate timed out after {limit:.0f}s "
+                f"(provider={self._config.provider.value}, "
+                f"model={self._config.llm_model}). "
+                f"Raise LLM_GENERATE_TIMEOUT_SECONDS or reduce max_wiki_chunks."
+            ) from exc
         finally:
             _log_llm_generate_stats(
                 elapsed_seconds=time.perf_counter() - started,
@@ -859,6 +880,7 @@ class UnifiedLLMWrapper:
             f"{self._config.openai_base_url}/chat/completions",
             headers=headers,
             json=payload,
+            timeout=self._config.generate_timeout_seconds,
         )
         response.raise_for_status()
         return response.json()["choices"][0]["message"]["content"].strip()
@@ -912,6 +934,7 @@ class UnifiedLLMWrapper:
                 "stream": False,
                 "options": {"temperature": temperature},
             },
+            timeout=self._config.generate_timeout_seconds,
         )
         response.raise_for_status()
         return response.json()["message"]["content"].strip()
@@ -973,6 +996,7 @@ class UnifiedLLMWrapper:
             f"{self._config.vllm_base_url}/chat/completions",
             headers=headers,
             json=payload,
+            timeout=self._config.generate_timeout_seconds,
         )
         response.raise_for_status()
         return response.json()["choices"][0]["message"]["content"].strip()

@@ -69,6 +69,7 @@ class QueryAnalysis:
     keywords: list[str] = field(default_factory=list)
     lemmas: list[str] = field(default_factory=list)
     search_terms: list[str] = field(default_factory=list)
+    morphosyntax: list[dict[str, Any]] = field(default_factory=list)
     lexical_query: str = ""
     chunk_embedding_text: str = ""
     pipeline_failed: bool = False
@@ -181,6 +182,9 @@ def extract_keyword_terms(keywords: list[dict[str, Any]]) -> list[str]:
 
 # Universal Dependencies content POS tags (language-agnostic).
 _CONTENT_POS = frozenset({"NOUN", "PROPN", "VERB", "ADJ", "NUM"})
+# Answer grounding focuses on referential content (entities, nouns, numbers,
+# adjectives). Verbs are often paraphrased and are not used as grounding keys.
+_GROUNDING_CONTENT_POS = frozenset({"NOUN", "PROPN", "ADJ", "NUM"})
 
 
 def extract_lemma_terms(morphosyntax: list[dict[str, Any]]) -> list[str]:
@@ -211,10 +215,134 @@ def extract_lemma_terms(morphosyntax: list[dict[str, Any]]) -> list[str]:
     return lemmas
 
 
+def content_terms_from_morphosyntax(
+    morphosyntax: list[dict[str, Any]] | None,
+    *,
+    content_pos: frozenset[str] | None = None,
+) -> set[str]:
+    """Return lowercased content lemmas/surfaces from UD morphosyntax.
+
+    Uses Universal Dependencies POS tags only — no language word lists.
+
+    Example:
+        >>> sorted(content_terms_from_morphosyntax([
+        ...     {"text": "the", "lemma": "the", "pos": "DET"},
+        ...     {"text": "Suez", "lemma": "Suez", "pos": "PROPN"},
+        ...     {"text": "Canal", "lemma": "canal", "pos": "NOUN"},
+        ... ]))
+        ['canal', 'suez']
+    """
+    allowed = content_pos or _CONTENT_POS
+    terms: set[str] = set()
+    for token in morphosyntax or []:
+        pos = str(token.get("pos") or "").upper()
+        if pos and pos not in allowed:
+            continue
+        for key in ("lemma", "text"):
+            raw = str(token.get(key) or "").strip().strip("._-")
+            if len(raw) < 2:
+                continue
+            terms.add(raw.lower())
+    return terms
+
+
+def morphosyntax_for_text(
+    text: str,
+    *,
+    language: str | None = None,
+    pipeline_runner: Any | None = None,
+) -> list[dict[str, Any]]:
+    """Run morphosyntax on ``text`` when a pipeline runner is available.
+
+    Returns an empty list when NLP is unavailable (callers fall back to
+    non-linguistic token overlap without language word lists).
+
+    Example:
+        >>> morphosyntax_for_text("")
+        []
+    """
+    normalized = (text or "").strip()
+    if not normalized or pipeline_runner is None:
+        return []
+    document: dict[str, Any] = {"content": [normalized]}
+    if language:
+        document["language-detection"] = {"language": language}
+    try:
+        processed = pipeline_runner.run(
+            document,
+            skip_converter=True,
+            tasks=["morphosyntax"],
+        )
+    except Exception:  # noqa: BLE001
+        return []
+    morph = processed.get("content_morphosyntax") or []
+    return morph if isinstance(morph, list) else []
+
+
+def content_terms_for_grounding(
+    text: str,
+    *,
+    morphosyntax: list[dict[str, Any]] | None = None,
+    language: str | None = None,
+    pipeline_runner: Any | None = None,
+    min_length: int = 2,
+) -> set[str]:
+    """Content-bearing terms for answer grounding (language-agnostic).
+
+    Prefers UD morphosyntax with referential POS (NOUN/PROPN/ADJ/NUM). Without
+    NLP, keeps alphanumeric tokens of ``min_length``+ (no stopword word-list).
+
+    Example:
+        >>> "suez" in content_terms_for_grounding(
+        ...     "Suez Canal",
+        ...     morphosyntax=[
+        ...         {"text": "Suez", "lemma": "Suez", "pos": "PROPN"},
+        ...         {"text": "Canal", "lemma": "canal", "pos": "NOUN"},
+        ...     ],
+        ... )
+        True
+    """
+    morph = morphosyntax
+    if morph is None:
+        morph = morphosyntax_for_text(
+            text, language=language, pipeline_runner=pipeline_runner
+        )
+    if morph:
+        return {
+            term
+            for term in content_terms_from_morphosyntax(
+                morph, content_pos=_GROUNDING_CONTENT_POS
+            )
+            if len(term) >= min_length
+        }
+    # NLP unavailable: prefer referential surface forms (capitalized spans +
+    # numbers). Avoid language-specific stopword lists.
+    terms: set[str] = set()
+    for match in re.finditer(
+        r"\b([A-Z][\w'._-]{1,}|\d{2,})\b", text or "", flags=re.UNICODE
+    ):
+        cleaned = match.group(1).lower().strip("._-")
+        if len(cleaned) >= min_length:
+            terms.add(cleaned)
+    if terms:
+        return terms
+    for token in re.findall(
+        r"[A-Za-z0-9][A-Za-z0-9'._-]{1,}", (text or "").lower()
+    ):
+        cleaned = token.strip("._-")
+        if len(cleaned) >= max(min_length, 4):
+            terms.add(cleaned)
+    return terms
+
+
 def build_search_terms(
     analysis: QueryAnalysis, config: RagSearchConfig
 ) -> list[str]:
     """Merge NER, SVO, keywords, and lemmas into a deduplicated term list.
+
+    Interrogative / function tokens (UD PRON, DET, ADP, …) from morphosyntax
+    are never kept — otherwise ``What happen at Suez`` injects ``What`` into
+    BM25 OR clauses and matches unrelated ``what appeared…`` passages.
 
     Example:
         >>> analysis = QueryAnalysis(
@@ -228,13 +356,30 @@ def build_search_terms(
     """
     ordered: list[str] = []
     seen: set[str] = set()
+    # Surfaces tagged as non-content POS (language-agnostic).
+    blocked: set[str] = set()
+    for morph_token in analysis.morphosyntax or []:
+        pos = str(morph_token.get("pos") or "").upper()
+        if pos in _CONTENT_POS:
+            continue
+        for key in ("lemma", "text"):
+            raw = str(morph_token.get(key) or "").strip()
+            if raw:
+                blocked.add(raw.casefold())
 
     def add_term(value: str) -> None:
         cleaned = (value or "").strip()
         if not cleaned:
             return
-        key = cleaned.lower()
+        key = cleaned.casefold()
         if key in seen:
+            return
+        # Drop single-token function words (e.g. SVO subject "What").
+        if key in blocked:
+            return
+        # Drop multi-token phrases that are only function words + contentless glue.
+        parts = [p for p in _WHITESPACE_RE.split(cleaned) if p]
+        if parts and all(part.casefold() in blocked for part in parts):
             return
         seen.add(key)
         ordered.append(cleaned)
@@ -259,7 +404,8 @@ def build_search_terms(
 
     if not ordered:
         for token in meaningful_tokens_from_morphosyntax(
-            [
+            analysis.morphosyntax
+            or [
                 {"text": part, "pos": "X"}
                 for part in _WHITESPACE_RE.split(analysis.raw_query)
                 if part
@@ -523,6 +669,9 @@ def analyze_query_document(
         svo_triples=extract_svo_triples(processed.get("kg") or []),
         keywords=extract_keyword_terms(processed.get("keywords") or []),
         lemmas=extract_lemma_terms(morphosyntax),
+        morphosyntax=(
+            list(morphosyntax) if isinstance(morphosyntax, list) else []
+        ),
     )
     if not analysis.lemmas:
         analysis.lemmas = meaningful_tokens_from_morphosyntax(morphosyntax)
@@ -711,6 +860,7 @@ class QueryAnalyzerTask:
                     for triple in analysis.svo_triples
                 ],
                 "keywords": analysis.keywords,
+                "morphosyntax": analysis.morphosyntax,
                 "pipeline_failed": analysis.pipeline_failed,
                 "ranking_weights": {
                     "chunk_embedding": self._config.weight_chunk_embedding,

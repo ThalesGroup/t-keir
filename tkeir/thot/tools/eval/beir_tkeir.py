@@ -25,8 +25,8 @@ from typing import Any
 from thot.core.TkeirPaths import configs_dir, vespa_dir
 from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
 from thot.tasks.pipeline.PipelineRunner import PipelineRunner
-from thot.tools.ingest.index_passages import index_pipeline_document
 from thot.tools.eval.hybrid_retrieve import document_text
+from thot.tools.ingest.index_passages import index_pipeline_document
 from thot.tools.search.rag_config import load_rag_config
 from thot.tools.search.vespa_client import VespaClient
 
@@ -409,7 +409,9 @@ def beir_business_ontology_path(
     datasets_dir: Path | str | None = None,
 ) -> Path:
     """Alias of :func:`dataset_business_ontology_path` (BEIR naming)."""
-    from thot.tools.search.business_ontology import dataset_business_ontology_path
+    from thot.tools.search.business_ontology import (
+        dataset_business_ontology_path,
+    )
 
     return dataset_business_ontology_path(dataset, datasets_dir)
 
@@ -612,11 +614,7 @@ async def index_beir_corpus(
             pipeline_doc["dataset"] = dataset
             nlp_ms = (time.perf_counter() - t_nlp) * 1000
             chunk_count = len(pipeline_doc.get("golden_chunks") or [])
-            done_label = (
-                "synthetic ready"
-                if mode == "fast"
-                else "NLP done"
-            )
+            done_label = "synthetic ready" if mode == "fast" else "NLP done"
             LOGGER.info(
                 "T-KEIR doc %d / %d: %s %s (%d chunks, embedding…)",
                 position,
@@ -822,4 +820,3 @@ async def run_tkeir_eval(
         corpus=corpus,
         language=language,
     )
-

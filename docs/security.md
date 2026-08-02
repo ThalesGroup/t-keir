@@ -8,6 +8,8 @@ components). Task configuration files no longer expose HTTP `network` or
 This page describes **engineering controls**. It is not a compliance
 attestation or legal advice. Regulation-oriented mappings live under
 [Compliance](compliance/index.md) (authored as evidence packs land).
+Supply-chain scans, SBOM/AIBOM, Cosign, and report paths are catalogued under
+[CI, reports & Actions](ci/index.md).
 
 ## Input and output paths
 

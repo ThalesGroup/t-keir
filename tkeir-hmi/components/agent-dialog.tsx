@@ -1,11 +1,14 @@
 "use client";
 
 import { Bot, Loader2, Send, User } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { resolvePersonaWorkflowPreset } from "@/lib/persona-workflows";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/src/auth/AuthProvider";
+import { apiFetch } from "@/src/auth/useApiClient";
 
 type ChatRole = "user" | "assistant" | "system";
 
@@ -34,7 +37,7 @@ type RunPayload = {
   } | null;
 };
 
-type Mode = "researcher" | "content_brief";
+type Mode = "researcher" | "persona";
 
 function newId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -96,18 +99,29 @@ interface AgentDialogProps {
 }
 
 /**
- * Chat-style dialog to ask the corpus via tkeir-agent (researcher or workflow).
+ * Chat-style dialog to ask the corpus via tkeir-agent (researcher or persona workflow).
  */
 export function AgentDialog({
   initialGoal = "",
   className,
 }: AgentDialogProps) {
-  const [mode, setMode] = useState<Mode>("researcher");
-  const [draft, setDraft] = useState(initialGoal);
+  const { roles, activePersonaId } = useAuth();
+  const preset = useMemo(
+    () => resolvePersonaWorkflowPreset({ roles, activePersonaId }),
+    [roles, activePersonaId],
+  );
+  const [mode, setMode] = useState<Mode>("persona");
+  const [draft, setDraft] = useState(initialGoal || preset.goal);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!draft.trim()) {
+      setDraft(preset.goal);
+    }
+  }, [preset.goal, draft]);
 
   useEffect(() => {
     if (initialGoal.trim() && !draft.trim()) {
@@ -122,7 +136,7 @@ export function AgentDialog({
   const pollUntilDone = useCallback(async (runId: string): Promise<RunPayload> => {
     const maxAttempts = 120;
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/agent/agent/runs/${encodeURIComponent(runId)}`,
         { cache: "no-store" },
       );
@@ -163,11 +177,15 @@ export function AgentDialog({
         mode === "researcher"
           ? { agent: "researcher", goal }
           : {
-              workflow: "content_brief",
+              workflow: preset.workflow,
               goal,
-              params: { topic: goal },
+              params: {
+                topic: preset.topic || goal,
+                report_form: preset.reportForm,
+                query: goal,
+              },
             };
-      const res = await fetch("/api/agent/agent/runs", {
+      const res = await apiFetch("/api/agent/agent/runs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -180,12 +198,14 @@ export function AgentDialog({
         throw new Error(created.detail || `Start failed (${res.status})`);
       }
 
+      const modeLabel =
+        mode === "researcher" ? "researcher" : preset.workflow;
       setMessages((prev) => [
         ...prev,
         {
           id: newId(),
           role: "system",
-          text: `Run ${created.run_id} started (${mode})…`,
+          text: `Run ${created.run_id} started (${modeLabel})…`,
           runId: created.run_id,
         },
       ]);
@@ -216,11 +236,23 @@ export function AgentDialog({
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       <p className="text-xs text-muted-foreground">
-        Ask grounded questions over your Vespa user space via tkeir-agent.
-        Claims without chunk citations are dropped.
+        Ask grounded questions via tkeir-agent. Default workflow:{" "}
+        <code className="rounded bg-muted px-1 py-0.5">{preset.workflow}</code>{" "}
+        ({preset.label} / {preset.reportForm}). Claims without chunk citations
+        are dropped.
       </p>
 
       <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={mode === "persona" ? "default" : "outline"}
+          className="h-7"
+          disabled={busy}
+          onClick={() => setMode("persona")}
+        >
+          Workflow ({preset.workflow})
+        </Button>
         <Button
           type="button"
           size="sm"
@@ -231,22 +263,12 @@ export function AgentDialog({
         >
           Researcher
         </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={mode === "content_brief" ? "default" : "outline"}
-          className="h-7"
-          disabled={busy}
-          onClick={() => setMode("content_brief")}
-        >
-          Workflow (content_brief)
-        </Button>
       </div>
 
       <div className="flex max-h-[min(28rem,60vh)] flex-col gap-2 overflow-y-auto rounded-md border bg-muted/20 p-3">
         {messages.length === 0 ? (
           <p className="text-xs text-muted-foreground">
-            No messages yet. Try a goal like the last search query.
+            No messages yet. Try the persona goal or your last search query.
           </p>
         ) : (
           messages.map((message) => (
@@ -301,7 +323,7 @@ export function AgentDialog({
         <Input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder="Ask the corpus via agents…"
+          placeholder={`Ask via ${preset.workflow}…`}
           disabled={busy}
           className="text-sm"
         />

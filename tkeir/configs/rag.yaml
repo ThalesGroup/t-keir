@@ -141,19 +141,21 @@ dual_hybrid:
         sparse: 0.20
         bm25: 0.10
   # Tag passages with datasets/<name>/business_ontology.yaml at index time /
-  # pass the YAML on search (defaults on).
+  # auto-load that YAML on /search and /rag/query (merge with request payload).
   business_ontology:
     index_enabled: true
     search_enabled: true
+    default_dataset: osint
   # One JSON dump per indexed document under workspace/ (gitignored).
   index_dump:
     enabled: false
     path: workspace/index-dumps
     save_document: false
   query_expansion:
-    # Resolve query (+ NLP seeds when nlp_seed_expansion applies) against the
+    # Resolve analyzed request (NER / keywords / kg) + raw query against the
     # per-request business ontology; expand synonym / narrower / broader /
-    # related / paraphrase for BM25 probe + ontology_concepts.
+    # related / paraphrase into BM25 probe + Vespa ontology_concepts OR
+    # clauses (expand recall — never AND-filter).
     enabled: true
     max_terms_per_relation: 5
     weights:
@@ -164,9 +166,10 @@ dual_hybrid:
       related: 0.2
       paraphrase: 0.85
     nlp_seed_expansion:
+      # When true, always feed analyzed NER/kg/keywords into the expander.
       enabled: true
       min_tokens: 32
-      # Also trigger on multi-sentence queries (even if under min_tokens).
+      # Legacy knobs (no longer gate expansion when enabled).
       min_sentences: 2
   rrf:
     k: 60

@@ -12,7 +12,7 @@ make quickstart
 ```
 
 This runs `tkeir-pipeline` only (no Vespa indexing) on
-`tkeir/tests/fixtures/test-raw`:
+`tests/fixtures/test-raw`:
 
 - `raw/` — plain text
 - `mail/` — email

@@ -13,7 +13,11 @@ T-KEIR ships two complementary layers:
    Assessment Results / POA&M under `reports/compliance/eu-audit/<version>/`.
 
 After `make ci` (or `make audit-compliance`), the **full** article outcomes are
-also published into MkDocs — see [Latest audit results](latest-results.md).
+also published into MkDocs — see [Compliance status (one page)](status.md) and
+[Latest audit results](latest-results.md).
+
+For the catalogue of **all** CI reports and GitHub Actions (not only OPA
+evidence), see [CI, reports & Actions](../ci/index.md).
 
 ```bash
 make audit-compliance   # OPA audit → reports/… + docs/compliance/generated/
@@ -26,6 +30,7 @@ make annex-iv           # reports/compliance/annex-iv/
 | Doc | Regulation | OPA package |
 |-----|------------|-------------|
 | [EU Compliance OPA Audit](eu-audit.md) | Tool, result model, category gates | all |
+| [Compliance status (one page)](status.md) | Colored status · criticality · remediation | all |
 | [Latest audit results](latest-results.md) | Last CI / audit snapshot (full outcomes) | all |
 | [Legal / reviewer checklist](legal-review-checklist.md) | GDPR/CRA human vs automatic checkboxes | `eu.gdpr` / `eu.cra` |
 | [ai-act.md](ai-act.md) | AI Act Reg. (EU) 2024/1689 | `eu.ai_act` |

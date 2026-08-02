@@ -3,6 +3,7 @@
 import { memo } from "react";
 import { AlertCircle, Bot, Sparkles } from "lucide-react";
 
+import { MarkdownContent } from "@/components/markdown-content";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -86,7 +87,7 @@ export const AiSynthesis = memo(function AiSynthesis({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="whitespace-pre-wrap text-base leading-relaxed">{answer}</p>
+        <MarkdownContent content={answer} className="text-base [&_p]:text-base" />
         {typeof vespaHits === "number" && (
           <p className="mt-3 text-xs text-muted-foreground">
             Grounded on {vespaHits} Vespa hit(s)

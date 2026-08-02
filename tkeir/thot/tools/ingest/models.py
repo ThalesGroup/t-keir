@@ -171,6 +171,37 @@ class BatchAcceptedResponse(BaseModel):
     jobs: list[IngestAcceptedResponse]
 
 
+class JsonRecordsIngestRequest(BaseModel):
+    """Options for ``POST /ingest/json-records`` (multipart or JSON path)."""
+
+    split_records: bool = True
+    index_target: str = Field(
+        default="global",
+        description="Vespa target: global | user | both",
+    )
+    offset: int = Field(default=0, ge=0)
+    limit: int | None = Field(
+        default=None,
+        ge=1,
+        description="Max records to queue (None = all)",
+    )
+    # Server-side dataset path relative to repo / TKEIR_WORKSPACE (admin demos).
+    dataset_path: str | None = None
+    filename: str | None = None
+
+
+class JsonRecordsAcceptedResponse(BaseModel):
+    """202 response after splitting a JSON corpus into per-record jobs."""
+
+    batch_id: str
+    correlation_id: str
+    record_count: int
+    queued: int
+    index_target: str
+    source_basename: str
+    jobs: list[IngestAcceptedResponse]
+
+
 class IngestStatusResponse(BaseModel):
     """``GET /ingest/status/{id}`` payload."""
 

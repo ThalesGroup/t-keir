@@ -20,7 +20,7 @@ try:
     from thot.action.correlation import current_correlation_id
 except Exception:  # noqa: BLE001 — keep logger usable before action package
 
-    def current_correlation_id() -> str | None:  # type: ignore[misc]
+    def current_correlation_id() -> str | None:
         return None
 
 

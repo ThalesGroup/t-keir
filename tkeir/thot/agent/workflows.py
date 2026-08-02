@@ -1,6 +1,7 @@
 """Title: Workflows
 
-Load workflow YAML specs from ``tkeir/configs/workflows/``.
+Load workflow YAML specs from ``tkeir/configs/workflows/`` and dataset packs
+(``datasets/<pack>/workflows/``).
 
 Author: Eric Blaudez
 
@@ -10,16 +11,17 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import yaml
 
 from thot.agent.models import WorkflowSpec, WorkflowStep
-from thot.core.TkeirPaths import configs_dir
+from thot.core.TkeirPaths import configs_dir, repo_root
 
 
 def workflows_dir() -> Path:
-    """Return the workflows configuration directory.
+    """Return the core workflows configuration directory.
 
     Example:
         >>> from thot.agent.workflows import workflows_dir
@@ -27,6 +29,67 @@ def workflows_dir() -> Path:
         'workflows'
     """
     return Path(configs_dir()) / "workflows"
+
+
+def workflow_config_dirs() -> list[Path]:
+    """Return search roots for workflow YAML (core configs + dataset packs).
+
+    Dataset-specific workflows live under ``datasets/<pack>/workflows/``
+    (for example OSINT persona flows under ``datasets/osint/workflows/``).
+    Docker images may also ship packs under ``<package>/packs/<pack>/workflows/``.
+
+    Example:
+        >>> from thot.agent.workflows import workflow_config_dirs
+        >>> any(p.name == "workflows" for p in workflow_config_dirs())
+        True
+    """
+    from thot.core.TkeirPaths import package_root
+
+    roots: list[Path] = [workflows_dir()]
+    for base in (
+        Path(repo_root()) / "datasets",
+        Path(package_root()) / "packs",
+    ):
+        if not base.is_dir():
+            continue
+        for pack in sorted(base.iterdir()):
+            if not pack.is_dir() or pack.name.startswith("."):
+                continue
+            candidate = pack / "workflows"
+            if candidate.is_dir():
+                roots.append(candidate)
+    extra = os.getenv("TKEIR_WORKFLOW_CONFIG_DIRS", "").strip()
+    if extra:
+        for part in extra.split(os.pathsep):
+            path = Path(part).expanduser()
+            if path.is_dir():
+                roots.append(path)
+    seen: set[Path] = set()
+    unique: list[Path] = []
+    for root in roots:
+        key = root.resolve()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(root)
+    return unique
+
+
+def resolve_workflow_path(name: str, *, directory: Path | None = None) -> Path:
+    """Resolve ``<name>.yaml`` across workflow config roots."""
+    if directory is not None:
+        path = Path(directory) / f"{name}.yaml"
+        if path.is_file():
+            return path
+        raise FileNotFoundError(f"workflow not found: {path}")
+    for root in workflow_config_dirs():
+        path = root / f"{name}.yaml"
+        if path.is_file():
+            return path
+    searched = ", ".join(str(p) for p in workflow_config_dirs())
+    raise FileNotFoundError(
+        f"workflow not found: {name}.yaml (searched: {searched})"
+    )
 
 
 def load_workflow(name: str, *, directory: Path | None = None) -> WorkflowSpec:
@@ -40,10 +103,7 @@ def load_workflow(name: str, *, directory: Path | None = None) -> WorkflowSpec:
         >>> len(wf.steps) >= 2
         True
     """
-    root = directory or workflows_dir()
-    path = root / f"{name}.yaml"
-    if not path.is_file():
-        raise FileNotFoundError(f"workflow not found: {path}")
+    path = resolve_workflow_path(name, directory=directory)
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     if not isinstance(raw, dict):
         raise ValueError(f"workflow must be a mapping: {path}")
@@ -71,14 +131,21 @@ def load_workflow(name: str, *, directory: Path | None = None) -> WorkflowSpec:
 
 
 def list_workflow_names(*, directory: Path | None = None) -> list[str]:
-    """List available workflow YAML stems.
+    """List available workflow YAML stems (core + dataset packs).
 
     Example:
         >>> from thot.agent.workflows import list_workflow_names
         >>> "content_brief" in list_workflow_names()
         True
     """
-    root = directory or workflows_dir()
-    if not root.is_dir():
-        return []
-    return sorted(p.stem for p in root.glob("*.yaml"))
+    if directory is not None:
+        root = Path(directory)
+        if not root.is_dir():
+            return []
+        return sorted(p.stem for p in root.glob("*.yaml"))
+    names: set[str] = set()
+    for root in workflow_config_dirs():
+        if not root.is_dir():
+            continue
+        names.update(p.stem for p in root.glob("*.yaml"))
+    return sorted(names)

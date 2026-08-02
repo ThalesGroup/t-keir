@@ -1,13 +1,7 @@
 """Title: Ontology reasoner queries over merged RAG graphs
 
 Query a merged document ontology (JSON-LD from Vespa parents) with SPARQL
-and optional OWLAPY SyncReasoner (HermiT / Pellet / …).
-
-Install the optional extra when Java reasoners are needed::
-
-    cd tkeir && uv sync --extra owl
-
-Without ``owlapy``, SPARQL and RDFS walks still work via rdflib.
+and the single ``python`` reasoner (coherence / hierarchy + class expressions).
 
 Author: Eric Blaudez
 
@@ -17,8 +11,6 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
 from typing import Any
 from typing import Literal as TypingLiteral
 
@@ -37,6 +29,7 @@ OntologyOperation = TypingLiteral[
     "instances",
     "types",
     "sparql",
+    "expression",
     "infer",
 ]
 
@@ -47,21 +40,12 @@ SUPPORTED_OPERATIONS: tuple[str, ...] = (
     "instances",
     "types",
     "sparql",
+    "expression",
     "infer",
 )
 
-DEFAULT_REASONER = "HermiT"
-
-# OWLAPY SyncReasoner names + local rdflib fallback (no Java).
-SUPPORTED_REASONERS: tuple[str, ...] = (
-    "HermiT",
-    "Pellet",
-    "ELK",
-    "JFact",
-    "Openllet",
-    "Structural",
-    "rdflib",
-)
+DEFAULT_REASONER = "python"
+SUPPORTED_REASONERS: tuple[str, ...] = ("python",)
 
 TKEIR_REASON = "http://tkeir.local/reasoner/"
 RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#"
@@ -326,38 +310,23 @@ def results_as_json_ld(
 
 
 def normalize_reasoner_name(reasoner: str | None) -> str:
-    """Normalize a reasoner name; unknown values fall back to HermiT.
+    """Return ``python`` or raise if another reasoner name is requested.
 
     Example:
-        >>> normalize_reasoner_name("pellet")
-        'Pellet'
-        >>> normalize_reasoner_name("rdflib")
-        'rdflib'
+        >>> normalize_reasoner_name(None)
+        'python'
+        >>> normalize_reasoner_name("python")
+        'python'
     """
-    raw = (reasoner or DEFAULT_REASONER).strip()
+    raw = (reasoner or DEFAULT_REASONER).strip().lower()
     if not raw:
         return DEFAULT_REASONER
-    if raw.lower() == "rdflib":
-        return "rdflib"
-    for name in SUPPORTED_REASONERS:
-        if name.lower() == raw.lower():
-            return name
-    return DEFAULT_REASONER
-
-
-def owlapy_available() -> bool:
-    """Return True when the optional ``owlapy`` package can be imported.
-
-    Example:
-        >>> isinstance(owlapy_available(), bool)
-        True
-    """
-    try:
-        import owlapy  # noqa: F401
-
-        return True
-    except Exception:
-        return False
+    if raw == DEFAULT_REASONER:
+        return DEFAULT_REASONER
+    raise ValueError(
+        f"unsupported reasoner {reasoner!r}; "
+        f"only {DEFAULT_REASONER!r} is available"
+    )
 
 
 def _load_graph(payload: str) -> Graph:
@@ -373,10 +342,6 @@ def _local_name(uri: str) -> str:
     if "#" in text:
         return text.rsplit("#", 1)[-1]
     return text.rsplit("/", 1)[-1]
-
-
-def _node_ref(value: Any) -> str:
-    return str(value)
 
 
 def _rdfs_related_classes(
@@ -456,7 +421,7 @@ def _sparql_select(
     return rows
 
 
-def _instances_rdflib(
+def _instances_python(
     graph: Graph, class_iri: str, *, limit: int
 ) -> list[dict[str, str]]:
     cls = URIRef(class_iri)
@@ -470,7 +435,7 @@ def _instances_rdflib(
     return out
 
 
-def _types_rdflib(
+def _types_python(
     graph: Graph, individual_iri: str, *, limit: int
 ) -> list[dict[str, str]]:
     ind = URIRef(individual_iri)
@@ -484,251 +449,36 @@ def _types_rdflib(
     return out
 
 
-def _write_temp_ontology(graph: Graph) -> Path:
-    """Serialize graph to a temporary Turtle file for OWLAPY."""
-    handle = tempfile.NamedTemporaryFile(
-        prefix="tkeir-merged-",
-        suffix=".ttl",
-        delete=False,
-        mode="w",
-        encoding="utf-8",
+def _query_with_python(
+    graph: Graph,
+    *,
+    operation: OntologyOperation,
+    class_iri: str | None,
+    individual_iri: str | None,
+    sparql: str | None,
+    expression: str | None = None,
+    direct: bool,
+    limit: int,
+) -> dict[str, Any]:
+    """Single pure-Python reasoner (coherence + hierarchy + expressions)."""
+    from thot.tools.search.python_reasoner import (
+        check_coherence,
+        evaluate_expression,
     )
-    path = Path(handle.name)
-    try:
-        handle.write(graph.serialize(format="turtle"))
-    finally:
-        handle.close()
-    return path
 
-
-def _owlapy_nodes_to_results(
-    nodes: list[Any], *, limit: int
-) -> list[dict[str, str]]:
-    """Map OWLAPY nodes to ``iri``/``label`` result rows."""
-    return [
-        {"iri": _node_ref(node), "label": _local_name(_node_ref(node))}
-        for node in nodes[:limit]
-    ]
-
-
-def _owlapy_consistency(
-    sync: Any, *, operation: str, backend: str
-) -> dict[str, Any]:
-    consistent = bool(sync.has_consistent_ontology())
-    return {
-        "operation": operation,
-        "backend": backend,
-        "consistent": consistent,
-        "results": [{"consistent": str(consistent).lower()}],
-    }
-
-
-def _owlapy_sparql(
-    graph: Graph, *, operation: str, sparql: str | None, limit: int
-) -> dict[str, Any]:
-    if not sparql or not sparql.strip():
-        raise ValueError("sparql operation requires a non-empty query")
-    rows = _sparql_select(graph, sparql, limit=limit)
-    return {
-        "operation": operation,
-        "backend": "rdflib+sparql",
-        "results": rows,
-        "count": len(rows),
-    }
-
-
-def _owlapy_hierarchy(
-    sync: Any,
-    *,
-    operation: OntologyOperation,
-    class_iri: str | None,
-    direct: bool,
-    limit: int,
-    backend: str,
-    owl_class_cls: Any,
-    iri_cls: Any,
-) -> dict[str, Any]:
-    if not class_iri:
-        raise ValueError(f"{operation} requires class_iri")
-    owl_class = owl_class_cls(iri_cls.create(class_iri))
-    if operation == "subclasses":
-        nodes = list(sync.sub_classes(owl_class, direct=direct) or [])
-    elif operation == "superclasses":
-        nodes = list(sync.super_classes(owl_class, direct=direct) or [])
-    else:
-        nodes = list(sync.instances(owl_class) or [])
-    results = _owlapy_nodes_to_results(nodes, limit=limit)
-    return {
-        "operation": operation,
-        "backend": backend,
-        "results": results,
-        "count": len(results),
-    }
-
-
-def _owlapy_types(
-    sync: Any,
-    *,
-    operation: str,
-    individual_iri: str | None,
-    limit: int,
-    backend: str,
-    named_individual_cls: Any,
-    iri_cls: Any,
-) -> dict[str, Any]:
-    if not individual_iri:
-        raise ValueError("types requires individual_iri")
-    individual = named_individual_cls(iri_cls.create(individual_iri))
-    nodes = list(sync.types(individual) or [])
-    results = _owlapy_nodes_to_results(nodes, limit=limit)
-    return {
-        "operation": operation,
-        "backend": backend,
-        "results": results,
-        "count": len(results),
-    }
-
-
-def _owlapy_infer(
-    sync: Any,
-    graph: Graph,
-    *,
-    operation: str,
-    limit: int,
-    backend: str,
-) -> dict[str, Any]:
-    # Materialize inferred class assertions back into JSON-LD when possible.
-    inferred = Graph()
-    for triple in graph:
-        inferred.add(triple)
-    try:
-        axioms = list(
-            sync.infer_axioms(
-                inference_types=["InferredClassAssertionAxiomGenerator"]
-            )
-            or []
-        )
-    except TypeError:
-        axioms = []
-    added = 0
-    for axiom in axioms[: max(limit * 5, limit)]:
-        text = str(axiom)
-        # Best-effort: SyncReasoner axiom objects vary by version;
-        # keep count even when we cannot map every axiom to RDF.
-        added += 1
-        _ = text
-    return {
-        "operation": operation,
-        "backend": backend,
-        "results": [{"inferred_axioms": str(added)}],
-        "count": added,
-        "json_ld": serialize_graph_json_ld(inferred),
-        "note": (
-            "Inferred axiom count from OWLAPY; JSON-LD is the "
-            "pre-inference merge (re-serialize after apply if needed)."
-        ),
-    }
-
-
-def _query_with_owlapy(
-    graph: Graph,
-    *,
-    operation: OntologyOperation,
-    class_iri: str | None,
-    individual_iri: str | None,
-    sparql: str | None,
-    reasoner: str,
-    direct: bool,
-    limit: int,
-) -> dict[str, Any]:
-    """Run an OWLAPY SyncReasoner query; raises ImportError if unavailable."""
-    from owlapy.class_expression import OWLClass
-    from owlapy.iri import IRI
-    from owlapy.owl_individual import OWLNamedIndividual
-    from owlapy.owl_ontology import SyncOntology
-    from owlapy.owl_reasoner import SyncReasoner
-
-    path = _write_temp_ontology(graph)
-    try:
-        ontology = SyncOntology(path.as_posix())
-        sync = SyncReasoner(ontology, reasoner=reasoner)
-        backend = f"owlapy:{reasoner}"
-
-        if operation == "consistency":
-            return _owlapy_consistency(
-                sync, operation=operation, backend=backend
-            )
-
-        if operation == "sparql":
-            return _owlapy_sparql(
-                graph, operation=operation, sparql=sparql, limit=limit
-            )
-
-        if operation in {"subclasses", "superclasses", "instances"}:
-            return _owlapy_hierarchy(
-                sync,
-                operation=operation,
-                class_iri=class_iri,
-                direct=direct,
-                limit=limit,
-                backend=backend,
-                owl_class_cls=OWLClass,
-                iri_cls=IRI,
-            )
-
-        if operation == "types":
-            return _owlapy_types(
-                sync,
-                operation=operation,
-                individual_iri=individual_iri,
-                limit=limit,
-                backend=backend,
-                named_individual_cls=OWLNamedIndividual,
-                iri_cls=IRI,
-            )
-
-        if operation == "infer":
-            return _owlapy_infer(
-                sync,
-                graph,
-                operation=operation,
-                limit=limit,
-                backend=backend,
-            )
-
-        raise ValueError(f"unsupported operation: {operation}")
-    finally:
-        try:
-            path.unlink(missing_ok=True)
-        except OSError:
-            pass
-
-
-def _query_with_rdflib(
-    graph: Graph,
-    *,
-    operation: OntologyOperation,
-    class_iri: str | None,
-    individual_iri: str | None,
-    sparql: str | None,
-    direct: bool,
-    limit: int,
-) -> dict[str, Any]:
-    """Lightweight reasoner substitute using rdflib only."""
-    backend = "rdflib"
+    backend = "python"
 
     if operation == "consistency":
-        # rdflib cannot prove DL consistency; report structural emptiness check.
-        consistent = len(graph) >= 0
-        return {
-            "operation": operation,
-            "backend": backend,
-            "consistent": consistent,
-            "results": [{"consistent": "true"}],
-            "note": (
-                "Install owlapy (uv sync --extra owl) for HermiT consistency."
-            ),
-        }
+        return check_coherence(graph, limit=limit)
+
+    if operation == "expression":
+        expr = (expression or sparql or "").strip()
+        if not expr:
+            raise ValueError(
+                "expression requires a non-empty Manchester-like string "
+                "(e.g. 'Person and age > 20')"
+            )
+        return evaluate_expression(graph, expr, limit=limit)
 
     if operation == "sparql":
         if not sparql or not sparql.strip():
@@ -759,13 +509,13 @@ def _query_with_rdflib(
             "backend": backend,
             "results": results,
             "count": len(results),
-            "note": "RDFS walk only; install owlapy for full OWL reasoning.",
+            "note": "RDFS hierarchy walk (pure Python).",
         }
 
     if operation == "instances":
         if not class_iri:
             raise ValueError("instances requires class_iri")
-        results = _instances_rdflib(graph, class_iri, limit=limit)
+        results = _instances_python(graph, class_iri, limit=limit)
         return {
             "operation": operation,
             "backend": backend,
@@ -776,7 +526,7 @@ def _query_with_rdflib(
     if operation == "types":
         if not individual_iri:
             raise ValueError("types requires individual_iri")
-        results = _types_rdflib(graph, individual_iri, limit=limit)
+        results = _types_python(graph, individual_iri, limit=limit)
         return {
             "operation": operation,
             "backend": backend,
@@ -785,14 +535,18 @@ def _query_with_rdflib(
         }
 
     if operation == "infer":
+        # Materialize rdfs:subClassOf transitive closure into a result note.
+        inferred = 0
+        for cls in list(graph.subjects(RDF.type, OWL.Class)):
+            for parent in graph.transitive_objects(cls, RDFS.subClassOf):
+                if parent != cls:
+                    inferred += 1
         return {
             "operation": operation,
             "backend": backend,
-            "results": [],
-            "count": 0,
-            "note": (
-                "infer requires owlapy SyncReasoner (uv sync --extra owl)."
-            ),
+            "results": [{"inferred_subclass_links": str(inferred)}],
+            "count": inferred,
+            "note": "RDFS transitive subclass materialization count.",
         }
 
     raise ValueError(f"unsupported operation: {operation}")
@@ -805,12 +559,13 @@ def query_merged_ontology(
     class_iri: str | None = None,
     individual_iri: str | None = None,
     sparql: str | None = None,
+    expression: str | None = None,
     reasoner: str = DEFAULT_REASONER,
     direct: bool = False,
     limit: int = 50,
-    prefer_owlapy: bool = True,
+    extra_json_ld: str | None = None,
 ) -> dict[str, Any]:
-    """Query a merged ontology payload from a prior RAG / search response.
+    """Query a merged ontology with the ``python`` reasoner.
 
     Args:
         json_ld: Fused ontology ``json_ld`` (JSON-LD or Turtle also accepted).
@@ -818,28 +573,14 @@ def query_merged_ontology(
         class_iri: Class IRI for hierarchy / instance queries.
         individual_iri: Individual IRI for ``types``.
         sparql: SPARQL SELECT string for ``sparql``.
-        reasoner: OWLAPY reasoner name (``HermiT``, ``Pellet``, …).
+        expression: Manchester-like expression for ``expression``.
+        reasoner: Must be ``python`` (the only supported engine).
         direct: Restrict hierarchy to direct relations when supported.
         limit: Max rows / individuals returned.
-        prefer_owlapy: Use OWLAPY when installed; else rdflib fallback.
+        extra_json_ld: Optional business-ontology JSON-LD merged before query.
 
     Returns:
-        Dict with ``operation``, ``backend``, ``results``, and optional notes.
-
-    Example:
-        >>> payload = (
-        ...     '[{"@id":"http://ex/A","@type":["http://www.w3.org/2002/07/owl#Class"]},'
-        ...     '{"@id":"http://ex/B","@type":["http://www.w3.org/2002/07/owl#Class"],'
-        ...     '"http://www.w3.org/2000/01/rdf-schema#subClassOf":[{"@id":"http://ex/A"}]}]'
-        ... )
-        >>> out = query_merged_ontology(
-        ...     payload,
-        ...     operation="subclasses",
-        ...     class_iri="http://ex/A",
-        ...     prefer_owlapy=False,
-        ... )
-        >>> out["count"] >= 1
-        True
+        Dict with ``operation``, ``backend``, ``reasoner``, ``results``.
     """
     op = str(operation).strip().lower()
     if op not in SUPPORTED_OPERATIONS:
@@ -847,11 +588,17 @@ def query_merged_ontology(
             f"unsupported operation {operation!r}; "
             f"expected one of {SUPPORTED_OPERATIONS}"
         )
-    graph = _load_graph(json_ld)
+    payloads = [json_ld]
+    if extra_json_ld and str(extra_json_ld).strip():
+        payloads.append(str(extra_json_ld))
+    graph = (
+        merge_rdf_graphs(payloads)
+        if len(payloads) > 1
+        else _load_graph(json_ld)
+    )
     chosen = normalize_reasoner_name(reasoner)
     meta = {
         "triple_count": len(graph),
-        "owlapy_available": owlapy_available(),
         "input_format": detect_rdf_format(json_ld) if json_ld.strip() else "",
         "reasoner": chosen,
     }
@@ -873,49 +620,19 @@ def query_merged_ontology(
             **meta,
         }
 
-    force_rdflib = chosen == "rdflib" or not prefer_owlapy
-    use_owl = (not force_rdflib) and owlapy_available() and op != "sparql"
-
-    if op == "sparql" or not use_owl:
-        result = _query_with_rdflib(
-            graph,
-            operation=op,  # type: ignore[arg-type]
-            class_iri=class_iri,
-            individual_iri=individual_iri,
-            sparql=sparql,
-            direct=direct,
-            limit=limit,
-        )
-    else:
-        try:
-            result = _query_with_owlapy(
-                graph,
-                operation=op,  # type: ignore[arg-type]
-                class_iri=class_iri,
-                individual_iri=individual_iri,
-                sparql=sparql,
-                reasoner=chosen,
-                direct=direct,
-                limit=limit,
-            )
-        except Exception as exc:  # noqa: BLE001 — fall back gracefully
-            result = _query_with_rdflib(
-                graph,
-                operation=op,  # type: ignore[arg-type]
-                class_iri=class_iri,
-                individual_iri=individual_iri,
-                sparql=sparql,
-                direct=direct,
-                limit=limit,
-            )
-            result["note"] = (
-                f"owlapy failed ({exc}); used rdflib fallback. "
-                + str(result.get("note") or "")
-            ).strip()
+    result = _query_with_python(
+        graph,
+        operation=op,  # type: ignore[arg-type]
+        class_iri=class_iri,
+        individual_iri=individual_iri,
+        sparql=sparql,
+        expression=expression,
+        direct=direct,
+        limit=limit,
+    )
 
     result.update(meta)
-    result["reasoner"] = normalize_reasoner_name(reasoner)
-    # Always attach a JSON-LD view of the reasoner answer for HMI graph display.
+    result["reasoner"] = chosen
     if not result.get("json_ld"):
         result["json_ld"] = results_as_json_ld(
             op,
@@ -926,6 +643,4 @@ def query_merged_ontology(
             backend=str(result.get("backend") or ""),
             reasoner=str(result.get("reasoner") or ""),
         )
-    # Touch OWL for doctest / import side-effect stability.
-    _ = OWL.Class
     return result

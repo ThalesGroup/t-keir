@@ -203,7 +203,9 @@ Passages are indexed by `thot.tools.ingest.index_passages` (BGE-M3 dense + spars
 `PassageRetrievalPipeline` (`global` / `user` / `both` / `auto`).
 
 Parent documents carry optional `document_ontology.json_ld` produced by
-`thot.tasks.document_ontology` (see [Document ontology](../tools/document_ontology.md)).
+`thot.tasks.document_ontology` as a **Document → Chunk → Sub-ontology**
+hypergraph (shared concepts = chunk-set intersection; see
+[Document ontology](../tools/document_ontology.md#hypergraph-shape-document--chunk--sub-ontology)).
 
 Checkpoint: field names above match the `.sd` files and Pydantic models in
 `thot/*/models.py`.

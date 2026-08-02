@@ -21,6 +21,7 @@ from thot.compose.template_models import Slot, SlotFill, SlotProvenance
 _JSON_FENCE = re.compile(
     r"```(?:json)?\s*(\{.*?\})\s*```", re.DOTALL | re.IGNORECASE
 )
+_SLOT_TAG = re.compile(r"^\[([A-Za-z0-9_]+)\]\s*", re.IGNORECASE)
 
 
 def _parse_json_object(text: str) -> dict[str, Any] | None:
@@ -114,6 +115,115 @@ class DeterministicWriter:
                 document_ids=list(evidence_document_ids),
                 source="writer",
             ),
+        )
+
+
+class FindingsGroundedWriter:
+    """Prefer researcher grounded claims for freeform slots; never invent ids.
+
+    When claims are tagged ``[slot_name] …`` (persona OTAN writers), only the
+    matching tags fill that compose slot. Untagged findings remain a legacy
+    fallback (same prose for every freeform slot).
+    """
+
+    def __init__(
+        self,
+        *,
+        findings_context: str,
+        chunk_ids: list[str],
+        document_ids: list[str],
+        fallback: DeterministicWriter | None = None,
+    ) -> None:
+        self.findings_context = (findings_context or "").strip()
+        self.chunk_ids = list(chunk_ids or [])
+        self.document_ids = list(document_ids or [])
+        self.fallback = fallback or DeterministicWriter()
+
+    @staticmethod
+    def prose_for_slot(findings_context: str, slot_name: str) -> str | None:
+        """Return slot-tagged bullets, empty string if tags exist but none match,
+        or ``None`` when findings are untagged (legacy dump-all mode).
+        """
+        text = (findings_context or "").strip()
+        if not text:
+            return None
+        slot_key = (slot_name or "").strip().lower()
+        matched: list[str] = []
+        saw_tag = False
+        for raw_line in text.splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+            body = line[2:].strip() if line.startswith("- ") else line
+            tag = _SLOT_TAG.match(body)
+            if not tag:
+                continue
+            saw_tag = True
+            if tag.group(1).lower() != slot_key:
+                continue
+            rest = body[tag.end() :].strip()
+            matched.append(f"- {rest}" if rest else f"- {body}")
+        if matched:
+            return "\n".join(matched)
+        if saw_tag:
+            return ""
+        return None
+
+    def write(
+        self,
+        slot: Slot,
+        *,
+        topic: str,
+        context: str,
+        evidence_chunk_ids: list[str],
+        evidence_document_ids: list[str],
+    ) -> SlotFill:
+        if slot.name in {"open_questions", "open_question"}:
+            return self.fallback.write(
+                slot,
+                topic=topic,
+                context=context,
+                evidence_chunk_ids=evidence_chunk_ids,
+                evidence_document_ids=evidence_document_ids,
+            )
+        chunks = list(self.chunk_ids or evidence_chunk_ids)
+        docs = list(self.document_ids or evidence_document_ids)
+        if self.findings_context and chunks:
+            slotted = self.prose_for_slot(self.findings_context, slot.name)
+            if slotted is not None:
+                if not slotted.strip():
+                    return SlotFill(
+                        name=slot.name,
+                        filled=False,
+                        reason_unfilled=(
+                            f"no [{slot.name}] tagged findings for this slot"
+                        ),
+                    )
+                header = slot.description or slot.name
+                prose = f"{header}\n\n{slotted}"
+            else:
+                header = slot.description or slot.name
+                prose = (
+                    f"{header}\n\n"
+                    f"Grounded findings for {topic or 'the topic'}:\n"
+                    f"{self.findings_context}"
+                )
+            return SlotFill(
+                name=slot.name,
+                filled=True,
+                value=prose,
+                provenance=SlotProvenance(
+                    chunk_ids=chunks,
+                    document_ids=docs,
+                    source="findings",
+                ),
+            )
+        return self.fallback.write(
+            slot,
+            topic=topic,
+            context=context,
+            evidence_chunk_ids=chunks,
+            evidence_document_ids=docs,
         )
 
 

@@ -1,0 +1,138 @@
+name: otan_intsum
+version: 2
+title: OTAN / NATO INTSUM
+description: >
+  Intelligence Summary (INTSUM) in OTAN/NATO formalism for J2 analysts.
+  Header / administrative block plus body sections (Highlights, Adversary
+  Situation by domain, Specialist Threat, Environment, Assessment & Outlook).
+  Grounded dual-index evidence (global + personal) and LLM Wiki structured facts.
+slots:
+  - name: subject
+    type: freeform_grounded
+    description: >
+      SUBJECT line — e.g. INTSUM [Serial] — <topic / EOI>. Cite grounding when known.
+    constraints: { required: false }
+  - name: period_covered
+    type: freeform_grounded
+    description: >
+      PERIOD COVERED — DTG Start to DTG End (e.g. 020600AZUG26 to 021800AZUG26)
+      from wiki Structured facts / chunk ## Information dtg fields.
+    constraints: { required: false }
+  - name: issuing_hq
+    type: freeform_grounded
+    description: >
+      ISSUING HQ — unit / echelon (e.g. 1 (GNB) Armd Div J2) when present in evidence.
+    constraints: { required: false }
+  - name: classification_handling
+    type: freeform_grounded
+    description: >
+      CLASSIFICATION / HANDLING (e.g. NATO RESTRICTED / SECRET // REL TO COALITION TF).
+    constraints: { required: false }
+  - name: highlights
+    type: freeform_grounded
+    description: >
+      1. HIGHLIGHTS / EXECUTIVE SUMMARY — key intelligence developments during
+      the reporting period. Cite chunk_ids; no invention.
+    constraints: { required: true }
+  - name: adversary_situation
+    type: freeform_grounded
+    description: >
+      2. ADVERSARY / ENEMY SITUATION by sector/domain. Cover applicable
+      sub-paragraphs with grounded bullets:
+      a. Land / Ground Operations
+      b. Air / Air Defense Activity
+      c. Maritime Operations (if applicable)
+      d. Cyber / Electromagnetic Spectrum (EMS) Activity
+      e. Information Operations / Hybrid Threats
+      Mark unfilled domains as "NIL / NTR" only when evidence supports silence,
+      else list under Gaps / unfilled.
+    constraints: { required: false }
+  - name: specialist_threat
+    type: freeform_grounded
+    description: >
+      3. SPECIALIST THREAT EVALUATION:
+      a. Enemy Capabilities & Combat Effectiveness
+      b. Logistics, Resupply, and Sustainability
+      c. CBRN Threat Status
+      Include Admiralty evaluation grades from ## Information when present.
+    constraints: { required: false }
+  - name: environmental_factors
+    type: freeform_grounded
+    description: >
+      4. ENVIRONMENTAL & OPERATIONAL FACTORS:
+      a. Weather & Astronomical Data (Illumination, Sunrise/Sunset)
+      b. Terrain & Infrastructure Impacts
+      c. Civil-Military Environment / Population Factors
+    constraints: { required: false }
+  - name: assessment_outlook
+    type: freeform_grounded
+    description: >
+      5. ASSESSMENT & OUTLOOK (Adversary Intentions):
+      a. Most Likely Course of Action (MLCOA)
+      b. Most Dangerous Course of Action (MDCOA)
+      c. Key Intelligence Gaps / PIRs (Priority Intelligence Requirements)
+      Ground MLCOA/MDCOA in wiki/chunk evidence; put unsupported items in Gaps.
+    constraints: { required: false }
+  - name: supporting_keywords
+    type: keyword
+    description: Intelligence keywords from fused ontology
+    constraints: { min_items: 0, max_items: 12, required: false }
+  - name: sources
+    type: freeform_grounded
+    description: >
+      SOURCES — chunk_id citations from the LLM Wiki Evidence/Sources sections.
+      List each supporting chunk_id (and parent when known).
+    constraints: { required: false }
+markdown_template: |
+  # INTSUM — {{ topic or "untitled" }}
+
+  ## Header / Administrative Block
+
+  **SUBJECT:** {{ subject or ("INTSUM — " ~ (topic or "untitled")) }}
+  **PERIOD COVERED:** {{ period_covered or "as retrieved / see Sources" }}
+  **ISSUING HQ:** {{ issuing_hq or "J2 (as tasked)" }}
+  **CLASSIFICATION / HANDLING:** {{ classification_handling or "SECRET // REL TO COALITION TF" }}
+
+  Form: OTAN INTSUM
+
+  {% if highlights %}
+  ## 1. HIGHLIGHTS / EXECUTIVE SUMMARY
+
+  {{ highlights }}
+  {% endif %}
+
+  {% if adversary_situation %}
+  ## 2. ADVERSARY / ENEMY SITUATION (By Sector or Domain)
+
+  {{ adversary_situation }}
+  {% endif %}
+
+  {% if specialist_threat %}
+  ## 3. SPECIALIST THREAT EVALUATION
+
+  {{ specialist_threat }}
+  {% endif %}
+
+  {% if environmental_factors %}
+  ## 4. ENVIRONMENTAL & OPERATIONAL FACTORS
+
+  {{ environmental_factors }}
+  {% endif %}
+
+  {% if assessment_outlook %}
+  ## 5. ASSESSMENT & OUTLOOK (Adversary Intentions)
+
+  {{ assessment_outlook }}
+  {% endif %}
+
+  {% if supporting_keywords %}
+  ## Keywords
+
+  {{ supporting_keywords | join(", ") }}
+  {% endif %}
+
+  {% if sources %}
+  ## Sources
+
+  {{ sources }}
+  {% endif %}

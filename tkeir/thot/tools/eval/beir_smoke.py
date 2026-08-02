@@ -196,8 +196,7 @@ _ALERT_FOCUS: dict[str, tuple[str, str]] = {
     ),
     "slow_stage_rrf": (
         "low",
-        "RRF cost unusual — check `fusion.py` / "
-        "`rrf.top_n_after_fusion`.",
+        "RRF cost unusual — check `fusion.py` / `rrf.top_n_after_fusion`.",
     ),
     "slow_stage_ontology": (
         "low",
@@ -381,15 +380,9 @@ def build_smoke_subset(
         raise ValueError("no queries with in-corpus gold documents")
     eligible_set = set(eligible)
 
-    focus = [
-        qid
-        for qid in (focus_query_ids or [])
-        if qid in eligible_set
-    ]
+    focus = [qid for qid in focus_query_ids or [] if qid in eligible_set]
     missing_focus = [
-        qid
-        for qid in (focus_query_ids or [])
-        if qid not in eligible_set
+        qid for qid in focus_query_ids or [] if qid not in eligible_set
     ]
     selected: list[str] = []
     seen: set[str] = set()
@@ -506,7 +499,9 @@ def load_previous_smoke_report(
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        LOGGER.warning("Could not read previous smoke report %s: %s", path, exc)
+        LOGGER.warning(
+            "Could not read previous smoke report %s: %s", path, exc
+        )
         return None
     if not isinstance(data, dict) or "runs" not in data:
         return None
@@ -571,9 +566,7 @@ def _dataset_verdict(
     quality = (
         "better"
         if ndcg_delta > _NDCG_EPS
-        else "worse"
-        if ndcg_delta < -_NDCG_EPS
-        else "unchanged"
+        else "worse" if ndcg_delta < -_NDCG_EPS else "unchanged"
     )
     if high_alerts_delta is None:
         return quality
@@ -604,7 +597,7 @@ def compare_smoke_to_previous(
 
     prev_runs = {
         str(row.get("name")): row
-        for row in (previous.get("runs") or [])
+        for row in previous.get("runs") or []
         if isinstance(row, dict) and row.get("name")
     }
     deltas: list[DatasetDelta] = []
@@ -673,9 +666,7 @@ def compare_smoke_to_previous(
 
     prev_wall = previous.get("wall_s")
     prev_wall_f = float(prev_wall) if prev_wall is not None else None
-    wall_delta = (
-        wall_s - prev_wall_f if prev_wall_f is not None else None
-    )
+    wall_delta = wall_s - prev_wall_f if prev_wall_f is not None else None
     mean_ndcg_delta = (
         sum(ndcg_deltas) / len(ndcg_deltas) if ndcg_deltas else None
     )
@@ -739,7 +730,10 @@ def render_comparison_section(comparison: SmokeComparison) -> list[str]:
 
     lines.append(comparison.summary)
     lines.append("")
-    if comparison.wall_delta_s is not None and comparison.prev_wall_s is not None:
+    if (
+        comparison.wall_delta_s is not None
+        and comparison.prev_wall_s is not None
+    ):
         lines.append(
             f"Wall clock: {_fmt_ms(comparison.wall_s * 1000)} "
             f"(prev {_fmt_ms(comparison.prev_wall_s * 1000)}, "
@@ -998,7 +992,6 @@ async def _run_tkeir_smoke(
     return results, timings, None
 
 
-
 def evaluate_smoke_dataset(
     name: str,
     datasets_dir: Path,
@@ -1187,7 +1180,11 @@ def render_smoke_report(
                 )
             )
     focus_items.sort(
-        key=lambda pair: (_severity_rank(pair[1].severity), pair[0].name, pair[1].code)
+        key=lambda pair: (
+            _severity_rank(pair[1].severity),
+            pair[0].name,
+            pair[1].code,
+        )
     )
 
     if not focus_items:
@@ -1256,7 +1253,8 @@ def render_smoke_report(
         alerts_n = len(run.alerts)
         err = run.error or (
             run.tkeir_error
-            if run.tkeir_error and not str(run.tkeir_error).startswith("skipped")
+            if run.tkeir_error
+            and not str(run.tkeir_error).startswith("skipped")
             else ""
         )
         note = "err" if err else str(alerts_n)
@@ -1284,7 +1282,9 @@ def render_smoke_report(
     for run in runs:
         stages = run.timings.dual_avg_ms or {}
         if stages:
-            ordered = sorted(stages.items(), key=lambda kv: kv[1], reverse=True)
+            ordered = sorted(
+                stages.items(), key=lambda kv: kv[1], reverse=True
+            )
             top = ", ".join(f"**{k}**={v:.0f}ms" for k, v in ordered[:3])
             rest = ", ".join(f"{k}={v:.0f}" for k, v in ordered[3:])
             stage_line = top + (f" | {rest}" if rest else "")
@@ -1355,7 +1355,9 @@ def write_smoke_reports(
                     "focus": _ALERT_FOCUS["tkeir_error"][1],
                 }
             )
-    focus.sort(key=lambda row: (_severity_rank(row["severity"]), row["dataset"]))
+    focus.sort(
+        key=lambda row: (_severity_rank(row["severity"]), row["dataset"])
+    )
     payload = []
     for run in runs:
         payload.append(
@@ -1538,9 +1540,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     setup_logging(args.verbose)
     n_close = (
-        int(args.noise)
-        if args.noise is not None
-        else int(args.close_docs)
+        int(args.noise) if args.noise is not None else int(args.close_docs)
     )
     rank_docs = max(1, int(args.rank_docs))
     top_k = max(int(args.top_k), rank_docs)
@@ -1569,9 +1569,7 @@ def main(argv: list[str] | None = None) -> int:
                     skip_tkeir=args.skip_tkeir,
                     reindex=not args.skip_tkeir,
                     focus_eval_report=bool(args.focus_eval_report),
-                    query_ids=list(args.query_ids)
-                    if args.query_ids
-                    else None,
+                    query_ids=list(args.query_ids) if args.query_ids else None,
                 )
             )
     finally:
@@ -1595,7 +1593,11 @@ def main(argv: list[str] | None = None) -> int:
     print(render_smoke_report(runs, wall_s=wall_s, comparison=comparison))
     print(f"\nWrote {report}")
     if comparison.overall != "no_baseline":
-        LOGGER.info("Smoke vs previous: %s — %s", comparison.overall, comparison.summary)
+        LOGGER.info(
+            "Smoke vs previous: %s — %s",
+            comparison.overall,
+            comparison.summary,
+        )
     if wall_s > 300:
         LOGGER.warning(
             "Smoke wall clock %.1fs exceeded 5 min target — "

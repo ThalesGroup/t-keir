@@ -1,0 +1,4417 @@
+{
+  "dataset": {
+    "name": "user_specific_cdo_analyst",
+    "version": "1.0",
+    "persona": "CDO — Chief Data Officer",
+    "role_description": "Enterprise intelligence fusion — entity tracking, risk assessment, multi-source analysis",
+    "primary_report_type": "RISK_SUMMARY",
+    "generated_utc": "2026-07-28T06:00:00Z",
+    "record_count": 110,
+    "index_type": "USER_SPECIFIC",
+    "classification_of_compilation": "CONFIDENTIAL — C-SUITE",
+    "note": "Simulated CDO personal index. Links to enterprise corpus via generic_refs. Not real data.",
+    "coverage_window_utc": {
+      "from": "2026-06-28T06:00:00Z",
+      "to": "2026-07-28T05:45:00Z"
+    },
+    "cross_reference_schema": {
+      "generic_refs": "doc_id values from enterprise_intelligence_corpus.json",
+      "kri_refs": "KRI-01..06 from the kri_register",
+      "location_refs": "jurisdiction.name values"
+    }
+  },
+  "records": [
+    {
+      "doc_id": "CDO-202606-0088",
+      "dtg": "281748ZJUN26",
+      "timestamp_utc": "2026-06-28T17:48:18Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0395",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0395. Additional context: Matches known typology of PACIFIC CONDUIT GROUP. Analyst: CDO-DUTY-03. Action: MONITOR",
+      "referenced_doc": "ENT-202606-0395",
+      "analyst_id": "CDO-DUTY-01",
+      "annotation_type": "NEW_ENTITY_LINK",
+      "action_required": "TASK SOURCE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [
+        "ENT-202606-0395"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0084",
+      "dtg": "290615ZJUN26",
+      "timestamp_utc": "2026-06-29T06:15:10Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0493",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0493. Additional context: Matches known typology of SHADOW LEDGER COORDINATOR ALPHA. Analyst: CDO-DUTY-02. Action: ESCALATE TO CFO",
+      "referenced_doc": "ENT-202606-0493",
+      "analyst_id": "CDO-DUTY-02",
+      "annotation_type": "CONTRADICTING_EVIDENCE",
+      "action_required": "MONITOR",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0493"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0031",
+      "dtg": "290737ZJUN26",
+      "timestamp_utc": "2026-06-29T07:37:24Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-005 / VOYAGER PETROCHEMICALS LTD (Ma",
+      "text": "Entity EOI-005 (VOYAGER PETROCHEMICALS LTD (Malta)) assessed to be coordinating financial flows through Lagos. Associated entity VOYAGER PETROCHEMICALS LTD (Malta) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-04.",
+      "entity_id": "EOI-005",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "NEH-D",
+        "name": "ARCADIA CLEARING HOUSE (Nicosia)"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Lagos",
+      "track_age_days": 12,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0515",
+        "ENT-202606-0164",
+        "ENT-202606-0239"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_AML_LAYERING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0017",
+      "dtg": "292358ZJUN26",
+      "timestamp_utc": "2026-06-29T23:58:12Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-036 / GOLDEN EAGLE FUND LP (BVI)",
+      "text": "Entity EOI-036 (GOLDEN EAGLE FUND LP (BVI)) assessed to be coordinating financial flows through Singapore Freeport. Associated entity GOLDEN NILE LOGISTICS (BVI) remains under active monitoring. Activity pattern consistent with MERIDIAN BROKER NETWORK network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-03.",
+      "entity_id": "EOI-036",
+      "threat_actor": "MERIDIAN BROKER NETWORK",
+      "associated_entity": {
+        "code": "NEH-G",
+        "name": "CARACAS VENTURE ENERGIA (Venezuela)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Singapore Freeport",
+      "track_age_days": 52,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [
+        "ENT-202606-0272",
+        "ENT-202606-0472"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_BRIBERY_CORRUPTION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0076",
+      "dtg": "300228ZJUN26",
+      "timestamp_utc": "2026-06-30T02:28:45Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-201",
+      "text": "Periodic reliability review for SRC-201. Category: EXTERNAL_INFORMANT. Source reliability maintained at grade B. Reports on record: 20. Last corroborated report: 8 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 66 days. Primary areas: Nicosia.",
+      "source_id": "SRC-201",
+      "reliability_grade": "B",
+      "source_category": "EXTERNAL_INFORMANT",
+      "reports_on_record": 47,
+      "days_since_last_report": 42,
+      "evaluation_cycle_days": 63,
+      "sourcing_status": "ACTIVE",
+      "areas_covered": [
+        "Nicosia",
+        "Lagos"
+      ],
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "EXTERNAL_INFORMANT"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0077",
+      "dtg": "300254ZJUN26",
+      "timestamp_utc": "2026-06-30T02:54:32Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-205",
+      "text": "Periodic reliability review for SRC-205. Category: INTERNAL_WHISTLEBLOWER. Source reliability maintained at grade C. Reports on record: 73. Last corroborated report: 16 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 111 days. Primary areas: BVI.",
+      "source_id": "SRC-205",
+      "reliability_grade": "C",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "reports_on_record": 77,
+      "days_since_last_report": 48,
+      "evaluation_cycle_days": 54,
+      "sourcing_status": "RESTRICTED",
+      "areas_covered": [
+        "BVI",
+        "Nicosia"
+      ],
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "INTERNAL_WHISTLEBLOWER"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0056",
+      "dtg": "300818ZJUN26",
+      "timestamp_utc": "2026-06-30T08:18:07Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-03 / Dubai Free Zone",
+      "text": "CDO analytical assessment for KRI-03 (Bribery/Corruption): based on fusion of 11 source reports over the past 2 days, assessed that risk exposure in Dubai Free Zone attributable to DESERT FALCON ENERGY (Dubai) is ELEVATED. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 25 hours.",
+      "kri_assessed": "KRI-03",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 6,
+      "validity_hours": 25,
+      "key_judgement": "Threshold met for two KRIs simultaneously",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [
+        "ENT-202606-0659",
+        "ENT-202606-0538",
+        "ENT-202606-0781"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_BRIBERY_CORRUPTION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0080",
+      "dtg": "300852ZJUN26",
+      "timestamp_utc": "2026-06-30T08:52:23Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-203",
+      "text": "Periodic reliability review for SRC-203. Category: FORMER_EMPLOYEE. Source reliability maintained at grade A. Reports on record: 17. Last corroborated report: 9 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 40 days. Primary areas: BVI.",
+      "source_id": "SRC-203",
+      "reliability_grade": "A",
+      "source_category": "FORMER_EMPLOYEE",
+      "reports_on_record": 4,
+      "days_since_last_report": 51,
+      "evaluation_cycle_days": 64,
+      "sourcing_status": "RESTRICTED",
+      "areas_covered": [
+        "BVI",
+        "Lagos"
+      ],
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "FORMER_EMPLOYEE"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0047",
+      "dtg": "302138ZJUN26",
+      "timestamp_utc": "2026-06-30T21:38:33Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-04 / BVI",
+      "text": "CDO analytical assessment for KRI-04 (AML/Layering): based on fusion of 6 source reports over the past 3 days, assessed that risk exposure in BVI attributable to NEH Geneva Trading SA is MODERATE. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 62 hours.",
+      "kri_assessed": "KRI-04",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 6,
+      "validity_hours": 38,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0726",
+        "ENT-202606-0318",
+        "ENT-202606-0178",
+        "ENT-202606-0847"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_AML_LAYERING",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0055",
+      "dtg": "010033ZJUL26",
+      "timestamp_utc": "2026-07-01T00:33:19Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-03 / Cayman Islands",
+      "text": "CDO analytical assessment for KRI-03 (Bribery/Corruption): based on fusion of 6 source reports over the past 9 days, assessed that risk exposure in Cayman Islands attributable to TERRACINA MARITIME LTD (Nassau) is ELEVATED. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 87 hours.",
+      "kri_assessed": "KRI-03",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 54,
+      "key_judgement": "Threshold met — escalate to CFO",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [
+        "ENT-202606-0465",
+        "ENT-202606-0831",
+        "ENT-202606-0811"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_BRIBERY_CORRUPTION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0052",
+      "dtg": "010033ZJUL26",
+      "timestamp_utc": "2026-07-01T00:33:27Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-04 / Malta",
+      "text": "CDO analytical assessment for KRI-04 (AML/Layering): based on fusion of 11 source reports over the past 8 days, assessed that risk exposure in Malta attributable to CARACAS VENTURE ENERGIA (Venezuela) is HIGH. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 72 hours.",
+      "kri_assessed": "KRI-04",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 37,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [
+        "ENT-202606-0138",
+        "ENT-202606-0065",
+        "ENT-202606-0269",
+        "ENT-202606-0698"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_AML_LAYERING",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0030",
+      "dtg": "010137ZJUL26",
+      "timestamp_utc": "2026-07-01T01:37:30Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-002 / NEXUS ENERGY HOLDINGS (Cayman)",
+      "text": "Entity EOI-002 (NEXUS ENERGY HOLDINGS (Cayman)) assessed to be coordinating financial flows through Dubai Free Zone. Associated entity DESERT FALCON ENERGY (Dubai) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-002",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "GEF",
+        "name": "NEXUS ENERGY HOLDINGS (Cayman)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Dubai Free Zone",
+      "track_age_days": 24,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0153",
+        "ENT-202606-0004",
+        "ENT-202606-0956",
+        "ENT-202606-0660"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0053",
+      "dtg": "010458ZJUL26",
+      "timestamp_utc": "2026-07-01T04:58:12Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-01 / Lagos",
+      "text": "CDO analytical assessment for KRI-01 (Financial Fraud): based on fusion of 12 source reports over the past 5 days, assessed that risk exposure in Lagos attributable to VOYAGER PETROCHEMICALS LTD (Malta) is ELEVATED. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 61 hours.",
+      "kri_assessed": "KRI-01",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 76,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0683",
+        "ENT-202606-0909",
+        "ENT-202606-0862"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_FINANCIAL_FRAUD",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0094",
+      "dtg": "010918ZJUL26",
+      "timestamp_utc": "2026-07-01T09:18:21Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0901",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0901. Additional context: Matches known typology of MERIDIAN BROKER NETWORK. Analyst: CDO-DUTY-06. Action: CROSS-REFERENCE",
+      "referenced_doc": "ENT-202606-0901",
+      "analyst_id": "CDO-DUTY-05",
+      "annotation_type": "CONTRADICTING_EVIDENCE",
+      "action_required": "MONITOR",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0901"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_AML_LAYERING"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0039",
+      "dtg": "011759ZJUL26",
+      "timestamp_utc": "2026-07-01T17:59:11Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-05 / Singapore Freeport",
+      "text": "CDO analytical assessment for KRI-05 (Commodity Misreporting): based on fusion of 6 source reports over the past 6 days, assessed that risk exposure in Singapore Freeport attributable to NEH Geneva Trading SA is HIGH. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 37 hours.",
+      "kri_assessed": "KRI-05",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 63,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0453",
+        "ENT-202606-0682",
+        "ENT-202606-0456"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_COMMODITY_MISREPORTING",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0054",
+      "dtg": "020318ZJUL26",
+      "timestamp_utc": "2026-07-02T03:18:46Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-06 / Cayman Islands",
+      "text": "CDO analytical assessment for KRI-06 (Market Manipulation): based on fusion of 11 source reports over the past 6 days, assessed that risk exposure in Cayman Islands attributable to NKOSI TRADING & BROKERAGE (Lagos) is MODERATE. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 55 hours.",
+      "kri_assessed": "KRI-06",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 9,
+      "validity_hours": 91,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [
+        "ENT-202606-0311",
+        "ENT-202606-0445",
+        "ENT-202606-0761",
+        "ENT-202606-0394"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_MARKET_MANIPULATION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0025",
+      "dtg": "021529ZJUL26",
+      "timestamp_utc": "2026-07-02T15:29:26Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-047 / DESERT FALCON ENERGY (Dubai)",
+      "text": "Entity EOI-047 (DESERT FALCON ENERGY (Dubai)) assessed to be coordinating financial flows through Malta. Associated entity TERRACINA MARITIME LTD (Nassau) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-047",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "DFE",
+        "name": "GOLDEN NILE LOGISTICS (BVI)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Malta",
+      "track_age_days": 31,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [
+        "ENT-202606-0751",
+        "ENT-202606-0812",
+        "ENT-202606-0617",
+        "ENT-202606-0896"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0096",
+      "dtg": "030205ZJUL26",
+      "timestamp_utc": "2026-07-03T02:05:44Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 03 Jul 2026",
+      "text": "CDO analytics production cycle 03JUL26. Products due: 3 risk summaries. Priority KRIs: KRI-02, KRI-06. Analyst on duty: CDO-DUTY-05. Deadline: 0905Z.",
+      "cycle_date": "2026-07-03",
+      "products_due": {
+        "risk_summary": 2,
+        "flash": 2
+      },
+      "priority_kris": [
+        "KRI-02",
+        "KRI-06"
+      ],
+      "analyst_on_duty": "CDO-DUTY-04",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0082",
+      "dtg": "031117ZJUL26",
+      "timestamp_utc": "2026-07-03T11:17:35Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0319",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0319. Additional context: Matches known typology of MERIDIAN BROKER NETWORK. Analyst: CDO-DUTY-05. Action: MONITOR",
+      "referenced_doc": "ENT-202606-0319",
+      "analyst_id": "CDO-DUTY-06",
+      "annotation_type": "NEW_ENTITY_LINK",
+      "action_required": "ESCALATE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [
+        "ENT-202606-0319"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0098",
+      "dtg": "031300ZJUL26",
+      "timestamp_utc": "2026-07-03T13:00:34Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 03 Jul 2026",
+      "text": "CDO analytics production cycle 03JUL26. Products due: 1 risk summaries. Priority KRIs: KRI-05, KRI-01. Analyst on duty: CDO-DUTY-04. Deadline: 1900Z.",
+      "cycle_date": "2026-07-03",
+      "products_due": {
+        "risk_summary": 5,
+        "flash": 1
+      },
+      "priority_kris": [
+        "KRI-05",
+        "KRI-01"
+      ],
+      "analyst_on_duty": "CDO-DUTY-06",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0050",
+      "dtg": "031308ZJUL26",
+      "timestamp_utc": "2026-07-03T13:08:22Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-05 / Geneva",
+      "text": "CDO analytical assessment for KRI-05 (Commodity Misreporting): based on fusion of 12 source reports over the past 7 days, assessed that risk exposure in Geneva attributable to NEXUS ENERGY HOLDINGS (Cayman) is MODERATE. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 40 hours.",
+      "kri_assessed": "KRI-05",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 9,
+      "validity_hours": 29,
+      "key_judgement": "Threshold met — escalate to CFO",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0978",
+        "ENT-202606-0690",
+        "ENT-202606-0572",
+        "ENT-202606-0300"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_COMMODITY_MISREPORTING",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0003",
+      "dtg": "031450ZJUL26",
+      "timestamp_utc": "2026-07-03T14:50:09Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-006 / PETROSERV ASIA PTE (Singapore)",
+      "text": "Entity EOI-006 (PETROSERV ASIA PTE (Singapore)) assessed to be coordinating financial flows through Nicosia. Associated entity MERIDIAN STAR CAPITAL (Cayman) remains under active monitoring. Activity pattern consistent with SHADOW LEDGER COORDINATOR ALPHA network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-03.",
+      "entity_id": "EOI-006",
+      "threat_actor": "SHADOW LEDGER COORDINATOR ALPHA",
+      "associated_entity": {
+        "code": "VPL",
+        "name": "NEXUS ENERGY HOLDINGS (Cayman)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Nicosia",
+      "track_age_days": 72,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [
+        "ENT-202606-0436"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_BRIBERY_CORRUPTION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0010",
+      "dtg": "031626ZJUL26",
+      "timestamp_utc": "2026-07-03T16:26:13Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-047 / NEXUS ENERGY HOLDINGS (Cayman)",
+      "text": "Entity EOI-047 (NEXUS ENERGY HOLDINGS (Cayman)) assessed to be coordinating financial flows through Singapore Freeport. Associated entity GOLDEN EAGLE FUND LP (BVI) remains under active monitoring. Activity pattern consistent with PACIFIC CONDUIT GROUP network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-03.",
+      "entity_id": "EOI-047",
+      "threat_actor": "PACIFIC CONDUIT GROUP",
+      "associated_entity": {
+        "code": "CVE",
+        "name": "DESERT FALCON ENERGY (Dubai)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Singapore Freeport",
+      "track_age_days": 84,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0109",
+        "ENT-202606-0896",
+        "ENT-202606-0705"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_BRIBERY_CORRUPTION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0035",
+      "dtg": "032228ZJUL26",
+      "timestamp_utc": "2026-07-03T22:28:53Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-019 / NEXUS ENERGY HOLDINGS (Cayman)",
+      "text": "Entity EOI-019 (NEXUS ENERGY HOLDINGS (Cayman)) assessed to be coordinating financial flows through Geneva. Associated entity NEXUS ENERGY HOLDINGS (Cayman) remains under active monitoring. Activity pattern consistent with MERIDIAN BROKER NETWORK network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-06.",
+      "entity_id": "EOI-019",
+      "threat_actor": "MERIDIAN BROKER NETWORK",
+      "associated_entity": {
+        "code": "PSA",
+        "name": "NKOSI TRADING & BROKERAGE (Lagos)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 26,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0117",
+        "ENT-202606-0164",
+        "ENT-202606-0353"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_MARKET_MANIPULATION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0004",
+      "dtg": "040839ZJUL26",
+      "timestamp_utc": "2026-07-04T08:39:33Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-006 / TERRACINA MARITIME LTD (Nassau",
+      "text": "Entity EOI-006 (TERRACINA MARITIME LTD (Nassau)) assessed to be coordinating financial flows through Nicosia. Associated entity NEXUS ENERGY HOLDINGS (Cayman) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-006",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "MSC",
+        "name": "NEH Dubai Commodities DMCC"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Nicosia",
+      "track_age_days": 21,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [
+        "ENT-202606-0610",
+        "ENT-202606-0948",
+        "ENT-202606-0182",
+        "ENT-202606-0967"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0079",
+      "dtg": "041922ZJUL26",
+      "timestamp_utc": "2026-07-04T19:22:21Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-206",
+      "text": "Periodic reliability review for SRC-206. Category: FORMER_EMPLOYEE. Source reliability maintained at grade C. Reports on record: 72. Last corroborated report: 50 days ago. Sourcing status: SUSPENDED. Next scheduled evaluation: 34 days. Primary areas: BVI.",
+      "source_id": "SRC-206",
+      "reliability_grade": "C",
+      "source_category": "FORMER_EMPLOYEE",
+      "reports_on_record": 24,
+      "days_since_last_report": 7,
+      "evaluation_cycle_days": 55,
+      "sourcing_status": "RESTRICTED",
+      "areas_covered": [
+        "BVI",
+        "Malta"
+      ],
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "FORMER_EMPLOYEE"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0105",
+      "dtg": "041925ZJUL26",
+      "timestamp_utc": "2026-07-04T19:25:17Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 04 Jul 2026",
+      "text": "CDO analytics production cycle 04JUL26. Products due: 5 risk summaries. Priority KRIs: KRI-01, KRI-04. Analyst on duty: CDO-DUTY-06. Deadline: 0525Z.",
+      "cycle_date": "2026-07-04",
+      "products_due": {
+        "risk_summary": 4,
+        "flash": 0
+      },
+      "priority_kris": [
+        "KRI-01",
+        "KRI-04"
+      ],
+      "analyst_on_duty": "CDO-DUTY-02",
+      "kri_refs": [
+        "KRI-01",
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0106",
+      "dtg": "042356ZJUL26",
+      "timestamp_utc": "2026-07-04T23:56:30Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "DATA_REQUIREMENT",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Data collection requirement — KRI-02 / Malta",
+      "text": "Formal data collection requirement raised against KRI-02. Gap identified: SPV structure unverified. Tasked to: CISO INTELLIGENCE. Priority: ROUTINE. Deadline: 52h.",
+      "requirement_id": "DR-6130",
+      "gap_type": "TEMPORAL_GAP",
+      "tasked_to": "EXTERNAL COUNSEL",
+      "deadline_hours": 119,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_SANCTIONS_EVASION",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0024",
+      "dtg": "050439ZJUL26",
+      "timestamp_utc": "2026-07-05T04:39:46Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-011 / PETROSERV ASIA PTE (Singapore)",
+      "text": "Entity EOI-011 (PETROSERV ASIA PTE (Singapore)) assessed to be coordinating financial flows through Lagos. Associated entity GOLDEN NILE LOGISTICS (BVI) remains under active monitoring. Activity pattern consistent with SHADOW LEDGER COORDINATOR ALPHA network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-011",
+      "threat_actor": "SHADOW LEDGER COORDINATOR ALPHA",
+      "associated_entity": {
+        "code": "DFE",
+        "name": "VOYAGER PETROCHEMICALS LTD (Malta)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Lagos",
+      "track_age_days": 40,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [
+        "ENT-202606-0757",
+        "ENT-202606-0114"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0034",
+      "dtg": "051817ZJUL26",
+      "timestamp_utc": "2026-07-05T18:17:43Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-022 / GOLDEN NILE LOGISTICS (BVI)",
+      "text": "Entity EOI-022 (GOLDEN NILE LOGISTICS (BVI)) assessed to be coordinating financial flows through BVI. Associated entity GOLDEN NILE LOGISTICS (BVI) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-022",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "DFE",
+        "name": "NEXUS ENERGY HOLDINGS (Cayman)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "BVI",
+      "track_age_days": 56,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0323"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0038",
+      "dtg": "052211ZJUL26",
+      "timestamp_utc": "2026-07-05T22:11:52Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-01 / Cayman Islands",
+      "text": "CDO analytical assessment for KRI-01 (Financial Fraud): based on fusion of 9 source reports over the past 3 days, assessed that risk exposure in Cayman Islands attributable to VOYAGER PETROCHEMICALS LTD (Malta) is HIGH. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 87 hours.",
+      "kri_assessed": "KRI-01",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 9,
+      "validity_hours": 95,
+      "key_judgement": "Threshold met for two KRIs simultaneously",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0335",
+        "ENT-202606-0730",
+        "ENT-202606-0354",
+        "ENT-202606-0828"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_FINANCIAL_FRAUD",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0101",
+      "dtg": "070025ZJUL26",
+      "timestamp_utc": "2026-07-07T00:25:17Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 07 Jul 2026",
+      "text": "CDO analytics production cycle 07JUL26. Products due: 3 risk summaries. Priority KRIs: KRI-02, KRI-05. Analyst on duty: CDO-DUTY-05. Deadline: 1025Z.",
+      "cycle_date": "2026-07-07",
+      "products_due": {
+        "risk_summary": 5,
+        "flash": 2
+      },
+      "priority_kris": [
+        "KRI-02",
+        "KRI-05"
+      ],
+      "analyst_on_duty": "CDO-DUTY-03",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0006",
+      "dtg": "071259ZJUL26",
+      "timestamp_utc": "2026-07-07T12:59:00Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-022 / NEXUS ENERGY HOLDINGS (Cayman)",
+      "text": "Entity EOI-022 (NEXUS ENERGY HOLDINGS (Cayman)) assessed to be coordinating financial flows through Singapore Freeport. Associated entity TERRACINA MARITIME LTD (Nassau) remains under active monitoring. Activity pattern consistent with PACIFIC CONDUIT GROUP network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-04.",
+      "entity_id": "EOI-022",
+      "threat_actor": "PACIFIC CONDUIT GROUP",
+      "associated_entity": {
+        "code": "GNL",
+        "name": "NEXUS ENERGY HOLDINGS (Cayman)"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Singapore Freeport",
+      "track_age_days": 28,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0264",
+        "ENT-202606-0559",
+        "ENT-202606-0414",
+        "ENT-202606-0845"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_AML_LAYERING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0028",
+      "dtg": "071823ZJUL26",
+      "timestamp_utc": "2026-07-07T18:23:43Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-021 / MERIDIAN STAR CAPITAL (Cayman)",
+      "text": "Entity EOI-021 (MERIDIAN STAR CAPITAL (Cayman)) assessed to be coordinating financial flows through Geneva. Associated entity PETROSERV ASIA PTE (Singapore) remains under active monitoring. Activity pattern consistent with PACIFIC CONDUIT GROUP network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-06.",
+      "entity_id": "EOI-021",
+      "threat_actor": "PACIFIC CONDUIT GROUP",
+      "associated_entity": {
+        "code": "NEH-S",
+        "name": "NKOSI TRADING & BROKERAGE (Lagos)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 89,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "MSC"
+      ],
+      "generic_refs": [
+        "ENT-202606-0783"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_MARKET_MANIPULATION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0018",
+      "dtg": "080250ZJUL26",
+      "timestamp_utc": "2026-07-08T02:50:19Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-029 / TERRACINA MARITIME LTD (Nassau",
+      "text": "Entity EOI-029 (TERRACINA MARITIME LTD (Nassau)) assessed to be coordinating financial flows through Malta. Associated entity NKOSI TRADING & BROKERAGE (Lagos) remains under active monitoring. Activity pattern consistent with PACIFIC CONDUIT GROUP network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-02.",
+      "entity_id": "EOI-029",
+      "threat_actor": "PACIFIC CONDUIT GROUP",
+      "associated_entity": {
+        "code": "OPG",
+        "name": "NEH Dubai Commodities DMCC"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Malta",
+      "track_age_days": 33,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [
+        "ENT-202606-0281",
+        "ENT-202606-0475"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_SANCTIONS_EVASION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0065",
+      "dtg": "081009ZJUL26",
+      "timestamp_utc": "2026-07-08T10:09:53Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-201",
+      "text": "Periodic reliability review for SRC-201. Category: REGULATORY_LIAISON. Source reliability maintained at grade B. Reports on record: 42. Last corroborated report: 22 days ago. Sourcing status: SUSPENDED. Next scheduled evaluation: 51 days. Primary areas: Malta.",
+      "source_id": "SRC-201",
+      "reliability_grade": "B",
+      "source_category": "REGULATORY_LIAISON",
+      "reports_on_record": 20,
+      "days_since_last_report": 35,
+      "evaluation_cycle_days": 102,
+      "sourcing_status": "RESTRICTED",
+      "areas_covered": [
+        "Malta",
+        "Dubai Free Zone"
+      ],
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0014",
+      "dtg": "082143ZJUL26",
+      "timestamp_utc": "2026-07-08T21:43:09Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-043 / GOLDEN EAGLE FUND LP (BVI)",
+      "text": "Entity EOI-043 (GOLDEN EAGLE FUND LP (BVI)) assessed to be coordinating financial flows through Geneva. Associated entity DESERT FALCON ENERGY (Dubai) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-02.",
+      "entity_id": "EOI-043",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "VPL",
+        "name": "ORYX POWER GROUP (Abu Dhabi)"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 30,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [
+        "ENT-202606-0882",
+        "ENT-202606-0883",
+        "ENT-202606-0354",
+        "ENT-202606-0673"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_SANCTIONS_EVASION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0073",
+      "dtg": "090020ZJUL26",
+      "timestamp_utc": "2026-07-09T00:20:56Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-210",
+      "text": "Periodic reliability review for SRC-210. Category: EXTERNAL_INFORMANT. Source reliability maintained at grade B. Reports on record: 35. Last corroborated report: 29 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 107 days. Primary areas: Lagos.",
+      "source_id": "SRC-210",
+      "reliability_grade": "B",
+      "source_category": "EXTERNAL_INFORMANT",
+      "reports_on_record": 31,
+      "days_since_last_report": 47,
+      "evaluation_cycle_days": 69,
+      "sourcing_status": "SUSPENDED",
+      "areas_covered": [
+        "Lagos",
+        "BVI"
+      ],
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "EXTERNAL_INFORMANT"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0078",
+      "dtg": "090059ZJUL26",
+      "timestamp_utc": "2026-07-09T00:59:34Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-210",
+      "text": "Periodic reliability review for SRC-210. Category: FORMER_EMPLOYEE. Source reliability maintained at grade B. Reports on record: 67. Last corroborated report: 34 days ago. Sourcing status: RESTRICTED. Next scheduled evaluation: 83 days. Primary areas: Malta.",
+      "source_id": "SRC-210",
+      "reliability_grade": "B",
+      "source_category": "FORMER_EMPLOYEE",
+      "reports_on_record": 27,
+      "days_since_last_report": 33,
+      "evaluation_cycle_days": 59,
+      "sourcing_status": "RESTRICTED",
+      "areas_covered": [
+        "Malta",
+        "Cayman Islands"
+      ],
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "FORMER_EMPLOYEE"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0092",
+      "dtg": "090423ZJUL26",
+      "timestamp_utc": "2026-07-09T04:23:29Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0790",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0790. Additional context: Matches known typology of SHADOW LEDGER COORDINATOR ALPHA. Analyst: CDO-DUTY-05. Action: TASK SOURCE",
+      "referenced_doc": "ENT-202606-0790",
+      "analyst_id": "CDO-DUTY-05",
+      "annotation_type": "TYPOLOGY_MATCH",
+      "action_required": "ESCALATE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0790"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_AML_LAYERING"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0037",
+      "dtg": "091512ZJUL26",
+      "timestamp_utc": "2026-07-09T15:12:33Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-03 / Lagos",
+      "text": "CDO analytical assessment for KRI-03 (Bribery/Corruption): based on fusion of 6 source reports over the past 10 days, assessed that risk exposure in Lagos attributable to TERRACINA MARITIME LTD (Nassau) is MODERATE. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 33 hours.",
+      "kri_assessed": "KRI-03",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 3,
+      "validity_hours": 27,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [
+        "ENT-202606-0228",
+        "ENT-202606-0352",
+        "ENT-202606-0636"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_BRIBERY_CORRUPTION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0036",
+      "dtg": "092209ZJUL26",
+      "timestamp_utc": "2026-07-09T22:09:15Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-06 / Geneva",
+      "text": "CDO analytical assessment for KRI-06 (Market Manipulation): based on fusion of 6 source reports over the past 9 days, assessed that risk exposure in Geneva attributable to NKOSI TRADING & BROKERAGE (Lagos) is ELEVATED. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 27 hours.",
+      "kri_assessed": "KRI-06",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 8,
+      "validity_hours": 53,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [
+        "ENT-202606-0855",
+        "ENT-202606-0882"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_MARKET_MANIPULATION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0075",
+      "dtg": "100327ZJUL26",
+      "timestamp_utc": "2026-07-10T03:27:23Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-214",
+      "text": "Periodic reliability review for SRC-214. Category: INTERNAL_WHISTLEBLOWER. Source reliability maintained at grade D. Reports on record: 42. Last corroborated report: 17 days ago. Sourcing status: RESTRICTED. Next scheduled evaluation: 64 days. Primary areas: Lagos.",
+      "source_id": "SRC-214",
+      "reliability_grade": "D",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "reports_on_record": 65,
+      "days_since_last_report": 52,
+      "evaluation_cycle_days": 52,
+      "sourcing_status": "ACTIVE",
+      "areas_covered": [
+        "Lagos",
+        "Cayman Islands"
+      ],
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "INTERNAL_WHISTLEBLOWER"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0063",
+      "dtg": "100334ZJUL26",
+      "timestamp_utc": "2026-07-10T03:34:25Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-206",
+      "text": "Periodic reliability review for SRC-206. Category: EXTERNAL_INFORMANT. Source reliability maintained at grade C. Reports on record: 29. Last corroborated report: 50 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 41 days. Primary areas: Lagos.",
+      "source_id": "SRC-206",
+      "reliability_grade": "C",
+      "source_category": "EXTERNAL_INFORMANT",
+      "reports_on_record": 30,
+      "days_since_last_report": 45,
+      "evaluation_cycle_days": 61,
+      "sourcing_status": "RESTRICTED",
+      "areas_covered": [
+        "Lagos",
+        "Dubai Free Zone"
+      ],
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "EXTERNAL_INFORMANT"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0015",
+      "dtg": "100549ZJUL26",
+      "timestamp_utc": "2026-07-10T05:49:42Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-035 / NEH Geneva Trading SA",
+      "text": "Entity EOI-035 (NEH Geneva Trading SA) assessed to be coordinating financial flows through Geneva. Associated entity DESERT FALCON ENERGY (Dubai) remains under active monitoring. Activity pattern consistent with SHADOW LEDGER COORDINATOR ALPHA network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-035",
+      "threat_actor": "SHADOW LEDGER COORDINATOR ALPHA",
+      "associated_entity": {
+        "code": "OPG",
+        "name": "NEH Dubai Commodities DMCC"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 57,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0271",
+        "ENT-202606-0767"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0061",
+      "dtg": "100641ZJUL26",
+      "timestamp_utc": "2026-07-10T06:41:24Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-215",
+      "text": "Periodic reliability review for SRC-215. Category: EXTERNAL_INFORMANT. Source reliability maintained at grade B. Reports on record: 2. Last corroborated report: 14 days ago. Sourcing status: SUSPENDED. Next scheduled evaluation: 89 days. Primary areas: Dubai Free Zone.",
+      "source_id": "SRC-215",
+      "reliability_grade": "B",
+      "source_category": "EXTERNAL_INFORMANT",
+      "reports_on_record": 61,
+      "days_since_last_report": 22,
+      "evaluation_cycle_days": 91,
+      "sourcing_status": "SUSPENDED",
+      "areas_covered": [
+        "Dubai Free Zone",
+        "Lagos"
+      ],
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "EXTERNAL_INFORMANT"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0001",
+      "dtg": "100845ZJUL26",
+      "timestamp_utc": "2026-07-10T08:45:47Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-012 / NEH Singapore Pte Ltd",
+      "text": "Entity EOI-012 (NEH Singapore Pte Ltd) assessed to be coordinating financial flows through Dubai Free Zone. Associated entity GOLDEN NILE LOGISTICS (BVI) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-012",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "NEH-G",
+        "name": "GOLDEN EAGLE FUND LP (BVI)"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Dubai Free Zone",
+      "track_age_days": 50,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [
+        "ENT-202606-0961"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0086",
+      "dtg": "111137ZJUL26",
+      "timestamp_utc": "2026-07-11T11:37:19Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0574",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0574. Additional context: Matches known typology of MERIDIAN BROKER NETWORK. Analyst: CDO-DUTY-05. Action: TASK SOURCE",
+      "referenced_doc": "ENT-202606-0574",
+      "analyst_id": "CDO-DUTY-04",
+      "annotation_type": "NEW_ENTITY_LINK",
+      "action_required": "MONITOR",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0574"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0081",
+      "dtg": "111421ZJUL26",
+      "timestamp_utc": "2026-07-11T14:21:37Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0614",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0614. Additional context: Matches known typology of MERIDIAN BROKER NETWORK. Analyst: CDO-DUTY-02. Action: CROSS-REFERENCE",
+      "referenced_doc": "ENT-202606-0614",
+      "analyst_id": "CDO-DUTY-02",
+      "annotation_type": "CONTRADICTING_EVIDENCE",
+      "action_required": "TASK SOURCE",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "MSC"
+      ],
+      "generic_refs": [
+        "ENT-202606-0614"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0057",
+      "dtg": "112345ZJUL26",
+      "timestamp_utc": "2026-07-11T23:45:38Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-06 / Cayman Islands",
+      "text": "CDO analytical assessment for KRI-06 (Market Manipulation): based on fusion of 3 source reports over the past 5 days, assessed that risk exposure in Cayman Islands attributable to NEH Singapore Pte Ltd is MODERATE. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 79 hours.",
+      "kri_assessed": "KRI-06",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 5,
+      "validity_hours": 40,
+      "key_judgement": "Threshold met for two KRIs simultaneously",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [
+        "ENT-202606-0855",
+        "ENT-202606-0624",
+        "ENT-202606-0022",
+        "ENT-202606-0789"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_MARKET_MANIPULATION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0110",
+      "dtg": "120322ZJUL26",
+      "timestamp_utc": "2026-07-12T03:22:20Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "DATA_REQUIREMENT",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Data collection requirement — KRI-06 / Cayman Islands",
+      "text": "Formal data collection requirement raised against KRI-06. Gap identified: beneficial ownership unclear. Tasked to: CISO INTELLIGENCE. Priority: PRIORITY. Deadline: 60h.",
+      "requirement_id": "DR-7170",
+      "gap_type": "JURISDICTIONAL_GAP",
+      "tasked_to": "CDO ANALYTICS",
+      "deadline_hours": 48,
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_MARKET_MANIPULATION",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0070",
+      "dtg": "121247ZJUL26",
+      "timestamp_utc": "2026-07-12T12:47:39Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-214",
+      "text": "Periodic reliability review for SRC-214. Category: EXTERNAL_INFORMANT. Source reliability maintained at grade B. Reports on record: 33. Last corroborated report: 23 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 112 days. Primary areas: Lagos.",
+      "source_id": "SRC-214",
+      "reliability_grade": "B",
+      "source_category": "EXTERNAL_INFORMANT",
+      "reports_on_record": 59,
+      "days_since_last_report": 11,
+      "evaluation_cycle_days": 51,
+      "sourcing_status": "SUSPENDED",
+      "areas_covered": [
+        "Lagos",
+        "Cayman Islands"
+      ],
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "EXTERNAL_INFORMANT"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0022",
+      "dtg": "121850ZJUL26",
+      "timestamp_utc": "2026-07-12T18:50:06Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-043 / GOLDEN EAGLE FUND LP (BVI)",
+      "text": "Entity EOI-043 (GOLDEN EAGLE FUND LP (BVI)) assessed to be coordinating financial flows through Singapore Freeport. Associated entity GOLDEN NILE LOGISTICS (BVI) remains under active monitoring. Activity pattern consistent with SHADOW LEDGER COORDINATOR ALPHA network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-03.",
+      "entity_id": "EOI-043",
+      "threat_actor": "SHADOW LEDGER COORDINATOR ALPHA",
+      "associated_entity": {
+        "code": "NTB",
+        "name": "NEH Dubai Commodities DMCC"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Singapore Freeport",
+      "track_age_days": 46,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [
+        "ENT-202606-0762"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_BRIBERY_CORRUPTION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0072",
+      "dtg": "130145ZJUL26",
+      "timestamp_utc": "2026-07-13T01:45:13Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-208",
+      "text": "Periodic reliability review for SRC-208. Category: EXTERNAL_INFORMANT. Source reliability maintained at grade A. Reports on record: 44. Last corroborated report: 11 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 84 days. Primary areas: BVI.",
+      "source_id": "SRC-208",
+      "reliability_grade": "A",
+      "source_category": "EXTERNAL_INFORMANT",
+      "reports_on_record": 49,
+      "days_since_last_report": 49,
+      "evaluation_cycle_days": 120,
+      "sourcing_status": "ACTIVE",
+      "areas_covered": [
+        "BVI",
+        "Dubai Free Zone"
+      ],
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "EXTERNAL_INFORMANT"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0009",
+      "dtg": "130645ZJUL26",
+      "timestamp_utc": "2026-07-13T06:45:44Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-004 / NEXUS ENERGY HOLDINGS (Cayman)",
+      "text": "Entity EOI-004 (NEXUS ENERGY HOLDINGS (Cayman)) assessed to be coordinating financial flows through Malta. Associated entity VOYAGER PETROCHEMICALS LTD (Malta) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-004",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "MSC",
+        "name": "CARACAS VENTURE ENERGIA (Venezuela)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Malta",
+      "track_age_days": 50,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0834",
+        "ENT-202606-0380",
+        "ENT-202606-0548",
+        "ENT-202606-0095"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0012",
+      "dtg": "130808ZJUL26",
+      "timestamp_utc": "2026-07-13T08:08:33Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-021 / TERRACINA MARITIME LTD (Nassau",
+      "text": "Entity EOI-021 (TERRACINA MARITIME LTD (Nassau)) assessed to be coordinating financial flows through Geneva. Associated entity VOYAGER PETROCHEMICALS LTD (Malta) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-06.",
+      "entity_id": "EOI-021",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "TML",
+        "name": "GOLDEN EAGLE FUND LP (BVI)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 85,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [
+        "ENT-202606-0290",
+        "ENT-202606-0389"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_MARKET_MANIPULATION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0005",
+      "dtg": "130810ZJUL26",
+      "timestamp_utc": "2026-07-13T08:10:29Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-008 / NEH Dubai Commodities DMCC",
+      "text": "Entity EOI-008 (NEH Dubai Commodities DMCC) assessed to be coordinating financial flows through Nicosia. Associated entity DESERT FALCON ENERGY (Dubai) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-01.",
+      "entity_id": "EOI-008",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "CVE",
+        "name": "VOYAGER PETROCHEMICALS LTD (Malta)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Nicosia",
+      "track_age_days": 55,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [
+        "ENT-202606-0147"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_FINANCIAL_FRAUD",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0093",
+      "dtg": "131518ZJUL26",
+      "timestamp_utc": "2026-07-13T15:18:57Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0587",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0587. Additional context: Matches known typology of SHADOW LEDGER COORDINATOR ALPHA. Analyst: CDO-DUTY-05. Action: TASK SOURCE",
+      "referenced_doc": "ENT-202606-0587",
+      "analyst_id": "CDO-DUTY-02",
+      "annotation_type": "NEW_ENTITY_LINK",
+      "action_required": "MONITOR",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0587"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0104",
+      "dtg": "132009ZJUL26",
+      "timestamp_utc": "2026-07-13T20:09:04Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 13 Jul 2026",
+      "text": "CDO analytics production cycle 13JUL26. Products due: 4 risk summaries. Priority KRIs: KRI-05, KRI-01. Analyst on duty: CDO-DUTY-06. Deadline: 0609Z.",
+      "cycle_date": "2026-07-13",
+      "products_due": {
+        "risk_summary": 5,
+        "flash": 0
+      },
+      "priority_kris": [
+        "KRI-05",
+        "KRI-01"
+      ],
+      "analyst_on_duty": "CDO-DUTY-06",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0040",
+      "dtg": "132142ZJUL26",
+      "timestamp_utc": "2026-07-13T21:42:35Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-05 / Geneva",
+      "text": "CDO analytical assessment for KRI-05 (Commodity Misreporting): based on fusion of 4 source reports over the past 2 days, assessed that risk exposure in Geneva attributable to NEH Geneva Trading SA is HIGH. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 87 hours.",
+      "kri_assessed": "KRI-05",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 10,
+      "validity_hours": 78,
+      "key_judgement": "No change to assessed risk posture",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0620",
+        "ENT-202606-0711",
+        "ENT-202606-0548"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_COMMODITY_MISREPORTING",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0044",
+      "dtg": "140052ZJUL26",
+      "timestamp_utc": "2026-07-14T00:52:00Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-03 / Dubai Free Zone",
+      "text": "CDO analytical assessment for KRI-03 (Bribery/Corruption): based on fusion of 4 source reports over the past 2 days, assessed that risk exposure in Dubai Free Zone attributable to GOLDEN NILE LOGISTICS (BVI) is ELEVATED. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 56 hours.",
+      "kri_assessed": "KRI-03",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 10,
+      "validity_hours": 74,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0613",
+        "ENT-202606-0496",
+        "ENT-202606-0223",
+        "ENT-202606-0867"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_BRIBERY_CORRUPTION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0108",
+      "dtg": "140817ZJUL26",
+      "timestamp_utc": "2026-07-14T08:17:09Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "DATA_REQUIREMENT",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Data collection requirement — KRI-02 / Geneva",
+      "text": "Formal data collection requirement raised against KRI-02. Gap identified: source corroboration missing. Tasked to: CDO ANALYTICS. Priority: PRIORITY. Deadline: 84h.",
+      "requirement_id": "DR-5845",
+      "gap_type": "TEMPORAL_GAP",
+      "tasked_to": "CISO INTELLIGENCE",
+      "deadline_hours": 103,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_SANCTIONS_EVASION",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0083",
+      "dtg": "141854ZJUL26",
+      "timestamp_utc": "2026-07-14T18:54:43Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0767",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0767. Additional context: Matches known typology of SHADOW LEDGER COORDINATOR ALPHA. Analyst: CDO-DUTY-05. Action: CROSS-REFERENCE",
+      "referenced_doc": "ENT-202606-0767",
+      "analyst_id": "CDO-DUTY-01",
+      "annotation_type": "KRI_THRESHOLD_NOTE",
+      "action_required": "HOLD",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0767"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0048",
+      "dtg": "142126ZJUL26",
+      "timestamp_utc": "2026-07-14T21:26:26Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-06 / Singapore Freeport",
+      "text": "CDO analytical assessment for KRI-06 (Market Manipulation): based on fusion of 4 source reports over the past 7 days, assessed that risk exposure in Singapore Freeport attributable to NEH Geneva Trading SA is ELEVATED. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 51 hours.",
+      "kri_assessed": "KRI-06",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 75,
+      "key_judgement": "No change to assessed risk posture",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0454",
+        "ENT-202606-0665"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_MARKET_MANIPULATION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0019",
+      "dtg": "151010ZJUL26",
+      "timestamp_utc": "2026-07-15T10:10:28Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-025 / TERRACINA MARITIME LTD (Nassau",
+      "text": "Entity EOI-025 (TERRACINA MARITIME LTD (Nassau)) assessed to be coordinating financial flows through Nicosia. Associated entity DESERT FALCON ENERGY (Dubai) remains under active monitoring. Activity pattern consistent with PACIFIC CONDUIT GROUP network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-06.",
+      "entity_id": "EOI-025",
+      "threat_actor": "PACIFIC CONDUIT GROUP",
+      "associated_entity": {
+        "code": "NEH-D",
+        "name": "NEH Geneva Trading SA"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Nicosia",
+      "track_age_days": 31,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [
+        "ENT-202606-0536",
+        "ENT-202606-0016",
+        "ENT-202606-0118",
+        "ENT-202606-0338"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_MARKET_MANIPULATION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0095",
+      "dtg": "151416ZJUL26",
+      "timestamp_utc": "2026-07-15T14:16:09Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0602",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0602. Additional context: Matches known typology of MERIDIAN BROKER NETWORK. Analyst: CDO-DUTY-02. Action: TASK SOURCE",
+      "referenced_doc": "ENT-202606-0602",
+      "analyst_id": "CDO-DUTY-03",
+      "annotation_type": "TYPOLOGY_MATCH",
+      "action_required": "MONITOR",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0602"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0060",
+      "dtg": "161010ZJUL26",
+      "timestamp_utc": "2026-07-16T10:10:41Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-04 / Cayman Islands",
+      "text": "CDO analytical assessment for KRI-04 (AML/Layering): based on fusion of 3 source reports over the past 6 days, assessed that risk exposure in Cayman Islands attributable to NKOSI TRADING & BROKERAGE (Lagos) is MODERATE. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 46 hours.",
+      "kri_assessed": "KRI-04",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 3,
+      "validity_hours": 44,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [
+        "ENT-202606-0262",
+        "ENT-202606-0330",
+        "ENT-202606-0403",
+        "ENT-202606-0368"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_AML_LAYERING",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0099",
+      "dtg": "162247ZJUL26",
+      "timestamp_utc": "2026-07-16T22:47:55Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 16 Jul 2026",
+      "text": "CDO analytics production cycle 16JUL26. Products due: 4 risk summaries. Priority KRIs: KRI-02, KRI-05. Analyst on duty: CDO-DUTY-03. Deadline: 0347Z.",
+      "cycle_date": "2026-07-16",
+      "products_due": {
+        "risk_summary": 1,
+        "flash": 0
+      },
+      "priority_kris": [
+        "KRI-02",
+        "KRI-05"
+      ],
+      "analyst_on_duty": "CDO-DUTY-03",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0002",
+      "dtg": "162303ZJUL26",
+      "timestamp_utc": "2026-07-16T23:03:58Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-047 / NEH Singapore Pte Ltd",
+      "text": "Entity EOI-047 (NEH Singapore Pte Ltd) assessed to be coordinating financial flows through Lagos. Associated entity CARACAS VENTURE ENERGIA (Venezuela) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-04.",
+      "entity_id": "EOI-047",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "VPL",
+        "name": "CARACAS VENTURE ENERGIA (Venezuela)"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Lagos",
+      "track_age_days": 28,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [
+        "ENT-202606-0473",
+        "ENT-202606-0677"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_AML_LAYERING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0062",
+      "dtg": "170436ZJUL26",
+      "timestamp_utc": "2026-07-17T04:36:06Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-206",
+      "text": "Periodic reliability review for SRC-206. Category: FORMER_EMPLOYEE. Source reliability maintained at grade C. Reports on record: 66. Last corroborated report: 30 days ago. Sourcing status: SUSPENDED. Next scheduled evaluation: 115 days. Primary areas: Cayman Islands.",
+      "source_id": "SRC-206",
+      "reliability_grade": "C",
+      "source_category": "FORMER_EMPLOYEE",
+      "reports_on_record": 77,
+      "days_since_last_report": 14,
+      "evaluation_cycle_days": 89,
+      "sourcing_status": "ACTIVE",
+      "areas_covered": [
+        "Cayman Islands",
+        "BVI"
+      ],
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "FORMER_EMPLOYEE"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0042",
+      "dtg": "170629ZJUL26",
+      "timestamp_utc": "2026-07-17T06:29:44Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-04 / Singapore Freeport",
+      "text": "CDO analytical assessment for KRI-04 (AML/Layering): based on fusion of 12 source reports over the past 2 days, assessed that risk exposure in Singapore Freeport attributable to VOYAGER PETROCHEMICALS LTD (Malta) is ELEVATED. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 39 hours.",
+      "kri_assessed": "KRI-04",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 8,
+      "validity_hours": 51,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0014",
+        "ENT-202606-0441"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_AML_LAYERING",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0091",
+      "dtg": "171624ZJUL26",
+      "timestamp_utc": "2026-07-17T16:24:58Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0471",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0471. Additional context: Matches known typology of SHADOW LEDGER COORDINATOR ALPHA. Analyst: CDO-DUTY-05. Action: TASK SOURCE",
+      "referenced_doc": "ENT-202606-0471",
+      "analyst_id": "CDO-DUTY-01",
+      "annotation_type": "CONTRADICTING_EVIDENCE",
+      "action_required": "TASK SOURCE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [
+        "ENT-202606-0471"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0107",
+      "dtg": "172351ZJUL26",
+      "timestamp_utc": "2026-07-17T23:51:56Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "DATA_REQUIREMENT",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Data collection requirement — KRI-06 / BVI",
+      "text": "Formal data collection requirement raised against KRI-06. Gap identified: beneficial ownership unclear. Tasked to: CDO ANALYTICS. Priority: PRIORITY. Deadline: 76h.",
+      "requirement_id": "DR-7616",
+      "gap_type": "ENTITY_GAP",
+      "tasked_to": "CDO ANALYTICS",
+      "deadline_hours": 64,
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_MARKET_MANIPULATION",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0090",
+      "dtg": "180649ZJUL26",
+      "timestamp_utc": "2026-07-18T06:49:59Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0285",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0285. Additional context: Matches known typology of PACIFIC CONDUIT GROUP. Analyst: CDO-DUTY-05. Action: MONITOR",
+      "referenced_doc": "ENT-202606-0285",
+      "analyst_id": "CDO-DUTY-06",
+      "annotation_type": "CONTRADICTING_EVIDENCE",
+      "action_required": "ESCALATE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [
+        "ENT-202606-0285"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0074",
+      "dtg": "180658ZJUL26",
+      "timestamp_utc": "2026-07-18T06:58:29Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-202",
+      "text": "Periodic reliability review for SRC-202. Category: FORMER_EMPLOYEE. Source reliability maintained at grade A. Reports on record: 46. Last corroborated report: 29 days ago. Sourcing status: RESTRICTED. Next scheduled evaluation: 58 days. Primary areas: BVI.",
+      "source_id": "SRC-202",
+      "reliability_grade": "A",
+      "source_category": "FORMER_EMPLOYEE",
+      "reports_on_record": 33,
+      "days_since_last_report": 8,
+      "evaluation_cycle_days": 46,
+      "sourcing_status": "SUSPENDED",
+      "areas_covered": [
+        "BVI",
+        "Geneva"
+      ],
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "FORMER_EMPLOYEE"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0023",
+      "dtg": "181353ZJUL26",
+      "timestamp_utc": "2026-07-18T13:53:59Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-009 / ORYX POWER GROUP (Abu Dhabi)",
+      "text": "Entity EOI-009 (ORYX POWER GROUP (Abu Dhabi)) assessed to be coordinating financial flows through Cayman Islands. Associated entity GOLDEN NILE LOGISTICS (BVI) remains under active monitoring. Activity pattern consistent with SHADOW LEDGER COORDINATOR ALPHA network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-02.",
+      "entity_id": "EOI-009",
+      "threat_actor": "SHADOW LEDGER COORDINATOR ALPHA",
+      "associated_entity": {
+        "code": "NTB",
+        "name": "DESERT FALCON ENERGY (Dubai)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Cayman Islands",
+      "track_age_days": 22,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [
+        "ENT-202606-0892",
+        "ENT-202606-0802",
+        "ENT-202606-0735"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_SANCTIONS_EVASION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0013",
+      "dtg": "181409ZJUL26",
+      "timestamp_utc": "2026-07-18T14:09:53Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-043 / PETROSERV ASIA PTE (Singapore)",
+      "text": "Entity EOI-043 (PETROSERV ASIA PTE (Singapore)) assessed to be coordinating financial flows through Singapore Freeport. Associated entity VOYAGER PETROCHEMICALS LTD (Malta) remains under active monitoring. Activity pattern consistent with PACIFIC CONDUIT GROUP network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-05.",
+      "entity_id": "EOI-043",
+      "threat_actor": "PACIFIC CONDUIT GROUP",
+      "associated_entity": {
+        "code": "MSC",
+        "name": "TERRACINA MARITIME LTD (Nassau)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Singapore Freeport",
+      "track_age_days": 45,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [
+        "ENT-202606-0684"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_COMMODITY_MISREPORTING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0033",
+      "dtg": "182006ZJUL26",
+      "timestamp_utc": "2026-07-18T20:06:32Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-034 / NEH Dubai Commodities DMCC",
+      "text": "Entity EOI-034 (NEH Dubai Commodities DMCC) assessed to be coordinating financial flows through Singapore Freeport. Associated entity NEH Singapore Pte Ltd remains under active monitoring. Activity pattern consistent with SHADOW LEDGER COORDINATOR ALPHA network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-06.",
+      "entity_id": "EOI-034",
+      "threat_actor": "SHADOW LEDGER COORDINATOR ALPHA",
+      "associated_entity": {
+        "code": "NTB",
+        "name": "NEH Singapore Pte Ltd"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Singapore Freeport",
+      "track_age_days": 54,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [
+        "ENT-202606-0537",
+        "ENT-202606-0575",
+        "ENT-202606-0075",
+        "ENT-202606-0248"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_MARKET_MANIPULATION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0064",
+      "dtg": "191437ZJUL26",
+      "timestamp_utc": "2026-07-19T14:37:41Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-204",
+      "text": "Periodic reliability review for SRC-204. Category: INTERNAL_WHISTLEBLOWER. Source reliability maintained at grade B. Reports on record: 9. Last corroborated report: 51 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 41 days. Primary areas: Dubai Free Zone.",
+      "source_id": "SRC-204",
+      "reliability_grade": "B",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "reports_on_record": 62,
+      "days_since_last_report": 29,
+      "evaluation_cycle_days": 57,
+      "sourcing_status": "SUSPENDED",
+      "areas_covered": [
+        "Dubai Free Zone",
+        "Geneva"
+      ],
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "INTERNAL_WHISTLEBLOWER"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0011",
+      "dtg": "192044ZJUL26",
+      "timestamp_utc": "2026-07-19T20:44:31Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-044 / NEH Singapore Pte Ltd",
+      "text": "Entity EOI-044 (NEH Singapore Pte Ltd) assessed to be coordinating financial flows through Malta. Associated entity GOLDEN EAGLE FUND LP (BVI) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-06.",
+      "entity_id": "EOI-044",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "ACH",
+        "name": "GOLDEN NILE LOGISTICS (BVI)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Malta",
+      "track_age_days": 57,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [
+        "ENT-202606-0987",
+        "ENT-202606-0930",
+        "ENT-202606-0263",
+        "ENT-202606-0072"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_MARKET_MANIPULATION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0102",
+      "dtg": "200505ZJUL26",
+      "timestamp_utc": "2026-07-20T05:05:37Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 20 Jul 2026",
+      "text": "CDO analytics production cycle 20JUL26. Products due: 2 risk summaries. Priority KRIs: KRI-04, KRI-02. Analyst on duty: CDO-DUTY-02. Deadline: 1505Z.",
+      "cycle_date": "2026-07-20",
+      "products_due": {
+        "risk_summary": 4,
+        "flash": 1
+      },
+      "priority_kris": [
+        "KRI-04",
+        "KRI-02"
+      ],
+      "analyst_on_duty": "CDO-DUTY-03",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0032",
+      "dtg": "200602ZJUL26",
+      "timestamp_utc": "2026-07-20T06:02:00Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-046 / ARCADIA CLEARING HOUSE (Nicosi",
+      "text": "Entity EOI-046 (ARCADIA CLEARING HOUSE (Nicosia)) assessed to be coordinating financial flows through Singapore Freeport. Associated entity TERRACINA MARITIME LTD (Nassau) remains under active monitoring. Activity pattern consistent with PACIFIC CONDUIT GROUP network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-02.",
+      "entity_id": "EOI-046",
+      "threat_actor": "PACIFIC CONDUIT GROUP",
+      "associated_entity": {
+        "code": "GNL",
+        "name": "NEH Dubai Commodities DMCC"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Singapore Freeport",
+      "track_age_days": 61,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0177",
+        "ENT-202606-0862"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_SANCTIONS_EVASION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0007",
+      "dtg": "210344ZJUL26",
+      "timestamp_utc": "2026-07-21T03:44:29Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-031 / MERIDIAN STAR CAPITAL (Cayman)",
+      "text": "Entity EOI-031 (MERIDIAN STAR CAPITAL (Cayman)) assessed to be coordinating financial flows through Dubai Free Zone. Associated entity PETROSERV ASIA PTE (Singapore) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: HIGH CONFIDENCE. KRI linkage: KRI-06.",
+      "entity_id": "EOI-031",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "VPL",
+        "name": "NEH Geneva Trading SA"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Dubai Free Zone",
+      "track_age_days": 16,
+      "confidence": "HIGH CONFIDENCE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "MSC"
+      ],
+      "generic_refs": [
+        "ENT-202606-0304",
+        "ENT-202606-0179"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_MARKET_MANIPULATION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0085",
+      "dtg": "211747ZJUL26",
+      "timestamp_utc": "2026-07-21T17:47:50Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0214",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0214. Additional context: Matches known typology of PACIFIC CONDUIT GROUP. Analyst: CDO-DUTY-01. Action: CROSS-REFERENCE",
+      "referenced_doc": "ENT-202606-0214",
+      "analyst_id": "CDO-DUTY-06",
+      "annotation_type": "CONTRADICTING_EVIDENCE",
+      "action_required": "TASK SOURCE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [
+        "ENT-202606-0214"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0100",
+      "dtg": "211854ZJUL26",
+      "timestamp_utc": "2026-07-21T18:54:35Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 21 Jul 2026",
+      "text": "CDO analytics production cycle 21JUL26. Products due: 5 risk summaries. Priority KRIs: KRI-02, KRI-02. Analyst on duty: CDO-DUTY-01. Deadline: 2354Z.",
+      "cycle_date": "2026-07-21",
+      "products_due": {
+        "risk_summary": 4,
+        "flash": 0
+      },
+      "priority_kris": [
+        "KRI-02",
+        "KRI-02"
+      ],
+      "analyst_on_duty": "CDO-DUTY-05",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0109",
+      "dtg": "212105ZJUL26",
+      "timestamp_utc": "2026-07-21T21:05:53Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "DATA_REQUIREMENT",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Data collection requirement — KRI-06 / Dubai Free Zone",
+      "text": "Formal data collection requirement raised against KRI-06. Gap identified: reporting gap unaccounted for. Tasked to: CDO ANALYTICS. Priority: ROUTINE. Deadline: 89h.",
+      "requirement_id": "DR-1723",
+      "gap_type": "JURISDICTIONAL_GAP",
+      "tasked_to": "EXTERNAL COUNSEL",
+      "deadline_hours": 61,
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_MARKET_MANIPULATION",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0097",
+      "dtg": "212218ZJUL26",
+      "timestamp_utc": "2026-07-21T22:18:23Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 21 Jul 2026",
+      "text": "CDO analytics production cycle 21JUL26. Products due: 4 risk summaries. Priority KRIs: KRI-03, KRI-02. Analyst on duty: CDO-DUTY-06. Deadline: 0918Z.",
+      "cycle_date": "2026-07-21",
+      "products_due": {
+        "risk_summary": 3,
+        "flash": 2
+      },
+      "priority_kris": [
+        "KRI-03",
+        "KRI-02"
+      ],
+      "analyst_on_duty": "CDO-DUTY-01",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0020",
+      "dtg": "220306ZJUL26",
+      "timestamp_utc": "2026-07-22T03:06:40Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-042 / NEH Geneva Trading SA",
+      "text": "Entity EOI-042 (NEH Geneva Trading SA) assessed to be coordinating financial flows through Geneva. Associated entity DESERT FALCON ENERGY (Dubai) remains under active monitoring. Activity pattern consistent with SHADOW LEDGER COORDINATOR ALPHA network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-03.",
+      "entity_id": "EOI-042",
+      "threat_actor": "SHADOW LEDGER COORDINATOR ALPHA",
+      "associated_entity": {
+        "code": "NEH",
+        "name": "PETROSERV ASIA PTE (Singapore)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 53,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [
+        "ENT-202606-0170",
+        "ENT-202606-0140",
+        "ENT-202606-0603"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_BRIBERY_CORRUPTION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0071",
+      "dtg": "220439ZJUL26",
+      "timestamp_utc": "2026-07-22T04:39:57Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-207",
+      "text": "Periodic reliability review for SRC-207. Category: EXTERNAL_INFORMANT. Source reliability maintained at grade B. Reports on record: 25. Last corroborated report: 50 days ago. Sourcing status: SUSPENDED. Next scheduled evaluation: 90 days. Primary areas: Lagos.",
+      "source_id": "SRC-207",
+      "reliability_grade": "B",
+      "source_category": "EXTERNAL_INFORMANT",
+      "reports_on_record": 44,
+      "days_since_last_report": 46,
+      "evaluation_cycle_days": 68,
+      "sourcing_status": "SUSPENDED",
+      "areas_covered": [
+        "Lagos",
+        "Nicosia"
+      ],
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "EXTERNAL_INFORMANT"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0046",
+      "dtg": "220713ZJUL26",
+      "timestamp_utc": "2026-07-22T07:13:15Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-02 / Lagos",
+      "text": "CDO analytical assessment for KRI-02 (Sanctions Evasion): based on fusion of 4 source reports over the past 5 days, assessed that risk exposure in Lagos attributable to PETROSERV ASIA PTE (Singapore) is CRITICAL. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 42 hours.",
+      "kri_assessed": "KRI-02",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 12,
+      "validity_hours": 24,
+      "key_judgement": "No change to assessed risk posture",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [
+        "ENT-202606-0595",
+        "ENT-202606-0813",
+        "ENT-202606-0085",
+        "ENT-202606-0011",
+        "ENT-202606-0433"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_SANCTIONS_EVASION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0043",
+      "dtg": "230338ZJUL26",
+      "timestamp_utc": "2026-07-23T03:38:54Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-03 / Dubai Free Zone",
+      "text": "CDO analytical assessment for KRI-03 (Bribery/Corruption): based on fusion of 7 source reports over the past 4 days, assessed that risk exposure in Dubai Free Zone attributable to CARACAS VENTURE ENERGIA (Venezuela) is CRITICAL. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 37 hours.",
+      "kri_assessed": "KRI-03",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 47,
+      "key_judgement": "Threshold met for two KRIs simultaneously",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [
+        "ENT-202606-0647",
+        "ENT-202606-0099",
+        "ENT-202606-0080",
+        "ENT-202606-0276",
+        "ENT-202606-0972"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_BRIBERY_CORRUPTION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0058",
+      "dtg": "230445ZJUL26",
+      "timestamp_utc": "2026-07-23T04:45:59Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-01 / Geneva",
+      "text": "CDO analytical assessment for KRI-01 (Financial Fraud): based on fusion of 3 source reports over the past 5 days, assessed that risk exposure in Geneva attributable to NEXUS ENERGY HOLDINGS (Cayman) is CRITICAL. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 71 hours.",
+      "kri_assessed": "KRI-01",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 10,
+      "validity_hours": 41,
+      "key_judgement": "No change to assessed risk posture",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [
+        "ENT-202606-0715",
+        "ENT-202606-0913",
+        "ENT-202606-0154",
+        "ENT-202606-0708"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_FINANCIAL_FRAUD",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0051",
+      "dtg": "230616ZJUL26",
+      "timestamp_utc": "2026-07-23T06:16:35Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-02 / Lagos",
+      "text": "CDO analytical assessment for KRI-02 (Sanctions Evasion): based on fusion of 4 source reports over the past 10 days, assessed that risk exposure in Lagos attributable to ORYX POWER GROUP (Abu Dhabi) is HIGH. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 28 hours.",
+      "kri_assessed": "KRI-02",
+      "assessment_confidence": "LOW CONFIDENCE",
+      "source_count": 8,
+      "validity_hours": 78,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [
+        "ENT-202606-0042",
+        "ENT-202606-0180",
+        "ENT-202606-0644"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_SANCTIONS_EVASION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0016",
+      "dtg": "231849ZJUL26",
+      "timestamp_utc": "2026-07-23T18:49:57Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-036 / VOYAGER PETROCHEMICALS LTD (Ma",
+      "text": "Entity EOI-036 (VOYAGER PETROCHEMICALS LTD (Malta)) assessed to be coordinating financial flows through Singapore Freeport. Associated entity ORYX POWER GROUP (Abu Dhabi) remains under active monitoring. Activity pattern consistent with MERIDIAN BROKER NETWORK network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-04.",
+      "entity_id": "EOI-036",
+      "threat_actor": "MERIDIAN BROKER NETWORK",
+      "associated_entity": {
+        "code": "NEH",
+        "name": "NEH Geneva Trading SA"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Singapore Freeport",
+      "track_age_days": 10,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0985"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_AML_LAYERING",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0029",
+      "dtg": "240312ZJUL26",
+      "timestamp_utc": "2026-07-24T03:12:48Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-026 / GOLDEN EAGLE FUND LP (BVI)",
+      "text": "Entity EOI-026 (GOLDEN EAGLE FUND LP (BVI)) assessed to be coordinating financial flows through Dubai Free Zone. Associated entity NKOSI TRADING & BROKERAGE (Lagos) remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-06.",
+      "entity_id": "EOI-026",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "VPL",
+        "name": "NEXUS ENERGY HOLDINGS (Cayman)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Dubai Free Zone",
+      "track_age_days": 31,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [
+        "ENT-202606-0168",
+        "ENT-202606-0864",
+        "ENT-202606-0581"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_MARKET_MANIPULATION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0087",
+      "dtg": "240658ZJUL26",
+      "timestamp_utc": "2026-07-24T06:58:58Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0658",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0658. Additional context: Matches known typology of SHADOW LEDGER COORDINATOR ALPHA. Analyst: CDO-DUTY-05. Action: ESCALATE TO CFO",
+      "referenced_doc": "ENT-202606-0658",
+      "analyst_id": "CDO-DUTY-05",
+      "annotation_type": "NEW_ENTITY_LINK",
+      "action_required": "HOLD",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0658"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0068",
+      "dtg": "241350ZJUL26",
+      "timestamp_utc": "2026-07-24T13:50:02Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-202",
+      "text": "Periodic reliability review for SRC-202. Category: REGULATORY_LIAISON. Source reliability maintained at grade C. Reports on record: 16. Last corroborated report: 13 days ago. Sourcing status: SUSPENDED. Next scheduled evaluation: 54 days. Primary areas: Cayman Islands.",
+      "source_id": "SRC-202",
+      "reliability_grade": "C",
+      "source_category": "REGULATORY_LIAISON",
+      "reports_on_record": 19,
+      "days_since_last_report": 19,
+      "evaluation_cycle_days": 62,
+      "sourcing_status": "ACTIVE",
+      "areas_covered": [
+        "Cayman Islands",
+        "Lagos"
+      ],
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0103",
+      "dtg": "241658ZJUL26",
+      "timestamp_utc": "2026-07-24T16:58:00Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ANALYTICS_PRODUCTION",
+      "classification": "INTERNAL — RESTRICTED",
+      "handling_caveats": [
+        "INTERNAL USE ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Analytics production schedule — 24 Jul 2026",
+      "text": "CDO analytics production cycle 24JUL26. Products due: 3 risk summaries. Priority KRIs: KRI-06, KRI-04. Analyst on duty: CDO-DUTY-01. Deadline: 0458Z.",
+      "cycle_date": "2026-07-24",
+      "products_due": {
+        "risk_summary": 1,
+        "flash": 0
+      },
+      "priority_kris": [
+        "KRI-06",
+        "KRI-04"
+      ],
+      "analyst_on_duty": "CDO-DUTY-04",
+      "kri_refs": [
+        "KRI-06",
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "CDO_ANALYTICS"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0026",
+      "dtg": "242248ZJUL26",
+      "timestamp_utc": "2026-07-24T22:48:25Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-011 / TERRACINA MARITIME LTD (Nassau",
+      "text": "Entity EOI-011 (TERRACINA MARITIME LTD (Nassau)) assessed to be coordinating financial flows through Geneva. Associated entity MERIDIAN STAR CAPITAL (Cayman) remains under active monitoring. Activity pattern consistent with MERIDIAN BROKER NETWORK network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-02.",
+      "entity_id": "EOI-011",
+      "threat_actor": "MERIDIAN BROKER NETWORK",
+      "associated_entity": {
+        "code": "PSA",
+        "name": "NEXUS ENERGY HOLDINGS (Cayman)"
+      },
+      "track_status": "DORMANT",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 51,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [
+        "ENT-202606-0308"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_SANCTIONS_EVASION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0021",
+      "dtg": "252009ZJUL26",
+      "timestamp_utc": "2026-07-25T20:09:57Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-004 / VOYAGER PETROCHEMICALS LTD (Ma",
+      "text": "Entity EOI-004 (VOYAGER PETROCHEMICALS LTD (Malta)) assessed to be coordinating financial flows through Geneva. Associated entity NEH Dubai Commodities DMCC remains under active monitoring. Activity pattern consistent with NEXUS INNER CIRCLE network. Confidence level: MEDIUM CONFIDENCE. KRI linkage: KRI-01.",
+      "entity_id": "EOI-004",
+      "threat_actor": "NEXUS INNER CIRCLE",
+      "associated_entity": {
+        "code": "CVE",
+        "name": "ARCADIA CLEARING HOUSE (Nicosia)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 90,
+      "confidence": "MEDIUM CONFIDENCE",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0236",
+        "ENT-202606-0825",
+        "ENT-202606-0194",
+        "ENT-202606-0120"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_FINANCIAL_FRAUD",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0059",
+      "dtg": "252048ZJUL26",
+      "timestamp_utc": "2026-07-25T20:48:18Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-03 / Lagos",
+      "text": "CDO analytical assessment for KRI-03 (Bribery/Corruption): based on fusion of 9 source reports over the past 6 days, assessed that risk exposure in Lagos attributable to NKOSI TRADING & BROKERAGE (Lagos) is MODERATE. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 89 hours.",
+      "kri_assessed": "KRI-03",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 7,
+      "validity_hours": 85,
+      "key_judgement": "Threshold met — escalate to CFO",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [
+        "ENT-202606-0725",
+        "ENT-202606-0423",
+        "ENT-202606-0738",
+        "ENT-202606-0267",
+        "ENT-202606-0982"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_BRIBERY_CORRUPTION",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0041",
+      "dtg": "252202ZJUL26",
+      "timestamp_utc": "2026-07-25T22:02:11Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-01 / Geneva",
+      "text": "CDO analytical assessment for KRI-01 (Financial Fraud): based on fusion of 4 source reports over the past 6 days, assessed that risk exposure in Geneva attributable to VOYAGER PETROCHEMICALS LTD (Malta) is CRITICAL. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 86 hours.",
+      "kri_assessed": "KRI-01",
+      "assessment_confidence": "HIGH CONFIDENCE",
+      "source_count": 8,
+      "validity_hours": 34,
+      "key_judgement": "Threshold met — escalate to CFO",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0577",
+        "ENT-202606-0086"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_FINANCIAL_FRAUD",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0027",
+      "dtg": "261644ZJUL26",
+      "timestamp_utc": "2026-07-26T16:44:51Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-019 / NEH Dubai Commodities DMCC",
+      "text": "Entity EOI-019 (NEH Dubai Commodities DMCC) assessed to be coordinating financial flows through Geneva. Associated entity NEH Geneva Trading SA remains under active monitoring. Activity pattern consistent with MERIDIAN BROKER NETWORK network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-01.",
+      "entity_id": "EOI-019",
+      "threat_actor": "MERIDIAN BROKER NETWORK",
+      "associated_entity": {
+        "code": "ACH",
+        "name": "VOYAGER PETROCHEMICALS LTD (Malta)"
+      },
+      "track_status": "ACTIVE",
+      "last_confirmed_location": "Geneva",
+      "track_age_days": 6,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [
+        "ENT-202606-0168",
+        "ENT-202606-0622",
+        "ENT-202606-0700"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_FINANCIAL_FRAUD",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0089",
+      "dtg": "261713ZJUL26",
+      "timestamp_utc": "2026-07-26T17:13:09Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "COLLATERAL_ANALYSIS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Collateral analysis — ref ENT-202606-0646",
+      "text": "Analyst collateral annotation on corpus record ENT-202606-0646. Additional context: Matches known typology of MERIDIAN BROKER NETWORK. Analyst: CDO-DUTY-05. Action: CROSS-REFERENCE",
+      "referenced_doc": "ENT-202606-0646",
+      "analyst_id": "CDO-DUTY-02",
+      "annotation_type": "KRI_THRESHOLD_NOTE",
+      "action_required": "TASK SOURCE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [
+        "ENT-202606-0646"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_AML_LAYERING"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0067",
+      "dtg": "270432ZJUL26",
+      "timestamp_utc": "2026-07-27T04:32:05Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-215",
+      "text": "Periodic reliability review for SRC-215. Category: REGULATORY_LIAISON. Source reliability maintained at grade D. Reports on record: 17. Last corroborated report: 27 days ago. Sourcing status: RESTRICTED. Next scheduled evaluation: 31 days. Primary areas: Singapore Freeport.",
+      "source_id": "SRC-215",
+      "reliability_grade": "D",
+      "source_category": "REGULATORY_LIAISON",
+      "reports_on_record": 50,
+      "days_since_last_report": 32,
+      "evaluation_cycle_days": 70,
+      "sourcing_status": "ACTIVE",
+      "areas_covered": [
+        "Singapore Freeport",
+        "Singapore Freeport"
+      ],
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0049",
+      "dtg": "270530ZJUL26",
+      "timestamp_utc": "2026-07-27T05:30:53Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-04 / Lagos",
+      "text": "CDO analytical assessment for KRI-04 (AML/Layering): based on fusion of 5 source reports over the past 2 days, assessed that risk exposure in Lagos attributable to NEH Singapore Pte Ltd is HIGH. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 94 hours.",
+      "kri_assessed": "KRI-04",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 6,
+      "validity_hours": 50,
+      "key_judgement": "Threshold met for two KRIs simultaneously",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [
+        "ENT-202606-0984",
+        "ENT-202606-0168",
+        "ENT-202606-0619",
+        "ENT-202606-0356",
+        "ENT-202606-0571"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_AML_LAYERING",
+        "EVALUATION_STANDARD"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0069",
+      "dtg": "271222ZJUL26",
+      "timestamp_utc": "2026-07-27T12:22:00Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-201",
+      "text": "Periodic reliability review for SRC-201. Category: INTERNAL_WHISTLEBLOWER. Source reliability maintained at grade B. Reports on record: 30. Last corroborated report: 43 days ago. Sourcing status: ACTIVE. Next scheduled evaluation: 57 days. Primary areas: Singapore Freeport.",
+      "source_id": "SRC-201",
+      "reliability_grade": "B",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "reports_on_record": 68,
+      "days_since_last_report": 53,
+      "evaluation_cycle_days": 30,
+      "sourcing_status": "ACTIVE",
+      "areas_covered": [
+        "Singapore Freeport",
+        "Nicosia"
+      ],
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "INTERNAL_WHISTLEBLOWER"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0008",
+      "dtg": "272321ZJUL26",
+      "timestamp_utc": "2026-07-27T23:21:35Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "ENTITY_TRACK",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Entity tracking update — EOI-014 / VOYAGER PETROCHEMICALS LTD (Ma",
+      "text": "Entity EOI-014 (VOYAGER PETROCHEMICALS LTD (Malta)) assessed to be coordinating financial flows through Nicosia. Associated entity GOLDEN NILE LOGISTICS (BVI) remains under active monitoring. Activity pattern consistent with MERIDIAN BROKER NETWORK network. Confidence level: LOW CONFIDENCE. KRI linkage: KRI-02.",
+      "entity_id": "EOI-014",
+      "threat_actor": "MERIDIAN BROKER NETWORK",
+      "associated_entity": {
+        "code": "NEH-S",
+        "name": "CARACAS VENTURE ENERGIA (Venezuela)"
+      },
+      "track_status": "WATCH",
+      "last_confirmed_location": "Nicosia",
+      "track_age_days": 16,
+      "confidence": "LOW CONFIDENCE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [
+        "ENT-202606-0191",
+        "ENT-202606-0695",
+        "ENT-202606-0075"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "KRI_SANCTIONS_EVASION",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0066",
+      "dtg": "272335ZJUL26",
+      "timestamp_utc": "2026-07-27T23:35:12Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "SOURCE_EVAL",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source evaluation — SRC-208",
+      "text": "Periodic reliability review for SRC-208. Category: REGULATORY_LIAISON. Source reliability maintained at grade B. Reports on record: 78. Last corroborated report: 43 days ago. Sourcing status: RESTRICTED. Next scheduled evaluation: 98 days. Primary areas: Nicosia.",
+      "source_id": "SRC-208",
+      "reliability_grade": "B",
+      "source_category": "REGULATORY_LIAISON",
+      "reports_on_record": 59,
+      "days_since_last_report": 44,
+      "evaluation_cycle_days": 89,
+      "sourcing_status": "ACTIVE",
+      "areas_covered": [
+        "Nicosia",
+        "Nicosia"
+      ],
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EVALUATION_STANDARD",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CDO-202606-0045",
+      "dtg": "280327ZJUL26",
+      "timestamp_utc": "2026-07-28T03:27:12Z",
+      "persona": "CDO_ANALYST",
+      "record_type": "RISK_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Risk assessment — KRI-05 / Geneva",
+      "text": "CDO analytical assessment for KRI-05 (Commodity Misreporting): based on fusion of 7 source reports over the past 10 days, assessed that risk exposure in Geneva attributable to CARACAS VENTURE ENERGIA (Venezuela) is HIGH. Key indicators: transaction anomalies, informant reporting, open-source corroboration. Assessment validity: 47 hours.",
+      "kri_assessed": "KRI-05",
+      "assessment_confidence": "MEDIUM CONFIDENCE",
+      "source_count": 10,
+      "validity_hours": 60,
+      "key_judgement": "Approaching threshold — maintain monitoring",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [
+        "ENT-202606-0338",
+        "ENT-202606-0523",
+        "ENT-202606-0132"
+      ],
+      "concept_ids": [
+        "COMPLIANCE",
+        "RISK_SUMMARY",
+        "KRI_COMMODITY_MISREPORTING",
+        "EVALUATION_STANDARD"
+      ]
+    }
+  ]
+}

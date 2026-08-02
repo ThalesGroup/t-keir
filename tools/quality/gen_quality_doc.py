@@ -242,6 +242,10 @@ def main() -> None:
 
 Generated automatically by `make quality-docs` — last updated **{ts}**.
 
+How this dashboard is produced, which Actions upload artefacts, and gate
+thresholds: **[CI, reports & Actions](../ci/index.md)** ·
+[Reports catalog](../ci/reports-catalog.md) · [Quality gates](../ci/gates.md).
+
 Baseline before the B-grade refactoring pass (``thot/`` only): average was
 already within band after hotspots were reduced; gate target remains
 **average ≤ 7.0 (grade B)** with **zero functions at grade D or worse**.

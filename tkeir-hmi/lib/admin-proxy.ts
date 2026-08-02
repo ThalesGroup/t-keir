@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const PROXY_TIMEOUT_MS = Number(process.env.API_PROXY_TIMEOUT_MS ?? "300000");
@@ -22,14 +21,9 @@ export async function proxyUpstream(
     headers.set("accept", accept);
   }
 
-  if (process.env.AUTH_ENABLED === "true") {
-    const session = await auth();
-    if (session?.accessToken) {
-      headers.set("authorization", `Bearer ${session.accessToken}`);
-    }
-  }
+  // Forward inbound bearer from keycloak-js (browser attaches Authorization).
   const inboundAuth = request.headers.get("authorization");
-  if (inboundAuth && !headers.has("authorization")) {
+  if (inboundAuth) {
     headers.set("authorization", inboundAuth);
   }
 
@@ -41,12 +35,13 @@ export async function proxyUpstream(
   };
 
   if (request.method !== "GET" && request.method !== "HEAD") {
-    init.body = await request.text();
+    // Preserve multipart uploads (ingest document) via raw bytes.
+    init.body = await request.arrayBuffer();
   }
 
   try {
     const upstream = await fetch(target, init);
-    const body = await upstream.text();
+    const body = await upstream.arrayBuffer();
     const responseHeaders = new Headers();
     const upstreamType = upstream.headers.get("content-type");
     if (upstreamType) {

@@ -54,12 +54,12 @@ The Morphosyntactic tagger comes with unit and functional testing.
 ### Morphosyntactic Tagger Unit tests
 
 ```shell
-python3 -m pytest tkeir/tests/unittests/TestMorphoSyntacticTaggerConfiguration.py
-python3 -m pytest tkeir/tests/unittests/TestMorphoSyntacticTagger.py
+python3 -m pytest tests/unittests/TestMorphoSyntacticTaggerConfiguration.py
+python3 -m pytest tests/unittests/TestMorphoSyntacticTagger.py
 ```
 
 ### Morphosyntactic Tagger Functional tests
 
 ```shell
-python3 -m pytest tkeir/tests/functional_tests/TestPipeline.py
+python3 -m pytest tests/functional_tests/TestPipeline.py
 ```

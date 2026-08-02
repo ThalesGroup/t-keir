@@ -1,8 +1,10 @@
 """Title: Query expansion via the in-memory business ontology.
 
-Resolve query / NLP seeds (NER, keywords, SVO) to concept ids, then expand
-with synonyms, narrower, broader, related, and paraphrase bridges so Vespa
-``ontology_concepts`` and BM25 probes share semantically close terms.
+Resolve the analyzed request (NER, keywords, kg/SVO) plus the raw query to
+concept ids, then expand with synonyms, narrower, broader, related, and
+paraphrase bridges. Expanded ids are OR-joined against Vespa
+``ontology_concepts`` (see ``doc_base.sd``) together with NN + BM25 — this
+**expands** recall and never AND-filters hits.
 
 Author: Eric Blaudez
 
@@ -15,7 +17,10 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
-from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+from thot.tools.search.business_ontology import (
+    BusinessConcept,
+    BusinessOntology,
+)
 from thot.tools.search.text_normalizer import TextNormalizer
 
 LOGGER = logging.getLogger(__name__)
@@ -107,7 +112,7 @@ class QueryExpander:
         ]
         # Structural identifier stems only (FoxO3a → foxo). Language
         # morphology / synonyms come from TextNormalizer + ontology.
-        from thot.tools.search.lexical_signal import tokenize, token_stems
+        from thot.tools.search.lexical_signal import token_stems, tokenize
 
         seen_lower = {query.strip().casefold()}
         stem_budget = 12
@@ -197,7 +202,7 @@ class QueryExpander:
         seed_labels: list[str] | None,
     ) -> list[str]:
         """Resolve query tokens + NLP seed labels to ontology concept ids."""
-        from thot.tools.search.lexical_signal import tokenize, token_stems
+        from thot.tools.search.lexical_signal import token_stems, tokenize
 
         candidates: list[str] = [normalized] + normalized.split()
         for tok in tokenize(query):
@@ -325,9 +330,7 @@ class QueryExpander:
             elif doc_n in normalized_query or normalized_query in doc_n:
                 targets.append(bridge.claim)
         if targets:
-            self._add_group(
-                terms, targets, weight, "paraphrase", concept_id
-            )
+            self._add_group(terms, targets, weight, "paraphrase", concept_id)
 
     def _labels_for_ids(self, concept_ids: list[str]) -> list[str]:
         labels: list[str] = []

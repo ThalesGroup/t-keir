@@ -1,0 +1,3217 @@
+{
+  "dataset": {
+    "name": "user_specific_cfo_executive",
+    "version": "1.0",
+    "persona": "CFO — Chief Financial Officer",
+    "role_description": "Strategic decision authority — KRI resolution, policy cards, capital exposure, decision log, CCIR",
+    "primary_report_type": "CFO_DECISION_BRIEFING",
+    "generated_utc": "2026-07-28T06:00:00Z",
+    "record_count": 110,
+    "index_type": "USER_SPECIFIC",
+    "classification_of_compilation": "CONFIDENTIAL — C-SUITE",
+    "note": "Simulated CFO personal index. Not real data.",
+    "coverage_window_utc": {
+      "from": "2026-06-28T06:00:00Z",
+      "to": "2026-07-28T05:45:00Z"
+    },
+    "cross_reference_schema": {
+      "generic_refs": "doc_id values from enterprise_intelligence_corpus.json",
+      "kri_refs": "KRI-01..06",
+      "location_refs": "jurisdiction.name values"
+    }
+  },
+  "records": [
+    {
+      "doc_id": "CFO-202606-0019",
+      "dtg": "281929ZJUN26",
+      "timestamp_utc": "2026-06-28T19:29:37Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 28 Jun 2026 update",
+      "text": "CFO policy standing card effective 281929ZJUN26. Policies in force: POLICY 475, POLICY 463. Amplification: Enhanced KYC required. General Counsel: GC-02. Validity: 29 Jun 2026.",
+      "policies_in_force": [
+        "POLICY 475",
+        "POLICY 463"
+      ],
+      "general_counsel": "GC-02",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0044",
+      "dtg": "290356ZJUN26",
+      "timestamp_utc": "2026-06-29T03:56:27Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 3 — CONTAIN",
+      "text": "Financial objective record. Phase: PHASE 2 — REMEDIATE. Objective: Contain capital exposure to <$100M. KPI threshold: Whistleblower programme formalised. Status: DEFERRED.",
+      "phase": "PHASE 4",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0049",
+      "dtg": "290437ZJUN26",
+      "timestamp_utc": "2026-06-29T04:37:41Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 3 — IDENTIFY",
+      "text": "Financial objective record. Phase: PHASE 2 — IDENTIFY. Objective: Contain capital exposure to <$100M. KPI threshold: Zero unresolved KRI-02 exposures. Status: DEFERRED.",
+      "phase": "PHASE 4",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0067",
+      "dtg": "291921ZJUN26",
+      "timestamp_utc": "2026-06-29T19:21:11Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — SFO / 29 Jun 2026",
+      "text": "Liaison report from SFO regulatory channel. Subject: Request for voluntary cooperation. Key point: Regulatory resources available for cooperation. Action: NOTIFY BOARD.",
+      "regulatory_body": "SFO",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0068",
+      "dtg": "292324ZJUN26",
+      "timestamp_utc": "2026-06-29T23:24:13Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — DOJ / 29 Jun 2026",
+      "text": "Liaison report from DOJ regulatory channel. Subject: Pre-dawn for investigation scope. Key point: Regulatory resources available for cooperation. Action: ENGAGE EXTERNAL COUNSEL.",
+      "regulatory_body": "DOJ",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0012",
+      "dtg": "301251ZJUN26",
+      "timestamp_utc": "2026-06-30T12:51:38Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 30 Jun 2026 update",
+      "text": "CFO policy standing card effective 301251ZJUN26. Policies in force: POLICY 409, POLICY 424, POLICY 453, POLICY 446. Amplification: Due diligence mandatory for all NEH counterparties. General Counsel: GC-01. Validity: 01 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 409",
+        "POLICY 424",
+        "POLICY 453",
+        "POLICY 446"
+      ],
+      "general_counsel": "GC-02",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0033",
+      "dtg": "010535ZJUL26",
+      "timestamp_utc": "2026-07-01T05:35:57Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 01 Jul 2026",
+      "text": "Capital exposure report 010535ZJUL26. Jurisdictions with elevated KRI: Geneva, Malta. Total exposed capital: ~$341M across 8 entities. Fully cleared: 2. Under review: 3. Current project phase: PHASE 2 — IDENTIFY.",
+      "exposed_capital_usd_m": 406,
+      "entities_count": 5,
+      "phase": "REMEDIATE",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0029",
+      "dtg": "010632ZJUL26",
+      "timestamp_utc": "2026-07-01T06:32:53Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 01 Jul 2026",
+      "text": "Capital exposure report 010632ZJUL26. Jurisdictions with elevated KRI: Geneva, Dubai Free Zone. Total exposed capital: ~$167M across 6 entities. Fully cleared: 2. Under review: 1. Current project phase: PHASE 4 — IDENTIFY.",
+      "exposed_capital_usd_m": 232,
+      "entities_count": 7,
+      "phase": "RESOLVE",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0080",
+      "dtg": "010743ZJUL26",
+      "timestamp_utc": "2026-07-01T07:43:38Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 010743ZJUL26",
+      "text": "CFO decision log entry 010743ZJUL26. Decision: Engage regulatory counsel on UK SFO cooperation. Rationale: Board directive. Approved by: CFO. Time: 010743ZJUL26.",
+      "decision": "Engage regulatory counsel on UK SFO cooperation",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0059",
+      "dtg": "010935ZJUL26",
+      "timestamp_utc": "2026-07-01T09:35:20Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — FCA / 01 Jul 2026",
+      "text": "Liaison report from FCA regulatory channel. Subject: KRI-related regulatory enquiry. Key point: Legal privilege considerations flagged. Action: NOTIFY BOARD.",
+      "regulatory_body": "FCA",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0046",
+      "dtg": "020223ZJUL26",
+      "timestamp_utc": "2026-07-02T02:23:30Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 3 — IDENTIFY",
+      "text": "Financial objective record. Phase: PHASE 2 — IDENTIFY. Objective: Complete forensic accounting review. KPI threshold: Whistleblower programme formalised. Status: DEFERRED.",
+      "phase": "PHASE 2",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0060",
+      "dtg": "020338ZJUL26",
+      "timestamp_utc": "2026-07-02T03:38:04Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — DOJ / 02 Jul 2026",
+      "text": "Liaison report from DOJ regulatory channel. Subject: KRI-related regulatory enquiry. Key point: Regulatory resources available for cooperation. Action: ENGAGE EXTERNAL COUNSEL.",
+      "regulatory_body": "DOJ",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0100",
+      "dtg": "030223ZJUL26",
+      "timestamp_utc": "2026-07-03T02:23:56Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 030223ZJUL26: Has NEH Geneva executed an undisclosed transfer in the last 48 hours? Status: OPEN — collection ongoing. Raised by: CFO. CDO action: TASKED.",
+      "ccir_question": "Has NEH Geneva executed an undisclosed transfer in the last 48 hours?",
+      "ccir_status": "CLOSED — THRESHOLD MET",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_BRIBERY_CORRUPTION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0082",
+      "dtg": "030827ZJUL26",
+      "timestamp_utc": "2026-07-03T08:27:53Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 030827ZJUL26",
+      "text": "CFO decision log entry 030827ZJUL26. Decision: Issue internal hold notice on document destruction. Rationale: KRI threshold met. Approved by: CFO. Time: 030827ZJUL26.",
+      "decision": "Issue internal hold notice on document destruction",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0106",
+      "dtg": "031521ZJUL26",
+      "timestamp_utc": "2026-07-03T15:21:28Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 031521ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: CLOSED — THRESHOLD MET. Raised by: CFO. CDO action: IN PROGRESS.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "OPEN",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_AML_LAYERING",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0110",
+      "dtg": "040035ZJUL26",
+      "timestamp_utc": "2026-07-04T00:35:28Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 040035ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: OPEN — collection ongoing. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "CLOSED — NOT MET",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_AML_LAYERING",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0074",
+      "dtg": "040732ZJUL26",
+      "timestamp_utc": "2026-07-04T07:32:19Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 040732ZJUL26",
+      "text": "CFO decision log entry 040732ZJUL26. Decision: Instruct CDO to expand entity tracking to all ACH-linked counterparties. Rationale: Legal counsel advice. Approved by: CFO. Time: 040732ZJUL26.",
+      "decision": "Instruct CDO to expand entity tracking to all ACH-linked counterparties",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0054",
+      "dtg": "040907ZJUL26",
+      "timestamp_utc": "2026-07-04T09:07:12Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 1 — IDENTIFY",
+      "text": "Financial objective record. Phase: PHASE 4 — CONTAIN. Objective: Achieve regulatory settlement. KPI threshold: Zero unresolved KRI-02 exposures. Status: ON TRACK.",
+      "phase": "PHASE 3",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0097",
+      "dtg": "040913ZJUL26",
+      "timestamp_utc": "2026-07-04T09:13:59Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 040913ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: CLOSED — threshold not met. Raised by: CFO. CDO action: IN PROGRESS.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "OPEN",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_AML_LAYERING",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0062",
+      "dtg": "041150ZJUL26",
+      "timestamp_utc": "2026-07-04T11:50:38Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — SEC / 04 Jul 2026",
+      "text": "Liaison report from SEC regulatory channel. Subject: Informal inquiry into NEH trading patterns. Key point: National enquiry parallel to internal review. Action: HOLD — ASSESS IMPLICATIONS.",
+      "regulatory_body": "SEC",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0013",
+      "dtg": "041342ZJUL26",
+      "timestamp_utc": "2026-07-04T13:42:21Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 04 Jul 2026 update",
+      "text": "CFO policy standing card effective 041342ZJUL26. Policies in force: POLICY 470, POLICY 472, POLICY 431. Amplification: Due diligence mandatory for all NEH counterparties. General Counsel: GC-02. Validity: 05 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 470",
+        "POLICY 472",
+        "POLICY 431"
+      ],
+      "general_counsel": "GC-02",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0023",
+      "dtg": "041537ZJUL26",
+      "timestamp_utc": "2026-07-04T15:37:32Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 04 Jul 2026",
+      "text": "Capital exposure report 041537ZJUL26. Jurisdictions with elevated KRI: Cayman Islands, Singapore Freeport. Total exposed capital: ~$490M across 8 entities. Fully cleared: 5. Under review: 1. Current project phase: PHASE 3 — REMEDIATE.",
+      "exposed_capital_usd_m": 329,
+      "entities_count": 4,
+      "phase": "CONTAIN",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0027",
+      "dtg": "041606ZJUL26",
+      "timestamp_utc": "2026-07-04T16:06:27Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 04 Jul 2026",
+      "text": "Capital exposure report 041606ZJUL26. Jurisdictions with elevated KRI: Lagos, Geneva. Total exposed capital: ~$88M across 6 entities. Fully cleared: 2. Under review: 3. Current project phase: PHASE 3 — RESOLVE.",
+      "exposed_capital_usd_m": 279,
+      "entities_count": 4,
+      "phase": "RESOLVE",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0083",
+      "dtg": "042052ZJUL26",
+      "timestamp_utc": "2026-07-04T20:52:42Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 042052ZJUL26",
+      "text": "CFO decision log entry 042052ZJUL26. Decision: Refer intermediary contracts to board audit committee. Rationale: Regulatory enquiry received. Approved by: CFO. Time: 042052ZJUL26.",
+      "decision": "Refer intermediary contracts to board audit committee",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0085",
+      "dtg": "042233ZJUL26",
+      "timestamp_utc": "2026-07-04T22:33:01Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 042233ZJUL26",
+      "text": "CFO decision log entry 042233ZJUL26. Decision: Freeze asset transfers pending beneficial ownership verification. Rationale: Legal counsel advice. Approved by: CFO. Time: 042233ZJUL26.",
+      "decision": "Freeze asset transfers pending beneficial ownership verification",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0072",
+      "dtg": "051108ZJUL26",
+      "timestamp_utc": "2026-07-05T11:08:19Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — SFO / 05 Jul 2026",
+      "text": "Liaison report from SFO regulatory channel. Subject: KRI-related regulatory enquiry. Key point: National enquiry parallel to internal review. Action: LEGAL REVIEW.",
+      "regulatory_body": "SFO",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0011",
+      "dtg": "051330ZJUL26",
+      "timestamp_utc": "2026-07-05T13:30:28Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 05 Jul 2026 update",
+      "text": "CFO policy standing card effective 051330ZJUL26. Policies in force: POLICY 406, POLICY 410. Amplification: Enhanced KYC required. General Counsel: GC-01. Validity: 06 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 406",
+        "POLICY 410"
+      ],
+      "general_counsel": "GC-01",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0031",
+      "dtg": "061039ZJUL26",
+      "timestamp_utc": "2026-07-06T10:39:02Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 06 Jul 2026",
+      "text": "Capital exposure report 061039ZJUL26. Jurisdictions with elevated KRI: Geneva, Lagos. Total exposed capital: ~$304M across 4 entities. Fully cleared: 3. Under review: 2. Current project phase: PHASE 3 — CONTAIN.",
+      "exposed_capital_usd_m": 414,
+      "entities_count": 8,
+      "phase": "IDENTIFY",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0108",
+      "dtg": "061304ZJUL26",
+      "timestamp_utc": "2026-07-06T13:04:37Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 061304ZJUL26: Has NEH Geneva executed an undisclosed transfer in the last 48 hours? Status: CLOSED — THRESHOLD MET. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has NEH Geneva executed an undisclosed transfer in the last 48 hours?",
+      "ccir_status": "CLOSED — THRESHOLD MET",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_SANCTIONS_EVASION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0016",
+      "dtg": "061522ZJUL26",
+      "timestamp_utc": "2026-07-06T15:22:55Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 06 Jul 2026 update",
+      "text": "CFO policy standing card effective 061522ZJUL26. Policies in force: POLICY 405, POLICY 450, POLICY 438. Amplification: Asset freeze authority activated. General Counsel: GC-01. Validity: 07 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 405",
+        "POLICY 450",
+        "POLICY 438"
+      ],
+      "general_counsel": "GC-02",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0048",
+      "dtg": "061728ZJUL26",
+      "timestamp_utc": "2026-07-06T17:28:26Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 4 — REMEDIATE",
+      "text": "Financial objective record. Phase: PHASE 2 — IDENTIFY. Objective: Resolve OFAC nexus. KPI threshold: All SPVs consolidated or wound down. Status: DEFERRED.",
+      "phase": "PHASE 3",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0064",
+      "dtg": "061938ZJUL26",
+      "timestamp_utc": "2026-07-06T19:38:33Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — Swiss FINMA / 06 Jul 2026",
+      "text": "Liaison report from Swiss FINMA regulatory channel. Subject: Request for voluntary cooperation. Key point: Legal privilege considerations flagged. Action: ENGAGE EXTERNAL COUNSEL.",
+      "regulatory_body": "Swiss FINMA",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0025",
+      "dtg": "061947ZJUL26",
+      "timestamp_utc": "2026-07-06T19:47:09Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 06 Jul 2026",
+      "text": "Capital exposure report 061947ZJUL26. Jurisdictions with elevated KRI: Nicosia, Geneva. Total exposed capital: ~$372M across 8 entities. Fully cleared: 4. Under review: 3. Current project phase: PHASE 3 — RESOLVE.",
+      "exposed_capital_usd_m": 358,
+      "entities_count": 4,
+      "phase": "REMEDIATE",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0084",
+      "dtg": "062013ZJUL26",
+      "timestamp_utc": "2026-07-06T20:13:58Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 062013ZJUL26",
+      "text": "CFO decision log entry 062013ZJUL26. Decision: Activate whistleblower hotline and appoint independent investigator. Rationale: Board directive. Approved by: CFO. Time: 062013ZJUL26.",
+      "decision": "Activate whistleblower hotline and appoint independent investigator",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0009",
+      "dtg": "062018ZJUL26",
+      "timestamp_utc": "2026-07-06T20:18:46Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 06 Jul 2026 update",
+      "text": "CFO policy standing card effective 062018ZJUL26. Policies in force: POLICY 445, POLICY 450, POLICY 463. Amplification: No changes from previous card. General Counsel: GC-01. Validity: 07 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 445",
+        "POLICY 450",
+        "POLICY 463"
+      ],
+      "general_counsel": "GC-01",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0022",
+      "dtg": "062058ZJUL26",
+      "timestamp_utc": "2026-07-06T20:58:12Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 06 Jul 2026",
+      "text": "Capital exposure report 062058ZJUL26. Jurisdictions with elevated KRI: Dubai Free Zone, Geneva. Total exposed capital: ~$274M across 4 entities. Fully cleared: 3. Under review: 1. Current project phase: PHASE 1 — CONTAIN.",
+      "exposed_capital_usd_m": 126,
+      "entities_count": 6,
+      "phase": "CONTAIN",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0094",
+      "dtg": "071550ZJUL26",
+      "timestamp_utc": "2026-07-07T15:50:24Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 071550ZJUL26: Has the BVI SPV network received new capital injection since 15 Jul 2026? Status: CLOSED — THRESHOLD MET. Raised by: CFO. CDO action: IN PROGRESS.",
+      "ccir_question": "Has the BVI SPV network received new capital injection since 15 Jul 2026?",
+      "ccir_status": "OPEN",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_BRIBERY_CORRUPTION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0101",
+      "dtg": "071952ZJUL26",
+      "timestamp_utc": "2026-07-07T19:52:11Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 071952ZJUL26: Has a fictitious receivable been written down or restated without board approval? Status: CLOSED — THRESHOLD MET. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has a fictitious receivable been written down or restated without board approval?",
+      "ccir_status": "CLOSED — THRESHOLD MET",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_BRIBERY_CORRUPTION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0098",
+      "dtg": "072149ZJUL26",
+      "timestamp_utc": "2026-07-07T21:49:02Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 072149ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: OPEN — collection ongoing. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "CLOSED — THRESHOLD MET",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_BRIBERY_CORRUPTION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0038",
+      "dtg": "072330ZJUL26",
+      "timestamp_utc": "2026-07-07T23:30:40Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 07 Jul 2026",
+      "text": "Capital exposure report 072330ZJUL26. Jurisdictions with elevated KRI: Geneva, Dubai Free Zone. Total exposed capital: ~$420M across 6 entities. Fully cleared: 4. Under review: 3. Current project phase: PHASE 1 — CONTAIN.",
+      "exposed_capital_usd_m": 220,
+      "entities_count": 3,
+      "phase": "CONTAIN",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0077",
+      "dtg": "081202ZJUL26",
+      "timestamp_utc": "2026-07-08T12:02:31Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 081202ZJUL26",
+      "text": "CFO decision log entry 081202ZJUL26. Decision: Freeze asset transfers pending beneficial ownership verification. Rationale: Board directive. Approved by: CFO. Time: 081202ZJUL26.",
+      "decision": "Freeze asset transfers pending beneficial ownership verification",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0090",
+      "dtg": "081720ZJUL26",
+      "timestamp_utc": "2026-07-08T17:20:43Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 081720ZJUL26",
+      "text": "CFO decision log entry 081720ZJUL26. Decision: Instruct external counsel on OFAC voluntary disclosure. Rationale: Board directive. Approved by: CFO. Time: 081720ZJUL26.",
+      "decision": "Instruct external counsel on OFAC voluntary disclosure",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0010",
+      "dtg": "090014ZJUL26",
+      "timestamp_utc": "2026-07-09T00:14:45Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 09 Jul 2026 update",
+      "text": "CFO policy standing card effective 090014ZJUL26. Policies in force: POLICY 400, POLICY 401, POLICY 478, POLICY 413. Amplification: Due diligence mandatory for all NEH counterparties. General Counsel: GC-02. Validity: 10 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 400",
+        "POLICY 401",
+        "POLICY 478",
+        "POLICY 413"
+      ],
+      "general_counsel": "GC-01",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0015",
+      "dtg": "090453ZJUL26",
+      "timestamp_utc": "2026-07-09T04:53:17Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 09 Jul 2026 update",
+      "text": "CFO policy standing card effective 090453ZJUL26. Policies in force: POLICY 467, POLICY 469, POLICY 451. Amplification: Asset freeze authority activated. General Counsel: GC-03. Validity: 10 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 467",
+        "POLICY 469",
+        "POLICY 451"
+      ],
+      "general_counsel": "GC-02",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0095",
+      "dtg": "090511ZJUL26",
+      "timestamp_utc": "2026-07-09T05:11:38Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 090511ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: CLOSED — THRESHOLD MET. Raised by: CFO. CDO action: IN PROGRESS.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "CLOSED — THRESHOLD MET",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_FINANCIAL_FRAUD",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0058",
+      "dtg": "110527ZJUL26",
+      "timestamp_utc": "2026-07-11T05:27:21Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — Swiss FINMA / 11 Jul 2026",
+      "text": "Liaison report from Swiss FINMA regulatory channel. Subject: Pre-dawn for investigation scope. Key point: Regulatory resources available for cooperation. Action: NOTIFY BOARD.",
+      "regulatory_body": "Swiss FINMA",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0028",
+      "dtg": "111719ZJUL26",
+      "timestamp_utc": "2026-07-11T17:19:22Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 11 Jul 2026",
+      "text": "Capital exposure report 111719ZJUL26. Jurisdictions with elevated KRI: Nicosia, Nicosia. Total exposed capital: ~$246M across 5 entities. Fully cleared: 3. Under review: 2. Current project phase: PHASE 3 — RESOLVE.",
+      "exposed_capital_usd_m": 192,
+      "entities_count": 4,
+      "phase": "IDENTIFY",
+      "kri_refs": [
+        "KRI-01",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0092",
+      "dtg": "120030ZJUL26",
+      "timestamp_utc": "2026-07-12T00:30:59Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 120030ZJUL26",
+      "text": "CFO decision log entry 120030ZJUL26. Decision: Refer intermediary contracts to board audit committee. Rationale: Regulatory enquiry received. Approved by: CFO. Time: 120030ZJUL26.",
+      "decision": "Refer intermediary contracts to board audit committee",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0017",
+      "dtg": "120907ZJUL26",
+      "timestamp_utc": "2026-07-12T09:07:18Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 12 Jul 2026 update",
+      "text": "CFO policy standing card effective 120907ZJUL26. Policies in force: POLICY 407, POLICY 480, POLICY 456, POLICY 423. Amplification: Due diligence mandatory for all NEH counterparties. General Counsel: GC-02. Validity: 13 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 407",
+        "POLICY 480",
+        "POLICY 456",
+        "POLICY 423"
+      ],
+      "general_counsel": "GC-02",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0069",
+      "dtg": "121601ZJUL26",
+      "timestamp_utc": "2026-07-12T16:01:01Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — Nigerian EFCC / 12 Jul 2026",
+      "text": "Liaison report from Nigerian EFCC regulatory channel. Subject: KRI-related regulatory enquiry. Key point: National enquiry parallel to internal review. Action: HOLD — ASSESS IMPLICATIONS.",
+      "regulatory_body": "Nigerian EFCC",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0079",
+      "dtg": "121734ZJUL26",
+      "timestamp_utc": "2026-07-12T17:34:13Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 121734ZJUL26",
+      "text": "CFO decision log entry 121734ZJUL26. Decision: Instruct CDO to expand entity tracking to all ACH-linked counterparties. Rationale: Board directive. Approved by: CFO. Time: 121734ZJUL26.",
+      "decision": "Instruct CDO to expand entity tracking to all ACH-linked counterparties",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0109",
+      "dtg": "121746ZJUL26",
+      "timestamp_utc": "2026-07-12T17:46:56Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 121746ZJUL26: Has the BVI SPV network received new capital injection since 15 Jul 2026? Status: OPEN — collection ongoing. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has the BVI SPV network received new capital injection since 15 Jul 2026?",
+      "ccir_status": "CLOSED — THRESHOLD MET",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_AML_LAYERING",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0105",
+      "dtg": "131531ZJUL26",
+      "timestamp_utc": "2026-07-13T15:31:22Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 131531ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: OPEN — collection ongoing. Raised by: CFO. CDO action: IN PROGRESS.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "CLOSED — NOT MET",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_AML_LAYERING",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0036",
+      "dtg": "140901ZJUL26",
+      "timestamp_utc": "2026-07-14T09:01:11Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 14 Jul 2026",
+      "text": "Capital exposure report 140901ZJUL26. Jurisdictions with elevated KRI: Lagos, Geneva. Total exposed capital: ~$102M across 5 entities. Fully cleared: 4. Under review: 3. Current project phase: PHASE 1 — REMEDIATE.",
+      "exposed_capital_usd_m": 210,
+      "entities_count": 5,
+      "phase": "IDENTIFY",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0061",
+      "dtg": "140907ZJUL26",
+      "timestamp_utc": "2026-07-14T09:07:00Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — FCA / 14 Jul 2026",
+      "text": "Liaison report from FCA regulatory channel. Subject: Informal inquiry into NEH trading patterns. Key point: Legal privilege considerations flagged. Action: NOTIFY BOARD.",
+      "regulatory_body": "FCA",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0071",
+      "dtg": "141109ZJUL26",
+      "timestamp_utc": "2026-07-14T11:09:29Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — OFAC / 14 Jul 2026",
+      "text": "Liaison report from OFAC regulatory channel. Subject: KRI-related regulatory enquiry. Key point: National enquiry parallel to internal review. Action: NOTIFY BOARD.",
+      "regulatory_body": "OFAC",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0087",
+      "dtg": "142116ZJUL26",
+      "timestamp_utc": "2026-07-14T21:16:56Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 142116ZJUL26",
+      "text": "CFO decision log entry 142116ZJUL26. Decision: Instruct external counsel on OFAC voluntary disclosure. Rationale: Legal counsel advice. Approved by: CFO. Time: 142116ZJUL26.",
+      "decision": "Instruct external counsel on OFAC voluntary disclosure",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0004",
+      "dtg": "150106ZJUL26",
+      "timestamp_utc": "2026-07-15T01:06:08Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CFO_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED — CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO assessment — 15 Jul 2026",
+      "text": "CFO periodic assessment 150106ZJUL26. Overall situation: IMPROVING. Priority concern: SPV consolidation legal opinion outstanding. Intent for next 72h: Commission forensic review.",
+      "situation": "IMPROVING",
+      "priority_concern": "SPV consolidation legal opinion outstanding",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "CFO_RISK_DESK",
+        "KRI"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0076",
+      "dtg": "150525ZJUL26",
+      "timestamp_utc": "2026-07-15T05:25:46Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 150525ZJUL26",
+      "text": "CFO decision log entry 150525ZJUL26. Decision: Activate whistleblower hotline and appoint independent investigator. Rationale: Legal counsel advice. Approved by: CFO. Time: 150525ZJUL26.",
+      "decision": "Activate whistleblower hotline and appoint independent investigator",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0091",
+      "dtg": "151814ZJUL26",
+      "timestamp_utc": "2026-07-15T18:14:58Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 151814ZJUL26",
+      "text": "CFO decision log entry 151814ZJUL26. Decision: Issue internal hold notice on document destruction. Rationale: Regulatory enquiry received. Approved by: CFO. Time: 151814ZJUL26.",
+      "decision": "Issue internal hold notice on document destruction",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0107",
+      "dtg": "160526ZJUL26",
+      "timestamp_utc": "2026-07-16T05:26:27Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 160526ZJUL26: Has a fictitious receivable been written down or restated without board approval? Status: OPEN — collection ongoing. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has a fictitious receivable been written down or restated without board approval?",
+      "ccir_status": "OPEN",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_MARKET_MANIPULATION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0056",
+      "dtg": "161040ZJUL26",
+      "timestamp_utc": "2026-07-16T10:40:44Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 1 — REMEDIATE",
+      "text": "Financial objective record. Phase: PHASE 4 — CONTAIN. Objective: Achieve regulatory settlement. KPI threshold: Intermediary contracts terminated. Status: ON TRACK.",
+      "phase": "PHASE 2",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0007",
+      "dtg": "170007ZJUL26",
+      "timestamp_utc": "2026-07-17T00:07:25Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CFO_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED — CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO assessment — 17 Jul 2026",
+      "text": "CFO periodic assessment 170007ZJUL26. Overall situation: DETERIORATING. Priority concern: SPV consolidation legal opinion outstanding. Intent for next 72h: Commission forensic review.",
+      "situation": "DETERIORATING",
+      "priority_concern": "SPV consolidation legal opinion outstanding",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "CFO_RISK_DESK",
+        "KRI"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0103",
+      "dtg": "171058ZJUL26",
+      "timestamp_utc": "2026-07-17T10:58:06Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 171058ZJUL26: Has any NEH director met with a PEP-linked counterparty in the investigation window? Status: CLOSED — THRESHOLD MET. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has any NEH director met with a PEP-linked counterparty in the investigation window?",
+      "ccir_status": "CLOSED — NOT MET",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_BRIBERY_CORRUPTION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0008",
+      "dtg": "171209ZJUL26",
+      "timestamp_utc": "2026-07-17T12:09:44Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CFO_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED — CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO assessment — 17 Jul 2026",
+      "text": "CFO periodic assessment 171209ZJUL26. Overall situation: CRITICAL. Priority concern: Intermediary payment audit overdue. Intent for next 72h: Instruct write-down provisioning.",
+      "situation": "CRITICAL",
+      "priority_concern": "Intermediary payment audit overdue",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "CFO_RISK_DESK",
+        "KRI"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0078",
+      "dtg": "172031ZJUL26",
+      "timestamp_utc": "2026-07-17T20:31:20Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 172031ZJUL26",
+      "text": "CFO decision log entry 172031ZJUL26. Decision: Activate whistleblower hotline and appoint independent investigator. Rationale: Board directive. Approved by: CFO. Time: 172031ZJUL26.",
+      "decision": "Activate whistleblower hotline and appoint independent investigator",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0081",
+      "dtg": "180613ZJUL26",
+      "timestamp_utc": "2026-07-18T06:13:36Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 180613ZJUL26",
+      "text": "CFO decision log entry 180613ZJUL26. Decision: Engage regulatory counsel on UK SFO cooperation. Rationale: Legal counsel advice. Approved by: CFO. Time: 180613ZJUL26.",
+      "decision": "Engage regulatory counsel on UK SFO cooperation",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0024",
+      "dtg": "180744ZJUL26",
+      "timestamp_utc": "2026-07-18T07:44:10Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 18 Jul 2026",
+      "text": "Capital exposure report 180744ZJUL26. Jurisdictions with elevated KRI: Singapore Freeport, Cayman Islands. Total exposed capital: ~$269M across 4 entities. Fully cleared: 3. Under review: 3. Current project phase: PHASE 2 — RESOLVE.",
+      "exposed_capital_usd_m": 428,
+      "entities_count": 3,
+      "phase": "CONTAIN",
+      "kri_refs": [
+        "KRI-01",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0088",
+      "dtg": "181117ZJUL26",
+      "timestamp_utc": "2026-07-18T11:17:18Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 181117ZJUL26",
+      "text": "CFO decision log entry 181117ZJUL26. Decision: Engage regulatory counsel on UK SFO cooperation. Rationale: Board directive. Approved by: CFO. Time: 181117ZJUL26.",
+      "decision": "Engage regulatory counsel on UK SFO cooperation",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0003",
+      "dtg": "181249ZJUL26",
+      "timestamp_utc": "2026-07-18T12:49:54Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CFO_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED — CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO assessment — 18 Jul 2026",
+      "text": "CFO periodic assessment 181249ZJUL26. Overall situation: UNCHANGED. Priority concern: Intermediary payment audit overdue. Intent for next 72h: Instruct write-down provisioning.",
+      "situation": "UNCHANGED",
+      "priority_concern": "Intermediary payment audit overdue",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "CFO_RISK_DESK",
+        "KRI"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0002",
+      "dtg": "182200ZJUL26",
+      "timestamp_utc": "2026-07-18T22:00:39Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CFO_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED — CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO assessment — 18 Jul 2026",
+      "text": "CFO periodic assessment 182200ZJUL26. Overall situation: DETERIORATING. Priority concern: SPV consolidation legal opinion outstanding. Intent for next 72h: Hold pending legal opinion.",
+      "situation": "DETERIORATING",
+      "priority_concern": "SPV consolidation legal opinion outstanding",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "CFO_RISK_DESK",
+        "KRI"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0086",
+      "dtg": "190209ZJUL26",
+      "timestamp_utc": "2026-07-19T02:09:15Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 190209ZJUL26",
+      "text": "CFO decision log entry 190209ZJUL26. Decision: Issue internal hold notice on document destruction. Rationale: Legal counsel advice. Approved by: CFO. Time: 190209ZJUL26.",
+      "decision": "Issue internal hold notice on document destruction",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0051",
+      "dtg": "190219ZJUL26",
+      "timestamp_utc": "2026-07-19T02:19:49Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 1 — CONTAIN",
+      "text": "Financial objective record. Phase: PHASE 3 — CONTAIN. Objective: Complete forensic accounting review. KPI threshold: All SPVs consolidated or wound down. Status: ON TRACK.",
+      "phase": "PHASE 1",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0026",
+      "dtg": "192345ZJUL26",
+      "timestamp_utc": "2026-07-19T23:45:15Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 19 Jul 2026",
+      "text": "Capital exposure report 192345ZJUL26. Jurisdictions with elevated KRI: Geneva, Singapore Freeport. Total exposed capital: ~$54M across 6 entities. Fully cleared: 4. Under review: 4. Current project phase: PHASE 2 — CONTAIN.",
+      "exposed_capital_usd_m": 433,
+      "entities_count": 4,
+      "phase": "IDENTIFY",
+      "kri_refs": [
+        "KRI-06",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0070",
+      "dtg": "201826ZJUL26",
+      "timestamp_utc": "2026-07-20T18:26:10Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — SEC / 20 Jul 2026",
+      "text": "Liaison report from SEC regulatory channel. Subject: Pre-dawn for investigation scope. Key point: Legal privilege considerations flagged. Action: ENGAGE EXTERNAL COUNSEL.",
+      "regulatory_body": "SEC",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0021",
+      "dtg": "202055ZJUL26",
+      "timestamp_utc": "2026-07-20T20:55:53Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 20 Jul 2026",
+      "text": "Capital exposure report 202055ZJUL26. Jurisdictions with elevated KRI: BVI, Lagos. Total exposed capital: ~$185M across 8 entities. Fully cleared: 2. Under review: 1. Current project phase: PHASE 2 — CONTAIN.",
+      "exposed_capital_usd_m": 198,
+      "entities_count": 6,
+      "phase": "REMEDIATE",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-05"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0040",
+      "dtg": "202057ZJUL26",
+      "timestamp_utc": "2026-07-20T20:57:08Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 20 Jul 2026",
+      "text": "Capital exposure report 202057ZJUL26. Jurisdictions with elevated KRI: Geneva, Cayman Islands. Total exposed capital: ~$441M across 6 entities. Fully cleared: 5. Under review: 2. Current project phase: PHASE 2 — RESOLVE.",
+      "exposed_capital_usd_m": 328,
+      "entities_count": 3,
+      "phase": "REMEDIATE",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0045",
+      "dtg": "202136ZJUL26",
+      "timestamp_utc": "2026-07-20T21:36:28Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 4 — REMEDIATE",
+      "text": "Financial objective record. Phase: PHASE 4 — CONTAIN. Objective: Contain capital exposure to <$100M. KPI threshold: Intermediary contracts terminated. Status: ON TRACK.",
+      "phase": "PHASE 3",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0104",
+      "dtg": "210124ZJUL26",
+      "timestamp_utc": "2026-07-21T01:24:39Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 210124ZJUL26: Has NEH Geneva executed an undisclosed transfer in the last 48 hours? Status: CLOSED — threshold not met. Raised by: CFO. CDO action: IN PROGRESS.",
+      "ccir_question": "Has NEH Geneva executed an undisclosed transfer in the last 48 hours?",
+      "ccir_status": "CLOSED — NOT MET",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_COMMODITY_MISREPORTING",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0047",
+      "dtg": "210248ZJUL26",
+      "timestamp_utc": "2026-07-21T02:48:41Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 4 — CONTAIN",
+      "text": "Financial objective record. Phase: PHASE 4 — REMEDIATE. Objective: Contain capital exposure to <$100M. KPI threshold: All SPVs consolidated or wound down. Status: DEFERRED.",
+      "phase": "PHASE 2",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0042",
+      "dtg": "211046ZJUL26",
+      "timestamp_utc": "2026-07-21T10:46:12Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 21 Jul 2026",
+      "text": "Capital exposure report 211046ZJUL26. Jurisdictions with elevated KRI: Dubai Free Zone, Cayman Islands. Total exposed capital: ~$229M across 7 entities. Fully cleared: 4. Under review: 3. Current project phase: PHASE 2 — REMEDIATE.",
+      "exposed_capital_usd_m": 327,
+      "entities_count": 4,
+      "phase": "REMEDIATE",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0052",
+      "dtg": "212005ZJUL26",
+      "timestamp_utc": "2026-07-21T20:05:09Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 3 — IDENTIFY",
+      "text": "Financial objective record. Phase: PHASE 4 — CONTAIN. Objective: Complete forensic accounting review. KPI threshold: Intermediary contracts terminated. Status: ON TRACK.",
+      "phase": "PHASE 2",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0041",
+      "dtg": "221306ZJUL26",
+      "timestamp_utc": "2026-07-22T13:06:50Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 22 Jul 2026",
+      "text": "Capital exposure report 221306ZJUL26. Jurisdictions with elevated KRI: Malta, Dubai Free Zone. Total exposed capital: ~$90M across 4 entities. Fully cleared: 5. Under review: 1. Current project phase: PHASE 4 — CONTAIN.",
+      "exposed_capital_usd_m": 62,
+      "entities_count": 3,
+      "phase": "RESOLVE",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0032",
+      "dtg": "221603ZJUL26",
+      "timestamp_utc": "2026-07-22T16:03:50Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 22 Jul 2026",
+      "text": "Capital exposure report 221603ZJUL26. Jurisdictions with elevated KRI: Singapore Freeport, Dubai Free Zone. Total exposed capital: ~$193M across 7 entities. Fully cleared: 3. Under review: 3. Current project phase: PHASE 3 — CONTAIN.",
+      "exposed_capital_usd_m": 225,
+      "entities_count": 5,
+      "phase": "RESOLVE",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0053",
+      "dtg": "230009ZJUL26",
+      "timestamp_utc": "2026-07-23T00:09:58Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 2 — CONTAIN",
+      "text": "Financial objective record. Phase: PHASE 4 — REMEDIATE. Objective: Complete forensic accounting review. KPI threshold: Zero unresolved KRI-02 exposures. Status: AT RISK.",
+      "phase": "PHASE 3",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0014",
+      "dtg": "230704ZJUL26",
+      "timestamp_utc": "2026-07-23T07:04:20Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 23 Jul 2026 update",
+      "text": "CFO policy standing card effective 230704ZJUL26. Policies in force: POLICY 425, POLICY 480. Amplification: Asset freeze authority activated. General Counsel: GC-01. Validity: 24 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 425",
+        "POLICY 480"
+      ],
+      "general_counsel": "GC-01",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0018",
+      "dtg": "230742ZJUL26",
+      "timestamp_utc": "2026-07-23T07:42:10Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 23 Jul 2026 update",
+      "text": "CFO policy standing card effective 230742ZJUL26. Policies in force: POLICY 473, POLICY 413, POLICY 469, POLICY 401. Amplification: Due diligence mandatory for all NEH counterparties. General Counsel: GC-02. Validity: 24 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 473",
+        "POLICY 413",
+        "POLICY 469",
+        "POLICY 401"
+      ],
+      "general_counsel": "GC-02",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0073",
+      "dtg": "231449ZJUL26",
+      "timestamp_utc": "2026-07-23T14:49:39Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 231449ZJUL26",
+      "text": "CFO decision log entry 231449ZJUL26. Decision: Instruct external counsel on OFAC voluntary disclosure. Rationale: Board directive. Approved by: CFO. Time: 231449ZJUL26.",
+      "decision": "Instruct external counsel on OFAC voluntary disclosure",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0001",
+      "dtg": "240242ZJUL26",
+      "timestamp_utc": "2026-07-24T02:42:12Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CFO_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED — CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO assessment — 24 Jul 2026",
+      "text": "CFO periodic assessment 240242ZJUL26. Overall situation: CRITICAL. Priority concern: Intermediary payment audit overdue. Intent for next 72h: Commission forensic review.",
+      "situation": "CRITICAL",
+      "priority_concern": "Intermediary payment audit overdue",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "CFO_RISK_DESK",
+        "KRI"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0020",
+      "dtg": "240659ZJUL26",
+      "timestamp_utc": "2026-07-24T06:59:18Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "POLICY_CARD",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO policy card — 24 Jul 2026 update",
+      "text": "CFO policy standing card effective 240659ZJUL26. Policies in force: POLICY 410, POLICY 420, POLICY 457. Amplification: Asset freeze authority activated. General Counsel: GC-03. Validity: 25 Jul 2026.",
+      "policies_in_force": [
+        "POLICY 410",
+        "POLICY 420",
+        "POLICY 457"
+      ],
+      "general_counsel": "GC-03",
+      "kri_refs": [],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0039",
+      "dtg": "240724ZJUL26",
+      "timestamp_utc": "2026-07-24T07:24:24Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 24 Jul 2026",
+      "text": "Capital exposure report 240724ZJUL26. Jurisdictions with elevated KRI: Singapore Freeport, Dubai Free Zone. Total exposed capital: ~$118M across 7 entities. Fully cleared: 4. Under review: 3. Current project phase: PHASE 2 — IDENTIFY.",
+      "exposed_capital_usd_m": 154,
+      "entities_count": 5,
+      "phase": "RESOLVE",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0096",
+      "dtg": "240743ZJUL26",
+      "timestamp_utc": "2026-07-24T07:43:50Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 240743ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: OPEN — collection ongoing. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "CLOSED — NOT MET",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_SANCTIONS_EVASION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0065",
+      "dtg": "240902ZJUL26",
+      "timestamp_utc": "2026-07-24T09:02:36Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — OFAC / 24 Jul 2026",
+      "text": "Liaison report from OFAC regulatory channel. Subject: Request for voluntary cooperation. Key point: Regulatory resources available for cooperation. Action: LEGAL REVIEW.",
+      "regulatory_body": "OFAC",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0006",
+      "dtg": "241228ZJUL26",
+      "timestamp_utc": "2026-07-24T12:28:00Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CFO_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED — CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO assessment — 24 Jul 2026",
+      "text": "CFO periodic assessment 241228ZJUL26. Overall situation: CRITICAL. Priority concern: SPV consolidation legal opinion outstanding. Intent for next 72h: Escalate to board.",
+      "situation": "CRITICAL",
+      "priority_concern": "SPV consolidation legal opinion outstanding",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "CFO_RISK_DESK",
+        "KRI"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0089",
+      "dtg": "242033ZJUL26",
+      "timestamp_utc": "2026-07-24T20:33:42Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 242033ZJUL26",
+      "text": "CFO decision log entry 242033ZJUL26. Decision: Instruct external counsel on OFAC voluntary disclosure. Rationale: Board directive. Approved by: CFO. Time: 242033ZJUL26.",
+      "decision": "Instruct external counsel on OFAC voluntary disclosure",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0043",
+      "dtg": "250747ZJUL26",
+      "timestamp_utc": "2026-07-25T07:47:27Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 1 — CONTAIN",
+      "text": "Financial objective record. Phase: PHASE 3 — REMEDIATE. Objective: Resolve OFAC nexus. KPI threshold: Zero unresolved KRI-02 exposures. Status: AT RISK.",
+      "phase": "PHASE 2",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0005",
+      "dtg": "250809ZJUL26",
+      "timestamp_utc": "2026-07-25T08:09:15Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CFO_ASSESSMENT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED — CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO assessment — 25 Jul 2026",
+      "text": "CFO periodic assessment 250809ZJUL26. Overall situation: CRITICAL. Priority concern: Fictitious receivables write-down required. Intent for next 72h: Escalate to board.",
+      "situation": "CRITICAL",
+      "priority_concern": "Fictitious receivables write-down required",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "COMPLIANCE",
+        "CFO_RISK_DESK",
+        "KRI"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0035",
+      "dtg": "250848ZJUL26",
+      "timestamp_utc": "2026-07-25T08:48:12Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 25 Jul 2026",
+      "text": "Capital exposure report 250848ZJUL26. Jurisdictions with elevated KRI: Geneva, Geneva. Total exposed capital: ~$130M across 8 entities. Fully cleared: 3. Under review: 2. Current project phase: PHASE 1 — CONTAIN.",
+      "exposed_capital_usd_m": 453,
+      "entities_count": 8,
+      "phase": "IDENTIFY",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0075",
+      "dtg": "251012ZJUL26",
+      "timestamp_utc": "2026-07-25T10:12:09Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "DECISION_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED",
+        "CFO DISTRIBUTION ONLY"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CFO decision log — 251012ZJUL26",
+      "text": "CFO decision log entry 251012ZJUL26. Decision: Activate whistleblower hotline and appoint independent investigator. Rationale: Regulatory enquiry received. Approved by: CFO. Time: 251012ZJUL26.",
+      "decision": "Activate whistleblower hotline and appoint independent investigator",
+      "approved_by": "CFO",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0093",
+      "dtg": "251216ZJUL26",
+      "timestamp_utc": "2026-07-25T12:16:12Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 251216ZJUL26: Has the intermediary network received payments in excess of $5M in current quarter? Status: CLOSED — THRESHOLD MET. Raised by: CFO. CDO action: TASKED.",
+      "ccir_question": "Has the intermediary network received payments in excess of $5M in current quarter?",
+      "ccir_status": "CLOSED — NOT MET",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_SANCTIONS_EVASION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0102",
+      "dtg": "251447ZJUL26",
+      "timestamp_utc": "2026-07-25T14:47:50Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 251447ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: CLOSED — threshold not met. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "OPEN",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_SANCTIONS_EVASION",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0057",
+      "dtg": "251552ZJUL26",
+      "timestamp_utc": "2026-07-25T15:52:25Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 1 — IDENTIFY",
+      "text": "Financial objective record. Phase: PHASE 1 — CONTAIN. Objective: Resolve OFAC nexus. KPI threshold: Intermediary contracts terminated. Status: ON TRACK.",
+      "phase": "PHASE 1",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0037",
+      "dtg": "260512ZJUL26",
+      "timestamp_utc": "2026-07-26T05:12:18Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 26 Jul 2026",
+      "text": "Capital exposure report 260512ZJUL26. Jurisdictions with elevated KRI: Malta, Lagos. Total exposed capital: ~$476M across 4 entities. Fully cleared: 4. Under review: 1. Current project phase: PHASE 2 — RESOLVE.",
+      "exposed_capital_usd_m": 197,
+      "entities_count": 7,
+      "phase": "CONTAIN",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Malta"
+      ],
+      "entity_refs": [
+        "MSC"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0050",
+      "dtg": "260604ZJUL26",
+      "timestamp_utc": "2026-07-26T06:04:56Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 2 — REMEDIATE",
+      "text": "Financial objective record. Phase: PHASE 4 — IDENTIFY. Objective: Resolve OFAC nexus. KPI threshold: Zero unresolved KRI-02 exposures. Status: AT RISK.",
+      "phase": "PHASE 3",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0066",
+      "dtg": "261201ZJUL26",
+      "timestamp_utc": "2026-07-26T12:01:09Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — FCA / 26 Jul 2026",
+      "text": "Liaison report from FCA regulatory channel. Subject: KRI-related regulatory enquiry. Key point: Regulatory resources available for cooperation. Action: LEGAL REVIEW.",
+      "regulatory_body": "FCA",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0030",
+      "dtg": "261230ZJUL26",
+      "timestamp_utc": "2026-07-26T12:30:39Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 26 Jul 2026",
+      "text": "Capital exposure report 261230ZJUL26. Jurisdictions with elevated KRI: BVI, Malta. Total exposed capital: ~$299M across 7 entities. Fully cleared: 2. Under review: 4. Current project phase: PHASE 4 — CONTAIN.",
+      "exposed_capital_usd_m": 303,
+      "entities_count": 8,
+      "phase": "RESOLVE",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "BVI"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0055",
+      "dtg": "261555ZJUL26",
+      "timestamp_utc": "2026-07-26T15:55:07Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "FINANCIAL_OBJECTIVE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Financial objective — PHASE 2 — REMEDIATE",
+      "text": "Financial objective record. Phase: PHASE 3 — IDENTIFY. Objective: Complete forensic accounting review. KPI threshold: All SPVs consolidated or wound down. Status: ON TRACK.",
+      "phase": "PHASE 4",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0034",
+      "dtg": "270313ZJUL26",
+      "timestamp_utc": "2026-07-27T03:13:31Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CAPITAL_EXPOSURE_STATUS",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Capital exposure status — 27 Jul 2026",
+      "text": "Capital exposure report 270313ZJUL26. Jurisdictions with elevated KRI: Lagos, Geneva. Total exposed capital: ~$463M across 3 entities. Fully cleared: 5. Under review: 3. Current project phase: PHASE 4 — IDENTIFY.",
+      "exposed_capital_usd_m": 280,
+      "entities_count": 6,
+      "phase": "RESOLVE",
+      "kri_refs": [
+        "KRI-06",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Lagos"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "FINANCIAL_RISK",
+        "COUNTERPARTY_RISK"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0099",
+      "dtg": "270836ZJUL26",
+      "timestamp_utc": "2026-07-27T08:36:55Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "CCIR",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "CCIR — Critical compliance information requirement",
+      "text": "CCIR raised 270836ZJUL26: Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began? Status: CLOSED — THRESHOLD MET. Raised by: CFO. CDO action: COMPLETE.",
+      "ccir_question": "Has any NEH entity engaged with OFAC-listed counterparty since reporting gap began?",
+      "ccir_status": "CLOSED — NOT MET",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "KRI",
+        "KRI_AML_LAYERING",
+        "CFO_RISK_DESK",
+        "COMPLIANCE"
+      ]
+    },
+    {
+      "doc_id": "CFO-202606-0063",
+      "dtg": "271439ZJUL26",
+      "timestamp_utc": "2026-07-27T14:39:38Z",
+      "persona": "CFO_EXECUTIVE",
+      "record_type": "BOARD_LIAISON_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "BOARD RESTRICTED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Board liaison report — SEC / 27 Jul 2026",
+      "text": "Liaison report from SEC regulatory channel. Subject: Informal inquiry into NEH trading patterns. Key point: Settlement framework indicated as possible. Action: NOTIFY BOARD.",
+      "regulatory_body": "SEC",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "OPERATIONS",
+        "CFO_RISK_DESK",
+        "REGULATORY_LIAISON",
+        "COMPLIANCE"
+      ]
+    }
+  ]
+}

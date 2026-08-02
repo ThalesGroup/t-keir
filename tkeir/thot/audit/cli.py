@@ -60,6 +60,7 @@ def main(args: list[str] | None = None) -> None:
 
     parsed = parser.parse_args(args)
     from thot.core.StructuredLogging import configure_text_logging
+
     configure_text_logging(level=logging.INFO, force=True)
     settings = audit_settings()
     hot = open_hot_store(settings.hot_store_url)
@@ -67,7 +68,7 @@ def main(args: list[str] | None = None) -> None:
         logging.error("AUDIT_HOT_STORE_URL is not configured")
         sys.exit(1)
     worm = WormSegmentStore(settings.worm_root)
-    keys = SubjectKeyStore(settings.subject_keys_path)
+    keys: SubjectKeyStore | None = None
 
     try:
         if parsed.command == "report":
@@ -100,13 +101,34 @@ def main(args: list[str] | None = None) -> None:
             sys.exit(0)
         if parsed.command == "verify":
             result = verify_store(hot, worm)
-            print(json.dumps(result.__dict__, indent=2))
+            payload = result.__dict__.copy()
+            payload["hot_store_url"] = settings.hot_store_url
+            payload["worm_root"] = str(settings.worm_root)
+            if (
+                result.records_checked == 0
+                and result.worm_segments_checked == 0
+            ):
+                payload["note"] = (
+                    "empty store — host emitters need AUDIT_HOT_STORE_URL "
+                    "(make rag|agent|ingest|okf sets workspace/audit)"
+                )
+            print(json.dumps(payload, indent=2))
             sys.exit(0 if result.ok else 1)
         if parsed.command == "archive":
             segment = archive_unarchived(hot, worm)
-            print(json.dumps({"segment_id": segment}, indent=2))
+            archive_payload: dict[str, object] = {
+                "segment_id": segment,
+                "hot_store_url": settings.hot_store_url,
+                "worm_root": str(settings.worm_root),
+            }
+            if segment is None:
+                archive_payload["note"] = (
+                    "no unarchived ActionRecords in hot store"
+                )
+            print(json.dumps(archive_payload, indent=2))
             sys.exit(0)
         if parsed.command == "forget":
+            keys = SubjectKeyStore(settings.subject_keys_path)
             ok = keys.forget(parsed.subject)
             if not ok:
                 logging.error("Unknown subject: %s", parsed.subject)
@@ -153,7 +175,8 @@ def main(args: list[str] | None = None) -> None:
             sys.exit(0)
     finally:
         hot.close()
-        keys.close()
+        if keys is not None:
+            keys.close()
 
 
 if __name__ == "__main__":

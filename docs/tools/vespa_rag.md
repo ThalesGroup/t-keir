@@ -54,7 +54,7 @@ cd tkeir-hmi && npm install && npm run dev
 
 See [HMI documentation](../hmi.md).
 
-Default index input: `tkeir/tests/indexing/output`.
+Default index input: `tests/indexing/output`.
 
 ## CLI entry points
 
@@ -88,3 +88,30 @@ Response fields:
 | `ranking_profile` | Vespa ranking profile used when known |
 
 Schemas are generated from `tkeir/configs/rag.yaml` via `make schemas`.
+
+### `POST /documents/analyze` (NLP only)
+
+Multipart upload → converter + full pipeline → analyzed document JSON.
+Does **not** write to Vespa. Default converter datatype is **`raw`**
+(UTF-8 plain text via `RawTextConverter`).
+
+Optionally upload a `business_ontology.yaml` as a second multipart file;
+matched concepts are annotated after NLP.
+
+```bash
+curl -sS -X POST "http://localhost:8090/documents/analyze" \
+  -F "file=@./notes.txt;type=text/plain" \
+  -F "datatype=raw" \
+  -F "language=en" \
+  -F "business_ontology=@datasets/osint/business_ontology.yaml"
+```
+
+| Form field | Default | Notes |
+|---|---|---|
+| `file` | required | Document bytes |
+| `datatype` | `raw` | Converter type (`raw`, `auto`, `pdf`, …) |
+| `language` | `en` | Selects preloaded pipeline runner |
+| `business_ontology` | unset | Multipart YAML/JSON file (`business_ontology.yaml`) |
+
+Response is the full pipeline output (`content`, `golden_chunks`, NER, …),
+plus BO annotations on `document_ontology` / `kg` / `core_concepts` when applied.

@@ -139,9 +139,7 @@ class GovernorEnforceMiddleware(BaseHTTPMiddleware):
             raise RuntimeError(
                 f"governor state not writable at {settings.flags_path}: {exc}"
             ) from exc
-        self._evaluator = PolicyEvaluator(
-            settings, flags, budgets, approvals
-        )
+        self._evaluator = PolicyEvaluator(settings, flags, budgets, approvals)
         return self._evaluator
 
     async def dispatch(

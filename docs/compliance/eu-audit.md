@@ -52,7 +52,7 @@ docs-only republish: `make compliance-doc-results`.
 | 4 | `opa eval` of `data.eu.<reg>.summary` for each regulation |
 | 5 | `opa_to_oscal.py` → OSCAL Assessment Results + POA&M under `…/oscal/` |
 | 6 | `report_generator.py` → HTML + JSON (includes OSCAL download links + posture trend) |
-| 7 | `gen_doc_results.py` → full outcomes into `docs/compliance/generated/` |
+| 7 | `gen_doc_results.py` → full outcomes + **one-page status table** into `docs/compliance/generated/` |
 
 Without OPA:
 
@@ -64,8 +64,8 @@ Exit code **0** so `make ci` stays green. Set `COMPLIANCE_STRICT=1` to fail the
 orchestrator when the aggregated report still has gaps.
 
 `make ci` runs **`audit-compliance` after** SBOM / Trivy / OWASP evidence is
-produced, then rebuilds MkDocs so [Latest audit results](latest-results.md)
-embeds the full article outcomes from that run.
+produced, then rebuilds MkDocs so [Compliance status](status.md) and
+[Latest audit results](latest-results.md) embed the outcomes from that run.
 
 ## OSCAL layer (regulator / GRC exchange)
 

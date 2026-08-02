@@ -72,7 +72,7 @@ make setup
 make quickstart
 ```
 
-Runs `tkeir-pipeline` on bundled fixtures under `tkeir/tests/fixtures/` and writes
+Runs `tkeir-pipeline` on bundled fixtures under `tests/fixtures/` and writes
 results to `output/quickstart/`.
 
 ### 3. Vespa stack — bootstrap, index, RAG
@@ -86,7 +86,7 @@ make install           # uv sync in tkeir/
 make bootstrap         # start Vespa + deploy schemas
 
 # Build pipeline JSON from example PDFs (if output/ is empty)
-make index-fixtures    # tkeir/tests/indexing/input → output/
+make index-fixtures    # tests/indexing/input → output/
 
 # Index passages into Vespa (BGE-M3 dense+sparse from resources/modeling/net)
 export PROVIDER=ollama
@@ -101,7 +101,7 @@ make rag
 make rag-query RAG_QUERY="Who is Rob Brown?"
 ```
 
-Indexing reads `tkeir/tests/indexing/output/*.pipeline.json` by default.
+Indexing reads `tests/indexing/output/*.pipeline.json` by default.
 Override with `INDEX_INPUT=/path/to/json/dir make index`.
 
 Details: [vespa/README.md](vespa/README.md), [docs/tools/vespa_rag.md](docs/tools/vespa_rag.md)
@@ -207,7 +207,7 @@ setup, pipeline, tests, docs, Vespa, indexing, and RAG.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `PIPELINE_INPUT` | `tkeir/tests/fixtures/test-raw/raw` | Input file or directory |
+| `PIPELINE_INPUT` | `tests/fixtures/test-raw/raw` | Input file or directory |
 | `PIPELINE_OUTPUT` | `/tmp/tkeir-pipeline-out` | Output directory for JSON |
 | `PIPELINE_TYPE` | `auto` | Input type: `auto`, `raw`, `pdf`, … |
 | `PIPELINE_CONFIG` | `tkeir/configs/pipeline.yaml` | Pipeline configuration |
@@ -227,7 +227,7 @@ make pipeline \
 | Target | Description |
 |---|---|
 | `make test` | Unit + functional test suites |
-| `make test-unit` | Unit tests only (`tkeir/tests/unittests/`) |
+| `make test-unit` | Unit tests only (`tests/unittests/`) |
 | `make test-functional` | Functional tests only |
 | `make coverage` | Coverage run (90% fail-under) |
 | `make lint` | `black` + `isort` checks |
@@ -239,9 +239,14 @@ make pipeline \
 | `make bom` | CycloneDX SBOM + AIBOM → `reports/bom/` |
 | `make trivy` | Filesystem/config security scan (Docker) |
 | `make owasp-dependency-check` | OWASP Dependency-Check (Docker) |
-| `make ci` | All quality gates (lint, types, tests, coverage, security, BOM) |
+| `make security-report` | Unified security index → `reports/security/` |
+| `make slsa-report` | SLSA provenance + upgrade roadmap → `reports/slsa/` |
+| `make ci` | Full local gate (lint, types, tests, coverage, security, BOM, SLSA, compliance, docs) |
 | `make docs` | MkDocs dev server → http://127.0.0.1:8000 |
 | `make docs-build` | Static site → `site/` |
+
+CI reports, GitHub Actions, and gate thresholds are documented under
+[`docs/ci/`](docs/ci/index.md) (MkDocs nav: **CI & reports**).
 
 ### Search & RAG (Vespa)
 
@@ -256,7 +261,7 @@ make pipeline \
 | `make vespa-check` | Vespa health check |
 | `make test-vespa` | Vespa query smoke test |
 | `make test-vespa-py` | Python unit tests for search tools |
-| `make index-fixtures` | Pipeline on `tkeir/tests/indexing/input/` → `output/` |
+| `make index-fixtures` | Pipeline on `tests/indexing/input/` → `output/` |
 | `make index` | Embed and index `*.pipeline.json` into Vespa |
 | `make rag` | Start FastAPI RAG API on port **8090** |
 | `make rag-query` | `curl` sample RAG request |
@@ -274,7 +279,7 @@ make pipeline \
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `INDEX_INPUT` | `tkeir/tests/indexing/output` | Directory of `*.pipeline.json` to index |
+| `INDEX_INPUT` | `tests/indexing/output` | Directory of `*.pipeline.json` to index |
 | `PROVIDER` | `ollama` | LLM/embeddings provider (`openai`, `ollama`, `vllm`) |
 | `EMBEDDING_MODEL` | provider-specific | Embedding model (e.g. `bge-m3`) |
 | `LLM_MODEL` | provider-specific | Generation model (e.g. `mistral-nemo`) |

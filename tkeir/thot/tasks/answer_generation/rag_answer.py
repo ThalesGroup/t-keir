@@ -37,12 +37,15 @@ from thot.tools.search.ontology_utils import (
     filter_query_relevant_chunks,
     prioritize_chunks_by_query_match,
 )
-from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
-from thot.tools.search.rag_config import load_rag_config, resolve_passage_settings
+from thot.tools.search.rag_config import (
+    load_rag_config,
+    resolve_passage_settings,
+)
 from thot.tools.search.rag_report import (
     format_input_prompt,
     parse_structured_generation,
 )
+from thot.tools.search.vespa_client import clean_chunk_text_for_prompt
 
 LOGGER = logging.getLogger(__name__)
 
@@ -115,7 +118,7 @@ def query_analysis_to_dict(analysis: Any) -> dict[str, Any]:
         "pipeline_failed": bool(getattr(analysis, "pipeline_failed", False)),
         "ner_entities": [
             {"text": entity.text, "label": entity.label}
-            for entity in (getattr(analysis, "ner_entities", None) or [])
+            for entity in getattr(analysis, "ner_entities", None) or []
         ],
         "svo_triples": [
             {
@@ -123,7 +126,7 @@ def query_analysis_to_dict(analysis: Any) -> dict[str, Any]:
                 "verb": triple.verb,
                 "object": triple.object,
             }
-            for triple in (getattr(analysis, "svo_triples", None) or [])
+            for triple in getattr(analysis, "svo_triples", None) or []
         ],
         "morphosyntax": list(getattr(analysis, "morphosyntax", []) or []),
     }
@@ -169,7 +172,9 @@ def analyze_request(
         }
 
 
-def ensure_pipeline_safe(processed: dict[str, Any], text: str) -> dict[str, Any]:
+def ensure_pipeline_safe(
+    processed: dict[str, Any], text: str
+) -> dict[str, Any]:
     """Shallow-copy pipeline output with content filled when missing."""
     document = dict(processed or {})
     if text and not document.get("content"):
@@ -187,14 +192,14 @@ def _analyze_passages(
     """Run NLP on passages → SVO lines + pipeline documents for ontology."""
     if runner is None:
         return [], []
+    from thot.tasks.answer_generation.ontology_clues import (
+        ensure_pipeline_document,
+    )
     from thot.tools.search.query_analyzer import (
         analyze_query_document,
         run_linguistic_pipeline,
     )
     from thot.tools.search.rag_config import RagSearchConfig
-    from thot.tasks.answer_generation.ontology_clues import (
-        ensure_pipeline_document,
-    )
 
     lines: list[str] = []
     documents: list[dict[str, Any]] = []
@@ -296,7 +301,10 @@ def structure_passages(
     )
 
     svo_lines, passage_documents = _analyze_passages(
-        [PassageHit(c.chunk_id, c.title, c.text_raw, c.score) for c in prioritized],
+        [
+            PassageHit(c.chunk_id, c.title, c.text_raw, c.score)
+            for c in prioritized
+        ],
         runner=runner,
         language=language,
         max_passages=min(5, passage_settings.count),
@@ -350,7 +358,9 @@ def _try_reason_over_svo(svo_lines: list[str]) -> str:
             o_uri = URIRef(ns[f"o{index}"])
             graph.add((o_uri, RDF.type, ns.Entity))
             graph.add((o_uri, RDFS.label, Literal(obj)))
-            pred = URIRef(ns[re.sub(r"[^a-zA-Z0-9_]", "_", verb) or "relatedTo"])
+            pred = URIRef(
+                ns[re.sub(r"[^a-zA-Z0-9_]", "_", verb) or "relatedTo"]
+            )
             graph.add((s_uri, pred, o_uri))
             graph.add((pred, RDFS.label, Literal(verb)))
     if len(graph) == 0:
@@ -361,14 +371,15 @@ def _try_reason_over_svo(svo_lines: list[str]) -> str:
         result = query_merged_ontology(
             json_ld,
             operation="consistency",
-            prefer_owlapy=False,
         )
         consistent = result.get("consistent")
         if consistent is True:
             return "ontology reasoner: SVO graph consistent"
         if consistent is False:
             return "ontology reasoner: SVO graph inconsistent"
-        return f"ontology reasoner: {result.get('operation', 'consistency')} ok"
+        return (
+            f"ontology reasoner: {result.get('operation', 'consistency')} ok"
+        )
     except Exception as exc:  # noqa: BLE001
         LOGGER.debug("Reasoner skipped: %s", exc)
         return f"reasoner skipped: {exc}"
@@ -393,7 +404,9 @@ def _parse_svo_line(line: str) -> tuple[str, str, str] | None:
     return subject, verb, obj
 
 
-def _svo_dicts_from_analysis(analysis: dict[str, Any]) -> list[tuple[str, str, str]]:
+def _svo_dicts_from_analysis(
+    analysis: dict[str, Any],
+) -> list[tuple[str, str, str]]:
     """Normalize query analysis SVO triples."""
     out: list[tuple[str, str, str]] = []
     for triple in analysis.get("svo_triples") or []:
@@ -410,7 +423,9 @@ def _svo_dicts_from_analysis(analysis: dict[str, Any]) -> list[tuple[str, str, s
     return out
 
 
-def _svo_dicts_from_structured_facts(structured_facts: str) -> list[tuple[str, str, str]]:
+def _svo_dicts_from_structured_facts(
+    structured_facts: str,
+) -> list[tuple[str, str, str]]:
     """Extract passage SVO triples from structured facts text."""
     block = _extract_passage_svo_block(structured_facts)
     if block.startswith("(no"):
@@ -462,7 +477,9 @@ def build_query_passage_ontology(
                 f"- bridge: {subject} — {verb} — {obj}".rstrip(" —")
             )
     if bridges:
-        lines.append("Bridging relations (shared entities across query/passages):")
+        lines.append(
+            "Bridging relations (shared entities across query/passages):"
+        )
         lines.extend(list(dict.fromkeys(bridges))[:40])
 
     reasoner_note = ""
@@ -574,7 +591,9 @@ def _compact_reasoner_note(reasoner_note: str) -> str:
     return "; ".join(kept)
 
 
-def _filter_ontology_clue_lines(ontology_facts: str, *, max_lines: int = 24) -> str:
+def _filter_ontology_clue_lines(
+    ontology_facts: str, *, max_lines: int = 24
+) -> str:
     """Prefer relational ontology lines; drop pure type/label noise when possible."""
     text = (ontology_facts or "").strip()
     if not text or text.startswith("(no ") or text == "(none)":
@@ -631,7 +650,8 @@ def build_unique_qa_prompt(
     """
     prompt_cfg = load_prompt_language_block(language)
     unavailable = str(
-        prompt_cfg.get("unavailable_answer") or "The information is not available."
+        prompt_cfg.get("unavailable_answer")
+        or "The information is not available."
     )
     short_spec = question_type_short_answer_spec(
         question_type, language=language
@@ -835,7 +855,9 @@ async def forge_prompt_with_llm(
         f"FORMAT HINT (system excerpt):\n{system_prompt[:1200]}\n\n"
         f"FORMAT HINT (template excerpt):\n{user_prompt[:1500]}"
     )
-    forged = await llm.generate(forge_user, system=_FORGE_SYSTEM, temperature=0.1)
+    forged = await llm.generate(
+        forge_user, system=_FORGE_SYSTEM, temperature=0.1
+    )
     text = (forged or "").strip()
     if not text:
         return user_prompt
@@ -917,7 +939,9 @@ def _kg_node_text(node: Any) -> str:
         return ""
     content = node.get("content")
     if isinstance(content, list):
-        return " ".join(str(part).strip() for part in content if str(part).strip())
+        return " ".join(
+            str(part).strip() for part in content if str(part).strip()
+        )
     if isinstance(content, str):
         return content.strip()
     return ""
@@ -1027,7 +1051,14 @@ def coherent_short_answer(
         return cleaned
 
     if max_sentences is None:
-        if question_type in {"who", "what", "which", "when", "where", "yes_no"}:
+        if question_type in {
+            "who",
+            "what",
+            "which",
+            "when",
+            "where",
+            "yes_no",
+        }:
             max_sentences = 1
         elif question_type in {"inference", "entity_report", "comparison"}:
             max_sentences = 2
@@ -1070,7 +1101,9 @@ def clean_generated_answers(
     stripped = strip_answer_markup(short_answer)
     if runner is not None and stripped:
         try:
-            from thot.tools.search.query_analyzer import run_linguistic_pipeline
+            from thot.tools.search.query_analyzer import (
+                run_linguistic_pipeline,
+            )
 
             processed = run_linguistic_pipeline(
                 runner, stripped, language=language
@@ -1103,7 +1136,8 @@ async def generate_rag_answer(
     """Run the unique QA prompt through the LLM and clean structured output."""
     prompt_cfg = load_prompt_language_block(language)
     unavailable = str(
-        prompt_cfg.get("unavailable_answer") or "The information is not available."
+        prompt_cfg.get("unavailable_answer")
+        or "The information is not available."
     )
     raw = await llm.generate(
         user_prompt, system=system_prompt or None, temperature=0.1
@@ -1144,9 +1178,7 @@ async def answer_from_passages(
     """
     try:
         if runner is not None:
-            analysis = analyze_request(
-                query, runner=runner, language=language
-            )
+            analysis = analyze_request(query, runner=runner, language=language)
         else:
             analysis = {"raw_query": query, "language": language}
 

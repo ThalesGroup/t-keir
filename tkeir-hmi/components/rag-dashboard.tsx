@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, Moon, Sun } from "lucide-react";
 
-import { AgentPanel } from "@/components/agent-panel";
 import { AuthButton } from "@/components/auth-button";
+import { GlobalIngestPanel } from "@/components/global-ingest-panel";
 import { ModeSidebar } from "@/components/mode-sidebar";
-import { OntologyNavigator } from "@/components/ontology-navigator";
-import { RagPanel } from "@/components/rag-panel";
+import { MyFilesPanel } from "@/components/my-files-panel";
+import { ReporterPanel } from "@/components/reporter-panel";
 import { SearchPanel } from "@/components/search-panel";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -18,15 +18,54 @@ import type {
   SemanticKeyword,
   WorkspaceMode,
 } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/src/auth/AuthProvider";
 
-export function RagDashboard() {
-  const [mode, setMode] = useState<WorkspaceMode>("search");
+const VALID_MODES = new Set<WorkspaceMode>([
+  "search",
+  "reporter",
+  "files",
+  "ingest",
+]);
+
+const LEGACY_MODE_ALIASES: Record<string, WorkspaceMode> = {
+  wiki: "reporter",
+  agent: "reporter",
+  rag: "search",
+};
+
+function parseInitialMode(value?: string | null): WorkspaceMode {
+  if (!value) return "search";
+  if (LEGACY_MODE_ALIASES[value]) {
+    return LEGACY_MODE_ALIASES[value];
+  }
+  if (VALID_MODES.has(value as WorkspaceMode)) {
+    return value as WorkspaceMode;
+  }
+  return "search";
+}
+
+export function RagDashboard({
+  initialMode,
+}: {
+  initialMode?: string | null;
+} = {}) {
+  const { roles } = useAuth();
+  const canIngest =
+    roles.includes("c2-admin") || roles.includes("tkeir-admin");
+  const [mode, setMode] = useState<WorkspaceMode>(() =>
+    parseInitialMode(initialMode),
+  );
+  // Keep visited panels mounted (hidden) so search/reporter/files/ingest
+  // local state survives sidebar mode switches.
+  const [visitedModes, setVisitedModes] = useState<Set<WorkspaceMode>>(
+    () => new Set([parseInitialMode(initialMode)]),
+  );
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [apiHealthy, setApiHealthy] = useState<boolean | null>(null);
   const [agentAvailable, setAgentAvailable] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
-  // Shared across Search + RAG modes
   const [ontology, setOntology] = useState<FusedOntology | null>(null);
   const [ontologyLoading, setOntologyLoading] = useState(false);
   const [ontologyKey, setOntologyKey] = useState("idle");
@@ -43,6 +82,15 @@ export function RagDashboard() {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
+
+  useEffect(() => {
+    setVisitedModes((prev) => {
+      if (prev.has(mode)) return prev;
+      const next = new Set(prev);
+      next.add(mode);
+      return next;
+    });
+  }, [mode]);
 
   const handleOntologyUpdate = useCallback(
     (next: FusedOntology | null, meta?: { loading?: boolean; key?: string }) => {
@@ -105,7 +153,11 @@ export function RagDashboard() {
     setActiveLabel(null);
   }, []);
 
-  const showOntology = mode === "search" || mode === "rag";
+  useEffect(() => {
+    if (mode === "ingest" && !canIngest) {
+      setMode("search");
+    }
+  }, [mode, canIngest]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -120,12 +172,6 @@ export function RagDashboard() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <a
-              href="/okf"
-              className="hidden text-sm text-muted-foreground underline-offset-2 hover:underline sm:inline"
-            >
-              OKF Bundles
-            </a>
             <a
               href="/agents"
               className="hidden text-sm text-muted-foreground underline-offset-2 hover:underline sm:inline"
@@ -158,10 +204,14 @@ export function RagDashboard() {
           collapsed={sidebarCollapsed}
           onCollapsedChange={setSidebarCollapsed}
           agentAvailable={agentAvailable}
+          showIngest={canIngest}
         />
 
         <main className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-          {apiHealthy === false && mode !== "agent" && (
+          {apiHealthy === false &&
+            mode !== "reporter" &&
+            mode !== "files" &&
+            mode !== "ingest" && (
             <Alert variant="destructive" className="mb-6">
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>RAG API unreachable</AlertTitle>
@@ -176,32 +226,50 @@ export function RagDashboard() {
           )}
 
           <div className="space-y-6">
-            {mode === "search" && (
-              <SearchPanel
-                onOntologyUpdate={handleOntologyUpdate}
-                activeChunkIds={activeChunkIds}
-              />
-            )}
-            {mode === "rag" && (
-              <RagPanel
-                onOntologyUpdate={handleOntologyUpdate}
-                activeChunkIds={activeChunkIds}
-              />
-            )}
-            {mode === "agent" && <AgentPanel available={agentAvailable} />}
-
-            {showOntology && (
-              <div className="mx-auto w-full max-w-5xl">
-                <OntologyNavigator
+            {visitedModes.has("search") && (
+              <div
+                className={cn(mode !== "search" && "hidden")}
+                aria-hidden={mode !== "search"}
+                inert={mode !== "search" ? true : undefined}
+              >
+                <SearchPanel
                   ontology={ontology}
-                  loading={ontologyLoading}
+                  ontologyLoading={ontologyLoading}
+                  ontologyKey={ontologyKey}
                   activeChunkIds={activeChunkIds}
                   activeLabel={activeLabel}
+                  onOntologyUpdate={handleOntologyUpdate}
                   onSelectEntity={handleSelectEntity}
                   onSelectKeyword={handleSelectKeyword}
                   onClearFilter={handleClearFilter}
-                  accordionKey={ontologyKey}
                 />
+              </div>
+            )}
+            {visitedModes.has("reporter") && (
+              <div
+                className={cn(mode !== "reporter" && "hidden")}
+                aria-hidden={mode !== "reporter"}
+                inert={mode !== "reporter" ? true : undefined}
+              >
+                <ReporterPanel agentAvailable={agentAvailable} />
+              </div>
+            )}
+            {visitedModes.has("files") && (
+              <div
+                className={cn(mode !== "files" && "hidden")}
+                aria-hidden={mode !== "files"}
+                inert={mode !== "files" ? true : undefined}
+              >
+                <MyFilesPanel />
+              </div>
+            )}
+            {visitedModes.has("ingest") && canIngest && (
+              <div
+                className={cn(mode !== "ingest" && "hidden")}
+                aria-hidden={mode !== "ingest"}
+                inert={mode !== "ingest" ? true : undefined}
+              >
+                <GlobalIngestPanel />
               </div>
             )}
           </div>

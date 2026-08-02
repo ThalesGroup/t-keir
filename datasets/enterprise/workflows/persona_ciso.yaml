@@ -1,0 +1,76 @@
+name: persona_ciso
+version: 1
+description: >
+  CISO Chief Information Security Officer enterprise workflow (Project MERIDIAN).
+  When Reporter Phase 3 supplies an edited LLM Wiki, treat it as the primary
+  fact base and reshape into ent_field_report (field_report). Otherwise
+  dual-index. Example goal: Which sources can I task on Dubai Free Zone to
+  cover KRI-02?
+template: ent_field_report
+budgets:
+  llm_tokens: 90000
+  tool_calls: 60
+  wall_seconds: 900
+steps:
+  - id: analyse
+    agent: ciso_analyser
+    goal_template: >
+      Produce grounded findings for CISO Chief Information Security Officer
+      enterprise field_report on: {goal}.
+      Topic: {topic}. report_form={report_form}. has_llm_wiki={has_llm_wiki}.
+      bundle_id={bundle_id}.
+
+      IF has_llm_wiki is true OR wiki_markdown / wiki_excerpt is non-empty:
+        PRIMARY SOURCE is the Phase-2 LLM Wiki (also in the agent prompt).
+        Call okf_bundle_get when bundle_id is set. Extract atomic findings from
+        Answer + Evidence; preserve chunk_ids. Use search/rag_query
+        (search_mode="both") only to verify citations or fill Gaps — do not
+        rebuild research from scratch.
+        FULL WIKI:
+        -----
+        {wiki_markdown}
+        -----
+      ELSE:
+        HARD REQUIREMENT: dual-index search_mode="both" on rag_query and search.
+        Never invent facts absent from chunks.
+
+      Never invent intermediary structures, KRI labels, source reliability
+      grades, or assessments absent from wiki/chunks.
+    tools:
+      - search
+      - rag_query
+      - ontology_query
+      - document_get
+      - workspace_wiki_list
+      - workspace_wiki_get
+      - okf_bundle_get
+    max_steps: 14
+
+  - id: review
+    agent: ciso_reviewer
+    goal_template: >
+      Review CISO Chief Information Security Officer findings for enterprise
+      field_report on: {goal}.
+      Prior findings JSON: {prior_findings_json}
+      Prefer claims grounded in the LLM Wiki / cited chunk_ids.
+      Reject uncited or world-knowledge claims. Return accepted findings only.
+    tools: []
+    max_steps: 2
+
+  - id: write
+    agent: ciso_writer
+    goal_template: >
+      Write persona enterprise report claims for: {goal}.
+      Use reviewed findings only: {prior_findings_json}
+      Keep chunk_ids; do not add facts.
+      Follow the enterprise report TEMPLATE embedded in your system prompt
+      (slots + markdown skeleton for {report_form} / {report_form_slots}).
+      Emit one finding per filled slot with claim prefixed by [slot_name],
+      e.g. "[situation] …". Compose maps tagged claims into the template.
+    tools: []
+    max_steps: 2
+
+  - id: deliverable
+    compose:
+      template: ent_field_report
+      topic_from: topic

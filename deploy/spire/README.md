@@ -12,10 +12,25 @@ Agent IDs: `spiffe://tkeir.local/agent/{name}` (e.g. `researcher`, `tkeir-agent`
 ## Compose
 
 ```bash
-# SPIRE server + agent sockets
-make compose-up PROFILES=spire
+# SPIRE server + agent (healthcheck + automatic join token)
+make spire-up
+```
 
-# Agents with workload identity (dev synthesize if socket not yet registered)
+`make spire-up` starts the Compose `spire` profile, waits until the server is
+**healthy**, mints a join token for `spiffe://tkeir.local/spire-agent`, and
+recreates the agent with `-joinToken`.
+
+The SPIRE images are distroless (no `/bin/sh`). Healthchecks must use:
+
+```text
+/opt/spire/bin/spire-server healthcheck -socketPath /tmp/spire-server/private/api.sock
+```
+
+not a shell TCP probe.
+
+Agents with workload identity (dev synthesize if socket not yet registered):
+
+```bash
 make compose-up PROFILES=spire,agents,governor,auth
 ```
 

@@ -5,6 +5,162 @@ export interface HighlightLabel {
   kind: "entity" | "keyword" | "query";
 }
 
+/**
+ * Surfaces whose UD POS is closed-class (DET / PRON / CCONJ / ADP / …).
+ * Used client-side as a safety net when the API still returns stopword
+ * highlight terms; backend filtering uses the NLP morphosyntax pipeline.
+ */
+const CLOSED_CLASS_SURFACES = new Set(
+  [
+    // EN
+    "a",
+    "an",
+    "the",
+    "and",
+    "or",
+    "but",
+    "nor",
+    "for",
+    "yet",
+    "so",
+    "of",
+    "to",
+    "in",
+    "on",
+    "at",
+    "by",
+    "with",
+    "from",
+    "as",
+    "into",
+    "over",
+    "after",
+    "before",
+    "between",
+    "about",
+    "against",
+    "during",
+    "without",
+    "within",
+    "through",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "am",
+    "do",
+    "does",
+    "did",
+    "have",
+    "has",
+    "had",
+    "will",
+    "would",
+    "shall",
+    "should",
+    "can",
+    "could",
+    "may",
+    "might",
+    "must",
+    "i",
+    "me",
+    "my",
+    "we",
+    "our",
+    "you",
+    "your",
+    "he",
+    "him",
+    "his",
+    "she",
+    "her",
+    "it",
+    "its",
+    "they",
+    "them",
+    "their",
+    "this",
+    "that",
+    "these",
+    "those",
+    "who",
+    "whom",
+    "which",
+    "what",
+    "where",
+    "when",
+    "why",
+    "how",
+    "not",
+    "no",
+    "yes",
+    // FR
+    "le",
+    "la",
+    "les",
+    "un",
+    "une",
+    "des",
+    "et",
+    "ou",
+    "mais",
+    "donc",
+    "car",
+    "ni",
+    "de",
+    "du",
+    "au",
+    "aux",
+    "en",
+    "dans",
+    "sur",
+    "sous",
+    "par",
+    "pour",
+    "avec",
+    "sans",
+    "chez",
+    "je",
+    "tu",
+    "il",
+    "elle",
+    "nous",
+    "vous",
+    "ils",
+    "elles",
+    "ce",
+    "cet",
+    "cette",
+    "ces",
+    "qui",
+    "que",
+    "quoi",
+    "dont",
+    "où",
+    "ne",
+    "pas",
+  ].map((value) => value.toLowerCase()),
+);
+
+/** Drop closed-class singles (DET/PRON/CCONJ/…) from highlight candidate lists. */
+export function filterHighlightSurfaces(labels: string[]): string[] {
+  return labels.filter((label) => {
+    const trimmed = label.trim();
+    if (!trimmed) return false;
+    const parts = trimmed.split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return false;
+    if (parts.length === 1) {
+      return !CLOSED_CLASS_SURFACES.has(parts[0].toLowerCase());
+    }
+    // Keep phrases that contain at least one content-bearing token.
+    return parts.some((part) => !CLOSED_CLASS_SURFACES.has(part.toLowerCase()));
+  });
+}
+
 const highlightPatternCache = new Map<string, RegExp>();
 const highlightLookupCache = new Map<
   string,
@@ -23,7 +179,7 @@ export function buildHighlightLabels(
   const seen = new Set<string>();
   const labels: HighlightLabel[] = [];
 
-  for (const label of queryTerms) {
+  for (const label of filterHighlightSurfaces(queryTerms)) {
     const trimmed = label.trim();
     const key = trimmed.toLowerCase();
     if (trimmed && !seen.has(key)) {
@@ -32,7 +188,7 @@ export function buildHighlightLabels(
     }
   }
 
-  for (const label of entities) {
+  for (const label of filterHighlightSurfaces(entities)) {
     const trimmed = label.trim();
     const key = trimmed.toLowerCase();
     if (trimmed && !seen.has(key)) {
@@ -41,7 +197,7 @@ export function buildHighlightLabels(
     }
   }
 
-  for (const label of keywords) {
+  for (const label of filterHighlightSurfaces(keywords)) {
     const trimmed = label.trim();
     const key = trimmed.toLowerCase();
     if (trimmed && !seen.has(key)) {

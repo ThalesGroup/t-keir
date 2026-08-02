@@ -1,0 +1,3899 @@
+{
+  "dataset": {
+    "name": "user_specific_ciso_operator",
+    "version": "1.0",
+    "persona": "CISO — Chief Information Security Officer",
+    "role_description": "Confidential source management, collection gap reasoning, source activation and tasking",
+    "primary_report_type": "FIELD_REPORT",
+    "generated_utc": "2026-07-28T06:00:00Z",
+    "record_count": 110,
+    "index_type": "USER_SPECIFIC",
+    "classification_of_compilation": "CONFIDENTIAL — C-SUITE",
+    "note": "Simulated CISO personal index. Not real data.",
+    "coverage_window_utc": {
+      "from": "2026-06-28T06:00:00Z",
+      "to": "2026-07-28T05:45:00Z"
+    },
+    "cross_reference_schema": {
+      "generic_refs": "doc_id values from enterprise_intelligence_corpus.json",
+      "kri_refs": "KRI-01..06",
+      "location_refs": "jurisdiction.name values"
+    }
+  },
+  "records": [
+    {
+      "doc_id": "CISO-202606-0052",
+      "dtg": "281217ZJUN26",
+      "timestamp_utc": "2026-06-28T12:17:19Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-208 / KRI-01",
+      "text": "Tasking order for SRC-208 against KRI-01 (Financial Fraud). Requirement: Identify beneficial owner of SPV in Washington DC. Deadline: 30h. Source handler: SH-04. Priority: PRIORITY.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "tasking_requirement": "KRI-01 coverage in Washington DC",
+      "deadline_hours": 55,
+      "priority": "PRIORITY",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "KRI_FINANCIAL_FRAUD",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0096",
+      "dtg": "281603ZJUN26",
+      "timestamp_utc": "2026-06-28T16:03:39Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-207 / 28 Jun 2026",
+      "text": "Meeting log: SRC-207 / Source handler SH-01. Location type: encrypted video call. Duration: 47 min. Material passed: YES — documents. Counter-surveillance: MINOR SURVEILLANCE — ABORTED",
+      "source_id": "SRC-207",
+      "source_category": "EXTERNAL_INFORMANT",
+      "location_type": "encrypted video call",
+      "duration_min": 66,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0060",
+      "dtg": "290441ZJUN26",
+      "timestamp_utc": "2026-06-29T04:41:56Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-212 / KRI-04",
+      "text": "Tasking order for SRC-212 against KRI-04 (AML/Layering). Requirement: Confirm commodity origin documentation in Nicosia. Deadline: 13h. Source handler: SH-03. Priority: ROUTINE.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "tasking_requirement": "KRI-04 coverage in Nicosia",
+      "deadline_hours": 77,
+      "priority": "ROUTINE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "KRI_AML_LAYERING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0034",
+      "dtg": "291148ZJUN26",
+      "timestamp_utc": "2026-06-29T11:48:37Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-210 / 29 Jun 2026",
+      "text": "Post-meeting debrief note for SRC-210. Source handler: SH-03. Meeting duration: 54 min. Category: EXTERNAL_INFORMANT. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next contact scheduled: 17 days. Security assessment: MINOR CONCERN NOTED.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "meeting_duration_min": 52,
+      "reporting_quality": "GOOD — mostly consistent",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0093",
+      "dtg": "291155ZJUN26",
+      "timestamp_utc": "2026-06-29T11:55:58Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-206 / 29 Jun 2026",
+      "text": "Meeting log: SRC-206 / Source handler SH-05. Location type: intermediary relay. Duration: 86 min. Material passed: YES — verbal only. Counter-surveillance: MINOR SURVEILLANCE — ABORTED",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "location_type": "intermediary relay",
+      "duration_min": 56,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0028",
+      "dtg": "291211ZJUN26",
+      "timestamp_utc": "2026-06-29T12:11:44Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-209 / pending validation",
+      "text": "Raw report from SRC-209 received 291211ZJUN26. Observation: Commodity origin documentation inconsistent in Singapore Freeport involving NEXUS ENERGY HOLDINGS (Cayman). Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-05.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "EVALUATION_STANDARD",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0059",
+      "dtg": "300001ZJUN26",
+      "timestamp_utc": "2026-06-30T00:01:45Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-212 / KRI-05",
+      "text": "Tasking order for SRC-212 against KRI-05 (Commodity Misreporting). Requirement: Confirm payment flow through BVI structure in Nicosia. Deadline: 52h. Source handler: SH-02. Priority: IMMEDIATE.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "tasking_requirement": "KRI-05 coverage in Nicosia",
+      "deadline_hours": 15,
+      "priority": "IMMEDIATE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "KRI_COMMODITY_MISREPORTING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0075",
+      "dtg": "300400ZJUN26",
+      "timestamp_utc": "2026-06-30T04:00:26Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-204",
+      "text": "Access evaluation for SRC-204. Primary area: London. Secondary areas: Geneva, Malta. Access to: procurement systems. Corroboration: STRONG — independently verified. Access risk: LOW.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "primary_area": "London",
+      "access_level": "INDIRECT",
+      "corroboration": "STRONG",
+      "access_risk": "MEDIUM",
+      "kri_refs": [
+        "KRI-01",
+        "KRI-06"
+      ],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "REGULATORY_LIAISON",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0027",
+      "dtg": "300618ZJUN26",
+      "timestamp_utc": "2026-06-30T06:18:50Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-207 / pending validation",
+      "text": "Raw report from SRC-207 received 300618ZJUN26. Observation: PEP connection to intermediary confirmed in Lagos Energy Sector involving NEH Singapore Pte Ltd. Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-05.",
+      "source_id": "SRC-207",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "B",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "EVALUATION_STANDARD",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0004",
+      "dtg": "300718ZJUN26",
+      "timestamp_utc": "2026-06-30T07:18:02Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-209 / pending validation",
+      "text": "Raw report from SRC-209 received 300718ZJUN26. Observation: PEP connection to intermediary confirmed in Singapore Freeport involving CARACAS VENTURE ENERGIA (Venezuela). Validation status: PENDING. Provisional evaluation: B4. Source handler: SH-02.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "EVALUATION_STANDARD",
+        "KRI_AML_LAYERING"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0051",
+      "dtg": "010207ZJUL26",
+      "timestamp_utc": "2026-07-01T02:07:34Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-211 / KRI-03",
+      "text": "Tasking order for SRC-211 against KRI-03 (Bribery/Corruption). Requirement: Report on intermediary network activity in Geneva Trading Hub. Deadline: 69h. Source handler: SH-03. Priority: IMMEDIATE.",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "tasking_requirement": "KRI-03 coverage in Geneva Trading Hub",
+      "deadline_hours": 14,
+      "priority": "IMMEDIATE",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "KRI_BRIBERY_CORRUPTION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0007",
+      "dtg": "010410ZJUL26",
+      "timestamp_utc": "2026-07-01T04:10:44Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-206 / pending validation",
+      "text": "Raw report from SRC-206 received 010410ZJUL26. Observation: Round-trip trade pattern observed in Cayman Islands involving CARACAS VENTURE ENERGIA (Venezuela). Validation status: PENDING. Provisional evaluation: C4. Source handler: SH-01.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "C",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "EVALUATION_STANDARD",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0087",
+      "dtg": "010823ZJUL26",
+      "timestamp_utc": "2026-07-01T08:23:08Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-202",
+      "text": "Access evaluation for SRC-202. Primary area: Dubai Free Zone. Secondary areas: Geneva, Lagos. Access to: beneficial ownership records. Corroboration: STRONG — independently verified. Access risk: MEDIUM.",
+      "source_id": "SRC-202",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "B",
+      "primary_area": "Dubai Free Zone",
+      "access_level": "INDIRECT",
+      "corroboration": "WEAK",
+      "access_risk": "HIGH",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "FORMER_EMPLOYEE",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0049",
+      "dtg": "011147ZJUL26",
+      "timestamp_utc": "2026-07-01T11:47:10Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-201 / 01 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-201. Source handler: SH-05. Meeting duration: 75 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: YES. Next contact scheduled: 27 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-201",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 40,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0095",
+      "dtg": "011454ZJUL26",
+      "timestamp_utc": "2026-07-01T14:54:49Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-211 / 01 Jul 2026",
+      "text": "Meeting log: SRC-211 / Source handler SH-05. Location type: encrypted video call. Duration: 76 min. Material passed: NO. Counter-surveillance: MINOR SURVEILLANCE — ABORTED",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "location_type": "encrypted video call",
+      "duration_min": 43,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0069",
+      "dtg": "012146ZJUL26",
+      "timestamp_utc": "2026-07-01T21:46:42Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-211 / KRI-02",
+      "text": "Tasking order for SRC-211 against KRI-02 (Sanctions Evasion). Requirement: Confirm commodity origin documentation in Geneva Trading Hub. Deadline: 78h. Source handler: SH-04. Priority: PRIORITY.",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "tasking_requirement": "KRI-02 coverage in Geneva Trading Hub",
+      "deadline_hours": 70,
+      "priority": "PRIORITY",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "KRI_SANCTIONS_EVASION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0084",
+      "dtg": "021530ZJUL26",
+      "timestamp_utc": "2026-07-02T15:30:38Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-212",
+      "text": "Access evaluation for SRC-212. Primary area: Nicosia. Secondary areas: Cayman Islands, Lagos. Access to: procurement systems. Corroboration: PARTIAL — some gaps. Access risk: HIGH.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "B",
+      "primary_area": "Nicosia",
+      "access_level": "INDIRECT",
+      "corroboration": "PARTIAL",
+      "access_risk": "LOW",
+      "kri_refs": [
+        "KRI-02",
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "FORMER_EMPLOYEE",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0057",
+      "dtg": "030821ZJUL26",
+      "timestamp_utc": "2026-07-03T08:21:20Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-212 / KRI-04",
+      "text": "Tasking order for SRC-212 against KRI-04 (AML/Layering). Requirement: Identify beneficial owner of SPV in Nicosia. Deadline: 54h. Source handler: SH-04. Priority: PRIORITY.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "tasking_requirement": "KRI-04 coverage in Nicosia",
+      "deadline_hours": 81,
+      "priority": "PRIORITY",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "KRI_AML_LAYERING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0097",
+      "dtg": "031325ZJUL26",
+      "timestamp_utc": "2026-07-03T13:25:24Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-207 / 03 Jul 2026",
+      "text": "Meeting log: SRC-207 / Source handler SH-05. Location type: dead drop. Duration: 20 min. Material passed: YES — verbal only. Counter-surveillance: MINOR SURVEILLANCE — ABORTED",
+      "source_id": "SRC-207",
+      "source_category": "EXTERNAL_INFORMANT",
+      "location_type": "dead drop",
+      "duration_min": 35,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0086",
+      "dtg": "032123ZJUL26",
+      "timestamp_utc": "2026-07-03T21:23:20Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-212",
+      "text": "Access evaluation for SRC-212. Primary area: Nicosia. Secondary areas: Lagos, Lagos. Access to: trade finance documentation. Corroboration: PARTIAL — some gaps. Access risk: MEDIUM.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "B",
+      "primary_area": "Nicosia",
+      "access_level": "INDIRECT",
+      "corroboration": "STRONG",
+      "access_risk": "MEDIUM",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "FORMER_EMPLOYEE",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0005",
+      "dtg": "040543ZJUL26",
+      "timestamp_utc": "2026-07-04T05:43:32Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-209 / pending validation",
+      "text": "Raw report from SRC-209 received 040543ZJUL26. Observation: SPV incorporated without disclosure in Singapore Freeport involving CARACAS VENTURE ENERGIA (Venezuela). Validation status: PENDING. Provisional evaluation: B4. Source handler: SH-02.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "EVALUATION_STANDARD",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0041",
+      "dtg": "040714ZJUL26",
+      "timestamp_utc": "2026-07-04T07:14:28Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-209 / 04 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-209. Source handler: SH-05. Meeting duration: 63 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: EXCELLENT — fully corroborated. New intelligence obtained: NO. Next contact scheduled: 34 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 31,
+      "reporting_quality": "EXCELLENT — fully corroborated",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0073",
+      "dtg": "041604ZJUL26",
+      "timestamp_utc": "2026-07-04T16:04:20Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-210",
+      "text": "Access evaluation for SRC-210. Primary area: Nicosia. Secondary areas: Cayman Islands, Geneva. Access to: procurement systems. Corroboration: STRONG — independently verified. Access risk: LOW.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "primary_area": "Nicosia",
+      "access_level": "DIRECT",
+      "corroboration": "PARTIAL",
+      "access_risk": "MEDIUM",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0065",
+      "dtg": "041622ZJUL26",
+      "timestamp_utc": "2026-07-04T16:22:36Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-210 / KRI-04",
+      "text": "Tasking order for SRC-210 against KRI-04 (AML/Layering). Requirement: Identify beneficial owner of SPV in Nicosia. Deadline: 56h. Source handler: SH-04. Priority: ROUTINE.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "tasking_requirement": "KRI-04 coverage in Nicosia",
+      "deadline_hours": 40,
+      "priority": "ROUTINE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NTB"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "KRI_AML_LAYERING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0019",
+      "dtg": "050753ZJUL26",
+      "timestamp_utc": "2026-07-05T07:53:46Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-201 / pending validation",
+      "text": "Raw report from SRC-201 received 050753ZJUL26. Observation: SPV incorporated without disclosure in Geneva Trading Hub involving NEH Dubai Commodities DMCC. Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-03.",
+      "source_id": "SRC-201",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "EVALUATION_STANDARD",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0064",
+      "dtg": "051250ZJUL26",
+      "timestamp_utc": "2026-07-05T12:50:49Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-201 / KRI-05",
+      "text": "Tasking order for SRC-201 against KRI-05 (Commodity Misreporting). Requirement: Identify beneficial owner of SPV in Geneva Trading Hub. Deadline: 68h. Source handler: SH-03. Priority: ROUTINE.",
+      "source_id": "SRC-201",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "tasking_requirement": "KRI-05 coverage in Geneva Trading Hub",
+      "deadline_hours": 68,
+      "priority": "ROUTINE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "KRI_COMMODITY_MISREPORTING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0090",
+      "dtg": "051825ZJUL26",
+      "timestamp_utc": "2026-07-05T18:25:23Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-203",
+      "text": "Access evaluation for SRC-203. Primary area: Singapore Freeport. Secondary areas: Singapore Freeport, Singapore Freeport. Access to: beneficial ownership records. Corroboration: STRONG — independently verified. Access risk: HIGH.",
+      "source_id": "SRC-203",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "primary_area": "Singapore Freeport",
+      "access_level": "INDIRECT",
+      "corroboration": "PARTIAL",
+      "access_risk": "LOW",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0089",
+      "dtg": "060442ZJUL26",
+      "timestamp_utc": "2026-07-06T04:42:15Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-205",
+      "text": "Access evaluation for SRC-205. Primary area: Lagos Energy Sector. Secondary areas: Malta, Cayman Islands. Access to: beneficial ownership records. Corroboration: PARTIAL — some gaps. Access risk: HIGH.",
+      "source_id": "SRC-205",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "primary_area": "Lagos Energy Sector",
+      "access_level": "INDIRECT",
+      "corroboration": "STRONG",
+      "access_risk": "MEDIUM",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "INTERNAL_WHISTLEBLOWER",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0083",
+      "dtg": "060746ZJUL26",
+      "timestamp_utc": "2026-07-06T07:46:02Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-212",
+      "text": "Access evaluation for SRC-212. Primary area: Nicosia. Secondary areas: Singapore Freeport, Malta. Access to: executive communication channels. Corroboration: WEAK — unverified. Access risk: HIGH.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "B",
+      "primary_area": "Nicosia",
+      "access_level": "DIRECT",
+      "corroboration": "PARTIAL",
+      "access_risk": "MEDIUM",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "FORMER_EMPLOYEE",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0044",
+      "dtg": "060847ZJUL26",
+      "timestamp_utc": "2026-07-06T08:47:43Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-205 / 06 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-205. Source handler: SH-01. Meeting duration: 68 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next contact scheduled: 18 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-205",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 60,
+      "reporting_quality": "GOOD — mostly consistent",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0055",
+      "dtg": "061049ZJUL26",
+      "timestamp_utc": "2026-07-06T10:49:42Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-202 / KRI-05",
+      "text": "Tasking order for SRC-202 against KRI-05 (Commodity Misreporting). Requirement: Identify beneficial owner of SPV in Dubai Free Zone. Deadline: 34h. Source handler: SH-02. Priority: ROUTINE.",
+      "source_id": "SRC-202",
+      "source_category": "FORMER_EMPLOYEE",
+      "tasking_requirement": "KRI-05 coverage in Dubai Free Zone",
+      "deadline_hours": 88,
+      "priority": "ROUTINE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "KRI_COMMODITY_MISREPORTING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0038",
+      "dtg": "070811ZJUL26",
+      "timestamp_utc": "2026-07-07T08:11:34Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-208 / 07 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-208. Source handler: SH-02. Meeting duration: 109 min. Category: REGULATORY_LIAISON. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: NO. Next contact scheduled: 14 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "meeting_duration_min": 40,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0061",
+      "dtg": "080518ZJUL26",
+      "timestamp_utc": "2026-07-08T05:18:02Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-211 / KRI-06",
+      "text": "Tasking order for SRC-211 against KRI-06 (Market Manipulation). Requirement: Confirm commodity origin documentation in Geneva Trading Hub. Deadline: 79h. Source handler: SH-03. Priority: ROUTINE.",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "tasking_requirement": "KRI-06 coverage in Geneva Trading Hub",
+      "deadline_hours": 52,
+      "priority": "ROUTINE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "KRI_MARKET_MANIPULATION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0070",
+      "dtg": "080848ZJUL26",
+      "timestamp_utc": "2026-07-08T08:48:55Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-212 / KRI-03",
+      "text": "Tasking order for SRC-212 against KRI-03 (Bribery/Corruption). Requirement: Confirm payment flow through BVI structure in Nicosia. Deadline: 62h. Source handler: SH-01. Priority: PRIORITY.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "tasking_requirement": "KRI-03 coverage in Nicosia",
+      "deadline_hours": 69,
+      "priority": "PRIORITY",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "KRI_BRIBERY_CORRUPTION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0015",
+      "dtg": "090324ZJUL26",
+      "timestamp_utc": "2026-07-09T03:24:02Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-204 / pending validation",
+      "text": "Raw report from SRC-204 received 090324ZJUL26. Observation: Undisclosed payment routed via BVI shell in London involving DESERT FALCON ENERGY (Dubai). Validation status: PENDING. Provisional evaluation: A3. Source handler: SH-02.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "EVALUATION_STANDARD",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0103",
+      "dtg": "090425ZJUL26",
+      "timestamp_utc": "2026-07-09T04:25:07Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "OPERATIONAL_COVER_PLAN",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Operational cover plan — SRC-205 / Lagos Energy Sector",
+      "text": "Cover and security plan for SRC-205 operations in Lagos Energy Sector. Cover story: industry journalist. Emergency contact: EH-04. Extraction route: in-place secure facility. Plan validity: 54 days.",
+      "source_id": "SRC-205",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "cover_story": "management consultant",
+      "plan_validity_days": 50,
+      "kri_refs": [],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "CISO_INTELLIGENCE",
+        "INTERNAL_WHISTLEBLOWER"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0035",
+      "dtg": "091344ZJUL26",
+      "timestamp_utc": "2026-07-09T13:44:53Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-205 / 09 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-205. Source handler: SH-03. Meeting duration: 71 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: EXCELLENT — fully corroborated. New intelligence obtained: YES. Next contact scheduled: 37 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-205",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 65,
+      "reporting_quality": "EXCELLENT — fully corroborated",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0101",
+      "dtg": "092113ZJUL26",
+      "timestamp_utc": "2026-07-09T21:13:07Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-212 / 09 Jul 2026",
+      "text": "Meeting log: SRC-212 / Source handler SH-01. Location type: in-person secure location. Duration: 46 min. Material passed: NO. Counter-surveillance: CLEAN",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "location_type": "in-person secure location",
+      "duration_min": 48,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0079",
+      "dtg": "100838ZJUL26",
+      "timestamp_utc": "2026-07-10T08:38:41Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-206",
+      "text": "Access evaluation for SRC-206. Primary area: Cayman Islands. Secondary areas: BVI, Nicosia. Access to: procurement systems. Corroboration: WEAK — unverified. Access risk: LOW.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "C",
+      "primary_area": "Cayman Islands",
+      "access_level": "INDIRECT",
+      "corroboration": "WEAK",
+      "access_risk": "LOW",
+      "kri_refs": [
+        "KRI-04",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "FORMER_EMPLOYEE",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0081",
+      "dtg": "101731ZJUL26",
+      "timestamp_utc": "2026-07-10T17:31:34Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-210",
+      "text": "Access evaluation for SRC-210. Primary area: Nicosia. Secondary areas: Lagos, Cayman Islands. Access to: beneficial ownership records. Corroboration: WEAK — unverified. Access risk: LOW.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "primary_area": "Nicosia",
+      "access_level": "LIMITED",
+      "corroboration": "PARTIAL",
+      "access_risk": "LOW",
+      "kri_refs": [
+        "KRI-06",
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0043",
+      "dtg": "102320ZJUL26",
+      "timestamp_utc": "2026-07-10T23:20:14Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-202 / 10 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-202. Source handler: SH-01. Meeting duration: 112 min. Category: FORMER_EMPLOYEE. Reporting quality: EXCELLENT — fully corroborated. New intelligence obtained: YES. Next contact scheduled: 34 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-202",
+      "source_category": "FORMER_EMPLOYEE",
+      "meeting_duration_min": 101,
+      "reporting_quality": "EXCELLENT — fully corroborated",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0067",
+      "dtg": "110519ZJUL26",
+      "timestamp_utc": "2026-07-11T05:19:18Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-206 / KRI-01",
+      "text": "Tasking order for SRC-206 against KRI-01 (Financial Fraud). Requirement: Report on intermediary network activity in Cayman Islands. Deadline: 95h. Source handler: SH-03. Priority: PRIORITY.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "tasking_requirement": "KRI-01 coverage in Cayman Islands",
+      "deadline_hours": 73,
+      "priority": "PRIORITY",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "KRI_FINANCIAL_FRAUD",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0023",
+      "dtg": "110812ZJUL26",
+      "timestamp_utc": "2026-07-11T08:12:25Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-209 / pending validation",
+      "text": "Raw report from SRC-209 received 110812ZJUL26. Observation: Undisclosed payment routed via BVI shell in Singapore Freeport involving NEXUS ENERGY HOLDINGS (Cayman). Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-03.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "EVALUATION_STANDARD",
+        "KRI_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0108",
+      "dtg": "111443ZJUL26",
+      "timestamp_utc": "2026-07-11T14:43:04Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "OPERATIONAL_COVER_PLAN",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Operational cover plan — SRC-209 / Singapore Freeport",
+      "text": "Cover and security plan for SRC-209 operations in Singapore Freeport. Cover story: industry journalist. Emergency contact: EH-03. Extraction route: in-place secure facility. Plan validity: 56 days.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "cover_story": "management consultant",
+      "plan_validity_days": 33,
+      "kri_refs": [],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "CISO_INTELLIGENCE",
+        "INTERNAL_WHISTLEBLOWER"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0110",
+      "dtg": "120502ZJUL26",
+      "timestamp_utc": "2026-07-12T05:02:02Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "OPERATIONAL_COVER_PLAN",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Operational cover plan — SRC-208 / Washington DC",
+      "text": "Cover and security plan for SRC-208 operations in Washington DC. Cover story: compliance officer on secondment. Emergency contact: EH-02. Extraction route: border crossing protocol. Plan validity: 31 days.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "cover_story": "management consultant",
+      "plan_validity_days": 64,
+      "kri_refs": [],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "CISO_INTELLIGENCE",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0047",
+      "dtg": "120651ZJUL26",
+      "timestamp_utc": "2026-07-12T06:51:12Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-208 / 12 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-208. Source handler: SH-02. Meeting duration: 71 min. Category: REGULATORY_LIAISON. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next contact scheduled: 31 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "meeting_duration_min": 47,
+      "reporting_quality": "GOOD — mostly consistent",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0078",
+      "dtg": "120840ZJUL26",
+      "timestamp_utc": "2026-07-12T08:40:14Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-207",
+      "text": "Access evaluation for SRC-207. Primary area: Lagos Energy Sector. Secondary areas: Geneva, BVI. Access to: procurement systems. Corroboration: WEAK — unverified. Access risk: HIGH.",
+      "source_id": "SRC-207",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "B",
+      "primary_area": "Lagos Energy Sector",
+      "access_level": "LIMITED",
+      "corroboration": "PARTIAL",
+      "access_risk": "HIGH",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0082",
+      "dtg": "130036ZJUL26",
+      "timestamp_utc": "2026-07-13T00:36:18Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-204",
+      "text": "Access evaluation for SRC-204. Primary area: London. Secondary areas: Dubai Free Zone, Nicosia. Access to: executive communication channels. Corroboration: WEAK — unverified. Access risk: HIGH.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "primary_area": "London",
+      "access_level": "INDIRECT",
+      "corroboration": "STRONG",
+      "access_risk": "MEDIUM",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-02"
+      ],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "REGULATORY_LIAISON",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0105",
+      "dtg": "130758ZJUL26",
+      "timestamp_utc": "2026-07-13T07:58:09Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "OPERATIONAL_COVER_PLAN",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Operational cover plan — SRC-206 / Cayman Islands",
+      "text": "Cover and security plan for SRC-206 operations in Cayman Islands. Cover story: industry journalist. Emergency contact: EH-04. Extraction route: in-place secure facility. Plan validity: 59 days.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "cover_story": "industry journalist",
+      "plan_validity_days": 49,
+      "kri_refs": [],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "CISO_INTELLIGENCE",
+        "FORMER_EMPLOYEE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0020",
+      "dtg": "130916ZJUL26",
+      "timestamp_utc": "2026-07-13T09:16:30Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-212 / pending validation",
+      "text": "Raw report from SRC-212 received 130916ZJUL26. Observation: Commodity origin documentation inconsistent in Nicosia involving TERRACINA MARITIME LTD (Nassau). Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-04.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "B",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "EVALUATION_STANDARD",
+        "KRI_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0040",
+      "dtg": "130939ZJUL26",
+      "timestamp_utc": "2026-07-13T09:39:43Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-208 / 13 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-208. Source handler: SH-02. Meeting duration: 44 min. Category: REGULATORY_LIAISON. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: YES. Next contact scheduled: 33 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "meeting_duration_min": 47,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0025",
+      "dtg": "131039ZJUL26",
+      "timestamp_utc": "2026-07-13T10:39:08Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-206 / pending validation",
+      "text": "Raw report from SRC-206 received 131039ZJUL26. Observation: PEP connection to intermediary confirmed in Cayman Islands involving NEH Geneva Trading SA. Validation status: PENDING. Provisional evaluation: C4. Source handler: SH-04.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "C",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "EVALUATION_STANDARD",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0050",
+      "dtg": "131429ZJUL26",
+      "timestamp_utc": "2026-07-13T14:29:26Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-209 / 13 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-209. Source handler: SH-03. Meeting duration: 106 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: YES. Next contact scheduled: 15 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 61,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0046",
+      "dtg": "131742ZJUL26",
+      "timestamp_utc": "2026-07-13T17:42:44Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-209 / 13 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-209. Source handler: SH-05. Meeting duration: 91 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: EXCELLENT — fully corroborated. New intelligence obtained: NO. Next contact scheduled: 22 days. Security assessment: MINOR CONCERN NOTED.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 99,
+      "reporting_quality": "EXCELLENT — fully corroborated",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0076",
+      "dtg": "132110ZJUL26",
+      "timestamp_utc": "2026-07-13T21:10:56Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-211",
+      "text": "Access evaluation for SRC-211. Primary area: Geneva Trading Hub. Secondary areas: BVI, Cayman Islands. Access to: trade finance documentation. Corroboration: STRONG — independently verified. Access risk: MEDIUM.",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "primary_area": "Geneva Trading Hub",
+      "access_level": "INDIRECT",
+      "corroboration": "WEAK",
+      "access_risk": "LOW",
+      "kri_refs": [
+        "KRI-06",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "REGULATORY_LIAISON",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0091",
+      "dtg": "132151ZJUL26",
+      "timestamp_utc": "2026-07-13T21:51:03Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-210 / 13 Jul 2026",
+      "text": "Meeting log: SRC-210 / Source handler SH-03. Location type: dead drop. Duration: 28 min. Material passed: YES — verbal only. Counter-surveillance: MINOR SURVEILLANCE — ABORTED",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "location_type": "dead drop",
+      "duration_min": 38,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0077",
+      "dtg": "140147ZJUL26",
+      "timestamp_utc": "2026-07-14T01:47:50Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-210",
+      "text": "Access evaluation for SRC-210. Primary area: Nicosia. Secondary areas: Cayman Islands, Lagos. Access to: trade finance documentation. Corroboration: PARTIAL — some gaps. Access risk: LOW.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "primary_area": "Nicosia",
+      "access_level": "INDIRECT",
+      "corroboration": "STRONG",
+      "access_risk": "MEDIUM",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0053",
+      "dtg": "140625ZJUL26",
+      "timestamp_utc": "2026-07-14T06:25:18Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-201 / KRI-04",
+      "text": "Tasking order for SRC-201 against KRI-04 (AML/Layering). Requirement: Confirm payment flow through BVI structure in Geneva Trading Hub. Deadline: 96h. Source handler: SH-05. Priority: IMMEDIATE.",
+      "source_id": "SRC-201",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "tasking_requirement": "KRI-04 coverage in Geneva Trading Hub",
+      "deadline_hours": 16,
+      "priority": "IMMEDIATE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "KRI_AML_LAYERING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0016",
+      "dtg": "150008ZJUL26",
+      "timestamp_utc": "2026-07-15T00:08:55Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-208 / pending validation",
+      "text": "Raw report from SRC-208 received 150008ZJUL26. Observation: Undisclosed payment routed via BVI shell in Washington DC involving TERRACINA MARITIME LTD (Nassau). Validation status: PENDING. Provisional evaluation: A3. Source handler: SH-01.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "EVALUATION_STANDARD",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0006",
+      "dtg": "150412ZJUL26",
+      "timestamp_utc": "2026-07-15T04:12:22Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-203 / pending validation",
+      "text": "Raw report from SRC-203 received 150412ZJUL26. Observation: Commodity origin documentation inconsistent in Singapore Freeport involving NKOSI TRADING & BROKERAGE (Lagos). Validation status: PENDING. Provisional evaluation: C3. Source handler: SH-02.",
+      "source_id": "SRC-203",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "EVALUATION_STANDARD",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0021",
+      "dtg": "151005ZJUL26",
+      "timestamp_utc": "2026-07-15T10:05:38Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-202 / pending validation",
+      "text": "Raw report from SRC-202 received 151005ZJUL26. Observation: Commodity origin documentation inconsistent in Dubai Free Zone involving GOLDEN NILE LOGISTICS (BVI). Validation status: PENDING. Provisional evaluation: B4. Source handler: SH-04.",
+      "source_id": "SRC-202",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "B",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "EVALUATION_STANDARD",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0009",
+      "dtg": "151447ZJUL26",
+      "timestamp_utc": "2026-07-15T14:47:12Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-201 / pending validation",
+      "text": "Raw report from SRC-201 received 151447ZJUL26. Observation: Undisclosed payment routed via BVI shell in Geneva Trading Hub involving NEH Geneva Trading SA. Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-03.",
+      "source_id": "SRC-201",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "VPL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "EVALUATION_STANDARD",
+        "KRI_AML_LAYERING"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0037",
+      "dtg": "152203ZJUL26",
+      "timestamp_utc": "2026-07-15T22:03:22Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-201 / 15 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-201. Source handler: SH-04. Meeting duration: 101 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: EXCELLENT — fully corroborated. New intelligence obtained: NO. Next contact scheduled: 27 days. Security assessment: MINOR CONCERN NOTED.",
+      "source_id": "SRC-201",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 80,
+      "reporting_quality": "EXCELLENT — fully corroborated",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0056",
+      "dtg": "152209ZJUL26",
+      "timestamp_utc": "2026-07-15T22:09:25Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-207 / KRI-03",
+      "text": "Tasking order for SRC-207 against KRI-03 (Bribery/Corruption). Requirement: Report on intermediary network activity in Lagos Energy Sector. Deadline: 88h. Source handler: SH-03. Priority: IMMEDIATE.",
+      "source_id": "SRC-207",
+      "source_category": "EXTERNAL_INFORMANT",
+      "tasking_requirement": "KRI-03 coverage in Lagos Energy Sector",
+      "deadline_hours": 87,
+      "priority": "IMMEDIATE",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "KRI_BRIBERY_CORRUPTION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0109",
+      "dtg": "152320ZJUL26",
+      "timestamp_utc": "2026-07-15T23:20:39Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "OPERATIONAL_COVER_PLAN",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Operational cover plan — SRC-204 / London",
+      "text": "Cover and security plan for SRC-204 operations in London. Cover story: compliance officer on secondment. Emergency contact: EH-03. Extraction route: border crossing protocol. Plan validity: 41 days.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "cover_story": "law firm secondee",
+      "plan_validity_days": 34,
+      "kri_refs": [],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "CISO_INTELLIGENCE",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0032",
+      "dtg": "161102ZJUL26",
+      "timestamp_utc": "2026-07-16T11:02:07Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-208 / 16 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-208. Source handler: SH-05. Meeting duration: 25 min. Category: REGULATORY_LIAISON. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: NO. Next contact scheduled: 19 days. Security assessment: MINOR CONCERN NOTED.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "meeting_duration_min": 75,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0085",
+      "dtg": "161823ZJUL26",
+      "timestamp_utc": "2026-07-16T18:23:37Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-209",
+      "text": "Access evaluation for SRC-209. Primary area: Singapore Freeport. Secondary areas: Lagos, Singapore Freeport. Access to: beneficial ownership records. Corroboration: PARTIAL — some gaps. Access risk: MEDIUM.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "primary_area": "Singapore Freeport",
+      "access_level": "DIRECT",
+      "corroboration": "WEAK",
+      "access_risk": "LOW",
+      "kri_refs": [
+        "KRI-03",
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "INTERNAL_WHISTLEBLOWER",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0003",
+      "dtg": "170237ZJUL26",
+      "timestamp_utc": "2026-07-17T02:37:54Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-202 / pending validation",
+      "text": "Raw report from SRC-202 received 170237ZJUL26. Observation: Commodity origin documentation inconsistent in Dubai Free Zone involving ARCADIA CLEARING HOUSE (Nicosia). Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-02.",
+      "source_id": "SRC-202",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "B",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Dubai Free Zone"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "EVALUATION_STANDARD",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0048",
+      "dtg": "170259ZJUL26",
+      "timestamp_utc": "2026-07-17T02:59:40Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-209 / 17 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-209. Source handler: SH-04. Meeting duration: 113 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: NO. Next contact scheduled: 20 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 40,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0018",
+      "dtg": "170708ZJUL26",
+      "timestamp_utc": "2026-07-17T07:08:51Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-209 / pending validation",
+      "text": "Raw report from SRC-209 received 170708ZJUL26. Observation: Commodity origin documentation inconsistent in Singapore Freeport involving GOLDEN NILE LOGISTICS (BVI). Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-04.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "EVALUATION_STANDARD",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0024",
+      "dtg": "170719ZJUL26",
+      "timestamp_utc": "2026-07-17T07:19:04Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-203 / pending validation",
+      "text": "Raw report from SRC-203 received 170719ZJUL26. Observation: Commodity origin documentation inconsistent in Singapore Freeport involving NKOSI TRADING & BROKERAGE (Lagos). Validation status: PENDING. Provisional evaluation: C4. Source handler: SH-01.",
+      "source_id": "SRC-203",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "CVE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "EVALUATION_STANDARD",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0058",
+      "dtg": "171622ZJUL26",
+      "timestamp_utc": "2026-07-17T16:22:58Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-204 / KRI-06",
+      "text": "Tasking order for SRC-204 against KRI-06 (Market Manipulation). Requirement: Identify beneficial owner of SPV in London. Deadline: 57h. Source handler: SH-05. Priority: IMMEDIATE.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "tasking_requirement": "KRI-06 coverage in London",
+      "deadline_hours": 23,
+      "priority": "IMMEDIATE",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "KRI_MARKET_MANIPULATION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0008",
+      "dtg": "171949ZJUL26",
+      "timestamp_utc": "2026-07-17T19:49:32Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-205 / pending validation",
+      "text": "Raw report from SRC-205 received 171949ZJUL26. Observation: Commodity origin documentation inconsistent in Lagos Energy Sector involving NEH Dubai Commodities DMCC. Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-01.",
+      "source_id": "SRC-205",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "EVALUATION_STANDARD",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0010",
+      "dtg": "172247ZJUL26",
+      "timestamp_utc": "2026-07-17T22:47:45Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-210 / pending validation",
+      "text": "Raw report from SRC-210 received 172247ZJUL26. Observation: Commodity origin documentation inconsistent in Nicosia involving NEH Dubai Commodities DMCC. Validation status: PENDING. Provisional evaluation: C4. Source handler: SH-02.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "EVALUATION_STANDARD",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0022",
+      "dtg": "180058ZJUL26",
+      "timestamp_utc": "2026-07-18T00:58:45Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-208 / pending validation",
+      "text": "Raw report from SRC-208 received 180058ZJUL26. Observation: Round-trip trade pattern observed in Washington DC involving NEH Singapore Pte Ltd. Validation status: PENDING. Provisional evaluation: A4. Source handler: SH-05.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "EVALUATION_STANDARD",
+        "KRI_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0017",
+      "dtg": "180424ZJUL26",
+      "timestamp_utc": "2026-07-18T04:24:54Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-210 / pending validation",
+      "text": "Raw report from SRC-210 received 180424ZJUL26. Observation: SPV incorporated without disclosure in Nicosia involving PETROSERV ASIA PTE (Singapore). Validation status: PENDING. Provisional evaluation: C4. Source handler: SH-02.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "EVALUATION_STANDARD",
+        "KRI_FINANCIAL_FRAUD"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0042",
+      "dtg": "180807ZJUL26",
+      "timestamp_utc": "2026-07-18T08:07:49Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-210 / 18 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-210. Source handler: SH-05. Meeting duration: 50 min. Category: EXTERNAL_INFORMANT. Reporting quality: EXCELLENT — fully corroborated. New intelligence obtained: NO. Next contact scheduled: 34 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "meeting_duration_min": 101,
+      "reporting_quality": "EXCELLENT — fully corroborated",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0092",
+      "dtg": "181526ZJUL26",
+      "timestamp_utc": "2026-07-18T15:26:26Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-203 / 18 Jul 2026",
+      "text": "Meeting log: SRC-203 / Source handler SH-05. Location type: in-person secure location. Duration: 21 min. Material passed: YES — verbal only. Counter-surveillance: CLEAN",
+      "source_id": "SRC-203",
+      "source_category": "EXTERNAL_INFORMANT",
+      "location_type": "in-person secure location",
+      "duration_min": 34,
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0080",
+      "dtg": "181837ZJUL26",
+      "timestamp_utc": "2026-07-18T18:37:24Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-209",
+      "text": "Access evaluation for SRC-209. Primary area: Singapore Freeport. Secondary areas: BVI, Dubai Free Zone. Access to: procurement systems. Corroboration: WEAK — unverified. Access risk: LOW.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "source_reliability": "B",
+      "primary_area": "Singapore Freeport",
+      "access_level": "INDIRECT",
+      "corroboration": "PARTIAL",
+      "access_risk": "HIGH",
+      "kri_refs": [
+        "KRI-06",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "INTERNAL_WHISTLEBLOWER",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0045",
+      "dtg": "182206ZJUL26",
+      "timestamp_utc": "2026-07-18T22:06:55Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-207 / 18 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-207. Source handler: SH-04. Meeting duration: 97 min. Category: EXTERNAL_INFORMANT. Reporting quality: EXCELLENT — fully corroborated. New intelligence obtained: YES. Next contact scheduled: 42 days. Security assessment: MINOR CONCERN NOTED.",
+      "source_id": "SRC-207",
+      "source_category": "EXTERNAL_INFORMANT",
+      "meeting_duration_min": 103,
+      "reporting_quality": "EXCELLENT — fully corroborated",
+      "new_intelligence": true,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0030",
+      "dtg": "200057ZJUL26",
+      "timestamp_utc": "2026-07-20T00:57:25Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-204 / 20 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-204. Source handler: SH-03. Meeting duration: 66 min. Category: REGULATORY_LIAISON. Reporting quality: GOOD — mostly consistent. New intelligence obtained: YES. Next contact scheduled: 14 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "meeting_duration_min": 89,
+      "reporting_quality": "GOOD — mostly consistent",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0074",
+      "dtg": "200222ZJUL26",
+      "timestamp_utc": "2026-07-20T02:22:05Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-210",
+      "text": "Access evaluation for SRC-210. Primary area: Nicosia. Secondary areas: Geneva, BVI. Access to: beneficial ownership records. Corroboration: WEAK — unverified. Access risk: HIGH.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "primary_area": "Nicosia",
+      "access_level": "LIMITED",
+      "corroboration": "STRONG",
+      "access_risk": "LOW",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "EXTERNAL_INFORMANT",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0100",
+      "dtg": "200244ZJUL26",
+      "timestamp_utc": "2026-07-20T02:44:41Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-205 / 20 Jul 2026",
+      "text": "Meeting log: SRC-205 / Source handler SH-01. Location type: encrypted video call. Duration: 86 min. Material passed: YES — documents. Counter-surveillance: CLEAN",
+      "source_id": "SRC-205",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "location_type": "encrypted video call",
+      "duration_min": 39,
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0099",
+      "dtg": "201009ZJUL26",
+      "timestamp_utc": "2026-07-20T10:09:26Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-211 / 20 Jul 2026",
+      "text": "Meeting log: SRC-211 / Source handler SH-02. Location type: in-person secure location. Duration: 86 min. Material passed: NO. Counter-surveillance: MINOR SURVEILLANCE — ABORTED",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "location_type": "in-person secure location",
+      "duration_min": 73,
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0102",
+      "dtg": "202035ZJUL26",
+      "timestamp_utc": "2026-07-20T20:35:45Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-211 / 20 Jul 2026",
+      "text": "Meeting log: SRC-211 / Source handler SH-02. Location type: dead drop. Duration: 81 min. Material passed: YES — verbal only. Counter-surveillance: NIL NOTED",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "location_type": "dead drop",
+      "duration_min": 85,
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0098",
+      "dtg": "210756ZJUL26",
+      "timestamp_utc": "2026-07-21T07:56:13Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-204 / 21 Jul 2026",
+      "text": "Meeting log: SRC-204 / Source handler SH-03. Location type: encrypted video call. Duration: 41 min. Material passed: YES — verbal only. Counter-surveillance: NIL NOTED",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "location_type": "encrypted video call",
+      "duration_min": 63,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0039",
+      "dtg": "211406ZJUL26",
+      "timestamp_utc": "2026-07-21T14:06:18Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-210 / 21 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-210. Source handler: SH-04. Meeting duration: 87 min. Category: EXTERNAL_INFORMANT. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: NO. Next contact scheduled: 31 days. Security assessment: MINOR CONCERN NOTED.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "meeting_duration_min": 60,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0011",
+      "dtg": "211608ZJUL26",
+      "timestamp_utc": "2026-07-21T16:08:35Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-206 / pending validation",
+      "text": "Raw report from SRC-206 received 211608ZJUL26. Observation: PEP connection to intermediary confirmed in Cayman Islands involving NEH Dubai Commodities DMCC. Validation status: PENDING. Provisional evaluation: C3. Source handler: SH-04.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "C",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "TML"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "EVALUATION_STANDARD",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0072",
+      "dtg": "211750ZJUL26",
+      "timestamp_utc": "2026-07-21T17:50:25Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-206 / KRI-05",
+      "text": "Tasking order for SRC-206 against KRI-05 (Commodity Misreporting). Requirement: Confirm payment flow through BVI structure in Cayman Islands. Deadline: 39h. Source handler: SH-04. Priority: IMMEDIATE.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "tasking_requirement": "KRI-05 coverage in Cayman Islands",
+      "deadline_hours": 62,
+      "priority": "IMMEDIATE",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "NEH-S"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "KRI_COMMODITY_MISREPORTING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0054",
+      "dtg": "230240ZJUL26",
+      "timestamp_utc": "2026-07-23T02:40:31Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-205 / KRI-06",
+      "text": "Tasking order for SRC-205 against KRI-06 (Market Manipulation). Requirement: Report on intermediary network activity in Lagos Energy Sector. Deadline: 22h. Source handler: SH-03. Priority: PRIORITY.",
+      "source_id": "SRC-205",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "tasking_requirement": "KRI-06 coverage in Lagos Energy Sector",
+      "deadline_hours": 52,
+      "priority": "PRIORITY",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [
+        "NEH-G"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "KRI_MARKET_MANIPULATION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0068",
+      "dtg": "231712ZJUL26",
+      "timestamp_utc": "2026-07-23T17:12:19Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-209 / KRI-04",
+      "text": "Tasking order for SRC-209 against KRI-04 (AML/Layering). Requirement: Confirm payment flow through BVI structure in Singapore Freeport. Deadline: 39h. Source handler: SH-04. Priority: ROUTINE.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "tasking_requirement": "KRI-04 coverage in Singapore Freeport",
+      "deadline_hours": 16,
+      "priority": "ROUTINE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "KRI_AML_LAYERING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0106",
+      "dtg": "240521ZJUL26",
+      "timestamp_utc": "2026-07-24T05:21:31Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "OPERATIONAL_COVER_PLAN",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Operational cover plan — SRC-204 / London",
+      "text": "Cover and security plan for SRC-204 operations in London. Cover story: law firm secondee. Emergency contact: EH-01. Extraction route: in-place secure facility. Plan validity: 66 days.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "cover_story": "management consultant",
+      "plan_validity_days": 78,
+      "kri_refs": [],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "CISO_INTELLIGENCE",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0071",
+      "dtg": "241355ZJUL26",
+      "timestamp_utc": "2026-07-24T13:55:45Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-208 / KRI-01",
+      "text": "Tasking order for SRC-208 against KRI-01 (Financial Fraud). Requirement: Report on intermediary network activity in Washington DC. Deadline: 79h. Source handler: SH-03. Priority: ROUTINE.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "tasking_requirement": "KRI-01 coverage in Washington DC",
+      "deadline_hours": 85,
+      "priority": "ROUTINE",
+      "kri_refs": [
+        "KRI-01"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "KRI_FINANCIAL_FRAUD",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0062",
+      "dtg": "241945ZJUL26",
+      "timestamp_utc": "2026-07-24T19:45:40Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-211 / KRI-04",
+      "text": "Tasking order for SRC-211 against KRI-04 (AML/Layering). Requirement: Confirm payment flow through BVI structure in Geneva Trading Hub. Deadline: 89h. Source handler: SH-01. Priority: IMMEDIATE.",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "tasking_requirement": "KRI-04 coverage in Geneva Trading Hub",
+      "deadline_hours": 16,
+      "priority": "IMMEDIATE",
+      "kri_refs": [
+        "KRI-04"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "GNL"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "KRI_AML_LAYERING",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0026",
+      "dtg": "242007ZJUL26",
+      "timestamp_utc": "2026-07-24T20:07:02Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-206 / pending validation",
+      "text": "Raw report from SRC-206 received 242007ZJUL26. Observation: Undisclosed payment routed via BVI shell in Cayman Islands involving MERIDIAN STAR CAPITAL (Cayman). Validation status: PENDING. Provisional evaluation: C4. Source handler: SH-03.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "C",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [
+        "GEF"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "EVALUATION_STANDARD",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0094",
+      "dtg": "250601ZJUL26",
+      "timestamp_utc": "2026-07-25T06:01:00Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_MEETING_LOG",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source meeting log — SRC-204 / 25 Jul 2026",
+      "text": "Meeting log: SRC-204 / Source handler SH-05. Location type: intermediary relay. Duration: 78 min. Material passed: YES — documents. Counter-surveillance: MINOR SURVEILLANCE — ABORTED",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "location_type": "intermediary relay",
+      "duration_min": 21,
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0088",
+      "dtg": "250755ZJUL26",
+      "timestamp_utc": "2026-07-25T07:55:26Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "ACCESS_EVALUATION",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Access evaluation — SRC-206",
+      "text": "Access evaluation for SRC-206. Primary area: Cayman Islands. Secondary areas: Nicosia, Singapore Freeport. Access to: trade finance documentation. Corroboration: WEAK — unverified. Access risk: MEDIUM.",
+      "source_id": "SRC-206",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "C",
+      "primary_area": "Cayman Islands",
+      "access_level": "INDIRECT",
+      "corroboration": "WEAK",
+      "access_risk": "MEDIUM",
+      "kri_refs": [
+        "KRI-05",
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Cayman Islands"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "SOURCE_RELIABILITY",
+        "FORMER_EMPLOYEE",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0031",
+      "dtg": "252300ZJUL26",
+      "timestamp_utc": "2026-07-25T23:00:46Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-205 / 25 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-205. Source handler: SH-04. Meeting duration: 46 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: EXCELLENT — fully corroborated. New intelligence obtained: NO. Next contact scheduled: 40 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-205",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 50,
+      "reporting_quality": "EXCELLENT — fully corroborated",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0013",
+      "dtg": "260213ZJUL26",
+      "timestamp_utc": "2026-07-26T02:13:29Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-211 / pending validation",
+      "text": "Raw report from SRC-211 received 260213ZJUL26. Observation: Undisclosed payment routed via BVI shell in Geneva Trading Hub involving DESERT FALCON ENERGY (Dubai). Validation status: PENDING. Provisional evaluation: A3. Source handler: SH-03.",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "PSA"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "EVALUATION_STANDARD",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0063",
+      "dtg": "261006ZJUL26",
+      "timestamp_utc": "2026-07-26T10:06:34Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-208 / KRI-02",
+      "text": "Tasking order for SRC-208 against KRI-02 (Sanctions Evasion). Requirement: Identify beneficial owner of SPV in Washington DC. Deadline: 18h. Source handler: SH-01. Priority: PRIORITY.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "tasking_requirement": "KRI-02 coverage in Washington DC",
+      "deadline_hours": 41,
+      "priority": "PRIORITY",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [
+        "OPG"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "KRI_SANCTIONS_EVASION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0029",
+      "dtg": "261206ZJUL26",
+      "timestamp_utc": "2026-07-26T12:06:03Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-211 / 26 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-211. Source handler: SH-03. Meeting duration: 118 min. Category: REGULATORY_LIAISON. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: NO. Next contact scheduled: 33 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "meeting_duration_min": 27,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0104",
+      "dtg": "261924ZJUL26",
+      "timestamp_utc": "2026-07-26T19:24:59Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "OPERATIONAL_COVER_PLAN",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Operational cover plan — SRC-204 / London",
+      "text": "Cover and security plan for SRC-204 operations in London. Cover story: management consultant. Emergency contact: EH-03. Extraction route: in-place secure facility. Plan validity: 81 days.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "cover_story": "industry journalist",
+      "plan_validity_days": 33,
+      "kri_refs": [],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "CISO_INTELLIGENCE",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0012",
+      "dtg": "270537ZJUL26",
+      "timestamp_utc": "2026-07-27T05:37:52Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-204 / pending validation",
+      "text": "Raw report from SRC-204 received 270537ZJUL26. Observation: Round-trip trade pattern observed in London involving TERRACINA MARITIME LTD (Nassau). Validation status: PENDING. Provisional evaluation: A4. Source handler: SH-02.",
+      "source_id": "SRC-204",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "London"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "EVALUATION_STANDARD",
+        "KRI_BRIBERY_CORRUPTION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0014",
+      "dtg": "270606ZJUL26",
+      "timestamp_utc": "2026-07-27T06:06:01Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-210 / pending validation",
+      "text": "Raw report from SRC-210 received 270606ZJUL26. Observation: Undisclosed payment routed via BVI shell in Nicosia involving GOLDEN EAGLE FUND LP (BVI). Validation status: PENDING. Provisional evaluation: C4. Source handler: SH-05.",
+      "source_id": "SRC-210",
+      "source_category": "EXTERNAL_INFORMANT",
+      "source_reliability": "C",
+      "information_credibility": "3",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "DFE"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "EVALUATION_STANDARD",
+        "KRI_SANCTIONS_EVASION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0066",
+      "dtg": "271157ZJUL26",
+      "timestamp_utc": "2026-07-27T11:57:29Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_TASKING_ORDER",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source tasking order — SRC-207 / KRI-02",
+      "text": "Tasking order for SRC-207 against KRI-02 (Sanctions Evasion). Requirement: Confirm commodity origin documentation in Lagos Energy Sector. Deadline: 24h. Source handler: SH-02. Priority: ROUTINE.",
+      "source_id": "SRC-207",
+      "source_category": "EXTERNAL_INFORMANT",
+      "tasking_requirement": "KRI-02 coverage in Lagos Energy Sector",
+      "deadline_hours": 96,
+      "priority": "ROUTINE",
+      "kri_refs": [
+        "KRI-02"
+      ],
+      "location_refs": [
+        "Lagos Energy Sector"
+      ],
+      "entity_refs": [
+        "ACH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "EXTERNAL_INFORMANT",
+        "KRI_SANCTIONS_EVASION",
+        "CISO_INTELLIGENCE"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0107",
+      "dtg": "271814ZJUL26",
+      "timestamp_utc": "2026-07-27T18:14:00Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "OPERATIONAL_COVER_PLAN",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "ORIGINATOR-CONTROLLED"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Operational cover plan — SRC-208 / Washington DC",
+      "text": "Cover and security plan for SRC-208 operations in Washington DC. Cover story: compliance officer on secondment. Emergency contact: EH-04. Extraction route: border crossing protocol. Plan validity: 80 days.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "cover_story": "management consultant",
+      "plan_validity_days": 73,
+      "kri_refs": [],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "CISO_INTELLIGENCE",
+        "REGULATORY_LIAISON"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0033",
+      "dtg": "271910ZJUL26",
+      "timestamp_utc": "2026-07-27T19:10:24Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-209 / 27 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-209. Source handler: SH-01. Meeting duration: 116 min. Category: INTERNAL_WHISTLEBLOWER. Reporting quality: GOOD — mostly consistent. New intelligence obtained: NO. Next contact scheduled: 21 days. Security assessment: UNDER REVIEW.",
+      "source_id": "SRC-209",
+      "source_category": "INTERNAL_WHISTLEBLOWER",
+      "meeting_duration_min": 120,
+      "reporting_quality": "GOOD — mostly consistent",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Singapore Freeport"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "INTERNAL_WHISTLEBLOWER",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0036",
+      "dtg": "272121ZJUL26",
+      "timestamp_utc": "2026-07-27T21:21:56Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "SOURCE_DEBRIEF_NOTE",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Source debrief note — SRC-208 / 27 Jul 2026",
+      "text": "Post-meeting debrief note for SRC-208. Source handler: SH-04. Meeting duration: 73 min. Category: REGULATORY_LIAISON. Reporting quality: FAIR — some inconsistencies. New intelligence obtained: NO. Next contact scheduled: 17 days. Security assessment: NO CONCERNS.",
+      "source_id": "SRC-208",
+      "source_category": "REGULATORY_LIAISON",
+      "meeting_duration_min": 119,
+      "reporting_quality": "FAIR — some inconsistencies",
+      "new_intelligence": false,
+      "kri_refs": [
+        "KRI-03"
+      ],
+      "location_refs": [
+        "Washington DC"
+      ],
+      "entity_refs": [],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "SOURCE_RELIABILITY"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0002",
+      "dtg": "272129ZJUL26",
+      "timestamp_utc": "2026-07-27T21:29:46Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-212 / pending validation",
+      "text": "Raw report from SRC-212 received 272129ZJUL26. Observation: Round-trip trade pattern observed in Nicosia involving CARACAS VENTURE ENERGIA (Venezuela). Validation status: PENDING. Provisional evaluation: B3. Source handler: SH-01.",
+      "source_id": "SRC-212",
+      "source_category": "FORMER_EMPLOYEE",
+      "source_reliability": "B",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-06"
+      ],
+      "location_refs": [
+        "Nicosia"
+      ],
+      "entity_refs": [
+        "NEH"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "FORMER_EMPLOYEE",
+        "EVALUATION_STANDARD",
+        "KRI_MARKET_MANIPULATION"
+      ]
+    },
+    {
+      "doc_id": "CISO-202606-0001",
+      "dtg": "280349ZJUL26",
+      "timestamp_utc": "2026-07-28T03:49:52Z",
+      "persona": "CISO_OPERATOR",
+      "record_type": "RAW_FIELD_REPORT",
+      "classification": "CONFIDENTIAL — C-SUITE",
+      "handling_caveats": [
+        "SOURCE IDENTITY PROTECTED",
+        "NEED-TO-KNOW",
+        "NOT FOR EXTERNAL DISCLOSURE"
+      ],
+      "index_type": "USER_SPECIFIC",
+      "title": "Raw field report — SRC-211 / pending validation",
+      "text": "Raw report from SRC-211 received 280349ZJUL26. Observation: Round-trip trade pattern observed in Geneva Trading Hub involving ARCADIA CLEARING HOUSE (Nicosia). Validation status: PENDING. Provisional evaluation: A3. Source handler: SH-04.",
+      "source_id": "SRC-211",
+      "source_category": "REGULATORY_LIAISON",
+      "source_reliability": "A",
+      "information_credibility": "4",
+      "validation_status": "PENDING",
+      "kri_refs": [
+        "KRI-05"
+      ],
+      "location_refs": [
+        "Geneva Trading Hub"
+      ],
+      "entity_refs": [
+        "NEH-D"
+      ],
+      "generic_refs": [],
+      "concept_ids": [
+        "HUMINT_CORPORATE",
+        "REGULATORY_LIAISON",
+        "EVALUATION_STANDARD",
+        "KRI_COMMODITY_MISREPORTING"
+      ]
+    }
+  ]
+}

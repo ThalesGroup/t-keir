@@ -1,0 +1,53 @@
+# Agent orchestrator settings for the OSINT / OTAN C2 usecase.
+# Loaded by thot.agent.orchestrator_config (not hardcoded in orchestrator.py).
+name: osint
+default_report_form: intsum
+
+# Maps HMI / workflow report_form aliases → compose template names
+# under tkeir/configs/templates/.
+report_form_templates:
+  intsum: otan_intsum
+  sitrep: otan_sitrep
+  spotrep: otan_spotrep
+  commander_brief: otan_commander_brief
+  otan_intsum: otan_intsum
+  otan_sitrep: otan_sitrep
+  otan_spotrep: otan_spotrep
+  otan_commander_brief: otan_commander_brief
+
+# Slot hints injected into persona writer goals as {report_form_slots}.
+report_form_slot_hints:
+  intsum: >-
+    otan_intsum slots: subject, period_covered, issuing_hq,
+    classification_handling, highlights (required), adversary_situation
+    (a Land / b Air / c Maritime / d Cyber-EMS / e InfoOps),
+    specialist_threat (a Capabilities / b Logistics / c CBRN),
+    environmental_factors (a Weather / b Terrain / c Civil-Military),
+    assessment_outlook (a MLCOA / b MDCOA / c Gaps-PIRs),
+    supporting_keywords, sources
+  sitrep: >-
+    otan_sitrep slots: situation (required), units_in_sector,
+    pir_activated, recommended_action, supporting_keywords
+  spotrep: >-
+    otan_spotrep slots: coverage_analysis (required), recommended_source,
+    suggested_tasking, supporting_keywords
+  commander_brief: >-
+    otan_commander_brief slots: situation (required), pir_status,
+    prior_decisions, decisions_required (required), constraints
+  otan_intsum: >-
+    otan_intsum slots: subject, period_covered, issuing_hq,
+    classification_handling, highlights (required), adversary_situation
+    (a Land / b Air / c Maritime / d Cyber-EMS / e InfoOps),
+    specialist_threat (a Capabilities / b Logistics / c CBRN),
+    environmental_factors (a Weather / b Terrain / c Civil-Military),
+    assessment_outlook (a MLCOA / b MDCOA / c Gaps-PIRs),
+    supporting_keywords, sources
+  otan_sitrep: >-
+    otan_sitrep slots: situation (required), units_in_sector,
+    pir_activated, recommended_action, supporting_keywords
+  otan_spotrep: >-
+    otan_spotrep slots: coverage_analysis (required), recommended_source,
+    suggested_tasking, supporting_keywords
+  otan_commander_brief: >-
+    otan_commander_brief slots: situation (required), pir_status,
+    prior_decisions, decisions_required (required), constraints

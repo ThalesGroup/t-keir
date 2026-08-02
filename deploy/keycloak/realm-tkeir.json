@@ -12,6 +12,9 @@
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
   "sslRequired": "none",
+  "attributes": {
+    "unmanagedAttributePolicy": "ENABLED"
+  },
   "roles": {
     "realm": [
       { "name": "tkeir-user", "description": "Query / RAG" },
@@ -23,6 +26,30 @@
         "composite": true,
         "composites": {
           "realm": ["tkeir-user", "tkeir-operator", "tkeir-auditor"]
+        }
+      },
+      {
+        "name": "c2-j2-analyst",
+        "description": "NATO C2 J2 analyst persona"
+      },
+      {
+        "name": "c2-moc-watch",
+        "description": "NATO C2 MOC watch persona"
+      },
+      {
+        "name": "c2-j2x-humint",
+        "description": "NATO C2 J2X HUMINT persona"
+      },
+      {
+        "name": "c2-ctf-commander",
+        "description": "NATO C2 CTF commander persona"
+      },
+      {
+        "name": "c2-admin",
+        "description": "NATO C2 admin persona",
+        "composite": true,
+        "composites": {
+          "realm": ["tkeir-admin", "tkeir-user", "tkeir-operator", "tkeir-auditor"]
         }
       }
     ]
@@ -135,9 +162,24 @@
             "introspection.token.claim": "true",
             "userinfo.token.claim": "true"
           }
+        },
+        {
+          "name": "clearance",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "clearance",
+            "claim.name": "clearance",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
         }
       ],
       "defaultClientScopes": [
+        "roles",
         "intent:search",
         "intent:ingest",
         "intent:index"
@@ -168,6 +210,36 @@
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "http://localhost:3000/*##http://127.0.0.1:3000/*"
       },
+      "protocolMappers": [
+        {
+          "name": "username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "username",
+            "claim.name": "preferred_username",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "clearance",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "clearance",
+            "claim.name": "clearance",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ],
       "defaultClientScopes": [
         "web-origins",
         "acr",
@@ -267,6 +339,9 @@
       "emailVerified": true,
       "firstName": "Demo",
       "lastName": "User",
+      "attributes": {
+        "clearance": ["UNCLASSIFIED"]
+      },
       "credentials": [
         {
           "type": "password",
@@ -283,6 +358,9 @@
       "emailVerified": true,
       "firstName": "Demo",
       "lastName": "Auditor",
+      "attributes": {
+        "clearance": ["FOUO"]
+      },
       "credentials": [
         {
           "type": "password",
@@ -299,6 +377,9 @@
       "emailVerified": true,
       "firstName": "Demo",
       "lastName": "Admin",
+      "attributes": {
+        "clearance": ["SECRET"]
+      },
       "credentials": [
         {
           "type": "password",
@@ -306,7 +387,102 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["tkeir-admin"]
+      "realmRoles": ["tkeir-admin", "c2-admin"]
+    },
+    {
+      "username": "analyst",
+      "enabled": true,
+      "email": "analyst@tkeir",
+      "emailVerified": true,
+      "firstName": "J2",
+      "lastName": "Analyst",
+      "attributes": {
+        "clearance": ["SECRET"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "analyst",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["c2-j2-analyst", "tkeir-user"]
+    },
+    {
+      "username": "moc-watch",
+      "enabled": true,
+      "email": "moc-watch@tkeir",
+      "emailVerified": true,
+      "firstName": "MOC",
+      "lastName": "Watch",
+      "attributes": {
+        "clearance": ["FOUO"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "moc-watch",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["c2-moc-watch", "tkeir-user"]
+    },
+    {
+      "username": "humint",
+      "enabled": true,
+      "email": "humint@tkeir",
+      "emailVerified": true,
+      "firstName": "J2X",
+      "lastName": "HUMINT",
+      "attributes": {
+        "clearance": ["SECRET"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "humint",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["c2-j2x-humint", "tkeir-user"]
+    },
+    {
+      "username": "commander",
+      "enabled": true,
+      "email": "commander@tkeir",
+      "emailVerified": true,
+      "firstName": "CTF",
+      "lastName": "Commander",
+      "attributes": {
+        "clearance": ["SECRET"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "commander",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["c2-ctf-commander", "tkeir-user"]
+    },
+    {
+      "username": "c2-admin",
+      "enabled": true,
+      "email": "c2-admin@tkeir",
+      "emailVerified": true,
+      "firstName": "C2",
+      "lastName": "Admin",
+      "attributes": {
+        "clearance": ["SECRET"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "c2-admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["c2-admin"]
     }
   ]
 }

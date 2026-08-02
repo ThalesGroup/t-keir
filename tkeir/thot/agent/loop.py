@@ -34,20 +34,37 @@ from thot.mcp.authz import McpPrincipal
 
 LOGGER = logging.getLogger(__name__)
 
-_JSON_FENCE = re.compile(
-    r"```(?:json)?\s*(\{.*?\})\s*```",
-    re.DOTALL | re.IGNORECASE,
-)
+_FENCE_START = re.compile(r"```(?:json)?\s*", re.IGNORECASE)
 
 
-class LlmClient(Protocol):
-    async def generate(
-        self,
-        prompt: str,
-        *,
-        system: str | None = None,
-        temperature: float = 0.1,
-    ) -> str: ...
+def _extract_balanced_json_object(text: str, *, start: int = 0) -> str | None:
+    """Return the first top-level ``{...}`` slice using brace depth (string-aware)."""
+    i = text.find("{", start)
+    if i < 0:
+        return None
+    depth = 0
+    in_string = False
+    escape = False
+    for j in range(i, len(text)):
+        ch = text[j]
+        if in_string:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[i : j + 1]
+    return None
 
 
 def parse_agent_message(text: str) -> dict[str, Any]:
@@ -60,12 +77,29 @@ def parse_agent_message(text: str) -> dict[str, Any]:
         ... )["tool"]
         'search'
     """
-    match = _JSON_FENCE.search(text or "")
-    raw = match.group(1) if match else (text or "").strip()
+    blob = text or ""
+    raw: str | None = None
+    fence = _FENCE_START.search(blob)
+    if fence is not None:
+        raw = _extract_balanced_json_object(blob, start=fence.end())
+    if raw is None:
+        raw = _extract_balanced_json_object(blob)
+    if raw is None:
+        raw = blob.strip()
     data = json.loads(raw)
     if not isinstance(data, dict):
         raise ValueError("agent message must be a JSON object")
     return data
+
+
+class LlmClient(Protocol):
+    async def generate(
+        self,
+        prompt: str,
+        *,
+        system: str | None = None,
+        temperature: float = 0.1,
+    ) -> str: ...
 
 
 def _estimate_tokens(text: str) -> int:
@@ -108,6 +142,59 @@ def _findings_from_final(
         findings=findings,
         unfilled=unfilled,
         notes=str(payload.get("notes") or ""),
+    )
+
+
+def _is_successful_wiki_put(
+    tool_name: str, observation: dict[str, Any]
+) -> bool:
+    """True when okf_wiki_put persisted wiki.md successfully."""
+    return (
+        tool_name == "okf_wiki_put"
+        and isinstance(observation, dict)
+        and observation.get("ok") is True
+        and not observation.get("error")
+    )
+
+
+def _findings_after_wiki_put(
+    state: RunState,
+    observation: dict[str, Any],
+    *,
+    phase_goal: str,
+) -> GroundedFindings:
+    """Keep reviewed findings; mark wiki persistence in notes/document_ids."""
+    notes = f"okf_wiki_put:{observation.get('path') or observation.get('bundle_id') or 'ok'}"
+    if state.result and state.result.findings:
+        findings = [
+            GroundedFinding(
+                claim=finding.claim,
+                chunk_ids=list(finding.chunk_ids),
+                document_ids=list(
+                    dict.fromkeys([*finding.document_ids, "okf:wiki"])
+                ),
+                confidence=finding.confidence,
+            )
+            for finding in state.result.findings
+        ]
+        return GroundedFindings(
+            goal=phase_goal,
+            findings=findings,
+            unfilled=list(state.result.unfilled),
+            notes=notes,
+        )
+    return GroundedFindings(
+        goal=phase_goal,
+        findings=[
+            GroundedFinding(
+                claim="LLMWiki written answering the query",
+                chunk_ids=[],
+                document_ids=["okf:wiki"],
+                confidence=0.9,
+            )
+        ],
+        unfilled=[],
+        notes=notes,
     )
 
 
@@ -260,6 +347,49 @@ class AgentLoop:
         finalize: bool,
     ) -> RunState:
         findings = _findings_from_final(parsed, phase_goal)
+        return self._finish_with_findings(
+            state,
+            step,
+            findings,
+            step_index=step_index,
+            finalize=finalize,
+        )
+
+    def _complete_after_successful_wiki_put(
+        self,
+        state: RunState,
+        step: StepRecord,
+        observation: dict[str, Any],
+        *,
+        phase_goal: str,
+        step_index: int,
+        finalize: bool,
+    ) -> RunState:
+        LOGGER.info(
+            "auto-finalizing after successful okf_wiki_put run_id=%s step=%s",
+            state.run_id,
+            step_index,
+        )
+        findings = _findings_after_wiki_put(
+            state, observation, phase_goal=phase_goal
+        )
+        return self._finish_with_findings(
+            state,
+            step,
+            findings,
+            step_index=step_index,
+            finalize=finalize,
+        )
+
+    def _finish_with_findings(
+        self,
+        state: RunState,
+        step: StepRecord,
+        findings: GroundedFindings,
+        *,
+        step_index: int,
+        finalize: bool,
+    ) -> RunState:
         step.final = findings
         step.ended_at = utc_now_rfc3339()
         self.store.write_step(state.run_id, step)
@@ -506,6 +636,17 @@ class AgentLoop:
                 observation=observation,
                 history=history,
             )
+            # okf_wiki_put is a terminal write: models often re-call it instead
+            # of emitting final=true after ok:true (burns max_steps).
+            if _is_successful_wiki_put(tool_name, observation):
+                return self._complete_after_successful_wiki_put(
+                    state,
+                    step,
+                    observation,
+                    phase_goal=phase_goal,
+                    step_index=step_index,
+                    finalize=finalize,
+                )
 
         return self._fail_max_steps(state)
 
@@ -523,9 +664,60 @@ class AgentLoop:
             f"{item.get('role')}: {item.get('content')}"
             for item in history[-8:]
         )
+        prior = ""
+        if state.result and state.result.findings:
+            try:
+                prior = (
+                    "\nPrior grounded findings (JSON):\n"
+                    + json.dumps(
+                        [
+                            f.model_dump(mode="json")
+                            for f in state.result.findings
+                        ],
+                        ensure_ascii=False,
+                        indent=2,
+                    )
+                    + "\n"
+                )
+            except Exception:  # noqa: BLE001
+                prior = ""
+        params_hint = ""
+        wiki_block = ""
+        if state.params:
+            interesting = {
+                k: state.params[k]
+                for k in (
+                    "report_form",
+                    "report_form_slots",
+                    "bundle_id",
+                    "use_existing_wiki",
+                    "has_llm_wiki",
+                    "topic",
+                )
+                if k in state.params
+            }
+            if interesting:
+                params_hint = (
+                    "\nRun params: "
+                    + json.dumps(interesting, ensure_ascii=False)
+                    + "\n"
+                )
+            wiki = str(state.params.get("wiki_markdown") or "").strip()
+            if wiki:
+                wiki_block = (
+                    "\nPRIMARY SOURCE — Phase-2 LLM Wiki (edited; treat as "
+                    "authoritative fact base for this report; do not rebuild "
+                    "research from scratch):\n"
+                    "----- BEGIN LLM WIKI -----\n"
+                    f"{wiki}\n"
+                    "----- END LLM WIKI -----\n"
+                )
         return (
             f"Goal: {goal if goal is not None else state.goal}\n"
             f"user_space: {state.user_space}\n"
+            f"{params_hint}"
+            f"{wiki_block}"
+            f"{prior}"
             f"Available tools (JSON Schema):\n{tools_json}\n\n"
             f"Recent history:\n{hist or '(none)'}\n\n"
             "Emit the next JSON fence now."

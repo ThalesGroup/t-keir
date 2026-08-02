@@ -24,28 +24,8 @@
       "PIR-05": "Illicit weapons transhipment through regional ports",
       "PIR-06": "Force posture changes by non-state armed groups in the coastal belt"
     },
-    "changes_from_v2": [
-      "Admiralty codes rebuilt: source reliability and information credibility separated; sensor technology moved out of the evaluation field.",
-      "GPS spoofing records no longer carry high positional confidence; the spoofed AIS fix is retained separately and flagged unusable.",
-      "All timestamps moved into a valid past window; none post-date generation.",
-      "Vessel registry expanded from 6 to 48 hulls with valid IMO check digits.",
-      "Iranian flag replaced by realistic open-registry reflagging patterns.",
-      "MGRS computed from coordinates rather than invented.",
-      "Classification and handling caveats applied to every record.",
-      "HUMINT reporting in native languages with translation metadata.",
-      "OSINT text bank expanded from 9 templates to 45.",
-      "Single jurisdiction per location; maritime zone made explicit.",
-      "Observation/report time separated to expose reporting latency.",
-      "Cross-source correlation computed; credibility 1 requires corroboration."
-    ],
     "languages": [
       "en"
-    ],
-    "changes_from_v3_multilingual": [
-      "OSINT non-English records: native title and text replaced by their English translations.",
-      "HUMINT non-English records: native text_original field removed; English text retained.",
-      "Translation metadata fields (translation_status, text_language, text_original_language) removed.",
-      "All language tags set to \"en\"."
     ]
   },
   "records": [

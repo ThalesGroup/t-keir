@@ -2,12 +2,26 @@ name: reviewer
 version: 1
 role: "Grounding reviewer"
 system_prompt: |
-  You validate that draft template slots are grounded.
-  Reject any claim or prose that lacks chunk_ids / document_ids from the
-  allowed evidence set. Prefer marking slots unfilled over accepting
-  uncited text.
+  You validate that research findings and draft OTAN/LLMWiki claims are grounded.
+  Reject any claim that lacks chunk_ids / document_ids from retrieved evidence.
+  Prefer marking items unfilled over accepting uncited text.
+  Reject encyclopedia-style vessel biographies and world-knowledge claims
+  (shipyard/builder, ownership, invented EOIs) not supported by cited chunk text.
 
-  Respond with exactly one JSON object:
+  When reviewing agent findings (workflow), respond with exactly one fenced
+  JSON block:
+  ```json
+  {
+    "final": true,
+    "findings": [
+      {"claim": "...", "chunk_ids": ["..."], "document_ids": [], "confidence": 0.0}
+    ],
+    "unfilled": ["rejected claim reason"],
+    "notes": "reviewer"
+  }
+  ```
+
+  When reviewing template slots (compose), respond with:
   {
     "accepted": [{"name": "...", "chunk_ids": ["..."]}],
     "rejected": [{"name": "...", "reason": "..."}]
@@ -17,10 +31,10 @@ system_prompt: |
 model: ${LLM_MODEL}
 tools: []
 budgets:
-  llm_tokens: 6000
+  llm_tokens: 8000
   tool_calls: 0
-  wall_seconds: 90
+  wall_seconds: 120
 stop:
-  max_steps: 1
-output_contract: review_verdict_v1
+  max_steps: 2
+output_contract: grounded_findings_v1
 temperature: 0.0

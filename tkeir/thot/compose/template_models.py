@@ -68,7 +68,9 @@ class SlotProvenance(BaseModel):
 
     chunk_ids: list[str] = Field(default_factory=list)
     document_ids: list[str] = Field(default_factory=list)
-    source: Literal["kg", "sparql", "writer", "retrieval", "param"] = "kg"
+    source: Literal[
+        "kg", "sparql", "writer", "retrieval", "param", "findings"
+    ] = "kg"
 
 
 class SlotFill(BaseModel):

@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { apiFetch } from "@/src/auth/useApiClient";
 
 type KillScope = "all" | "ingest" | "index" | "inference" | "hmi-write" | "agents";
 
@@ -68,21 +70,21 @@ export function AdminPanel({
   const refresh = useCallback(async () => {
     setError(null);
     try {
-      const flagsRes = await fetch("/api/governor/governor/flags", {
+      const flagsRes = await apiFetch("/api/governor/governor/flags", {
         cache: "no-store",
       });
       if (flagsRes.ok) {
         setFlags((await flagsRes.json()) as RuntimeFlags);
       }
       if (isAdmin) {
-        const budgetRes = await fetch("/api/governor/governor/budgets", {
+        const budgetRes = await apiFetch("/api/governor/governor/budgets", {
           cache: "no-store",
         });
         if (budgetRes.ok) {
           const body = (await budgetRes.json()) as { items: BudgetSnapshot[] };
           setBudgets(body.items);
         }
-        const approvalRes = await fetch("/api/governor/governor/approvals", {
+        const approvalRes = await apiFetch("/api/governor/governor/approvals", {
           cache: "no-store",
         });
         if (approvalRes.ok) {
@@ -90,9 +92,10 @@ export function AdminPanel({
         }
       }
       if (correlationId) {
-        const auditRes = await fetch(
+        const auditRes = await apiFetch(
           `/api/audit/audit/report?correlation_id=${encodeURIComponent(correlationId)}`,
           { cache: "no-store" },
+          { retryOn401: false },
         );
         if (auditRes.ok) {
           setAuditReport((await auditRes.json()) as AuditReport);
@@ -115,7 +118,7 @@ export function AdminPanel({
     }
     setBusy(true);
     try {
-      const response = await fetch("/api/governor/governor/kill", {
+      const response = await apiFetch("/api/governor/governor/kill", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ scope, active, reason: "admin panel" }),
@@ -134,7 +137,7 @@ export function AdminPanel({
   async function decideApproval(approvalId: string, decision: "approve" | "deny") {
     setBusy(true);
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/governor/governor/approvals/${approvalId}/${decision}`,
         {
           method: "POST",
@@ -159,6 +162,21 @@ export function AdminPanel({
         <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </p>
+      ) : null}
+
+      {isAdmin ? (
+        <section className="rounded-md border bg-card p-4 text-sm">
+          <h2 className="text-lg font-semibold">Corpus ingest</h2>
+          <p className="mt-1 text-muted-foreground">
+            Global corpus ingest lives in the main workspace sidebar as{" "}
+            <strong>Ingest</strong> (same place as Search / RAG / Agent). Open{" "}
+            <Link href="/" className="underline underline-offset-2">
+              Corpus workspace
+            </Link>{" "}
+            while signed in as c2-admin — no separate admin re-login needed for
+            ingest.
+          </p>
+        </section>
       ) : null}
 
       <section className="rounded-md border bg-card p-4">

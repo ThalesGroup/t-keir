@@ -72,7 +72,9 @@ def ensure_golden_chunks_for_index(document: dict[str, Any]) -> dict[str, Any]:
     if not text:
         text = (document.get("title") or "").strip()
     if not text:
-        LOGGER.warning("No content/title to synthesize chunk for %s", source_id)
+        LOGGER.warning(
+            "No content/title to synthesize chunk for %s", source_id
+        )
         return document
 
     document = dict(document)
@@ -136,9 +138,16 @@ def _ontology_fields_for_chunk(
             continue
         seen.add(key.casefold())
         concepts.append(key)
+    # Structured JSON-record attributes promoted to ontology concepts.
+    for cid in document.get("record_concept_ids") or []:
+        key = str(cid).strip()
+        if not key or key.casefold() in seen:
+            continue
+        seen.add(key.casefold())
+        concepts.append(key)
     labels = [
         str(lab).strip()
-        for lab in (fields.get("expansion_labels") or [])
+        for lab in fields.get("expansion_labels") or []
         if lab and str(lab).strip()
     ]
     return concepts[:64], labels[:96]
@@ -158,7 +167,9 @@ def _ontology_concept_list(
 
 def _resolve_index_dump_dir(dump: IndexDumpConfig) -> Path:
     """Resolve dump directory (absolute, or relative to repo root)."""
-    raw = (dump.path or IndexDumpConfig().path).strip() or IndexDumpConfig().path
+    raw = (
+        dump.path or IndexDumpConfig().path
+    ).strip() or IndexDumpConfig().path
     path = Path(raw).expanduser()
     if not path.is_absolute():
         path = Path(repo_root()) / path

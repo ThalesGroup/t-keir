@@ -72,9 +72,7 @@ def hit_text_for_rerank(fields: dict[str, Any]) -> str:
         joined = " ".join(str(part) for part in content if part).strip()
         if joined:
             return joined
-    return str(
-        fields.get("title") or fields.get("parent_title") or ""
-    ).strip()
+    return str(fields.get("title") or fields.get("parent_title") or "").strip()
 
 
 async def rerank_vespa_children(
@@ -249,8 +247,7 @@ def colbert_rerank(
     colbert = encode_colbert_vecs([query, *texts], batch_size=batch_size)
     if colbert is None or len(colbert) < 2:
         return [
-            (doc_id, float(score))
-            for doc_id, _text, score in ordered[:top_k]
+            (doc_id, float(score)) for doc_id, _text, score in ordered[:top_k]
         ]
 
     q_vecs = colbert[0]

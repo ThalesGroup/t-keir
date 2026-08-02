@@ -33,6 +33,11 @@ from catalogue_parse import (  # noqa: E402
     parse_rego_articles,
 )
 
+OPA_DIR = ROOT / "compliance" / "opa"
+if str(OPA_DIR) not in sys.path:
+    sys.path.insert(0, str(OPA_DIR))
+from status_page import render_status_page_md  # noqa: E402
+
 EU_AUDIT = ROOT / "reports" / "compliance" / "eu-audit"
 POLICIES = ROOT / "compliance" / "opa" / "policies"
 OUT = ROOT / "docs" / "compliance" / "generated"
@@ -488,6 +493,10 @@ def render_overview(report: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
+            "## One-page status table\n",
+            "Colored full posture (status · criticality · remediation): "
+            "[Compliance status](status.md).\n",
+            "",
             "## GDPR & CRA reviewer checklists\n",
             "After each audit, full checkbox lists are generated for articles "
             "that need **legal / human review** vs those already closed by "
@@ -514,6 +523,9 @@ def render_overview(report: dict[str, Any]) -> str:
 def write_placeholder(out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "latest_results.md").write_text(PLACEHOLDER + "\n", encoding="utf-8")
+    (out_dir / "compliance_status.md").write_text(
+        PLACEHOLDER + "\n", encoding="utf-8"
+    )
     for name in REG_ORDER:
         (out_dir / f"{name}_results.md").write_text(
             PLACEHOLDER + "\n", encoding="utf-8"
@@ -532,6 +544,9 @@ def publish(report_path: Path, out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     overview = render_overview(report)
     (out_dir / "latest_results.md").write_text(overview, encoding="utf-8")
+    (out_dir / "compliance_status.md").write_text(
+        render_status_page_md(report), encoding="utf-8"
+    )
     # Keep a copy of the aggregate JSON next to the Markdown for GRC diffs in-repo.
     (out_dir / "latest_report.json").write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8"
@@ -557,6 +572,7 @@ def publish(report_path: Path, out_dir: Path) -> None:
         encoding="utf-8",
     )
     print(f"[eu-audit] docs results → {out_dir / 'latest_results.md'}")
+    print(f"[eu-audit] docs status  → {out_dir / 'compliance_status.md'}")
     print(f"[eu-audit] docs report  → {out_dir / 'latest_report.json'}")
     print(f"[eu-audit] GDPR/CRA checklists → {out_dir}")
 

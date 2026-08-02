@@ -15,6 +15,20 @@ import re
 from typing import Any
 
 
+def _ner_entity_text(entity: Any) -> str:
+    """Normalize a NER entry (dict or bare string) to display text."""
+    if isinstance(entity, dict):
+        return str(entity.get("text", "")).strip()
+    return str(entity or "").strip()
+
+
+def _ner_entity_label(entity: Any) -> str:
+    """Normalize a NER entry (dict or bare string) to a label."""
+    if isinstance(entity, dict):
+        return str(entity.get("label", "entity")).strip() or "entity"
+    return "entity"
+
+
 def _append_unique_analysis_terms(
     parts: list[str],
     existing: str,
@@ -22,10 +36,12 @@ def _append_unique_analysis_terms(
 ) -> None:
     """Append NER, SVO, and search terms not already present in ``existing``."""
     for entity in analysis.get("ner_entities") or []:
-        text = str(entity.get("text", "")).strip()
+        text = _ner_entity_text(entity)
         if text and text.lower() not in existing:
             parts.append(text)
     for triple in analysis.get("svo_triples") or []:
+        if not isinstance(triple, dict):
+            continue
         for key in ("subject", "verb", "object"):
             text = str(triple.get(key, "")).strip()
             if text and text.lower() not in existing:
@@ -161,14 +177,13 @@ def _focal_entity_from_query(
 
     if analysis:
         for entity in analysis.get("ner_entities") or []:
-            text = str(entity.get("text", "")).strip()
+            text = _ner_entity_text(entity)
             if text and len(text.split()) <= 8:
                 return text
         morph = analysis.get("morphosyntax") or []
         after_adp = _entity_after_adp(morph)
         if after_adp:
             return after_adp
-
     for match in re.finditer(r'"([^"]{2,80})"|\'([^\']{2,80})\'', query):
         candidate = (match.group(1) or match.group(2) or "").strip()
         if candidate:
@@ -384,7 +399,8 @@ def detect_question_type(
         return "comparison"
 
     if any(
-        token in lower for token in ("list ", "enumerate ", "name all ", "all of the ")
+        token in lower
+        for token in ("list ", "enumerate ", "name all ", "all of the ")
     ):
         return "list"
 
@@ -409,7 +425,9 @@ def detect_question_type(
     return "other"
 
 
-def question_type_short_answer_spec(question_type: str, *, language: str = "en") -> str:
+def question_type_short_answer_spec(
+    question_type: str, *, language: str = "en"
+) -> str:
     """Return SHORT_ANSWER shape instructions for a question type."""
     lang = (language or "en").lower()
     specs_en = {
@@ -421,42 +439,64 @@ def question_type_short_answer_spec(question_type: str, *, language: str = "en")
             "SHORT_ANSWER must define the term in 1–2 precise sentences "
             "(genus + distinguishing properties)."
         ),
-        "who": "SHORT_ANSWER must name the person/organization (plus a brief role if needed).",
+        "who": (
+            "SHORT_ANSWER must name the person/organization (plus a brief role if needed)."
+        ),
         "what": "SHORT_ANSWER must name the thing/event/result directly.",
-        "when": "SHORT_ANSWER must give the date, year, or time span explicitly.",
+        "when": (
+            "SHORT_ANSWER must give the date, year, or time span explicitly."
+        ),
         "where": "SHORT_ANSWER must give the place/location explicitly.",
         "why": "SHORT_ANSWER must state the cause/reason in 1–2 sentences.",
-        "how": "SHORT_ANSWER must state the manner/mechanism in 1–3 sentences.",
-        "which": "SHORT_ANSWER must select the matching option(s) from the evidence.",
+        "how": (
+            "SHORT_ANSWER must state the manner/mechanism in 1–3 sentences."
+        ),
+        "which": (
+            "SHORT_ANSWER must select the matching option(s) from the evidence."
+        ),
         "list": (
             "SHORT_ANSWER must be a compact enumeration (comma-separated or short bullets)."
         ),
         "comparison": (
             "SHORT_ANSWER must contrast the compared entities on the asked dimension."
         ),
-        "factoid": "SHORT_ANSWER must be a concise factual span answering the question.",
+        "factoid": (
+            "SHORT_ANSWER must be a concise factual span answering the question."
+        ),
         "inference": (
             "SHORT_ANSWER must combine evidence across passages into one grounded conclusion."
         ),
         "entity_report": (
             "SHORT_ANSWER must summarize the entity in 2–4 factual sentences."
         ),
-        "other": "SHORT_ANSWER must answer the question directly and concisely.",
+        "other": (
+            "SHORT_ANSWER must answer the question directly and concisely."
+        ),
     }
     specs_fr = {
-        "yes_no": "SHORT_ANSWER doit être Oui ou Non (clause justificative courte optionnelle).",
-        "definition": "SHORT_ANSWER doit définir le terme en 1–2 phrases précises.",
+        "yes_no": (
+            "SHORT_ANSWER doit être Oui ou Non (clause justificative courte optionnelle)."
+        ),
+        "definition": (
+            "SHORT_ANSWER doit définir le terme en 1–2 phrases précises."
+        ),
         "who": "SHORT_ANSWER doit nommer la personne/organisation.",
         "what": "SHORT_ANSWER doit nommer directement la chose/l'événement.",
         "when": "SHORT_ANSWER doit donner la date, l'année ou la période.",
         "where": "SHORT_ANSWER doit donner le lieu explicitement.",
         "why": "SHORT_ANSWER doit énoncer la cause en 1–2 phrases.",
         "how": "SHORT_ANSWER doit décrire le mécanisme en 1–3 phrases.",
-        "which": "SHORT_ANSWER doit sélectionner la/les option(s) pertinentes.",
+        "which": (
+            "SHORT_ANSWER doit sélectionner la/les option(s) pertinentes."
+        ),
         "list": "SHORT_ANSWER doit être une énumération compacte.",
-        "comparison": "SHORT_ANSWER doit comparer les entités sur le critère demandé.",
+        "comparison": (
+            "SHORT_ANSWER doit comparer les entités sur le critère demandé."
+        ),
         "factoid": "SHORT_ANSWER doit être une réponse factuelle concise.",
-        "inference": "SHORT_ANSWER doit combiner les preuves en une conclusion fondée.",
+        "inference": (
+            "SHORT_ANSWER doit combiner les preuves en une conclusion fondée."
+        ),
         "entity_report": "SHORT_ANSWER doit résumer l'entité en 2–4 phrases.",
         "other": "SHORT_ANSWER doit répondre directement et concisément.",
     }
@@ -560,6 +600,9 @@ def format_generation_guidance(
                 f"{type_header}\n"
                 "MODE DE GÉNÉRATION : réponse directe\n"
                 "- Alignez la réponse sur la structure SVO de la question.\n"
+                "- SHORT_ANSWER et DETAILED_REPORT doivent paraphraser uniquement "
+                "les PASSAGES CLÉS.\n"
+                "- N'ajoutez aucune connaissance générale absente des passages.\n"
                 "- DETAILED_REPORT : explication appuyée par les passages "
                 "(noms, dates, événements).\n"
                 "- Privilégiez les PASSAGES CLÉS aux lignes SVO isolées."
@@ -569,6 +612,8 @@ def format_generation_guidance(
             "GENERATION MODE: direct question answering\n"
             "- Align the answer with the question's SVO structure "
             "(subject / verb / object from SEARCH QUERY ANALYSIS).\n"
+            "- SHORT_ANSWER and DETAILED_REPORT must paraphrase KEY PASSAGES only.\n"
+            "- Never add world-knowledge or historical facts absent from the passages.\n"
             "- DETAILED_REPORT: explain the answer with supporting facts from the "
             "passages; cite names, dates, and events explicitly.\n"
             "- Prefer KEY PASSAGES over isolated SVO lines when they conflict."
@@ -641,13 +686,13 @@ def _format_svo_analysis_section(
 
 
 def _format_ner_analysis_section(
-    ner_entities: list[dict[str, Any]],
+    ner_entities: list[Any],
 ) -> list[str]:
     """Format the named-entity section for prompt query analysis."""
     lines = ["- Named entities:"]
     for entity in ner_entities:
-        text = str(entity.get("text", "")).strip()
-        label = str(entity.get("label", "entity")).strip()
+        text = _ner_entity_text(entity)
+        label = _ner_entity_label(entity)
         if text:
             lines.append(f"  - {text} ({label})")
     return lines
@@ -711,4 +756,3 @@ def format_query_analysis_for_prompt(
         )
 
     return "\n".join(lines)
-

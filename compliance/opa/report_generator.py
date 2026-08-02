@@ -14,9 +14,16 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+# Shared one-page status table (also published into MkDocs).
+_OPA_DIR = Path(__file__).resolve().parent
+if str(_OPA_DIR) not in sys.path:
+    sys.path.insert(0, str(_OPA_DIR))
+from status_page import render_status_table_html  # noqa: E402
 
 
 def _load(path: Path) -> dict[str, Any]:
@@ -234,6 +241,8 @@ def render_html(
     · violations {report.get('violations_count')}
   </p>
   <p><em>Engineering evidence mapping — not legal advice.</em></p>
+  <h2>One-page compliance status</h2>
+  {render_status_table_html(report, include_na=True)}
   <h2>Per regulation</h2>
   <table>
     <thead>

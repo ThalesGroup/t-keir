@@ -151,7 +151,7 @@ make rag-query RAG_QUERY="Who is Rob Brown?"
 make ci
 ```
 
-Indexing fixtures live under `tkeir/tests/indexing/` (portable `tests/indexing/input`
+Indexing fixtures live under `tests/indexing/` (portable `tests/indexing/input`
 PDFs and `tests/indexing/output` pipeline JSON).
 
 ## Environment variables

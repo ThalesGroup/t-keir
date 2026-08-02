@@ -23,6 +23,7 @@ class IngestSettings:
     """Runtime configuration for the ingest service and CLI."""
 
     root: Path
+    workspace_root: Path
     auth_enabled: bool
     dev_token: str | None
     pipeline_config_path: Path
@@ -52,14 +53,23 @@ def ingest_settings() -> IngestSettings:
         >>> settings.port > 0
         True
     """
+    from thot.core.TkeirPaths import repo_root
+
     default_pipeline = Path(configs_dir()) / "pipeline.yaml"
     pipeline_path = Path(
         os.getenv("INGEST_PIPELINE_CONFIG", str(default_pipeline))
     )
     root = Path(os.getenv("INGEST_ROOT", "/var/tkeir/ingest"))
+    workspace_env = os.getenv("TKEIR_WORKSPACE") or os.getenv("WORKSPACE")
+    workspace_root = (
+        Path(workspace_env).expanduser()
+        if workspace_env
+        else Path(repo_root()) / "workspace"
+    )
     max_concurrency = max(1, int(os.getenv("INGEST_MAX_CONCURRENCY", "1")))
     return IngestSettings(
         root=root,
+        workspace_root=workspace_root.resolve(),
         auth_enabled=_env_bool("INGEST_AUTH_ENABLED", False),
         dev_token=os.getenv("INGEST_DEV_TOKEN") or None,
         pipeline_config_path=pipeline_path,

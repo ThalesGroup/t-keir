@@ -355,8 +355,11 @@ Vespa (`document_ontology` / `json_ld`).
 
 **Pipeline inside the task**
 
-1. **Build** (`OntologyBuilder`) — SVO / NER / keywords → RDF under
-   `http://tkeir.local/ontology/` (Metric class, coverage stats).
+1. **Build** (`OntologyBuilder`) — SVO / NER / keywords → RDF **hypergraph**
+   under `http://tkeir.local/ontology/`: Document → Chunk (`SubOntology`) →
+   reified `Statement` + shared concepts (`mentionedIn` / `chunkSupport`);
+   materialized SPO kept for reasoners. See
+   [Document ontology — hypergraph](tools/document_ontology.md#hypergraph-shape-document--chunk--sub-ontology).
 2. **Align** (`OntologyAlignment` + `label_vectorizer`) — CamelCase / lemma
    tokenization → TF-IDF → agglomerative clustering of synonymous classes /
    properties; rewrite to a canonical vocabulary.

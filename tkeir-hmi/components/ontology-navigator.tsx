@@ -46,11 +46,13 @@ export const OntologyNavigator = memo(function OntologyNavigator({
   onClearFilter,
   accordionKey = "ontology",
 }: OntologyNavigatorProps) {
+  // Always open by default so a late ontology load (key remount while null)
+  // does not leave the navigator collapsed/empty-looking.
   return (
     <Accordion
       key={accordionKey}
       type="multiple"
-      defaultValue={ontology ? ["ontology"] : []}
+      defaultValue={["ontology"]}
       className="rounded-xl border bg-card px-4 shadow-sm"
     >
       <AccordionItem value="ontology" className="border-b-0">

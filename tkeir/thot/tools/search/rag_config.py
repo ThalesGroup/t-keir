@@ -40,9 +40,7 @@ _ALLOWED_CHUNK_CONTEXT_MODES = frozenset({"chunk_excerpts", "svo_ontology"})
 _DEFAULT_RERANK_ENABLED = True
 _DEFAULT_RERANK_CANDIDATES = 50
 _DEFAULT_RERANK_STRATEGY = "embedding_cosine"
-_ALLOWED_RERANK_STRATEGIES = frozenset(
-    {"cross_encoder", "embedding_cosine"}
-)
+_ALLOWED_RERANK_STRATEGIES = frozenset({"cross_encoder", "embedding_cosine"})
 _FORBIDDEN_LLM_RERANK_STRATEGIES = frozenset(
     {
         "llm",

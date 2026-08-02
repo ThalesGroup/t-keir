@@ -33,7 +33,10 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob:",
               "font-src 'self' data:",
-              "connect-src 'self'",
+              // Keycloak token refresh / discovery happens in-browser.
+              "connect-src 'self' http://localhost:8082 https://kc.local",
+              // Silent-check iframe needs to talk to Keycloak.
+              "frame-src 'self' http://localhost:8082 https://kc.local",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

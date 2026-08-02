@@ -34,7 +34,7 @@ python3 -m thot.tools.pipeline -c tkeir/configs/pipeline.yaml -i <input> -o <out
 ### Vespa indexing and RAG
 
 After pipeline output is produced, index fixtures or your own JSON under
-`tkeir/tests/indexing/` and start the RAG stack — see [Vespa RAG](vespa_rag.md).
+`tests/indexing/` and start the RAG stack — see [Vespa RAG](vespa_rag.md).
 
 ### Agentic layer (MCP, agents, templates)
 
@@ -51,8 +51,9 @@ needed for external MCP hosts (see [MCP](mcp.md)).
 | HMI run monitor | `/agents` — [HMI](../hmi.md) |
 
 Base agents ship as YAML under `tkeir/configs/agents/` (`researcher`,
-`analyst`, `writer`, `reviewer`). Workflows live under
-`tkeir/configs/workflows/` (for example `content_brief`). The runtime is
+`analyst`, `writer`, `reviewer`) plus dataset packs under
+`datasets/<pack>/agents/` (OSINT personas). Workflows live under
+`tkeir/configs/workflows/` and `datasets/<pack>/workflows/`. The runtime is
 implemented in `thot/agent/` and `thot/mcp/` **without** third-party agent
 frameworks; governance uses the same ActionRecord / governor path as ingest.
 

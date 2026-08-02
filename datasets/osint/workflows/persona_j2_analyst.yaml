@@ -1,0 +1,96 @@
+name: persona_j2_analyst
+version: 3
+description: >
+  J2 Intelligence Analyst OTAN workflow (Operation RED HORIZON).
+  When Reporter Phase 3 supplies an edited LLM Wiki (wiki_markdown /
+  bundle_id), treat that FULL wiki (Answer + Evidence + Sources +
+  Structured facts INTSUM checklist) as the primary fact base and reshape
+  it into a full otan_intsum (header + body sections 1–5).
+  Example goal: Tell me everything the system knows about MT RED SEA EAGLE.
+template: otan_intsum
+budgets:
+  llm_tokens: 140000
+  tool_calls: 60
+  wall_seconds: 900
+steps:
+  - id: analyse
+    agent: j2_analyst_analyser
+    goal_template: >
+      Produce grounded findings for a FULL J2 OTAN INTSUM on: {goal}.
+      Topic: {topic}. report_form={report_form}. has_llm_wiki={has_llm_wiki}.
+      bundle_id={bundle_id}.
+      Slot hints: {report_form_slots}
+
+      INTSUM coverage required (tag claims with [slot] names):
+      Header — [subject], [period_covered], [issuing_hq], [classification_handling]
+      1 [highlights] (required)
+      2 [adversary_situation] a Land / b Air / c Maritime / d Cyber-EMS / e InfoOps
+      3 [specialist_threat] a Capabilities / b Logistics / c CBRN
+      4 [environmental_factors] a Weather / b Terrain / c Civil-Military
+      5 [assessment_outlook] a MLCOA / b MDCOA / c Gaps-PIRs
+      plus [sources] citations.
+
+      IF has_llm_wiki is true OR wiki_markdown / wiki_excerpt is non-empty:
+        PRIMARY SOURCE is the FULL Phase-2 LLM Wiki (Answer + Evidence + Sources
+        + Structured facts INTSUM checklist). The complete wiki is injected below.
+        Call okf_bundle_get for bundle_id when set and reconcile with wiki_md.
+        Mine Structured facts first, then Answer/Evidence; preserve EVERY
+        chunk_id. Only use search/rag_query (search_mode="both") to verify
+        citations or fill Gaps — do NOT rebuild research from scratch.
+        FULL WIKI:
+        -----
+        {wiki_markdown}
+        -----
+      ELSE:
+        HARD REQUIREMENT: dual-index search_mode="both" on rag_query and search.
+        Use ontology_query when helpful. Never invent facts absent from chunks.
+
+      Never invent builders, flags, EOIs, MLCOA/MDCOA, or assessments absent
+      from wiki/chunks — put missing INTSUM sub-paragraphs in unfilled.
+    tools:
+      - search
+      - rag_query
+      - ontology_query
+      - document_get
+      - workspace_wiki_list
+      - workspace_wiki_get
+      - okf_bundle_get
+    max_steps: 14
+
+  - id: review
+    agent: j2_analyst_reviewer
+    goal_template: >
+      Review J2 Intelligence Analyst findings for FULL OTAN INTSUM on: {goal}.
+      Prior findings JSON: {prior_findings_json}
+      Prefer claims that appear in the LLM Wiki Evidence/Sources/Structured facts
+      with chunk_ids. Keep [slot] tags. Reject uncited or world-knowledge claims
+      (shipyard, ownership, invented EOIs, unsupported MLCOA/MDCOA).
+      Return accepted findings only.
+    tools: []
+    max_steps: 2
+
+  - id: write
+    agent: j2_analyst_writer
+    goal_template: >
+      Write FULL OTAN INTSUM slot claims for: {goal}.
+      Use reviewed findings only: {prior_findings_json}
+      Keep chunk_ids; do not add facts.
+      Follow the OTAN INTSUM TEMPLATE in your system prompt
+      (header + sections 1–5; slots for {report_form} / {report_form_slots}).
+      Emit one finding per filled slot with claim prefixed by [slot_name],
+      e.g. "[highlights] …", "[adversary_situation] c. Maritime: …",
+      "[assessment_outlook] a. MLCOA: …". Also emit [sources] listing chunk_id
+      citations from the wiki Sources/Evidence sections.
+      Compose maps tagged claims into the template.
+
+      FULL WIKI (for Structured facts + Sources fidelity):
+      -----
+      {wiki_markdown}
+      -----
+    tools: []
+    max_steps: 2
+
+  - id: deliverable
+    compose:
+      template: otan_intsum
+      topic_from: topic

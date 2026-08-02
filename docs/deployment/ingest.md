@@ -3,20 +3,61 @@
 The **tkeir-ingest** service exposes a push API for documents, stages them
 under `staging/{doc_id}/`, writes an `ingest.manifest.json`, runs the NLP
 pipeline, and indexes chunks into Vespa when `INGEST_INDEX_ENABLED=true`.
-Indexed docs use Vespa **streaming** groups: the job’s `user_space` is the
-Keycloak principal (or **`dev@tkeir`** when auth is off).
+
+Vespa has two catalogs:
+
+| Target | Who | Visibility |
+|--------|-----|------------|
+| **`user`** (streaming group = Keycloak username) | Every persona via **My files** | Personal only |
+| **`global`** (shared schema) | **Admin** via Global corpus ingest | All users |
+
+Non-admin API callers cannot select `global` / `both` when
+`INGEST_AUTH_ENABLED=true`. Workspace endpoints always index `user`.
 
 ## Endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/ingest/document` | Multipart file **or** JSON `{"url": "..."}` (+ optional `ontologies`) |
-| `POST` | `/ingest/batch` | JSON manifest of URL items (each may set `ontologies`) |
+| `POST` | `/ingest/document` | Multipart/JSON; non-admin → `user`, admin may choose |
+| `POST` | `/ingest/json-records` | **Admin-only** corpus split → default `global` |
+| `POST` | `/ingest/batch` | URL batch; same target policy as document |
 | `POST` | `/ingest/stop` | Stop the ingest process (client `--stop-on-failed`) |
-| `GET` | `/ingest/status/{id}` | Job status + manifest |
+| `GET` | `/ingest/status/{id}` | Job status (`?include_manifest=true` for full manifest) |
+| `GET` | `/workspace/tree` | List authenticated user’s My files |
+| `POST` | `/workspace/mkdir` | Create folder under My files |
+| `POST` | `/workspace/upload` | My files import only (default **no** index) |
+| `POST` | `/workspace/copy-to` | Copy selected files to allowlisted space (e.g. commander) |
+| `POST` | `/workspace/index` | Index selected My files → `user` + business ontology |
+| `POST` | `/workspace/sync` | Refresh catalog status / passage ids |
+| `DELETE` | `/workspace/file` | Delete file and unindex by `source_ref` |
 | `GET` | `/health`, `/ready`, `/metrics` | Probes (same pattern as RAG API) |
 
 Default port: **8091**.
+
+### JSON record corpora (admin / OSINT)
+
+For files such as `datasets/osint/c2_middle_east_multi_source_1000_v3_en.json`
+(`{ "records": [ … ] }`):
+
+1. Each record becomes one Markdown document (title, text, and every attribute).
+2. Source id is `{filename_stem}/{doc_id}` (e.g. `c2_middle_east_…/C2-202606-0001`).
+3. Non-narrative fields are promoted to `record_concept_ids` → Vespa
+   `ontology_concepts` (dense + sparse still come from the NLP/embed path).
+4. Default index target is **`global`**.
+
+HMI: **Admin → Global corpus ingest** posts to `/api/ingest/ingest/json-records`
+(preset path or file upload). Prefer a small `limit` first (default UI: 20).
+
+```bash
+curl -X POST http://localhost:8091/ingest/json-records \
+  -H 'content-type: application/json' \
+  -d '{
+    "dataset_path": "osint/c2_middle_east_multi_source_1000_v3_en.json",
+    "index_target": "global",
+    "offset": 0,
+    "limit": 5
+  }'
+```
 
 ### Stop on first failure
 
@@ -124,7 +165,7 @@ tkeir-ingest retry --from-dlq --ingest-id <original-id>
 make compose-up PROFILES=core,auth,ingest
 # With auth off / INGEST_DEV_TOKEN: indexes into VESPA_USER_SPACE (dev@tkeir).
 # With a Keycloak bearer: indexes into that user's streaming group.
-curl -F "file=@tkeir/tests/indexing/input/00163fe7688e71ce06f495a6811fef71.pdf" \
+curl -F "file=@tests/indexing/input/00163fe7688e71ce06f495a6811fef71.pdf" \
   http://localhost:8091/ingest/document
 ```
 

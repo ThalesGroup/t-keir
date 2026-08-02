@@ -1,0 +1,71 @@
+name: otan_c2_brief
+version: 1
+description: >
+  Operation RED HORIZON / C2 OTAN formal report + LLM Wiki pipeline.
+  Researcher MUST dual-index (global + user). Optional prior wiki from My files.
+  Reviewer validates grounding. Writer writes the OKF LLMWiki page.
+  Final compose uses report_form: intsum | sitrep | spotrep | commander_brief.
+template: otan_intsum
+budgets:
+  llm_tokens: 100000
+  tool_calls: 80
+  wall_seconds: 1200
+steps:
+  - id: scope_bundle
+    builtin: okf_scoped_export
+    params_from: [query, topic]
+    output_key: bundle_id
+
+  - id: research
+    agent: researcher
+    goal_template: >
+      Produce grounded research for an OTAN/NATO {report_form} on: {goal}.
+      HARD REQUIREMENT: every substantive retrieval MUST use search_mode="both"
+      (global shared corpus AND personal user index). Prefer rag_query with
+      search_mode="both"; also call search with search_mode="both".
+      Optional prior LLM Wiki: if use_existing_wiki is true/1/yes, call
+      workspace_wiki_list then workspace_wiki_get on relevant wiki/*.md and
+      treat that markdown as prior context (still re-verify with dual-index
+      retrieval — do not trust wiki alone).
+      Bundle id for later wiki write: {bundle_id}.
+      Return findings with chunk_ids from BOTH schemas when available.
+    tools:
+      - search
+      - rag_query
+      - ontology_query
+      - document_get
+      - workspace_wiki_list
+      - workspace_wiki_get
+      - okf_bundle_get
+    max_steps: 14
+
+  - id: review
+    agent: reviewer
+    goal_template: >
+      Review the research findings for OTAN {report_form} on: {goal}.
+      Prior findings JSON: {prior_findings_json}
+      Reject uncited claims. Return accepted findings only (same grounded
+      findings JSON schema). Prefer unfilled over hallucination.
+    tools: []
+    max_steps: 2
+
+  - id: write_wiki
+    agent: wiki_writer
+    goal_template: >
+      Write the LLMWiki page for bundle_id={bundle_id} covering: {goal}.
+      Use reviewed findings: {prior_findings_json}
+      Optionally merge facts from existing user-space wiki if
+      use_existing_wiki was requested (re-read via workspace_wiki_get).
+      Call okf_wiki_put with full markdown (type: Wiki frontmatter + body).
+      Every section must cite chunk_ids in the body or footnotes.
+    tools:
+      - okf_wiki_put
+      - okf_bundle_get
+      - workspace_wiki_list
+      - workspace_wiki_get
+    max_steps: 6
+
+  - id: deliverable
+    compose:
+      template: otan_intsum
+      topic_from: topic

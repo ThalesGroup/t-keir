@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Link from "next/link";
 import { Check, Copy, Fingerprint } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ interface CorrelationIdBadgeProps {
 /** Shows X-Correlation-Id with copy + optional audit deep-link. */
 export function CorrelationIdBadge({
   correlationId,
-  auditBaseUrl = "/admin",
+  auditBaseUrl = "/audit",
 }: CorrelationIdBadgeProps) {
   const [copied, setCopied] = useState(false);
 
@@ -57,13 +58,14 @@ export function CorrelationIdBadge({
           <Copy className="h-3.5 w-3.5" />
         )}
       </Button>
-      <a
+      <Link
         href={auditHref}
         className="underline-offset-2 hover:underline"
-        title="Open oversight panel for this correlation ID"
+        title="Open audit trail for this correlation ID"
+        prefetch={false}
       >
         Audit this answer
-      </a>
+      </Link>
     </div>
   );
 }

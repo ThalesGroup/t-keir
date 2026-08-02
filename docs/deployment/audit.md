@@ -114,15 +114,17 @@ WORM bytes remain intact while subject linkage is destroyed.
 
 | Variable | Default | Notes |
 |----------|---------|--------|
-| `AUDIT_HOT_STORE_URL` | unset | Required for durable hot tier / CLI |
-| `AUDIT_WORM_ROOT` | `/var/tkeir/audit/worm` | Segment filesystem root |
-| `AUDIT_SUBJECT_KEYS_PATH` | `/var/tkeir/audit/subject_keys.db` | Forget keys |
+| `AUDIT_HOT_STORE_URL` | unset | Required for durable hot tier / CLI; host Make uses `sqlite:workspace/audit/hot_store.db` |
+| `AUDIT_WORM_ROOT` | `workspace/audit/worm` (host) | Segment filesystem root; Compose may use `/var/tkeir/audit/worm` |
+| `AUDIT_SUBJECT_KEYS_PATH` | `workspace/audit/subject_keys.db` (host) | Forget keys |
 | `AUDIT_HOST` / `AUDIT_PORT` | `0.0.0.0` / `8093` | HTTP listen |
 | `AUDIT_SINK_MODE` | `dual` if hot URL else `memory` | Emitter side |
 | `AUDIT_AUTH_ENABLED` | `false` | Gate read APIs |
 | `AUDIT_DEV_TOKEN` | unset | Bearer shortcut when auth on |
 | `AUDIT_CORS_ORIGINS` | localhost:3000 variants | Comma-separated |
-| (+ S3 vars above) | | |
+| (+ S3 vars above) | | Optional; leave unset when not using MinIO |
+
+On the host, `make audit-*` always reads **`workspace/audit`** (hot sqlite + `worm/`). MinIO is not required — it is only an optional WORM mirror when `AUDIT_WORM_S3_ENDPOINT` is set. Host `make rag|agent|ingest|okf|mcp` now export the same `AUDIT_*` so ActionRecords land in that directory.
 
 ## HTTP API
 
@@ -158,7 +160,8 @@ Entry point: `tkeir-audit` (requires `AUDIT_HOT_STORE_URL` or exits 1).
 
 ```bash
 make audit-report CID=<correlation-id> # FORMAT=json|html
-make audit-verify AUDIT_HOT_STORE_URL=sqlite:////tmp/audit.db
+make audit-summary                      # LAST=24h
+make audit-verify                       # reads workspace/audit (no MinIO)
 make audit-archive
 make audit-evidence # compliance evidence pack
 ```

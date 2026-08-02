@@ -51,7 +51,9 @@ def ensure_pipeline_document(
 
 def build_document_ontology_json_ld(document: dict[str, Any]) -> str:
     """Build JSON-LD for one analyzed T-KEIR document (passage or query)."""
-    from thot.tasks.document_ontology.OntologyBuilder import build_document_graph
+    from thot.tasks.document_ontology.OntologyBuilder import (
+        build_document_graph,
+    )
     from thot.tools.search.ontology_utils import serialize_graph_json_ld
 
     graph = build_document_graph(document)
@@ -75,7 +77,9 @@ def merge_passage_ontology_json_lds(json_lds: list[str]) -> tuple[Any, str]:
     return merged, serialize_graph_json_ld(merged)
 
 
-def _terms_from_pipeline_document(document: dict[str, Any] | None) -> list[str]:
+def _terms_from_pipeline_document(
+    document: dict[str, Any] | None,
+) -> list[str]:
     """Harvest subject/object labels from a query pipeline document KG."""
     if not document:
         return []
@@ -126,7 +130,9 @@ def _content_token_keys(
     query_document: dict[str, Any] | None = None,
 ) -> set[str]:
     """Lowercased content-bearing surfaces from morphosyntax (UD POS)."""
-    from thot.tools.search.query_refiner import meaningful_tokens_from_morphosyntax
+    from thot.tools.search.query_refiner import (
+        meaningful_tokens_from_morphosyntax,
+    )
 
     morph = _analysis_morphosyntax(analysis, query_document=query_document)
     if not morph:
@@ -151,7 +157,7 @@ def _is_content_phrase(text: str, content_keys: set[str]) -> bool:
     return any(part.lower() in content_keys for part in parts)
 
 
-def _append_term(terms: list[str], text: str) -> None:
+def _append_term(terms: list[str], text: str | None) -> None:
     """Append a non-empty term string."""
     value = str(text or "").strip()
     if value:
@@ -193,9 +199,7 @@ def _query_focus_terms(
     for term in analysis.get("search_terms") or []:
         _append_term(terms, term)
 
-    content_keys = _content_token_keys(
-        analysis, query_document=query_document
-    )
+    content_keys = _content_token_keys(analysis, query_document=query_document)
     for triple in analysis.get("svo_triples") or []:
         if isinstance(triple, dict):
             parts = [
@@ -216,9 +220,7 @@ def _query_focus_terms(
 
     # Fallback: content lemmas / surfaces from morphosyntax only
     if not terms:
-        morph = _analysis_morphosyntax(
-            analysis, query_document=query_document
-        )
+        morph = _analysis_morphosyntax(analysis, query_document=query_document)
         if morph:
             from thot.tools.search.query_analyzer import extract_lemma_terms
             from thot.tools.search.query_refiner import (
@@ -262,15 +264,13 @@ def generate_sparql_from_query_ontology(
     query_document: dict[str, Any] | None = None,
     limit: int = 30,
 ) -> list[str]:
-    """Generate SPARQL SELECT queries from the query ontology.
+    """Generate up to three SPARQL SELECT queries from the query ontology.
 
-    Uses query pipeline KG / NER / SVO terms. Targets the merged passage
-    ontology (``rdfs:label`` match + multi-hop bridges between the two
-    strongest query entities).
+    1. Label-oriented fact harvest for focus terms
+    2. Multi-hop bridge between the two strongest entities (when available)
+    3. Class / type focus for the top entity-like term
     """
-    terms = _query_focus_terms(
-        analysis, query, query_document=query_document
-    )
+    terms = _query_focus_terms(analysis, query, query_document=query_document)
     if not terms:
         return []
 
@@ -281,8 +281,7 @@ def generate_sparql_from_query_ontology(
         f'CONTAINS(LCASE(STR(?ol)), "{_sparql_string_literal(term.lower())}")'
         for term in terms[:8]
     )
-    queries.append(
-        f"""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    queries.append(f"""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX tkeir: <http://tkeir.local/ontology/>
 SELECT ?s ?p ?o ?sl ?ol WHERE {{
   ?s ?p ?o .
@@ -291,16 +290,14 @@ SELECT ?s ?p ?o ?sl ?ol WHERE {{
   FILTER(
     {filters}
   )
-}} LIMIT {int(limit)}"""
-    )
+}} LIMIT {int(limit)}""")
 
     # 2) Multi-hop bridge between the two longest entity-like terms
     entity_like = sorted(terms, key=len, reverse=True)
     if len(entity_like) >= 2:
         left = _sparql_string_literal(entity_like[0].lower())
         right = _sparql_string_literal(entity_like[1].lower())
-        queries.append(
-            f"""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        queries.append(f"""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX tkeir: <http://tkeir.local/ontology/>
 SELECT ?a ?p1 ?mid ?p2 ?b ?al ?midl ?bl WHERE {{
   ?a ?p1 ?mid .
@@ -317,9 +314,82 @@ SELECT ?a ?p1 ?mid ?p2 ?b ?al ?midl ?bl WHERE {{
       CONTAINS(LCASE(STR(?bl)), "{left}")
     )
   )
+}} LIMIT {max(10, int(limit) // 2)}""")
+    else:
+        # Fallback second query: outgoing edges from the top term
+        top = _sparql_string_literal(entity_like[0].lower())
+        queries.append(f"""PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX tkeir: <http://tkeir.local/ontology/>
+SELECT ?s ?p ?o ?sl ?ol WHERE {{
+  ?s ?p ?o .
+  OPTIONAL {{ ?s rdfs:label ?sl }}
+  OPTIONAL {{ ?o rdfs:label ?ol }}
+  FILTER(CONTAINS(LCASE(STR(?sl)), "{top}"))
+}} LIMIT {max(10, int(limit) // 2)}""")
+
+    # 3) Class / type inventory for the strongest focus term
+    top = _sparql_string_literal(entity_like[0].lower())
+    queries.append(
+        f"""PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+SELECT ?x ?type ?xl ?tl WHERE {{
+  ?x rdf:type ?type .
+  OPTIONAL {{ ?x rdfs:label ?xl }}
+  OPTIONAL {{ ?type rdfs:label ?tl }}
+  FILTER(
+    CONTAINS(LCASE(STR(?xl)), "{top}") ||
+    CONTAINS(LCASE(STR(?tl)), "{top}") ||
+    CONTAINS(LCASE(STR(?x)), "{top}") ||
+    CONTAINS(LCASE(STR(?type)), "{top}")
+  )
 }} LIMIT {max(10, int(limit) // 2)}"""
-        )
-    return queries
+    )
+    return queries[:3]
+
+
+def propose_queries_for_navigator(
+    analysis: dict[str, Any] | None,
+    query: str,
+    *,
+    ontology_json_ld: str = "",
+    entity_types: list[str] | None = None,
+    chunk_entities: list[dict[str, Any]] | None = None,
+    chunk_keywords: list[dict[str, Any]] | None = None,
+) -> list[dict[str, str]]:
+    """Build Navigator proposals from returned-chunk importance + ontology.
+
+    The three SPARQL chips are driven by the most important entity/keyword
+    terms across retrieved chunks (not by generic business-ontology popularity).
+    """
+    analysis = analysis or {}
+    from thot.tools.search.ontology_utils import merge_rdf_graphs
+    from thot.tools.search.python_reasoner import propose_navigator_queries
+
+    focus = _query_focus_terms(analysis, query)
+    if not (ontology_json_ld or "").strip():
+        return [
+            {
+                "kind": "coherence",
+                "title": "Coherence check",
+                "query": "consistency",
+                "description": (
+                    "No fused ontology yet — run a search/RAG query first"
+                ),
+            }
+        ]
+    try:
+        graph = merge_rdf_graphs([ontology_json_ld])
+    except Exception:  # noqa: BLE001
+        LOGGER.exception("Failed to parse ontology for navigator proposals")
+        return []
+    return propose_navigator_queries(
+        graph,
+        focus_terms=focus,
+        entity_types=entity_types or [],
+        chunk_entities=chunk_entities or [],
+        chunk_keywords=chunk_keywords or [],
+    )
 
 
 def _format_sparql_binding_row(row: Any) -> str:
@@ -357,7 +427,6 @@ def run_sparql_on_merged(
     merged_json_ld: str,
     sparql_queries: list[str],
     *,
-    prefer_owlapy: bool = False,
     limit_rows: int = 20,
 ) -> tuple[str, list[str]]:
     """Execute SPARQL queries via ``query_merged_ontology``; return clue text."""
@@ -371,7 +440,6 @@ def run_sparql_on_merged(
                 merged_json_ld,
                 operation="sparql",
                 sparql=sparql,
-                prefer_owlapy=prefer_owlapy,
                 limit=limit_rows,
             )
         except Exception as exc:  # noqa: BLE001
@@ -381,7 +449,7 @@ def run_sparql_on_merged(
         rows = result.get("results") or []
         backend = result.get("backend") or ""
         notes.append(
-            f"SPARQL#{index}: {len(rows)} hit(s) via {backend or 'rdflib'}"
+            f"SPARQL#{index}: {len(rows)} hit(s) via {backend or 'python'}"
         )
         for row in rows[:limit_rows]:
             line = _format_sparql_binding_row(row)
@@ -394,8 +462,6 @@ def run_sparql_on_merged(
 
 def run_reasoner_on_merged(
     merged_json_ld: str,
-    *,
-    prefer_owlapy: bool = False,
 ) -> str:
     """Run consistency (+ optional infer) on the merged passage ontology."""
     from thot.tools.search.ontology_reasoner import query_merged_ontology
@@ -405,7 +471,6 @@ def run_reasoner_on_merged(
         consistency = query_merged_ontology(
             merged_json_ld,
             operation="consistency",
-            prefer_owlapy=prefer_owlapy,
         )
         consistent = consistency.get("consistent")
         backend = consistency.get("backend") or ""
@@ -424,10 +489,11 @@ def run_reasoner_on_merged(
         inferred = query_merged_ontology(
             merged_json_ld,
             operation="infer",
-            prefer_owlapy=prefer_owlapy,
             limit=20,
         )
-        count = int(inferred.get("count") or len(inferred.get("results") or []))
+        count = int(
+            inferred.get("count") or len(inferred.get("results") or [])
+        )
         if count:
             notes.append(f"infer: {count} result(s)")
             for row in (inferred.get("results") or [])[:8]:
@@ -485,7 +551,9 @@ def build_ontology_clues(
         bundle.ontology_facts = "(no passage ontologies built)"
         return bundle
 
-    merged_graph, merged_json_ld = merge_passage_ontology_json_lds(passage_json_lds)
+    merged_graph, merged_json_ld = merge_passage_ontology_json_lds(
+        passage_json_lds
+    )
     bundle.merged_triple_count = len(merged_graph)
     bundle.ontology_facts = summarize_graph_for_prompt(
         merged_graph, query, max_triples=50
@@ -499,7 +567,7 @@ def build_ontology_clues(
     sparql_notes: list[str] = []
     if sparql_queries and merged_json_ld.strip() not in {"", "[]"}:
         clues, sparql_notes = run_sparql_on_merged(
-            merged_json_ld, sparql_queries, prefer_owlapy=False
+            merged_json_ld, sparql_queries
         )
         bundle.sparql_clues = clues
     else:
@@ -507,9 +575,7 @@ def build_ontology_clues(
 
     reasoner_bits: list[str] = []
     if use_reasoner and merged_json_ld.strip() not in {"", "[]"}:
-        reasoner_bits.append(
-            run_reasoner_on_merged(merged_json_ld, prefer_owlapy=False)
-        )
+        reasoner_bits.append(run_reasoner_on_merged(merged_json_ld))
     reasoner_bits.extend(sparql_notes)
     bundle.reasoner_note = "; ".join(bit for bit in reasoner_bits if bit)
     return bundle

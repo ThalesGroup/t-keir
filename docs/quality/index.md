@@ -1,6 +1,10 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-07-22 17:30 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-08-02 20:24 UTC**.
+
+How this dashboard is produced, which Actions upload artefacts, and gate
+thresholds: **[CI, reports & Actions](../ci/index.md)** ·
+[Reports catalog](../ci/reports-catalog.md) · [Quality gates](../ci/gates.md).
 
 Baseline before the B-grade refactoring pass (``thot/`` only): average was
 already within band after hotspots were reduced; gate target remains
@@ -15,18 +19,18 @@ Scoped line coverage from `make coverage` / `CoverageFast.sh` (same
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Scoped line coverage | 90.11% | ≥ 90% | PASS |
-| Full ``thot/`` XML line-rate | 71.52% | informational | — |
-| Statements (scoped) | 5471 | — | — |
-| Covered lines | 4930 | — | — |
-| Missing lines | 541 | — | — |
+| Scoped line coverage | 90.25% | ≥ 90% | PASS |
+| Full ``thot/`` XML line-rate | 57.80% | informational | — |
+| Statements (scoped) | 6544 | — | — |
+| Covered lines | 5906 | — | — |
+| Missing lines | 638 | — | — |
 
 ### Coverage report (TOTAL)
 
 ```
 Name                                                                                                  Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                  5471    541    90%
+TOTAL                                                                                                  6544    638    90%
 ```
 
 Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
@@ -40,10 +44,10 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Average CC | 3.92 | ≤ 7.0 | PASS |
-| Grade | A | B or better | PASS |
-| Functions at grade D+ | 0 | 0 | PASS |
-| Lowest MI module | thot/tasks/syntax/SyntacticTagger.py (15.74) | ≥ 20 preferred | — |
+| Average CC | 5.06 | ≤ 7.0 | PASS |
+| Grade | B | B or better | PASS |
+| Functions at grade D+ | 50 | 0 | FAIL |
+| Lowest MI module | thot/tasks/answer_generation/rag_answer.py (0.00) | ≥ 20 preferred | — |
 
 ### Risk reference table
 
@@ -59,8 +63,8 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 ### Full report (summary)
 
 ```
-1538 blocks (classes, functions, methods) analyzed.
-Average complexity: A (3.9161248374512354)
+2154 blocks (classes, functions, methods) analyzed.
+Average complexity: B (5.064066852367688)
 
 Full per-function JSON: reports/quality/radon_cc.json
 ```
@@ -74,6 +78,10 @@ All runtime and optional Python dependencies from the locked dependency set
 
 | Package | Version | Licence | URL |
 |---------|---------|---------|-----|
+| accelerate | 1.14.0 | Apache Software License | https://github.com/huggingface/accelerate |
+| aiohappyeyeballs | 2.7.1 | Python Software Foundation License | https://github.com/aio-libs/aiohappyeyeballs |
+| aiohttp | 3.14.1 | Apache-2.0 AND MIT | https://github.com/aio-libs/aiohttp |
+| aiosignal | 1.4.0 | Apache Software License | https://github.com/aio-libs/aiosignal |
 | annotated-doc | 0.0.4 | MIT | https://github.com/fastapi/annotated-doc |
 | annotated-types | 0.7.0 | MIT License | https://github.com/annotated-types/annotated-types |
 | anyio | 4.14.1 | MIT | https://anyio.readthedocs.io/en/stable/versionhistory.html |
@@ -101,18 +109,22 @@ All runtime and optional Python dependencies from the locked dependency set
 | cyclonedx-bom | 7.3.0 | Apache Software License | https://github.com/CycloneDX/cyclonedx-python/#readme |
 | cyclonedx-python-lib | 11.11.0 | Apache Software License | https://github.com/CycloneDX/cyclonedx-python-lib/#readme |
 | cymem | 2.0.13 | MIT License | https://github.com/explosion/cymem |
+| datasets | 5.0.0 | Apache Software License | https://github.com/huggingface/datasets |
 | defusedxml | 0.7.1 | Python Software Foundation License | https://github.com/tiran/defusedxml |
+| dill | 0.4.1 | BSD License | https://github.com/uqfoundation/dill |
 | emoji | 2.0.0 | BSD License | https://github.com/carpedm20/emoji/ |
 | en-core-web-md | 3.6.0 | MIT | https://explosion.ai |
 | en-core-web-sm | 3.6.0 | MIT | https://explosion.ai |
 | et_xmlfile | 2.0.0 | MIT License | https://foss.heptapod.net/openpyxl/et_xmlfile |
 | fastapi | 0.139.0 | MIT | https://github.com/fastapi/fastapi |
 | filelock | 3.29.7 | MIT | https://github.com/tox-dev/py-filelock |
+| FlagEmbedding | 1.4.0 | UNKNOWN | https://github.com/FlagOpen/FlagEmbedding |
 | flatbuffers | 25.12.19 | Apache Software License | https://google.github.io/flatbuffers/ |
 | fold-to-ascii | 1.0.2.post1 | MIT License | https://github.com/spanishdict/fold_to_ascii |
 | fqdn | 1.5.1 | Mozilla Public License 2.0 (MPL 2.0) | https://github.com/ypcrts/fqdn |
 | fr-core-news-md | 3.6.0 | LGPL-LR | https://explosion.ai |
 | fr-core-news-sm | 3.6.0 | LGPL-LR | https://explosion.ai |
+| frozenlist | 1.8.0 | Apache-2.0 | https://github.com/aio-libs/frozenlist |
 | fsspec | 2026.4.0 | BSD-3-Clause | https://github.com/fsspec/filesystem_spec |
 | h11 | 0.16.0 | MIT License | https://github.com/python-hyper/h11 |
 | hf-xet | 1.5.1 | Apache-2.0 | https://github.com/huggingface/xet-core |
@@ -125,6 +137,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | idna | 3.18 | BSD-3-Clause | https://github.com/kjd/idna |
 | importlib_metadata | 9.0.0 | Apache-2.0 | https://github.com/python/importlib_metadata |
 | iniconfig | 2.3.0 | MIT | https://github.com/pytest-dev/iniconfig |
+| ir_datasets | 0.6.3 | MIT License | https://ir-datasets.com/ |
 | isodate | 0.7.2 | BSD License | https://github.com/gweis/isodate/ |
 | isoduration | 20.11.0 | ISC License (ISCL) | https://github.com/bolsote/isoduration |
 | Jinja2 | 3.1.6 | BSD License | https://github.com/pallets/jinja/ |
@@ -138,6 +151,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | liccheck | 0.9.2 | Apache Software License | https://github.com/dhatim/python-license-check |
 | license-expression | 30.4.4 | Apache-2.0 | https://github.com/aboutcode-org/license-expression |
 | lxml | 6.1.1 | BSD-3-Clause | https://lxml.de/ |
+| lz4 | 4.4.5 | BSD License | https://github.com/python-lz4/python-lz4 |
 | magika | 0.6.3 | Apache Software License | https://github.com/google/magika |
 | mammoth | 1.12.0 | BSD License | https://github.com/mwilliamson/python-mammoth |
 | mando | 0.7.1 | MIT License | https://mando.readthedocs.org/ |
@@ -150,6 +164,8 @@ All runtime and optional Python dependencies from the locked dependency set
 | msal | 1.37.0 | MIT License | https://github.com/AzureAD/microsoft-authentication-library-for-python |
 | msal-extensions | 1.3.1 | MIT License | https://github.com/AzureAD/microsoft-authentication-extensions-for-python/releases |
 | msgpack | 1.2.1 | Apache-2.0 | https://msgpack.org/ |
+| multidict | 6.7.1 | Apache License 2.0 | https://github.com/aio-libs/multidict |
+| multiprocess | 0.70.19 | BSD License | https://github.com/uqfoundation/multiprocess |
 | murmurhash | 1.0.15 | MIT License | https://github.com/explosion/murmurhash |
 | narwhals | 2.23.0 | MIT | https://github.com/narwhals-dev/narwhals |
 | networkx | 3.6.1 | BSD-3-Clause | https://networkx.org/ |
@@ -169,6 +185,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | pathlib_abc | 0.5.2 | Python Software Foundation License | https://github.com/barneygale/pathlib-abc |
 | pathy | 0.14.2 | Apache-2.0 | https://github.com/justindujardin/pathy |
 | pdfminer.six | 20260107 | MIT | https://github.com/pdfminer/pdfminer.six |
+| peft | 0.19.1 | Apache Software License | https://github.com/huggingface/peft |
 | pillow | 12.3.0 | MIT-CMU | https://python-pillow.github.io |
 | pip-api | 0.0.34 | Apache Software License | http://github.com/di/pip-api |
 | pip-requirements-parser | 32.0.1 | MIT | https://github.com/nexB/pip-requirements-parser |
@@ -177,8 +194,11 @@ All runtime and optional Python dependencies from the locked dependency set
 | pluggy | 1.6.0 | MIT License | UNKNOWN |
 | preshed | 3.0.13 | MIT License | https://github.com/explosion/preshed |
 | prometheus-client | 0.14.1 | Apache Software License | https://github.com/prometheus/client_python |
+| propcache | 0.5.2 | Apache Software License | https://github.com/aio-libs/propcache |
 | protobuf | 5.29.6 | 3-Clause BSD License | https://developers.google.com/protocol-buffers/ |
+| psutil | 7.2.2 | BSD-3-Clause | https://github.com/giampaolo/psutil |
 | py-serializable | 2.1.0 | Apache Software License | https://github.com/madpah/serializable#readme |
+| pyarrow | 25.0.0 | Apache-2.0 | https://arrow.apache.org/ |
 | pycparser | 3.0 | BSD-3-Clause | https://github.com/eliben/pycparser |
 | pydantic | 2.13.4 | MIT | https://github.com/pydantic/pydantic |
 | pydantic_core | 2.46.4 | MIT | https://github.com/pydantic |
@@ -250,6 +270,8 @@ All runtime and optional Python dependencies from the locked dependency set
 | xlrd | 2.0.2 | BSD License | http://www.python-excel.org/ |
 | xlsxwriter | 3.2.9 | BSD License | https://github.com/jmcnamara/XlsxWriter |
 | xx-ent-wiki-sm | 3.6.0 | MIT | https://explosion.ai |
+| xxhash | 3.8.1 | BSD-2-Clause | https://github.com/ifduyue/python-xxhash |
+| yarl | 1.24.2 | Apache-2.0 | https://github.com/aio-libs/yarl |
 | youtube-transcript-api | 1.0.3 | MIT License | https://github.com/jdepoix/youtube-transcript-api |
 | zipp | 4.1.0 | MIT | https://github.com/jaraco/zipp |
 

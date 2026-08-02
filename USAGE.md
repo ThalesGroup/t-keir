@@ -10,7 +10,7 @@ make docs          # http://127.0.0.1:8000/
 
 Also useful: [Installation](docs/installation.md), [NLP quickstart](docs/ready_to_run.md),
 [Environment variables](docs/deployment/environment.md), [Vespa RAG](docs/tools/vespa_rag.md),
-[Dev Container](docs/devcontainer.md).
+[Dev Container](docs/devcontainer.md), [CI & reports](docs/ci/index.md).
 
 Analysis runs through the unified in-process pipeline (`tkeir-pipeline`). Legacy
 REST `_svc.py` / `_client.py` services were removed.
@@ -64,7 +64,7 @@ tkeir-pipeline \
   -t auto
 
 make pipeline \
-  PIPELINE_INPUT=tkeir/tests/fixtures/test-raw/raw \
+  PIPELINE_INPUT=tests/fixtures/test-raw/raw \
   PIPELINE_OUTPUT=/tmp/out
 ```
 
@@ -129,6 +129,7 @@ See [Evaluation](docs/evaluation.md).
 make help
 make pre-commit             # fast local gates
 make ci                     # full quality gate
+# Reports & Actions map: docs/ci/index.md
 make docs                   # MkDocs :8000
 make docs-build             # static site/ 
 ```
@@ -136,5 +137,5 @@ make docs-build             # static site/
 ## API examples
 
 Documented Python snippets are tested in
-`tkeir/tests/unittests/TestToolsDocExamples.py`.
+`tests/unittests/TestToolsDocExamples.py`.
 See [API reference](docs/tools/api_reference.md).

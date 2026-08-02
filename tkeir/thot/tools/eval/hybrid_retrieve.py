@@ -141,7 +141,7 @@ def score_bm25(
 
             arr = np.asarray(scores, dtype=np.float64)
             part = np.argpartition(-arr, keep)[:keep]
-            order = part[np.argsort(-arr[part])]
+            order = list(part[np.argsort(-arr[part])])
         results[qid] = {
             doc_ids[int(i)]: float(scores[int(i)]) for i in order[:keep]
         }
@@ -172,12 +172,16 @@ def score_bge_hybrid(
     )
     query_ids = list(queries.keys())
     query_texts = [queries[qid] for qid in query_ids]
-    LOGGER.info("Encoding %d queries with BGE-M3 dense+sparse…", len(query_texts))
+    LOGGER.info(
+        "Encoding %d queries with BGE-M3 dense+sparse…", len(query_texts)
+    )
     q_emb = encode_texts(query_texts, model_id=path, batch_size=batch_size)
 
     doc_ids = list(corpus.keys())
     doc_texts = [document_text(corpus[did]) for did in doc_ids]
-    LOGGER.info("Encoding %d corpus docs with BGE-M3 dense+sparse…", len(doc_texts))
+    LOGGER.info(
+        "Encoding %d corpus docs with BGE-M3 dense+sparse…", len(doc_texts)
+    )
     d_emb = encode_texts(doc_texts, model_id=path, batch_size=batch_size)
 
     q_dense = np.asarray([row.dense for row in q_emb], dtype=np.float32)

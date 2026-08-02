@@ -96,6 +96,19 @@ highlights matches, and scrolls to the first linked chunk via
 
 Toggle the same entity/keyword again to clear the filter.
 
+### Ontology graph views
+
+Search / Reporter fuse graphs are built for analysts from verbal SPO and
+optional containment, not from Document/Chunk filename scaffolding:
+
+| View | Shows |
+|------|--------|
+| **SPO concepts** | Subject–predicate–object from analyzed `kg` / fused `relations` |
+| **Doc → chunk → ontology** | Document contains chunks; chunks link into concepts; multi-chunk concepts marked as shared (intersection) |
+
+Underlying RDF shape and weights:
+[Document ontology — hypergraph](tools/document_ontology.md#hypergraph-shape-document--chunk--sub-ontology).
+
 ## Environment variables
 
 | Variable | Default | Purpose |
@@ -104,6 +117,7 @@ Toggle the same entity/keyword again to clear the filter.
 | `API_URL` | `http://localhost:8090` | Server-side proxy target (RAG) |
 | `AGENT_URL` | `http://localhost:8092` | Server-side proxy for agent runs (`/api/agent/*`) |
 | `GOVERNOR_URL` | `http://localhost:8094` | Governor proxy (`/api/governor/*`) |
+| `OKF_URL` | `http://localhost:8095` | OKF proxy (`/api/okf/*`) |
 | `API_PROXY_TIMEOUT_MS` | `300000` | Upstream timeout for RAG queries (ms) |
 | `AUTH_ENABLED` | unset / `false` | When `true`, require Keycloak OIDC login |
 | `AUTH_SECRET` | — | Auth.js secret (required if AUTH_ENABLED) |

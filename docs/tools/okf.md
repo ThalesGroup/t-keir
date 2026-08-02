@@ -15,18 +15,39 @@ bundle/
 ├── index.md
 ├── log.md
 ├── query_context.md # scoped exports only
+├── wiki.md          # LLMWiki page (scoped exports)
 ├── concepts/<doc>.md
 └── chunks/<id>.md
 ```
+
+## Where bundles live (workspace / MinIO-ready)
+
+Demo durable OKF + LLM Wiki bundles are written under the shared workspace tree,
+isolated per authenticated user (same prefix as My files)::
+
+```text
+workspace/users/<user_space>/
+  files/                 # My files
+  catalog.json
+  okf/<bundle_id>/       # OKF bundle (wiki.md, concepts, …)
+```
+
+This layout is intended to map 1:1 to object storage later
+(`s3://…/users/<user_space>/okf/<bundle_id>/…`).
+
+- Host Make: set `TKEIR_WORKSPACE` (default `./workspace`); leave `OKF_ROOT`
+  unset for the per-user layout.
+- `OKF_ROOT` remains an optional **flat** override for tests / legacy
+  (`.tkeir-okf/<bundle_id>`). Migrate with `make okf-migrate-workspace`.
 
 ## Who uses it
 
 | Actor | Path |
 |-------|------|
 | Operators / CLI | `tkeir-okf-export`, `make okf-export` |
-| HTTP clients / HMI | `tkeir-okf` `:8094`, `/okf` in the HMI |
+| HTTP clients / HMI | `tkeir-okf` `:8095`, `/okf` in the HMI |
 | Agents | `okf_bundle_list` / `okf_bundle_get` via in-process `McpHandlers` |
-| Workflows | `okf_wiki_brief` (builtin scoped export → curator → compose) |
+| Workflows | `llm_wiki` (scoped export → analyse → review → wiki write); `okf_wiki_brief` (curate → compose) |
 
 ## Static export (`tkeir-okf-export`)
 
@@ -48,6 +69,11 @@ make okf-export QUERY="What is the status of Project ATLAS?" USER_SPACE=dev@tkei
 
 Runs RAG for the query, restricts the export to returned document ids, and
 writes `query_context.md` with the query, answer summary, and concept links.
+It also writes `wiki.md` (OKF `type: Wiki` / LLMWiki page). The HMI Wiki tab
+lets you edit and save that page (`PUT /okf/bundles/{id}/wiki`). **Add wiki to
+My files** calls `POST /okf/bundles/{id}/publish-wiki` (optional `markdown`
+body), which uploads into the user personal workspace (`wiki/<slug>.md`) and
+indexes it into Vespa streaming `user`.
 
 ## New MCP tools: `okf_bundle_list` / `okf_bundle_get`
 
@@ -68,7 +94,28 @@ YAML: `configs/agents/okf_curator.yaml`. Tools: `search`, `rag_query`,
 (enrichments recovered from `notes` JSON; `claim` + `chunk_ids` keep the
 AgentLoop provenance filter).
 
-## New workflow: `okf_wiki_brief`
+## Workflow: `llm_wiki`
+
+```text
+scope_bundle (builtin: okf_scoped_export)
+ → iterative_wiki (builtin: okf_iterative_wiki)
+```
+
+Folds Grab/export chunks into a detailed answer-first `wiki.md` using a persona
+`*_prompt` agent (`params.prompt_name` / `wiki_agent`:
+`wiki_structured_facts_seed` + `wiki_merge_system_prompt`). No separate
+`llm_wiki_*` tool-loop agents.
+
+The HMI **Reporter** / **LLM Wiki** tabs run this via **Grab & generate wiki**,
+then open the page for Save / Add to My files / Send to commander.
+
+```bash
+make okf-workflow WORKFLOW=llm_wiki \
+ GOAL="Tell me everything about MT RED SEA EAGLE" \
+ TOPIC="MT RED SEA EAGLE"
+```
+
+## Workflow: `okf_wiki_brief`
 
 ```text
 scope_bundle (builtin: okf_scoped_export)
@@ -96,7 +143,7 @@ make okf-workflow \
 ## Run via Makefile
 
 ```bash
-make okf # tkeir-okf on :8094
+make okf # tkeir-okf on :8095
 make okf-export # CLI export
 make okf-bundle-ls # list via HTTP
 make okf-workflow # okf_wiki_brief via tkeir-agent
@@ -108,8 +155,7 @@ make okf-workflow # okf_wiki_brief via tkeir-agent
 make compose-up PROFILES=core,okf
 ```
 
-Service `tkeir-okf` publishes host port **8094**. Do not enable the `governor`
-profile on the same host at the same time (governor also uses 8094).
+Service `tkeir-okf` publishes host port **8095**. Governor stays on **8094**.
 
 ## HMI `/okf` bundle browser
 

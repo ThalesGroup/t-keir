@@ -82,7 +82,7 @@ uv run pytest tests/unittests/TestDocExampleCoverage.py tests/unittests/TestAllD
 |---|---|
 | `merge_turtle_graphs(documents)` | Merge parent RDF graphs |
 | `merge_rdf_graphs(documents)` | Merge JSON-LD / Turtle parent payloads |
-| `build_hmi_ontology(...)` | Export entities + keywords + fused `json_ld` (+ merge counts) |
+| `build_hmi_ontology(...)` | Export entities + keywords + relations + fused `json_ld` from Document→Chunk→Statement hypergraphs (+ merge counts) |
 | `extract_relevant_triples(graph, query)` | Filter triple lines by query terms |
 | `summarize_graph_for_prompt(graph, query)` | Bullet summary for LLM prompts |
 
@@ -186,6 +186,8 @@ See [Document ontology](document_ontology.md) and [Architecture data model](../a
 |---|---|
 | `POST /search` | Hybrid Vespa search |
 | `POST /rag/query` | Full RAG answer path |
+| `POST /documents/analyze` | Multipart `file` + optional `business_ontology=@….yaml` → NLP analyzed JSON |
+| `GET /documents/analyzed` | Fetch prior ingest analyzed JSON by `source_ref` |
 | `GET /health` `/ready` `/metrics` | Ops |
 
 Run example tests:

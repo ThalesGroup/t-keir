@@ -1,22 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { AuthProvider } from "@/src/auth/AuthProvider";
 
 export const metadata: Metadata = {
   title: "T-KEIR Workspace",
   description:
     "Search, RAG report generation, and agent dialogs over the T-KEIR corpus",
+  icons: {
+    icon: [{ url: "/tkeir-logo.png", type: "image/png" }],
+    shortcut: "/tkeir-logo.png",
+    apple: "/tkeir-logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -25,11 +19,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen font-sans`}
-      >
-        {children}
+    <html lang="en" suppressHydrationWarning className="dark">
+      <body className="min-h-screen font-sans">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

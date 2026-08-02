@@ -9,14 +9,14 @@ ARG BUILD_DATE=unknown
 USER root
 ENV TKEIR_SERVICE=tkeir-okf \
     OKF_HOST=0.0.0.0 \
-    OKF_PORT=8094 \
-    OKF_ROOT=/var/tkeir/okf
+    OKF_PORT=8095 \
+    TKEIR_WORKSPACE=/workspace
 
-RUN mkdir -p /var/tkeir/okf /var/tkeir/governor \
-    && chown -R 10001:10001 /var/tkeir
+RUN mkdir -p /workspace /var/tkeir/governor \
+    && chown -R 10001:10001 /workspace /var/tkeir
 
 USER 10001
-EXPOSE 8094
+EXPOSE 8095
 
 LABEL org.opencontainers.image.title="tkeir-okf" \
       org.opencontainers.image.description="T-KEIR OKF bundle export service" \

@@ -33,8 +33,11 @@ export function AgentPanel({ available }: AgentPanelProps) {
       <div>
         <h2 className="text-xl font-semibold tracking-tight">Agent dialog</h2>
         <p className="text-sm text-muted-foreground">
-          Discuss with researcher or multi-agent workflows, then compose a
-          custom grounded report from your data.
+          Runs your persona OTAN workflow by default (or researcher). Open{" "}
+          <a href="/agents" className="underline underline-offset-2">
+            /agents
+          </a>{" "}
+          to pick another workflow and publish.
         </p>
       </div>
       <div className="rounded-xl border bg-card p-4 shadow-sm">
@@ -45,7 +48,7 @@ export function AgentPanel({ available }: AgentPanelProps) {
         <a href="/agents" className="underline underline-offset-2">
           /agents
         </a>{" "}
-        to monitor run status and publish composed markdown.
+        to monitor runs; the selected persona workflow is the default.
       </p>
     </div>
   );

@@ -1,0 +1,807 @@
+# Enterprise Intelligence Platform — Business Ontology
+# Scenario: "Project MERIDIAN" — Corporate Fraud & Sanctions-Evasion Investigation
+# Focal entity: NEXUS ENERGY HOLDINGS (NEH) — a multi-jurisdictional energy trading conglomerate
+#
+# Grounded in real-world case typologies:
+#   - Glencore commodity bribery (DOJ/SFO, 2022)
+#   - Vitol sanctions-evasion (DOJ, 2020)
+#   - 1MDB-linked shell flows (DOJ, 2016–2023)
+#   - Enron SPE off-balance-sheet structuring
+#   - Wirecard phantom revenue / fictitious receivables (2020)
+#   - FinCEN Files / SWIFT anomalies (ICIJ, 2020)
+#
+# Ontology spine: FINANCIAL_RISK / COMPLIANCE / OPERATIONS
+# version: 1.0.0
+# dataset_version: 1.0-enterprise-EN
+# generated_utc: 2026-07-28
+
+# ---------------------------------------------------------------------------
+# HIERARCHY OVERVIEW
+#
+#  FINANCIAL_RISK
+#  ├─ MARKET_SURVEILLANCE          (real-time trading anomaly monitoring)
+#  │   ├─ TRADE_REPORTING
+#  │   │   ├─ REPORTING_GAP        (deliberate trade reporting blackout)
+#  │   │   ├─ LATE_FILING
+#  │   │   ├─ AMENDED_FILING
+#  │   │   └─ DISCLOSURE_OMISSION
+#  │   ├─ TRANSACTION_ANOMALY
+#  │   │   ├─ VELOCITY_SPIKE       (abnormal transaction frequency)
+#  │   │   ├─ ROUND_TRIP_TRADE     (wash trade / mirror trade)
+#  │   │   ├─ COMMODITY_MISMATCH   (declared vs. actual cargo)
+#  │   │   └─ PRICE_MANIPULATION
+#  │   └─ COUNTERPARTY
+#  │       ├─ ENTITY_TYPE
+#  │       │   ├─ TRADING_HOUSE
+#  │       │   ├─ SHELL_COMPANY
+#  │       │   ├─ SPV              (Special Purpose Vehicle)
+#  │       │   ├─ STATE_OWNED_ENTERPRISE
+#  │       │   └─ INTERMEDIARY_AGENT
+#  │       └─ COUNTERPARTY_RISK
+#  │           ├─ SANCTIONS_NEXUS  (OFAC / EU / UN listed or 50% rule)
+#  │           └─ PEP_NEXUS        (Politically Exposed Person connection)
+#  │
+#  ├─ COMPLIANCE
+#  │   ├─ RISK_SUMMARY             (output document — CDO product)
+#  │   ├─ SOURCE_DOMAIN
+#  │   │   ├─ HUMINT_CORPORATE     (whistleblowers, confidential informants)
+#  │   │   │   ├─ WHISTLEBLOWER_REPORT
+#  │   │   │   └─ SOURCE_CATEGORY
+#  │   │   │       ├─ INTERNAL_WHISTLEBLOWER
+#  │   │   │       ├─ EXTERNAL_INFORMANT
+#  │   │   │       ├─ REGULATORY_LIAISON
+#  │   │   │       └─ FORMER_EMPLOYEE
+#  │   │   ├─ OPEN_SOURCE_ANALYTICS
+#  │   │   │   ├─ SOCIAL_MEDIA_SOURCE
+#  │   │   │   └─ PUBLICATION_SOURCE
+#  │   │   └─ MARKET_DATA_ANALYTICS
+#  │   ├─ ACTIVITY_TYPE
+#  │   │   ├─ BRIBERY_PAYMENT      (Glencore / Unaoil pattern)
+#  │   │   ├─ UNDISCLOSED_TRANSFER (off-balance-sheet / 1MDB pattern)
+#  │   │   ├─ FICTITIOUS_RECEIVABLE(Wirecard / phantom revenue)
+#  │   │   ├─ DOCUMENT_FALSIFICATION
+#  │   │   ├─ LAYERING             (AML 3-stage: placement, layering, integration)
+#  │   │   └─ COLLATERAL_PLEDGE_FRAUD
+#  │   ├─ EVALUATION_STANDARD
+#  │   │   ├─ SOURCE_RELIABILITY   (A–F: mirroring Admiralty A–F)
+#  │   │   └─ INFORMATION_CREDIBILITY (1–6: mirroring Admiralty 1–6)
+#  │   └─ KRI                      (Key Risk Indicator — enterprise ≡ PIR)
+#  │       ├─ KRI_FINANCIAL_FRAUD
+#  │       ├─ KRI_SANCTIONS_EVASION
+#  │       ├─ KRI_BRIBERY_CORRUPTION
+#  │       ├─ KRI_AML_LAYERING
+#  │       ├─ KRI_COMMODITY_MISREPORTING
+#  │       └─ KRI_MARKET_MANIPULATION
+#  │
+#  └─ OPERATIONS
+#      ├─ ORIGINATOR_UNIT
+#      │   ├─ CDO_ANALYTICS        (data / intelligence function)
+#      │   ├─ CISO_INTELLIGENCE    (confidential source management)
+#      │   ├─ CEO_DASHBOARD        (board-level awareness)
+#      │   └─ CFO_RISK_DESK        (financial decision authority)
+#      ├─ REPORT_PRECEDENCE
+#      │   ├─ FLASH
+#      │   ├─ IMMEDIATE
+#      │   ├─ PRIORITY
+#      │   └─ ROUTINE
+#      └─ ACCESS_TIER
+#          ├─ CONFIDENTIAL_CSUITE  (C-suite and board only)
+#          ├─ INTERNAL_RESTRICTED  (need-to-know internal)
+#          └─ PUBLIC_INFORMATION
+# ---------------------------------------------------------------------------
+
+concepts:
+
+  # =========================================================================
+  # ROOT 1 — FINANCIAL_RISK
+  # =========================================================================
+
+  - concept_id: FINANCIAL_RISK
+    preferred_label: Financial Risk
+    synonyms:
+      - enterprise risk
+      - corporate risk
+      - counterparty risk exposure
+    dataset_fields:
+      domain: [MARKET_DATA_ANALYTICS, OPEN_SOURCE_ANALYTICS, HUMINT_CORPORATE]
+      kri_ref: [KRI-01, KRI-02, KRI-03, KRI-04, KRI-05, KRI-06]
+    broader: []
+    narrower: [MARKET_SURVEILLANCE, COMPLIANCE, OPERATIONS]
+
+  - concept_id: MARKET_SURVEILLANCE
+    preferred_label: Market Surveillance
+    synonyms:
+      - trading surveillance
+      - transaction monitoring
+      - trade-flow oversight
+    dataset_fields:
+      domain: [MARKET_DATA_ANALYTICS]
+      kri_ref: [KRI-01, KRI-02, KRI-05, KRI-06]
+    broader: [FINANCIAL_RISK]
+    narrower: [TRADE_REPORTING, TRANSACTION_ANOMALY, COUNTERPARTY]
+
+  - concept_id: TRADE_REPORTING
+    preferred_label: Trade Reporting
+    synonyms:
+      - regulatory filing
+      - trade disclosure
+      - transaction reporting
+    dataset_fields:
+      activity_type: [REPORTING_GAP, LATE_FILING, AMENDED_FILING, DISCLOSURE_OMISSION]
+      kri_ref: [KRI-01, KRI-05]
+    broader: [MARKET_SURVEILLANCE]
+    narrower: [REPORTING_GAP, LATE_FILING, AMENDED_FILING, DISCLOSURE_OMISSION]
+
+  - concept_id: REPORTING_GAP
+    preferred_label: Reporting Gap
+    synonyms:
+      - dark window
+      - unreported period
+      - trade silence
+      - blackout period
+    description: >
+      Period during which a regulated entity fails to transmit required trade reports
+      to a regulatory body (e.g. MiFID II transaction reports, EMIR trade repository).
+      Enterprise analogue of a reporting blackout: deliberate suppression of a reporting
+      obligation to conceal a transaction. Key indicator of KRI-01 and KRI-02.
+    dataset_fields:
+      activity_type: [REPORTING_GAP]
+      kri_ref: [KRI-01, KRI-02]
+    broader: [TRADE_REPORTING]
+    narrower: []
+
+  - concept_id: LATE_FILING
+    preferred_label: Late Filing
+    synonyms:
+      - delayed disclosure
+      - tardy regulatory report
+    broader: [TRADE_REPORTING]
+    narrower: []
+
+  - concept_id: AMENDED_FILING
+    preferred_label: Amended Filing
+    synonyms:
+      - corrected report
+      - restated transaction report
+    broader: [TRADE_REPORTING]
+    narrower: []
+
+  - concept_id: DISCLOSURE_OMISSION
+    preferred_label: Disclosure Omission
+    synonyms:
+      - missing beneficial ownership disclosure
+      - omitted related-party transaction
+      - hidden interest
+    dataset_fields:
+      activity_type: [DISCLOSURE_OMISSION]
+      kri_ref: [KRI-01, KRI-03]
+    broader: [TRADE_REPORTING]
+    narrower: []
+
+  - concept_id: TRANSACTION_ANOMALY
+    preferred_label: Transaction Anomaly
+    synonyms:
+      - suspicious transaction
+      - unusual trade pattern
+      - red-flag transaction
+    dataset_fields:
+      domain: [MARKET_DATA_ANALYTICS]
+      kri_ref: [KRI-01, KRI-02, KRI-06]
+    broader: [MARKET_SURVEILLANCE]
+    narrower: [VELOCITY_SPIKE, ROUND_TRIP_TRADE, COMMODITY_MISMATCH, PRICE_MANIPULATION]
+
+  - concept_id: VELOCITY_SPIKE
+    preferred_label: Velocity Spike
+    synonyms:
+      - abnormal transaction frequency
+      - burst trading
+      - layering pattern
+    description: >
+      Sudden, statistically anomalous increase in transaction volume or frequency
+      by a single counterparty over a short window. Classic AML layering indicator.
+      Analogue of speed anomaly / loitering in vessel tracking.
+    dataset_fields:
+      kri_ref: [KRI-04, KRI-06]
+    broader: [TRANSACTION_ANOMALY]
+    narrower: []
+
+  - concept_id: ROUND_TRIP_TRADE
+    preferred_label: Round-Trip Trade
+    synonyms:
+      - wash trade
+      - mirror trade
+      - boomerang transaction
+      - back-to-back trade
+    description: >
+      A transaction in which value leaves and returns to the same beneficial owner
+      through one or more intermediary entities, creating the appearance of revenue
+      or trading activity without genuine economic substance. Core mechanism in
+      Vitol and Glencore bribery cases.
+    dataset_fields:
+      activity_type: [ROUND_TRIP_TRADE]
+      kri_ref: [KRI-01, KRI-06]
+    broader: [TRANSACTION_ANOMALY]
+    narrower: []
+
+  - concept_id: COMMODITY_MISMATCH
+    preferred_label: Commodity Mismatch
+    synonyms:
+      - cargo manifest discrepancy
+      - declared vs actual goods discrepancy
+      - trade document falsification
+    description: >
+      Discrepancy between goods declared on trade documentation (letter of credit,
+      bill of lading, customs declaration) and goods actually transferred.
+      Enterprise analogue of CARGO MANIFEST DISCREPANCY in the C2 scenario.
+    dataset_fields:
+      activity_type: [DOCUMENT_FALSIFICATION]
+      kri_ref: [KRI-05]
+    broader: [TRANSACTION_ANOMALY]
+    narrower: []
+
+  - concept_id: PRICE_MANIPULATION
+    preferred_label: Price Manipulation
+    synonyms:
+      - benchmark manipulation
+      - transfer pricing abuse
+      - artificial pricing
+    dataset_fields:
+      kri_ref: [KRI-06]
+    broader: [TRANSACTION_ANOMALY]
+    narrower: []
+
+  - concept_id: COUNTERPARTY
+    preferred_label: Counterparty
+    synonyms:
+      - business partner
+      - correspondent entity
+      - trading counterpart
+    broader: [MARKET_SURVEILLANCE]
+    narrower: [ENTITY_TYPE, COUNTERPARTY_RISK]
+
+  - concept_id: ENTITY_TYPE
+    preferred_label: Entity Type
+    synonyms:
+      - corporate structure type
+      - legal vehicle classification
+    broader: [COUNTERPARTY]
+    narrower: [TRADING_HOUSE, SHELL_COMPANY, SPV, STATE_OWNED_ENTERPRISE, INTERMEDIARY_AGENT]
+
+  - concept_id: TRADING_HOUSE
+    preferred_label: Trading House
+    synonyms:
+      - commodity trader
+      - energy trading company
+    broader: [ENTITY_TYPE]
+    narrower: []
+
+  - concept_id: SHELL_COMPANY
+    preferred_label: Shell Company
+    synonyms:
+      - letterbox company
+      - nominee company
+      - shelf company
+      - brass-plate entity
+    description: >
+      Entity with no substantive business activity, used to hold assets or route
+      payments. Core vehicle in 1MDB, Wirecard (Senjo Group), and Glencore
+      intermediary structures.
+    broader: [ENTITY_TYPE]
+    narrower: []
+
+  - concept_id: SPV
+    preferred_label: Special Purpose Vehicle
+    synonyms:
+      - SPE
+      - special purpose entity
+      - off-balance-sheet vehicle
+    description: >
+      Legally distinct entity created to isolate financial risk or assets from
+      the parent. Used legitimately in project finance; abused in Enron-style
+      off-balance-sheet structuring and securitisation fraud.
+    broader: [ENTITY_TYPE]
+    narrower: []
+
+  - concept_id: STATE_OWNED_ENTERPRISE
+    preferred_label: State-Owned Enterprise
+    synonyms:
+      - NOC
+      - national oil company
+      - parastatal
+    broader: [ENTITY_TYPE]
+    narrower: []
+
+  - concept_id: INTERMEDIARY_AGENT
+    preferred_label: Intermediary Agent
+    synonyms:
+      - fixer
+      - facilitator
+      - middleman
+      - commercial agent
+    description: >
+      Third party engaged to facilitate transactions with government officials
+      or state entities. Primary vector for FCPA and UK Bribery Act violations
+      (Glencore, Unaoil, SBM Offshore patterns).
+    broader: [ENTITY_TYPE]
+    narrower: []
+
+  - concept_id: COUNTERPARTY_RISK
+    preferred_label: Counterparty Risk
+    synonyms:
+      - third-party risk
+      - business partner risk
+    broader: [COUNTERPARTY]
+    narrower: [SANCTIONS_NEXUS, PEP_NEXUS]
+
+  - concept_id: SANCTIONS_NEXUS
+    preferred_label: Sanctions Nexus
+    synonyms:
+      - sanctions connection
+      - OFAC-linked entity
+      - EU-listed counterparty
+      - 50 percent rule exposure
+    description: >
+      Direct or indirect connection to a sanctioned party, including through the
+      OFAC 50% rule (entities ≥50% owned by a sanctioned party are themselves
+      treated as sanctioned even if not named on the SDN list). Vitol and Petróleos
+      de Venezuela (PDVSA) case is the defining precedent.
+    dataset_fields:
+      kri_ref: [KRI-02]
+    broader: [COUNTERPARTY_RISK]
+    narrower: []
+
+  - concept_id: PEP_NEXUS
+    preferred_label: PEP Nexus
+    synonyms:
+      - politically exposed person connection
+      - government official link
+      - state official relationship
+    broader: [COUNTERPARTY_RISK]
+    narrower: []
+
+  # =========================================================================
+  # ROOT 2 — COMPLIANCE
+  # =========================================================================
+
+  - concept_id: COMPLIANCE
+    preferred_label: Compliance
+    synonyms:
+      - regulatory compliance
+      - enterprise governance
+      - compliance framework
+    broader: []
+    narrower: [RISK_SUMMARY, SOURCE_DOMAIN, ACTIVITY_TYPE, EVALUATION_STANDARD, KRI]
+
+  - concept_id: RISK_SUMMARY
+    preferred_label: Risk Summary
+    synonyms:
+      - executive risk report
+      - compliance summary
+      - analytical product
+    dataset_fields:
+      record_type: [RISK_ASSESSMENT, ENTITY_TRACK]
+    broader: [COMPLIANCE]
+    narrower: []
+
+  - concept_id: SOURCE_DOMAIN
+    preferred_label: Source Domain
+    synonyms:
+      - intelligence source type
+      - information source category
+    broader: [COMPLIANCE]
+    narrower: [HUMINT_CORPORATE, OPEN_SOURCE_ANALYTICS, MARKET_DATA_ANALYTICS]
+
+  - concept_id: HUMINT_CORPORATE
+    preferred_label: Corporate Human Intelligence
+    synonyms:
+      - confidential human source
+      - corporate HUMINT
+      - whistleblower intelligence
+    broader: [SOURCE_DOMAIN]
+    narrower: [WHISTLEBLOWER_REPORT, SOURCE_CATEGORY]
+
+  - concept_id: WHISTLEBLOWER_REPORT
+    preferred_label: Whistleblower Report
+    synonyms:
+      - protected disclosure
+      - Dodd-Frank tip
+      - SEC whistleblower submission
+      - EU Whistleblowing Directive disclosure
+    broader: [HUMINT_CORPORATE]
+    narrower: []
+
+  - concept_id: SOURCE_CATEGORY
+    preferred_label: Source Category
+    synonyms:
+      - human source type
+      - informant classification
+    broader: [HUMINT_CORPORATE]
+    narrower: [INTERNAL_WHISTLEBLOWER, EXTERNAL_INFORMANT, REGULATORY_LIAISON, FORMER_EMPLOYEE]
+
+  - concept_id: INTERNAL_WHISTLEBLOWER
+    preferred_label: Internal Whistleblower
+    synonyms:
+      - current employee source
+      - inside informant
+    broader: [SOURCE_CATEGORY]
+    narrower: []
+
+  - concept_id: EXTERNAL_INFORMANT
+    preferred_label: External Informant
+    synonyms:
+      - third-party tipster
+      - competitor intelligence
+      - external source
+    broader: [SOURCE_CATEGORY]
+    narrower: []
+
+  - concept_id: REGULATORY_LIAISON
+    preferred_label: Regulatory Liaison
+    synonyms:
+      - regulator contact
+      - FCA liaison
+      - SEC contact
+      - DOJ cooperation contact
+    broader: [SOURCE_CATEGORY]
+    narrower: []
+
+  - concept_id: FORMER_EMPLOYEE
+    preferred_label: Former Employee
+    synonyms:
+      - ex-employee source
+      - departing staff informant
+    broader: [SOURCE_CATEGORY]
+    narrower: []
+
+  - concept_id: OPEN_SOURCE_ANALYTICS
+    preferred_label: Open Source Analytics
+    synonyms:
+      - OSINT
+      - public record analysis
+      - open-source intelligence
+    broader: [SOURCE_DOMAIN]
+    narrower: [SOCIAL_MEDIA_SOURCE, PUBLICATION_SOURCE]
+
+  - concept_id: SOCIAL_MEDIA_SOURCE
+    preferred_label: Social Media Source
+    broader: [OPEN_SOURCE_ANALYTICS]
+    narrower: []
+
+  - concept_id: PUBLICATION_SOURCE
+    preferred_label: Publication Source
+    synonyms:
+      - media report
+      - court filing
+      - regulatory order
+      - company filing
+    broader: [OPEN_SOURCE_ANALYTICS]
+    narrower: []
+
+  - concept_id: MARKET_DATA_ANALYTICS
+    preferred_label: Market Data Analytics
+    synonyms:
+      - transaction monitoring system
+      - TMS alert
+      - AML system alert
+      - trade surveillance platform
+    broader: [SOURCE_DOMAIN]
+    narrower: []
+
+  - concept_id: ACTIVITY_TYPE
+    preferred_label: Activity Type
+    synonyms:
+      - scheme type
+      - fraud typology
+      - misconduct pattern
+    broader: [COMPLIANCE]
+    narrower: [BRIBERY_PAYMENT, UNDISCLOSED_TRANSFER, FICTITIOUS_RECEIVABLE,
+               DOCUMENT_FALSIFICATION, LAYERING, COLLATERAL_PLEDGE_FRAUD]
+
+  - concept_id: BRIBERY_PAYMENT
+    preferred_label: Bribery Payment
+    synonyms:
+      - corrupt payment
+      - improper advantage
+      - facilitation payment
+      - grease payment
+    description: >
+      Payment made to a government official or private actor to obtain or retain
+      business, or to secure an improper advantage. Core typology in FCPA,
+      UK Bribery Act, and OECD Convention cases. Glencore paid >$180M in bribes
+      across DRC, Nigeria, and Venezuela (2022 DOJ resolution).
+    dataset_fields:
+      kri_ref: [KRI-03]
+    broader: [ACTIVITY_TYPE]
+    narrower: []
+
+  - concept_id: UNDISCLOSED_TRANSFER
+    preferred_label: Undisclosed Transfer
+    synonyms:
+      - off-balance-sheet payment
+      - hidden disbursement
+      - unrecorded transaction
+      - dark transfer
+    description: >
+      Financial transfer not recorded in audited financial statements or regulatory
+      filings. Classic 1MDB mechanism: funds routed through BVI shells (Good Star
+      Ltd, Aabar Investments PJS BVI) without appearing on IMDB's books.
+    dataset_fields:
+      activity_type: [UNDISCLOSED_TRANSFER]
+      kri_ref: [KRI-01, KRI-04]
+    broader: [ACTIVITY_TYPE]
+    narrower: []
+
+  - concept_id: FICTITIOUS_RECEIVABLE
+    preferred_label: Fictitious Receivable
+    synonyms:
+      - phantom receivable
+      - fake third-party collection
+      - false escrow account
+      - non-existent revenue
+    description: >
+      Accounting entry representing revenue or an asset that does not correspond
+      to any genuine underlying transaction. Wirecard's €1.9B in missing cash
+      was concealed as purported escrow receivables from a fictitious Asia-Pacific
+      payment processor network (Senjo Group).
+    dataset_fields:
+      activity_type: [FICTITIOUS_RECEIVABLE]
+      kri_ref: [KRI-01]
+    broader: [ACTIVITY_TYPE]
+    narrower: []
+
+  - concept_id: DOCUMENT_FALSIFICATION
+    preferred_label: Document Falsification
+    synonyms:
+      - fraudulent documentation
+      - forged trade document
+      - fabricated bill of lading
+      - falsified letter of credit
+    broader: [ACTIVITY_TYPE]
+    narrower: []
+
+  - concept_id: LAYERING
+    preferred_label: Layering
+    synonyms:
+      - AML layering
+      - transaction layering
+      - fund movement obfuscation
+    description: >
+      Second stage of money laundering: moving funds through multiple accounts,
+      entities, or jurisdictions to obscure origin. Identified in FinCEN Files
+      (2020) via SWIFT message analysis across Deutsche Bank, JPMorgan, HSBC,
+      Standard Chartered, BNY Mellon.
+    dataset_fields:
+      activity_type: [LAYERING]
+      kri_ref: [KRI-04]
+    broader: [ACTIVITY_TYPE]
+    narrower: []
+
+  - concept_id: COLLATERAL_PLEDGE_FRAUD
+    preferred_label: Collateral Pledge Fraud
+    synonyms:
+      - double-pledged collateral
+      - phantom collateral
+      - re-hypothecation fraud
+    broader: [ACTIVITY_TYPE]
+    narrower: []
+
+  - concept_id: EVALUATION_STANDARD
+    preferred_label: Source Evaluation Standard
+    synonyms:
+      - source grading system
+      - reliability and credibility scale
+    broader: [COMPLIANCE]
+    narrower: [SOURCE_RELIABILITY, INFORMATION_CREDIBILITY]
+
+  - concept_id: SOURCE_RELIABILITY
+    preferred_label: Source Reliability
+    synonyms:
+      - track record
+      - source grade
+      - reliability rating
+    description: >
+      Six-point scale (A–F) assessing the historical accuracy and dependability
+      of a human or institutional source. Adapted from NATO Admiralty System.
+      A=Completely reliable, B=Usually reliable, C=Fairly reliable,
+      D=Not usually reliable, E=Unreliable, F=Cannot be judged.
+    broader: [EVALUATION_STANDARD]
+    narrower: []
+
+  - concept_id: INFORMATION_CREDIBILITY
+    preferred_label: Information Credibility
+    synonyms:
+      - report credibility
+      - information grade
+      - content credibility
+    description: >
+      Six-point scale (1–6) assessing the intrinsic likelihood that a specific
+      report is accurate. 1=Confirmed, 2=Probably true, 3=Possibly true,
+      4=Doubtful, 5=Improbable, 6=Truth cannot be judged.
+    broader: [EVALUATION_STANDARD]
+    narrower: []
+
+  - concept_id: KRI
+    preferred_label: Key Risk Indicator
+    synonyms:
+      - KRI
+      - risk threshold
+      - monitoring trigger
+    broader: [COMPLIANCE]
+    narrower: [KRI_FINANCIAL_FRAUD, KRI_SANCTIONS_EVASION, KRI_BRIBERY_CORRUPTION,
+               KRI_AML_LAYERING, KRI_COMMODITY_MISREPORTING, KRI_MARKET_MANIPULATION]
+
+  - concept_id: KRI_FINANCIAL_FRAUD
+    preferred_label: KRI-01 — Financial Fraud & Asset Concealment
+    synonyms:
+      - fictitious revenue
+      - off-balance-sheet concealment
+      - phantom asset
+    broader: [KRI]
+    narrower: []
+
+  - concept_id: KRI_SANCTIONS_EVASION
+    preferred_label: KRI-02 — Sanctions Evasion
+    synonyms:
+      - sanctions circumvention
+      - OFAC evasion
+      - SDN exposure
+      - 50-percent rule breach
+    broader: [KRI]
+    narrower: []
+
+  - concept_id: KRI_BRIBERY_CORRUPTION
+    preferred_label: KRI-03 — Bribery & Corruption
+    synonyms:
+      - FCPA exposure
+      - UK Bribery Act risk
+      - corrupt payment
+      - improper advantage
+    broader: [KRI]
+    narrower: []
+
+  - concept_id: KRI_AML_LAYERING
+    preferred_label: KRI-04 — AML / Layering
+    synonyms:
+      - anti-money laundering risk
+      - layering exposure
+      - FinCEN SAR trigger
+    broader: [KRI]
+    narrower: []
+
+  - concept_id: KRI_COMMODITY_MISREPORTING
+    preferred_label: KRI-05 — Commodity Misreporting
+    synonyms:
+      - cargo fraud
+      - trade document fraud
+      - commodity misdeclaration
+    broader: [KRI]
+    narrower: []
+
+  - concept_id: KRI_MARKET_MANIPULATION
+    preferred_label: KRI-06 — Market Manipulation
+    synonyms:
+      - benchmark fixing
+      - wash trading
+      - spoofing
+      - transfer pricing abuse
+    broader: [KRI]
+    narrower: []
+
+  # =========================================================================
+  # ROOT 3 — OPERATIONS
+  # =========================================================================
+
+  - concept_id: OPERATIONS
+    preferred_label: Operations
+    synonyms:
+      - enterprise operations
+      - operational function
+    broader: []
+    narrower: [ORIGINATOR_UNIT, REPORT_PRECEDENCE, ACCESS_TIER]
+
+  - concept_id: ORIGINATOR_UNIT
+    preferred_label: Originator Unit
+    synonyms:
+      - authoring function
+      - report originator
+    broader: [OPERATIONS]
+    narrower: [CDO_ANALYTICS, CISO_INTELLIGENCE, CEO_DASHBOARD, CFO_RISK_DESK]
+
+  - concept_id: CDO_ANALYTICS
+    preferred_label: CDO Analytics Cell
+    synonyms:
+      - data analytics function
+      - chief data officer analytics
+      - intelligence production
+    broader: [ORIGINATOR_UNIT]
+    narrower: []
+
+  - concept_id: CISO_INTELLIGENCE
+    preferred_label: CISO Intelligence Operations
+    synonyms:
+      - confidential source management
+      - corporate HUMINT cell
+      - CISO ops
+    broader: [ORIGINATOR_UNIT]
+    narrower: []
+
+  - concept_id: CEO_DASHBOARD
+    preferred_label: CEO Dashboard
+    synonyms:
+      - board situational awareness
+      - executive monitoring dashboard
+      - C-suite watch
+    broader: [ORIGINATOR_UNIT]
+    narrower: []
+
+  - concept_id: CFO_RISK_DESK
+    preferred_label: CFO Risk Desk
+    synonyms:
+      - financial risk authority
+      - CFO decision desk
+      - treasury risk function
+    broader: [ORIGINATOR_UNIT]
+    narrower: []
+
+  - concept_id: REPORT_PRECEDENCE
+    preferred_label: Report Precedence
+    synonyms:
+      - alert priority
+      - escalation level
+    broader: [OPERATIONS]
+    narrower: [FLASH, IMMEDIATE, PRIORITY, ROUTINE]
+
+  - concept_id: FLASH
+    preferred_label: FLASH
+    synonyms:
+      - immediate escalation
+      - board-level urgent
+    broader: [REPORT_PRECEDENCE]
+    narrower: []
+
+  - concept_id: IMMEDIATE
+    preferred_label: IMMEDIATE
+    broader: [REPORT_PRECEDENCE]
+    narrower: []
+
+  - concept_id: PRIORITY
+    preferred_label: PRIORITY
+    broader: [REPORT_PRECEDENCE]
+    narrower: []
+
+  - concept_id: ROUTINE
+    preferred_label: ROUTINE
+    broader: [REPORT_PRECEDENCE]
+    narrower: []
+
+  - concept_id: ACCESS_TIER
+    preferred_label: Access Tier
+    synonyms:
+      - data classification
+      - confidentiality level
+    broader: [OPERATIONS]
+    narrower: [CONFIDENTIAL_CSUITE, INTERNAL_RESTRICTED, PUBLIC_INFORMATION]
+
+  - concept_id: CONFIDENTIAL_CSUITE
+    preferred_label: CONFIDENTIAL — C-Suite
+    synonyms:
+      - board restricted
+      - eyes-only executive
+    broader: [ACCESS_TIER]
+    narrower: []
+
+  - concept_id: INTERNAL_RESTRICTED
+    preferred_label: INTERNAL — RESTRICTED
+    synonyms:
+      - need-to-know internal
+      - internal use only
+    broader: [ACCESS_TIER]
+    narrower: []
+
+  - concept_id: PUBLIC_INFORMATION
+    preferred_label: PUBLIC — Open Source
+    synonyms:
+      - publicly available
+      - open source
+    broader: [ACCESS_TIER]
+    narrower: []

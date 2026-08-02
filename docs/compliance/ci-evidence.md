@@ -1,34 +1,41 @@
 # CI and evidence pipeline
 
-This page maps T-KEIR's repository checks to the evidence they produce.
-It describes engineering controls, not a legal attestation.
+This page maps repository checks to **OPA evidence keys** used by the EU
+compliance audit. For the full catalogue of GitHub Actions, report directories,
+and quality thresholds, start here:
 
-Those artefacts are also **inputs** to the OPA EU compliance audit
-(`make audit-compliance`) — see [EU Compliance OPA Audit](eu-audit.md).
+| Guide | Contents |
+|-------|----------|
+| [CI, reports & Actions](../ci/index.md) | Local `make ci` vs PR CI; report tree |
+| [Workflows](../ci/workflows.md) | All six Actions workflows + artefacts |
+| [Reports catalog](../ci/reports-catalog.md) | Make target → output path |
+| [Quality gates](../ci/gates.md) | Coverage / complexity / SLSA thresholds |
 
-## Quality gates
+Those artefacts are **inputs** to `make audit-compliance` — see
+[EU Compliance OPA Audit](eu-audit.md).
 
-The default repository gate is `make ci`.
+## Quality gates (summary)
 
-It runs:
+The default local gate is `make ci`. PR Actions (`ci.yml`) run a **subset**
+(unit + coverage + lint/types/docs). Full security, SLSA, and OPA run locally
+or on release — see [workflows](../ci/workflows.md).
 
-- secret hygiene (`make check-secrets`) — blocks tracked `.env`, credential
-  filenames, and high-confidence secret patterns (see `.secrets-allowlist.yaml`)
-- lockfile drift detection (`make verify-lockfile`)
-- Python lint / typecheck / tests / coverage
+`make ci` includes:
+
+- secret hygiene (`make check-secrets`)
+- lockfile drift (`make verify-lockfile`)
+- Python lint / typecheck / unit + functional tests / coverage
+- optional integration / Hypothesis fuzz / BDD
 - HMI lint / typecheck / build
-- dependency license review
-- complexity checks
+- licence review + complexity
 - dependency and filesystem security scans
-- SBOM / AIBOM generation
+- SBOM / AIBOM + Trivy / OWASP
+- SLSA provenance (+ cosign when installed)
 - documentation build
-- Trivy / OWASP Dependency-Check
-- **EU compliance OPA audit** (`make audit-compliance`) as the final additive
-  step — skipped with a warning if `opa` is not on `PATH`
+- **EU compliance OPA audit** (`make audit-compliance`) — skipped with a
+  warning if `opa` is not on `PATH`
 
-## Security artifacts
-
-These commands produce auditable outputs consumed by OPA `input.evidence`:
+## Security artefacts → OPA keys
 
 | Command | Evidence | Typical OPA keys |
 |---------|----------|------------------|
@@ -43,16 +50,7 @@ These commands produce auditable outputs consumed by OPA `input.evidence`:
 | `make annex-iv` | `reports/compliance/annex-iv/` | `annex_iv_dir_non_empty` |
 | `make audit-evidence` | `reports/evidence/<version>/` | `audit_evidence_dir_non_empty` |
 | `make audit-compliance` | `reports/compliance/eu-audit/<version>/` (+ `oscal/`) | OPA HTML/JSON + OSCAL AR/POA&M |
-
-## CI workflows
-
-The GitHub Actions layer separates concerns:
-
-| Workflow | Role |
-|----------|------|
-| `ci.yml` | quality gate for Python + HMI + docs |
-| `charts.yml` | Helm dependency update, lint, and template rendering |
-| `security.yml` | scheduled or on-demand dependency / SBOM / container-config scans |
+| `make slsa-report` | `reports/slsa/report.json` + `roadmap.md` | SLSA level assessment |
 
 ## Scope limits
 

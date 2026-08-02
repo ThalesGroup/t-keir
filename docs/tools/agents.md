@@ -44,8 +44,8 @@ POST /agent/runs { agent | workflow, goal, params }
 | Module | Role |
 |--------|------|
 | `service.py` | FastAPI app (`tkeir-agent`), create/poll/cancel/publish |
-| `registry.py` | Load `configs/agents/*.yaml` → `AgentSpec` |
-| `workflows.py` | Load `configs/workflows/*.yaml` → `WorkflowSpec` |
+| `registry.py` | Load `configs/agents/*.yaml` + `datasets/*/agents/` → `AgentSpec` |
+| `workflows.py` | Load `configs/workflows/*.yaml` + `datasets/*/workflows/` → `WorkflowSpec` |
 | `loop.py` | Single-agent reason→act→observe until final / budget / kill |
 | `orchestrator.py` | Sequential multi-agent plan + compose step |
 | `toolbox.py` | Allow-listed tool invoke + schema validation |
@@ -125,9 +125,10 @@ required.
 
 ---
 
-## Agent configs (`tkeir/configs/agents/`)
+## Agent configs (`tkeir/configs/agents/` + `datasets/*/agents/`)
 
-Each file is one role. Loaded by `load_agent_spec(name)`.
+Each file is one role. Loaded by `load_agent_spec(name)` from core configs
+and dataset packs (OSINT personas live under `datasets/osint/agents/`).
 
 | Field | Meaning |
 |-------|---------|
@@ -142,14 +143,84 @@ Each file is one role. Loaded by `load_agent_spec(name)`.
 | `output_contract` | Expected final JSON shape |
 | `temperature` | LLM temperature |
 
-### Shipped agents
+### Shipped agents (core — `tkeir/configs/agents/`)
 
 | Agent | Tools | Output contract | Role |
 |-------|-------|-----------------|------|
-| **researcher** | `search`, `rag_query`, `ontology_query`, `document_get` | `grounded_findings_v1` | Corpus research; claims need `chunk_ids` |
+| **researcher** | `search`, `rag_query`, `ontology_query`, `document_get`, wiki list/get | `grounded_findings_v1` | Dual-index research (`search_mode=both`); claims need `chunk_ids` |
 | **analyst** | `search`, `ontology_query`, `document_get` | `grounded_findings_v1` | Ontology / KG-oriented analysis |
 | **writer** | _(none)_ | `grounded_prose_v1` | Fill freeform template slots from KG context |
-| **reviewer** | _(none)_ | `review_verdict_v1` | Accept/reject slots by provenance |
+| **reviewer** | _(none)_ | `grounded_findings_v1` | Accept/reject findings or slots by provenance |
+| **okf_curator** | search/rag/ontology/`okf_bundle_get` | `okf_enrichment_v1` | Enrich OKF concepts |
+
+### OSINT pack (`datasets/osint/agents/`)
+
+| Agent | Role |
+|-------|------|
+| **`<persona>_{analyser,reviewer,writer}`** | RED HORIZON personas (j2_analyst, moc_watch, j2x_humint, ctf_commander, admin) |
+| **`<persona>_prompt`** | OKF wiki seed + merge system for `okf_iterative_wiki` (not a tool-loop agent) |
+| **`wiki_writer`** | Answer-first OKF LLMWiki writer used by `otan_c2_brief` |
+
+### Shipped workflows (core — `tkeir/configs/workflows/`)
+
+| Workflow | Pipeline | Deliverable |
+|----------|----------|-------------|
+| **content_brief** | researcher → analyst → compose | `synthesis_note` |
+| **okf_wiki_brief** | scoped OKF → okf_curator → compose | bundle + `synthesis_note` |
+
+### OSINT pack (`datasets/osint/workflows/`)
+
+| Workflow | Pipeline | Deliverable |
+|----------|----------|-------------|
+| **persona_*** | analyse → review → write → OTAN compose | INTSUM / SITREP / SPOTREP / Commander's Brief |
+| **otan_c2_brief** | scoped OKF → researcher → reviewer → wiki_writer → OTAN compose | OTAN form + LLMWiki |
+| **llm_wiki** | scoped OKF → `okf_iterative_wiki` (persona `*_prompt`) | detailed `wiki.md` |
+
+**OTAN C2 params** (HMI Agents page or API):
+
+```json
+{
+  "workflow": "otan_c2_brief",
+  "goal": "Tell me everything about MT RED SEA EAGLE.",
+  "params": {
+    "topic": "MT RED SEA EAGLE",
+    "report_form": "intsum",
+    "use_existing_wiki": "true"
+  }
+}
+```
+
+`report_form`: `intsum` (J2) · `sitrep` (MOC) · `spotrep` (HUMINT) · `commander_brief` (CTF).
+
+Form → compose template maps and writer slot hints are **usecase config**, not
+hardcoded in the orchestrator:
+
+- [`datasets/osint/agent_orchestrator.yaml`](../../datasets/osint/agent_orchestrator.yaml)
+- [`datasets/enterprise/agent_orchestrator.yaml`](../../datasets/enterprise/agent_orchestrator.yaml)
+
+Select with `params.usecase` / `params.dataset`, or env `TKEIR_AGENT_USECASE`
+(also `TKEIR_DATASET` / `TKEIR_BUSINESS_ONTOLOGY_DATASET`). Override path:
+`TKEIR_AGENT_ORCHESTRATOR_CONFIG`.
+
+**Reporter Phase 3** passes the edited Phase-2 LLM Wiki as the report base:
+
+```json
+{
+  "workflow": "persona_j2_analyst",
+  "goal": "Tell me everything about MT RED SEA EAGLE.",
+  "params": {
+    "topic": "MT RED SEA EAGLE",
+    "report_form": "intsum",
+    "use_existing_wiki": true,
+    "bundle_id": "<okf-bundle-id>",
+    "wiki_markdown": "---\\ntype: Wiki\\n..."
+  }
+}
+```
+
+Agents extract findings from that wiki (and `okf_bundle_get`), then reshape
+claims for the OTAN compose template. Without `wiki_markdown`, optional
+`use_existing_wiki` can still seed from `wiki/*.md` in My files / the bundle.
 
 **Example — `researcher.yaml` (abridged):**
 
@@ -181,7 +252,7 @@ Add a new agent by dropping another YAML in `configs/agents/` with a unique
 
 ---
 
-## Workflow configs (`tkeir/configs/workflows/`)
+## Workflow configs (`tkeir/configs/workflows/` + `datasets/*/workflows/`)
 
 Workflows are **sequential supervisor plans** (no parallel fan-out). Loaded by
 `load_workflow(name)`.

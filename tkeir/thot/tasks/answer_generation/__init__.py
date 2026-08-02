@@ -15,7 +15,9 @@ from thot.tasks.answer_generation.ontology_clues import (
     format_clues_for_prompt,
     generate_sparql_from_query_ontology,
 )
-from thot.tasks.answer_generation.query_enrichment import enrich_first_stage_runs
+from thot.tasks.answer_generation.query_enrichment import (
+    enrich_first_stage_runs,
+)
 from thot.tasks.answer_generation.rag_answer import (
     PassageHit,
     RagAnswerResult,

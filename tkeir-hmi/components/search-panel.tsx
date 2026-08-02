@@ -1,393 +1,585 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { AlertTriangle, ExternalLink, Loader2, Search } from "lucide-react";
+import {
+  AlertTriangle,
+  Loader2,
+  Network,
+  Upload,
+  X,
+} from "lucide-react";
 
 import { CorrelationIdBadge } from "@/components/correlation-id";
-import type { OntologyUpdateHandler } from "@/components/ontology-navigator";
+import { OntologyCoverageMeter } from "@/components/ontology-coverage-meter";
+import { OntologyNavigator } from "@/components/ontology-navigator";
+import { OntologyReasonGraph } from "@/components/ontology-reason-graph";
+import { ReporterChunkCard } from "@/components/reporter-chunk-card";
+import {
+  SearchHeader,
+  type SearchParams,
+} from "@/components/search-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { querySearch, RagApiError } from "@/lib/api";
+  ontologyQueryOptions,
+  parseBusinessOntologyFile,
+  querySearch,
+  RagApiError,
+} from "@/lib/api";
 import {
-  formatDocumentName,
-  type Language,
-  type SearchDocumentHit,
-  type SearchResponse,
+  chunkOntologyHaystacks,
+  coverageAgainstHaystacks,
+  extractBoConcepts,
+  fusedOntologyHaystacks,
+  type BoConceptSurface,
+} from "@/lib/ontology-coverage";
+import { weightMapsFromOntology } from "@/lib/ontology-graph";
+import type {
+  FusedOntology,
+  SearchChunkHit,
+  SearchResponse,
+  SemanticEntity,
+  SemanticKeyword,
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/src/auth/AuthProvider";
 
-function snippetForDoc(
-  doc: SearchDocumentHit,
-  response: SearchResponse,
-): string {
-  const firstId = doc.chunk_ids[0];
-  const chunk = response.chunks.find((item) => item.chunk_id === firstId);
-  const text = (chunk?.text_raw || "").replace(/\s+/g, " ").trim();
-  if (text.length <= 220) {
-    return text;
-  }
-  return `${text.slice(0, 217)}…`;
-}
+/** Default node budget for the left “major concepts” graph. */
+const DEFAULT_GRAPH_MAX_NODES = 18;
+const GRAPH_MAX_NODES_MIN = 4;
+const GRAPH_MAX_NODES_MAX = 80;
 
-function docMatchesFilter(
-  doc: SearchDocumentHit,
-  activeChunkIds: Set<string> | null,
-): boolean {
-  if (activeChunkIds === null || activeChunkIds.size === 0) {
-    return true;
-  }
-  return doc.chunk_ids.some((id) => activeChunkIds.has(id));
-}
+type OntologyView = "global" | "query" | "merged";
 
 interface SearchPanelProps {
-  onOntologyUpdate: OntologyUpdateHandler;
+  ontology: FusedOntology | null;
+  ontologyLoading: boolean;
+  ontologyKey: string;
   activeChunkIds: Set<string> | null;
+  activeLabel: string | null;
+  onOntologyUpdate: (
+    ontology: FusedOntology | null,
+    meta?: { loading?: boolean; key?: string },
+  ) => void;
+  onSelectEntity: (entity: SemanticEntity) => void;
+  onSelectKeyword: (keyword: SemanticKeyword) => void;
+  onClearFilter: () => void;
 }
 
+/**
+ * Search workspace — retrieval only (no RAG/LLM answer).
+ * Left: global (chunk-fused) / query / query⊕fuse ontology graphs · Right:
+ * chunks · Bottom: ontology navigator on the global fused graph.
+ * Optional external business-ontology file is sent on every /search request.
+ */
 export function SearchPanel({
-  onOntologyUpdate,
+  ontology,
+  ontologyLoading,
+  ontologyKey,
   activeChunkIds,
+  activeLabel,
+  onOntologyUpdate,
+  onSelectEntity,
+  onSelectKeyword,
+  onClearFilter,
 }: SearchPanelProps) {
-  const [query, setQuery] = useState("");
-  const [language, setLanguage] = useState<Language>("en");
-  const [hits, setHits] = useState(20);
+  const { runtimeConfig } = useAuth();
+  const defaultDataset =
+    runtimeConfig?.businessOntologyDataset?.trim() || "osint";
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState("");
+  const [info, setInfo] = useState<string | null>(null);
   const [response, setResponse] = useState<SearchResponse | null>(null);
   const [correlationId, setCorrelationId] = useState<string | null>(null);
-  const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
 
-  const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      const trimmed = query.trim();
-      if (!trimmed || loading) {
-        return;
-      }
+  const [boBusy, setBoBusy] = useState(false);
+  const [boPayload, setBoPayload] = useState<Record<string, unknown> | null>(
+    null,
+  );
+  const [boFilename, setBoFilename] = useState<string | null>(null);
+  const [boConceptCount, setBoConceptCount] = useState(0);
+  const [graphMaxNodes, setGraphMaxNodes] = useState(DEFAULT_GRAPH_MAX_NODES);
+  const [ontologyView, setOntologyView] = useState<OntologyView>("global");
+
+  const boConcepts = useMemo(
+    () => extractBoConcepts(boPayload) as BoConceptSurface[],
+    [boPayload],
+  );
+
+  const queryOntology = response?.query_ontology ?? null;
+  const mergedOntology = response?.merged_ontology ?? null;
+
+  const retrievedChunks = useMemo(() => {
+    if (!response) return [] as SearchChunkHit[];
+    const chunks = [...response.chunks];
+    chunks.sort((a, b) => b.score - a.score);
+    return chunks;
+  }, [response]);
+
+  const visibleChunks = useMemo(() => {
+    if (!activeChunkIds || activeChunkIds.size === 0) return retrievedChunks;
+    return retrievedChunks.filter((chunk) =>
+      activeChunkIds.has(chunk.chunk_id),
+    );
+  }, [retrievedChunks, activeChunkIds]);
+
+  const displayOntology = useMemo(() => {
+    if (ontologyView === "query") return queryOntology;
+    if (ontologyView === "merged") return mergedOntology ?? ontology;
+    return ontology;
+  }, [ontologyView, ontology, queryOntology, mergedOntology]);
+
+  const displayWeights = useMemo(
+    () => weightMapsFromOntology(displayOntology),
+    [displayOntology],
+  );
+
+  const preferredLabels = useMemo(() => {
+    if (!displayOntology) return [] as string[];
+    const ranked = [
+      ...displayOntology.entities.map((entity) => ({
+        label: entity.label,
+        weight:
+          entity.weight ?? Math.max(1, entity.chunk_ids?.length ?? 0) * 10,
+      })),
+      ...displayOntology.keywords.map((keyword) => ({
+        label: keyword.label,
+        weight:
+          keyword.weight ?? Math.max(1, keyword.chunk_ids?.length ?? 0) * 8,
+      })),
+    ]
+      .filter((row) => row.label.trim())
+      .sort((a, b) => b.weight - a.weight);
+    return ranked.slice(0, 12).map((row) => row.label);
+  }, [displayOntology]);
+
+  const fusedCoverage = useMemo(
+    () =>
+      coverageAgainstHaystacks(
+        boConcepts,
+        fusedOntologyHaystacks(ontology),
+      ),
+    [boConcepts, ontology],
+  );
+
+  const chunkCoverageById = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof coverageAgainstHaystacks>>();
+    if (boConcepts.length === 0) return map;
+    for (const chunk of retrievedChunks) {
+      map.set(
+        chunk.chunk_id,
+        coverageAgainstHaystacks(
+          boConcepts,
+          chunkOntologyHaystacks(chunk, ontology),
+        ),
+      );
+    }
+    return map;
+  }, [boConcepts, ontology, retrievedChunks]);
+
+  const handleBoUpload = useCallback(async (file: File) => {
+    setBoBusy(true);
+    setError(null);
+    setInfo(null);
+    try {
+      const parsed = await parseBusinessOntologyFile(file);
+      setBoPayload(parsed.business_ontology);
+      setBoFilename(parsed.filename || file.name);
+      setBoConceptCount(parsed.concept_count);
+      setInfo(
+        `Loaded business ontology “${parsed.filename || file.name}”` +
+          ` (${parsed.concept_count} concepts) — sent with the next search.`,
+      );
+    } catch (caught) {
+      setBoPayload(null);
+      setBoFilename(null);
+      setBoConceptCount(0);
+      setError(
+        caught instanceof RagApiError
+          ? caught.message
+          : caught instanceof Error
+            ? caught.message
+            : "Failed to parse business ontology file",
+      );
+    } finally {
+      setBoBusy(false);
+    }
+  }, []);
+
+  const handleSearch = useCallback(
+    async ({ query, language, hits }: SearchParams) => {
       setLoading(true);
       setError(null);
-      setSubmitted(trimmed);
-      setExpandedDoc(null);
-      onOntologyUpdate(null, { loading: true, key: trimmed });
+      setInfo(null);
+      setResponse(null);
+      setCorrelationId(null);
+      setOntologyView("global");
+      onOntologyUpdate(null, { loading: true, key: query });
+
       try {
         const result = await querySearch({
-          query: trimmed,
+          query,
           language,
           hits,
+          ...ontologyQueryOptions(runtimeConfig),
+          ...(boPayload ? { business_ontology: boPayload } : {}),
         });
         setResponse(result.response);
         setCorrelationId(result.correlationId);
-        onOntologyUpdate(result.response.ontology ?? null, {
-          loading: false,
-          key: trimmed,
-        });
+        const fused = result.response.ontology ?? null;
+        onOntologyUpdate(fused, { loading: false, key: query });
+        const ent = fused?.entities.length ?? 0;
+        const kw = fused?.keywords.length ?? 0;
+        const triples = fused?.triple_count;
+        const qTriples = result.response.query_ontology?.triple_count;
+        const mTriples = result.response.merged_ontology?.triple_count;
+        setInfo(
+          `Retrieved ${result.response.documents.length} doc(s) · ` +
+            `${result.response.chunks.length} chunk(s)` +
+            ` · global ${ent} entities / ${kw} keywords` +
+            (triples != null ? ` · ${triples} triples` : "") +
+            (qTriples != null ? ` · query ${qTriples} triples` : "") +
+            (mTriples != null ? ` · merged ${mTriples} triples` : "") +
+            (boFilename
+              ? ` · external BO “${boFilename}”`
+              : ` · dataset ${defaultDataset}`),
+        );
+        if (boPayload) {
+          const cov = coverageAgainstHaystacks(
+            extractBoConcepts(boPayload),
+            fusedOntologyHaystacks(fused),
+          );
+          if (cov.total > 0) {
+            setInfo((prev) =>
+              `${prev ?? ""} · BO coverage ${Math.round(cov.ratio * 100)}% (${cov.matched}/${cov.total})`.trim(),
+            );
+          }
+        }
       } catch (caught) {
         const message =
           caught instanceof RagApiError
             ? caught.message
             : caught instanceof Error
               ? caught.message
-              : "Search failed.";
+              : "An unexpected error occurred.";
         setError(message);
         setResponse(null);
         setCorrelationId(null);
-        onOntologyUpdate(null, { loading: false, key: trimmed });
+        onOntologyUpdate(null, { loading: false, key: query });
       } finally {
         setLoading(false);
       }
     },
-    [hits, language, loading, onOntologyUpdate, query],
+    [
+      boFilename,
+      boPayload,
+      defaultDataset,
+      onOntologyUpdate,
+      runtimeConfig,
+    ],
   );
 
-  const documents = useMemo(
-    () => response?.documents ?? [],
-    [response?.documents],
-  );
-
-  const showHero = !submitted && !loading;
+  const viewMeta: Record<
+    OntologyView,
+    { label: string; title: string; blurb: string }
+  > = {
+    global: {
+      label: "Global",
+      title: "Weighted ontology hubs",
+      blurb:
+        "All retrieved chunk/parent ontologies fused. Nodes/links ranked by text importance (coverage + hits), summed across the fuse — hubs keep their strongest links.",
+    },
+    query: {
+      label: "Query",
+      title: "Query NLP ontology",
+      blurb:
+        "Linguistic pipeline on the query, extended with matched external business-ontology concepts.",
+    },
+    merged: {
+      label: "Query ⊕ Fuse",
+      title: "Query ∪ global ontology",
+      blurb:
+        "Union of the query ontology and the fused chunk ontology (weights summed).",
+    },
+  };
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <form
-        onSubmit={handleSubmit}
-        className={
-          showHero
-            ? "flex min-h-[42vh] flex-col items-center justify-center gap-6"
-            : "space-y-3"
-        }
-      >
-        {showHero && (
-          <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-              T-KEIR Search
-            </p>
-            <h2 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Search the corpus
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Hybrid retrieval over your documents — ontology is shared with
-              RAG.
-            </p>
-          </div>
-        )}
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+          Search
+        </p>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight">
+          Retrieval &amp; ontology
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Hybrid retrieval only (no RAG answer). Left panel: global chunk
+          fusion, query NLP (+ BO), and their merge. Expand a chunk for its
+          analyzed ontology.
+        </p>
+      </div>
 
-        <div
-          className={
-            showHero
-              ? "flex w-full flex-col gap-3"
-              : "flex flex-col gap-3 sm:flex-row sm:items-end"
-          }
-        >
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search documents…"
-              className="h-12 rounded-full border-2 pl-12 text-base shadow-sm"
-              disabled={loading}
-              autoFocus
-            />
-          </div>
-          {!showHero && (
-            <div className="flex gap-2">
-              <Select
-                value={language}
-                onValueChange={(value) => setLanguage(value as Language)}
-                disabled={loading}
-              >
-                <SelectTrigger className="w-[7rem]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                type="submit"
-                className="h-10 rounded-full px-6"
-                disabled={loading || !query.trim()}
-              >
-                {loading ? <Loader2 className="animate-spin" /> : "Search"}
-              </Button>
-            </div>
+      <SearchHeader loading={loading} onSearch={handleSearch} />
+
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed px-3 py-2">
+        <label
+          className={cn(
+            "inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md border px-3 text-sm",
+            (boBusy || loading) && "pointer-events-none opacity-50",
           )}
-        </div>
-
-        {showHero && (
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Select
-              value={language}
-              onValueChange={(value) => setLanguage(value as Language)}
-              disabled={loading}
-            >
-              <SelectTrigger className="w-[8rem]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="fr">Français</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input
-              type="number"
-              min={1}
-              max={100}
-              value={hits}
-              onChange={(event) => {
-                const parsed = Number.parseInt(event.target.value, 10);
-                if (!Number.isNaN(parsed)) {
-                  setHits(Math.min(100, Math.max(1, parsed)));
-                }
+        >
+          {boBusy ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
+          Business ontology file
+          <input
+            type="file"
+            accept=".yaml,.yml,.json,application/json,text/yaml,text/x-yaml"
+            className="hidden"
+            disabled={boBusy || loading}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void handleBoUpload(file);
+              event.currentTarget.value = "";
+            }}
+          />
+        </label>
+        {boFilename ? (
+          <Badge variant="outline" className="gap-1.5">
+            {boFilename}
+            <span className="text-muted-foreground">
+              ({boConceptCount} concepts)
+            </span>
+            <button
+              type="button"
+              className="rounded p-0.5 hover:bg-muted"
+              aria-label="Clear business ontology file"
+              onClick={() => {
+                setBoPayload(null);
+                setBoFilename(null);
+                setBoConceptCount(0);
+                setInfo(null);
               }}
-              className="w-24"
-              aria-label="Max hits"
-              disabled={loading}
-            />
-            <Button
-              type="submit"
-              size="lg"
-              className="rounded-full px-8"
-              disabled={loading || !query.trim()}
             >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Searching…
-                </>
-              ) : (
-                "Search"
-              )}
-            </Button>
-          </div>
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            Sent as <code>business_ontology</code> on search — otherwise dataset{" "}
+            <code>{defaultDataset}</code>
+          </span>
         )}
-      </form>
+      </div>
 
       {error && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Search failed</AlertTitle>
+          <AlertTitle>Search</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+      {info && (
+        <Alert>
+          <Network className="h-4 w-4" />
+          <AlertTitle>Retrieval</AlertTitle>
+          <AlertDescription>{info}</AlertDescription>
+        </Alert>
+      )}
 
-      {loading && (
-        <div className="space-y-4 py-4">
-          {[1, 2, 3].map((key) => (
-            <div key={key} className="animate-pulse space-y-2">
-              <div className="h-4 w-2/3 rounded bg-muted" />
-              <div className="h-3 w-full rounded bg-muted" />
-              <div className="h-3 w-5/6 rounded bg-muted" />
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        <aside className="flex min-h-[28rem] flex-col gap-3 rounded-lg border p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Network className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium">Ontology</span>
+            <div className="flex flex-wrap gap-1">
+              {(Object.keys(viewMeta) as OntologyView[]).map((view) => (
+                <button
+                  key={view}
+                  type="button"
+                  onClick={() => setOntologyView(view)}
+                  className={cn(
+                    "rounded-md border px-2 py-0.5 text-[11px]",
+                    ontologyView === view
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted",
+                  )}
+                >
+                  {viewMeta[view].label}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-
-      {!loading && correlationId && (
-        <CorrelationIdBadge correlationId={correlationId} />
-      )}
-
-      {!loading && response && (
-        <div className="space-y-1">
-          <p className="mb-4 text-sm text-muted-foreground">
-            About {documents.length} document
-            {documents.length === 1 ? "" : "s"}
-            {response.vespa_hits
-              ? ` · ${response.vespa_hits} Vespa hits`
-              : ""}
-            {response.ranking_profile
-              ? ` · ${response.ranking_profile}`
-              : ""}
-            {submitted ? ` for “${submitted}”` : ""}
+            {displayOntology && (
+              <>
+                <Badge variant="outline">
+                  {displayOntology.entities.length} entities
+                </Badge>
+                <Badge variant="outline">
+                  {displayOntology.keywords.length} keywords
+                </Badge>
+                {displayOntology.triple_count != null && (
+                  <Badge variant="outline">
+                    {displayOntology.triple_count} triples
+                  </Badge>
+                )}
+              </>
+            )}
+            <label className="ml-auto flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              Nodes
+              <Input
+                type="number"
+                min={GRAPH_MAX_NODES_MIN}
+                max={GRAPH_MAX_NODES_MAX}
+                value={graphMaxNodes}
+                onChange={(event) => {
+                  const parsed = Number.parseInt(event.target.value, 10);
+                  if (Number.isNaN(parsed)) return;
+                  setGraphMaxNodes(
+                    Math.min(
+                      GRAPH_MAX_NODES_MAX,
+                      Math.max(GRAPH_MAX_NODES_MIN, parsed),
+                    ),
+                  );
+                }}
+                className="h-7 w-16 text-xs"
+                aria-label="Maximum ontology graph nodes"
+                title={`Default ${DEFAULT_GRAPH_MAX_NODES} (range ${GRAPH_MAX_NODES_MIN}–${GRAPH_MAX_NODES_MAX})`}
+              />
+            </label>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            {viewMeta[ontologyView].blurb}
           </p>
-          {response.timings && (
-            <p className="mb-4 font-mono text-xs text-muted-foreground">
-              timings: nlp {response.timings.nlp_ms.toFixed(0)}ms · vespa{" "}
-              {(
-                response.timings.vespa_ms ??
-                response.timings.vespa_chunk_ms +
-                  response.timings.vespa_document_ms
-              ).toFixed(0)}
-              ms (chunk {response.timings.vespa_chunk_ms.toFixed(0)} · doc{" "}
-              {response.timings.vespa_document_ms.toFixed(0)}) · rrf{" "}
-              {response.timings.rrf_ms.toFixed(0)}ms · rerank{" "}
-              {response.timings.rerank_ms.toFixed(0)}ms
-              {response.timings.total_ms != null
-                ? ` · total ${response.timings.total_ms.toFixed(0)}ms`
-                : ""}
+
+          {boConcepts.length > 0 ? (
+            ontology ? (
+              <OntologyCoverageMeter
+                coverage={fusedCoverage}
+                title="External BO ↔ global (chunk) ontology"
+                showDetails
+              />
+            ) : (
+              <p className="text-[11px] text-muted-foreground">
+                External BO loaded ({boConcepts.length} concepts) — run search
+                to measure coverage against the fused graph.
+              </p>
+            )
+          ) : (
+            <p className="text-[11px] text-muted-foreground">
+              Upload a business ontology file to measure coverage of the
+              extended request against this graph and each chunk.
             </p>
           )}
 
-          {documents.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No documents matched.</p>
+          {ontologyLoading && !displayOntology?.json_ld ? (
+            <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Building query / fused ontologies…
+            </div>
+          ) : displayOntology?.json_ld?.trim() &&
+            displayOntology.json_ld.trim() !== "[]" ? (
+            <OntologyReasonGraph
+              key={`${ontologyKey}:${ontologyView}:${graphMaxNodes}:weight`}
+              jsonLd={displayOntology.json_ld}
+              ontology={displayOntology}
+              chunks={retrievedChunks.map((chunk) => ({
+                chunk_id: chunk.chunk_id,
+                parent_doc_id: chunk.parent_doc_id,
+              }))}
+              maxNodes={graphMaxNodes}
+              rankBy="weight"
+              preferredLabels={preferredLabels}
+              weights={displayWeights}
+              relations={displayOntology.relations}
+              fill
+              height={420}
+              title={viewMeta[ontologyView].title}
+              className="flex-1"
+            />
           ) : (
-            <ul className="space-y-6">
-              {documents.map((doc) => {
-                const title =
-                  doc.title?.trim() ||
-                  formatDocumentName(doc.document_id);
-                const matches = docMatchesFilter(doc, activeChunkIds);
-                const filtering =
-                  activeChunkIds !== null && activeChunkIds.size > 0;
-                const open =
-                  expandedDoc === doc.document_id ||
-                  (filtering && matches && expandedDoc === null);
-                const relatedChunks = response.chunks.filter((chunk) =>
-                  doc.chunk_ids.includes(chunk.chunk_id),
-                );
-                return (
-                  <li
-                    key={doc.document_id}
-                    className={cn(
-                      "space-y-1 transition-opacity",
-                      filtering && !matches && "opacity-40",
-                      filtering && matches && "chunk-highlight rounded-lg p-2",
-                    )}
-                  >
-                    <button
-                      type="button"
-                      className="group text-left"
-                      onClick={() =>
-                        setExpandedDoc(
-                          expandedDoc === doc.document_id
-                            ? null
-                            : doc.document_id,
-                        )
-                      }
-                    >
-                      <span className="text-lg text-primary group-hover:underline">
-                        {title}
-                      </span>
-                    </button>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <span className="truncate font-mono text-[11px]">
-                        {doc.document_id}
-                      </span>
-                      <Badge variant="secondary">
-                        score {doc.score.toFixed(3)}
-                      </Badge>
-                      <Badge variant="outline">
-                        {doc.hit_count || doc.chunk_ids.length} chunks
-                      </Badge>
-                    </div>
-                    <p className="text-sm leading-relaxed text-foreground/90">
-                      {snippetForDoc(doc, response)}
-                    </p>
-                    {open && relatedChunks.length > 0 && (
-                      <div className="mt-2 space-y-2 rounded-lg border bg-muted/20 p-3">
-                        {relatedChunks.map((chunk) => {
-                          const chunkActive =
-                            activeChunkIds === null ||
-                            activeChunkIds.size === 0 ||
-                            activeChunkIds.has(chunk.chunk_id);
-                          return (
-                            <div
-                              key={chunk.chunk_id}
-                              data-chunk-id={chunk.chunk_id}
-                              className={cn(
-                                "text-xs",
-                                !chunkActive && "opacity-40",
-                                chunkActive &&
-                                  filtering &&
-                                  "rounded border border-primary/40 bg-primary/5 p-2",
-                              )}
-                            >
-                              <div className="mb-1 flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
-                                <ExternalLink className="h-3 w-3" />
-                                {chunk.chunk_id}
-                                <Badge
-                                  variant="outline"
-                                  className="text-[10px]"
-                                >
-                                  {chunk.score.toFixed(3)}
-                                </Badge>
-                              </div>
-                              <p className="leading-relaxed text-foreground/80">
-                                {chunk.text_raw}
-                              </p>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
+            <div className="flex flex-1 items-center justify-center rounded-md border border-dashed px-4 text-center text-sm text-muted-foreground">
+              {response
+                ? `No ${viewMeta[ontologyView].label.toLowerCase()} ontology graph for this query.`
+                : "Run a search to display the ontology graph."}
+            </div>
+          )}
+        </aside>
+
+        <div className="min-h-[28rem] space-y-3 rounded-lg border p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium">Retrieved chunks</span>
+            {response && (
+              <Badge variant="outline">
+                {visibleChunks.length}
+                {activeChunkIds && activeChunkIds.size > 0
+                  ? ` / ${retrievedChunks.length} filtered`
+                  : ` / ${retrievedChunks.length}`}
+              </Badge>
+            )}
+            {!loading && correlationId && (
+              <CorrelationIdBadge correlationId={correlationId} />
+            )}
+          </div>
+
+          {loading && (
+            <div className="space-y-2">
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          )}
+
+          {!loading && response && visibleChunks.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              {retrievedChunks.length === 0
+                ? "No chunks retrieved for this query."
+                : "No chunks match the current ontology filter."}
+            </p>
+          )}
+
+          {!loading && visibleChunks.length > 0 && (
+            <ul className="space-y-2">
+              {visibleChunks.map((chunk, index) => (
+                <ReporterChunkCard
+                  key={chunk.chunk_id}
+                  chunk={chunk}
+                  ontology={ontology}
+                  active={
+                    !activeChunkIds ||
+                    activeChunkIds.size === 0 ||
+                    activeChunkIds.has(chunk.chunk_id)
+                  }
+                  defaultOpen={index === 0}
+                  ontologyTitle="Chunk ontology"
+                  boCoverage={chunkCoverageById.get(chunk.chunk_id) ?? null}
+                />
+              ))}
             </ul>
           )}
+
+          {!loading && !response && (
+            <p className="text-sm text-muted-foreground">
+              Submit a query to retrieve grounded passages.
+            </p>
+          )}
         </div>
-      )}
+      </div>
+
+      <OntologyNavigator
+        ontology={ontology}
+        loading={ontologyLoading}
+        activeChunkIds={activeChunkIds}
+        activeLabel={activeLabel}
+        onSelectEntity={onSelectEntity}
+        onSelectKeyword={onSelectKeyword}
+        onClearFilter={onClearFilter}
+        accordionKey={ontologyKey}
+      />
     </div>
   );
 }

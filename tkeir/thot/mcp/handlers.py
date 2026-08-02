@@ -11,7 +11,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import logging
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from thot.core.ThotMetrics import ThotMetrics
 from thot.mcp.authz import McpPrincipal, strip_tenant_overrides
@@ -48,8 +48,9 @@ class McpBackend(Protocol):
         hits: int,
         user_space: str,
         language: str | None = None,
+        search_mode: str | None = None,
     ) -> dict[str, Any]:
-        """Run hybrid search in ``user_space``."""
+        """Run hybrid search in ``user_space`` (optional dual-hybrid mode)."""
 
     async def rag_query(
         self,
@@ -59,6 +60,7 @@ class McpBackend(Protocol):
         user_space: str,
         language: str | None = None,
         generate: bool = True,
+        search_mode: str | None = None,
     ) -> dict[str, Any]:
         """Run RAG (or retrieval-only) in ``user_space``."""
 
@@ -93,6 +95,21 @@ class McpBackend(Protocol):
     ) -> dict[str, Any]:
         """Fetch OKF index / concept markdown for ``user_space``."""
 
+    async def workspace_wiki_list(
+        self, *, user_space: str, path: str = "wiki"
+    ) -> dict[str, Any]:
+        """List personal-space wiki files."""
+
+    async def workspace_wiki_get(
+        self, *, user_space: str, path: str
+    ) -> dict[str, Any]:
+        """Read one personal-space wiki markdown file."""
+
+    async def okf_wiki_put(
+        self, *, user_space: str, bundle_id: str, markdown: str
+    ) -> dict[str, Any]:
+        """Write LLMWiki markdown into an OKF bundle."""
+
 
 class VespaMcpBackend:
     """Default backend using :class:`VespaClient` (+ optional RAG HTTP)."""
@@ -107,14 +124,61 @@ class VespaMcpBackend:
         hits: int,
         user_space: str,
         language: str | None = None,
+        search_mode: str | None = None,
     ) -> dict[str, Any]:
         space = normalize_user_space(user_space)
-        # Zero vectors → BM25-heavy path still applies streaming.groupname.
+        mode = (search_mode or "").strip().lower() or None
+        if mode in {"both", "global", "auto"}:
+            try:
+                from thot.tools.search.passage_retrieval import (
+                    PassageRetrievalPipeline,
+                    SearchMode,
+                )
+                from thot.tools.search.rag_config import load_rag_config
+
+                dual_cfg = load_rag_config().dual_hybrid
+                if dual_cfg.enabled:
+                    pipeline = PassageRetrievalPipeline(dual_cfg, self._vespa)
+                    pipeline_mode = cast(
+                        SearchMode,
+                        "both" if mode == "auto" else mode,
+                    )
+                    result = await pipeline.search(
+                        query,
+                        user_space=space,
+                        language=language or "en",
+                        mode=pipeline_mode,
+                        top_k=hits,
+                    )
+                    dual_chunks = [
+                        {
+                            "chunk_id": hit.passage_id,
+                            "parent_doc_id": hit.source_ref,
+                            "text_raw": hit.chunk_text,
+                            "score": hit.score,
+                            "user_space": space,
+                            "schema": hit.schema,
+                        }
+                        for hit in result.hits[:hits]
+                    ]
+                    return {
+                        "query": query,
+                        "user_space": space,
+                        "language": language,
+                        "search_mode": result.mode,
+                        "chunks": dual_chunks,
+                        "vespa_hits": len(dual_chunks),
+                    }
+            except Exception:  # noqa: BLE001
+                LOGGER.exception(
+                    "dual-hybrid search failed; falling back to user schema"
+                )
+
+        # User-schema BM25/ANN path (or fallback).
         dim = int(self._vespa.config.embedding_dim or 384)
         zeros = [0.0] * dim
         response = await self._vespa.hybrid_search(
             query,
-            zeros,
             zeros,
             hits=hits,
             user_space=space,
@@ -146,6 +210,7 @@ class VespaMcpBackend:
             "query": query,
             "user_space": space,
             "language": language,
+            "search_mode": mode or "user",
             "chunks": chunks,
             "vespa_hits": len(children),
         }
@@ -158,6 +223,7 @@ class VespaMcpBackend:
         user_space: str,
         language: str | None = None,
         generate: bool = True,
+        search_mode: str | None = None,
     ) -> dict[str, Any]:
         import os
 
@@ -167,27 +233,33 @@ class VespaMcpBackend:
         rag_url = (
             os.getenv("MCP_RAG_URL") or os.getenv("RAG_URL") or ""
         ).rstrip("/")
+        mode = (search_mode or "").strip().lower() or None
         if rag_url and generate:
-            headers: dict[str, str] = {}
-            # Prefer propagating the caller's JWT when present via env bridge —
-            # handlers pass authorization through principal when calling HTTP.
+            payload_body: dict[str, Any] = {
+                "query": query,
+                "hits": hits,
+                "language": language or "en",
+            }
+            if mode:
+                payload_body["search_mode"] = mode
             async with httpx.AsyncClient(timeout=120.0) as client:
                 response = await client.post(
                     f"{rag_url}/rag/query",
-                    json={
-                        "query": query,
-                        "hits": hits,
-                        "language": language,
-                    },
-                    headers=headers,
+                    json=payload_body,
                 )
                 response.raise_for_status()
                 payload = response.json()
             payload["user_space"] = space
+            if mode:
+                payload.setdefault("search_mode", mode)
             return payload
 
         retrieved = await self.hybrid_search(
-            query, hits=hits, user_space=space, language=language
+            query,
+            hits=hits,
+            user_space=space,
+            language=language,
+            search_mode=mode or "both",
         )
         return {
             "query": query,
@@ -195,6 +267,7 @@ class VespaMcpBackend:
             "answer": None,
             "report_markdown": None,
             "generate": False,
+            "search_mode": retrieved.get("search_mode"),
             "chunks": retrieved.get("chunks") or [],
             "note": "retrieval-only (set MCP_RAG_URL for full RAG generation)",
         }
@@ -338,9 +411,7 @@ class VespaMcpBackend:
 
         space = normalize_user_space(user_space)
         store = OkfBundleStore()
-        payload = store.bundle_payload(
-            bundle_id, space, concept_id=concept_id
-        )
+        payload = store.bundle_payload(bundle_id, space, concept_id=concept_id)
         if payload is None:
             return {
                 "user_space": space,
@@ -348,6 +419,91 @@ class VespaMcpBackend:
                 "error": "bundle not found or access denied",
             }
         return payload
+
+    async def workspace_wiki_list(
+        self, *, user_space: str, path: str = "wiki"
+    ) -> dict[str, Any]:
+        from thot.tools.ingest.user_workspace import UserWorkspace
+
+        space = normalize_user_space(user_space)
+        ws = UserWorkspace(space)
+        rel = (path or "wiki").strip().lstrip("/")
+        tree = ws.list_dir(rel)
+        files = [
+            e
+            for e in tree.get("entries") or []
+            if e.get("kind") == "file"
+            and str(e.get("name") or "").lower().endswith((".md", ".markdown"))
+        ]
+        return {
+            "user_space": space,
+            "path": rel,
+            "files": files,
+            "count": len(files),
+        }
+
+    async def workspace_wiki_get(
+        self, *, user_space: str, path: str
+    ) -> dict[str, Any]:
+        from thot.tools.ingest.user_workspace import UserWorkspace
+
+        space = normalize_user_space(user_space)
+        ws = UserWorkspace(space)
+        rel = (path or "").strip().lstrip("/")
+        if not rel:
+            raise ValueError("path is required")
+        try:
+            full = ws.resolve_file(rel)
+        except ValueError as exc:
+            return {
+                "user_space": space,
+                "path": rel,
+                "error": str(exc),
+                "markdown": "",
+            }
+        if not full.is_file():
+            return {
+                "user_space": space,
+                "path": rel,
+                "error": "file not found",
+                "markdown": "",
+            }
+        text = full.read_text(encoding="utf-8")
+        return {
+            "user_space": space,
+            "path": rel,
+            "markdown": text,
+            "chars": len(text),
+        }
+
+    async def okf_wiki_put(
+        self, *, user_space: str, bundle_id: str, markdown: str
+    ) -> dict[str, Any]:
+        from thot.okf.store import OkfBundleStore
+
+        space = normalize_user_space(user_space)
+        store = OkfBundleStore()
+        try:
+            wiki_path = store.put_wiki(bundle_id, space, markdown)
+        except FileNotFoundError:
+            return {
+                "user_space": space,
+                "bundle_id": bundle_id,
+                "error": "bundle not found or access denied",
+            }
+        except ValueError as exc:
+            return {
+                "user_space": space,
+                "bundle_id": bundle_id,
+                "error": str(exc),
+            }
+        return {
+            "user_space": space,
+            "bundle_id": bundle_id,
+            "path": wiki_path,
+            "chars": len(markdown or ""),
+            "ok": True,
+        }
 
 
 class McpHandlers:
@@ -382,6 +538,12 @@ class McpHandlers:
             ...         return {"user_space": kw["user_space"], "bundles": []}
             ...     async def okf_bundle_get(self, **kw):
             ...         return {"user_space": kw["user_space"], "bundle_id": kw["bundle_id"]}
+            ...     async def workspace_wiki_list(self, **kw):
+            ...         return {"user_space": kw["user_space"], "files": []}
+            ...     async def workspace_wiki_get(self, **kw):
+            ...         return {"user_space": kw["user_space"], "markdown": ""}
+            ...     async def okf_wiki_put(self, **kw):
+            ...         return {"user_space": kw["user_space"], "ok": True}
             >>> h = McpHandlers(backend=_Stub())
             >>> out = asyncio.run(h.invoke(
             ...     "search",
@@ -407,6 +569,7 @@ class McpHandlers:
                 hits=int(args.get("hits") or 10),
                 user_space=space,
                 language=args.get("language"),
+                search_mode=args.get("search_mode"),
             )
         if tool_name == "rag_query":
             return await self.backend.rag_query(
@@ -415,6 +578,7 @@ class McpHandlers:
                 user_space=space,
                 language=args.get("language"),
                 generate=bool(args.get("generate", True)),
+                search_mode=args.get("search_mode"),
             )
         if tool_name == "ontology_query":
             return await self.backend.ontology_from_query(
@@ -436,5 +600,21 @@ class McpHandlers:
                 user_space=space,
                 bundle_id=str(args.get("bundle_id") or ""),
                 concept_id=args.get("concept_id"),
+            )
+        if tool_name == "workspace_wiki_list":
+            return await self.backend.workspace_wiki_list(
+                user_space=space,
+                path=str(args.get("path") or "wiki"),
+            )
+        if tool_name == "workspace_wiki_get":
+            return await self.backend.workspace_wiki_get(
+                user_space=space,
+                path=str(args.get("path") or ""),
+            )
+        if tool_name == "okf_wiki_put":
+            return await self.backend.okf_wiki_put(
+                user_space=space,
+                bundle_id=str(args.get("bundle_id") or ""),
+                markdown=str(args.get("markdown") or ""),
             )
         raise KeyError(f"unknown tool handler: {tool_name}")

@@ -36,7 +36,7 @@ import logging
 import threading
 import time
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from thot.tools.search.bge_m3 import (
     BGE_M3_DENSE_DIM,
@@ -52,7 +52,7 @@ from thot.tools.search.rag_config import load_rag_config
 from thot.tools.search.text_normalizer import normalizer_for_language
 from thot.tools.search.vespa_client import (
     VespaClient,
-    build_field_contains_or_clause,
+    build_multi_field_contains_or_clause,
     escape_yql_literal,
 )
 
@@ -65,6 +65,133 @@ SearchMode = Literal["global", "user", "both", "auto"]
 
 _PIPELINE_RUNNER: PipelineRunner | None = None
 _PIPELINE_LOCK = threading.Lock()
+
+# UD POS kept for BM25 probe terms (language-agnostic; no word lists).
+_PROBE_CONTENT_POS = frozenset({"NOUN", "PROPN", "VERB", "ADJ", "NUM"})
+
+
+def _content_probe_terms(
+    query: str,
+    query_analysis: dict[str, Any] | None,
+    nlp_terms: list[str],
+) -> list[str]:
+    """Build BM25 probe terms from NLP content signals (not raw interrogatives).
+
+    Joining the raw question into the probe and then whitespace-splitting it
+    turns ``What happen at Suez`` into an OR on ``What``, which matches
+    unrelated passages that merely contain ``what appeared…``.
+
+    Example:
+        >>> terms = _content_probe_terms(
+        ...     "What happen at Suez",
+        ...     {
+        ...         "search_terms": ["happen", "Suez"],
+        ...         "ner_entities": [{"text": "Suez", "label": "LOC"}],
+        ...         "morphosyntax": [
+        ...             {"text": "What", "pos": "PRON"},
+        ...             {"text": "happen", "pos": "VERB"},
+        ...             {"text": "Suez", "pos": "PROPN"},
+        ...         ],
+        ...     },
+        ...     ["happen", "Suez"],
+        ... )
+        >>> "Suez" in terms and "What" not in terms
+        True
+    """
+    ordered: list[str] = []
+    seen: set[str] = set()
+
+    def add(value: str) -> None:
+        cleaned = (value or "").strip()
+        if not cleaned:
+            return
+        key = cleaned.casefold()
+        if key in seen:
+            return
+        seen.add(key)
+        ordered.append(cleaned)
+
+    analysis = query_analysis or {}
+    blocked: set[str] = set()
+    for token in analysis.get("morphosyntax") or []:
+        if not isinstance(token, dict):
+            continue
+        pos = str(token.get("pos") or "").upper()
+        if pos in _PROBE_CONTENT_POS:
+            continue
+        for key in ("lemma", "text"):
+            raw = str(token.get(key) or "").strip()
+            if raw:
+                blocked.add(raw.casefold())
+
+    for entity in analysis.get("ner_entities") or []:
+        if isinstance(entity, dict):
+            add(str(entity.get("text") or ""))
+        else:
+            add(str(entity or ""))
+    for token in analysis.get("morphosyntax") or []:
+        if not isinstance(token, dict):
+            continue
+        pos = str(token.get("pos") or "").upper()
+        if pos and pos not in _PROBE_CONTENT_POS:
+            continue
+        add(str(token.get("lemma") or token.get("text") or ""))
+    for term in analysis.get("search_terms") or []:
+        cleaned = str(term or "").strip()
+        if not cleaned:
+            continue
+        if cleaned.casefold() in blocked:
+            continue
+        parts = [p for p in cleaned.split() if p]
+        if parts and all(part.casefold() in blocked for part in parts):
+            continue
+        add(cleaned)
+    for term in nlp_terms:
+        cleaned = str(term or "").strip()
+        if cleaned.casefold() in blocked:
+            continue
+        add(cleaned)
+    if ordered:
+        return ordered
+    # No NLP: keep multi-word surface as a single phrase (AND in Vespa), not
+    # per-token OR of sentence-initial interrogatives.
+    stripped = (query or "").strip()
+    if stripped:
+        add(stripped)
+    return ordered
+
+
+def _boost_hits_by_content_overlap(
+    hits: list[PassageHit],
+    content_terms: list[str],
+) -> list[PassageHit]:
+    """Prefer passages that contain distinctive probe terms.
+
+    Example:
+        >>> hits = [
+        ...     PassageHit("a", "a", "what appeared near Gaza", 0.9, "global"),
+        ...     PassageHit("b", "b", "calm around Suez Gulf", 0.5, "global"),
+        ... ]
+        >>> _boost_hits_by_content_overlap(hits, ["Suez"])[0].passage_id
+        'b'
+    """
+    needles = [
+        term.casefold()
+        for term in content_terms
+        if term and len(term.strip()) >= 3
+    ]
+    if not needles or not hits:
+        return hits
+
+    def overlap(hit: PassageHit) -> int:
+        haystack = (hit.chunk_text or "").casefold()
+        return sum(1 for term in needles if term in haystack)
+
+    return sorted(
+        hits,
+        key=lambda hit: (overlap(hit), float(hit.score)),
+        reverse=True,
+    )
 
 
 def _default_pipeline_runner() -> PipelineRunner | None:
@@ -141,26 +268,27 @@ def _nlp_seed_expansion_applies(
     min_tokens: int,
     min_sentences: int = 2,
 ) -> bool:
-    """Return whether NLP-seed resolve + neighborhood expansion should run.
+    """Return whether NLP-seed ontology expansion should run.
 
-    True when enabled and the query is long enough by tokens **or** has
-    multiple sentences (document-as-query / multi-claim).
+    When ``enabled``, always True: analyzed NER / kg / keywords expand Vespa
+    ``ontology_concepts`` via YQL OR (broaden recall, never filter).
+
+    ``min_tokens`` / ``min_sentences`` / ``query`` are retained for API
+    compatibility but no longer restrict expansion.
     """
-    if not enabled:
-        return False
-    if _query_token_count(query) >= max(1, int(min_tokens)):
-        return True
-    return _query_sentence_count(query) >= max(1, int(min_sentences))
+    del query, min_tokens, min_sentences
+    return bool(enabled)
 
 
 def _nlp_seed_labels(
     query_analysis: dict[str, Any] | None,
     nlp_terms: list[str],
 ) -> list[str]:
-    """Collect labels from query NLP for ontology resolve + expansion.
+    """Collect labels from analyzed request for ontology resolve + expansion.
 
-    Prefer structured NER / keywords / SVO-bearing ``search_terms`` over the
-    raw multi-sentence query so long claims still map to concept ids.
+    Sources: ``ner_entities``, ``keywords``, ``svo_triples`` / ``kg``
+    (subject / verb / object), lemmas, then ``search_terms``. Resolved concept
+    ids OR against Vespa ``ontology_concepts``.
     """
     seeds: list[str] = []
     seen: set[str] = set()
@@ -177,9 +305,28 @@ def _nlp_seed_labels(
 
     analysis = query_analysis or {}
     for entity in analysis.get("ner_entities") or []:
-        _add(str(entity))
+        if isinstance(entity, dict):
+            _add(str(entity.get("text") or ""))
+        else:
+            _add(str(entity))
     for keyword in analysis.get("keywords") or []:
-        _add(str(keyword))
+        if isinstance(keyword, dict):
+            _add(str(keyword.get("text") or keyword.get("label") or ""))
+        else:
+            _add(str(keyword))
+    for triple in analysis.get("svo_triples") or analysis.get("kg") or []:
+        if not isinstance(triple, dict):
+            continue
+        for key in ("subject", "verb", "object", "property", "value"):
+            part = triple.get(key)
+            if isinstance(part, dict):
+                content = part.get("content") or part.get("text") or ""
+                if isinstance(content, list):
+                    _add(" ".join(str(x) for x in content if x))
+                else:
+                    _add(str(content))
+            elif part:
+                _add(str(part))
     for lemma in analysis.get("lemmas") or []:
         _add(str(lemma))
     for term in analysis.get("search_terms") or nlp_terms:
@@ -275,18 +422,32 @@ class PassageRetrievalPipeline:
             LOGGER.warning("Query NLP failed (continuing without): %s", exc)
             return None, [], (time.perf_counter() - t0) * 1000
         nlp_ms = (time.perf_counter() - t0) * 1000
-        terms = [t for t in (analysis.search_terms or []) if t][:48]
+        terms = [t for t in analysis.search_terms or [] if t][:48]
         payload = {
             "raw_query": analysis.raw_query,
             "lexical_query": analysis.lexical_query,
             "search_terms": list(analysis.search_terms or []),
             "lemmas": list(analysis.lemmas or []),
             "keywords": list(analysis.keywords or []),
+            "morphosyntax": list(analysis.morphosyntax or []),
             "ner_entities": [
-                getattr(e, "text", str(e))
-                for e in (analysis.ner_entities or [])
+                {
+                    "text": getattr(e, "text", str(e)),
+                    "label": getattr(e, "label", "entity"),
+                }
+                for e in analysis.ner_entities or []
+            ],
+            "svo_triples": [
+                {
+                    "subject": triple.subject,
+                    "verb": triple.verb,
+                    "object": triple.object,
+                }
+                for triple in analysis.svo_triples or []
             ],
             "language": analysis.language,
+            # Server-only: rebuild query document ontology for HMI fuse.
+            "_pipeline_doc": processed,
         }
         return payload, terms, nlp_ms
 
@@ -306,11 +467,12 @@ class PassageRetrievalPipeline:
         rag = load_rag_config()
         dim = int(rag.models.embedding_dim or BGE_M3_DENSE_DIM)
         model_id = None  # load resources/modeling/net/bge-m3
-        hits_n = int(
-            top_k
-            or getattr(self.config.retrieval, "hits", None)
-            or 100
+        configured_hits = int(
+            getattr(self.config.retrieval, "hits", None) or 100
         )
+        return_k = int(top_k or self.config.final_fusion.top_k_returned or 10)
+        # Always fetch a deep first-stage pool; trim to return_k after rerank.
+        hits_n = max(return_k, configured_hits)
         profile = str(
             getattr(self.config.retrieval, "ranking_profile", None) or "hybrid"
         )
@@ -320,9 +482,24 @@ class PassageRetrievalPipeline:
         )
         timings: dict[str, float] = {"nlp": nlp_ms, "expand": 0.0}
 
-        # Expansion (optional external ontology) on top of NLP terms.
-        expansion_terms: list[str] = []
-        seen_terms: set[str] = set()
+        # Expansion: content-bearing NLP / ontology labels only. Never append
+        # the raw interrogative sentence (whitespace-splitting it into the
+        # BM25 OR clause matches noise like "what appeared…").
+        expansion_terms = _content_probe_terms(
+            query, query_analysis, nlp_terms
+        )
+        seen_terms = {term.casefold() for term in expansion_terms}
+        blocked_function: set[str] = set()
+        for token in (query_analysis or {}).get("morphosyntax") or []:
+            if not isinstance(token, dict):
+                continue
+            pos = str(token.get("pos") or "").upper()
+            if pos in _PROBE_CONTENT_POS:
+                continue
+            for key in ("lemma", "text"):
+                raw = str(token.get(key) or "").strip()
+                if raw:
+                    blocked_function.add(raw.casefold())
 
         def _add_term(value: str) -> None:
             cleaned = (value or "").strip()
@@ -331,23 +508,22 @@ class PassageRetrievalPipeline:
             key = cleaned.casefold()
             if key in seen_terms:
                 return
+            if key in blocked_function:
+                return
+            parts = [p for p in cleaned.split() if p]
+            if parts and all(
+                part.casefold() in blocked_function for part in parts
+            ):
+                return
             seen_terms.add(key)
             expansion_terms.append(cleaned)
-
-        for term in nlp_terms:
-            _add_term(term)
-        if query.strip():
-            _add_term(query.strip())
 
         concept_ids: list[str] = []
         ontology_graph = None
         text_normalizer = None
-        use_search_ont = (
-            self.config.business_ontology.search_enabled
-            and (
-                self.config.query_expansion.enabled
-                or self.config.ontology_scoring.enabled
-            )
+        use_search_ont = self.config.business_ontology.search_enabled and (
+            self.config.query_expansion.enabled
+            or self.config.ontology_scoring.enabled
         )
         if use_search_ont and business_ontology is not None:
             t_exp = time.perf_counter()
@@ -359,17 +535,15 @@ class PassageRetrievalPipeline:
                 ontology_graph = business_ontology_from_data(business_ontology)
                 if ontology_graph.concepts:
                     ontology_graph.build_label_index(text_normalizer)
-                # Optional NLP seeds (NER / keywords / SVO) when enabled and
-                # query length ≥ min_tokens; otherwise raw-query expansion only.
+                # Analyzed request (NER / keywords / kg) → resolve + expand
+                # concept ids for Vespa ``ontology_concepts`` OR clauses.
                 nlp_cfg = self.config.query_expansion.nlp_seed_expansion
                 seed_labels: list[str] = []
                 if _nlp_seed_expansion_applies(
                     query,
                     enabled=bool(nlp_cfg.enabled),
                     min_tokens=int(nlp_cfg.min_tokens),
-                    min_sentences=int(
-                        getattr(nlp_cfg, "min_sentences", 2)
-                    ),
+                    min_sentences=int(getattr(nlp_cfg, "min_sentences", 2)),
                 ):
                     seed_labels = _nlp_seed_labels(query_analysis, nlp_terms)
                 expander = QueryExpander(
@@ -378,7 +552,9 @@ class PassageRetrievalPipeline:
                     weights=ExpansionWeights(
                         **{
                             k: float(v)
-                            for k, v in self.config.query_expansion.weights.items()
+                            for k, v in (
+                                self.config.query_expansion.weights.items()
+                            )
                             if k
                             in {
                                 "original",
@@ -395,44 +571,60 @@ class PassageRetrievalPipeline:
                     ),
                     enabled=self.config.query_expansion.enabled,
                 )
-                expanded = expander.expand(query, seed_labels=seed_labels or None)
+                expanded = expander.expand(
+                    query, seed_labels=seed_labels or None
+                )
                 concept_ids = list(expanded.concept_ids or [])
                 for term in expanded.terms:
                     if term.text:
                         _add_term(term.text)
+                if concept_ids:
+                    LOGGER.info(
+                        "query expand ontology_concepts OR ids=%s seeds=%d",
+                        concept_ids[:16],
+                        len(seed_labels),
+                    )
             timings["expand"] = (time.perf_counter() - t_exp) * 1000
 
         if not expansion_terms and query.strip():
             expansion_terms = [query.strip()]
 
-        requested = mode or getattr(self.config, "search_mode", None) or "auto"
-        if isinstance(requested, str):
-            requested = requested.strip().lower()  # type: ignore[assignment]
+        requested_raw = (
+            mode or getattr(self.config, "search_mode", None) or "auto"
+        )
+        requested_mode: SearchMode = "auto"
+        if isinstance(requested_raw, str):
+            normalized = requested_raw.strip().lower()
+            if normalized in ("global", "user", "both", "auto"):
+                requested_mode = cast(SearchMode, normalized)
         chosen = choose_search_mode(
             query,
-            requested=(
-                requested
-                if requested in ("global", "user", "both", "auto")
-                else "auto"
-            ),  # type: ignore[arg-type]
+            requested=requested_mode,
             has_user_space=bool(user_space),
             expansion_concept_ids=concept_ids,
             language=language,
         )
 
         t_emb = time.perf_counter()
-        emb = encode_one(query, model_id=model_id, dense_dim=dim)
+        # Dense/sparse on content-focused lexical text when NLP produced terms;
+        # avoids interrogative-heavy embeddings pulling narrative SPOTREPs.
+        embed_text = (
+            (query_analysis or {}).get("lexical_query")
+            or " ".join(expansion_terms[:12])
+            or query
+        )
+        emb = encode_one(str(embed_text), model_id=model_id, dense_dim=dim)
         # Pure BGE-M3 sparse; BM25 probe + ontology_concepts handle lexical /
         # concept overlap (enrich_sparse previously hurt SciFact NDCG).
         query_sparse = emb.sparse
         timings["embed"] = (time.perf_counter() - t_emb) * 1000
 
-        probe = " ".join(expansion_terms[:24]).strip() or query
+        probe_terms = expansion_terms[:24]
 
         if chosen == "global":
             ranked, meta = await self._search_schema(
                 "global",
-                probe=probe,
+                probe_terms=probe_terms,
                 dense=emb.dense,
                 sparse=query_sparse,
                 hits=hits_n,
@@ -446,7 +638,7 @@ class PassageRetrievalPipeline:
         elif chosen == "user":
             ranked, meta = await self._search_schema(
                 "user",
-                probe=probe,
+                probe_terms=probe_terms,
                 dense=emb.dense,
                 sparse=query_sparse,
                 hits=hits_n,
@@ -461,7 +653,7 @@ class PassageRetrievalPipeline:
             t_g = time.perf_counter()
             g_rank, g_meta = await self._search_schema(
                 "global",
-                probe=probe,
+                probe_terms=probe_terms,
                 dense=emb.dense,
                 sparse=query_sparse,
                 hits=hits_n,
@@ -474,7 +666,7 @@ class PassageRetrievalPipeline:
             t_u = time.perf_counter()
             u_rank, u_meta = await self._search_schema(
                 "user",
-                probe=probe,
+                probe_terms=probe_terms,
                 dense=emb.dense,
                 sparse=query_sparse,
                 hits=hits_n,
@@ -490,7 +682,9 @@ class PassageRetrievalPipeline:
                 self.config.rrf.k,
             )
             fused_ids = sorted(
-                fused, key=fused.get, reverse=True  # type: ignore[arg-type]
+                fused,
+                key=lambda pid: fused[pid],
+                reverse=True,
             )[: self.config.rrf.top_n_after_fusion]
             fields_map = {
                 **(g_meta.get("fields") or {}),
@@ -556,14 +750,16 @@ class PassageRetrievalPipeline:
                     ),
                 ),
             )
-            weight = float(
-                getattr(ont_cfg, "rescore_weight", 0.13) or 0.13
-            )
+            weight = float(getattr(ont_cfg, "rescore_weight", 0.13) or 0.13)
             rescorer = OntologyRescorer(scorer, weight=weight)
             ranked_ont = rescorer.rescore(
                 concept_ids,
                 [
-                    (hit.passage_id, float(hit.score), list(hit.ontology_concepts))
+                    (
+                        hit.passage_id,
+                        float(hit.score),
+                        list(hit.ontology_concepts),
+                    )
                     for hit in hits
                 ],
             )
@@ -587,12 +783,15 @@ class PassageRetrievalPipeline:
                 hits = rescored
             timings["ontology_rescore"] = (time.perf_counter() - t_ont) * 1000
 
+        # Prefer passages that actually mention content probe terms (e.g. Suez)
+        # before ColBERT, so entity questions are not drowned by narrative noise.
+        hits = _boost_hits_by_content_overlap(hits, expansion_terms)
+
         # ColBERT MaxSim second stage (1 query × N hits).
-        return_k = int(
-            top_k or self.config.final_fusion.top_k_returned or 10
-        )
         colbert_cfg = getattr(self.config, "colbert", None)
-        if colbert_cfg is not None and bool(getattr(colbert_cfg, "enabled", False)):
+        if colbert_cfg is not None and bool(
+            getattr(colbert_cfg, "enabled", False)
+        ):
             t_cb = time.perf_counter()
             from thot.tools.search.rerank import colbert_rerank
 
@@ -602,26 +801,28 @@ class PassageRetrievalPipeline:
                 if hit.chunk_text
             ]
             if candidates:
-                ranked = await asyncio.to_thread(
-                    colbert_rerank,
-                    query,
-                    candidates,
-                    top_m=int(getattr(colbert_cfg, "top_m", 40)),
-                    top_k=return_k,
-                    batch_size=int(getattr(colbert_cfg, "batch_size", 8)),
-                    first_stage_weight=float(
-                        getattr(colbert_cfg, "first_stage_weight", 0.55)
-                    ),
-                    colbert_weight=float(
-                        getattr(colbert_cfg, "colbert_weight", 0.45)
-                    ),
-                    tail_weight=float(
-                        getattr(colbert_cfg, "tail_weight", 0.15)
-                    ),
+                colbert_ranked: list[tuple[str, float]] = (
+                    await asyncio.to_thread(
+                        colbert_rerank,
+                        query,
+                        candidates,
+                        top_m=int(getattr(colbert_cfg, "top_m", 40)),
+                        top_k=return_k,
+                        batch_size=int(getattr(colbert_cfg, "batch_size", 8)),
+                        first_stage_weight=float(
+                            getattr(colbert_cfg, "first_stage_weight", 0.55)
+                        ),
+                        colbert_weight=float(
+                            getattr(colbert_cfg, "colbert_weight", 0.45)
+                        ),
+                        tail_weight=float(
+                            getattr(colbert_cfg, "tail_weight", 0.15)
+                        ),
+                    )
                 )
                 by_id = {hit.passage_id: hit for hit in hits}
                 reranked_hits: list[PassageHit] = []
-                for pid, score in ranked:
+                for pid, score in colbert_ranked:
                     base = by_id.get(pid)
                     if base is None:
                         continue
@@ -654,7 +855,7 @@ class PassageRetrievalPipeline:
         self,
         schema: str,
         *,
-        probe: str,
+        probe_terms: list[str],
         dense: list[float],
         sparse: dict[str, float],
         hits: int,
@@ -668,10 +869,15 @@ class PassageRetrievalPipeline:
         parts: list[str] = [
             f'({{"targetNumHits": {hits}}}nearestNeighbor(dense_vector, q_dense))'
         ]
-        text_clause = build_field_contains_or_clause("chunk_text", probe)
+        text_clause = build_multi_field_contains_or_clause(
+            list(probe_terms or []),
+            fields=("chunk_text",),
+        )
         if text_clause:
             parts.append(text_clause)
         # Expanded neighborhood (synonym/narrower/related/broader ids).
+        # OR-joined with NN + BM25 — expands recall via ontology_concepts,
+        # never ANDed (would filter).
         for cid in concept_ids[:16]:
             lit = escape_yql_literal(str(cid))
             if lit:
@@ -698,9 +904,7 @@ class PassageRetrievalPipeline:
         for child in children:
             f = child.get("fields") or {}
             pid = str(
-                f.get("source_ref")
-                or child.get("id")
-                or f"hit-{len(ordered)}"
+                f.get("source_ref") or child.get("id") or f"hit-{len(ordered)}"
             )
             if pid in fields_map:
                 continue

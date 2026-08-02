@@ -12,6 +12,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -21,7 +22,14 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from cyclonedx.model import Property
+from cyclonedx.model import (
+    ExternalReference,
+    ExternalReferenceType,
+    HashAlgorithm,
+    HashType,
+    Property,
+    XsUri,
+)
 from cyclonedx.model.bom import Bom
 from cyclonedx.model.component import Component, ComponentType
 from cyclonedx.model.contact import OrganizationalContact
@@ -72,7 +80,175 @@ def _model_component(entry: dict[str, Any]) -> Component:
     return component
 
 
-def build_ai_bom(config: dict[str, Any]) -> Bom:
+def _sha256_file(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _guess_dataset_supplier(name: str, download_url: str | None) -> str:
+    lowered = name.lower()
+    if "geoname" in lowered or (download_url and "geonames.org" in download_url):
+        return "GeoNames"
+    if "fortune" in lowered:
+        return "Fortune"
+    return "tkeir"
+
+
+def _dataset_component(
+    *,
+    name: str,
+    path: Path,
+    language: str,
+    role: str,
+    use_case: str,
+    repo_root: Path,
+    label: str | None = None,
+    data_type: str | None = None,
+    pos: str | None = None,
+    download_url: str | None = None,
+    description: str | None = None,
+) -> Component:
+    supplier = _guess_dataset_supplier(name, download_url)
+    try:
+        relative = path.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError:
+        relative = path.as_posix()
+    qualifiers = {"download_url": download_url} if download_url else None
+    purl = PackageURL(
+        type="generic",
+        namespace="tkeir",
+        name=name,
+        qualifiers=qualifiers,
+        subpath=relative if path.is_file() else None,
+    )
+    component = Component(
+        type=ComponentType.DATA,
+        name=name,
+        description=description,
+        purl=purl,
+        supplier=OrganizationalContact(name=supplier),
+    )
+    component.properties.add(Property(name="ai:component_role", value=role))
+    component.properties.add(Property(name="ai:use_case", value=use_case))
+    component.properties.add(Property(name="tokenizer:language", value=language))
+    component.properties.add(Property(name="tokenizer:path", value=relative))
+    if label:
+        component.properties.add(Property(name="tokenizer:label", value=label))
+    if data_type:
+        component.properties.add(Property(name="tokenizer:type", value=data_type))
+    if pos:
+        component.properties.add(Property(name="tokenizer:pos", value=pos))
+    if download_url:
+        component.external_references.add(
+            ExternalReference(
+                type=ExternalReferenceType.DISTRIBUTION,
+                url=XsUri(download_url),
+            )
+        )
+    digest = _sha256_file(path)
+    if digest:
+        component.hashes.add(
+            HashType(alg=HashAlgorithm.SHA_256, content=digest)
+        )
+    return component
+
+
+def _iter_annotation_lists(catalog: dict[str, Any]) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for block in catalog.get("data") or []:
+        if not isinstance(block, dict):
+            continue
+        for item in block.get("lists") or []:
+            if isinstance(item, dict) and item.get("name"):
+                entries.append(item)
+    return entries
+
+
+def load_dataset_components(
+    config: dict[str, Any],
+    *,
+    repo_root: Path,
+) -> list[Component]:
+    """Expand annotation-resources catalogs into CycloneDX DATA components."""
+    components: list[Component] = []
+    seen: set[str] = set()
+
+    for entry in config.get("datasets") or []:
+        if not isinstance(entry, dict):
+            continue
+        catalog_rel = entry.get("catalog")
+        if not catalog_rel:
+            continue
+        catalog_path = Path(str(catalog_rel))
+        if not catalog_path.is_absolute():
+            catalog_path = repo_root / catalog_path
+        if not catalog_path.is_file():
+            raise BomConfigError(f"dataset catalog not found: {catalog_path}")
+
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+        language = str(entry.get("language") or catalog_path.parent.name)
+        role = str(entry.get("role") or "inference-gazetteer")
+        use_case = str(entry.get("use_case") or "tokenizer-ner-mwe")
+        base = catalog_path.parent
+
+        for item in _iter_annotation_lists(catalog):
+            name = str(item["name"])
+            if name in seen:
+                continue
+            seen.add(name)
+            rel_path = str(item.get("path") or "")
+            file_path = base / rel_path if rel_path else base
+            download = item.get("download") or {}
+            download_url = None
+            if isinstance(download, dict):
+                download_url = download.get("url")
+            components.append(
+                _dataset_component(
+                    name=name,
+                    path=file_path,
+                    language=language,
+                    role=role,
+                    use_case=use_case,
+                    repo_root=repo_root,
+                    label=str(item["label"]) if item.get("label") else None,
+                    data_type=str(item["type"]) if item.get("type") else None,
+                    pos=str(item["pos"]) if item.get("pos") else None,
+                    download_url=str(download_url) if download_url else None,
+                    description=(
+                        f"Tokenizer {language} gazetteer/lexicon "
+                        f"from {catalog_path.name}"
+                    ),
+                )
+            )
+
+        if entry.get("include_compiled_mwe", True):
+            mwe_path = base / "tkeir_mwe.pkl"
+            mwe_name = f"tkeir-mwe-{language}"
+            if mwe_name not in seen and mwe_path.is_file():
+                seen.add(mwe_name)
+                components.append(
+                    _dataset_component(
+                        name=mwe_name,
+                        path=mwe_path,
+                        language=language,
+                        role="compiled-mwe",
+                        use_case=use_case,
+                        repo_root=repo_root,
+                        description=(
+                            f"Compiled MWE trie for tokenizer language={language}"
+                        ),
+                    )
+                )
+
+    return components
+
+
+def build_ai_bom(config: dict[str, Any], *, repo_root: Path | None = None) -> Bom:
     bom = Bom()
     root = Component(
         type=ComponentType.APPLICATION,
@@ -91,9 +267,16 @@ def build_ai_bom(config: dict[str, Any]) -> Bom:
         for entry in config.get("models") or []
         if isinstance(entry, dict) and entry.get("name")
     ]
-    for component in model_components:
+    dataset_components = (
+        load_dataset_components(config, repo_root=repo_root)
+        if repo_root is not None
+        else []
+    )
+    for component in model_components + dataset_components:
         bom.components.add(component)
-    bom.register_dependency(root, depends_on=model_components)
+    bom.register_dependency(
+        root, depends_on=model_components + dataset_components
+    )
     return bom
 
 
@@ -249,7 +432,7 @@ def build_unified_bom(
     spec_version: str = "1.6",
     python_executable: Path | None = None,
 ) -> tuple[Bom, dict[str, dict[str, Any]]]:
-    bom = build_ai_bom(config)
+    bom = build_ai_bom(config, repo_root=repo_root)
     ml_libraries = {
         _normalise_package_name(str(name))
         for name in config.get("ml_libraries") or []

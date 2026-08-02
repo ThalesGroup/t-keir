@@ -49,6 +49,8 @@ _STRUCTURAL_CLASSES = frozenset(
     {
         "Document",
         "DocumentChunk",
+        "SubOntology",
+        "Statement",
         "Keyword",
         "Tag",
         "Entity",
@@ -64,6 +66,16 @@ _STRUCTURAL_PREDICATES = frozenset(
         "isTagOf",
         "hasNumericValue",
         "has-concept",
+        "hasChunk",
+        "mentionedIn",
+        "inChunk",
+        "hasSubOntology",
+        "subject",
+        "predicate",
+        "object",
+        "chunkSupport",
+        "sharedConceptCount",
+        "intersectionWeight",
     }
 )
 

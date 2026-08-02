@@ -1,0 +1,9 @@
+{
+  "keycloakUrl": "http://localhost:8082",
+  "realm": "tkeir",
+  "clientId": "tkeir-hmi",
+  "ragBaseUrl": "http://localhost:8090",
+  "analyzedDocumentsPath": "workspace/ingest",
+  "businessOntologyDataset": "osint"
+}
+

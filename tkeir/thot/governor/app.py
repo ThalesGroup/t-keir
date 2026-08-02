@@ -304,6 +304,7 @@ def main() -> None:
 
     settings = governor_settings()
     from thot.core.StructuredLogging import configure_text_logging
+
     configure_text_logging(level=logging.INFO, force=True)
     uvicorn.run(
         "thot.governor.app:app",

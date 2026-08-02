@@ -306,8 +306,8 @@ def run_dense(
             "Use --dense-model bge-m3 (default) or make pull-bge-model."
         )
 
-    from thot.tools.search.bge_m3 import resolve_bge_m3_path
     from thot.tools.eval.hybrid_retrieve import score_bge_hybrid
+    from thot.tools.search.bge_m3 import resolve_bge_m3_path
 
     model_path = resolve_bge_m3_path(
         None
@@ -321,6 +321,7 @@ def run_dense(
         batch_size=batch_size,
         top_k=top_k,
     )
+
 
 def evaluate_results(
     qrels: dict[str, dict[str, int]],
@@ -758,7 +759,6 @@ def analyze_failures(
             break
 
     return fps + fns + near
-
 
 
 def _fmt(value: float | None, digits: int = 3) -> str:

@@ -1,0 +1,85 @@
+name: persona_cdo
+version: 2
+description: >
+  CDO Chief Data Officer enterprise workflow (Project MERIDIAN).
+  When Reporter Phase 3 supplies an edited LLM Wiki (wiki_markdown /
+  bundle_id), treat that FULL wiki (Answer + Evidence + Sources) as the
+  primary fact base and reshape it into ent_risk_summary (risk_summary).
+template: ent_risk_summary
+budgets:
+  llm_tokens: 120000
+  tool_calls: 60
+  wall_seconds: 900
+steps:
+  - id: analyse
+    agent: cdo_analyser
+    goal_template: >
+      Produce grounded findings for CDO Chief Data Officer enterprise
+      risk_summary on: {goal}.
+      Topic: {topic}. report_form={report_form}. has_llm_wiki={has_llm_wiki}.
+      bundle_id={bundle_id}.
+
+      IF has_llm_wiki is true OR wiki_markdown / wiki_excerpt is non-empty:
+        PRIMARY SOURCE is the FULL Phase-2 LLM Wiki (Answer + Evidence + Sources).
+        The complete wiki is also injected in the agent prompt.
+        Call okf_bundle_get for bundle_id when set and reconcile with wiki_md.
+        Extract MANY atomic findings from Answer + Evidence; preserve EVERY
+        chunk_id cited under Evidence and Sources. Only use search/rag_query
+        (search_mode="both") to verify citations or fill Gaps — do NOT rebuild
+        research from scratch.
+        FULL WIKI:
+        -----
+        {wiki_markdown}
+        -----
+      ELSE:
+        HARD REQUIREMENT: dual-index search_mode="both" on rag_query and search.
+        Use ontology_query when helpful. Never invent facts absent from chunks.
+
+      Never invent intermediary structures, KRI labels, source reliability
+      grades, or assessments absent from wiki/chunks.
+    tools:
+      - search
+      - rag_query
+      - ontology_query
+      - document_get
+      - workspace_wiki_list
+      - workspace_wiki_get
+      - okf_bundle_get
+    max_steps: 14
+
+  - id: review
+    agent: cdo_reviewer
+    goal_template: >
+      Review CDO Chief Data Officer findings for enterprise risk_summary
+      on: {goal}.
+      Prior findings JSON: {prior_findings_json}
+      Prefer claims that appear in the LLM Wiki Evidence/Sources with chunk_ids.
+      Reject uncited or world-knowledge claims (intermediary structures,
+      SPV ownership, invented KRI labels). Return accepted findings only.
+    tools: []
+    max_steps: 2
+
+  - id: write
+    agent: cdo_writer
+    goal_template: >
+      Write persona enterprise report claims for: {goal}.
+      Use reviewed findings only: {prior_findings_json}
+      Keep chunk_ids; do not add facts.
+      Follow the enterprise report TEMPLATE embedded in your system prompt
+      (slots + markdown skeleton for {report_form} / {report_form_slots}).
+      Emit one finding per filled slot with claim prefixed by [slot_name],
+      e.g. "[situation] …". Also emit [sources] listing chunk_id citations
+      from the wiki Sources/Evidence sections.
+      Compose maps tagged claims into the template.
+
+      FULL WIKI (for Sources fidelity):
+      -----
+      {wiki_markdown}
+      -----
+    tools: []
+    max_steps: 2
+
+  - id: deliverable
+    compose:
+      template: ent_risk_summary
+      topic_from: topic

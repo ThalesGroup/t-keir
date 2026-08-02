@@ -5,7 +5,7 @@ set -euo pipefail
 script_path="$(cd "$(dirname "$0")" && pwd)"
 root_path="$(cd "$script_path/.." && pwd)"
 tkeir_path="$root_path/tkeir"
-fixtures_path="$tkeir_path/tests/fixtures/test-raw"
+fixtures_path="$root_path/tests/fixtures/test-raw"
 
 config_path="${QUICKSTART_CONFIG:-$tkeir_path/configs/pipeline.yaml}"
 output_path="${QUICKSTART_OUTPUT:-$root_path/output/quickstart}"
@@ -18,7 +18,7 @@ usage() {
     echo "  QUICKSTART_OUTPUT      output directory (default: output/quickstart)"
     echo "  TRANSFORMERS_CACHE     model cache path (default: .cache/models)"
     echo ""
-    echo "Runs tkeir-pipeline only on tkeir/tests/fixtures/test-raw (no indexing)."
+    echo "Runs tkeir-pipeline only on tests/fixtures/test-raw (no indexing)."
     exit 1
 }
 

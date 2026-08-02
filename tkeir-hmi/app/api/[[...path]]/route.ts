@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const API_URL = (process.env.API_URL ?? "http://localhost:8090").replace(
@@ -36,13 +35,9 @@ async function proxyRequest(
     headers.set("x-correlation-id", correlationId);
   }
 
-  // Forward bearer from Auth.js session when present.
-  if (process.env.AUTH_ENABLED === "true") {
-    const session = await auth();
-    if (session?.accessToken) {
-      headers.set("authorization", `Bearer ${session.accessToken}`);
-    }
-  }
+  // Forward inbound bearer token when present.
+  // With keycloak-js, the browser attaches `Authorization: Bearer ...` to
+  // every call hitting this proxy.
   const inboundAuth = request.headers.get("authorization");
   if (inboundAuth && !headers.has("authorization")) {
     headers.set("authorization", inboundAuth);
@@ -56,7 +51,11 @@ async function proxyRequest(
   };
 
   if (request.method !== "GET" && request.method !== "HEAD") {
-    init.body = await request.text();
+    // Preserve multipart boundaries (business ontology upload); text() breaks them.
+    const isMultipart = (contentType || "")
+      .toLowerCase()
+      .includes("multipart/form-data");
+    init.body = isMultipart ? await request.arrayBuffer() : await request.text();
   }
 
   try {

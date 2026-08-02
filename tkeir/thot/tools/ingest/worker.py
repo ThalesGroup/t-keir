@@ -28,8 +28,19 @@ from thot.action.models import new_action_id, utc_now_rfc3339
 from thot.core.ThotLogger import LogUserContext
 from thot.core.TkeirPaths import configs_dir
 from thot.governor.client import GovernorClient
+from thot.tasks.converters.InputFormat import (
+    AUTO_DATATYPE,
+    detect_input_format,
+)
+from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
+from thot.tasks.pipeline.PipelineRunner import PipelineRunner
 from thot.tools.ingest.config import IngestSettings, ingest_settings
-from thot.tools.ingest.fetch import FetchError, doc_id_from_content, fetch_bytes
+from thot.tools.ingest.fetch import (
+    FetchError,
+    doc_id_from_content,
+    fetch_bytes,
+)
+from thot.tools.ingest.index_passages import index_pipeline_document
 from thot.tools.ingest.manifest import (
     build_manifest,
     embedder_fingerprint,
@@ -45,13 +56,6 @@ from thot.tools.ingest.models import (
     SourceInfo,
 )
 from thot.tools.ingest.store import IngestStore
-from thot.tasks.converters.InputFormat import (
-    AUTO_DATATYPE,
-    detect_input_format,
-)
-from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
-from thot.tasks.pipeline.PipelineRunner import PipelineRunner
-from thot.tools.ingest.index_passages import index_pipeline_document
 from thot.tools.search.vespa_client import VespaClient
 
 LOGGER = logging.getLogger(__name__)
@@ -152,11 +156,16 @@ def run_pipeline_on_bytes(
     correlation_id: str,
     *,
     document_extras: dict[str, Any] | None = None,
+    datatype: str | None = None,
 ) -> dict[str, Any]:
     """Execute the NLP pipeline on raw document bytes.
 
     ``document_extras`` (e.g. per-request ``ontologies`` paths) are
     merged into the pipeline input and preserved across the converter step.
+
+    ``datatype`` selects the converter input type. Default ``None`` uses
+    auto-detection (same as ingest). Pass ``\"raw\"`` to force
+    :class:`~thot.tasks.converters.RawTextConverter.RawTextConverter`.
     """
     from thot.tools.ingest.fetch import doc_id_from_content
 
@@ -165,11 +174,13 @@ def run_pipeline_on_bytes(
     call_context["input-file"] = filename
     call_context["source-file-size-bytes"] = len(content)
     content_digest = doc_id_from_content(content)
+    requested = (datatype or "").strip().lower() or None
 
     with tempfile.TemporaryDirectory(prefix="tkeir-ingest-") as temp_dir:
         input_path = Path(temp_dir) / f"source{suffix}"
         input_path.write_bytes(content)
-        if input_path.suffix == ".json":
+        # Pre-converted pipeline JSON: skip converter unless datatype forced.
+        if input_path.suffix == ".json" and requested is None:
             with input_path.open(encoding="utf-8") as handle:
                 payload = json.load(handle)
             if isinstance(payload, dict) and (
@@ -196,11 +207,21 @@ def run_pipeline_on_bytes(
                     filename=filename,
                     content_digest=content_digest,
                 )
-        resolved_type = detect_input_format(
-            str(input_path),
-            content,
-            AUTO_DATATYPE,
-        )
+        if requested == "raw":
+            from thot.tasks.converters.InputFormat import is_binary_document
+
+            if is_binary_document(content):
+                raise ValueError(
+                    "Binary documents cannot use datatype 'raw'; "
+                    "pass datatype=auto (or pdf/docx/…)"
+                )
+            resolved_type = "raw"
+        else:
+            resolved_type = detect_input_format(
+                str(input_path),
+                content,
+                requested or AUTO_DATATYPE,
+            )
         encoded = base64.b64encode(content).decode()
         payload = {
             "datatype": resolved_type,
@@ -229,13 +250,18 @@ async def _default_index(
     *,
     user_space: str | None = None,
     nlp_ms: float = 0.0,
+    target: str = "both",
+    dataset: str | None = None,
+    ontology_payload: dict[str, Any] | None = None,
 ) -> int:
     async with VespaClient() as vespa:
         result = await index_pipeline_document(
             document,
             vespa=vespa,
-            target="both",
+            target=target,  # type: ignore[arg-type]
             user_space=user_space,
+            ontology_payload=ontology_payload,
+            dataset=dataset,
             nlp_ms=nlp_ms,
         )
         return result.passage_count
@@ -380,6 +406,31 @@ class IngestWorker:
             noop=True,
         )
 
+    @staticmethod
+    def _resolve_business_ontology_payload(
+        *,
+        dataset: str | None,
+        request_payload: Any,
+    ) -> dict[str, Any] | None:
+        """Load ``datasets/<dataset>/business_ontology.yaml`` and merge request."""
+        from thot.tools.search.business_ontology import (
+            load_dataset_business_ontology_payload,
+            merge_business_ontology_payloads,
+        )
+
+        file_payload = None
+        if dataset:
+            file_payload = load_dataset_business_ontology_payload(dataset)
+        merged = merge_business_ontology_payloads(
+            file_payload, request_payload
+        )
+        if not merged:
+            return None
+        concepts = merged.get("concepts") if isinstance(merged, dict) else None
+        if not isinstance(concepts, list) or not concepts:
+            return None
+        return merged
+
     async def process_source(
         self,
         *,
@@ -392,6 +443,7 @@ class IngestWorker:
         batch_id: str | None = None,
         user_space: str | None = None,
         document_extras: dict[str, Any] | None = None,
+        index_target: str = "both",
     ) -> IngestJob:
         """Fetch (when needed), stage, pipeline, and optionally index."""
         from thot.tools.search.user_space import resolve_vespa_user_space
@@ -402,7 +454,33 @@ class IngestWorker:
             fallback=user_space
             or (existing_job.user_space if existing_job else None),
         )
-        extras = document_extras
+        extras = dict(document_extras or {})
+        # index_target may be carried in extras from JSON-record ingest.
+        target = (
+            str(extras.pop("index_target", None) or index_target or "both")
+            .strip()
+            .lower()
+        )
+        if target not in {"global", "user", "both"}:
+            target = "both"
+        record_concepts = extras.pop("record_concept_ids", None)
+        forced_source = extras.pop("source_doc_id", None) or extras.pop(
+            "source", None
+        )
+        force_reindex = bool(extras.pop("force_reindex", False))
+        bo_dataset_raw = extras.pop("business_ontology_dataset", None)
+        bo_payload_raw = extras.pop("business_ontology", None)
+        bo_dataset = (
+            str(bo_dataset_raw).strip()
+            if isinstance(bo_dataset_raw, str) and bo_dataset_raw.strip()
+            else (
+                str(extras.get("dataset")).strip()
+                if extras.get("dataset")
+                else None
+            )
+        )
+        if bo_dataset and not extras.get("dataset"):
+            extras["dataset"] = bo_dataset
         failed = self._bootstrap_job(
             ingest_id=ingest_id,
             correlation_id=correlation_id,
@@ -432,11 +510,12 @@ class IngestWorker:
 
         doc_id = doc_id_from_content(content)
         key = idempotency_key(doc_id, pipeline_sha, embedder.sha256)
-        noop_job = self._idempotent_noop_job(
-            ingest_id=ingest_id, doc_id=doc_id, key=key
-        )
-        if noop_job is not None:
-            return noop_job
+        if not force_reindex:
+            noop_job = self._idempotent_noop_job(
+                ingest_id=ingest_id, doc_id=doc_id, key=key
+            )
+            if noop_job is not None:
+                return noop_job
 
         source = SourceInfo(
             uri=source_uri,
@@ -470,6 +549,7 @@ class IngestWorker:
         try:
             async with self._pipeline_sem:
                 t_nlp = time.perf_counter()
+                pipeline_extras = extras or None
                 if self._pipeline_fn is not None:
                     runner = self._runner(config_path)
                     document = self._invoke_pipeline_fn(
@@ -477,7 +557,7 @@ class IngestWorker:
                         content,
                         filename,
                         correlation_id,
-                        extras,
+                        pipeline_extras,
                     )
                 else:
                     runner = self._runner(config_path)
@@ -487,9 +567,53 @@ class IngestWorker:
                         content,
                         filename,
                         correlation_id,
-                        document_extras=extras,
+                        document_extras=pipeline_extras,
                     )
                 nlp_ms = (time.perf_counter() - t_nlp) * 1000
+                if isinstance(forced_source, str) and forced_source.strip():
+                    document["source_doc_id"] = forced_source.strip()
+                    document["source"] = forced_source.strip()
+                if isinstance(record_concepts, list) and record_concepts:
+                    document["record_concept_ids"] = [
+                        str(c).strip()
+                        for c in record_concepts
+                        if c and str(c).strip()
+                    ]
+                if bo_dataset and not document.get("dataset"):
+                    document["dataset"] = bo_dataset
+
+                ontology_payload = self._resolve_business_ontology_payload(
+                    dataset=bo_dataset,
+                    request_payload=bo_payload_raw,
+                )
+                if ontology_payload is not None:
+                    from thot.tools.search.business_ontology import (
+                        annotate_document_with_business_ontology,
+                    )
+
+                    document = annotate_document_with_business_ontology(
+                        document, ontology_payload
+                    )
+                    document["business_ontology_applied"] = {
+                        "dataset": bo_dataset,
+                        "concept_count": (
+                            len(ontology_payload.get("concepts") or [])
+                            if isinstance(ontology_payload, dict)
+                            else None
+                        ),
+                    }
+
+                source_ref = str(
+                    document.get("source_doc_id")
+                    or document.get("source")
+                    or ""
+                ).strip()
+                if source_ref:
+                    self.store.write_analyzed_document(
+                        doc_id,
+                        document,
+                        source_ref=source_ref,
+                    )
                 pipeline_path = (
                     self.store.staging_path(doc_id) / "pipeline.json"
                 )
@@ -507,6 +631,14 @@ class IngestWorker:
                             document,
                             user_space=space,
                             nlp_ms=nlp_ms,
+                            target=target,
+                            dataset=bo_dataset
+                            or (
+                                str(document.get("dataset")).strip()
+                                if document.get("dataset")
+                                else None
+                            ),
+                            ontology_payload=ontology_payload,
                         )
 
             manifest.status = "indexed"

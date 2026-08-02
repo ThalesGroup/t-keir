@@ -8,6 +8,11 @@ External ontology concepts are attached **only when a label is evidenced in
 the chunk text** (not the document title alone). Linked neighbors
 (broader / narrower / related) require the same chunk-text evidence.
 
+At search / RAG time, ``kg`` / ``content_ner`` / ``keywords`` are re-read from
+``analyzed_document.json`` for HMI fusion (see
+``enrich_hmi_ontology_from_analyzed_documents``) — this module does not change
+the ingest NLP strategy.
+
 ``expansion_labels`` prefer paraphrase-bridge partners (not full synonym
 lists). Causal / directionality hubs never expand labels (too generic).
 Sparse vectors stay pure BGE-M3 — labels are for dumps / BM25 probe only.
@@ -46,8 +51,8 @@ def _is_expansion_hub(concept_id: str) -> bool:
 
 def _labels_from_concept_row(raw: dict[str, Any]) -> list[str]:
     labels = [str(raw.get("preferred_label") or raw.get("concept_id") or "")]
-    labels.extend(str(x) for x in (raw.get("synonyms") or []) if x)
-    labels.extend(str(x) for x in (raw.get("surface_forms") or []) if x)
+    labels.extend(str(x) for x in raw.get("synonyms") or [] if x)
+    labels.extend(str(x) for x in raw.get("surface_forms") or [] if x)
     # paraphrase_bridges: claim ↔ document surface forms
     for bridge in raw.get("paraphrase_bridges") or []:
         if not isinstance(bridge, dict):
@@ -123,9 +128,7 @@ def _label_in_text(label: str, haystack_cf: str) -> bool:
 def _chunk_match_text(chunk: dict[str, Any]) -> str:
     """Body text used to decide whether a concept belongs to this chunk."""
     return str(
-        chunk.get("text_raw")
-        or chunk.get("search_vector_payload")
-        or ""
+        chunk.get("text_raw") or chunk.get("search_vector_payload") or ""
     ).strip()
 
 
@@ -172,6 +175,53 @@ def extract_concepts_from_json_ld(json_ld: str | dict[str, Any]) -> list[str]:
     return found
 
 
+def _kg_node_text(node: Any) -> str:
+    """Extract display text from a pipeline kg subject/property/value node.
+
+    Real kg slots use ``content`` / ``lemma_content`` (lists or strings), not
+    ``text`` / ``lemma``. Also accept simple string nodes and alternate keys.
+    """
+    if node is None:
+        return ""
+    if isinstance(node, str):
+        return node.strip()
+    if isinstance(node, (list, tuple)):
+        return " ".join(
+            str(part).strip() for part in node if str(part).strip()
+        )
+    if not isinstance(node, dict):
+        return str(node).strip()
+    content = node.get("content")
+    if isinstance(content, list):
+        joined = " ".join(
+            str(part).strip() for part in content if str(part).strip()
+        )
+        if joined:
+            return joined
+    if isinstance(content, str) and content.strip():
+        return content.strip()
+    lemma = node.get("lemma_content")
+    if isinstance(lemma, list):
+        joined = " ".join(
+            str(part).strip() for part in lemma if str(part).strip()
+        )
+        if joined:
+            return joined
+    if isinstance(lemma, str) and lemma.strip():
+        return lemma.strip()
+    for key in ("text", "lemma", "label", "name"):
+        val = node.get(key)
+        if isinstance(val, str) and val.strip():
+            return val.strip()
+        if isinstance(val, list):
+            joined = " ".join(
+                str(part).strip() for part in val if str(part).strip()
+            )
+            if joined:
+                return joined
+    return ""
+
+
 def extract_svo_concept_labels(document: dict[str, Any]) -> list[str]:
     """Pull entity-like strings from SVO / kg structures on the document."""
     labels: list[str] = []
@@ -194,21 +244,58 @@ def extract_svo_concept_labels(document: dict[str, Any]) -> list[str]:
             continue
         for row in payload:
             if isinstance(row, dict):
+                # Pipeline kg: subject / property / value with content arrays.
+                # Also accept object/predicate and text/lemma aliases.
                 for part in (
                     row.get("subject"),
                     row.get("object"),
+                    row.get("value"),
                     row.get("predicate"),
+                    row.get("property"),
                     row.get("s"),
                     row.get("o"),
                     row.get("p"),
                 ):
-                    if isinstance(part, dict):
-                        _add(str(part.get("text") or part.get("lemma") or ""))
-                    elif part:
-                        _add(str(part))
+                    _add(_kg_node_text(part))
             elif isinstance(row, (list, tuple)) and len(row) >= 2:
                 for part in row[:3]:
-                    _add(str(part))
+                    _add(_kg_node_text(part))
+    return labels
+
+
+def extract_ner_concept_labels(document: dict[str, Any]) -> list[str]:
+    """Pull surface strings from ``content_ner`` / ``title_ner`` / chunk entities."""
+    labels: list[str] = []
+    seen: set[str] = set()
+
+    def _add(text: str) -> None:
+        tok = (text or "").strip()
+        if len(tok) < 2 or tok.casefold() in seen:
+            return
+        seen.add(tok.casefold())
+        labels.append(tok)
+
+    for key in ("content_ner", "title_ner"):
+        for span in document.get(key) or []:
+            if not isinstance(span, dict):
+                continue
+            _add(str(span.get("text") or span.get("lemma") or ""))
+
+    for chunk in document.get("golden_chunks") or []:
+        if not isinstance(chunk, dict):
+            continue
+        metadata = chunk.get("metadata") or {}
+        primary = metadata.get("primary_entities") or {}
+        if isinstance(primary, dict):
+            for entities in primary.values():
+                if isinstance(entities, list):
+                    for entity in entities:
+                        _add(str(entity))
+                elif entities:
+                    _add(str(entities))
+        elif isinstance(primary, list):
+            for entity in primary:
+                _add(str(entity))
     return labels
 
 
@@ -283,11 +370,7 @@ def match_external_concepts(
         for rel in ("broader", "narrower", "related"):
             for other in raw.get(rel) or []:
                 oid = str(other).strip()
-                if (
-                    not oid
-                    or oid in seen_ids
-                    or oid in seen_linked
-                ):
+                if not oid or oid in seen_ids or oid in seen_linked:
                     continue
                 other_row = by_id.get(oid)
                 linked_labels: list[str] = []
@@ -302,9 +385,7 @@ def match_external_concepts(
                             lab
                             for lab in _labels_from_concept_row(other_row)
                             if _label_in_text(lab, haystack)
-                        ] or [
-                            str(other_row.get("preferred_label") or oid)
-                        ]
+                        ] or [str(other_row.get("preferred_label") or oid)]
                 elif _label_in_text(oid, haystack):
                     linked_labels.append(oid)
                 if not linked_labels:
@@ -333,6 +414,10 @@ def chunk_ontology_fields(
     Combines document-extracted JSON-LD / SVO concepts with optional external
     ontology matches. External matches use **chunk body text only** so a
     title-only hit does not tag every passage.
+
+    Note: at search / RAG time, ``kg`` / ``content_ner`` / ``keywords`` are
+    re-read from ``analyzed_document.json`` for display fusion — this index
+    helper does not change the ingest NLP strategy.
     """
     ontology = document.get("document_ontology") or {}
     json_ld = ontology.get("json_ld") or ontology.get(
@@ -382,7 +467,9 @@ def chunk_ontology_fields(
         linked_ids.append(cid)
 
     # SVO labels only when they also appear in the chunk body.
-    chunk_svo = [lab for lab in svo_labels if _label_in_text(lab, hay)] if hay else []
+    chunk_svo = (
+        [lab for lab in svo_labels if _label_in_text(lab, hay)] if hay else []
+    )
 
     labels: list[str] = []
     seen_lab: set[str] = set()

@@ -123,7 +123,7 @@ make quickstart
 ```
 
 What happens: `tkeir-pipeline` analyzes text under
-`tkeir/tests/fixtures/test-raw/` (no Vespa indexing) and writes JSON under
+`tests/fixtures/test-raw/` (no Vespa indexing) and writes JSON under
 `output/quickstart/`.
 
 **Checkpoint:** `ls output/quickstart/raw/*.json | head` shows analyzed documents.
@@ -243,7 +243,7 @@ Details: [Vespa RAG — user space](tools/vespa_rag.md#user-space-streaming-grou
 export VESPA_USER_SPACE=dev@tkeir
 
 make bootstrap # start Vespa + deploy doc_base / global / user schemas
-make index-fixtures # build pipeline JSON under tkeir/tests/indexing/output if needed
+make index-fixtures # build pipeline JSON under tests/indexing/output if needed
 make index # feed passages (user group = VESPA_USER_SPACE)
 ```
 
@@ -402,8 +402,8 @@ under `concepts/` — frontmatter includes `type` plus T-KEIR `tkeir_*` fields.
 **2. HTTP API + HMI browser** — optional when you want list/download from the UI:
 
 ```bash
-# Terminal C — OKF service (:8094); keep RAG on :8090
-make okf
+# Terminal C — OKF service (:8095); keep RAG on :8090
+make okf-up
 
 # List bundles for the default caller space
 make okf-bundle-ls
@@ -483,12 +483,181 @@ make compose-up PROFILES=core,auth,ingest,audit,governor,observability,objectsto
 | `ingest` | Document push API | 8091 |
 | `audit` | Hot store + WORM | 8093 |
 | `governor` | Kill / budgets / tokens | 8094 |
+| `okf` | OKF bundle API | 8095 |
 | `observability` | Grafana, Prom, Loki, Tempo, OTel | Grafana **3001** |
 | `objectstore` | MinIO (WORM buckets) | 9000 / 9001 |
 | `mcp` | MCP tool server | (compose network / published port) |
 | `agents` | `tkeir-agent` | **8092** |
 
 Guide: [Compose (P1)](deployment/compose.md).
+
+### 5.2.a Hybrid demo: Vespa + Keycloak + SPIRE infra, host services
+
+For live demos, a practical setup is to keep only the **infrastructure**
+components in containers and run all T-KEIR application code on the **host**.
+This gives faster edit/restart loops while still demonstrating real auth,
+SPIFFE/SPIRE, and audit/WORM behavior.
+
+#### One-shot launcher (recommended)
+
+Use the root script **`start_services.sh`** to open a **tmux** session, start
+each target in its own window, and wait for health checks before continuing:
+
+```bash
+./start_services.sh
+```
+
+Details, shortcuts (`TAB` / `CTRL+R` / `ESC`), and failure behaviour
+(`make down` on abort): **[Hybrid demo launcher](deployment/start_services.md)**.
+
+#### Manual startup (per terminal)
+
+**Infrastructure in containers**
+
+- `make vespa-up` - Vespa
+- `make keycloak-up` - Keycloak + sync demo users (`make keycloak-sync-demo-users`)
+- `make spire-up` - SPIRE server + agent
+
+**T-KEIR services on the host**
+
+- `make index-up` - deploy Vespa schemas (`init`) **and** start the host ingest
+  API on `:8091` (does **not** bulk-index fixtures; load user/global docs via the HMI)
+- `make rag-up` - RAG API on `:8090`
+- `make governor-up` - governor API on `:8094`
+- `make audit-up` - audit API on `:8093`
+- `make okf-up` - OKF API on `:8095`
+- `make agent` - agent service on `:8092` (starts with SPIFFE enforcement path enabled)
+- `make hmi-up` - Next.js HMI on `:3000` (or `./start_services.sh`, which starts HMI last)
+
+Recommended startup order:
+
+```bash
+make vespa-up
+make keycloak-up
+make spire-up
+make index-up          # schemas + ingest service (leave running)
+# other terminals:
+make rag-up
+make governor-up
+make audit-up
+make okf-up
+make agent
+make hmi-up              # http://localhost:3000
+```
+
+Notes:
+
+- `make index-up` = `make init` (schemas) + `make ingest` (API). Corpus content
+  (user + global) is ingested through the HMI / `POST /api/ingest/...` proxy to
+  `:8091`. Use `make index` only when you intentionally want offline fixture
+  indexing.
+- After `vespa-up` in the **manual** path, schemas are deployed by `make index-up`
+  (`init`). The **`start_services.sh`** launcher runs `vespa-up && bootstrap` in
+  the Vespa window so `:8080` is application-ready before ingest/RAG start.
+- In this hybrid mode, Vespa, Keycloak, and SPIRE stay stable in Docker while
+  the Python/Node services can be restarted directly from the host.
+- `make agent` depends on SPIRE startup so the demo can show workload identity,
+  not only auth-off local runs.
+
+Tear everything down (also wipes Vespa / audit / governor / ingest / OKF /
+agent state and Compose volumes):
+
+```bash
+make down
+# optional: stop services but keep databases
+KEEP_DATA=1 make down
+```
+
+**Corpus loading (user + global) — through the interface**
+
+In the hybrid demonstrator, **do not** run `make index` / `make index-fixtures`
+to populate Vespa. After `make index-up`:
+
+1. Leave the ingest service running on `:8091`.
+2. Start the HMI (`cd tkeir-hmi && npm run dev`) with `INGEST_URL=http://localhost:8091`
+   (see `.env.local.example`).
+3. Sign in as a persona (or `demo-user` / `demo-admin`) and ingest documents
+   through the UI. The HMI proxies to ingest as `POST /api/ingest/...`
+   (multipart or JSON → `tkeir-ingest` on `:8091`).
+4. User-space docs land in that session’s Vespa streaming group
+   (`preferred_username`); global / shared content follows the ingest API’s
+   global index path when used from the workbench.
+
+Offline CLI bulk feed (`make index`) remains available for P0 fixture / CI
+workflows only — it is **not** part of the hybrid demo path.
+
+**Persona browser setup**
+
+Use **one browser profile/window per persona** so each session keeps its own
+Keycloak login and HMI state. Accounts come from the realm import
+(`deploy/keycloak/realm-tkeir.json`) and are also ensured by
+`make keycloak-sync-demo-users` (runs automatically at the end of
+`make keycloak-up`):
+
+| Browser window | Login | Password | Persona role | Clearance |
+|----------------|-------|----------|--------------|-----------|
+| Analyst | `analyst` | `analyst` | `c2-j2-analyst` | `SECRET` |
+| MOC Watch | `moc-watch` | `moc-watch` | `c2-moc-watch` | `FOUO` |
+| HUMINT | `humint` | `humint` | `c2-j2x-humint` | `SECRET` |
+| Commander | `commander` | `commander` | `c2-ctf-commander` | `SECRET` |
+| Admin | `c2-admin` | `c2-admin` | `c2-admin` | `SECRET` |
+
+Legacy P1 isolation accounts still work:
+
+| Login | Password | Role | Clearance |
+|-------|----------|------|-----------|
+| `demo-user` | `demo-user` | `tkeir-user` | `UNCLASSIFIED` |
+| `demo-auditor` | `demo-auditor` | auditor | `FOUO` |
+| `demo-admin` | `demo-admin` | admin | `SECRET` |
+
+Keycloak admin console (realm management): `admin` / `admin` at
+http://localhost:8082
+
+If persona users are missing (realm imported before this change), re-sync
+without wiping volumes:
+
+```bash
+make keycloak-sync-demo-users
+```
+
+Or recreate the auth volume:
+
+```bash
+make compose-down VOLUMES=1 PROFILES=auth
+make keycloak-up
+```
+
+The HMI shows the selected persona and the classification banner from the
+Keycloak token (`clearance` claim). When a user has multiple persona roles, the
+top banner exposes a persona selector; for a pure demo account with one role,
+the selector stays hidden and the browser window itself acts as the persona
+boundary.
+
+**Audit + WORM demo**
+
+After generating a few actions (RAG queries, agent runs, admin operations),
+archive hot audit records into WORM segments:
+
+```bash
+make audit-archive
+make audit-verify
+make audit-worm-list2
+```
+
+This uses the local defaults under `workspace/audit/`:
+
+- hot store: `workspace/audit/hot_store.db`
+- subject keys: `workspace/audit/subject_keys.db`
+- WORM segments: `workspace/audit/worm/`
+
+**Hybrid demo checkpoint:**
+
+1. HMI login redirects to Keycloak.
+2. Classification banner is visible at the top and bottom of the UI.
+3. Persona windows stay isolated by session.
+4. Agent runs carry a SPIFFE identity path.
+5. `make audit-archive` produces real WORM segment files under
+   `workspace/audit/worm/`.
 
 ### 5.3 Smoke test
 
@@ -505,6 +674,15 @@ COMPOSE_SMOKE_RAG=1 make compose-smoke
 | `demo-user` | `demo-user` | user | `demo-user` (`preferred_username`) |
 | `demo-auditor` | `demo-auditor` | auditor | `demo-auditor` |
 | `demo-admin` | `demo-admin` | admin | `demo-admin` |
+| `analyst` | `analyst` | `c2-j2-analyst` | `analyst` |
+| `moc-watch` | `moc-watch` | `c2-moc-watch` | `moc-watch` |
+| `humint` | `humint` | `c2-j2x-humint` | `humint` |
+| `commander` | `commander` | `c2-ctf-commander` | `commander` |
+| `c2-admin` | `c2-admin` | `c2-admin` | `c2-admin` |
+
+Persona accounts and the `clearance` claim are imported automatically from
+`deploy/keycloak/realm-tkeir.json` — see [§5.2.a](#52a-hybrid-demo-vespa--keycloak--spire-infra-host-services)
+and [Compose OIDC](deployment/compose.md#oidc-keycloak-and-vespa-user-space).
 
 Emails in the realm are `*@tkeir` (used only if `preferred_username` is absent).
 
@@ -817,7 +995,8 @@ make docs-build
 ### Complexity, coverage, and licence gates
 
 `make ci` publishes the following on the
-[Code quality dashboard](quality/index.md):
+[Code quality dashboard](quality/index.md)
+(full catalogue: [CI & reports](ci/index.md)):
 
 - **Test coverage** — `make coverage` runs the scoped suite
   (`CoverageFast.sh`) and fails below `COVERAGE_FAIL_UNDER` (default 90%).

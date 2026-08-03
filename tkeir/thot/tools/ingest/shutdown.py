@@ -23,12 +23,24 @@ _shutdown_reason: str | None = None
 
 
 def shutdown_requested() -> bool:
-    """Return True when a stop-on-failed / admin stop was requested."""
+    """Return True when a stop-on-failed / admin stop was requested.
+
+    Example:
+        >>> from thot.tools.ingest.shutdown import shutdown_requested
+        >>> isinstance(shutdown_requested(), bool)
+        True
+    """
     return _shutdown_requested
 
 
 def shutdown_reason() -> str | None:
-    """Return the last shutdown reason, if any."""
+    """Return the last shutdown reason, if any.
+
+    Example:
+        >>> from thot.tools.ingest.shutdown import shutdown_reason
+        >>> shutdown_reason() is None or isinstance(shutdown_reason(), str)
+        True
+    """
     return _shutdown_reason
 
 

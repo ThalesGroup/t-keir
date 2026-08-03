@@ -94,7 +94,7 @@ pip install dist/tkeir-*.whl
 ```
 
 Prefer **Option A** (`make setup`) for development. Models: `make init-models`
-(or `tkeir/app/bin/init-models.sh`).
+(or `tkeir/scripts/init-models.sh`).
 
 ## 3. Configuration and resources
 

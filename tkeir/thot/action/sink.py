@@ -21,18 +21,37 @@ class ActionSink(Protocol):
     """Destination for sealed ActionRecords in observe/enforce modes."""
 
     def append(self, record: ActionRecord) -> None:
-        """Persist or buffer one ActionRecord."""
+        """Persist or buffer one ActionRecord.
+
+        Example:
+            >>> from thot.action.models import ActionRecord
+            >>> sink: ActionSink = InMemoryActionSink()
+            >>> sink.append(ActionRecord(correlation_id="e" * 32))
+            >>> len(sink)
+            1
+        """
 
     @property
     def prev_hash(self) -> str:
-        """Latest ``record_hash`` in the chain (empty if none)."""
+        """Latest ``record_hash`` in the chain (empty if none).
+
+        Example:
+            >>> InMemoryActionSink().prev_hash == ""
+            True
+        """
 
 
 class InMemoryActionSink:
     """Bounded append-only buffer for local observe mode and tests."""
 
     def __init__(self, maxlen: int = 10_000) -> None:
-        """Create a sink retaining at most ``maxlen`` records."""
+        """Create a sink retaining at most ``maxlen`` records.
+
+        Example:
+            >>> sink = InMemoryActionSink(maxlen=3)
+            >>> len(sink) == 0
+            True
+        """
         self._records: deque[ActionRecord] = deque(maxlen=maxlen)
         self._lock = Lock()
         self._prev_hash = ""
@@ -59,11 +78,25 @@ class InMemoryActionSink:
 
     @property
     def prev_hash(self) -> str:
+        """Return the latest sealed ``record_hash`` (empty when buffer is empty).
+
+        Example:
+            >>> InMemoryActionSink().prev_hash == ""
+            True
+        """
         with self._lock:
             return self._prev_hash
 
     def clear(self) -> None:
-        """Drop all buffered records (tests only)."""
+        """Drop all buffered records (tests only).
+
+        Example:
+            >>> sink = InMemoryActionSink()
+            >>> sink.append(ActionRecord(correlation_id="f" * 32))
+            >>> sink.clear()
+            >>> len(sink) == 0 and sink.prev_hash == ""
+            True
+        """
         with self._lock:
             self._records.clear()
             self._prev_hash = ""
@@ -85,6 +118,12 @@ class InMemoryActionSink:
             ]
 
     def __len__(self) -> int:
+        """Return the number of buffered records.
+
+        Example:
+            >>> len(InMemoryActionSink()) == 0
+            True
+        """
         with self._lock:
             return len(self._records)
 
@@ -98,6 +137,11 @@ def default_action_sink() -> ActionSink:
 
     When ``AUDIT_HOT_STORE_URL`` is set (or ``AUDIT_SINK_MODE=hot|dual``),
     records are mirrored to the audit hot store.
+
+    Example:
+        >>> sink = default_action_sink()
+        >>> hasattr(sink, "append") and hasattr(sink, "prev_hash")
+        True
     """
     global _RESOLVED_SINK
     if _RESOLVED_SINK is not None:
@@ -127,7 +171,12 @@ def default_action_sink() -> ActionSink:
 
 
 def reset_action_sink_for_tests() -> None:
-    """Reset lazy sink resolution (unit tests only)."""
+    """Reset lazy sink resolution (unit tests only).
+
+    Example:
+        >>> reset_action_sink_for_tests() is None
+        True
+    """
     global _RESOLVED_SINK
     _RESOLVED_SINK = None
     _MEMORY_SINK.clear()

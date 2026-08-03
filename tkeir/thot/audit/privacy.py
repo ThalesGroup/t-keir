@@ -19,9 +19,31 @@ from thot.action.models import sha256_hex
 
 
 class SubjectKeyStore:
-    """Envelope keys kept outside the WORM tier."""
+    """Envelope keys kept outside the WORM tier.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.audit.privacy import SubjectKeyStore
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     keys = SubjectKeyStore(Path(td) / "keys.db", salt=b"salt")
+        ...     len(keys.pseudonym("alice")) == 64
+        True
+    """
 
     def __init__(self, path: Path, *, salt: bytes | None = None) -> None:
+        """Open SQLite envelope key store at ``path``.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.audit.privacy import SubjectKeyStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     p = Path(td) / "keys.db"
+            ...     _ = SubjectKeyStore(p, salt=b"s")
+            ...     p.is_file()
+            True
+        """
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._salt = salt or os.urandom(16)
@@ -107,4 +129,16 @@ class SubjectKeyStore:
         return cur.rowcount > 0
 
     def close(self) -> None:
+        """Close the SQLite connection.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.audit.privacy import SubjectKeyStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     keys = SubjectKeyStore(Path(td) / "keys.db", salt=b"s")
+            ...     keys.close()
+            ...     True
+            True
+        """
         self._conn.close()

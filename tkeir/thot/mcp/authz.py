@@ -40,11 +40,26 @@ class McpAuthError(PermissionError):
     """Raised when MCP authz denies a call."""
 
     def __init__(self, message: str, *, status_code: int = 403) -> None:
+        """Create an authz error with HTTP status metadata.
+
+        Example:
+            >>> from thot.mcp.authz import McpAuthError
+            >>> err = McpAuthError("denied", status_code=401)
+            >>> err.status_code
+            401
+        """
         super().__init__(message)
         self.status_code = status_code
 
 
 def _auth_enabled() -> bool:
+    """Return whether MCP bearer auth is enabled via ``MCP_AUTH_ENABLED``.
+
+    Example:
+        >>> from thot.mcp.authz import _auth_enabled
+        >>> isinstance(_auth_enabled(), bool)
+        True
+    """
     return os.getenv("MCP_AUTH_ENABLED", "false").lower() in {
         "1",
         "true",
@@ -54,6 +69,13 @@ def _auth_enabled() -> bool:
 
 
 def _governor_mode() -> str:
+    """Return OPA governor mode from ``GOVERNOR_MODE`` / ``MCP_GOVERNOR_MODE``.
+
+    Example:
+        >>> from thot.mcp.authz import _governor_mode
+        >>> isinstance(_governor_mode(), str)
+        True
+    """
     return (
         os.getenv("GOVERNOR_MODE")
         or os.getenv("MCP_GOVERNOR_MODE")
@@ -62,6 +84,17 @@ def _governor_mode() -> str:
 
 
 def _scopes_from_payload(payload: dict[str, Any]) -> list[str]:
+    """Extract OAuth scopes / roles from a decoded JWT payload.
+
+    Example:
+        >>> from thot.mcp.authz import _scopes_from_payload, SEARCH_SCOPE
+        >>> _scopes_from_payload({"scope": "openid intent:search"})
+        ['openid', 'intent:search']
+        >>> SEARCH_SCOPE in _scopes_from_payload({
+        ...     "resource_access": {"client": {"roles": ["search"]}},
+        ... })
+        True
+    """
     scopes: list[str] = []
     raw = payload.get("scope")
     if isinstance(raw, str):

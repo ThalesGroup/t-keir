@@ -15,7 +15,7 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 class KeywordsConfiguration:
     """load ner configuration
      A ner configuration is represented by JSON entry:
-
+    
      Example
      logger": {
              "logging-level": "debug"
@@ -48,8 +48,11 @@ class KeywordsConfiguration:
              "workers":1
          }
     }
-
-
+    
+        Example:
+            >>> from thot.tasks.keywords.KeywordsConfiguration import KeywordsConfiguration
+            >>> callable(KeywordsConfiguration)
+            True
     """
 
     def __init__(self):

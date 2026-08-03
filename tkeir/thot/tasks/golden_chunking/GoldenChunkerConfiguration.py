@@ -13,7 +13,13 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 
 
 class GoldenChunkerConfiguration:
-    """Load golden chunking configuration."""
+    """Load golden chunking configuration.
+    
+        Example:
+            >>> from thot.tasks.golden_chunking.GoldenChunkerConfiguration import GoldenChunkerConfiguration
+            >>> callable(GoldenChunkerConfiguration)
+            True
+    """
 
     def __init__(self):
         """Initialize the instance.

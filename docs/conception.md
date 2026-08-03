@@ -507,7 +507,7 @@ Deep dive: [Agents](tools/agents.md) · [Templates](tools/templates.md) ·
 | **Modules** | `service`, `registry`, `workflows`, `loop`, `orchestrator`, `toolbox`, `safety`, `guard`, `runs`, `publish`, `spiffe`, `models` |
 | **Libraries** | **FastAPI**, `UnifiedLLMWrapper` (Ollama / OpenAI / vLLM); optional **spiffe**; MCP handlers / outbound client |
 | **Config** | `configs/agents/*.yaml`, `configs/workflows/*.yaml`, `configs/templates/*`, `configs/mcp-client.yaml` |
-| **Store** | `AGENT_ROOT` (default `.tkeir-agent/`) — manifests, steps, blackboard, DLQ, publishes |
+| **Store** | `AGENT_ROOT` (default `workspace/agent/`) — manifests, steps, blackboard, DLQ, publishes |
 
 #### Design principles
 

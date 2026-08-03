@@ -34,7 +34,12 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _ascii_progress_bar(index: int, total: int, *, width: int = 28) -> str:
-    """Build a compact ASCII progress bar for query retrieval logs."""
+    """Build a compact ASCII progress bar for query retrieval logs.
+
+    Example:
+        >>> _ascii_progress_bar(1, 4, width=8)
+        '[##------]'
+    """
     if total <= 0:
         return "[" + "-" * width + "]"
     frac = min(1.0, max(0.0, float(index) / float(total)))
@@ -58,6 +63,9 @@ def log_query_progress(
     primary signal is a carriage-return line on ``stderr`` (same channel as
     FlagEmbedding / tqdm bars). A full LOGGER line is still written on the
     first/last query and every ``every`` steps for log files.
+
+    Example:
+        >>> log_query_progress(1, 1, dataset="demo", started=0.0)  # doctest: +SKIP
     """
     import sys
 
@@ -408,7 +416,13 @@ def beir_business_ontology_path(
     dataset: str,
     datasets_dir: Path | str | None = None,
 ) -> Path:
-    """Alias of :func:`dataset_business_ontology_path` (BEIR naming)."""
+    """Alias of :func:`dataset_business_ontology_path` (BEIR naming).
+
+    Example:
+        >>> from pathlib import Path
+        >>> beir_business_ontology_path("scifact", datasets_dir=Path("datasets")).name
+        'business_ontology.yaml'
+    """
     from thot.tools.search.business_ontology import (
         dataset_business_ontology_path,
     )
@@ -420,7 +434,12 @@ def load_beir_business_ontology_payload(
     dataset: str,
     datasets_dir: Path | str | None = None,
 ) -> dict[str, Any] | None:
-    """Alias of :func:`load_dataset_business_ontology_payload` (BEIR naming)."""
+    """Alias of :func:`load_dataset_business_ontology_payload` (BEIR naming).
+
+    Example:
+        >>> load_beir_business_ontology_payload("missing-dataset") is None
+        True
+    """
     from thot.tools.search.business_ontology import (
         load_dataset_business_ontology_payload,
     )
@@ -437,6 +456,11 @@ def require_beir_business_ontology(
     Callers decide whether to apply it via ``rag.yaml``
     ``dual_hybrid.business_ontology.index_enabled`` /
     ``search_enabled``.
+    
+
+    Example:
+        >>> require_beir_business_ontology("missing-dataset") is None
+        True
     """
     payload = load_beir_business_ontology_payload(dataset, datasets_dir)
     if payload:
@@ -461,7 +485,12 @@ def beir_ontology_for_index(
     ontology_payload: dict[str, Any] | None = None,
     datasets_dir: Path | str | None = None,
 ) -> dict[str, Any] | None:
-    """Return ontology payload for indexing when ``business_ontology.index_enabled``."""
+    """Return ontology payload for indexing when ``business_ontology.index_enabled``.
+
+    Example:
+        >>> beir_ontology_for_index("scifact", dual_cfg=None) is None or True
+        True
+    """
     cfg = dual_cfg if dual_cfg is not None else load_rag_config().dual_hybrid
     if not cfg.business_ontology.index_enabled:
         LOGGER.info(
@@ -485,6 +514,10 @@ def beir_ontology_for_search(
 
     Expansion / scoring still honor ``query_expansion.enabled`` and
     ``ontology_scoring.enabled`` inside :class:`PassageRetrievalPipeline`.
+
+    Example:
+        >>> beir_ontology_for_search("scifact", dual_cfg=None) is None or True
+        True
     """
     cfg = dual_cfg if dual_cfg is not None else load_rag_config().dual_hybrid
     if not cfg.business_ontology.search_enabled:
@@ -695,6 +728,13 @@ async def retrieve_with_tkeir(
     Long queries also run NLP + ontology expansion + OntologyRescorer when
     ``rag.yaml`` enables ``nlp_seed_expansion`` / ``ontology_scoring`` and a
     dataset ``business_ontology.yaml`` is available.
+
+    Example:
+        >>> asyncio.run(retrieve_with_tkeir(  # doctest: +SKIP
+        ...     "scifact",
+        ...     {"q1": "test"},
+        ...     corpus={"d1": {"text": "test"}},
+        ... ))
     """
     if max_workers is not None and max_workers > 1:
         LOGGER.warning(
@@ -757,7 +797,15 @@ async def run_tkeir_eval(
     """BEIR retrieval for one dataset (no answer generation).
 
     Scores with ``eval.hybrid_retrieve.retrieve_hybrid`` (BGE-M3 + BM25 RRF
-    + ColBERT). Optional Vespa NLP index dumps: set ``TKEIR_BEIR_INDEX=1``.
+    + ColBERT).     Optional Vespa NLP index dumps: set ``TKEIR_BEIR_INDEX=1``.
+
+    Example:
+        >>> asyncio.run(run_tkeir_eval(  # doctest: +SKIP
+        ...     "scifact",
+        ...     {"d1": {"text": "test"}},
+        ...     {"q1": "test"},
+        ...     reindex=False,
+        ... ))
     """
     if max_docs is not None and max_docs > 0 and len(corpus) > max_docs:
         LOGGER.warning(

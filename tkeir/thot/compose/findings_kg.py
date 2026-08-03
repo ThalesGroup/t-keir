@@ -19,11 +19,25 @@ from thot.agent.models import GroundedFinding, GroundedFindings
 
 
 def _iri_safe(token: str) -> str:
+    """Sanitize a token for use in Turtle local names.
+
+    Example:
+        >>> from thot.compose.findings_kg import _iri_safe
+        >>> _iri_safe("chunk-1/2")
+        'chunk-1_2'
+    """
     text = re.sub(r"[^a-zA-Z0-9_\-]+", "_", str(token or "").strip())
     return text.strip("_") or "item"
 
 
 def _turtle_escape(text: str) -> str:
+    """Escape a string for safe inclusion in Turtle literals.
+
+    Example:
+        >>> from thot.compose.findings_kg import _turtle_escape
+        >>> _turtle_escape("line1\\nline2")
+        'line1 line2'
+    """
     return (
         str(text or "")
         .replace("\\", "\\\\")
@@ -42,6 +56,21 @@ def turtles_from_grounded_findings(
 
     Returns:
         ``(turtles, document_ids)`` — empty turtles when there is no evidence.
+
+    Example:
+        >>> from thot.agent.models import GroundedFinding, GroundedFindings
+        >>> from thot.compose.findings_kg import turtles_from_grounded_findings
+        >>> findings = GroundedFindings(
+        ...     goal="Report",
+        ...     findings=[GroundedFinding(
+        ...         claim="Acme launched Widget",
+        ...         chunk_ids=["c1"],
+        ...         document_ids=["doc-a"],
+        ...     )],
+        ... )
+        >>> turtles, docs = turtles_from_grounded_findings(findings)
+        >>> "Acme" in turtles[0] and docs == ["doc-a"]
+        True
     """
     if findings is None:
         return [], []
@@ -150,7 +179,17 @@ def turtles_from_grounded_findings(
 def findings_prose_context(
     findings: GroundedFindings | list[GroundedFinding] | None,
 ) -> tuple[str, list[str], list[str]]:
-    """Bullet context + evidence ids for freeform compose slots."""
+    """Bullet context + evidence ids for freeform compose slots.
+
+    Example:
+        >>> from thot.agent.models import GroundedFinding
+        >>> from thot.compose.findings_kg import findings_prose_context
+        >>> prose, chunks, docs = findings_prose_context([
+        ...     GroundedFinding(claim="Acme launched Widget", chunk_ids=["c1"], document_ids=["d1"]),
+        ... ])
+        >>> "Acme" in prose and chunks == ["c1"] and docs == ["d1"]
+        True
+    """
     if findings is None:
         return "", [], []
     rows: list[GroundedFinding]
@@ -179,7 +218,16 @@ def findings_prose_context(
 def ontology_payloads_from_observations(
     observations: list[dict[str, Any]] | None,
 ) -> list[str]:
-    """Extract JSON-LD / Turtle ontology payloads from tool observations."""
+    """Extract JSON-LD / Turtle ontology payloads from tool observations.
+
+    Example:
+        >>> from thot.compose.findings_kg import ontology_payloads_from_observations
+        >>> ontology_payloads_from_observations([
+        ...     {"json_ld": '{"@context": {}, "@id": "ex:A"}'},
+        ...     {"ontology": {"json_ld": "@prefix ex: <http://ex/> ."}},
+        ... ])
+        ['{"@context": {}, "@id": "ex:A"}', '@prefix ex: <http://ex/> .']
+    """
     payloads: list[str] = []
     for obs in observations or []:
         if not isinstance(obs, dict):

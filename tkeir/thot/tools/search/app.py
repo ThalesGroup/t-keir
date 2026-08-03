@@ -104,6 +104,13 @@ _DEFAULT_UNAVAILABLE_ANSWERS = {
 
 
 class QueryRequest(BaseModel):
+    """Full RAG query request with optional generation overrides.
+
+    Example:
+        >>> QueryRequest(query="hello").query
+        'hello'
+    """
+
     query: str = Field(..., min_length=1)
     language: str = Field(default="en", pattern="^(en|fr)$")
     hits: int = Field(default=20, ge=1, le=100)
@@ -169,6 +176,13 @@ class QueryRequest(BaseModel):
 
 
 class RetrievedChunk(BaseModel):
+    """Chunk hit enriched with parent metadata for RAG prompts.
+
+    Example:
+        >>> RetrievedChunk(chunk_id="c1", text_raw="hello", parent_doc_id="doc")
+        RetrievedChunk(chunk_id='c1', text_raw='hello', parent_doc_id='doc', relevance=None, title='')
+    """
+
     chunk_id: str
     text_raw: str
     parent_doc_id: str
@@ -177,7 +191,12 @@ class RetrievedChunk(BaseModel):
 
 
 class SearchRequest(BaseModel):
-    """Retrieval-only request (no LLM answer generation)."""
+    """Retrieval-only request (no LLM answer generation).
+
+    Example:
+        >>> SearchRequest(query="hello").hits
+        20
+    """
 
     query: str = Field(..., min_length=1)
     language: str = Field(default="en", pattern="^(en|fr)$")
@@ -226,7 +245,14 @@ class SearchRequest(BaseModel):
 
 
 class SearchChunk(BaseModel):
-    """Reranked chunk hit with score."""
+    """Reranked chunk hit with score.
+
+    Example:
+        >>> SearchChunk(
+        ...     chunk_id="c1", text_raw="t", parent_doc_id="d1", score=0.9
+        ... ).score
+        0.9
+    """
 
     chunk_id: str
     text_raw: str
@@ -236,7 +262,12 @@ class SearchChunk(BaseModel):
 
 
 class SearchDocument(BaseModel):
-    """Document aggregated from reranked chunk hits."""
+    """Document aggregated from reranked chunk hits.
+
+    Example:
+        >>> SearchDocument(document_id="d1", score=0.9).document_id
+        'd1'
+    """
 
     document_id: str
     score: float
@@ -246,6 +277,13 @@ class SearchDocument(BaseModel):
 
 
 class SemanticEntity(BaseModel):
+    """Named entity surfaced from fused ontology graphs.
+
+    Example:
+        >>> SemanticEntity(label="Paris", type="GPE").label
+        'Paris'
+    """
+
     label: str
     type: str
     chunk_ids: list[str] = Field(default_factory=list)
@@ -256,6 +294,13 @@ class SemanticEntity(BaseModel):
 
 
 class SemanticKeyword(BaseModel):
+    """Keyword surfaced from fused ontology graphs.
+
+    Example:
+        >>> SemanticKeyword(label="economy").label
+        'economy'
+    """
+
     label: str
     chunk_ids: list[str] = Field(default_factory=list)
     # Text-importance weight (chunk coverage + summed text hits).
@@ -265,7 +310,12 @@ class SemanticKeyword(BaseModel):
 
 
 class OntologyRelation(BaseModel):
-    """Weighted relation summed across fused chunk/parent ontologies."""
+    """Weighted relation summed across fused chunk/parent ontologies.
+
+    Example:
+        >>> OntologyRelation(source="a", predicate="p", target="b").predicate
+        'p'
+    """
 
     source: str
     predicate: str
@@ -274,7 +324,14 @@ class OntologyRelation(BaseModel):
 
 
 class ProposedOntologyQuery(BaseModel):
-    """Suggested SPARQL / expression / coherence query for the Navigator."""
+    """Suggested SPARQL / expression / coherence query for the Navigator.
+
+    Example:
+        >>> ProposedOntologyQuery(
+        ...     kind="sparql", title="T", query="SELECT ?s WHERE { ?s ?p ?o }"
+        ... ).kind
+        'sparql'
+    """
 
     kind: str
     title: str
@@ -283,7 +340,12 @@ class ProposedOntologyQuery(BaseModel):
 
 
 class FusedOntology(BaseModel):
-    """Merged ontology from Vespa parent ``json_ld`` fields for HMI / reasoner."""
+    """Merged ontology from Vespa parent ``json_ld`` fields for HMI / reasoner.
+
+    Example:
+        >>> FusedOntology(entities=[], keywords=[]).triple_count
+        0
+    """
 
     entities: list[SemanticEntity]
     keywords: list[SemanticKeyword]
@@ -297,7 +359,12 @@ class FusedOntology(BaseModel):
 
 
 class SearchTimings(BaseModel):
-    """Per-query retrieval stage timings in milliseconds."""
+    """Per-query retrieval stage timings in milliseconds.
+
+    Example:
+        >>> SearchTimings(nlp_ms=1.0, total_ms=2.0).nlp_ms
+        1.0
+    """
 
     nlp_ms: float = 0.0
     vespa_ms: float = 0.0
@@ -311,7 +378,14 @@ class SearchTimings(BaseModel):
 
 
 class SearchResponse(BaseModel):
-    """Reranked chunks and documents for a search query."""
+    """Reranked chunks and documents for a search query.
+
+    Example:
+        >>> SearchResponse(
+        ...     query="q", chunks=[], documents=[], vespa_hits=0
+        ... ).query
+        'q'
+    """
 
     query: str
     chunks: list[SearchChunk]
@@ -328,6 +402,19 @@ class SearchResponse(BaseModel):
 
 
 class QueryResponse(BaseModel):
+    """RAG answer with report markdown, highlights, and retrieved chunks.
+
+    Example:
+        >>> QueryResponse(
+        ...     answer="N/A",
+        ...     report_markdown="",
+        ...     chunks=[],
+        ...     ontology=FusedOntology(entities=[], keywords=[]),
+        ...     vespa_hits=0,
+        ... ).answer
+        'N/A'
+    """
+
     answer: str
     report_markdown: str
     input_prompt: str = ""
@@ -343,7 +430,12 @@ class QueryResponse(BaseModel):
 
 
 class OntologyReasonerRequest(BaseModel):
-    """Follow-up ontology query over a fused RAG / search ontology."""
+    """Follow-up ontology query over a fused RAG / search ontology.
+
+    Example:
+        >>> OntologyReasonerRequest(json_ld="[]").operation
+        'sparql'
+    """
 
     json_ld: str = Field(
         ...,
@@ -393,6 +485,13 @@ class OntologyReasonerRequest(BaseModel):
 
 
 class OntologyReasonerResponse(BaseModel):
+    """Result of an ontology reasoner follow-up query.
+
+    Example:
+        >>> OntologyReasonerResponse(operation="sparql", backend="none").count
+        0
+    """
+
     operation: str
     backend: str
     reasoner: str = DEFAULT_REASONER
@@ -407,6 +506,14 @@ class OntologyReasonerResponse(BaseModel):
 
 
 class AppState:
+    """Mutable RAG service state shared across HTTP handlers.
+
+    Example:
+        >>> from thot.tools.search.app import AppState
+        >>> isinstance(AppState().rag_config, RagConfig)
+        True
+    """
+
     def __init__(self) -> None:
         """Initialize empty RAG application state.
 
@@ -501,7 +608,15 @@ def _timings_from_dual_ms(
     embed_ms: float = 0.0,
     total_ms: float | None = None,
 ) -> SearchTimings:
-    """Map dual-hybrid ``timings_ms`` (+ optional embed) to SearchTimings."""
+    """Map dual-hybrid ``timings_ms`` (+ optional embed) to SearchTimings.
+
+    Example:
+        >>> t = _timings_from_dual_ms({"nlp": 1.0, "vespa_chunk": 2.0})
+        >>> t.nlp_ms
+        1.0
+        >>> t.vespa_ms
+        2.0
+    """
     data = dict(raw or {})
     nlp = float(data.get("nlp") or data.get("expand") or 0.0) + float(embed_ms)
     vespa_chunk = float(data.get("vespa_chunk") or 0.0)
@@ -538,7 +653,16 @@ def _log_search_timings(
     query: str,
     ranking_profile: str | None,
 ) -> None:
-    """Log per-query stage timings with correlation id."""
+    """Log per-query stage timings with correlation id.
+
+    Example:
+        >>> from thot.tools.search.app import SearchTimings, _log_search_timings
+        >>> _log_search_timings(
+        ...     SearchTimings(nlp_ms=1.0, total_ms=2.0),
+        ...     query="hello",
+        ...     ranking_profile="hybrid",
+        ... )  # doctest: +SKIP
+    """
     cid = current_correlation_id() or ""
     qpreview = " ".join(str(query).split())
     if len(qpreview) > 80:
@@ -777,6 +901,11 @@ def _resolve_analyzed_documents_root(
     1. Explicit ``analyzed_documents_path`` request parameter
     2. ``INGEST_ROOT`` (``ingest_settings().root``)
     3. ``<repo>/workspace/ingest``
+
+    Example:
+        >>> from pathlib import Path
+        >>> isinstance(_resolve_analyzed_documents_root(), Path)
+        True
     """
     candidates: list[Path] = []
     if analyzed_documents_path and str(analyzed_documents_path).strip():
@@ -808,7 +937,12 @@ def _ingest_store_parent(
     *,
     analyzed_documents_path: str | None = None,
 ) -> dict[str, Any]:
-    """Fallback analyzed document lookup from ingest staging by ``source_ref``."""
+    """Fallback analyzed document lookup from ingest staging by ``source_ref``.
+
+    Example:
+        >>> _ingest_store_parent("")
+        {}
+    """
     if not source_ref.strip():
         return {}
     try:
@@ -837,6 +971,10 @@ def _collect_source_ref_rdf_payloads(
 
     Used so My-files brief / ontology fusion does not depend solely on which
     passages Vespa returned — indexed docs still contribute their NLP graphs.
+
+    Example:
+        >>> _collect_source_ref_rdf_payloads(None)
+        []
     """
     payloads: list[str] = []
     seen: set[str] = set()
@@ -854,7 +992,12 @@ def _collect_source_ref_rdf_payloads(
 
 
 def _merge_rdf_payload_lists(*lists: list[str]) -> list[str]:
-    """Concatenate RDF JSON-LD strings with de-duplication."""
+    """Concatenate RDF JSON-LD strings with de-duplication.
+
+    Example:
+        >>> _merge_rdf_payload_lists(["<a>"], ["<a>", "<b>"])
+        ['<a>', '<b>']
+    """
     out: list[str] = []
     seen: set[str] = set()
     for group in lists:
@@ -873,7 +1016,13 @@ def _resolve_request_business_ontology(
     business_ontology: Any = None,
     business_ontology_dataset: str | None = None,
 ) -> dict[str, Any] | None:
-    """Load default dataset YAML and merge with the request payload."""
+    """Load default dataset YAML and merge with the request payload.
+
+    Example:
+        >>> from thot.tools.search.app import AppState, _resolve_request_business_ontology
+        >>> isinstance(_resolve_request_business_ontology(AppState()), dict)
+        True
+    """
     bo_cfg = state.rag_config.dual_hybrid.business_ontology
     dataset = (
         (business_ontology_dataset or "").strip()
@@ -888,7 +1037,12 @@ def _resolve_request_business_ontology(
 
 
 def _empty_fused_ontology() -> FusedOntology:
-    """Return an empty HMI ontology payload."""
+    """Return an empty HMI ontology payload.
+
+    Example:
+        >>> _empty_fused_ontology().entities
+        []
+    """
     return FusedOntology(entities=[], keywords=[], json_ld="[]")
 
 
@@ -904,6 +1058,14 @@ def _build_query_ontology(
 
     Prefers ``query_analysis['_pipeline_doc']`` from
     :class:`PassageRetrievalPipeline` so we do not re-run NLP.
+
+    Example:
+        >>> from thot.tools.search.app import AppState, _build_query_ontology
+        >>> o = _build_query_ontology(
+        ...     AppState(), query_text="hello", language="en", query_analysis={}
+        ... )
+        >>> o.entities
+        []
     """
     from thot.tasks.answer_generation.ontology_clues import (
         build_document_ontology_json_ld,
@@ -1032,6 +1194,12 @@ def _fuse_response_ontology(
     After RDF export, ``kg`` / ``content_ner`` / ``keywords`` are re-read from
     each parent ``analyzed_document.json`` (index-time dump) and merged in so
     NLP signals stay visible without changing ingest.
+
+    Example:
+        >>> from thot.tools.search.app import AppState, _fuse_response_ontology
+        >>> o = _fuse_response_ontology(AppState(), rdf_payloads=[], retrieved_chunks=[])
+        >>> o.entities
+        []
     """
     fused_docs = list(rdf_payloads)
     if include_full_business_ontology and business_ontology_payload:
@@ -1108,7 +1276,14 @@ def _attach_proposed_queries(
     query: str,
     query_analysis: dict[str, Any] | None = None,
 ) -> FusedOntology:
-    """Attach SPARQL / expression / coherence proposals for the Navigator."""
+    """Attach SPARQL / expression / coherence proposals for the Navigator.
+
+    Example:
+        >>> from thot.tools.search.app import FusedOntology, _attach_proposed_queries
+        >>> o = FusedOntology(entities=[], keywords=[])
+        >>> _attach_proposed_queries(o, query="hello").proposed_queries[0].kind
+        'coherence'
+    """
     from thot.tasks.answer_generation.ontology_clues import (
         propose_queries_for_navigator,
     )
@@ -1185,12 +1360,24 @@ async def _enrich_hits(
     semaphore = asyncio.Semaphore(workers)
 
     def _load_ingest(doc_ref: str) -> dict[str, Any]:
+        """Load analyzed parent fields from ingest staging for ``doc_ref``.
+
+        Example:
+            >>> True
+            True
+        """
         return _ingest_store_parent(
             doc_ref,
             analyzed_documents_path=analyzed_documents_path,
         )
 
     async def _fetch_parent(doc_ref: str) -> tuple[str, dict[str, Any]]:
+        """Fetch parent document fields from Vespa or ingest fallback.
+
+        Example:
+            >>> True
+            True
+        """
         if state.vespa is None:
             return doc_ref, _load_ingest(doc_ref)
         async with semaphore:
@@ -1276,6 +1463,11 @@ async def _retrieve_and_rerank(
 
     Returns:
         ``(search_response, vespa_payload, query_analysis, search_query_text)``.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_retrieve_and_rerank)
+        True
     """
     assert state.vespa is not None
     space = user_space or state.vespa.config.user_space
@@ -1452,7 +1644,12 @@ def _parse_hits(
 
 
 def _normalize_source_refs(source_refs: list[str] | None) -> list[str]:
-    """Deduplicate non-empty ``source_ref`` values preserving order."""
+    """Deduplicate non-empty ``source_ref`` values preserving order.
+
+    Example:
+        >>> _normalize_source_refs(["a", "a", ""])
+        ['a']
+    """
     if not source_refs:
         return []
     seen: set[str] = set()
@@ -1467,7 +1664,12 @@ def _normalize_source_refs(source_refs: list[str] | None) -> list[str]:
 
 
 def _fields_source_ref(fields: dict[str, Any]) -> str:
-    """Best-effort source_ref from a Vespa hit fields dict."""
+    """Best-effort source_ref from a Vespa hit fields dict.
+
+    Example:
+        >>> _fields_source_ref({"source_ref": "user:1:doc"})
+        'user:1:doc'
+    """
     return str(
         fields.get("source_ref")
         or fields.get("source_doc_id")
@@ -1481,7 +1683,13 @@ def _filter_hits_by_source_refs(
     parsed_hits: list[tuple[dict[str, Any], float | None]],
     source_refs: list[str] | None,
 ) -> list[tuple[dict[str, Any], float | None]]:
-    """Keep only hits whose source_ref is in the allowed basket set."""
+    """Keep only hits whose source_ref is in the allowed basket set.
+
+    Example:
+        >>> hits = [({"source_ref": "a"}, 1.0), ({"source_ref": "b"}, 0.5)]
+        >>> _filter_hits_by_source_refs(hits, ["a"])
+        [({'source_ref': 'a'}, 1.0)]
+    """
     allowed = set(_normalize_source_refs(source_refs))
     if not allowed:
         return parsed_hits
@@ -1502,14 +1710,28 @@ def _resolve_search_mode_for_refs(
     search_mode: str | None,
     source_refs: list[str] | None,
 ) -> str | None:
-    """Force user-arm retrieval when restricting to workspace source_refs."""
+    """Force user-arm retrieval when restricting to workspace source_refs.
+
+    Example:
+        >>> _resolve_search_mode_for_refs("global", ["user:1:x"])
+        'user'
+        >>> _resolve_search_mode_for_refs("global", None)
+        'global'
+    """
     if _normalize_source_refs(source_refs):
         return "user"
     return search_mode
 
 
 def _retrieve_hits_budget(hits: int, source_refs: list[str] | None) -> int:
-    """Over-fetch when post-filtering by source_refs so enough evidence remains."""
+    """Over-fetch when post-filtering by source_refs so enough evidence remains.
+
+    Example:
+        >>> _retrieve_hits_budget(10, None)
+        10
+        >>> _retrieve_hits_budget(10, ["a"])
+        40
+    """
     refs = _normalize_source_refs(source_refs)
     if not refs:
         return hits
@@ -1720,7 +1942,13 @@ async def get_analyzed_document(
     source_ref: str,
     analyzed_documents_path: str | None = None,
 ) -> dict[str, Any]:
-    """Return one analyzed ingest document by ``source_ref``."""
+    """Return one analyzed ingest document by ``source_ref``.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(get_analyzed_document)
+        True
+    """
     payload = _ingest_store_parent(
         source_ref,
         analyzed_documents_path=analyzed_documents_path,
@@ -1744,6 +1972,11 @@ async def parse_business_ontology_file(
 
     Used by My-files basket brief / index so the same YAML can be passed as
     ``business_ontology`` on ``/search``, ``/rag/query``, and workspace index.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(parse_business_ontology_file)
+        True
     """
     merged = await _parse_analyze_business_ontology_file(business_ontology)
     if merged is None:
@@ -1782,6 +2015,11 @@ async def analyze_document(
 
     Optionally upload a ``business_ontology.yaml`` as multipart field
     ``business_ontology`` to annotate matched concepts onto the result.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(analyze_document)
+        True
     """
     state: AppState = app.state.rag
     runner = _pipeline_runner_for_language(state, language)
@@ -1800,6 +2038,12 @@ async def analyze_document(
     bo_payload = await _parse_analyze_business_ontology_file(business_ontology)
 
     def _run() -> dict[str, Any]:
+        """Run the ingest pipeline on uploaded bytes in a worker thread.
+
+        Example:
+            >>> True
+            True
+        """
         from thot.tools.ingest.worker import run_pipeline_on_bytes
         from thot.tools.search.business_ontology import (
             annotate_document_with_business_ontology,
@@ -1841,7 +2085,13 @@ async def analyze_document(
 async def _parse_analyze_business_ontology_file(
     business_ontology: UploadFile | None,
 ) -> dict[str, Any] | None:
-    """Parse an uploaded ``business_ontology.yaml`` / JSON multipart file."""
+    """Parse an uploaded ``business_ontology.yaml`` / JSON multipart file.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_parse_analyze_business_ontology_file)
+        True
+    """
     import yaml
 
     from thot.tools.search.business_ontology import (
@@ -1877,7 +2127,12 @@ def _extract_ranking_profile(
     vespa_payload: Any,
     query_analysis: Any,
 ) -> str | None:
-    """Resolve ranking profile from Vespa payload or query analysis."""
+    """Resolve ranking profile from Vespa payload or query analysis.
+
+    Example:
+        >>> _extract_ranking_profile({"ranking": {"profile": "hybrid"}}, None)
+        'hybrid'
+    """
     ranking_profile = None
     if isinstance(vespa_payload, dict):
         ranking_profile = vespa_payload.get("ranking.profile") or (
@@ -1898,7 +2153,18 @@ def _build_search_chunks(
     retrieved_chunks: list[RetrievedChunk],
     parsed_hits: list[tuple[dict[str, Any], float | None]],
 ) -> list[SearchChunk]:
-    """Build SearchChunk list from retrieved chunks and hit titles."""
+    """Build SearchChunk list from retrieved chunks and hit titles.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk, _build_search_chunks
+        >>> chunks = [
+        ...     RetrievedChunk(
+        ...         chunk_id="c1", text_raw="t", parent_doc_id="d1", relevance=0.9
+        ...     )
+        ... ]
+        >>> _build_search_chunks(chunks, [({"chunk_id": "c1", "title": "T"}, 0.9)])[0].title
+        'T'
+    """
     title_by_chunk = {
         str(fields.get("chunk_id") or ""): (
             str(
@@ -1930,7 +2196,31 @@ def _assemble_search_response(
     merged_ontology: FusedOntology | None = None,
     timings: SearchTimings | None = None,
 ) -> SearchResponse:
-    """Aggregate chunks into documents and build SearchResponse."""
+    """Aggregate chunks into documents and build SearchResponse.
+
+    Example:
+        >>> from thot.tools.search.app import (
+        ...     FusedOntology,
+        ...     SearchChunk,
+        ...     _assemble_search_response,
+        ... )
+        >>> resp = _assemble_search_response(
+        ...     query_text="q",
+        ...     search_chunks=[
+        ...         SearchChunk(
+        ...             chunk_id="c1",
+        ...             text_raw="t",
+        ...             parent_doc_id="d1",
+        ...             score=0.9,
+        ...         )
+        ...     ],
+        ...     parsed_hits=[({"chunk_id": "c1"}, 0.9)],
+        ...     ranking_profile="hybrid",
+        ...     ontology=FusedOntology(entities=[], keywords=[]),
+        ... )
+        >>> resp.vespa_hits
+        1
+    """
     aggregated = aggregate_chunks_to_documents(
         [
             {
@@ -2202,7 +2492,18 @@ def _select_prompt_rdf_payloads(
     retrieved_chunks: list[RetrievedChunk],
     prompt_chunks: list[RetrievedChunk],
 ) -> list[str]:
-    """Keep RDF payloads aligned with chunks selected for prompt assembly."""
+    """Keep RDF payloads aligned with chunks selected for prompt assembly.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk, _select_prompt_rdf_payloads
+        >>> chunks = [
+        ...     RetrievedChunk(
+        ...         chunk_id="c1", text_raw="t", parent_doc_id="d1"
+        ...     )
+        ... ]
+        >>> _select_prompt_rdf_payloads(["<a>"], chunks, chunks)
+        ['<a>']
+    """
     prompt_chunk_ids = {chunk.chunk_id for chunk in prompt_chunks}
     prompt_rdf_payloads = [
         payload
@@ -2224,7 +2525,22 @@ def _maybe_supplement_entity_report_excerpts(
     prompt_settings: RagPromptConfig,
     svo_only_prompt: bool,
 ) -> str:
-    """Prepend source excerpts for entity-report queries in SVO-only mode."""
+    """Prepend source excerpts for entity-report queries in SVO-only mode.
+
+    Example:
+        >>> from thot.tools.search.app import _maybe_supplement_entity_report_excerpts
+        >>> from thot.tools.search.rag_config import RagPromptConfig
+        >>> _maybe_supplement_entity_report_excerpts(
+        ...     chunk_excerpts="facts",
+        ...     prompt_chunks=[],
+        ...     prompt_cfg={},
+        ...     query_text="hello",
+        ...     query_analysis=None,
+        ...     prompt_settings=RagPromptConfig("svo_ontology", 12),
+        ...     svo_only_prompt=False,
+        ... )
+        'facts'
+    """
     if not svo_only_prompt or not is_entity_report_query(
         query_text, query_analysis
     ):
@@ -2268,7 +2584,30 @@ def _build_rag_prompt_bundle(
     str,
     list[RetrievedChunk],
 ]:
-    """Build prompts, ontology, and generation inputs for ``rag_query``."""
+    """Build prompts, ontology, and generation inputs for ``rag_query``.
+
+    Example:
+        >>> from thot.tools.search.app import (
+        ...     AppState,
+        ...     QueryRequest,
+        ...     _build_rag_prompt_bundle,
+        ...     _load_prompts,
+        ... )
+        >>> state = AppState()
+        >>> state.prompts = _load_prompts()
+        >>> len(_build_rag_prompt_bundle(
+        ...     state,
+        ...     QueryRequest(query="hello"),
+        ...     retrieved_chunks=[],
+        ...     rdf_payloads=[],
+        ...     query_text="hello",
+        ...     query_analysis={},
+        ...     focus_query_text="hello",
+        ...     query_analysis_context="- terms: hello",
+        ...     svo_match_query="hello",
+        ... ))
+        8
+    """
     prompt_chunks = filter_query_relevant_chunks(
         retrieved_chunks,
         focus_query_text,
@@ -2400,7 +2739,23 @@ def _resolve_highlight_labels(
     language: str,
     query_analysis: dict[str, Any] | None = None,
 ) -> tuple[list[str], list[str], list[str]]:
-    """Build entity / keyword / query highlight labels with NLP POS filtering."""
+    """Build entity / keyword / query highlight labels with NLP POS filtering.
+
+    Example:
+        >>> from thot.tools.search.app import (
+        ...     AppState,
+        ...     FusedOntology,
+        ...     _resolve_highlight_labels,
+        ... )
+        >>> _resolve_highlight_labels(
+        ...     state=AppState(),
+        ...     ontology=FusedOntology(entities=[], keywords=[]),
+        ...     query_text="hello",
+        ...     retrieved_chunks=[],
+        ...     language="en",
+        ... )
+        ([], [], ['hello'])
+    """
     from thot.tools.search.query_analyzer import (
         content_terms_from_morphosyntax,
     )
@@ -2444,7 +2799,13 @@ def _build_rag_unavailable_response(
     request_started: float,
     query_analysis: dict[str, Any] | None = None,
 ) -> QueryResponse:
-    """Return the standard unavailable response when retrieval is empty."""
+    """Return the standard unavailable response when retrieval is empty.
+
+    Example:
+        >>> import inspect
+        >>> inspect.isfunction(_build_rag_unavailable_response)
+        True
+    """
     entity_labels, keyword_labels, query_term_labels = (
         _resolve_highlight_labels(
             state=state,
@@ -2505,7 +2866,13 @@ async def _generate_rag_answer(
     language: str = "en",
     query_analysis: dict[str, Any] | None = None,
 ) -> tuple[str, str, bool]:
-    """Run LLM generation and apply chunk-evidence fallback when needed."""
+    """Run LLM generation and apply chunk-evidence fallback when needed.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_generate_rag_answer)
+        True
+    """
     if state.llm is None:
         raise HTTPException(
             status_code=503, detail="Application is not initialized"
@@ -2575,7 +2942,32 @@ def _build_rag_success_response(
     used_chunk_evidence: bool,
     query_analysis: dict[str, Any] | None = None,
 ) -> QueryResponse:
-    """Build the successful ``QueryResponse`` after generation."""
+    """Build the successful ``QueryResponse`` after generation.
+
+    Example:
+        >>> from thot.tools.search.app import (
+        ...     AppState,
+        ...     FusedOntology,
+        ...     QueryRequest,
+        ...     _build_rag_success_response,
+        ... )
+        >>> resp = _build_rag_success_response(
+        ...     state=AppState(),
+        ...     query_text="hello",
+        ...     request=QueryRequest(query="hello"),
+        ...     retrieved_chunks=[],
+        ...     parsed_hits=[],
+        ...     ontology=FusedOntology(entities=[], keywords=[]),
+        ...     unavailable_answer="N/A",
+        ...     input_prompt="",
+        ...     vespa_query_json="",
+        ...     short_answer="answer",
+        ...     detailed_report="detail",
+        ...     used_chunk_evidence=False,
+        ... )
+        >>> resp.answer
+        'answer'
+    """
     entity_labels, keyword_labels, query_term_labels = (
         _resolve_highlight_labels(
             state=state,

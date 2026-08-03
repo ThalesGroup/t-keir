@@ -25,7 +25,8 @@ curl -X POST "http://localhost:8092/agent/runs/${RUN_ID}/cancel"
 
 ## Aftermath
 
-- Inspect steps + blackboard under `AGENT_ROOT/runs/{run_id}/`.
+- Inspect steps + blackboard under `AGENT_ROOT/runs/{run_id}/`
+  (default `workspace/agent/runs/…`).
 - Review ActionRecords for `actor.type=agent` and the run's `correlation_id`.
 - Release kill when safe: `ACTIVE=false`.
 

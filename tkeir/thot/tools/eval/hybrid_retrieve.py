@@ -37,12 +37,38 @@ ProgressFn = Callable[[int, int, str], None]
 
 
 def tokenize(text: str) -> list[str]:
-    """Lowercase alphanumeric tokenization for BM25."""
+    """Lowercase alphanumeric tokenization for BM25.
+
+    Args:
+        text: Input string to tokenize.
+
+    Returns:
+        List of lowercase alphanumeric tokens.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import tokenize
+        >>> tokenize("Hello, World 42!")
+        ['hello', 'world', '42']
+    """
     return _TOKEN_RE.findall((text or "").lower())
 
 
 def document_text(doc: dict[str, str] | str) -> str:
-    """Join title+text for BEIR-style docs, or return a raw string."""
+    """Join title+text for BEIR-style docs, or return a raw string.
+
+    Args:
+        doc: BEIR document dict with ``title`` / ``text`` keys, or plain text.
+
+    Returns:
+        Combined title and body, or a stripped string when ``doc`` is str.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import document_text
+        >>> document_text({"title": "T", "text": "body"})
+        'T body'
+        >>> document_text("plain")
+        'plain'
+    """
     if isinstance(doc, str):
         return doc.strip()
     title = (doc.get("title") or "").strip()
@@ -51,7 +77,20 @@ def document_text(doc: dict[str, str] | str) -> str:
 
 
 def sparse_dot(query: dict[str, float], document: dict[str, float]) -> float:
-    """Lexical (sparse) match score used by BGE-M3 hybrid retrieval."""
+    """Lexical (sparse) match score used by BGE-M3 hybrid retrieval.
+
+    Args:
+        query: Sparse query vector (token → weight).
+        document: Sparse document vector (token → weight).
+
+    Returns:
+        Dot product over tokens present in both vectors.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import sparse_dot
+        >>> sparse_dot({"a": 1.0, "b": 2.0}, {"b": 3.0, "c": 1.0})
+        6.0
+    """
     if not query or not document:
         return 0.0
     score = 0.0
@@ -63,7 +102,17 @@ def sparse_dot(query: dict[str, float], document: dict[str, float]) -> float:
 
 
 def bge_hybrid_weights() -> tuple[float, float]:
-    """Dense/sparse fusion weights from ``rag.yaml`` passage hybrid."""
+    """Dense/sparse fusion weights from ``rag.yaml`` passage hybrid.
+
+    Returns:
+        Normalized ``(dense_weight, sparse_weight)`` tuple summing to 1.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import bge_hybrid_weights
+        >>> dense, sparse = bge_hybrid_weights()
+        >>> round(dense + sparse, 6)
+        1.0
+    """
     try:
         from thot.tools.search.rag_config import load_rag_config
 
@@ -84,7 +133,24 @@ def rrf_fuse_runs(
     k: int = DEFAULT_RRF_K,
     top_k: int = DEFAULT_POOL,
 ) -> dict[str, dict[str, float]]:
-    """Unweighted RRF over ``qid → {doc_id → score}`` runs."""
+    """Unweighted RRF over ``qid → {doc_id → score}`` runs.
+
+    Args:
+        *runs: One or more retrieval runs to fuse.
+        k: Reciprocal-rank fusion constant.
+        top_k: Maximum documents retained per query.
+
+    Returns:
+        Fused run mapping query ids to doc-id score dicts.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import rrf_fuse_runs
+        >>> run_a = {"q1": {"d1": 1.0, "d2": 0.5}}
+        >>> run_b = {"q1": {"d2": 1.0, "d3": 0.8}}
+        >>> fused = rrf_fuse_runs(run_a, run_b, top_k=2)
+        >>> set(fused["q1"]) <= {"d1", "d2", "d3"}
+        True
+    """
     if not runs:
         return {}
     query_ids: set[str] = set()
@@ -114,7 +180,24 @@ def score_bm25(
     *,
     top_k: int = DEFAULT_POOL,
 ) -> dict[str, dict[str, float]]:
-    """In-memory BM25Okapi over title+text (BEIR baseline / hybrid arm)."""
+    """In-memory BM25Okapi over title+text (BEIR baseline / hybrid arm).
+
+    Args:
+        corpus: Document id → text or ``{title, text}`` mapping.
+        queries: Query id → query text mapping.
+        top_k: Maximum hits per query.
+
+    Returns:
+        Run mapping query ids to ranked doc-id score dicts.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import score_bm25
+        >>> score_bm25(  # doctest: +SKIP
+        ...     {"d1": {"title": "", "text": "cat sat mat"}},
+        ...     {"q1": "cat mat"},
+        ...     top_k=1,
+        ... )
+    """
     try:
         from rank_bm25 import BM25Okapi
     except ImportError as exc:  # pragma: no cover - env dependent
@@ -156,7 +239,22 @@ def score_bge_hybrid(
     batch_size: int = 32,
     top_k: int = DEFAULT_POOL,
 ) -> dict[str, dict[str, float]]:
-    """BGE-M3 dense+sparse hybrid over a full corpus (eval / offline)."""
+    """BGE-M3 dense+sparse hybrid over a full corpus (eval / offline).
+
+    Args:
+        corpus: Document id → text or ``{title, text}`` mapping.
+        queries: Query id → query text mapping.
+        model_id: Optional BGE-M3 model path override.
+        batch_size: Encoding batch size.
+        top_k: Maximum hits per query.
+
+    Returns:
+        Run mapping query ids to ranked doc-id score dicts.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import score_bge_hybrid
+        >>> score_bge_hybrid({"d": "x"}, {"q": "x"}, top_k=1)  # doctest: +SKIP
+    """
     import numpy as np
 
     from thot.tools.search.bge_m3 import encode_texts, resolve_bge_m3_path
@@ -247,6 +345,27 @@ def colbert_rerank_queries(
     """Batch ColBERT MaxSim over many queries (eval / BEIR).
 
     Each query calls production :func:`thot.tools.search.rerank.colbert_rerank`.
+
+    Args:
+        corpus: Document id → text or ``{title, text}`` mapping.
+        queries: Query id → query text mapping.
+        first_stage: First-stage candidate scores per query.
+        top_m: ColBERT candidate pool size.
+        top_k: Final hits per query.
+        batch_size: ColBERT encoding batch size.
+        first_stage_weight: Blend weight for first-stage scores.
+        colbert_weight: Blend weight for ColBERT scores.
+        tail_weight: Weight for tail candidates.
+        progress: Optional ``(index, total, qid)`` callback.
+
+    Returns:
+        Reranked run mapping query ids to doc-id score dicts.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import colbert_rerank_queries
+        >>> colbert_rerank_queries(  # doctest: +SKIP
+        ...     {"d1": "text"}, {"q1": "text"}, {"q1": {"d1": 1.0}}
+        ... )
     """
     out: dict[str, dict[str, float]] = {}
     total = len(queries)
@@ -305,6 +424,29 @@ def retrieve_hybrid(
     Long queries (``nlp_seed_expansion``) run NLP + ontology expansion +
     :class:`~thot.tools.search.ontology_scorer.OntologyRescorer` on the
     first-stage pool before ColBERT. Short queries keep the plain RRF path.
+
+    Args:
+        corpus: Document id → text or ``{title, text}`` mapping.
+        queries: Query id → query text mapping.
+        top_k: Final hits per query.
+        pool: First-stage candidate pool size.
+        rrf_k: RRF fusion constant.
+        colbert_top_m: ColBERT rerank pool size.
+        batch_size: BGE-M3 encoding batch size.
+        colbert_batch_size: ColBERT encoding batch size.
+        model_id: Optional BGE-M3 model path override.
+        progress: Optional ColBERT progress callback.
+        ontology_payload: Optional ontology for long-query rescoring.
+        language: NLP / ontology language code.
+
+    Returns:
+        Final retrieval run mapping query ids to doc-id score dicts.
+
+    Example:
+        >>> from thot.tools.eval.hybrid_retrieve import retrieve_hybrid
+        >>> retrieve_hybrid(  # doctest: +SKIP
+        ...     {"d1": "hello world"}, {"q1": "hello"}, top_k=1
+        ... )
     """
     settings = colbert_settings()
     pool_n = int(pool if pool is not None else max(top_k, settings["pool"]))

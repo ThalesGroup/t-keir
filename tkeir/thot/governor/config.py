@@ -21,7 +21,23 @@ GovernorMode = Literal["off", "observe", "enforce"]
 
 @dataclass(frozen=True)
 class GovernorSettings:
-    """Runtime settings for governor API and enforcement hooks."""
+    """Runtime settings for governor API and enforcement hooks.
+
+    Example:
+        >>> from thot.governor.config import GovernorSettings
+        >>> from pathlib import Path
+        >>> s = GovernorSettings(
+        ...     mode="observe", host="127.0.0.1", port=8094,
+        ...     flags_path=Path("/tmp/flags.json"),
+        ...     budget_db_path=Path("/tmp/budgets.db"),
+        ...     approvals_path=Path("/tmp/approvals.json"),
+        ...     auth_enabled=False, dev_token=None,
+        ...     default_doc_budget=10000.0, default_llm_token_budget=500000.0,
+        ...     throttle_ratio=0.8,
+        ... )
+        >>> s.mode
+        'observe'
+    """
 
     mode: GovernorMode
     host: str
@@ -37,6 +53,26 @@ class GovernorSettings:
 
 
 def _env_bool(name: str, default: bool) -> bool:
+    """Parse a boolean environment variable.
+
+    Args:
+        name: Environment variable name.
+        default: Value when unset.
+
+    Returns:
+        Parsed boolean.
+
+    Example:
+        >>> import os
+        >>> from thot.governor.config import _env_bool
+        >>> _ = os.environ.pop("GOV_TEST_BOOL", None)
+        >>> _env_bool("GOV_TEST_BOOL", True)
+        True
+        >>> os.environ["GOV_TEST_BOOL"] = "yes"
+        >>> _env_bool("GOV_TEST_BOOL", False)
+        True
+        >>> del os.environ["GOV_TEST_BOOL"]
+    """
     raw = os.getenv(name)
     if raw is None:
         return default
@@ -44,6 +80,22 @@ def _env_bool(name: str, default: bool) -> bool:
 
 
 def _env_mode() -> GovernorMode:
+    """Read ``GOVERNOR_MODE`` (default ``observe``).
+
+    Returns:
+        Governor enforcement mode.
+
+    Example:
+        >>> import os
+        >>> from thot.governor.config import _env_mode
+        >>> _ = os.environ.pop("GOVERNOR_MODE", None)
+        >>> _env_mode()
+        'observe'
+        >>> os.environ["GOVERNOR_MODE"] = "enforce"
+        >>> _env_mode()
+        'enforce'
+        >>> del os.environ["GOVERNOR_MODE"]
+    """
     raw = os.getenv("GOVERNOR_MODE", os.getenv("governor.mode", "observe"))
     mode = raw.strip().lower()
     if mode in {"off", "observe", "enforce"}:
@@ -53,7 +105,18 @@ def _env_mode() -> GovernorMode:
 
 @lru_cache(maxsize=1)
 def governor_settings() -> GovernorSettings:
-    """Load governor settings once per process."""
+    """Load governor settings once per process.
+
+    Returns:
+        Cached ``GovernorSettings`` instance.
+
+    Example:
+        >>> from thot.governor.config import governor_settings
+        >>> governor_settings.cache_clear()
+        >>> s = governor_settings()
+        >>> s.port > 0 and s.mode in {"off", "observe", "enforce"}
+        True
+    """
     root = Path(os.getenv("GOVERNOR_STATE_ROOT", "/var/tkeir/governor"))
     return GovernorSettings(
         mode=_env_mode(),

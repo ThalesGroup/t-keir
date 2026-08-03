@@ -57,10 +57,22 @@ _PATH_INTENT = {
 
 
 def _env_name() -> str:
+    """Return deployment environment name from env vars.
+
+    Example:
+        >>> isinstance(_env_name(), str) and len(_env_name()) > 0
+        True
+    """
     return os.getenv("TKEIR_ENV", os.getenv("ENVIRONMENT", "dev"))
 
 
 def _service_name() -> str:
+    """Return service name stamped on ActionRecords.
+
+    Example:
+        >>> isinstance(_service_name(), str) and len(_service_name()) > 0
+        True
+    """
     return os.getenv("TKEIR_SERVICE", "tkeir-api")
 
 
@@ -102,6 +114,12 @@ class ActionCorrelationMiddleware(BaseHTTPMiddleware):
             app: Downstream ASGI app.
             sink: Observe sink; defaults to the process in-memory sink.
             service: Service name stamped on ActionRecords.
+
+        Example:
+            >>> from starlette.applications import Starlette
+            >>> mid = ActionCorrelationMiddleware(Starlette())
+            >>> mid._service.endswith("api") or mid._service == "tkeir-api"
+            True
         """
         super().__init__(app)
         self._sink = sink if sink is not None else default_action_sink()

@@ -115,7 +115,12 @@ def _answer_terms(short_answer: str) -> set[str]:
 
 
 def _year_tokens(text: str) -> set[str]:
-    """Return four-digit year tokens (1500–2099) from ``text``."""
+    """Return four-digit year tokens (1500–2099) from ``text``.
+
+    Example:
+        >>> sorted(_year_tokens("Events in 1956 and 2020"))
+        ['1956', '2020']
+    """
     return set(re.findall(r"\b((?:1[5-9]|20)\d{2})\b", text or ""))
 
 
@@ -324,7 +329,12 @@ def _extract_person_from_sentence(
 
 
 def _who_question_key_phrases(query_text: str) -> list[str]:
-    """Return multi-word highlight phrases for a who-question."""
+    """Return multi-word highlight phrases for a who-question.
+
+    Example:
+        >>> len(_who_question_key_phrases('Who liked "Something in the Way She Moves"')) >= 1
+        True
+    """
     return [
         label.lower()
         for label in extract_query_highlight_terms(query_text)
@@ -339,7 +349,17 @@ def _score_who_focus_sentence(
     terms: set[str],
     key_phrases: list[str],
 ) -> int | None:
-    """Score a sentence for who-question focus ranking, or None if irrelevant."""
+    """Score a sentence for who-question focus ranking, or None if irrelevant.
+
+    Example:
+        >>> _score_who_focus_sentence(
+        ...     "George Harrison liked the song.",
+        ...     predicate="liked",
+        ...     terms={"george", "harrison", "song"},
+        ...     key_phrases=["the song"],
+        ... )
+        3
+    """
     if _is_metadata_sentence(sentence):
         return None
     sentence_lower = sentence.lower()
@@ -354,7 +374,18 @@ def _best_who_focus_sentence(
     matching: list[RetrievedChunk],
     query_text: str,
 ) -> tuple[str, str] | None:
-    """Return the best who-question ``(chunk_id, sentence)`` pair when possible."""
+    """Return the best who-question ``(chunk_id, sentence)`` pair when possible.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunks = [RetrievedChunk(
+        ...     chunk_id="c1",
+        ...     text_raw="George Harrison liked the song.",
+        ...     parent_doc_id="file://doc.pdf",
+        ... )]
+        >>> _best_who_focus_sentence(chunks, "Who liked the song")
+        ('c1', 'George Harrison liked the song.')
+    """
     predicate = _who_predicate_token(query_text)
     terms = _focus_query_terms(query_text)
     key_phrases = _who_question_key_phrases(query_text)
@@ -379,7 +410,18 @@ def _focus_sentence_from_passages(
     matching: list[RetrievedChunk],
     query_text: str,
 ) -> tuple[str, str] | None:
-    """Return the top focus passage as a ``(chunk_id, sentence)`` pair."""
+    """Return the top focus passage as a ``(chunk_id, sentence)`` pair.
+
+    Example:
+        >>> from thot.tools.search.app import RetrievedChunk
+        >>> chunks = [RetrievedChunk(
+        ...     chunk_id="c1",
+        ...     text_raw="George Harrison liked the song.",
+        ...     parent_doc_id="file://doc.pdf",
+        ... )]
+        >>> _focus_sentence_from_passages(chunks, "Who liked the song") is not None
+        True
+    """
     focus = extract_focus_passages(
         [
             (
@@ -907,6 +949,12 @@ def extract_highlight_labels(
         }
 
     def _keep_label(raw: str) -> bool:
+        """Return whether an ontology label should appear in highlights.
+
+        Example:
+            >>> _keep_label("Microsoft")
+            True
+        """
         label = raw.strip()
         if not label:
             return False

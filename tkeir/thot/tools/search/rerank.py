@@ -32,7 +32,13 @@ DEFAULT_TAIL_WEIGHT = 0.15
 
 
 class RerankClient(Protocol):
-    """Minimal async client used by :func:`rerank_vespa_children`."""
+    """Minimal async client used by :func:`rerank_vespa_children`.
+
+    Example:
+        >>> import inspect
+        >>> inspect.isabstract(RerankClient.rerank)
+        False
+    """
 
     async def rerank(
         self,
@@ -52,7 +58,14 @@ class RerankClient(Protocol):
 
 
 def _resolve_strategy(strategy: str | None) -> str:
-    """Return an allowed rerank strategy (never LLM)."""
+    """Return an allowed rerank strategy (never LLM).
+
+    Example:
+        >>> _resolve_strategy("embedding_cosine")
+        'embedding_cosine'
+        >>> _resolve_strategy("llm_judge")
+        'embedding_cosine'
+    """
     chosen = str(strategy or _DEFAULT_STRATEGY).strip().lower()
     if chosen not in _ALLOWED_STRATEGIES:
         return _DEFAULT_STRATEGY
@@ -63,6 +76,12 @@ def hit_text_for_rerank(fields: dict[str, Any]) -> str:
     """Build the document string scored by the reranker.
 
     Prefers chunk ``text_raw``, then joined ``content``, then ``title``.
+
+    Example:
+        >>> hit_text_for_rerank({"text_raw": "Core passage"})
+        'Core passage'
+        >>> hit_text_for_rerank({"content": ["Part one", "Part two"]})
+        'Part one Part two'
     """
     text = str(fields.get("text_raw") or "").strip()
     if text:
@@ -83,7 +102,13 @@ async def rerank_vespa_children(
     top_n: int | None = None,
     strategy: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Reorder Vespa ``root.children`` using the configured rerank strategy."""
+    """Reorder Vespa ``root.children`` using the configured rerank strategy.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(rerank_vespa_children)
+        True
+    """
     if not children:
         return []
     chosen = _resolve_strategy(strategy)
@@ -127,7 +152,13 @@ async def rerank_vespa_children(
 
 
 def colbert_settings() -> dict[str, Any]:
-    """Load ColBERT knobs from ``rag.yaml`` ``dual_hybrid.colbert``."""
+    """Load ColBERT knobs from ``rag.yaml`` ``dual_hybrid.colbert``.
+
+    Example:
+        >>> settings = colbert_settings()
+        >>> "top_m" in settings and settings["top_m"] >= 1
+        True
+    """
     try:
         from thot.tools.search.rag_config import load_rag_config
 
@@ -165,7 +196,16 @@ def colbert_settings() -> dict[str, Any]:
 
 
 def colbert_late_interaction(query_vecs: Any, doc_vecs: Any) -> float:
-    """MaxSim late interaction (ColBERT) between one query and one document."""
+    """MaxSim late interaction (ColBERT) between one query and one document.
+
+    Example:
+        >>> import numpy as np
+        >>> round(colbert_late_interaction(
+        ...     np.array([[1.0, 0.0]]),
+        ...     np.array([[1.0, 0.0]]),
+        ... ), 6)
+        1.0
+    """
     import numpy as np
 
     q = np.asarray(query_vecs, dtype=np.float32)
@@ -208,6 +248,12 @@ def colbert_rerank(
 
     Returns:
         ``(doc_id, blended_score)`` best first.
+
+    Example:
+        >>> colbert_rerank("query", [])
+        []
+        >>> colbert_rerank("q", [("d1", "text", 0.5)])[0][0]
+        'd1'
     """
     settings = colbert_settings()
     if not settings["enabled"] or not candidates:

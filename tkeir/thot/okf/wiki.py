@@ -21,11 +21,38 @@ from thot.okf.models import OkfConceptFrontmatter
 
 
 def _clean_excerpt(text: str) -> str:
+    """Collapse whitespace in an excerpt string.
+
+    Args:
+        text: Raw chunk or answer text.
+
+    Returns:
+        Single-line string with runs of whitespace collapsed.
+
+    Example:
+        >>> from thot.okf.wiki import _clean_excerpt
+        >>> _clean_excerpt("  hello\\n  world  ")
+        'hello world'
+    """
     return re.sub(r"\s+", " ", (text or "").strip())
 
 
 def _distinctive_query_phrases(query_text: str) -> list[str]:
-    """Maximal capitalized spans, keeping short vessel prefixes (MT/MV/SS)."""
+    """Extract maximal capitalized spans from a query.
+
+    Keeps short vessel prefixes (MT/MV/SS) and returns longest phrases first.
+
+    Args:
+        query_text: Analyst query or title text.
+
+    Returns:
+        Distinct lowercase phrases sorted by descending length.
+
+    Example:
+        >>> from thot.okf.wiki import _distinctive_query_phrases
+        >>> _distinctive_query_phrases("MT Ever Given at Suez")
+        ['mt ever given suez']
+    """
     tokens = re.findall(r"[A-Za-z0-9][A-Za-z0-9'._-]*", query_text or "")
     cleaned_tokens: list[str] = []
     for token in tokens:
@@ -53,12 +80,41 @@ def _distinctive_query_phrases(query_text: str) -> list[str]:
 
 
 def _slugify(text: str, *, fallback: str = "wiki") -> str:
+    """Build a filesystem-safe slug from free text.
+
+    Args:
+        text: Source label or query.
+        fallback: Value when ``text`` yields an empty slug.
+
+    Returns:
+        Lowercase slug capped at 80 characters.
+
+    Example:
+        >>> from thot.okf.wiki import _slugify
+        >>> _slugify("Latakia Port!")
+        'latakia_port'
+    """
     cleaned = re.sub(r"[^A-Za-z0-9._\- ]+", "", (text or "").strip())
     cleaned = re.sub(r"\s+", "_", cleaned).strip("._-")
     return (cleaned[:80] or fallback).lower()
 
 
 def _looks_unavailable_answer(answer: str) -> bool:
+    """Detect RAG answers that admit missing or unavailable information.
+
+    Args:
+        answer: LLM or RAG answer text.
+
+    Returns:
+        ``True`` when the answer is empty or matches an unavailable marker.
+
+    Example:
+        >>> from thot.okf.wiki import _looks_unavailable_answer
+        >>> _looks_unavailable_answer("I don't know.")
+        True
+        >>> _looks_unavailable_answer("Latakia is a Syrian port.")
+        False
+    """
     text = (answer or "").strip().lower()
     if not text:
         return True
@@ -77,7 +133,27 @@ def _looks_unavailable_answer(answer: str) -> bool:
 def _ontology_lines(
     rag_payload: dict[str, Any],
 ) -> tuple[list[str], list[str]]:
-    """Extract entity / keyword bullet lines from a RAG response ontology."""
+    """Extract entity and keyword bullet lines from a RAG ontology block.
+
+    Args:
+        rag_payload: Scoped RAG response payload.
+
+    Returns:
+        Tuple of entity markdown lines and plain keyword labels (each capped).
+
+    Example:
+        >>> from thot.okf.wiki import _ontology_lines
+        >>> ents, kws = _ontology_lines({
+        ...     "ontology": {
+        ...         "entities": [{"label": "Latakia", "type": "Port"}],
+        ...         "keywords": ["Syria"],
+        ...     }
+        ... })
+        >>> ents[0]
+        '- **Latakia** (Port)'
+        >>> kws
+        ['Syria']
+    """
     ontology = rag_payload.get("ontology") or {}
     if not isinstance(ontology, dict):
         return [], []
@@ -103,6 +179,32 @@ def _ontology_lines(
 def _filter_entities_to_query(
     entities: list[str], keywords: list[str], query: str
 ) -> tuple[list[str], list[str]]:
+    """Keep ontology rows whose labels overlap distinctive query phrases.
+
+    When nothing matches, returns truncated originals (8 entities / 12 keywords).
+    Nested ``keep_label`` requires label overlap with the longest query phrase
+    or sufficient token overlap for multi-token queries.
+
+    Args:
+        entities: Markdown entity bullet lines.
+        keywords: Plain keyword strings.
+        query: Analyst query used for phrase extraction.
+
+    Returns:
+        Filtered ``(entities, keywords)`` pair.
+
+    Example:
+        >>> from thot.okf.wiki import _filter_entities_to_query
+        >>> ents = ["- **Latakia Port** (Location)", "- **Damascus** (City)"]
+        >>> kws = ["Syria", "port"]
+        >>> filtered_ents, _ = _filter_entities_to_query(
+        ...     ents, kws, "Latakia Port"
+        ... )
+        >>> any("Latakia" in line for line in filtered_ents)
+        True
+        >>> all("Damascus" not in line for line in filtered_ents)
+        True
+    """
     phrases = _distinctive_query_phrases(query)
     if not phrases:
         return entities, keywords
@@ -140,6 +242,34 @@ def _filter_entities_to_query(
 def _chunk_citation_lines(
     rag_payload: dict[str, Any], query: str, limit: int = 12
 ) -> list[str]:
+    """Build Evidence-section citation lines from RAG chunk hits.
+
+    Prefers chunks whose text contains the longest distinctive query phrase;
+    falls back to the first ``limit`` chunks when none match.
+
+    Args:
+        rag_payload: Scoped RAG response payload.
+        query: Analyst query for phrase matching.
+        limit: Maximum citation lines to return.
+
+    Returns:
+        Markdown bullet lines referencing chunk and parent ids.
+
+    Example:
+        >>> from thot.okf.wiki import _chunk_citation_lines
+        >>> lines = _chunk_citation_lines(
+        ...     {
+        ...         "chunks": [{
+        ...             "chunk_id": "c1",
+        ...             "parent_doc_id": "doc-1",
+        ...             "text_raw": "Latakia Port handles cargo.",
+        ...         }]
+        ...     },
+        ...     "Latakia Port",
+        ... )
+        >>> lines[0].startswith("- `c1`")
+        True
+    """
     phrases = _distinctive_query_phrases(query)
     longest = phrases[0] if phrases else ""
     lines: list[str] = []
@@ -173,7 +303,30 @@ def _chunk_citation_lines(
 def _answer_from_matching_chunks(
     rag_payload: dict[str, Any], query: str
 ) -> str:
-    """Extractive fallback when the LLM answer is empty / unavailable."""
+    """Extractive fallback when the LLM answer is empty or unavailable.
+
+    Concatenates up to five first sentences from chunks matching the query.
+
+    Args:
+        rag_payload: Scoped RAG response payload.
+        query: Analyst query for phrase matching.
+
+    Returns:
+        Joined sentences, or empty string when no chunk matches.
+
+    Example:
+        >>> from thot.okf.wiki import _answer_from_matching_chunks
+        >>> text = _answer_from_matching_chunks(
+        ...     {
+        ...         "chunks": [{
+        ...             "text_raw": "Latakia Port is in Syria. It handles cargo.",
+        ...         }]
+        ...     },
+        ...     "Latakia Port",
+        ... )
+        >>> "Latakia" in text
+        True
+    """
     phrases = _distinctive_query_phrases(query)
     longest = phrases[0] if phrases else ""
     sentences: list[str] = []
@@ -203,7 +356,17 @@ def build_llm_wiki_markdown(
     concept_ids: list[str] | None = None,
     bundle_id: str | None = None,
 ) -> tuple[OkfConceptFrontmatter, str]:
-    """Build frontmatter + body for an LLMWiki page.
+    """Build frontmatter and body for an LLMWiki page.
+
+    Args:
+        query: Analyst query driving title and filtering.
+        user_space: Vespa user space owning the bundle.
+        rag_payload: Optional scoped RAG response (answer, ontology, chunks).
+        concept_ids: Related OKF concept ids for cross-links.
+        bundle_id: Bundle identifier for the Sources section.
+
+    Returns:
+        ``(frontmatter, markdown_body)`` ready for ``wiki.md``.
 
     Example:
         >>> fm, body = build_llm_wiki_markdown(
@@ -236,6 +399,8 @@ def build_llm_wiki_markdown(
     citations = _chunk_citation_lines(payload, query)
     concepts = [str(c).strip() for c in concept_ids or [] if str(c).strip()]
 
+    from thot.okf.models import OkfActorEvent
+
     fm = OkfConceptFrontmatter(
         type="Wiki",
         title=title,
@@ -243,6 +408,10 @@ def build_llm_wiki_markdown(
         resource=None,
         tags=["llmwiki", "okf", "wiki"],
         timestamp=datetime.now(timezone.utc),
+        generated=OkfActorEvent(
+            by="process:tkeir-okf-wiki",
+            at=datetime.now(timezone.utc),
+        ),
         tkeir_doc_id=f"wiki:{_slugify(title)}",
         tkeir_user_space=user_space,
         tkeir_chunk_ids=[],
@@ -307,7 +476,33 @@ def write_llm_wiki(
     concept_ids: list[str] | None = None,
     bundle_id: str | None = None,
 ) -> Path:
-    """Write ``wiki.md`` into an OKF bundle and link it from ``index.md``."""
+    """Write ``wiki.md`` into an OKF bundle and link it from ``index.md``.
+
+    Args:
+        bundle_root: OKF bundle directory.
+        query: Analyst query.
+        user_space: Vespa user space owning the bundle.
+        rag_payload: Optional scoped RAG response.
+        concept_ids: Related OKF concept ids for cross-links.
+        bundle_id: Bundle identifier for the Sources section.
+
+    Returns:
+        Path to the written ``wiki.md`` file.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.wiki import write_llm_wiki
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     path = write_llm_wiki(
+        ...         Path(td),
+        ...         query="Latakia Port",
+        ...         user_space="dev@tkeir",
+        ...         rag_payload={"answer": "Latakia is a Syrian port."},
+        ...     )
+        ...     path.name
+        'wiki.md'
+    """
     root = Path(bundle_root)
     fm, body = build_llm_wiki_markdown(
         query=query,
@@ -332,5 +527,17 @@ def write_llm_wiki(
 
 
 def suggested_workspace_wiki_path(query: str) -> str:
-    """Default personal-space path for a published wiki page."""
+    """Default personal-space path for a published wiki page.
+
+    Args:
+        query: Analyst query used to derive the slug.
+
+    Returns:
+        Relative path under ``wiki/`` ending in ``.md``.
+
+    Example:
+        >>> from thot.okf.wiki import suggested_workspace_wiki_path
+        >>> suggested_workspace_wiki_path("Latakia Port")
+        'wiki/latakia_port.md'
+    """
     return f"wiki/{_slugify(query)}.md"

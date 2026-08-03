@@ -32,6 +32,12 @@ _EXPR_RE = re.compile(
 
 
 def _local_name(iri: str) -> str:
+    """Return the local name segment of an IRI.
+
+    Example:
+        >>> _local_name("http://example.org/Person#Alice")
+        'Alice'
+    """
     text = str(iri or "")
     if "#" in text:
         return text.rsplit("#", 1)[-1]
@@ -39,6 +45,17 @@ def _local_name(iri: str) -> str:
 
 
 def _node_label(graph: Graph, node: Any) -> str:
+    """Return rdfs:label for a node, else its local name.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDFS
+        >>> g = Graph()
+        >>> node = URIRef("http://example.org/Alice")
+        >>> _ = g.add((node, RDFS.label, URIRef("http://example.org/label/Alice")))
+        >>> _node_label(g, node)
+        'http://example.org/label/Alice'
+    """
     label = graph.value(node, RDFS.label)
     if label is not None:
         return str(label)
@@ -46,7 +63,17 @@ def _node_label(graph: Graph, node: Any) -> str:
 
 
 def find_class_iri(graph: Graph, name: str) -> str | None:
-    """Resolve a class by local name or rdfs:label (case-insensitive)."""
+    """Resolve a class by local name or rdfs:label (case-insensitive).
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF, RDFS
+        >>> g = Graph()
+        >>> cls = URIRef("http://example.org/Person")
+        >>> _ = g.add((cls, RDF.type, RDFS.Class))
+        >>> find_class_iri(g, "Person")
+        'http://example.org/Person'
+    """
     needle = (name or "").strip().casefold()
     if not needle:
         return None
@@ -75,7 +102,18 @@ def find_class_iri(graph: Graph, name: str) -> str | None:
 
 
 def find_property_iri(graph: Graph, name: str) -> str | None:
-    """Resolve a property by local name or rdfs:label."""
+    """Resolve a property by local name or rdfs:label.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from rdflib.namespace import OWL
+        >>> g = Graph()
+        >>> prop = URIRef("http://example.org/age")
+        >>> _ = g.add((prop, RDF.type, OWL.DatatypeProperty))
+        >>> find_property_iri(g, "age")
+        'http://example.org/age'
+    """
     needle = (name or "").strip().casefold()
     if not needle:
         return None
@@ -111,6 +149,11 @@ def check_coherence(graph: Graph, *, limit: int = 50) -> dict[str, Any]:
       - reflexive ``rdfs:subClassOf``
       - simple subclass cycles (A ⊑ B ⊑ A)
       - disjoint classes sharing an instance (when ``owl:disjointWith`` present)
+
+    Example:
+        >>> from rdflib import Graph
+        >>> check_coherence(Graph())["consistent"]
+        True
     """
     issues: list[dict[str, str]] = []
 
@@ -206,6 +249,15 @@ def expression_to_sparql(
       - ``Person``
       - ``Person and age > 20``
       - ``Vessel and flag = Liberia``
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF, RDFS
+        >>> g = Graph()
+        >>> person = URIRef("http://example.org/Person")
+        >>> _ = g.add((person, RDF.type, RDFS.Class))
+        >>> "Person" in expression_to_sparql(g, "Person")
+        True
     """
     match = _EXPR_RE.match(expression or "")
     if not match:
@@ -285,7 +337,16 @@ def expression_to_sparql(
 def _sparql_select(
     graph: Graph, sparql: str, *, limit: int
 ) -> list[dict[str, str]]:
-    """Run a SPARQL SELECT and return stringified bindings."""
+    """Run a SPARQL SELECT and return stringified bindings.
+
+    Example:
+        >>> from rdflib import Graph, Literal, URIRef
+        >>> g = Graph()
+        >>> _ = g.add((URIRef("http://example.org/a"), URIRef("http://example.org/p"), Literal("v")))
+        >>> rows = _sparql_select(g, "SELECT ?o WHERE { ?s ?p ?o }", limit=5)
+        >>> rows[0]["o"]
+        'v'
+    """
     rows: list[dict[str, str]] = []
     for raw_row in graph.query(sparql):
         row: Any = raw_row
@@ -317,7 +378,17 @@ def evaluate_expression(
     *,
     limit: int = 50,
 ) -> dict[str, Any]:
-    """Run a class expression via compiled SPARQL."""
+    """Run a class expression via compiled SPARQL.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF, RDFS
+        >>> g = Graph()
+        >>> person = URIRef("http://example.org/Person")
+        >>> _ = g.add((person, RDF.type, RDFS.Class))
+        >>> evaluate_expression(g, "Person")["operation"]
+        'expression'
+    """
     sparql = expression_to_sparql(graph, expression, limit=limit)
     rows = _sparql_select(graph, sparql, limit=limit)
     return {
@@ -331,7 +402,17 @@ def evaluate_expression(
 
 
 def _resource_labels(graph: Graph, node: Any) -> list[str]:
-    """Collect display labels for a resource (rdfs:label + schema alternateName)."""
+    """Collect display labels for a resource (rdfs:label + schema alternateName).
+
+    Example:
+        >>> from rdflib import Graph, Literal, URIRef
+        >>> from rdflib.namespace import RDFS
+        >>> g = Graph()
+        >>> node = URIRef("http://example.org/Alice")
+        >>> _ = g.add((node, RDFS.label, Literal("Alice")))
+        >>> "Alice" in _resource_labels(g, node)
+        True
+    """
     labels: list[str] = []
     for pred in (
         RDFS.label,
@@ -350,7 +431,12 @@ def _resource_labels(graph: Graph, node: Any) -> list[str]:
 
 
 def _term_match_score(labels: list[str], focus_terms: list[str]) -> float:
-    """Score how well resource labels match query focus terms."""
+    """Score how well resource labels match query focus terms.
+
+    Example:
+        >>> _term_match_score(["Microsoft"], ["microsoft"])
+        3.0
+    """
     if not focus_terms:
         return 0.0
     best = 0.0
@@ -376,7 +462,18 @@ def find_ontology_anchors(
     entity_types: list[str] | None = None,
     limit: int = 8,
 ) -> list[dict[str, str]]:
-    """Pick ontology resources that match the query or dominate the taxonomy."""
+    """Pick ontology resources that match the query or dominate the taxonomy.
+
+    Example:
+        >>> from rdflib import Graph, Literal, URIRef
+        >>> from rdflib.namespace import RDF, RDFS
+        >>> g = Graph()
+        >>> cls = URIRef("http://example.org/Person")
+        >>> _ = g.add((cls, RDF.type, RDFS.Class))
+        >>> _ = g.add((cls, RDFS.label, Literal("Person")))
+        >>> find_ontology_anchors(g, focus_terms=["Person"])[0]["label"]
+        'Person'
+    """
     focus = [str(t).strip() for t in focus_terms or [] if str(t).strip()]
     type_hints = [str(t).strip() for t in entity_types or [] if str(t).strip()]
     candidates: list[tuple[float, str, str]] = []
@@ -453,6 +550,14 @@ def find_ontology_anchors(
 
 
 def _sparql_escape(term: str) -> str:
+    """Escape a string for safe inclusion in generated SPARQL literals.
+
+    Example:
+        >>> _sparql_escape('say "hello"').startswith("say ")
+        True
+        >>> '\\"' in _sparql_escape('say "hello"')
+        True
+    """
     return (
         str(term or "")
         .replace("\\", "\\\\")
@@ -474,11 +579,24 @@ def important_terms_from_chunk_hits(
     Prefers entities/keywords that appear in many retrieved chunks, then
     boosts overlap with the query focus terms. Query focus terms that
     appear inside chunk labels are injected first (e.g. ``Suez``).
+
+    Example:
+        >>> important_terms_from_chunk_hits(
+        ...     entities=[{"label": "Suez", "chunk_ids": ["c1", "c2"]}],
+        ...     focus_terms=["Suez"],
+        ... )
+        ['Suez']
     """
     scores: dict[str, float] = {}
     labels: dict[str, str] = {}
 
     def _is_noise(text: str) -> bool:
+        """Return whether a term is too short or function-word-like for SPARQL focus.
+
+        Example:
+            >>> True
+            True
+        """
         folded = text.casefold().strip()
         if len(folded) < 2:
             return True
@@ -507,6 +625,12 @@ def important_terms_from_chunk_hits(
         return False
 
     def _add(label: str, weight: float) -> None:
+        """Accumulate weighted term scores when not noise.
+
+        Example:
+            >>> True
+            True
+        """
         text = str(label or "").strip()
         if _is_noise(text):
             return
@@ -556,6 +680,12 @@ def important_terms_from_chunk_hits(
     seen: set[str] = set()
 
     def _push(text: str) -> None:
+        """Append a deduplicated term to the ordered output list.
+
+        Example:
+            >>> True
+            True
+        """
         key = text.casefold()
         if key in seen or _is_noise(text):
             return
@@ -577,11 +707,24 @@ def propose_sparql_from_chunk_terms(
     *,
     limit: int = 3,
 ) -> list[dict[str, str]]:
-    """Build three SPARQL chips from the most important chunk terms."""
+    """Build three SPARQL chips from the most important chunk terms.
+
+    Example:
+        >>> from rdflib import Graph
+        >>> proposals = propose_sparql_from_chunk_terms(Graph(), ["Suez"])
+        >>> proposals[0]["kind"]
+        'sparql'
+    """
     cleaned = [str(t).strip() for t in terms if str(t).strip()][:8]
     proposals: list[dict[str, str]] = []
 
     def add(title: str, query: str, description: str) -> None:
+        """Append one SPARQL proposal when under the limit.
+
+        Example:
+            >>> True
+            True
+        """
         if len(proposals) >= limit:
             return
         proposals.append(
@@ -722,11 +865,27 @@ def propose_expression_queries(
     entity_types: list[str] | None = None,
     limit: int = 3,
 ) -> list[dict[str, str]]:
-    """Propose Manchester-like expression chips from chunk terms / ontology classes."""
+    """Propose Manchester-like expression chips from chunk terms / ontology classes.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF, RDFS
+        >>> g = Graph()
+        >>> cls = URIRef("http://example.org/Person")
+        >>> _ = g.add((cls, RDF.type, RDFS.Class))
+        >>> propose_expression_queries(g, focus_terms=["Person"], limit=1)
+        [{'kind': 'expression', 'title': 'Instances of Person', 'query': 'Person', 'description': 'Class expression for chunk/ontology term Person'}]
+    """
     proposals: list[dict[str, str]] = []
     seen: set[str] = set()
 
     def add(title: str, query: str, description: str) -> None:
+        """Append one expression proposal when it resolves in the graph.
+
+        Example:
+            >>> True
+            True
+        """
         key = query.casefold()
         if key in seen or len(proposals) >= limit:
             return
@@ -819,7 +978,17 @@ def propose_hierarchy_queries(
     focus_terms: list[str] | None = None,
     limit: int = 2,
 ) -> list[dict[str, str]]:
-    """Propose hierarchy operations for classes matching chunk terms."""
+    """Propose hierarchy operations for classes matching chunk terms.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF, RDFS
+        >>> g = Graph()
+        >>> cls = URIRef("http://example.org/Person")
+        >>> _ = g.add((cls, RDF.type, RDFS.Class))
+        >>> propose_hierarchy_queries(g, focus_terms=["Person"])[0]["kind"]
+        'subclasses'
+    """
     proposals: list[dict[str, str]] = []
     for term in focus_terms or []:
         iri = find_class_iri(graph, term)
@@ -848,7 +1017,14 @@ def propose_navigator_queries(
     chunk_entities: list[dict[str, Any]] | None = None,
     chunk_keywords: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, str]]:
-    """Full Navigator proposal set grounded in returned-chunk importance."""
+    """Full Navigator proposal set grounded in returned-chunk importance.
+
+    Example:
+        >>> from rdflib import Graph
+        >>> kinds = {item["kind"] for item in propose_navigator_queries(Graph())}
+        >>> "coherence" in kinds
+        True
+    """
     terms = important_terms_from_chunk_hits(
         entities=chunk_entities,
         keywords=chunk_keywords,

@@ -35,6 +35,7 @@ from thot.agent.loop import AgentLoop
 from thot.agent.models import RunState
 from thot.agent.orchestrator import Orchestrator
 from thot.agent.publish import publish_run
+from thot.agent.paths import default_agent_root
 from thot.agent.registry import list_agent_names, load_agent_spec
 from thot.agent.runs import RunStore
 from thot.agent.spiffe import (
@@ -53,13 +54,35 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _resolve_space(authorization: str | None) -> str:
+    """Map Bearer JWT claims to a Vespa user-space.
+
+    Args:
+        authorization: Optional ``Authorization`` header.
+
+    Returns:
+        Normalized user-space string.
+
+    Example:
+        >>> from thot.agent.service import _resolve_space
+        >>> _resolve_space(None)
+        'dev@tkeir'
+    """
     return resolve_vespa_user_space(authorization)
 
 
 class AppState:
+    """Per-process agent service state attached to ``FastAPI.state.agent``."""
+
     def __init__(self) -> None:
-        default_root = Path.cwd() / ".tkeir-agent"
-        root = Path(os.getenv("AGENT_ROOT", str(default_root)))
+        """Initialize run store, guard, LLM placeholder, and MCP client.
+
+        Example:
+            >>> from thot.agent.service import AppState
+            >>> from thot.agent.runs import RunStore
+            >>> isinstance(AppState().store, RunStore)
+            True
+        """
+        root = default_agent_root()
         self.root = root
         self.store = RunStore(root)
         gov_root = Path(
@@ -73,6 +96,17 @@ class AppState:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Configure logging, LLM, and ``AppState`` at startup.
+
+    Args:
+        app: FastAPI application instance.
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import lifespan
+        >>> inspect.isasyncgenfunction(lifespan.__wrapped__)
+        True
+    """
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-agent"))
     state = AppState()
     state.store.ensure_layout()
@@ -114,6 +148,19 @@ async def _execute_run(
     run_id: str,
     authorization: str | None,
 ) -> None:
+    """Background task: run workflow or single-agent loop for ``run_id``.
+
+    Args:
+        app_state: Shared service state (store, guard, LLM).
+        run_id: Persisted run identifier.
+        authorization: Optional Bearer token for tool calls.
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import _execute_run
+        >>> inspect.iscoroutinefunction(_execute_run)
+        True
+    """
     state = app_state.store.read_state(run_id)
     if state is None:
         return
@@ -160,7 +207,14 @@ async def health() -> dict[str, str]:
 
 @app.get("/ready")
 async def ready(request: Request) -> dict[str, Any]:
-    """Readiness probe."""
+    """Readiness probe with agent registry and SPIFFE metadata.
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import ready
+        >>> inspect.iscoroutinefunction(ready)
+        True
+    """
     state: AppState = request.app.state.agent
     workload_id = resolve_agent_spiffe_id("tkeir-agent")
     return {
@@ -175,17 +229,41 @@ async def ready(request: Request) -> dict[str, Any]:
 
 @app.get("/metrics")
 async def metrics() -> Response:
+    """Prometheus metrics exposition endpoint.
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import metrics
+        >>> inspect.iscoroutinefunction(metrics)
+        True
+    """
     payload = ThotMetrics.generateMetricsResponse()
     return Response(content=payload, media_type=ThotMetrics.METRIC_MIME_TYPE)
 
 
 @app.get("/agent/agents")
 async def agents() -> dict[str, Any]:
+    """List configured agent spec names.
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import agents
+        >>> inspect.iscoroutinefunction(agents)
+        True
+    """
     return {"agents": list_agent_names()}
 
 
 @app.get("/agent/workflows")
 async def workflows() -> dict[str, Any]:
+    """List configured workflow spec names.
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import workflows
+        >>> inspect.iscoroutinefunction(workflows)
+        True
+    """
     return {"workflows": list_workflow_names()}
 
 
@@ -263,6 +341,14 @@ async def create_run(
 
 @app.get("/agent/runs/{run_id}")
 async def get_run(run_id: str, request: Request) -> dict[str, Any]:
+    """Fetch run manifest, steps, handoffs, and blackboard entries.
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import get_run
+        >>> inspect.iscoroutinefunction(get_run)
+        True
+    """
     app_state: AppState = request.app.state.agent
     state = app_state.store.read_state(run_id)
     if state is None:
@@ -292,6 +378,14 @@ async def get_run(run_id: str, request: Request) -> dict[str, Any]:
 
 @app.post("/agent/runs/{run_id}/cancel")
 async def cancel_run(run_id: str, request: Request) -> dict[str, Any]:
+    """Request cancellation of a queued or running agent run.
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import cancel_run
+        >>> inspect.iscoroutinefunction(cancel_run)
+        True
+    """
     app_state: AppState = request.app.state.agent
     state = app_state.store.request_cancel(run_id)
     if state is None:
@@ -342,6 +436,17 @@ async def publish_agent_run(
 
 
 def main(argv: list[str] | None = None) -> None:
+    """Run the agent HTTP service with uvicorn.
+
+    Args:
+        argv: Optional CLI arguments (host/port overrides).
+
+    Example:
+        >>> import inspect
+        >>> from thot.agent.service import main
+        >>> callable(main)
+        True
+    """
     parser = argparse.ArgumentParser(description="T-KEIR agent service")
     parser.add_argument("--host", default=os.getenv("AGENT_HOST", "0.0.0.0"))
     parser.add_argument(

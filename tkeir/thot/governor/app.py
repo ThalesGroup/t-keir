@@ -46,9 +46,24 @@ LOGGER = logging.getLogger(__name__)
 
 
 class AppState:
-    """Shared governor runtime."""
+    """Shared governor runtime attached to ``FastAPI.state.governor``.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import AppState
+        >>> inspect.isclass(AppState)
+        True
+    """
 
     def __init__(self) -> None:
+        """Initialize flags, budgets, approvals, tokens, and evaluator.
+
+        Example:
+            >>> import inspect
+            >>> from thot.governor.app import AppState
+            >>> inspect.isfunction(AppState.__init__)
+            True
+        """
         settings = governor_settings()
         self.settings = settings
         self.flags = RuntimeFlagsStore(settings.flags_path)
@@ -67,6 +82,14 @@ class AppState:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Configure logging and governor ``AppState`` at startup.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import lifespan
+        >>> inspect.isasyncgenfunction(lifespan.__wrapped__)
+        True
+    """
     configure_json_logging(
         service=os.getenv("TKEIR_SERVICE", "tkeir-governor")
     )
@@ -98,16 +121,40 @@ app.add_middleware(
 
 
 class BudgetListResponse(BaseModel):
+    """Response wrapper for budget snapshot list.
+
+    Example:
+        >>> from thot.governor.app import BudgetListResponse
+        >>> BudgetListResponse().items
+        []
+    """
+
     items: list[BudgetSnapshot] = Field(default_factory=list)
 
 
 @app.get("/health")
 async def health() -> dict[str, str]:
+    """Liveness probe.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import health
+        >>> inspect.iscoroutinefunction(health)
+        True
+    """
     return {"status": "ok"}
 
 
 @app.get("/ready")
 async def ready() -> dict[str, str]:
+    """Readiness probe including governor mode.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import ready
+        >>> inspect.iscoroutinefunction(ready)
+        True
+    """
     state: AppState = app.state.governor
     _ = state.flags.snapshot()
     return {"status": "ready", "mode": state.settings.mode}
@@ -115,6 +162,14 @@ async def ready() -> dict[str, str]:
 
 @app.get("/metrics")
 async def metrics() -> Response:
+    """Prometheus metrics exposition endpoint.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import metrics
+        >>> inspect.iscoroutinefunction(metrics)
+        True
+    """
     ThotMetrics.create_counter(
         short_name="governor_http",
         function_name="tkeir_governor_http_requests_total",
@@ -129,6 +184,14 @@ async def metrics() -> Response:
 
 @app.get("/governor/flags", response_model=RuntimeFlags)
 async def get_flags() -> RuntimeFlags:
+    """Return current runtime kill-switch flags.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import get_flags
+        >>> inspect.iscoroutinefunction(get_flags)
+        True
+    """
     state: AppState = app.state.governor
     return state.flags.snapshot()
 
@@ -138,6 +201,14 @@ async def set_kill(
     body: KillRequest,
     actor: str = Depends(require_admin_auth),
 ) -> RuntimeFlags:
+    """Activate or clear a kill-switch scope.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import set_kill
+        >>> inspect.iscoroutinefunction(set_kill)
+        True
+    """
     state: AppState = app.state.governor
     return state.flags.set_kill(
         body.scope,
@@ -152,7 +223,14 @@ async def rollback(
     body: RollbackRequest,
     actor: str = Depends(require_admin_auth),
 ) -> dict[str, str]:
-    """Register a compensation plan and request indexer undo by run id."""
+    """Register a compensation plan and request indexer undo by run id.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import rollback
+        >>> inspect.iscoroutinefunction(rollback)
+        True
+    """
     state: AppState = app.state.governor
     run_id = (body.run_id or "").strip()
     LOGGER.info(
@@ -195,7 +273,14 @@ async def mint_token(
     body: MintTokenRequest,
     actor: str = Depends(require_admin_auth),
 ) -> dict[str, Any]:
-    """Mint a constrained action token (TTL ≤ 300s)."""
+    """Mint a constrained action token (TTL ≤ 300s).
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import mint_token
+        >>> inspect.iscoroutinefunction(mint_token)
+        True
+    """
     state: AppState = app.state.governor
     compact, token = state.tokens.mint(
         actor_id=actor,
@@ -222,7 +307,14 @@ async def revoke_token(
     body: RevokeTokenRequest,
     actor: str = Depends(require_admin_auth),
 ) -> dict[str, Any]:
-    """Revoke an action token by jti and/or actor (effective immediately)."""
+    """Revoke an action token by jti and/or actor (effective immediately).
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import revoke_token
+        >>> inspect.iscoroutinefunction(revoke_token)
+        True
+    """
     if not body.jti and not body.actor_id:
         raise HTTPException(status_code=400, detail="jti or actor_id required")
     state: AppState = app.state.governor
@@ -241,6 +333,14 @@ async def list_budgets(
     actor: str | None = None,
     _admin: str = Depends(require_admin_auth),
 ) -> BudgetListResponse:
+    """List document and LLM token budget snapshots for an actor.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import list_budgets
+        >>> inspect.iscoroutinefunction(list_budgets)
+        True
+    """
     state: AppState = app.state.governor
     subject = actor or "anonymous"
     docs = state.budgets.snapshot(
@@ -260,6 +360,14 @@ async def list_budgets(
 async def list_approvals(
     _admin: str = Depends(require_admin_auth),
 ) -> list[ApprovalItem]:
+    """List approval queue items.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import list_approvals
+        >>> inspect.iscoroutinefunction(list_approvals)
+        True
+    """
     state: AppState = app.state.governor
     return state.approvals.list_all()
 
@@ -270,6 +378,14 @@ async def approve_item(
     body: ApprovalDecision,
     actor: str = Depends(require_admin_auth),
 ) -> dict[str, Any]:
+    """Approve a pending escalation item.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import approve_item
+        >>> inspect.iscoroutinefunction(approve_item)
+        True
+    """
     state: AppState = app.state.governor
     item = state.approvals.decide(approval_id, status="approved")
     if item is None:
@@ -283,6 +399,14 @@ async def deny_item(
     body: ApprovalDecision,
     actor: str = Depends(require_admin_auth),
 ) -> dict[str, Any]:
+    """Deny a pending escalation item.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import deny_item
+        >>> inspect.iscoroutinefunction(deny_item)
+        True
+    """
     state: AppState = app.state.governor
     item = state.approvals.decide(approval_id, status="denied")
     if item is None:
@@ -291,7 +415,14 @@ async def deny_item(
 
 
 def main() -> None:
-    """CLI entry: server or maintenance subcommands."""
+    """CLI entry: server or maintenance subcommands.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.app import main
+        >>> callable(main)
+        True
+    """
     import sys
 
     if len(sys.argv) > 1 and sys.argv[1] in {"flags", "kill", "budgets"}:

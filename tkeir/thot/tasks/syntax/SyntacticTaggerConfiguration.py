@@ -15,7 +15,7 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 class SyntacticTaggerConfiguration:
     """load morphosyntactic tagger configuration
     A tagger configuration is represented by JSON entry:
-
+    
     Example
     {
     "logger": {
@@ -27,9 +27,14 @@ class SyntacticTaggerConfiguration:
             "resources-base-path":"/home/tkeir_svc/tkeir/thot/tests/data",
             "syntactic-rules": "syntactic-rules.json"
         }]
-
+    
     }
     }
+    
+        Example:
+            >>> from thot.tasks.syntax.SyntacticTaggerConfiguration import SyntacticTaggerConfiguration
+            >>> callable(SyntacticTaggerConfiguration)
+            True
     """
 
     def __init__(self):

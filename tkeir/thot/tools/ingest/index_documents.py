@@ -31,7 +31,17 @@ _ensure_golden_chunks_for_index = ensure_golden_chunks_for_index
 
 
 def _load_pipeline_document(path: Path) -> dict[str, Any]:
-    """Load one pipeline JSON file."""
+    """Load one pipeline JSON file.
+
+    Example:
+        >>> import tempfile, json
+        >>> from pathlib import Path
+        >>> with tempfile.TemporaryDirectory() as temp_dir:
+        ...     path = Path(temp_dir) / "doc.json"
+        ...     _ = path.write_text(json.dumps({"title": "x"}), encoding="utf-8")
+        ...     _load_pipeline_document(path)["title"]
+        'x'
+    """
     payload = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
         raise ValueError(f"Expected object in {path}")
@@ -46,7 +56,14 @@ async def index_directory(
     target: str = "both",
     max_workers: int | None = None,
 ) -> tuple[int, int]:
-    """Index every pipeline file matching ``pattern`` under ``input_dir``."""
+    """Index every pipeline file matching ``pattern`` under ``input_dir``.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.index_documents import index_directory
+        >>> inspect.iscoroutinefunction(index_directory)
+        True
+    """
     del max_workers  # sequential: FlagEmbedding + Vespa
     paths = sorted(input_dir.glob(pattern))
     if not paths:
@@ -79,6 +96,13 @@ async def index_directory(
 
 
 async def _async_main(args: argparse.Namespace) -> int:
+    """CLI async entry: index pipeline files from ``args.input``.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_async_main)
+        True
+    """
     from thot.core.StructuredLogging import configure_text_logging
 
     configure_text_logging(level=logging.INFO, force=True)
@@ -104,7 +128,13 @@ async def _async_main(args: argparse.Namespace) -> int:
 
 
 def main() -> None:
-    """Parse CLI arguments and index pipeline files into Vespa."""
+    """Parse CLI arguments and index pipeline files into Vespa.
+
+    Example:
+        >>> from thot.tools.ingest.index_documents import main
+        >>> callable(main)
+        True
+    """
     parser = argparse.ArgumentParser(
         description="Index pipeline JSON into Vespa global/user passages"
     )

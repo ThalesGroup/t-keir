@@ -88,14 +88,34 @@ def seed_iterative_wiki(
     Core Google OKF LLMWiki shape: Answer / Evidence / Sources / Gaps.
     Optional ``structured_facts_seed`` (from a persona ``*_prompt`` agent)
     injects a Structured facts checklist between Answer and Evidence.
+
+    Args:
+        query: Analyst query driving the wiki title.
+        title: Optional explicit title (defaults to ``query``).
+        structured_facts_seed: Optional markdown block inserted after Answer.
+
+    Returns:
+        Full wiki markdown including YAML frontmatter.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import seed_iterative_wiki
+        >>> wiki = seed_iterative_wiki(query="Latakia Port")
+        >>> "type: Wiki" in wiki and "## Answer" in wiki
+        True
     """
     heading = (title or query or "Knowledge wiki").strip() or "Knowledge wiki"
     if len(heading) > 80:
         heading = heading[:77] + "…"
+    from datetime import datetime, timezone
+
     lines = [
         "---",
         "type: Wiki",
         f"title: {heading}",
+        "generated:",
+        "  by: process:tkeir-okf-iterative-wiki",
+        f"  at: {datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}",
+        "tkeir_okf_version: '0.2'",
         "---",
         f"# {heading}",
         "",
@@ -126,7 +146,20 @@ def split_narrative_and_information(text: str) -> tuple[str, str]:
     """Split chunk text into narrative body and ``## Information`` attrs.
 
     Handles clean ingest markdown and NLP-spaced headings
-    (``# # Information``). Returns ``(narrative, information)``.
+    (``# # Information``).
+
+    Args:
+        text: Raw chunk text from ingest or retrieval.
+
+    Returns:
+        ``(narrative, information)`` — either side may be empty.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import split_narrative_and_information
+        >>> split_narrative_and_information(
+        ...     "Story here.\\n## Information\\n- **source:** x"
+        ... )
+        ('Story here.', '- **source:** x')
     """
     raw = (text or "").strip()
     if not raw:
@@ -159,7 +192,26 @@ def compact_information_for_prompt(
     max_chars: int = 1400,
     priority_keys: list[str] | tuple[str, ...] | None = None,
 ) -> str:
-    """Keep Information metadata short but retain key analyst fields."""
+    """Keep Information metadata short but retain key analyst fields.
+
+    Args:
+        information: Raw ``## Information`` block text.
+        max_chars: Maximum returned character count.
+        priority_keys: Keys whose lines are ranked first (defaults apply).
+
+    Returns:
+        Trimmed information block, truncated with an ellipsis when needed.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import compact_information_for_prompt
+        >>> out = compact_information_for_prompt(
+        ...     "- **evaluation:** high\\n- **misc:** filler",
+        ...     max_chars=40,
+        ...     priority_keys=["evaluation"],
+        ... )
+        >>> out.startswith("- **evaluation:**")
+        True
+    """
     text = (information or "").strip()
     if not text:
         return ""
@@ -191,6 +243,26 @@ def normalize_evidence_chunk(raw: Any) -> dict[str, str] | None:
 
     Extracts ``## Information`` into a dedicated ``information`` field and
     keeps narrative body in ``text_raw`` when possible.
+
+    Args:
+        raw: Chunk payload dict from retrieval or workflow params.
+
+    Returns:
+        Normalized chunk dict, or ``None`` when no usable content remains.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import normalize_evidence_chunk
+        >>> row = normalize_evidence_chunk({
+        ...     "chunk_id": "c1",
+        ...     "text_raw": "Narrative.\\n## Information\\n- **dtg:** today",
+        ...     "parent_doc_id": "doc-1",
+        ... })
+        >>> row["chunk_id"]
+        'c1'
+        >>> "Narrative." in row["text_raw"]
+        True
+        >>> "dtg" in row["information"]
+        True
     """
     if not isinstance(raw, dict):
         return None
@@ -234,7 +306,28 @@ def normalize_evidence_chunk(raw: Any) -> dict[str, str] | None:
 
 
 def write_evidence_chunks(root: Path, chunks: list[dict[str, Any]]) -> Path:
-    """Persist normalized evidence chunks next to wiki.md for iterative build."""
+    """Persist normalized evidence chunks next to wiki.md for iterative build.
+
+    Args:
+        root: OKF bundle directory.
+        chunks: Raw chunk dicts from retrieval or workflow params.
+
+    Returns:
+        Path to the written ``evidence_chunks.json`` file.
+
+    Example:
+        >>> import json, tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.iterative_wiki import write_evidence_chunks
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     path = write_evidence_chunks(
+        ...         Path(td),
+        ...         [{"chunk_id": "c1", "text_raw": "Hello world."}],
+        ...     )
+        ...     payload = json.loads(path.read_text(encoding="utf-8"))
+        ...     payload[0]["chunk_id"]
+        'c1'
+    """
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
     normalized: list[dict[str, str]] = []
@@ -256,7 +349,26 @@ def write_evidence_chunks(root: Path, chunks: list[dict[str, Any]]) -> Path:
 
 
 def load_evidence_chunks(root: Path) -> list[dict[str, str]]:
-    """Load ``evidence_chunks.json`` from an OKF bundle root."""
+    """Load ``evidence_chunks.json`` from an OKF bundle root.
+
+    Args:
+        root: OKF bundle directory.
+
+    Returns:
+        List of normalized chunk dicts; empty when the file is missing.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.iterative_wiki import load_evidence_chunks, write_evidence_chunks
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     root = Path(td)
+        ...     _ = write_evidence_chunks(
+        ...         root, [{"chunk_id": "c1", "text_raw": "Hello."}]
+        ...     )
+        ...     load_evidence_chunks(root)[0]["chunk_id"]
+        'c1'
+    """
     path = Path(root) / EVIDENCE_CHUNKS_FILENAME
     if not path.is_file():
         return []
@@ -276,7 +388,22 @@ def load_evidence_chunks(root: Path) -> list[dict[str, str]]:
 
 
 def chunks_from_params(params: dict[str, Any] | None) -> list[dict[str, str]]:
-    """Read grab/search chunks passed on workflow params (HMI Reporter)."""
+    """Read grab/search chunks passed on workflow params (HMI Reporter).
+
+    Args:
+        params: Workflow parameter dict; reads ``chunks`` or ``grab_chunks``.
+
+    Returns:
+        Deduplicated list of normalized chunk dicts.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import chunks_from_params
+        >>> rows = chunks_from_params(
+        ...     {"chunks": [{"chunk_id": "c1", "text_raw": "Hi"}]}
+        ... )
+        >>> rows[0]["chunk_id"]
+        'c1'
+    """
     params = params or {}
     raw_list = params.get("chunks") or params.get("grab_chunks") or []
     if isinstance(raw_list, str):
@@ -308,6 +435,22 @@ def enrich_chunks_with_sibling_information(
 
     Retrieval often splits narrative and ``## Information`` across golden
     chunks of the same parent document — fold them back for the LLM.
+
+    Args:
+        chunks: Normalized evidence chunk dicts.
+
+    Returns:
+        Copy of ``chunks`` with sibling information merged per parent.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import enrich_chunks_with_sibling_information
+        >>> chunks = [
+        ...     {"chunk_id": "a", "parent_doc_id": "p1", "text_raw": "narr", "information": ""},
+        ...     {"chunk_id": "b", "parent_doc_id": "p1", "text_raw": "", "information": "- **dtg:** today"},
+        ... ]
+        >>> out = enrich_chunks_with_sibling_information(chunks)
+        >>> "dtg" in out[0]["information"]
+        True
     """
     by_parent: dict[str, list[str]] = {}
     for chunk in chunks:
@@ -344,7 +487,30 @@ def build_merge_prompt(
     index: int,
     total: int,
 ) -> str:
-    """User prompt for one iterative wiki merge step."""
+    """User prompt for one iterative wiki merge step.
+
+    Args:
+        query: Analyst query or request text.
+        current_wiki: Wiki markdown accumulated so far.
+        chunk: Normalized evidence chunk for this step.
+        index: One-based chunk index in the batch.
+        total: Total chunks in the batch.
+
+    Returns:
+        Prompt string for a single merge LLM call.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import build_merge_prompt
+        >>> prompt = build_merge_prompt(
+        ...     query="Q",
+        ...     current_wiki="# W",
+        ...     chunk={"chunk_id": "c1", "text_raw": "text"},
+        ...     index=1,
+        ...     total=2,
+        ... )
+        >>> "Chunk 1/2" in prompt
+        True
+    """
     text = chunk.get("text_raw") or ""
     # Keep prompts bounded while preserving substance.
     if len(text) > 6000:
@@ -394,7 +560,20 @@ def build_merge_prompt(
 
 
 def extract_wiki_markdown(raw: str, *, fallback: str) -> str:
-    """Pull wiki markdown out of an LLM response (fenced or bare)."""
+    """Pull wiki markdown out of an LLM response (fenced or bare).
+
+    Args:
+        raw: Raw LLM response text.
+        fallback: Prior wiki markdown when extraction fails.
+
+    Returns:
+        Extracted wiki markdown, or ``fallback`` when none is detected.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import extract_wiki_markdown
+        >>> extract_wiki_markdown("```markdown\\n# Hi\\n```", fallback="fb")
+        '# Hi'
+    """
     text = (raw or "").strip()
     if not text:
         return fallback
@@ -426,7 +605,21 @@ def extract_wiki_markdown(raw: str, *, fallback: str) -> str:
 
 
 def ensure_sources_section(wiki: str, chunks: list[dict[str, str]]) -> str:
-    """Guarantee a Sources section listing every processed chunk_id."""
+    """Guarantee a Sources section listing every processed chunk_id.
+
+    Args:
+        wiki: Current wiki markdown.
+        chunks: Evidence chunks whose ids should appear under Sources.
+
+    Returns:
+        Wiki markdown with missing ``chunk_id`` lines appended.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import ensure_sources_section
+        >>> wiki = ensure_sources_section("## Answer\\n\\nHi", [{"chunk_id": "c1"}])
+        >>> "chunk_id=`c1`" in wiki
+        True
+    """
     text = (wiki or "").rstrip()
     if "## Sources" not in text:
         text = text + "\n\n## Sources\n"
@@ -459,7 +652,21 @@ def ensure_sources_section(wiki: str, chunks: list[dict[str, str]]) -> str:
 
 
 def _chunk_narrative_budget(total_chunks: int) -> int:
-    """Cap narrative chars so N chunks still fit one local-LLM generate call."""
+    """Cap narrative chars so N chunks still fit one local-LLM generate call.
+
+    Args:
+        total_chunks: Number of evidence chunks in the batch.
+
+    Returns:
+        Per-chunk narrative character budget (between 1000 and 2800).
+
+    Example:
+        >>> from thot.okf.iterative_wiki import _chunk_narrative_budget
+        >>> _chunk_narrative_budget(7)
+        2000
+        >>> _chunk_narrative_budget(1)
+        2800
+    """
     n = max(1, int(total_chunks or 1))
     # Aim for ≤ ~14k narrative chars across the batch (plus system + wiki seed).
     return max(1000, min(2800, 14000 // n))
@@ -473,6 +680,28 @@ def _format_chunk_block(
     priority_keys: list[str] | tuple[str, ...] | None = None,
     max_chars: int | None = None,
 ) -> str:
+    """Format one evidence chunk block for a merge or single-pass prompt.
+
+    Args:
+        chunk: Normalized evidence chunk dict.
+        index: One-based chunk index in the batch.
+        total: Total chunks in the batch.
+        priority_keys: Optional Information priority keys for compaction.
+        max_chars: Optional narrative override; defaults to batch budget.
+
+    Returns:
+        Markdown chunk block including narrative and Information metadata.
+
+    Example:
+        >>> from thot.okf.iterative_wiki import _format_chunk_block
+        >>> block = _format_chunk_block(
+        ...     {"chunk_id": "c1", "text_raw": "Hello"},
+        ...     1,
+        ...     1,
+        ... )
+        >>> "Chunk 1/1" in block
+        True
+    """
     text = chunk.get("text_raw") or ""
     budget = (
         int(max_chars)
@@ -509,7 +738,26 @@ async def build_wiki_single_pass(
     structured_facts_seed: str | None = None,
     information_priority_keys: list[str] | tuple[str, ...] | None = None,
 ) -> str:
-    """One LLM call that folds all chunks (fast path for small result sets)."""
+    """One LLM call that folds all chunks (fast path for small result sets).
+
+    Args:
+        llm: Async LLM client exposing ``generate(prompt, ...)``.
+        query: Analyst query or request text.
+        chunks: Normalized evidence chunk dicts.
+        temperature: Sampling temperature for the merge call.
+        system: Optional system prompt override.
+        structured_facts_seed: Optional Structured facts seed markdown.
+        information_priority_keys: Optional Information compaction keys.
+
+    Returns:
+        Full wiki markdown after merge and Sources enforcement.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.iterative_wiki import build_wiki_single_pass
+        >>> inspect.iscoroutinefunction(build_wiki_single_pass)
+        True
+    """
     usable = [
         c
         for c in enrich_chunks_with_sibling_information(chunks)
@@ -585,6 +833,27 @@ async def build_wiki_iteratively(
 
     Persona ``*_prompt`` agents supply ``structured_facts_seed`` /
     ``system`` / ``information_priority_keys`` via the orchestrator.
+
+    Args:
+        llm: Async LLM client exposing ``generate(prompt, ...)``.
+        query: Analyst query or request text.
+        chunks: Normalized evidence chunk dicts.
+        initial_wiki: Optional starting wiki when no chunks are usable.
+        max_chunks: Upper bound on chunks folded (hard-capped at 12).
+        temperature: Sampling temperature for the merge call.
+        on_progress: Optional ``(wiki, done, total)`` callback.
+        system: Optional system prompt override.
+        structured_facts_seed: Optional Structured facts seed markdown.
+        information_priority_keys: Optional Information compaction keys.
+
+    Returns:
+        Full wiki markdown after merge and Sources enforcement.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.iterative_wiki import build_wiki_iteratively
+        >>> inspect.iscoroutinefunction(build_wiki_iteratively)
+        True
     """
     # Hard cap: never fold more than 12 chunks even if caller asks for more.
     capped = max(1, min(int(max_chunks or 6), 12))
@@ -635,8 +904,31 @@ def create_evidence_bundle(
 ) -> tuple[str, Path]:
     """Create a minimal OKF bundle from grab/search chunks (no RAG export).
 
+    Args:
+        user_space: Vespa user space owning the bundle.
+        query: Analyst query driving the seed wiki.
+        chunks: Raw chunk dicts from grab or search.
+        bundle_id: Optional explicit bundle id (UUID when omitted).
+        structured_facts_seed: Optional Structured facts seed markdown.
+
     Returns:
         ``(bundle_id, bundle_root)``.
+
+    Example:
+        >>> import os, tempfile
+        >>> from thot.okf.iterative_wiki import create_evidence_bundle
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     os.environ["TKEIR_WORKSPACE"] = td
+        ...     bid, root = create_evidence_bundle(
+        ...         user_space="dev@tkeir",
+        ...         query="Test",
+        ...         chunks=[{"chunk_id": "c1", "text_raw": "Hello world."}],
+        ...         bundle_id="test-bundle",
+        ...     )
+        ...     ok = bid == "test-bundle" and (root / "wiki.md").is_file()
+        ...     del os.environ["TKEIR_WORKSPACE"]
+        ...     ok
+        True
     """
     import uuid
     from datetime import datetime, timezone

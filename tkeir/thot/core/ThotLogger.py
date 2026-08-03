@@ -163,7 +163,13 @@ class ThotLogger:
 
     @staticmethod
     def _correlation_extra(context: dict | None = None) -> dict[str, str]:
-        """Build ``extra`` so formatters can print correlation-id."""
+        """Build ``extra`` so formatters can print correlation-id.
+
+        Example:
+            >>> extra = ThotLogger._correlation_extra(LogUserContext("id-99"))
+            >>> extra["correlation_id"]
+            'id-99'
+        """
         if context and context.get("correlation-id"):
             return {"correlation_id": str(context["correlation-id"])}
         bound = current_correlation_id()
@@ -178,6 +184,12 @@ class ThotLogger:
         context=None,
         count_error: bool = False,
     ) -> None:
+        """Emit one log line at ``level`` with optional trace/context.
+
+        Example:
+            >>> ThotLogger._emit("info", "doctest ping") is None
+            True
+        """
         if not ThotLogger.logger:
             ThotLogger._default_load()
         assert ThotLogger.logger is not None

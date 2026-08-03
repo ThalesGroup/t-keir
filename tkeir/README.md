@@ -53,7 +53,7 @@ Published HTML (when available): [ThalesGroup.github.io/t-keir](https://thalesgr
 
 | Path | Role |
 |------|------|
-| `app/bin` | Scripts for model init / server helpers |
+| `scripts` | Helpers (e.g. `init-models.sh` for MWE trie) |
 | `configs` | Bundled service and pipeline YAML |
 | `../docs` | MkDocs documentation (repository root) |
 | `resources` | Lexical resources and tagger rules |
@@ -88,10 +88,14 @@ sudo apt install libcurl4-openssl-dev libssl-dev
 
 ### Configure and models
 
-Edit configs under **`configs/`**. Load models with:
+Edit configs under **`configs/`**. Load the tokenizer MWE model with:
 
 ```shell
-./app/bin/init-models.sh <PATH TO TKEIR>/tkeir/configs <MODEL PATH>
+# From repository root (preferred)
+make init-models
+
+# Or from tkeir/
+./scripts/init-models.sh [MODEL_CACHE_PATH]
 ```
 
 Set `TRANSFORMERS_CACHE` to that model path before running model-backed tools.

@@ -23,6 +23,18 @@ ORIGIN_AGENT_GENERATED = "agent-generated"
 
 
 def _observe_auto_publish_enabled() -> bool:
+    """Return whether observe mode may auto-approve publish staging.
+
+    Reads ``AGENT_PUBLISH_OBSERVE_AUTO`` (default enabled unless ``0``/``false``).
+
+    Returns:
+        ``True`` when observe-mode auto publish is allowed.
+
+    Example:
+        >>> from thot.agent.publish import _observe_auto_publish_enabled
+        >>> isinstance(_observe_auto_publish_enabled(), bool)
+        True
+    """
     return os.getenv("AGENT_PUBLISH_OBSERVE_AUTO", "1") not in {
         "0",
         "false",
@@ -31,6 +43,31 @@ def _observe_auto_publish_enabled() -> bool:
 
 
 def _approval_matches_run(item: Any, state: RunState) -> bool:
+    """True when an approval item targets this run's publish intent.
+
+    Args:
+        item: :class:`~thot.governor.models.ApprovalItem` from the queue.
+        state: Run whose ``correlation_id`` and ``run_id`` must match.
+
+    Returns:
+        ``True`` when correlation, intent, and run id align.
+
+    Example:
+        >>> from thot.agent.publish import _approval_matches_run
+        >>> from thot.agent.models import RunState
+        >>> from thot.governor.models import ApprovalItem
+        >>> state = RunState(goal="g", correlation_id="c" * 32)
+        >>> item = ApprovalItem(
+        ...     approval_id="a1",
+        ...     correlation_id="c" * 32,
+        ...     actor_id="alice",
+        ...     intent="generate",
+        ...     reason=f"publish agent-generated run_id={state.run_id}",
+        ...     created_at="2026-01-01T00:00:00Z",
+        ... )
+        >>> _approval_matches_run(item, state)
+        True
+    """
     return (
         item.correlation_id == state.correlation_id
         and item.intent in {"generate", "agent.publish"}
@@ -43,6 +80,29 @@ def _resolve_approval_by_id(
     approval_id: str,
     state: RunState,
 ) -> tuple[Any | None, dict[str, Any] | None]:
+    """Look up an approval by id and validate status/correlation.
+
+    Args:
+        guard_approvals: Governor approval queue backing store.
+        approval_id: Explicit approval id from the publish request.
+        state: Run whose correlation id must match when present on the item.
+
+    Returns:
+        ``(approved_item, None)`` on success, or ``(None, error_dict)``.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.agent.publish import _resolve_approval_by_id
+        >>> from thot.agent.models import RunState
+        >>> from thot.governor.approvals import ApprovalQueue
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     q = ApprovalQueue(Path(td) / "approvals.json")
+        ...     state = RunState(goal="g", correlation_id="c" * 32)
+        ...     item, err = _resolve_approval_by_id(q, "missing", state)
+        ...     item is None and err["status"] == "rejected"
+        True
+    """
     approved = guard_approvals.get(approval_id)
     if approved is None:
         return None, {"status": "rejected", "error": "unknown approval_id"}
@@ -69,6 +129,29 @@ def _find_existing_approval(
     state: RunState,
     mode: str,
 ) -> tuple[Any | None, dict[str, Any] | None]:
+    """Scan the queue for an existing publish approval for this run.
+
+    Args:
+        guard_approvals: Governor approval queue.
+        state: Run used to match correlation id and run id in reasons.
+        mode: Governor mode (``enforce`` blocks on pending items).
+
+    Returns:
+        ``(approved_item, None)``, ``(None, awaiting_dict)``, or ``(None, None)``.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.agent.publish import _find_existing_approval
+        >>> from thot.agent.models import RunState
+        >>> from thot.governor.approvals import ApprovalQueue
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     q = ApprovalQueue(Path(td) / "approvals.json")
+        ...     state = RunState(goal="g", correlation_id="c" * 32)
+        ...     item, err = _find_existing_approval(q, state, "observe")
+        ...     item is None and err is None
+        True
+    """
     for item in guard_approvals.list_all(limit=500):
         if not _approval_matches_run(item, state):
             continue
@@ -88,6 +171,29 @@ def _resolve_or_enqueue_approval(
     state: RunState,
     mode: str,
 ) -> tuple[Any, dict[str, Any] | None]:
+    """Enqueue a publish approval and optionally auto-approve in observe mode.
+
+    Args:
+        guard_approvals: Governor approval queue.
+        state: Run whose correlation id and user space are recorded.
+        mode: Governor mode controlling enforce vs observe behavior.
+
+    Returns:
+        Tuple of approval item and optional awaiting-approval response dict.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.agent.publish import _resolve_or_enqueue_approval
+        >>> from thot.agent.models import RunState
+        >>> from thot.governor.approvals import ApprovalQueue
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     q = ApprovalQueue(Path(td) / "approvals.json")
+        ...     state = RunState(goal="g", correlation_id="c" * 32, user_space="alice")
+        ...     item, err = _resolve_or_enqueue_approval(q, state, "enforce")
+        ...     err["status"]
+        'awaiting_approval'
+    """
     item = guard_approvals.enqueue(
         correlation_id=state.correlation_id or ("0" * 32),
         actor_id=state.user_space,
@@ -115,6 +221,41 @@ def _write_publish_artifacts(
     markdown: str,
     approved: Any,
 ) -> dict[str, Any]:
+    """Write markdown + manifest under ``publishes/{run_id}/`` and blackboard.
+
+    Args:
+        store: Run store receiving blackboard publish events.
+        state: Succeeded run being staged for re-ingest.
+        markdown: Deliverable body written to ``document.md``.
+        approved: Approved :class:`~thot.governor.models.ApprovalItem`.
+
+    Returns:
+        Published status dict with paths, ids, and ``source_uri``.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.agent.publish import _write_publish_artifacts, ORIGIN_AGENT_GENERATED
+        >>> from thot.agent.models import RunState
+        >>> from thot.agent.runs import RunStore
+        >>> from thot.governor.approvals import ApprovalQueue
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     root = Path(td)
+        ...     store = RunStore(root)
+        ...     store.ensure_layout()
+        ...     approvals = ApprovalQueue(root / "approvals.json")
+        ...     state = RunState(goal="g", correlation_id="c" * 32, user_space="alice")
+        ...     approved = approvals.enqueue(
+        ...         correlation_id=state.correlation_id,
+        ...         actor_id=state.user_space,
+        ...         intent="generate",
+        ...         reason=f"publish agent-generated run_id={state.run_id}",
+        ...     )
+        ...     approved = approvals.decide(approved.approval_id, status="approved")
+        ...     out = _write_publish_artifacts(store, state, "# doc\\n", approved)
+        ...     out["status"] == "published" and out["origin"] == ORIGIN_AGENT_GENERATED
+        True
+    """
     publish_id = new_action_id()
     out_dir = store.root / "publishes" / state.run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -168,6 +309,26 @@ def _write_publish_artifacts(
 
 
 def _markdown_from_state(state: RunState) -> str:
+    """Build publish markdown from compose result or grounded findings.
+
+    Args:
+        state: Run with ``compose_result.markdown`` or ``result`` findings.
+
+    Returns:
+        Markdown string, or empty when no deliverable is available.
+
+    Example:
+        >>> from thot.agent.publish import _markdown_from_state
+        >>> from thot.agent.models import RunState, GroundedFindings, GroundedFinding
+        >>> state = RunState(
+        ...     goal="summarize",
+        ...     result=GroundedFindings(
+        ...         findings=[GroundedFinding(claim="fact", chunk_ids=["c1"])]
+        ...     ),
+        ... )
+        >>> "# Agent findings" in _markdown_from_state(state)
+        True
+    """
     if state.compose_result and isinstance(state.compose_result, dict):
         md = state.compose_result.get("markdown")
         if isinstance(md, str) and md.strip():

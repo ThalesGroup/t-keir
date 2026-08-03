@@ -23,10 +23,13 @@ tkeir/resources/modeling/net/**
 !tkeir/resources/modeling/net/README.md
 !tkeir/resources/modeling/net/.gitkeep
 .pytest_cache/
+.coverage
+.coverage.*
 reports/
 results/
 coverage-reports/
 .tkeir-agent/
+# Prefer workspace/agent (Make default); keep legacy root path ignored too.
 .tkeir-compose/
 # Generated EU compliance OPA inputs (keep directory via .gitkeep)
 compliance/opa/input/*

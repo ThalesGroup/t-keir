@@ -1,6 +1,8 @@
 """Title: Doc Example Coverage
 
-Verify every thot function has a Google-style Example section.
+Verify every module-level function and class method under ``thot`` has a
+Google-style docstring with an ``Example:`` / ``Examples:`` section
+(nested helpers are covered by the enclosing callable's Example).
 
 Author: Eric Blaudez
 

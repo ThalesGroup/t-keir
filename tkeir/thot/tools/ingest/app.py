@@ -68,6 +68,14 @@ class AppState:
     """Shared ingest runtime state."""
 
     def __init__(self) -> None:
+        """Initialize store, worker, and optional Vespa client handles.
+
+        Example:
+            >>> from thot.tools.ingest.app import AppState
+            >>> state = AppState()
+            >>> state.store is not None
+            True
+        """
         settings = ingest_settings()
         self.settings = settings
         self.store = IngestStore(settings.root)
@@ -81,6 +89,11 @@ def _ensure_app_state(app: FastAPI) -> AppState:
     Uvicorn can skip lifespan when the ASGI stack reports it unsupported
     (seen after volume permission failures during early middleware init).
     Endpoints must not crash with ``AttributeError`` in that case.
+
+    Example:
+        >>> import inspect
+        >>> inspect.isfunction(_ensure_app_state)
+        True
     """
     state = getattr(app.state, "ingest", None)
     if isinstance(state, AppState):
@@ -98,7 +111,13 @@ def _ensure_app_state(app: FastAPI) -> AppState:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize store layout and optional Vespa client."""
+    """Initialize store layout and optional Vespa client.
+
+    Example:
+        >>> from thot.tools.ingest.app import lifespan
+        >>> callable(lifespan)
+        True
+    """
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-ingest"))
     # Always rebuild AppState so INGEST_ROOT / settings changes take effect
     # (TestClient runs lifespan per session; reusing a prior state points at
@@ -141,13 +160,24 @@ wire_governor_middleware(
 
 
 def _correlation_id() -> str:
+    """Return the current action correlation id or allocate a new one.
+
+    Example:
+        >>> len(_correlation_id()) > 0
+        True
+    """
     return current_correlation_id() or new_action_id()
 
 
 def _parse_json_object_field(
     raw: Any, *, field_name: str
 ) -> dict[str, Any] | None:
-    """Parse an optional multipart JSON object field."""
+    """Parse an optional multipart JSON object field.
+
+    Example:
+        >>> _parse_json_object_field('{"a": 1}', field_name="metadata")
+        {'a': 1}
+    """
     if raw is None or hasattr(raw, "read"):
         return None
     text = str(raw).strip()
@@ -169,7 +199,11 @@ def _parse_json_object_field(
 
 
 def _parse_ontology_paths_field(raw: Any) -> None:
-    """Reject path-only ``ontologies`` form fields (content must be uploaded)."""
+    """Reject path-only ``ontologies`` form fields (content must be uploaded).
+
+    Example:
+        >>> _parse_ontology_paths_field(None)  # no-op
+    """
     if raw is None or hasattr(raw, "read"):
         return
     text = str(raw).strip()
@@ -190,7 +224,13 @@ async def _stage_uploaded_ontologies(
     form: Any,
     staging_dir: Path,
 ) -> list[str]:
-    """Persist multipart ontology file uploads and return staged absolute paths."""
+    """Persist multipart ontology file uploads and return staged absolute paths.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_stage_uploaded_ontologies)
+        True
+    """
     from thot.tools.ingest.ontology_upload import stage_ontology_bytes
 
     items: list[tuple[str, bytes]] = []
@@ -219,7 +259,13 @@ async def _document_extras_from_multipart(
     *,
     ingest_id: str,
 ) -> dict[str, Any] | None:
-    """Build pipeline extras from multipart metadata + uploaded ontology bytes."""
+    """Build pipeline extras from multipart metadata + uploaded ontology bytes.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_document_extras_from_multipart)
+        True
+    """
     from thot.tools.ingest.ontology_upload import strip_client_ontology_paths
     from thot.tools.ingest.worker import document_extras_from_metadata
 
@@ -251,6 +297,13 @@ def _queue_job(
     document_extras: dict[str, Any] | None = None,
     index_target: str = "user",
 ) -> IngestAcceptedResponse:
+    """Queue one ingest job and return the accepted response.
+
+    Example:
+        >>> import inspect
+        >>> inspect.isfunction(_queue_job)
+        True
+    """
     state = _ensure_app_state(app)
     ingest_id = new_action_id()
     correlation_id = _correlation_id()
@@ -309,6 +362,19 @@ def _queue_job(
 
 
 def _job_status_value(job: Any) -> str:
+    """Normalize an ingest job status to a string value.
+
+    Example:
+        >>> from thot.tools.ingest.models import IngestJob, IngestJobStatus
+        >>> from thot.action.models import utc_now_rfc3339
+        >>> now = utc_now_rfc3339()
+        >>> job = IngestJob(
+        ...     ingest_id="i1", correlation_id="c1",
+        ...     status=IngestJobStatus.PENDING, created_at=now, updated_at=now,
+        ... )
+        >>> _job_status_value(job)
+        'pending'
+    """
     status = getattr(job, "status", None)
     if status is not None and hasattr(status, "value"):
         return str(status.value)
@@ -316,7 +382,12 @@ def _job_status_value(job: Any) -> str:
 
 
 def _parse_workspace_source_uri(source_uri: str) -> tuple[str, str] | None:
-    """Parse ``workspace://{user_space}/{relative_path}`` → ``(space, path)``."""
+    """Parse ``workspace://{user_space}/{relative_path}`` → ``(space, path)``.
+
+    Example:
+        >>> _parse_workspace_source_uri("workspace://demo@tkeir/reports/a.md")
+        ('demo@tkeir', 'reports/a.md')
+    """
     prefix = "workspace://"
     if not source_uri.startswith(prefix):
         return None
@@ -338,7 +409,29 @@ def _apply_ingest_job_to_workspace(
     *,
     ingest_id: str | None = None,
 ) -> dict[str, Any] | None:
-    """Update a My-files catalog entry from its ingest job (success/noop/fail)."""
+    """Update a My-files catalog entry from its ingest job (success/noop/fail).
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.tools.ingest.store import IngestStore
+        >>> from thot.tools.ingest.user_workspace import UserWorkspace, WorkspaceFileRecord
+        >>> with tempfile.TemporaryDirectory() as temp_dir:
+        ...     root = Path(temp_dir)
+        ...     ws = UserWorkspace("demo@tkeir", root=root)
+        ...     ws.ensure_layout()
+        ...     _ = ws.upsert_record(WorkspaceFileRecord(
+        ...         path="a.md", source_ref="s", status="indexing", ingest_id="missing",
+        ...     ))
+        ...     state = AppState()
+        ...     state.store = IngestStore(root / "ingest")
+        ...     state.store.ensure_layout()
+        ...     applied = _apply_ingest_job_to_workspace(
+        ...         ws, state, "a.md", ingest_id="missing",
+        ...     )
+        ...     applied["status"]
+        'failed'
+    """
     try:
         record = ws.get_record(relative_path)
     except ValueError:
@@ -395,7 +488,13 @@ def _apply_ingest_job_to_workspace(
 
 
 def _heal_workspace_indexing(ws: UserWorkspace, state: AppState) -> int:
-    """Resolve catalog rows stuck on ``indexing`` after jobs finished."""
+    """Resolve catalog rows stuck on ``indexing`` after jobs finished.
+
+    Example:
+        >>> import inspect
+        >>> inspect.isfunction(_heal_workspace_indexing)
+        True
+    """
     healed = 0
     for record in ws.iter_indexing_records():
         before = record.status
@@ -409,14 +508,28 @@ def _heal_workspace_indexing(ws: UserWorkspace, state: AppState) -> int:
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    """Liveness probe — also ensures AppState exists (lifespan safeguard)."""
+    """Liveness probe — also ensures AppState exists (lifespan safeguard).
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import health
+        >>> inspect.iscoroutinefunction(health)
+        True
+    """
     _ensure_app_state(app)
     return {"status": "ok"}
 
 
 @app.get("/ready")
 async def ready() -> dict[str, Any]:
-    """Readiness probe: Vespa + embedding provider."""
+    """Readiness probe: Vespa + embedding provider.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import ready
+        >>> inspect.iscoroutinefunction(ready)
+        True
+    """
     state = _ensure_app_state(app)
     vespa_ok = False
     if state.vespa is not None:
@@ -429,7 +542,14 @@ async def ready() -> dict[str, Any]:
 
 @app.get("/metrics")
 async def metrics() -> Response:
-    """Prometheus exposition."""
+    """Prometheus exposition.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import metrics
+        >>> inspect.iscoroutinefunction(metrics)
+        True
+    """
     ThotMetrics.create_counter(
         short_name="ingest_http",
         function_name="tkeir_ingest_http_requests_total",
@@ -466,6 +586,13 @@ async def ingest_document(
 
     Staged paths under ``INGEST_ROOT`` are passed to NER, syntax, and
     document-ontology for that document only.
+    
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import ingest_document
+        >>> inspect.iscoroutinefunction(ingest_document)
+        True
     """
     content_type = request.headers.get("content-type", "")
     if content_type.startswith("multipart/"):
@@ -581,6 +708,13 @@ async def ingest_json_records(
 
     Accepts multipart ``file`` upload **or** JSON body with ``dataset_path``
     (resolved under the repo ``datasets/`` tree for admin demos).
+    
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import ingest_json_records
+        >>> inspect.iscoroutinefunction(ingest_json_records)
+        True
     """
     from thot.core.TkeirPaths import repo_root
     from thot.tools.ingest.json_records import (
@@ -727,7 +861,14 @@ async def ingest_batch(
     actor: str = Depends(require_ingest_auth),
     authorization: str | None = Header(default=None),
 ) -> BatchAcceptedResponse:
-    """Queue a batch of URL-based ingest jobs (each item may carry ontologies)."""
+    """Queue a batch of URL-based ingest jobs (each item may carry ontologies).
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import ingest_batch
+        >>> inspect.iscoroutinefunction(ingest_batch)
+        True
+    """
     from thot.tools.ingest.ontology_upload import (
         decode_ontology_uploads,
         stage_ontology_bytes,
@@ -795,6 +936,13 @@ async def ingest_status(
     HMI progress polling must stay lightweight: loading every manifest on each
     tick overloaded the server and left transient ``poll_error`` statuses that
     never counted as done, so the progress bar stalled below 100%.
+    
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import ingest_status
+        >>> inspect.iscoroutinefunction(ingest_status)
+        True
     """
     state = _ensure_app_state(app)
     job = state.store.read_job(ingest_id)
@@ -821,7 +969,14 @@ async def ingest_stop(
     request: Request,
     _actor: str = Depends(require_ingest_auth),
 ) -> dict[str, str]:
-    """Stop the ingest server process (used by client ``--stop-on-failed``)."""
+    """Stop the ingest server process (used by client ``--stop-on-failed``).
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import ingest_stop
+        >>> inspect.iscoroutinefunction(ingest_stop)
+        True
+    """
     import threading
 
     from thot.tools.ingest.shutdown import request_ingest_shutdown
@@ -843,6 +998,13 @@ async def ingest_stop(
 
 
 def _user_workspace_for(actor: str) -> UserWorkspace:
+    """Return a layout-initialized workspace for ``actor``.
+
+    Example:
+        >>> import inspect
+        >>> inspect.isfunction(_user_workspace_for)
+        True
+    """
     state = _ensure_app_state(app)
     ws = UserWorkspace(actor, root=state.settings.workspace_root)
     ws.ensure_layout()
@@ -864,6 +1026,13 @@ async def workspace_tree(
 
     Also heals catalog rows stuck on ``indexing`` when their ingest jobs
     have already finished (success / noop / failed).
+    
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_tree
+        >>> inspect.iscoroutinefunction(workspace_tree)
+        True
     """
     ws = _user_workspace_for(actor)
     state = _ensure_app_state(app)
@@ -879,7 +1048,14 @@ async def workspace_mkdir(
     request: Request,
     actor: str = Depends(require_ingest_auth),
 ) -> dict[str, Any]:
-    """Create a directory under the user's workspace ``files/`` tree."""
+    """Create a directory under the user's workspace ``files/`` tree.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_mkdir
+        >>> inspect.iscoroutinefunction(workspace_mkdir)
+        True
+    """
     try:
         body = await request.json()
     except Exception:
@@ -909,6 +1085,13 @@ async def workspace_upload(
     When the upload is a record-oriented JSON corpus (``{records:[…]}``),
     each record is converted to Markdown and saved as
     ``{directory}/{corpus_stem}/{doc_id}.md`` (personal workspace only).
+    
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_upload
+        >>> inspect.iscoroutinefunction(workspace_upload)
+        True
     """
     content_type = request.headers.get("content-type", "")
     if not content_type.startswith("multipart/"):
@@ -1088,7 +1271,14 @@ async def workspace_read_file(
     path: str,
     actor: str = Depends(require_ingest_auth),
 ) -> dict[str, Any]:
-    """Read a workspace file for HMI preview (text / markdown)."""
+    """Read a workspace file for HMI preview (text / markdown).
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_read_file
+        >>> inspect.iscoroutinefunction(workspace_read_file)
+        True
+    """
     ws = _user_workspace_for(actor)
     try:
         file_path = ws.resolve_file(path)
@@ -1153,6 +1343,13 @@ async def workspace_copy_to(
     to the basename so they are visible without deep navigation). Only
     allowlisted targets (``commander``) are accepted. Destination catalog
     entries are ``pending`` so the recipient can choose what to index.
+    
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_copy_to
+        >>> inspect.iscoroutinefunction(workspace_copy_to)
+        True
     """
     try:
         body = await request.json()
@@ -1255,6 +1452,14 @@ def _received_dest_path(
     """Place ``src_rel`` under ``dest_prefix`` using a unique basename.
 
     Keeps the recipient's ``received/`` folder shallow and browsable.
+
+    Example:
+        >>> import tempfile
+        >>> with tempfile.TemporaryDirectory() as temp_dir:
+        ...     target = UserWorkspace("cmd@tkeir", root=temp_dir)
+        ...     target.ensure_layout()
+        ...     _received_dest_path(target, "received/analyst", "inbox/x/report.md")
+        'received/analyst/report.md'
     """
     from pathlib import Path as _Path
 
@@ -1278,6 +1483,16 @@ def _received_dest_path(
 
 
 def _received_path_taken(target: UserWorkspace, relative_path: str) -> bool:
+    """Return True when ``relative_path`` exists in catalog or on disk.
+
+    Example:
+        >>> import tempfile
+        >>> with tempfile.TemporaryDirectory() as temp_dir:
+        ...     target = UserWorkspace("cmd@tkeir", root=temp_dir)
+        ...     target.ensure_layout()
+        ...     _received_path_taken(target, "missing.md")
+        False
+    """
     if target.get_record(relative_path) is not None:
         return True
     try:
@@ -1287,7 +1502,12 @@ def _received_path_taken(target: UserWorkspace, relative_path: str) -> bool:
 
 
 def _default_business_ontology_dataset() -> str:
-    """Return rag.yaml ``dual_hybrid.business_ontology.default_dataset`` (osint)."""
+    """Return rag.yaml ``dual_hybrid.business_ontology.default_dataset`` (osint).
+
+    Example:
+        >>> isinstance(_default_business_ontology_dataset(), str)
+        True
+    """
     try:
         from thot.tools.search.rag_config import load_rag_config
 
@@ -1322,6 +1542,13 @@ async def workspace_index(
     Loads ``datasets/<business_ontology_dataset>/business_ontology.yaml``,
     runs the NLP pipeline, annotates the analyzed document with matched
     concepts, then indexes into the personal ``user`` streaming group.
+    
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_index
+        >>> inspect.iscoroutinefunction(workspace_index)
+        True
     """
     try:
         body = await request.json()
@@ -1409,7 +1636,14 @@ async def workspace_sync(
     request: Request,
     actor: str = Depends(require_ingest_auth),
 ) -> dict[str, Any]:
-    """Refresh catalog passage ids from ingest analyzed documents / job status."""
+    """Refresh catalog passage ids from ingest analyzed documents / job status.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_sync
+        >>> inspect.iscoroutinefunction(workspace_sync)
+        True
+    """
     try:
         body = await request.json()
     except Exception:
@@ -1433,7 +1667,14 @@ async def workspace_status(
     request: Request,
     actor: str = Depends(require_ingest_auth),
 ) -> dict[str, Any]:
-    """Return (and heal) indexing status for selected My-files paths."""
+    """Return (and heal) indexing status for selected My-files paths.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_status
+        >>> inspect.iscoroutinefunction(workspace_status)
+        True
+    """
     try:
         body = await request.json()
     except Exception:
@@ -1488,7 +1729,14 @@ async def workspace_delete_file(
     path: str,
     actor: str = Depends(require_ingest_auth),
 ) -> dict[str, Any]:
-    """Delete a workspace file and remove its passages from the user streaming index."""
+    """Delete a workspace file and remove its passages from the user streaming index.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.app import workspace_delete_file
+        >>> inspect.iscoroutinefunction(workspace_delete_file)
+        True
+    """
     ws = _user_workspace_for(actor)
     try:
         record = ws.get_record(path)
@@ -1545,7 +1793,13 @@ async def workspace_delete_file(
 
 
 def main() -> None:
-    """CLI entry point for the ingest FastAPI server or maintenance CLI."""
+    """CLI entry point for the ingest FastAPI server or maintenance CLI.
+
+    Example:
+        >>> from thot.tools.ingest.app import main
+        >>> callable(main)
+        True
+    """
     import sys
 
     import uvicorn

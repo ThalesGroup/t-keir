@@ -25,7 +25,13 @@ from thot.tools.annotation import __date_annotation__, __version_annotation__
 
 
 class AnnotationResources:
-    """Create an annotation Trie structure according the configuration file"""
+    """Create an annotation Trie structure from a configuration file.
+
+    Example:
+        >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+        >>> callable(AnnotationResources.createModel)
+        True
+    """
 
     @staticmethod
     def _pattern_text(value):
@@ -55,6 +61,25 @@ class AnnotationResources:
 
     @staticmethod
     def _validate_create_model_inputs(configuration, output):
+        """Validate required arguments for :meth:`createModel`.
+
+        Args:
+            configuration: Annotation JSON configuration dict.
+            output: Destination pickle path.
+
+        Raises:
+            ValueError: When ``configuration`` or ``output`` is missing.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> try:
+            ...     AnnotationResources._validate_create_model_inputs(None, "out.pkl")
+            ... except ValueError as err:
+            ...     "mandatory" in str(err)
+            ... else:
+            ...     False
+            True
+        """
         if not configuration:
             raise ValueError("Annotation description is mandatory")
         if not output:
@@ -62,6 +87,16 @@ class AnnotationResources:
 
     @staticmethod
     def _download_list_resource(list_item, resources_base_path):
+        """Download and extract a remote list resource when configured.
+
+        Args:
+            list_item: List resource entry from annotation configuration.
+            resources_base_path: Local directory for extracted files.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> AnnotationResources._download_list_resource({}, "/tmp")  # doctest: +SKIP
+        """
         if "download" not in list_item:
             return
         if "url" not in list_item["download"]:
@@ -90,6 +125,26 @@ class AnnotationResources:
 
     @staticmethod
     def _load_pattern_exceptions(list_item, basepath):
+        """Load exception patterns that suppress list entries.
+
+        Args:
+            list_item: List resource entry with optional ``exceptions`` paths.
+            basepath: Base directory for exception list files.
+
+        Returns:
+            Set of raw exception strings.
+
+        Example:
+            >>> import os, tempfile
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     exc = os.path.join(td, "skip.txt")
+            ...     _ = open(exc, "w").write("bad\\n")
+            ...     out = AnnotationResources._load_pattern_exceptions(
+            ...         {"exceptions": ["skip.txt"]}, td)
+            ...     "bad" in out
+            True
+        """
         pattern_exception = set()
         if "exceptions" not in list_item:
             return pattern_exception
@@ -106,6 +161,20 @@ class AnnotationResources:
 
     @staticmethod
     def _read_list_metadata(list_item):
+        """Read label, POS, and weight metadata from a list entry.
+
+        Args:
+            list_item: List resource configuration dict.
+
+        Returns:
+            Tuple ``(label, pos, weight)``.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> AnnotationResources._read_list_metadata(
+            ...     {"label": "ORG", "pos": "NOUN", "weight": 2})
+            ('ORG', 'NOUN', 2)
+        """
         label = None
         pos = "NOUN"
         weight = 1
@@ -123,6 +192,24 @@ class AnnotationResources:
 
     @staticmethod
     def _extract_csv_zip(list_item, basepath):
+        """Extract a ``csv-zip`` list archive beside its source path.
+
+        Args:
+            list_item: List entry whose ``path`` ends with ``.zip``.
+            basepath: Directory containing the zip file.
+
+        Example:
+            >>> import io, os, tempfile, zipfile
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     zpath = os.path.join(td, "items.zip")
+            ...     with zipfile.ZipFile(zpath, "w") as zf:
+            ...         zf.writestr("items.csv", "term\\n")
+            ...     item = {"path": "items.zip"}
+            ...     AnnotationResources._extract_csv_zip(item, td)
+            ...     item["path"]
+            'items'
+        """
         z = zipfile.ZipFile(os.path.join(basepath, list_item["path"]))
         ThotLogger.info("Extract to [" + basepath + "]")
         z.extractall(path=basepath)
@@ -131,6 +218,28 @@ class AnnotationResources:
 
     @staticmethod
     def _read_csv_dataframe(list_item, basepath):
+        """Read a CSV list resource into a pandas DataFrame.
+
+        Args:
+            list_item: List entry with ``path`` and ``format`` metadata.
+            basepath: Directory containing the CSV file.
+
+        Returns:
+            Parsed CSV dataframe.
+
+        Example:
+            >>> import os, tempfile
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     csv_path = os.path.join(td, "items.csv")
+            ...     _ = open(csv_path, "w").write("term\\nAlpha\\n")
+            ...     df = AnnotationResources._read_csv_dataframe(
+            ...         {"path": "items.csv", "format": {"sep": ",", "header": True}},
+            ...         td,
+            ...     )
+            ...     list(df.iloc[:, 0].values)
+            ['Alpha']
+        """
         sep = ","
         if "sep" in list_item["format"]:
             sep = list_item["format"]["sep"]
@@ -143,6 +252,29 @@ class AnnotationResources:
 
     @staticmethod
     def _parse_csv_columns(list_item, df):
+        """Parse CSV column metadata from a list configuration entry.
+
+        Args:
+            list_item: List entry with optional ``format.columns`` specs.
+            df: Loaded CSV dataframe.
+
+        Returns:
+            Tuple ``(columns, concept_type, concept_parent_col)``.
+
+        Example:
+            >>> import pandas as pd
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> df = pd.DataFrame([["Alpha", "Parent"]])
+            >>> cols, concepts, parent = AnnotationResources._parse_csv_columns(
+            ...     {"format": {"columns": [
+            ...         {"id": "0", "concept-type": "instance"},
+            ...         {"id": "1", "concept-type": "parent-instance"},
+            ...     ]}},
+            ...     df,
+            ... )
+            >>> parent
+            1
+        """
         columns = dict()
         concept_type = dict()
         concept_parent_col = -1
@@ -171,6 +303,27 @@ class AnnotationResources:
     def _append_column_patterns(
         df, col_i, columns, concept_parent_col, concept_col_list
     ):
+        """Extract patterns and optional concept ids from one CSV column.
+
+        Args:
+            df: Source CSV dataframe.
+            col_i: Column index to read.
+            columns: Parsed column split metadata.
+            concept_parent_col: Parent concept column index, or ``-1``.
+            concept_col_list: Parent concept values aligned to dataframe rows.
+
+        Returns:
+            Tuple ``(patterns, concepts)``.
+
+        Example:
+            >>> import pandas as pd
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> df = pd.DataFrame([["Alpha"], ["Beta"]])
+            >>> patterns, concepts = AnnotationResources._append_column_patterns(
+            ...     df, 0, {0: ""}, -1, [])
+            >>> patterns
+            ['Alpha', 'Beta']
+        """
         list_patterns = []
         list_concepts = []
         if not columns[col_i]:
@@ -200,6 +353,27 @@ class AnnotationResources:
 
     @staticmethod
     def _load_patterns_from_csv(list_item, basepath):
+        """Load lexicon patterns from a CSV or csv-zip list resource.
+
+        Args:
+            list_item: List entry describing CSV format and path.
+            basepath: Directory containing list files.
+
+        Returns:
+            Tuple ``(patterns, concepts, concept_type)``.
+
+        Example:
+            >>> import os, tempfile
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     _ = open(os.path.join(td, "items.csv"), "w").write("term\\nAlpha\\n")
+            ...     patterns, concepts, concept_type = AnnotationResources._load_patterns_from_csv(
+            ...         {"path": "items.csv", "format": {"type": "csv", "sep": ",", "header": True}},
+            ...         td,
+            ...     )
+            ...     patterns
+            ['Alpha']
+        """
         list_patterns = []
         list_concepts = []
         concept_type = dict()
@@ -248,6 +422,25 @@ class AnnotationResources:
 
     @staticmethod
     def _load_patterns_from_list_file(list_item, basepath):
+        """Load newline-separated patterns from a plain list file.
+
+        Args:
+            list_item: List entry with ``path`` to a text file.
+            basepath: Directory containing the list file.
+
+        Returns:
+            Tuple ``(patterns, [], {})`` for downstream registration.
+
+        Example:
+            >>> import os, tempfile
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     _ = open(os.path.join(td, "items.txt"), "w").write("Alpha\\nBeta\\n")
+            ...     patterns, _, _ = AnnotationResources._load_patterns_from_list_file(
+            ...         {"path": "items.txt"}, td)
+            ...     patterns[:2]
+            ['Alpha', 'Beta']
+        """
         with open(os.path.join(basepath, list_item["path"])) as list_f:
             list_patterns = list_f.read().split("\n")
             list_f.close()
@@ -255,6 +448,25 @@ class AnnotationResources:
 
     @staticmethod
     def _load_list_patterns(list_item, basepath):
+        """Dispatch pattern loading based on list ``format.type``.
+
+        Args:
+            list_item: List resource configuration entry.
+            basepath: Directory containing list files.
+
+        Returns:
+            Tuple ``(patterns, concepts, concept_type)``.
+
+        Example:
+            >>> import os, tempfile
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     _ = open(os.path.join(td, "items.txt"), "w").write("Alpha\\n")
+            ...     patterns, _, _ = AnnotationResources._load_list_patterns(
+            ...         {"path": "items.txt", "format": {"type": "list"}}, td)
+            ...     patterns[0]
+            'Alpha'
+        """
         list_patterns = []
         list_concepts = []
         concept_type = dict()
@@ -276,6 +488,21 @@ class AnnotationResources:
 
     @staticmethod
     def _is_punctuation_only_pattern(pattern_i):
+        """Return whether a pattern contains only punctuation, digits, or spaces.
+
+        Args:
+            pattern_i: Lowercased pattern string.
+
+        Returns:
+            ``True`` when every character is punctuation, digit, or space.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> AnnotationResources._is_punctuation_only_pattern("!!!")
+            True
+            >>> AnnotationResources._is_punctuation_only_pattern("alpha")
+            False
+        """
         word_with_punct = set(pattern_i) & set(
             string.punctuation + "0123456789 "
         )
@@ -295,6 +522,28 @@ class AnnotationResources:
         list_concepts,
         e_i,
     ):
+        """Append one lexicon pattern unless it was already registered.
+
+        Args:
+            patterns: Mutable pattern list being built.
+            remove_duplicate: Set of ``pattern#label#pos`` keys already seen.
+            pattern_i: Lowercased pattern text.
+            label: Entity label for the pattern.
+            pos: Part-of-speech tag.
+            data_type: Annotation data type string.
+            weight: Pattern weight.
+            concept_type: Parsed concept-type metadata for the source column.
+            list_concepts: Parallel concept ids for CSV rows.
+            e_i: Index into ``list_concepts`` for this pattern.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> patterns, seen = [], set()
+            >>> AnnotationResources._append_pattern_entry(
+            ...     patterns, seen, "acme", "ORG", "NOUN", "named-entity", 1, {}, [], 0)
+            >>> patterns[0]["label"]
+            'ORG'
+        """
         duplicate_id = pattern_i + "#" + label + "#" + pos
         if duplicate_id in remove_duplicate:
             return
@@ -320,6 +569,25 @@ class AnnotationResources:
         data_type,
         weight,
     ):
+        """Append an ASCII-folded duplicate of a pattern when it differs.
+
+        Args:
+            patterns: Mutable pattern list being built.
+            remove_duplicate: Set of folded ``pattern#label#pos`` keys seen.
+            pattern_i: Lowercased source pattern text.
+            label: Entity label for the pattern.
+            pos: Part-of-speech tag.
+            data_type: Annotation data type string.
+            weight: Pattern weight.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> patterns, seen = [], set()
+            >>> AnnotationResources._append_ascii_folded_pattern(
+            ...     patterns, seen, "café", "ORG", "NOUN", "named-entity", 1)
+            >>> patterns[0]["pattern"]
+            'cafe'
+        """
         duplicate_id = fold(pattern_i) + "#" + label + "#" + pos
         if duplicate_id in remove_duplicate:
             return
@@ -349,6 +617,29 @@ class AnnotationResources:
         remove_duplicate,
         patterns,
     ):
+        """Normalize and register all patterns from one list resource.
+
+        Args:
+            list_patterns: Raw pattern strings loaded from a list file.
+            list_item: Source list configuration entry.
+            label: Entity label applied to every pattern.
+            pos: Part-of-speech tag.
+            weight: Pattern weight.
+            pattern_exception: Set of raw patterns to skip.
+            concept_type: Parsed concept-type metadata.
+            list_concepts: Parallel concept ids for CSV rows.
+            remove_duplicate: Set of duplicate keys already registered.
+            patterns: Mutable output pattern list.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> patterns, seen = [], set()
+            >>> AnnotationResources._register_list_patterns(
+            ...     ["Acme"], {"type": "named-entity"}, "ORG", "NOUN", 1,
+            ...     set(), {}, [], seen, patterns)
+            >>> patterns[0]["pattern"]
+            'acme'
+        """
         for e_i in range(len(list_patterns)):
             pattern_text = AnnotationResources._pattern_text(
                 list_patterns[e_i]
@@ -389,6 +680,27 @@ class AnnotationResources:
 
     @staticmethod
     def _process_list_item(list_item, basepath, remove_duplicate, patterns):
+        """Load one configured list resource and append its patterns.
+
+        Args:
+            list_item: List resource configuration entry.
+            basepath: Directory containing list files.
+            remove_duplicate: Set of duplicate keys already registered.
+            patterns: Mutable output pattern list.
+
+        Example:
+            >>> import os, tempfile
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     _ = open(os.path.join(td, "items.txt"), "w").write("Acme\\n")
+            ...     patterns, seen = [], set()
+            ...     AnnotationResources._process_list_item(
+            ...         {"path": "items.txt", "label": "ORG",
+            ...          "format": {"type": "list"}},
+            ...         td, seen, patterns)
+            ...     patterns[0]["label"]
+            'ORG'
+        """
         AnnotationResources._download_list_resource(list_item, basepath)
         if "name" in list_item:
             ThotLogger.info("Load '" + list_item["name"] + "'")
@@ -439,6 +751,21 @@ class AnnotationResources:
 
     @staticmethod
     def _maybe_add_punctuated_word(patterns, p_i, words_hash):
+        """Track single-token patterns containing punctuation for later lookup.
+
+        Args:
+            patterns: Pattern list being normalized.
+            p_i: Index of the current pattern in ``patterns``.
+            words_hash: Mutable set of punctuated single-word forms.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> patterns = [{"pattern": "u.s.a."}]
+            >>> words = set()
+            >>> AnnotationResources._maybe_add_punctuated_word(patterns, 0, words)
+            >>> "u.s.a." in words
+            True
+        """
         word_with_punct = set(patterns[p_i]["pattern"]) & set(
             string.punctuation + "0123456789"
         )
@@ -453,6 +780,20 @@ class AnnotationResources:
 
     @staticmethod
     def _hyphen_split_tokens(entity_items, hyphen_letter):
+        """Split hyphenated entity tokens while preserving delimiter tokens.
+
+        Args:
+            entity_items: Whitespace-separated entity token list.
+            hyphen_letter: Delimiter character, ``-`` or ``&``.
+
+        Returns:
+            Lowercased token list with delimiter tokens preserved.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> AnnotationResources._hyphen_split_tokens(["New-York"], "-")
+            ['new', '-', 'york']
+        """
         lower_pattern = []
         for e_i in entity_items:
             if hyphen_letter in e_i:
@@ -467,6 +808,24 @@ class AnnotationResources:
 
     @staticmethod
     def _expand_hyphen_patterns(patterns):
+        """Normalize patterns to token tuples and expand hyphen variants.
+
+        Args:
+            patterns: Mutable pattern dict list with string ``pattern`` keys.
+
+        Returns:
+            Tuple ``(words_hash, delete_pattern)`` for downstream pruning.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> patterns = [{
+            ...     "label": "ORG", "pattern": "New-York", "pos": "NOUN",
+            ...     "data": {"type": "named-entity"}, "weight": 1,
+            ... }]
+            >>> words, deleted = AnnotationResources._expand_hyphen_patterns(patterns)
+            >>> patterns[0]["pattern"]
+            ('New-York',)
+        """
         words_hash = set()
         delete_pattern = set()
         count_patterns = len(patterns)
@@ -506,6 +865,20 @@ class AnnotationResources:
 
     @staticmethod
     def _compute_max_lengths(patterns, words_hash):
+        """Compute maximum pattern and punctuated-word lengths.
+
+        Args:
+            patterns: Normalized pattern dict list with tuple ``pattern`` keys.
+            words_hash: Set of punctuated single-word forms.
+
+        Returns:
+            Tuple ``(max_pattern_length, max_word_len)``.
+
+        Example:
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> AnnotationResources._compute_max_lengths([], {"ab"})[1]
+            2
+        """
         max_pattern_length = 0
         max_word_len = 0
         for pi in patterns:
@@ -518,6 +891,25 @@ class AnnotationResources:
 
     @staticmethod
     def _finalize_and_persist_model(patterns, output):
+        """Prune, build the trie, and pickle the compiled annotation model.
+
+        Args:
+            patterns: Raw pattern dict list collected from list resources.
+            output: Destination pickle path.
+
+        Example:
+            >>> import os, pickle, tempfile
+            >>> from thot.tools.annotation.AnnotationResources import AnnotationResources
+            >>> patterns = [{
+            ...     "label": "ORG", "pattern": "Acme", "pos": "NOUN",
+            ...     "data": {"type": "named-entity"}, "weight": 1,
+            ... }]
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     out = os.path.join(td, "model.pkl")
+            ...     AnnotationResources._finalize_and_persist_model(patterns, out)
+            ...     "trie" in pickle.load(open(out, "rb"))
+            True
+        """
         words_hash, delete_pattern = (
             AnnotationResources._expand_hyphen_patterns(patterns)
         )

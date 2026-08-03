@@ -19,9 +19,31 @@ from thot.governor.models import ApprovalItem
 
 
 class ApprovalQueue:
-    """JSON file queue for human approval workflows."""
+    """JSON file queue for human approval workflows.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.governor.approvals import ApprovalQueue
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     q = ApprovalQueue(Path(td) / "approvals.json")
+        ...     q.list_all()
+        []
+    """
 
     def __init__(self, path: Path) -> None:
+        """Open or create the approvals JSON file.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     p = Path(td) / "approvals.json"
+            ...     q = ApprovalQueue(p)
+            ...     p.is_file()
+            True
+        """
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
@@ -34,20 +56,69 @@ class ApprovalQueue:
                 self._write([])
 
     def _read(self) -> list[ApprovalItem]:
+        """Load all approval items from disk.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     q = ApprovalQueue(Path(td) / "approvals.json")
+            ...     q._read()
+            []
+        """
         raw = json.loads(self.path.read_text(encoding="utf-8"))
         return [ApprovalItem.model_validate(item) for item in raw]
 
     def _write(self, items: list[ApprovalItem]) -> None:
+        """Atomically persist approval items.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     q = ApprovalQueue(Path(td) / "approvals.json")
+            ...     q._write([])
+            ...     q.path.stat().st_size > 0
+            True
+        """
         payload = [item.model_dump(mode="json") for item in items]
         tmp = self.path.with_suffix(".tmp")
         tmp.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         tmp.replace(self.path)
 
     def list_pending(self) -> list[ApprovalItem]:
+        """Return items with status ``pending``.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     q = ApprovalQueue(Path(td) / "approvals.json")
+            ...     _ = q.enqueue(
+            ...         correlation_id="c" * 32, actor_id="u1",
+            ...         intent="ingest", reason="test",
+            ...     )
+            ...     len(q.list_pending())
+            1
+        """
         with self._lock:
             return [item for item in self._read() if item.status == "pending"]
 
     def list_all(self, *, limit: int = 100) -> list[ApprovalItem]:
+        """Return the most recent approval items (up to ``limit``).
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     q = ApprovalQueue(Path(td) / "approvals.json")
+            ...     q.list_all(limit=10)
+            []
+        """
         with self._lock:
             return self._read()[-limit:]
 

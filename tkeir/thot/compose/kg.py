@@ -49,13 +49,44 @@ class SparqlBackend(Protocol):
     """Swappable SPARQL/query backend over a fused graph."""
 
     def set_graph(self, graph: Graph) -> None:
-        """Replace the working graph."""
+        """Replace the working graph.
+
+        Example:
+            >>> from rdflib import Graph
+            >>> from thot.compose.kg import RdflibSparqlBackend
+            >>> be = RdflibSparqlBackend()
+            >>> be.set_graph(Graph())
+            >>> len(be.graph())
+            0
+        """
 
     def query(self, sparql: str) -> list[dict[str, str]]:
-        """Run a SELECT query; return list of binding dicts (str values)."""
+        """Run a SELECT query; return list of binding dicts (str values).
+
+        Example:
+            >>> from rdflib import Graph, URIRef, Literal
+            >>> from rdflib.namespace import RDFS
+            >>> from thot.compose.kg import RdflibSparqlBackend
+            >>> g = Graph()
+            >>> _ = g.add((URIRef("http://ex/A"), RDFS.label, Literal("X")))
+            >>> be = RdflibSparqlBackend()
+            >>> be.set_graph(g)
+            >>> be.query(
+            ...     "SELECT ?label WHERE { ?s <http://www.w3.org/2000/01/rdf-schema#label> ?label }"
+            ... )[0]["label"]
+            'X'
+        """
 
     def graph(self) -> Graph:
-        """Return the underlying rdflib Graph (read-only use)."""
+        """Return the underlying rdflib Graph (read-only use).
+
+        Example:
+            >>> from rdflib import Graph
+            >>> from thot.compose.kg import RdflibSparqlBackend
+            >>> be = RdflibSparqlBackend()
+            >>> isinstance(be.graph(), Graph)
+            True
+        """
 
 
 class RdflibSparqlBackend:
@@ -77,15 +108,55 @@ class RdflibSparqlBackend:
     """
 
     def __init__(self) -> None:
+        """Create an empty rdflib-backed SPARQL store.
+
+        Example:
+            >>> from thot.compose.kg import RdflibSparqlBackend
+            >>> len(RdflibSparqlBackend().graph())
+            0
+        """
         self._graph = Graph()
 
     def set_graph(self, graph: Graph) -> None:
+        """Replace the working graph.
+
+        Example:
+            >>> from rdflib import Graph
+            >>> from thot.compose.kg import RdflibSparqlBackend
+            >>> be = RdflibSparqlBackend()
+            >>> be.set_graph(Graph())
+            >>> len(be.graph())
+            0
+        """
         self._graph = graph
 
     def graph(self) -> Graph:
+        """Return the underlying rdflib Graph.
+
+        Example:
+            >>> from rdflib import Graph
+            >>> from thot.compose.kg import RdflibSparqlBackend
+            >>> isinstance(RdflibSparqlBackend().graph(), Graph)
+            True
+        """
         return self._graph
 
     def query(self, sparql: str) -> list[dict[str, str]]:
+        """Run SPARQL SELECT and normalize bindings to string dicts.
+
+        Example:
+            >>> from rdflib import Graph, URIRef, Literal
+            >>> from rdflib.namespace import RDFS
+            >>> from thot.compose.kg import RdflibSparqlBackend
+            >>> g = Graph()
+            >>> _ = g.add((URIRef("http://ex/A"), RDFS.label, Literal("Acme")))
+            >>> be = RdflibSparqlBackend()
+            >>> be.set_graph(g)
+            >>> be.query(
+            ...     "SELECT ?label WHERE { ?s <http://www.w3.org/2000/01/rdf-schema#label> ?label }"
+            ... )[0]["label"]
+            'Acme'
+        """
         results = self._graph.query(sparql)
         rows: list[dict[str, str]] = []
         vars_ = list(results.vars or [])
@@ -121,12 +192,31 @@ class FusedGraphEntry:
 
 
 def _fingerprint(turtle: str) -> str:
+    """Return a short stable hash for one Turtle payload.
+
+    Example:
+        >>> from thot.compose.kg import _fingerprint
+        >>> len(_fingerprint("@prefix ex: <http://ex/> ."))
+        16
+    """
     import hashlib
 
     return hashlib.sha256(turtle.encode("utf-8")).hexdigest()[:16]
 
 
 def _node_label(graph: Graph, node: Any) -> str:
+    """Resolve a human-readable label for an RDF node.
+
+    Example:
+        >>> from rdflib import Graph, URIRef, Literal
+        >>> from rdflib.namespace import RDFS
+        >>> from thot.compose.kg import _node_label
+        >>> g = Graph()
+        >>> node = URIRef("http://ex/A")
+        >>> _ = g.add((node, RDFS.label, Literal("Acme")))
+        >>> _node_label(g, node)
+        'Acme'
+    """
     if isinstance(node, Literal):
         return str(node)
     label = graph.value(node, RDFS.label)
@@ -139,6 +229,19 @@ def _node_label(graph: Graph, node: Any) -> str:
 
 
 def _local_type(graph: Graph, node: URIRef) -> str:
+    """Return the local name of the first ``tkeir:`` type for ``node``.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tools.search.ontology_utils import TKEIR
+        >>> from thot.compose.kg import _local_type
+        >>> g = Graph()
+        >>> node = URIRef("http://ex/Acme")
+        >>> _ = g.add((node, RDF.type, TKEIR.Company))
+        >>> _local_type(g, node)
+        'Company'
+    """
     for t in graph.objects(node, RDF.type):
         text = str(t)
         if text.startswith(str(TKEIR)):
@@ -176,6 +279,16 @@ class UserSpaceKG:
         backend: SparqlBackend | None = None,
         use_process_cache: bool = True,
     ) -> None:
+        """Bind a fused graph to one tenant ``user_space``.
+
+        Example:
+            >>> from thot.compose.kg import UserSpaceKG
+            >>> kg = UserSpaceKG("alice", use_process_cache=False)
+            >>> kg.user_space
+            'alice'
+            >>> kg.is_empty()
+            True
+        """
         self.user_space = user_space
         self.backend: SparqlBackend = backend or RdflibSparqlBackend()
         self.use_process_cache = use_process_cache
@@ -188,7 +301,13 @@ class UserSpaceKG:
                     self.backend.set_graph(cached.graph)
 
     def is_empty(self) -> bool:
-        """Return whether the working graph has no triples."""
+        """Return whether the working graph has no triples.
+
+        Example:
+            >>> from thot.compose.kg import UserSpaceKG
+            >>> UserSpaceKG("empty", use_process_cache=False).is_empty()
+            True
+        """
         return self._entry is None or len(self._entry.graph) == 0
 
     def load(
@@ -267,7 +386,19 @@ class UserSpaceKG:
         return self.backend.query(query)
 
     def summary(self, topic: str = "", *, max_triples: int = 40) -> str:
-        """Prompt-oriented triple summary."""
+        """Prompt-oriented triple summary.
+
+        Example:
+            >>> from thot.compose.kg import UserSpaceKG
+            >>> turtle = (
+            ...     '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . '
+            ...     '<http://ex/A> rdfs:label "Acme" .'
+            ... )
+            >>> kg = UserSpaceKG("sum", use_process_cache=False)
+            >>> _ = kg.load([turtle])
+            >>> "Acme" in kg.summary("Acme")
+            True
+        """
         if self.is_empty() or self._entry is None:
             return "No structured facts available."
         return summarize_graph_for_prompt(
@@ -280,7 +411,20 @@ class UserSpaceKG:
         label: str | None = None,
         limit: int = 20,
     ) -> list[dict[str, Any]]:
-        """List non-structural entities, optionally filtered by label substring."""
+        """List non-structural entities, optionally filtered by label substring.
+
+        Example:
+            >>> from thot.compose.kg import UserSpaceKG
+            >>> turtle = '''
+            ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            ... @prefix tkeir: <http://tkeir.local/ontology/> .
+            ... <http://ex/Acme> a tkeir:Company ; rdfs:label "Acme" .
+            ... '''
+            >>> kg = UserSpaceKG("ent", use_process_cache=False)
+            >>> _ = kg.load([turtle])
+            >>> kg.find_entities(label="Acme")[0]["label"]
+            'Acme'
+        """
         if self.is_empty() or self._entry is None:
             return []
         graph = self._entry.graph
@@ -316,7 +460,20 @@ class UserSpaceKG:
         return out
 
     def find_keywords(self, *, limit: int = 20) -> list[dict[str, Any]]:
-        """List ``tkeir:Keyword`` nodes with provenance."""
+        """List ``tkeir:Keyword`` nodes with provenance.
+
+        Example:
+            >>> from thot.compose.kg import UserSpaceKG
+            >>> turtle = '''
+            ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            ... @prefix tkeir: <http://tkeir.local/ontology/> .
+            ... <http://ex/kw> a tkeir:Keyword ; rdfs:label "widgets" .
+            ... '''
+            >>> kg = UserSpaceKG("kw", use_process_cache=False)
+            >>> _ = kg.load([turtle])
+            >>> kg.find_keywords()[0]["label"]
+            'widgets'
+        """
         if self.is_empty() or self._entry is None:
             return []
         graph = self._entry.graph
@@ -341,7 +498,22 @@ class UserSpaceKG:
         focus: str | None = None,
         limit: int = 20,
     ) -> list[dict[str, Any]]:
-        """Extract non-structural SVO triples as slot values."""
+        """Extract non-structural SVO triples as slot values.
+
+        Example:
+            >>> from thot.compose.kg import UserSpaceKG
+            >>> turtle = '''
+            ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            ... @prefix tkeir: <http://tkeir.local/ontology/> .
+            ... <http://ex/Acme> a tkeir:Company ; rdfs:label "Acme" ;
+            ...   tkeir:createdBy <http://ex/Widget> .
+            ... <http://ex/Widget> a tkeir:Product ; rdfs:label "Widget" .
+            ... '''
+            >>> kg = UserSpaceKG("svo", use_process_cache=False)
+            >>> _ = kg.load([turtle])
+            >>> "Acme" in kg.find_svo(focus="Acme")[0]["triple"]
+            True
+        """
         if self.is_empty() or self._entry is None:
             return []
         graph = self._entry.graph
@@ -396,7 +568,22 @@ class UserSpaceKG:
         return out
 
     def chunk_ids_for_node(self, node: Any) -> list[str]:
-        """Resolve DocumentChunk labels linked via mention / statement incidence."""
+        """Resolve DocumentChunk labels linked via mention / statement incidence.
+
+        Example:
+            >>> from thot.compose.kg import UserSpaceKG
+            >>> turtle = '''
+            ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+            ... @prefix tkeir: <http://tkeir.local/ontology/> .
+            ... <http://ex/c> a tkeir:DocumentChunk ; rdfs:label "chunk-1" ;
+            ...   tkeir:hasMention <http://ex/Acme> .
+            ... <http://ex/Acme> a tkeir:Company ; rdfs:label "Acme" .
+            ... '''
+            >>> kg = UserSpaceKG("chunk", use_process_cache=False)
+            >>> _ = kg.load([turtle])
+            >>> kg.chunk_ids_for_node("http://ex/Acme")
+            ['chunk-1']
+        """
         if self.is_empty() or self._entry is None:
             return []
         if not isinstance(node, (URIRef, str)):
@@ -435,7 +622,15 @@ class UserSpaceKG:
         return sorted(chunks)
 
     def document_ids_for_node(self, node: Any) -> list[str]:
-        """Best-effort document ids from URI path or cached load list."""
+        """Best-effort document ids from URI path or cached load list.
+
+        Example:
+            >>> from thot.compose.kg import UserSpaceKG
+            >>> kg = UserSpaceKG("doc", use_process_cache=False)
+            >>> _ = kg.load(["@prefix ex: <http://ex/> . ex:A a ex:T ."], document_ids=["doc-a"])
+            >>> kg.document_ids_for_node("http://tkeir.local/doc/doc-a/chunk/1")
+            ['doc-a']
+        """
         if self._entry is None:
             return []
         text = str(node)

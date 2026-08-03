@@ -62,6 +62,7 @@ ACTIVE_TESTS=(
     unittests/TestOkfServer.py
     unittests/TestOkfExtra.py
     unittests/okf/test_iterative_wiki.py
+    unittests/agent/test_agent_paths.py
     functional_tests/TestPipeline.py
     functional_tests/TestOkfWorkflow.py
 )

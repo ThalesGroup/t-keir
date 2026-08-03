@@ -22,6 +22,16 @@ ADMIN_SCOPE = "intent:admin.override"
 
 
 def _decode_jwt_payload(token: str) -> dict[str, Any]:
+    """Decode JWT payload segment without signature verification.
+
+    Example:
+        >>> import base64, json
+        >>> from thot.governor.auth import _decode_jwt_payload
+        >>> payload = {"sub": "u1", "scope": "intent:admin.override"}
+        >>> body = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+        >>> _decode_jwt_payload(f"hdr.{body}.sig")["sub"]
+        'u1'
+    """
     parts = token.split(".")
     if len(parts) < 2:
         raise ValueError("invalid jwt")
@@ -35,6 +45,13 @@ def _decode_jwt_payload(token: str) -> dict[str, Any]:
 
 
 def _token_has_admin_scope(payload: dict[str, Any]) -> bool:
+    """Return True when payload carries governor admin scope.
+
+    Example:
+        >>> from thot.governor.auth import _token_has_admin_scope
+        >>> _token_has_admin_scope({"scope": "intent:admin.override read"})
+        True
+    """
     scope = payload.get("scope")
     if isinstance(scope, str) and ADMIN_SCOPE in scope.split():
         return True
@@ -53,7 +70,13 @@ def _token_has_admin_scope(payload: dict[str, Any]) -> bool:
 
 
 def extract_bearer_payload(authorization: str | None) -> dict[str, Any] | None:
-    """Return decoded JWT payload when a bearer token is present."""
+    """Return decoded JWT payload when a bearer token is present.
+
+    Example:
+        >>> from thot.governor.auth import extract_bearer_payload
+        >>> extract_bearer_payload(None) is None
+        True
+    """
     if not authorization or not authorization.startswith("Bearer "):
         return None
     token = authorization.removeprefix("Bearer ").strip()
@@ -67,7 +90,15 @@ def extract_bearer_payload(authorization: str | None) -> dict[str, Any] | None:
 
 
 def verify_admin_authorization(authorization: str | None) -> str:
-    """Validate bearer token for governor admin operations."""
+    """Validate bearer token for governor admin operations.
+
+    Example:
+        >>> from thot.governor.config import governor_settings
+        >>> from thot.governor.auth import verify_admin_authorization
+        >>> governor_settings.cache_clear()
+        >>> verify_admin_authorization(None)
+        'anonymous'
+    """
     settings = governor_settings()
     if not settings.auth_enabled:
         return "anonymous"
@@ -92,5 +123,12 @@ def verify_admin_authorization(authorization: str | None) -> str:
 async def require_admin_auth(
     authorization: str | None = Header(default=None),
 ) -> str:
-    """FastAPI dependency for governor admin endpoints."""
+    """FastAPI dependency for governor admin endpoints.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.auth import require_admin_auth
+        >>> inspect.iscoroutinefunction(require_admin_auth)
+        True
+    """
     return verify_admin_authorization(authorization)

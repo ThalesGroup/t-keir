@@ -36,6 +36,12 @@ _FRONTMATTER_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n?", re.DOTALL)
 def parse_concept_file(text: str) -> tuple[dict[str, Any], str]:
     """Split YAML frontmatter and Markdown body.
 
+    Args:
+        text: Full concept file contents.
+
+    Returns:
+        Tuple of frontmatter dict and markdown body.
+
     Example:
         >>> fm, body = parse_concept_file('---\\ntype: Document\\n---\\n\\n# Hi\\n')
         >>> fm['type']
@@ -58,7 +64,21 @@ def parse_concept_file(text: str) -> tuple[dict[str, Any], str]:
 
 
 def render_concept_file(frontmatter: dict[str, Any], body: str) -> str:
-    """Serialize frontmatter + body to an OKF concept file."""
+    """Serialize frontmatter + body to an OKF concept file.
+
+    Args:
+        frontmatter: YAML frontmatter fields.
+        body: Markdown body after the closing ``---``.
+
+    Returns:
+        Full concept file text with YAML frontmatter block.
+
+    Example:
+        >>> from thot.okf.applicator import render_concept_file
+        >>> out = render_concept_file({"type": "Document"}, "# Hi\\n")
+        >>> '---' in out and '# Hi' in out
+        True
+    """
     dumped = yaml.safe_dump(
         frontmatter,
         sort_keys=False,
@@ -77,6 +97,33 @@ def enrichments_from_grounded(
 
     AgentLoop keeps ``claim`` + ``chunk_ids`` only; the curator embeds the full
     enrichment payload as JSON in ``notes`` (or ``notes.enrichments``).
+
+    Args:
+        result: Researcher grounded findings, when available.
+        raw_notes: Optional notes override (JSON or plain text).
+
+    Returns:
+        Parsed or synthesized ``OkfEnrichment`` payload.
+
+    Example:
+        >>> import json
+        >>> from thot.agent.models import GroundedFinding, GroundedFindings
+        >>> from thot.okf.applicator import enrichments_from_grounded
+        >>> notes = json.dumps(
+        ...     {"schema": "okf_enrichment_v1", "findings": [], "unfilled": []}
+        ... )
+        >>> e = enrichments_from_grounded(None, raw_notes=notes)
+        >>> e.schema_
+        'okf_enrichment_v1'
+        >>> gf = GroundedFindings(
+        ...     findings=[
+        ...         GroundedFinding(
+        ...             claim="x", document_ids=["okf:foo"], chunk_ids=["c1"]
+        ...         )
+        ...     ]
+        ... )
+        >>> enrichments_from_grounded(gf).findings[0].concept_id
+        'foo'
     """
     notes = (
         raw_notes
@@ -135,12 +182,48 @@ class OkfEnrichmentApplicator:
     """Mutate concept Markdown files with curator enrichments.
 
     Never overwrites ``tkeir_*`` frontmatter keys.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.applicator import OkfEnrichmentApplicator
+        >>> applicator = OkfEnrichmentApplicator(tempfile.mkdtemp())
+        >>> applicator.root.is_dir()
+        True
     """
 
     def __init__(self, bundle_root: Path | str) -> None:
+        """Bind the applicator to one OKF bundle directory.
+
+        Args:
+            bundle_root: Root path of the bundle on disk.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.applicator import OkfEnrichmentApplicator
+            >>> td = tempfile.mkdtemp()
+            >>> OkfEnrichmentApplicator(td).root == Path(td)
+            True
+        """
         self.root = Path(bundle_root)
 
     def _concept_path(self, concept_id: str) -> Path:
+        """Resolve a concept id to an on-disk ``.md`` path under the bundle.
+
+        Args:
+            concept_id: Relative concept path (with or without ``.md``).
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.applicator import OkfEnrichmentApplicator
+            >>> td = tempfile.mkdtemp()
+            >>> applicator = OkfEnrichmentApplicator(td)
+            >>> _ = (Path(td) / "foo.md").write_text("# foo\\n")
+            >>> applicator._concept_path("foo") == Path(td) / "foo.md"
+            True
+        """
         rel = concept_id[:-3] if concept_id.endswith(".md") else concept_id
         candidate = self.root / f"{rel}.md"
         if candidate.is_file():
@@ -152,7 +235,35 @@ class OkfEnrichmentApplicator:
         return candidate
 
     def apply_one(self, finding: OkfEnrichmentFinding) -> bool:
-        """Apply one finding; return True when a file was updated."""
+        """Apply one finding; return True when a file was updated.
+
+        Args:
+            finding: One curator enrichment finding.
+
+        Returns:
+            ``True`` when the concept file existed and was rewritten.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.applicator import OkfEnrichmentApplicator
+            >>> from thot.okf.models import OkfEnrichmentFinding, OkfEnrichmentPayload
+            >>> td = tempfile.mkdtemp()
+            >>> applicator = OkfEnrichmentApplicator(td)
+            >>> _ = (Path(td) / "foo.md").write_text(
+            ...     "---\\ntype: Document\\n---\\n\\n# Foo\\n"
+            ... )
+            >>> finding = OkfEnrichmentFinding(
+            ...     concept_id="foo",
+            ...     claim="summary",
+            ...     chunk_ids=["c1"],
+            ...     enrichments=OkfEnrichmentPayload(
+            ...         description="desc", tags=["t1"]
+            ...     ),
+            ... )
+            >>> applicator.apply_one(finding)
+            True
+        """
         path = self._concept_path(finding.concept_id)
         if not path.is_file():
             LOGGER.info(
@@ -195,7 +306,38 @@ class OkfEnrichmentApplicator:
         return True
 
     def apply(self, enrichment: OkfEnrichment) -> dict[str, Any]:
-        """Apply all findings; return summary counts."""
+        """Apply all findings; return summary counts.
+
+        Args:
+            enrichment: Full curator enrichment payload.
+
+        Returns:
+            Dict with ``applied``, ``missing``, and ``unfilled`` keys.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.applicator import OkfEnrichmentApplicator
+            >>> from thot.okf.models import (
+            ...     OkfEnrichment,
+            ...     OkfEnrichmentFinding,
+            ...     OkfEnrichmentPayload,
+            ... )
+            >>> td = tempfile.mkdtemp()
+            >>> applicator = OkfEnrichmentApplicator(td)
+            >>> _ = (Path(td) / "bar.md").write_text(
+            ...     "---\\ntype: Document\\n---\\n\\n# Bar\\n"
+            ... )
+            >>> finding = OkfEnrichmentFinding(
+            ...     concept_id="bar",
+            ...     claim="claim",
+            ...     chunk_ids=["c1"],
+            ...     enrichments=OkfEnrichmentPayload(description="d"),
+            ... )
+            >>> result = applicator.apply(OkfEnrichment(findings=[finding]))
+            >>> result["applied"]
+            1
+        """
         applied = 0
         missing: list[str] = []
         for finding in enrichment.findings:

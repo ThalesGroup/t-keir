@@ -54,7 +54,14 @@ OWL_NS = "http://www.w3.org/2002/07/owl#"
 
 
 def _iri_ref(iri: str) -> URIRef:
-    return URIRef(str(iri).strip())
+    """Wrap a string as an ``rdflib.URIRef``.
+
+    Example:
+        >>> from thot.tools.search.ontology_reasoner import _iri_ref
+        >>> str(_iri_ref("http://example.org/A"))
+        'http://example.org/A'
+    """
+    return URIRef(iri)
 
 
 def _init_result_set_graph(
@@ -64,7 +71,14 @@ def _init_result_set_graph(
     backend: str = "",
     reasoner: str = "",
 ) -> tuple[Graph, URIRef]:
-    """Build an empty result-set graph with metadata triples."""
+    """Build an empty result-set graph with metadata triples.
+
+    Example:
+        >>> from thot.tools.search.ontology_reasoner import _init_result_set_graph
+        >>> graph, result_set = _init_result_set_graph("sparql", hit_count=0)
+        >>> len(graph) > 0
+        True
+    """
     graph = Graph()
     graph.bind("rdfs", RDFS)
     graph.bind("owl", OWL)
@@ -112,7 +126,18 @@ def _add_focus_nodes(
     class_iri: str | None,
     individual_iri: str | None,
 ) -> tuple[URIRef | None, URIRef | None]:
-    """Attach focus class / individual nodes to the result set."""
+    """Attach focus class / individual nodes to the result set.
+
+    Example:
+        >>> from rdflib import Graph
+        >>> from thot.tools.search.ontology_reasoner import _add_focus_nodes, _init_result_set_graph
+        >>> graph, result_set = _init_result_set_graph("subclasses", hit_count=0)
+        >>> cls, _ = _add_focus_nodes(
+        ...     graph, result_set, class_iri="http://ex/A", individual_iri=None
+        ... )
+        >>> str(cls).endswith("/A")
+        True
+    """
     focus_class = _iri_ref(class_iri) if class_iri else None
     focus_ind = _iri_ref(individual_iri) if individual_iri else None
     if focus_class is not None:
@@ -140,7 +165,27 @@ def _add_iri_hit(
     focus_class: URIRef | None,
     focus_ind: URIRef | None,
 ) -> None:
-    """Add a typed IRI hit linked to the result set."""
+    """Add a typed IRI hit linked to the result set.
+
+    Example:
+        >>> from rdflib import Graph
+        >>> from thot.tools.search.ontology_reasoner import (
+        ...     _add_iri_hit,
+        ...     _init_result_set_graph,
+        ... )
+        >>> graph, result_set = _init_result_set_graph("subclasses", hit_count=1)
+        >>> _add_iri_hit(
+        ...     graph,
+        ...     result_set,
+        ...     operation="subclasses",
+        ...     iri="http://ex/B",
+        ...     label="B",
+        ...     focus_class=None,
+        ...     focus_ind=None,
+        ... )
+        >>> len(graph) > 1
+        True
+    """
     node = _iri_ref(iri)
     if operation in {"subclasses", "superclasses"}:
         graph.add((node, RDF.type, OWL.Class))
@@ -171,7 +216,26 @@ def _add_spo_binding(
     predicate: str,
     obj: str,
 ) -> None:
-    """Add a compact SPO triple from SPARQL / generic bindings."""
+    """Add a compact SPO triple from SPARQL / generic bindings.
+
+    Example:
+        >>> from rdflib import Graph
+        >>> from thot.tools.search.ontology_reasoner import (
+        ...     _add_spo_binding,
+        ...     _init_result_set_graph,
+        ... )
+        >>> graph, result_set = _init_result_set_graph("sparql", hit_count=1)
+        >>> _add_spo_binding(
+        ...     graph,
+        ...     result_set,
+        ...     index=0,
+        ...     subject="Alice",
+        ...     predicate="http://ex/worksAt",
+        ...     obj="Acme",
+        ... )
+        >>> len(graph) > 1
+        True
+    """
     s_node = (
         _iri_ref(subject)
         if subject.startswith("http")
@@ -201,7 +265,21 @@ def _add_binding_row_fallback(
     index: int,
     row: dict[str, str],
 ) -> None:
-    """Fallback: one blank Binding node per tabular row."""
+    """Fallback: one blank Binding node per tabular row.
+
+    Example:
+        >>> from rdflib import Graph
+        >>> from thot.tools.search.ontology_reasoner import (
+        ...     _add_binding_row_fallback,
+        ...     _init_result_set_graph,
+        ... )
+        >>> graph, result_set = _init_result_set_graph("sparql", hit_count=1)
+        >>> _add_binding_row_fallback(
+        ...     graph, result_set, index=0, row={"x": "1"}
+        ... )
+        >>> len(graph) > 1
+        True
+    """
     blank = URIRef(f"{TKEIR_REASON}row/{index}")
     graph.add((blank, RDF.type, URIRef(f"{TKEIR_REASON}Binding")))
     for key, value in row.items():
@@ -330,7 +408,13 @@ def normalize_reasoner_name(reasoner: str | None) -> str:
 
 
 def _load_graph(payload: str) -> Graph:
-    """Parse a single JSON-LD / Turtle payload into an rdflib graph."""
+    """Parse a single JSON-LD / Turtle payload into an rdflib graph.
+
+    Example:
+        >>> from thot.tools.search.ontology_reasoner import _load_graph
+        >>> len(_load_graph('[{"@id": "http://example.org/A"}]'))
+        0
+    """
     text = (payload or "").strip()
     if not text or text == "[]":
         return Graph()
@@ -338,6 +422,13 @@ def _load_graph(payload: str) -> Graph:
 
 
 def _local_name(uri: str) -> str:
+    """Return the fragment or last path segment of an IRI.
+
+    Example:
+        >>> from thot.tools.search.ontology_reasoner import _local_name
+        >>> _local_name("http://example.org/Person#Alice")
+        'Alice'
+    """
     text = str(uri)
     if "#" in text:
         return text.rsplit("#", 1)[-1]
@@ -352,7 +443,21 @@ def _rdfs_related_classes(
     direct: bool,
     limit: int,
 ) -> list[dict[str, str]]:
-    """Walk ``rdfs:subClassOf`` without a DL reasoner."""
+    """Walk ``rdfs:subClassOf`` without a DL reasoner.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDFS
+        >>> from thot.tools.search.ontology_reasoner import _rdfs_related_classes
+        >>> graph = Graph()
+        >>> parent = URIRef("http://ex/Animal")
+        >>> child = URIRef("http://ex/Dog")
+        >>> _ = graph.add((child, RDFS.subClassOf, parent))
+        >>> _rdfs_related_classes(
+        ...     graph, "http://ex/Animal", direction="sub", direct=True, limit=5
+        ... )[0]["label"]
+        'Dog'
+    """
     target = URIRef(class_iri)
     found: list[URIRef] = []
     if direction == "sub":
@@ -401,7 +506,22 @@ def _sparql_select(
     *,
     limit: int,
 ) -> list[dict[str, str]]:
-    """Run a SPARQL SELECT and return row dicts (string values)."""
+    """Run a SPARQL SELECT and return row dicts (string values).
+
+    Example:
+        >>> from rdflib import Graph, Literal, URIRef
+        >>> from thot.tools.search.ontology_reasoner import _sparql_select
+        >>> graph = Graph()
+        >>> alice = URIRef("http://ex/Alice")
+        >>> _ = graph.add((alice, URIRef("http://ex/name"), Literal("Alice")))
+        >>> rows = _sparql_select(
+        ...     graph,
+        ...     "SELECT ?s WHERE { ?s <http://ex/name> ?o }",
+        ...     limit=5,
+        ... )
+        >>> len(rows) >= 1
+        True
+    """
     capped = query.strip().rstrip(";")
     if "LIMIT" not in capped.upper():
         capped = f"{capped}\nLIMIT {max(1, limit)}"
@@ -424,6 +544,19 @@ def _sparql_select(
 def _instances_python(
     graph: Graph, class_iri: str, *, limit: int
 ) -> list[dict[str, str]]:
+    """List named individuals of a class via ``rdf:type``.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tools.search.ontology_reasoner import _instances_python
+        >>> graph = Graph()
+        >>> cls = URIRef("http://ex/Person")
+        >>> alice = URIRef("http://ex/Alice")
+        >>> _ = graph.add((alice, RDF.type, cls))
+        >>> _instances_python(graph, "http://ex/Person", limit=5)[0]["label"]
+        'Alice'
+    """
     cls = URIRef(class_iri)
     out: list[dict[str, str]] = []
     for subject in graph.subjects(RDF.type, cls):
@@ -438,6 +571,19 @@ def _instances_python(
 def _types_python(
     graph: Graph, individual_iri: str, *, limit: int
 ) -> list[dict[str, str]]:
+    """List ``rdf:type`` classes for one individual.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tools.search.ontology_reasoner import _types_python
+        >>> graph = Graph()
+        >>> alice = URIRef("http://ex/Alice")
+        >>> person = URIRef("http://ex/Person")
+        >>> _ = graph.add((alice, RDF.type, person))
+        >>> _types_python(graph, "http://ex/Alice", limit=5)[0]["label"]
+        'Person'
+    """
     ind = URIRef(individual_iri)
     out: list[dict[str, str]] = []
     for obj in graph.objects(ind, RDF.type):
@@ -460,7 +606,23 @@ def _query_with_python(
     direct: bool,
     limit: int,
 ) -> dict[str, Any]:
-    """Single pure-Python reasoner (coherence + hierarchy + expressions)."""
+    """Single pure-Python reasoner (coherence + hierarchy + expressions).
+
+    Example:
+        >>> from rdflib import Graph
+        >>> from thot.tools.search.ontology_reasoner import _query_with_python
+        >>> result = _query_with_python(
+        ...     Graph(),
+        ...     operation="consistency",
+        ...     class_iri=None,
+        ...     individual_iri=None,
+        ...     sparql=None,
+        ...     direct=False,
+        ...     limit=5,
+        ... )
+        >>> result["operation"]
+        'consistency'
+    """
     from thot.tools.search.python_reasoner import (
         check_coherence,
         evaluate_expression,
@@ -581,6 +743,12 @@ def query_merged_ontology(
 
     Returns:
         Dict with ``operation``, ``backend``, ``reasoner``, ``results``.
+
+    Example:
+        >>> from thot.tools.search.ontology_reasoner import query_merged_ontology
+        >>> result = query_merged_ontology("[]", operation="consistency")
+        >>> result["operation"]
+        'consistency'
     """
     op = str(operation).strip().lower()
     if op not in SUPPORTED_OPERATIONS:

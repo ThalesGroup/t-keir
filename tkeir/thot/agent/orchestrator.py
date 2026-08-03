@@ -58,7 +58,21 @@ _WIKI_EXCERPT_MAX = 100_000
 
 
 def _format_exc(exc: BaseException) -> str:
-    """Human-readable exception text (httpx timeouts often have empty str())."""
+    """Human-readable exception text (httpx timeouts often have empty str()).
+
+    Args:
+        exc: Exception to stringify.
+
+    Returns:
+        ``TypeName: message`` or type-only when ``str(exc)`` is empty.
+
+    Example:
+        >>> from thot.agent.orchestrator import _format_exc
+        >>> _format_exc(ValueError("bad"))
+        'ValueError: bad'
+        >>> _format_exc(TimeoutError())
+        'TimeoutError'
+    """
     msg = str(exc).strip()
     if msg:
         return f"{type(exc).__name__}: {msg}"
@@ -72,7 +86,19 @@ def _format_exc(exc: BaseException) -> str:
 
 
 def _orchestrator_cfg(params: dict[str, Any] | None = None):
-    """Resolve usecase orchestrator config (OSINT / enterprise / …)."""
+    """Resolve usecase orchestrator config (OSINT / enterprise / …).
+
+    Args:
+        params: Run params; ``usecase`` / ``dataset`` selects the pack.
+
+    Returns:
+        :class:`~thot.agent.orchestrator_config.OrchestratorConfig` for the pack.
+
+    Example:
+        >>> from thot.agent.orchestrator import _orchestrator_cfg
+        >>> _orchestrator_cfg({"usecase": "osint"}).default_report_form
+        'intsum'
+    """
     from thot.agent.orchestrator_config import get_orchestrator_config
 
     params = params or {}
@@ -86,11 +112,40 @@ def _orchestrator_cfg(params: dict[str, Any] | None = None):
 
 
 def _truthy(value: Any) -> bool:
+    """Return whether a workflow param value is truthy.
+
+    Args:
+        value: Raw param (string, number, or ``None``).
+
+    Returns:
+        ``True`` when normalized value is ``1``, ``true``, ``yes``, or ``on``.
+
+    Example:
+        >>> from thot.agent.orchestrator import _truthy
+        >>> _truthy("yes")
+        True
+        >>> _truthy("0")
+        False
+    """
     return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _format_goal(template: str, *, goal: str, params: dict[str, Any]) -> str:
-    """Substitute ``{placeholders}`` without interpreting braces inside values."""
+    """Substitute ``{placeholders}`` without interpreting braces inside values.
+
+    Args:
+        template: Goal template with ``{key}`` placeholders.
+        goal: Primary run goal (always available as ``{goal}``).
+        params: Extra substitution context.
+
+    Returns:
+        Formatted goal string.
+
+    Example:
+        >>> from thot.agent.orchestrator import _format_goal
+        >>> _format_goal("Research {topic}", goal="g", params={"topic": "AI"})
+        'Research AI'
+    """
     ctx: dict[str, Any] = {"goal": goal, **params}
     out = template
     for key in sorted(ctx.keys(), key=len, reverse=True):
@@ -103,6 +158,20 @@ def _format_goal(template: str, *, goal: str, params: dict[str, Any]) -> str:
 
 
 def _load_wiki_markdown(user_space: str, bundle_id: str) -> str:
+    """Load ``wiki.md`` from OKF for ``bundle_id``; empty when id is missing.
+
+    Args:
+        user_space: Tenant streaming group.
+        bundle_id: OKF bundle identifier.
+
+    Returns:
+        Wiki markdown text, or ``""`` when unavailable.
+
+    Example:
+        >>> from thot.agent.orchestrator import _load_wiki_markdown
+        >>> _load_wiki_markdown("dev@tkeir", "")
+        ''
+    """
     bid = (bundle_id or "").strip()
     if not bid:
         return ""
@@ -121,6 +190,17 @@ def _seed_wiki_params(state: RunState) -> None:
 
     Prefer explicit ``wiki_markdown`` from the HMI (edited Phase-2 wiki).
     Else, when ``use_existing_wiki`` is set, load ``wiki.md`` from ``bundle_id``.
+
+    Args:
+        state: Run state whose ``params`` are updated in place.
+
+    Example:
+        >>> from thot.agent.models import RunState
+        >>> from thot.agent.orchestrator import _seed_wiki_params
+        >>> state = RunState(goal="g", params={"wiki_markdown": "# Wiki"})
+        >>> _seed_wiki_params(state)
+        >>> state.params["has_llm_wiki"]
+        'true'
     """
     params = dict(state.params or {})
     wiki = str(params.get("wiki_markdown") or "").strip()
@@ -152,6 +232,26 @@ def _seed_wiki_params(state: RunState) -> None:
 
 
 def _chunk_ids_from_state(state: RunState) -> list[str]:
+    """Collect unique chunk ids from grounded findings on ``state``.
+
+    Args:
+        state: Run state with optional ``result`` findings.
+
+    Returns:
+        Sorted unique chunk id strings (empty when no findings).
+
+    Example:
+        >>> from thot.agent.models import GroundedFinding, GroundedFindings, RunState
+        >>> from thot.agent.orchestrator import _chunk_ids_from_state
+        >>> state = RunState(
+        ...     goal="g",
+        ...     result=GroundedFindings(
+        ...         findings=[GroundedFinding(claim="c", chunk_ids=["b", "a"])]
+        ...     ),
+        ... )
+        >>> _chunk_ids_from_state(state)
+        ['a', 'b']
+    """
     if state.result is None:
         return []
     out: list[str] = []
@@ -161,6 +261,24 @@ def _chunk_ids_from_state(state: RunState) -> list[str]:
 
 
 def _prior_findings_json(state: RunState) -> str:
+    """Serialize prior grounded findings for goal templates.
+
+    Args:
+        state: Run state with optional ``result`` findings.
+
+    Returns:
+        JSON array string, or ``"[]"`` when empty or on serialization error.
+
+    Example:
+        >>> from thot.agent.models import GroundedFinding, GroundedFindings, RunState
+        >>> from thot.agent.orchestrator import _prior_findings_json
+        >>> state = RunState(goal="g")
+        >>> _prior_findings_json(state)
+        '[]'
+        >>> state.result = GroundedFindings(findings=[GroundedFinding(claim="x")])
+        >>> '"claim": "x"' in _prior_findings_json(state)
+        True
+    """
     if state.result is None:
         return "[]"
     try:
@@ -176,7 +294,33 @@ def _compose_payloads_for_state(
     state: RunState,
     store: RunStore,
 ) -> tuple[list[str], list[str], str, list[str], list[str]]:
-    """Build KG turtles + findings prose from the run (never demo fixtures)."""
+    """Build KG turtles + findings prose from the run (never demo fixtures).
+
+    Args:
+        state: Run state with optional findings and params.
+        store: Run store for step observations.
+
+    Returns:
+        Tuple of turtles, document ids, findings prose, chunk ids, doc ids.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.agent.models import GroundedFinding, GroundedFindings, RunState
+        >>> from thot.agent.orchestrator import _compose_payloads_for_state
+        >>> from thot.agent.runs import RunStore
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     store = RunStore(Path(td))
+        ...     state = RunState(
+        ...         goal="summarize",
+        ...         result=GroundedFindings(
+        ...             findings=[GroundedFinding(claim="fact", chunk_ids=["c1"])]
+        ...         ),
+        ...     )
+        ...     _, _, _, chunks, _ = _compose_payloads_for_state(state, store)
+        ...     "c1" in chunks
+        True
+    """
     turtles: list[str] = []
     document_ids: list[str] = []
 
@@ -214,7 +358,19 @@ def _compose_payloads_for_state(
 
 
 def _sync_params_after_agent(state: RunState) -> None:
-    """Expose findings + defaults so later goal_templates can format them."""
+    """Expose findings + defaults so later goal_templates can format them.
+
+    Args:
+        state: Run state whose ``params`` are updated in place.
+
+    Example:
+        >>> from thot.agent.models import RunState
+        >>> from thot.agent.orchestrator import _sync_params_after_agent
+        >>> state = RunState(goal="g")
+        >>> _sync_params_after_agent(state)
+        >>> "prior_findings_json" in state.params
+        True
+    """
     params = dict(state.params or {})
     cfg = _orchestrator_cfg(params)
     params.setdefault("report_form", cfg.default_report_form)
@@ -250,6 +406,31 @@ class Orchestrator:
         outbound: OutboundMcpClient | None = None,
         handlers: McpHandlers | None = None,
     ) -> None:
+        """Wire run store, guard, LLM, and optional MCP handlers.
+
+        Args:
+            store: Filesystem run store.
+            guard: Agent safety / audit guard.
+            llm: LLM client for agent and wiki steps.
+            outbound: Optional outbound MCP client (defaults when omitted).
+            handlers: Optional in-process MCP tool handlers.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> from thot.agent.runs import RunStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     orch = Orchestrator(
+            ...         store=RunStore(root),
+            ...         guard=AgentGuard(root / "gov"),
+            ...         llm=object(),
+            ...     )
+            ...     orch.handlers is None
+            True
+        """
         self.store = store
         self.guard = guard
         self.llm = llm
@@ -378,6 +559,14 @@ class Orchestrator:
         *,
         previous_agent: str,
     ) -> RunState:
+        """Execute one builtin workflow step (OKF export / iterative wiki).
+
+        Example:
+            >>> import inspect
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> inspect.iscoroutinefunction(Orchestrator._run_builtin_step)
+            True
+        """
         assert wf_step.builtin is not None
         handoff = Handoff(
             from_agent=previous_agent,
@@ -429,7 +618,34 @@ class Orchestrator:
         return state
 
     def _bundle_root(self, state: RunState, bundle_id: str) -> Path | None:
-        """Resolve OKF bundle directory for ``bundle_id``."""
+        """Resolve OKF bundle directory for ``bundle_id``.
+
+        Args:
+            state: Run state (provides ``user_space``).
+            bundle_id: OKF bundle identifier.
+
+        Returns:
+            Existing bundle directory, or ``None`` when not found.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.models import RunState
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> from thot.agent.runs import RunStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     orch = Orchestrator(
+            ...         store=RunStore(root),
+            ...         guard=AgentGuard(root / "gov"),
+            ...         llm=object(),
+            ...     )
+            ...     orch._bundle_root(
+            ...         RunState(goal="g", user_space="dev@tkeir"), "missing"
+            ...     ) is None
+            True
+        """
         bid = (bundle_id or "").strip()
         if not bid:
             return None
@@ -442,7 +658,36 @@ class Orchestrator:
         return None
 
     def _fail_builtin(self, state: RunState, *, error: str) -> RunState:
-        """Mark a builtin step failed and persist."""
+        """Mark a builtin step failed and persist.
+
+        Args:
+            state: Run state to update.
+            error: Failure message stored on ``state.error``.
+
+        Returns:
+            Updated run state with ``status`` ``failed``.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.models import RunState
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> from thot.agent.runs import RunStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     store = RunStore(root)
+            ...     orch = Orchestrator(
+            ...         store=store,
+            ...         guard=AgentGuard(root / "gov"),
+            ...         llm=object(),
+            ...     )
+            ...     out = orch._fail_builtin(
+            ...         RunState(goal="g"), error="boom"
+            ...     )
+            ...     out.status
+            'failed'
+        """
         state.status = "failed"
         state.error = error
         state.ended_at = utc_now_rfc3339()
@@ -453,7 +698,28 @@ class Orchestrator:
     def _wiki_chunks_for_bundle(
         params: dict[str, Any], root: Path
     ) -> list[dict[str, str]]:
-        """Prefer HMI grab/search chunks; else load bundle evidence_chunks.json."""
+        """Prefer HMI grab/search chunks; else load bundle evidence_chunks.json.
+
+        Args:
+            params: Run params that may contain ``grab_chunks`` / ``chunks``.
+            root: OKF bundle directory for persisted evidence.
+
+        Returns:
+            List of evidence chunk dicts with ``chunk_id`` and ``text_raw``.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     chunks = Orchestrator._wiki_chunks_for_bundle(
+            ...         {"grab_chunks": [{"chunk_id": "c1", "text_raw": "hi"}]},
+            ...         root,
+            ...     )
+            ...     chunks[0]["chunk_id"]
+            'c1'
+        """
         from thot.okf.iterative_wiki import (
             chunks_from_params,
             load_evidence_chunks,
@@ -475,7 +741,33 @@ class Orchestrator:
         wiki_cfg: dict[str, Any],
         store: Any,
     ) -> str:
-        """Return existing wiki or a persona/OKF seed skeleton."""
+        """Return existing wiki or a persona/OKF seed skeleton.
+
+        Args:
+            bundle_id: OKF bundle identifier.
+            user_space: Tenant streaming group.
+            query: Analyst query for the seed title.
+            wiki_cfg: Persona wiki config (``structured_facts_seed``).
+            store: OKF bundle store.
+
+        Returns:
+            Wiki markdown (existing or freshly seeded).
+
+        Example:
+            >>> import tempfile
+            >>> from thot.okf.store import OkfBundleStore
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> store = OkfBundleStore(root=tempfile.mkdtemp())
+            >>> wiki = Orchestrator._seed_or_load_wiki(
+            ...     bundle_id="b1",
+            ...     user_space="dev@tkeir",
+            ...     query="topic",
+            ...     wiki_cfg={"structured_facts_seed": ""},
+            ...     store=store,
+            ... )
+            >>> wiki.startswith("---")
+            True
+        """
         from thot.okf.iterative_wiki import seed_iterative_wiki
 
         try:
@@ -502,7 +794,30 @@ class Orchestrator:
         path: Any,
         prompt_name: str,
     ) -> Any:
-        """Build GroundedFindings from folded evidence chunks."""
+        """Build GroundedFindings from folded evidence chunks.
+
+        Args:
+            chunks: Evidence chunk dicts from grab/search or OKF bundle.
+            max_chunks: Maximum chunks to fold into findings.
+            query: Run query stored on the findings goal.
+            path: Wiki file path for provenance notes.
+            prompt_name: Persona prompt agent name for notes.
+
+        Returns:
+            :class:`~thot.agent.models.GroundedFindings` with one claim per chunk.
+
+        Example:
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> out = Orchestrator._findings_from_wiki_chunks(
+            ...     [{"chunk_id": "c1", "text_raw": "hello", "parent_doc_id": "d1"}],
+            ...     max_chunks=1,
+            ...     query="q",
+            ...     path="/tmp/wiki.md",
+            ...     prompt_name="demo",
+            ... )
+            >>> out.findings[0].chunk_ids
+            ['c1']
+        """
         from thot.agent.models import GroundedFinding, GroundedFindings
 
         findings: list[GroundedFinding] = []
@@ -534,7 +849,14 @@ class Orchestrator:
     async def _run_okf_iterative_wiki(
         self, state: RunState, wf_step: WorkflowStep
     ) -> RunState:
-        """Build wiki.md by folding evidence chunks via a single LLM pass."""
+        """Build wiki.md by folding evidence chunks via a single LLM pass.
+
+        Example:
+            >>> import inspect
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> inspect.iscoroutinefunction(Orchestrator._run_okf_iterative_wiki)
+            True
+        """
         from thot.okf.iterative_wiki import build_wiki_iteratively
         from thot.okf.store import OkfBundleStore
 
@@ -653,7 +975,21 @@ class Orchestrator:
 
     @staticmethod
     def _resolve_wiki_prompt_config(params: dict[str, Any]) -> dict[str, Any]:
-        """Load persona ``*_prompt`` agent wiki seed/system from run params."""
+        """Load persona ``*_prompt`` agent wiki seed/system from run params.
+
+        Args:
+            params: Run params with ``wiki_agent`` / ``prompt_name``.
+
+        Returns:
+            Dict with ``prompt_name``, ``structured_facts_seed``,
+            ``merge_system``, and ``priority_keys``.
+
+        Example:
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> cfg = Orchestrator._resolve_wiki_prompt_config({})
+            >>> cfg["prompt_name"]
+            ''
+        """
         from thot.agent.registry import load_agent_spec
 
         name = str(
@@ -687,6 +1023,14 @@ class Orchestrator:
     async def _run_okf_scoped_export(
         self, state: RunState, wf_step: WorkflowStep
     ) -> RunState:
+        """Export or create an OKF evidence bundle (grab chunks or RAG scoped).
+
+        Example:
+            >>> import inspect
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> inspect.iscoroutinefunction(Orchestrator._run_okf_scoped_export)
+            True
+        """
         params = dict(state.params or {})
         for key in wf_step.params_from:
             if key not in params and key == "query":
@@ -802,6 +1146,27 @@ class Orchestrator:
         return state
 
     def _apply_okf_enrichments(self, state: RunState) -> None:
+        """Apply OKF curator enrichments to the bundle on disk when present.
+
+        Args:
+            state: Run state with ``bundle_id`` and grounded ``result``.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.models import RunState
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> from thot.agent.runs import RunStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     orch = Orchestrator(
+            ...         store=RunStore(root),
+            ...         guard=AgentGuard(root / "gov"),
+            ...         llm=object(),
+            ...     )
+            ...     orch._apply_okf_enrichments(RunState(goal="g"))  # no-op
+        """
         bundle_id = str((state.params or {}).get("bundle_id") or "")
         if not bundle_id or state.result is None:
             return
@@ -846,6 +1211,14 @@ class Orchestrator:
         step_offset: int,
         authorization: str | None,
     ) -> RunState:
+        """Run one workflow agent phase via :class:`AgentLoop`.
+
+        Example:
+            >>> import inspect
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> inspect.iscoroutinefunction(Orchestrator._run_agent_step)
+            True
+        """
         assert wf_step.agent is not None
         spec = load_agent_spec(wf_step.agent)
         tools = list(
@@ -932,6 +1305,42 @@ class Orchestrator:
         workflow: WorkflowSpec,
         wf_step: WorkflowStep,
     ) -> RunState:
+        """Run the final compose step and persist deliverable metadata.
+
+        Args:
+            state: Run state with findings and params.
+            workflow: Parent workflow spec.
+            wf_step: Compose workflow step configuration.
+
+        Returns:
+            Updated run state with ``compose_result`` and ``status`` succeeded.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.models import (
+            ...     RunState,
+            ...     WorkflowComposeStep,
+            ...     WorkflowSpec,
+            ...     WorkflowStep,
+            ... )
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> from thot.agent.runs import RunStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     store = RunStore(root)
+            ...     guard = AgentGuard(root / "gov")
+            ...     orch = Orchestrator(store=store, guard=guard, llm=object())
+            ...     state = RunState(goal="topic", user_space="dev@tkeir")
+            ...     wf = WorkflowSpec(name="wf", steps=[])
+            ...     step = WorkflowStep(
+            ...         id="compose", compose=WorkflowComposeStep()
+            ...     )
+            ...     out = orch._run_compose(state, wf, step)
+            ...     out.status
+            'succeeded'
+        """
         compose_cfg = wf_step.compose
         assert compose_cfg is not None
         params = dict(state.params or {})

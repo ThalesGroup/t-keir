@@ -32,7 +32,14 @@ _MODEL_PATH: str | None = None
 
 @dataclass(frozen=True)
 class DenseSparseEmbedding:
-    """One text encoded as dense + sparse BGE-M3 outputs."""
+    """One text encoded as dense + sparse BGE-M3 outputs.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import DenseSparseEmbedding
+        >>> emb = DenseSparseEmbedding(dense=[0.1, 0.2], sparse={"hello": 0.5})
+        >>> emb.sparse["hello"]
+        0.5
+    """
 
     dense: list[float]
     # Token id (string) → weight for Vespa mapped tensor ``token{}``.
@@ -44,6 +51,11 @@ def local_bge_m3_ready(path: str | None = None) -> bool:
 
     Requires ``config.json`` plus at least one dense weight file
     (``model.safetensors`` or ``pytorch_model.bin``).
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import local_bge_m3_ready
+        >>> local_bge_m3_ready("/nonexistent/path")
+        False
     """
     root = path or bge_m3_model_dir()
     if not os.path.isfile(os.path.join(root, "config.json")):
@@ -60,6 +72,12 @@ def resolve_bge_m3_path(model_id: str | None = None) -> str:
     Prefers ``resources/modeling/net/bge-m3``. Absolute/relative paths that
     already exist are accepted. Hugging Face repo ids are rejected at load
     time unless the local ``net/bge-m3`` tree is present (run ``make pull-bge-model``).
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import resolve_bge_m3_path, local_bge_m3_ready, bge_m3_model_dir
+        >>> path = resolve_bge_m3_path() if local_bge_m3_ready() else bge_m3_model_dir()
+        >>> path.endswith("bge-m3") or path.endswith("bge-m3/")
+        True
     """
     candidate = (model_id or "").strip()
     local = bge_m3_model_dir()
@@ -88,7 +106,12 @@ def resolve_bge_m3_path(model_id: str | None = None) -> str:
 
 
 def _load_model(model_id: str | None = None) -> Any:
-    """Lazy-load FlagEmbedding BGEM3FlagModel from the local net/ tree."""
+    """Lazy-load FlagEmbedding BGEM3FlagModel from the local net/ tree.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import _load_model
+        >>> _load_model()  # doctest: +SKIP
+    """
     global _MODEL, _MODEL_PATH
     path = resolve_bge_m3_path(model_id)
     with _LOCK:
@@ -108,6 +131,13 @@ def _load_model(model_id: str | None = None) -> Any:
 
 
 def _normalize_dense(vec: list[float] | Any, dim: int) -> list[float]:
+    """Pad or truncate a dense vector to ``dim`` floats.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import _normalize_dense
+        >>> _normalize_dense([1.0, 2.0], 4)
+        [1.0, 2.0, 0.0, 0.0]
+    """
     if vec is None:
         values: list[float] = []
     else:
@@ -221,7 +251,15 @@ DEFAULT_QUERY_EXPAND_SPARSE_WEIGHT = 0.75
 
 
 def normalize_sparse_token(token: str) -> str | None:
-    """Normalize a sparse dimension key (casefold, drop specials)."""
+    """Normalize a sparse dimension key (casefold, drop specials).
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import normalize_sparse_token
+        >>> normalize_sparse_token("Hello")
+        'hello'
+        >>> normalize_sparse_token("[CLS]") is None
+        True
+    """
     cleaned = (token or "").strip().casefold()
     if not cleaned or cleaned in _SPARSE_STOP:
         return None
@@ -233,7 +271,13 @@ def normalize_sparse_token(token: str) -> str | None:
 
 
 def _sparse_from_lexical_weights(raw: Any) -> dict[str, float]:
-    """Convert FlagEmbedding lexical_weights to Vespa token{} cells."""
+    """Convert FlagEmbedding lexical_weights to Vespa token{} cells.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import _sparse_from_lexical_weights
+        >>> _sparse_from_lexical_weights({"Hello": 0.9, "[CLS]": 0.1})
+        {'hello': 0.9}
+    """
     if raw is None:
         return {}
     if isinstance(raw, dict):
@@ -263,7 +307,13 @@ def _sparse_from_lexical_weights(raw: Any) -> dict[str, float]:
 
 
 def _convert_lexical_ids_to_tokens(model: Any, lexical: Any) -> list[Any]:
-    """Map BGE token-id sparse dicts to decoded tokens (SPLADE-readable)."""
+    """Map BGE token-id sparse dicts to decoded tokens (SPLADE-readable).
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import _convert_lexical_ids_to_tokens
+        >>> _convert_lexical_ids_to_tokens(None, {"hello": 0.5})
+        [{'hello': 0.5}]
+    """
     if lexical is None:
         return []
     converter = getattr(model, "convert_id_to_token", None)
@@ -283,7 +333,13 @@ def merge_sparse(
     *parts: dict[str, float] | None,
     max_tokens: int = DEFAULT_SPARSE_MAX_TOKENS,
 ) -> dict[str, float]:
-    """Merge sparse maps (max weight wins) and keep the strongest cells."""
+    """Merge sparse maps (max weight wins) and keep the strongest cells.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import merge_sparse
+        >>> merge_sparse({"hello": 0.5}, {"hello": 0.9, "world": 0.3})
+        {'hello': 0.9, 'world': 0.3}
+    """
     merged: dict[str, float] = {}
     for part in parts:
         if not part:
@@ -312,7 +368,13 @@ def terms_to_sparse(
     *,
     weight: float,
 ) -> dict[str, float]:
-    """Build a sparse map from free-text terms (ontology / expansion)."""
+    """Build a sparse map from free-text terms (ontology / expansion).
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import terms_to_sparse
+        >>> sorted(terms_to_sparse(["Maritime Analytics"], weight=0.8))
+        ['analytics', 'maritime', 'maritime-analytics']
+    """
     out: dict[str, float] = {}
     w = float(weight)
     if w == 0.0:
@@ -343,6 +405,12 @@ def content_sparse_from_text(
     SciFact leaderboard leader is SPLADE (learned sparse expansion). BGE-M3
     lexical weights are often sparse/small; injecting content tokens keeps a
     stronger lexical channel alongside dense (closer to SPLADE+BM25 hybrid).
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import content_sparse_from_text
+        >>> sparse = content_sparse_from_text("FoxO3a regulates apoptosis")
+        >>> "foxo3a" in sparse and "apoptosis" in sparse
+        True
     """
     counts: dict[str, int] = {}
     for tok in _CONTENT_TOKEN_RE.findall(text or ""):
@@ -378,6 +446,16 @@ def enrich_sparse(
       2. Chunk / query surface content tokens
       3. Ontology expansion labels (synonyms + paraphrase bridges)
       4. Query-time expansion terms
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import enrich_sparse
+        >>> enriched = enrich_sparse(
+        ...     {"hello": 0.5},
+        ...     text="hello world",
+        ...     expansion_terms=["greeting"],
+        ... )
+        >>> "hello" in enriched and "world" in enriched
+        True
     """
     return merge_sparse(
         base,
@@ -417,6 +495,10 @@ def encode_texts(
 
     Returns:
         One :class:`DenseSparseEmbedding` per input text.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import encode_texts
+        >>> encode_texts([])  # doctest: +SKIP
     """
     if not texts:
         return []
@@ -460,7 +542,12 @@ def encode_one(
     model_id: str | None = None,
     dense_dim: int = BGE_M3_DENSE_DIM,
 ) -> DenseSparseEmbedding:
-    """Encode a single string."""
+    """Encode a single string.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import encode_one
+        >>> encode_one("hello")  # doctest: +SKIP
+    """
     return encode_texts(
         [text], model_id=model_id, dense_dim=dense_dim, batch_size=1
     )[0]
@@ -477,6 +564,10 @@ def encode_colbert_vecs(
 
     Indexing stores dense+sparse only; ColBERT is computed at search time
     from the same FlagEmbedding weights under ``resources/modeling/net/bge-m3``.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import encode_colbert_vecs
+        >>> encode_colbert_vecs(["hello"])  # doctest: +SKIP
     """
     if not texts:
         return []
@@ -496,13 +587,26 @@ def encode_colbert_vecs(
 
 
 def vespa_dense_tensor(dense: list[float], dim: int) -> dict[str, list[float]]:
-    """Vespa indexed tensor payload for ``tensor<float>(x[dim])``."""
+    """Vespa indexed tensor payload for ``tensor<float>(x[dim])``.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import vespa_dense_tensor
+        >>> vespa_dense_tensor([1.0, 2.0], 2)
+        {'values': [1.0, 2.0]}
+    """
     values = _normalize_dense(dense, dim)
     return {"values": values}
 
 
 def vespa_sparse_tensor(sparse: dict[str, float]) -> dict[str, Any]:
-    """Vespa mapped tensor payload for ``tensor<float>(token{})``."""
+    """Vespa mapped tensor payload for ``tensor<float>(token{})``.
+
+    Example:
+        >>> from thot.tools.search.bge_m3 import vespa_sparse_tensor
+        >>> payload = vespa_sparse_tensor({"hello": 0.9})
+        >>> payload["cells"][0]["address"]["token"]
+        'hello'
+    """
     cells = [
         {"address": {"token": str(token)}, "value": float(weight)}
         for token, weight in sparse.items()

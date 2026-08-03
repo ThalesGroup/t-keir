@@ -159,7 +159,7 @@ Resolved by `UnifiedLLMWrapper` (`PROVIDER` → provider-specific defaults).
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `AGENT_ROOT` | `.tkeir-agent` (Compose: `/var/tkeir/agent`) | Run / publish store |
+| `AGENT_ROOT` | `workspace/agent` (Compose: `/var/tkeir/agent`) | Run / publish store |
 | `AGENT_HOST` / `AGENT_PORT` | `0.0.0.0` / `8092` | Agent HTTP |
 | `AGENT_URL` | `http://localhost:8092` | HMI / Make |
 | `AGENT_PUBLISH_OBSERVE_AUTO` | `1` | Auto-publish in observe mode |

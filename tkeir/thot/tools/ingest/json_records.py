@@ -36,7 +36,13 @@ _ID_KEYS = ("doc_id", "id", "document_id", "uid", "_id")
 
 
 def corpus_filename_stem(filename: str | None) -> str:
-    """Stable stem used in ``{stem}/{doc_id}`` source names."""
+    """Stable stem used in ``{stem}/{doc_id}`` source names.
+
+    Example:
+        >>> from thot.tools.ingest.json_records import corpus_filename_stem
+        >>> corpus_filename_stem("reports/data.json")
+        'data'
+    """
     name = (filename or "upload.json").strip() or "upload.json"
     stem = Path(name).name
     if stem.lower().endswith(".json"):
@@ -46,7 +52,13 @@ def corpus_filename_stem(filename: str | None) -> str:
 
 
 def record_doc_id(record: dict[str, Any], *, index: int) -> str:
-    """Pick a stable per-record id."""
+    """Pick a stable per-record id.
+
+    Example:
+        >>> from thot.tools.ingest.json_records import record_doc_id
+        >>> record_doc_id({"doc_id": "r1"}, index=0)
+        'r1'
+    """
     for key in _ID_KEYS:
         value = record.get(key)
         if value is not None and str(value).strip():
@@ -55,12 +67,24 @@ def record_doc_id(record: dict[str, Any], *, index: int) -> str:
 
 
 def source_name(filename: str | None, doc_id: str) -> str:
-    """Build ``{filename_stem}/{doc_id}`` source / source_doc_id."""
+    """Build ``{filename_stem}/{doc_id}`` source / source_doc_id.
+
+    Example:
+        >>> from thot.tools.ingest.json_records import source_name
+        >>> source_name("corpus.json", "r1")
+        'corpus/r1'
+    """
     return f"{corpus_filename_stem(filename)}/{doc_id}"
 
 
 def iter_json_records(payload: Any) -> list[dict[str, Any]]:
-    """Extract a list of record objects from common JSON corpus shapes."""
+    """Extract a list of record objects from common JSON corpus shapes.
+
+    Example:
+        >>> from thot.tools.ingest.json_records import iter_json_records
+        >>> iter_json_records({"records": [{"doc_id": "a"}]})
+        [{'doc_id': 'a'}]
+    """
     if isinstance(payload, list):
         return [row for row in payload if isinstance(row, dict)]
     if not isinstance(payload, dict):
@@ -76,7 +100,13 @@ def iter_json_records(payload: Any) -> list[dict[str, Any]]:
 
 
 def is_record_corpus(payload: Any) -> bool:
-    """True when payload looks like a multi-record (or single-record) corpus."""
+    """True when payload looks like a multi-record (or single-record) corpus.
+
+    Example:
+        >>> from thot.tools.ingest.json_records import is_record_corpus
+        >>> is_record_corpus({"records": [{"title": "x"}]})
+        True
+    """
     records = iter_json_records(payload)
     if not records:
         return False
@@ -92,6 +122,12 @@ def is_record_corpus(payload: Any) -> bool:
 
 
 def _scalar_to_str(value: Any) -> str:
+    """Convert JSON scalar values to display strings.
+
+    Example:
+        >>> _scalar_to_str(True)
+        'true'
+    """
     if value is None:
         return ""
     if isinstance(value, bool):
@@ -102,7 +138,12 @@ def _scalar_to_str(value: Any) -> str:
 
 
 def _markdown_value(value: Any, *, indent: int = 0) -> list[str]:
-    """Render nested JSON values as markdown lines."""
+    """Render nested JSON values as markdown lines.
+
+    Example:
+        >>> _markdown_value({"key": "val"})
+        ['- **key:** val']
+    """
     pad = "  " * indent
     lines: list[str] = []
     if isinstance(value, dict):
@@ -147,6 +188,13 @@ def record_to_markdown(record: dict[str, Any], *, source: str) -> str:
         - **source:** `stem/doc_id`
         - **attr:** value
           - **nested:** value
+    
+
+    Example:
+        >>> from thot.tools.ingest.json_records import record_to_markdown
+        >>> md = record_to_markdown({"title": "T", "text": "body"}, source="s/r1")
+        >>> md.startswith("# T")
+        True
     """
     title = _scalar_to_str(record.get("title")) or source
     text = _scalar_to_str(
@@ -177,7 +225,12 @@ def record_to_markdown(record: dict[str, Any], *, source: str) -> str:
 
 
 def _concept_token(path: str, value: Any) -> str | None:
-    """Build a stable concept id from a field path + scalar value."""
+    """Build a stable concept id from a field path + scalar value.
+
+    Example:
+        >>> _concept_token("domain", "osint")
+        'DOMAIN:osint'
+    """
     text = _scalar_to_str(value)
     if not text or len(text) > 120:
         return None
@@ -197,7 +250,13 @@ def extract_record_concepts(
     prefix: str = "",
     max_concepts: int = 64,
 ) -> list[str]:
-    """Promote non-narrative attribute values to ontology concept ids."""
+    """Promote non-narrative attribute values to ontology concept ids.
+
+    Example:
+        >>> from thot.tools.ingest.json_records import extract_record_concepts
+        >>> "DOMAIN:osint" in extract_record_concepts({"domain": "osint"})
+        True
+    """
     concepts: list[str] = []
     seen: set[str] = set()
 
@@ -248,6 +307,13 @@ def split_record_documents(
       - ``filename``: ``{stem}__{doc_id}.md``
       - ``record_concept_ids``: concepts from structured fields
       - ``metadata``: classification / domain / … for ingest extras
+    
+
+    Example:
+        >>> from thot.tools.ingest.json_records import split_record_documents
+        >>> docs = split_record_documents({"records": [{"doc_id": "1", "title": "A"}]}, filename="c.json")
+        >>> docs[0]["source"]
+        'c/1'
     """
     records = iter_json_records(payload)
     if offset:
@@ -298,7 +364,13 @@ def split_record_documents(
 
 
 def safe_doc_filename(doc_id: str) -> str:
-    """Filesystem-safe ``{doc_id}.md`` name for workspace My files."""
+    """Filesystem-safe ``{doc_id}.md`` name for workspace My files.
+
+    Example:
+        >>> from thot.tools.ingest.json_records import safe_doc_filename
+        >>> safe_doc_filename("doc/1")
+        'doc_1.md'
+    """
     cleaned = re.sub(r"[^\w.\-]+", "_", str(doc_id or "").strip()).strip("._")
     return f"{(cleaned or 'record')[:180]}.md"
 
@@ -314,6 +386,15 @@ def workspace_markdown_files_from_json(
 
     Each item: ``path`` (relative under workspace files/), ``doc_id``,
     ``markdown`` (str), ``title``. Returns ``None`` when not a record corpus.
+    
+
+    Example:
+        >>> import json
+        >>> from thot.tools.ingest.json_records import workspace_markdown_files_from_json
+        >>> payload = json.dumps({"records": [{"doc_id": "1", "title": "A"}]}).encode()
+        >>> files = workspace_markdown_files_from_json(payload, filename="c.json")
+        >>> files is not None and files[0]["doc_id"] == "1"
+        True
     """
     try:
         payload = json.loads(content.decode("utf-8"))
@@ -353,7 +434,15 @@ def load_and_split(
     offset: int = 0,
     limit: int | None = None,
 ) -> list[dict[str, Any]]:
-    """Parse JSON bytes and split into markdown ingest documents."""
+    """Parse JSON bytes and split into markdown ingest documents.
+
+    Example:
+        >>> import json
+        >>> from thot.tools.ingest.json_records import load_and_split
+        >>> content = json.dumps({"records": [{"doc_id": "1", "title": "A"}]}).encode()
+        >>> load_and_split(content, filename="c.json")[0]["doc_id"]
+        '1'
+    """
     payload = json.loads(content.decode("utf-8"))
     if not is_record_corpus(payload):
         raise ValueError(
@@ -374,7 +463,15 @@ def iter_split(
     offset: int = 0,
     limit: int | None = None,
 ) -> Iterator[dict[str, Any]]:
-    """Iterator wrapper around :func:`load_and_split`."""
+    """Iterator wrapper around :func:`load_and_split`.
+
+    Example:
+        >>> import json
+        >>> from thot.tools.ingest.json_records import iter_split
+        >>> content = json.dumps({"records": [{"doc_id": "1"}]}).encode()
+        >>> next(iter_split(content, filename="c.json"))["doc_id"]
+        '1'
+    """
     yield from load_and_split(
         content, filename=filename, offset=offset, limit=limit
     )

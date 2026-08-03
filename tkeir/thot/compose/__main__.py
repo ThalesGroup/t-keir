@@ -26,6 +26,18 @@ from thot.tools.search.user_space import resolve_vespa_user_space
 
 
 def _load_turtles_from_dir(path: Path) -> list[str]:
+    """Load Turtle / JSON-LD files from a directory.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.compose.__main__ import _load_turtles_from_dir
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     p = Path(td) / "demo.ttl"
+        ...     _ = p.write_text("@prefix ex: <http://ex/> . ex:A a ex:T .", encoding="utf-8")
+        ...     len(_load_turtles_from_dir(Path(td)))
+        1
+    """
     turtles: list[str] = []
     for pattern in ("*.ttl", "*.turtle", "*.jsonld", "*.json"):
         for file in sorted(path.glob(pattern)):

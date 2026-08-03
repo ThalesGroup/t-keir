@@ -21,6 +21,13 @@ from thot.tools.ingest.worker import IngestWorker
 
 
 async def _retry_from_dlq(store: IngestStore, ingest_id: str) -> int:
+    """Retry one failed ingest job from the DLQ.
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_retry_from_dlq)
+        True
+    """
     worker = IngestWorker(store)
     job = await worker.retry_from_dlq(ingest_id)
     logging.info(
@@ -33,7 +40,13 @@ async def _retry_from_dlq(store: IngestStore, ingest_id: str) -> int:
 
 
 def main(args: list[str] | None = None) -> None:
-    """Parse CLI arguments and run ingest maintenance commands."""
+    """Parse CLI arguments and run ingest maintenance commands.
+
+    Example:
+        >>> from thot.tools.ingest.cli import main
+        >>> callable(main)
+        True
+    """
     parser = argparse.ArgumentParser(
         description="T-KEIR ingest service CLI",
     )

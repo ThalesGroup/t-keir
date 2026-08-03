@@ -19,6 +19,13 @@ SUPPORTED_PROCESSING_LANGUAGES = {"en", "fr"}
 
 
 class ResourceSelector:
+    """ResourceSelector container.
+    
+        Example:
+            >>> from thot.tasks.pipeline.ResourceSelector import ResourceSelector
+            >>> callable(ResourceSelector)
+            True
+    """
     @staticmethod
     def list_available_languages() -> list:
         """List tokenizer resource languages bundled with T-KEIR.

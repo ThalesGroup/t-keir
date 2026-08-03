@@ -32,7 +32,14 @@ _CATALOG_LOCKS_GUARD = threading.Lock()
 
 
 def _catalog_lock_for(user_space: str) -> threading.RLock:
-    """Per-user-space re-entrant lock for catalog read-modify-write."""
+    """Per-user-space re-entrant lock for catalog read-modify-write.
+
+    Example:
+        >>> lock = _catalog_lock_for("demo@tkeir")
+        >>> lock.acquire()
+        True
+        >>> lock.release()
+    """
     with _CATALOG_LOCKS_GUARD:
         lock = _CATALOG_LOCKS.get(user_space)
         if lock is None:
@@ -42,13 +49,24 @@ def _catalog_lock_for(user_space: str) -> threading.RLock:
 
 
 def _normalize_space(user_space: str) -> str:
-    """Filesystem/Vespa-safe user space (mirrors vespa normalize without heavy imports)."""
+    """Filesystem/Vespa-safe user space (mirrors vespa normalize without heavy imports).
+
+    Example:
+        >>> _normalize_space(" Demo User ")
+        'Demo_User'
+    """
     value = (user_space or "dev@tkeir").strip() or "dev@tkeir"
     return re.sub(r"[^A-Za-z0-9._@+-]+", "_", value)[:200]
 
 
 def workspace_root(explicit: Path | str | None = None) -> Path:
-    """Resolve demo workspace root (``TKEIR_WORKSPACE`` or repo ``workspace/``)."""
+    """Resolve demo workspace root (``TKEIR_WORKSPACE`` or repo ``workspace/``).
+
+    Example:
+        >>> from thot.tools.ingest.user_workspace import workspace_root
+        >>> workspace_root("/tmp/ws").name
+        'ws'
+    """
     if explicit is not None:
         return Path(explicit).expanduser().resolve()
     env = os.getenv("TKEIR_WORKSPACE") or os.getenv("WORKSPACE")
@@ -60,14 +78,25 @@ def workspace_root(explicit: Path | str | None = None) -> Path:
 
 
 def _fs_safe_space(user_space: str) -> str:
-    """Filesystem-safe directory name for a Vespa user space."""
+    """Filesystem-safe directory name for a Vespa user space.
+
+    Example:
+        >>> _fs_safe_space("demo@tkeir")
+        'demo@tkeir'
+    """
     return _normalize_space(user_space) or "user"
 
 
 def sanitize_relative_path(
     raw: str | None, *, allow_empty: bool = True
 ) -> str:
-    """Normalize a user-relative path; reject traversal and absolute paths."""
+    """Normalize a user-relative path; reject traversal and absolute paths.
+
+    Example:
+        >>> from thot.tools.ingest.user_workspace import sanitize_relative_path
+        >>> sanitize_relative_path("reports/a.md")
+        'reports/a.md'
+    """
     text = (raw or "").strip().replace("\\", "/")
     if not text or text in {".", "./"}:
         if allow_empty:
@@ -106,10 +135,24 @@ class WorkspaceFileRecord:
     copied_from_source_ref: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
+        """Serialize the catalog record to a plain dict.
+
+        Example:
+            >>> from thot.tools.ingest.user_workspace import WorkspaceFileRecord
+            >>> WorkspaceFileRecord(path="a.md", source_ref="s").to_dict()["path"]
+            'a.md'
+        """
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> WorkspaceFileRecord:
+        """Build a record from a catalog JSON object.
+
+        Example:
+            >>> from thot.tools.ingest.user_workspace import WorkspaceFileRecord
+            >>> WorkspaceFileRecord.from_dict({"path": "a.md", "source_ref": "s"}).path
+            'a.md'
+        """
         return cls(
             path=str(data.get("path") or ""),
             source_ref=str(data.get("source_ref") or ""),
@@ -159,6 +202,16 @@ class UserWorkspace:
         *,
         root: Path | str | None = None,
     ) -> None:
+        """Bind a workspace to ``user_space`` under ``root``.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.user_space
+            'demo@tkeir'
+        """
         self.user_space = _normalize_space(user_space)
         self.root = workspace_root(root)
         self.user_dir = self.root / "users" / _fs_safe_space(self.user_space)
@@ -167,22 +220,60 @@ class UserWorkspace:
         self.catalog_path = self.user_dir / "catalog.json"
 
     def ensure_layout(self) -> None:
+        """Create files tree, catalog, and run inbox migration.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     ws.files_dir.is_dir()
+            True
+        """
         self._ensure_dirs()
         if not self.catalog_path.is_file():
             self._write_catalog({})
         self._migrate_inbox_to_received()
 
     def _ensure_dirs(self) -> None:
+        """Create workspace files directories (including ``received/``).
+
+        Example:
+            >>> import tempfile
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws._ensure_dirs()
+            ...     ws.files_dir.is_dir()
+            True
+        """
         self.files_dir.mkdir(parents=True, exist_ok=True)
         (self.files_dir / "received").mkdir(parents=True, exist_ok=True)
 
     def _read_catalog(self) -> dict[str, WorkspaceFileRecord]:
-        """Load catalog without running inbox migration (safe under catalog lock)."""
+        """Load catalog without running inbox migration (safe under catalog lock).
+
+        Example:
+            >>> import tempfile
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     ws._read_catalog()
+            {}
+        """
         self._ensure_dirs()
         return self._read_catalog_unlocked()
 
     def _read_catalog_unlocked(self) -> dict[str, WorkspaceFileRecord]:
-        """Load catalog.json without mkdir/migrate side effects."""
+        """Load catalog.json without mkdir/migrate side effects.
+
+        Example:
+            >>> import tempfile
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws._read_catalog_unlocked()
+            {}
+        """
         if not self.catalog_path.is_file():
             return {}
         raw = json.loads(self.catalog_path.read_text(encoding="utf-8"))
@@ -200,6 +291,13 @@ class UserWorkspace:
 
         Older shares used a deep ``inbox/<sender>/…`` tree that was easy to
         miss in My files. New copies use ``received/<sender>/<basename>``.
+
+        Example:
+            >>> import tempfile
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     ws._migrate_inbox_to_received()  # no-op when inbox absent
         """
         inbox = self.files_dir / "inbox"
         received = self.files_dir / "received"
@@ -302,23 +400,61 @@ class UserWorkspace:
                 self._write_catalog(rewritten)
 
     def ensure_okf_layout(self) -> Path:
-        """Ensure ``users/<space>/okf`` exists; return that directory."""
+        """Ensure ``users/<space>/okf`` exists; return that directory.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_okf_layout().name
+            'okf'
+        """
         self.okf_dir.mkdir(parents=True, exist_ok=True)
         return self.okf_dir
 
     def okf_bundle_dir(self, bundle_id: str) -> Path:
-        """Absolute path for one OKF bundle directory (does not create it)."""
+        """Absolute path for one OKF bundle directory (does not create it).
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.okf_bundle_dir("bundle-1").name
+            'bundle-1'
+        """
         bid = (bundle_id or "").strip()
         if not bid or "/" in bid or ".." in bid or bid in {".", ".."}:
             raise ValueError(f"invalid bundle_id: {bundle_id!r}")
         return self.okf_dir / bid
 
     def source_ref_for(self, relative_path: str) -> str:
-        """Stable Vespa ``source_ref`` / ``source_doc_id`` for a workspace file."""
+        """Stable Vespa ``source_ref`` / ``source_doc_id`` for a workspace file.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.source_ref_for("a.md").startswith("user:demo@tkeir:")
+            True
+        """
         rel = sanitize_relative_path(relative_path, allow_empty=False)
         return f"user:{self.user_space}:{rel}"
 
     def resolve_file(self, relative_path: str) -> Path:
+        """Resolve a safe absolute path under ``files/``.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     ws.resolve_file("a.md").name
+            'a.md'
+        """
         rel = sanitize_relative_path(relative_path, allow_empty=False)
         path = (self.files_dir / rel).resolve()
         if not str(path).startswith(str(self.files_dir.resolve())):
@@ -326,6 +462,17 @@ class UserWorkspace:
         return path
 
     def _write_catalog(self, files: dict[str, WorkspaceFileRecord]) -> None:
+        """Persist the workspace catalog atomically.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import WorkspaceFileRecord
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws._write_catalog({"a.md": WorkspaceFileRecord(path="a.md", source_ref="s")})
+            ...     ws.catalog_path.is_file()
+            True
+        """
         self.user_dir.mkdir(parents=True, exist_ok=True)
         payload = {
             "user_space": self.user_space,
@@ -344,6 +491,18 @@ class UserWorkspace:
     def upsert_record(
         self, record: WorkspaceFileRecord
     ) -> WorkspaceFileRecord:
+        """Insert or update one catalog entry.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace, WorkspaceFileRecord
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     rec = ws.upsert_record(WorkspaceFileRecord(path="a.md", source_ref="s"))
+            ...     rec.path
+            'a.md'
+        """
         with _catalog_lock_for(self.user_space):
             files = self._read_catalog()
             record.updated_at = utc_now_rfc3339()
@@ -352,11 +511,35 @@ class UserWorkspace:
             return record
 
     def get_record(self, relative_path: str) -> WorkspaceFileRecord | None:
+        """Return the catalog entry for ``relative_path``, if any.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace, WorkspaceFileRecord
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     _ = ws.upsert_record(WorkspaceFileRecord(path="a.md", source_ref="s"))
+            ...     ws.get_record("a.md").source_ref
+            's'
+        """
         rel = sanitize_relative_path(relative_path, allow_empty=False)
         with _catalog_lock_for(self.user_space):
             return self._read_catalog().get(rel)
 
     def remove_record(self, relative_path: str) -> WorkspaceFileRecord | None:
+        """Remove a catalog entry and return the previous record.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace, WorkspaceFileRecord
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     _ = ws.upsert_record(WorkspaceFileRecord(path="a.md", source_ref="s"))
+            ...     ws.remove_record("a.md").path
+            'a.md'
+        """
         rel = sanitize_relative_path(relative_path, allow_empty=False)
         with _catalog_lock_for(self.user_space):
             files = self._read_catalog()
@@ -366,7 +549,17 @@ class UserWorkspace:
             return record
 
     def iter_indexing_records(self) -> list[WorkspaceFileRecord]:
-        """Return catalog entries still marked ``indexing``."""
+        """Return catalog entries still marked ``indexing``.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     ws.iter_indexing_records()
+            []
+        """
         with _catalog_lock_for(self.user_space):
             return [
                 rec
@@ -375,13 +568,34 @@ class UserWorkspace:
             ]
 
     def mkdir(self, relative_path: str) -> str:
+        """Create a directory under ``files/`` and return its relative path.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     ws.mkdir("reports")
+            'reports'
+        """
         rel = sanitize_relative_path(relative_path, allow_empty=False)
         path = self.resolve_file(rel)
         path.mkdir(parents=True, exist_ok=True)
         return rel
 
     def read_file_bytes(self, relative_path: str) -> bytes:
-        """Read file bytes from the workspace tree."""
+        """Read file bytes from the workspace tree.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     _ = ws.write_file("a.md", b"hello")
+            ...     ws.read_file_bytes("a.md")
+            b'hello'
+        """
         path = self.resolve_file(relative_path)
         if not path.is_file():
             raise FileNotFoundError(
@@ -401,6 +615,16 @@ class UserWorkspace:
         copied_from_path: str | None = None,
         copied_from_source_ref: str | None = None,
     ) -> WorkspaceFileRecord:
+        """Write bytes to ``files/`` and upsert the catalog entry.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.write_file("a.md", b"hello").status
+            'pending'
+        """
         rel = sanitize_relative_path(relative_path, allow_empty=False)
         # Legacy share prefix — always land under the dedicated received/ tree.
         if rel.startswith("inbox/"):
@@ -423,6 +647,17 @@ class UserWorkspace:
         return self.upsert_record(record)
 
     def delete_file(self, relative_path: str) -> WorkspaceFileRecord | None:
+        """Delete a file or directory and remove its catalog entry.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     _ = ws.write_file("a.md", b"hello")
+            ...     ws.delete_file("a.md").path
+            'a.md'
+        """
         rel = sanitize_relative_path(relative_path, allow_empty=False)
         path = self.resolve_file(rel)
         record = self.remove_record(rel)
@@ -433,7 +668,17 @@ class UserWorkspace:
         return record
 
     def list_dir(self, relative_path: str = "") -> dict[str, Any]:
-        """List one directory; include catalog metadata for files."""
+        """List one directory; include catalog metadata for files.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     _ = ws.write_file("a.md", b"hello")
+            ...     ws.list_dir("")["user_space"]
+            'demo@tkeir'
+        """
         rel = sanitize_relative_path(relative_path, allow_empty=True)
         base = self.files_dir if not rel else self.resolve_file(rel)
         self.ensure_layout()
@@ -495,7 +740,19 @@ class UserWorkspace:
         *,
         status: str = "indexed",
     ) -> WorkspaceFileRecord | None:
-        """Fill passage_ids / doc_id from an analyzed ingest document."""
+        """Fill passage_ids / doc_id from an analyzed ingest document.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.tools.ingest.user_workspace import UserWorkspace, WorkspaceFileRecord
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     ws = UserWorkspace("demo@tkeir", root=temp_dir)
+            ...     ws.ensure_layout()
+            ...     _ = ws.upsert_record(WorkspaceFileRecord(path="a.md", source_ref="s"))
+            ...     synced = ws.sync_from_analyzed("a.md", {"golden_chunks": [{"chunk_id": "c1"}]})
+            ...     synced.passage_ids
+            ['c1']
+        """
         record = self.get_record(relative_path)
         if record is None:
             return None

@@ -68,6 +68,13 @@ _VERB_MODIFIER_DEPS = {"aux", "auxpass", "neg"}
 
 
 class SyntacticTagger:
+    """SyntacticTagger container.
+    
+        Example:
+            >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+            >>> callable(SyntacticTagger)
+            True
+    """
     def __init__(
         self, config: SyntacticTaggerConfiguration = None, call_context=None
     ):
@@ -276,10 +283,24 @@ class SyntacticTagger:
         return [tok] + verb_modifiers
 
     def _ensure_verb_entry(self, verb_sos, tok):
+        """_ensure_verb_entry helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._ensure_verb_entry)
+                True
+        """
         if tok.pos_ in ["VERB", "AUX"]:
             _ = verb_sos[tok]
 
     def _collect_token_svo(self, tok, verb_sos):
+        """_collect_token_svo helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._collect_token_svo)
+                True
+        """
         head = tok.head
         if tok.dep_ in _NOMINAL_SUBJ_DEPS:
             if head.pos_ in ["VERB", "AUX"]:
@@ -305,6 +326,13 @@ class SyntacticTagger:
             verb_sos[head]["objects"].update(tok.subtree)
 
     def _propagate_conjunct_svos(self, verb_sos):
+        """_propagate_conjunct_svos helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._propagate_conjunct_svos)
+                True
+        """
         for verb, so_dict in verb_sos.items():
             conjuncts = verb.conjuncts
             if so_dict.get("subjects"):
@@ -320,6 +348,13 @@ class SyntacticTagger:
                 )
 
     def _yield_dependency_svo_triples(self, verb_sos):
+        """_yield_dependency_svo_triples helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._yield_dependency_svo_triples)
+                True
+        """
         for verb, so_dict in verb_sos.items():
             if so_dict["subjects"] and so_dict["objects"]:
                 yield SVOTriple(
@@ -485,6 +520,13 @@ class SyntacticTagger:
         return deps
 
     def _relation_item(self, alternate):
+        """_relation_item helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._relation_item)
+                True
+        """
         return {
             "content": [token.text for token in alternate],
             "lemma_content": [token.lemma_ for token in alternate],
@@ -493,9 +535,16 @@ class SyntacticTagger:
             "label": alternate.label_,
         }
 
-    def _merge_triple_entry(
-        self, current_triples, triple_entry, triple_position
+    def _merge_triple_entry(        self, current_triples, triple_entry, triple_position
     ):
+        """_merge_triple_entry helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._merge_triple_entry)
+                True
+        """
+
         sz_alt = len(triple_entry)
         sz_triple = len(current_triples)
         if sz_triple:
@@ -516,6 +565,13 @@ class SyntacticTagger:
         return current_triples
 
     def _build_svo_triples(self, svo):
+        """_build_svo_triples helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._build_svo_triples)
+                True
+        """
         current_triples = []
         triple_position = 0
         for triple_entry in svo:
@@ -528,6 +584,13 @@ class SyntacticTagger:
         return current_triples
 
     def _relation_checksum(self, ct):
+        """_relation_checksum helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._relation_checksum)
+                True
+        """
         triple_str = ""
         for item_i in ct:
             triple_str = (
@@ -546,6 +609,13 @@ class SyntacticTagger:
         return hashlib.md5(triple_str.encode()).hexdigest()
 
     def _trim_relation_bounds(self, ct):
+        """_trim_relation_bounds helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._trim_relation_bounds)
+                True
+        """
         if not self._rule_settings["suppress-bounds-sw"]:
             return
         for c_p_o in [0, 2]:
@@ -565,6 +635,13 @@ class SyntacticTagger:
                 del ct[c_p_o]["lemma_content"][-1]
 
     def _should_discard_relation(self, ct):
+        """_should_discard_relation helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._should_discard_relation)
+                True
+        """
         discard_pos = {"PART", "DET", "PRON", "CONJ", "CCONJ"}
         if (
             len(ct[0]["pos"]) == 1
@@ -580,6 +657,13 @@ class SyntacticTagger:
         )
 
     def _append_relation(self, triple_list, ct, field):
+        """_append_relation helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._append_relation)
+                True
+        """
         triple_list.append(
             {
                 "subject": ct[0],
@@ -614,12 +698,26 @@ class SyntacticTagger:
         return triple_list
 
     def _validate_tag_input(self, tkeir_doc):
+        """_validate_tag_input helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._validate_tag_input)
+                True
+        """
         if ("title_tokens" not in tkeir_doc) and (
             "content_tokens" not in tkeir_doc
         ):
             raise ValueError("title tokens or content tokens should be set")
 
     def _prepare_spacy_doc(self, tokens):
+        """_prepare_spacy_doc helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._prepare_spacy_doc)
+                True
+        """
         search_doc = self._nlp.tokenizer(tokens)
         return self._nlp(
             search_doc,
@@ -627,6 +725,13 @@ class SyntacticTagger:
         )
 
     def _apply_morphosyntax(self, doc, morphosyntax):
+        """_apply_morphosyntax helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._apply_morphosyntax)
+                True
+        """
         with doc.retokenize() as retokenizer:
             for token_i in range(len(doc)):
                 attrs = {
@@ -636,6 +741,13 @@ class SyntacticTagger:
                 retokenizer.merge(doc[token_i : token_i + 1], attrs=attrs)
 
     def _should_add_ner_span(self, doc, span):
+        """_should_add_ner_span helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._should_add_ner_span)
+                True
+        """
         if (span["end"] - span["start"]) != 1:
             return True
         return doc[span["start"]].pos_ not in [
@@ -648,6 +760,13 @@ class SyntacticTagger:
         ]
 
     def _append_ner_spans(self, doc, matches, ner_spans):
+        """_append_ner_spans helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._append_ner_spans)
+                True
+        """
         for span in ner_spans or []:
             if not self._should_add_ner_span(doc, span):
                 continue
@@ -662,12 +781,25 @@ class SyntacticTagger:
 
     @staticmethod
     def _ner_spans_overlap(a: dict, b: dict) -> bool:
+        """_ner_spans_overlap helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._ner_spans_overlap)
+                True
+        """
         return not (a["end"] <= b["start"] or b["end"] <= a["start"])
 
     def _merge_ontology_ner(
         self, existing: list[dict], ontology_spans: list[dict]
     ) -> list[dict]:
-        """Merge ontology concept spans into NER without overlapping existing."""
+        """Merge ontology concept spans into NER without overlapping existing.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._merge_ontology_ner)
+                True
+        """
         merged = list(existing)
         for span in ontology_spans:
             if any(self._ner_spans_overlap(span, other) for other in merged):
@@ -676,6 +808,13 @@ class SyntacticTagger:
         return merged
 
     def _dep_svo_spans(self, doc, dep_svo):
+        """_dep_svo_spans helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._dep_svo_spans)
+                True
+        """
         d_subject = [
             Span(
                 doc,
@@ -702,8 +841,7 @@ class SyntacticTagger:
         ]
         return [d_subject, d_verb, d_object]
 
-    def _tag_field(
-        self,
+    def _tag_field(        self,
         doc,
         tkeir_doc,
         morph_key,
@@ -711,6 +849,14 @@ class SyntacticTagger:
         deps_key,
         field_type,
     ):
+        """_tag_field helper.
+        
+            Example:
+                >>> from thot.tasks.syntax.SyntacticTagger import SyntacticTagger
+                >>> callable(SyntacticTagger._tag_field)
+                True
+        """
+
         if doc is None or not len(doc):
             return
 

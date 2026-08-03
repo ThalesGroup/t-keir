@@ -16,14 +16,26 @@ from typing import Any
 
 
 def _ner_entity_text(entity: Any) -> str:
-    """Normalize a NER entry (dict or bare string) to display text."""
+    """Normalize a NER entry (dict or bare string) to display text.
+
+    Example:
+        >>> from thot.tools.search.generation_prompt import _ner_entity_text
+        >>> _ner_entity_text({"text": "Acme", "label": "ORG"})
+        'Acme'
+    """
     if isinstance(entity, dict):
         return str(entity.get("text", "")).strip()
     return str(entity or "").strip()
 
 
 def _ner_entity_label(entity: Any) -> str:
-    """Normalize a NER entry (dict or bare string) to a label."""
+    """Normalize a NER entry (dict or bare string) to a label.
+
+    Example:
+        >>> from thot.tools.search.generation_prompt import _ner_entity_label
+        >>> _ner_entity_label({"text": "Acme", "label": "ORG"})
+        'ORG'
+    """
     if isinstance(entity, dict):
         return str(entity.get("label", "entity")).strip() or "entity"
     return "entity"
@@ -34,7 +46,19 @@ def _append_unique_analysis_terms(
     existing: str,
     analysis: dict[str, Any],
 ) -> None:
-    """Append NER, SVO, and search terms not already present in ``existing``."""
+    """Append NER, SVO, and search terms not already present in ``existing``.
+
+    Example:
+        >>> from thot.tools.search.generation_prompt import _append_unique_analysis_terms
+        >>> parts = ["Who won"]
+        >>> _append_unique_analysis_terms(
+        ...     parts,
+        ...     "who won",
+        ...     {"ner_entities": [{"text": "Oscar", "label": "award"}]},
+        ... )
+        >>> parts
+        ['Who won', 'Oscar']
+    """
     for entity in analysis.get("ner_entities") or []:
         text = _ner_entity_text(entity)
         if text and text.lower() not in existing:
@@ -428,7 +452,13 @@ def detect_question_type(
 def question_type_short_answer_spec(
     question_type: str, *, language: str = "en"
 ) -> str:
-    """Return SHORT_ANSWER shape instructions for a question type."""
+    """Return SHORT_ANSWER shape instructions for a question type.
+
+    Example:
+        >>> from thot.tools.search.generation_prompt import question_type_short_answer_spec
+        >>> "Yes or No" in question_type_short_answer_spec("yes_no")
+        True
+    """
     lang = (language or "en").lower()
     specs_en = {
         "yes_no": (
@@ -664,7 +694,16 @@ def build_svo_question_restatement(
 def _format_svo_analysis_section(
     svo_triples: list[dict[str, Any]],
 ) -> list[str]:
-    """Format the SVO section for prompt query analysis."""
+    """Format the SVO section for prompt query analysis.
+
+    Example:
+        >>> from thot.tools.search.generation_prompt import _format_svo_analysis_section
+        >>> lines = _format_svo_analysis_section(
+        ...     [{"subject": "Alice", "verb": "works", "object": "Acme"}]
+        ... )
+        >>> lines[0].startswith("PRIMARY")
+        True
+    """
     lines = ["PRIMARY — question structure (SVO):"]
     for triple in svo_triples:
         subject = str(triple.get("subject", "")).strip()
@@ -688,7 +727,13 @@ def _format_svo_analysis_section(
 def _format_ner_analysis_section(
     ner_entities: list[Any],
 ) -> list[str]:
-    """Format the named-entity section for prompt query analysis."""
+    """Format the named-entity section for prompt query analysis.
+
+    Example:
+        >>> from thot.tools.search.generation_prompt import _format_ner_analysis_section
+        >>> _format_ner_analysis_section([{"text": "Paris", "label": "GPE"}])
+        ['- Named entities:', '  - Paris (GPE)']
+    """
     lines = ["- Named entities:"]
     for entity in ner_entities:
         text = _ner_entity_text(entity)

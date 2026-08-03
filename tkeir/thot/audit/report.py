@@ -86,6 +86,22 @@ def load_report(
     store: HotStore,
     correlation_id: str,
 ) -> dict[str, Any]:
-    """Load and build a report from the hot store."""
+    """Load and build a report from the hot store.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.action.models import ActionRecord
+        >>> from thot.audit.hot_store import SqliteHotStore
+        >>> from thot.audit.report import load_report
+        >>> cid = "t" * 32
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     hot = SqliteHotStore(Path(td) / "hot.db")
+        ...     _ = hot.append(ActionRecord(correlation_id=cid))
+        ...     report = load_report(hot, cid)
+        ...     hot.close()
+        ...     report["action_count"] == 1
+        True
+    """
     records = store.get_by_correlation(correlation_id)
     return build_report(records, correlation_id=correlation_id)

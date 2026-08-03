@@ -31,6 +31,12 @@ _METRICS_READY = False
 
 
 def _ensure_metrics() -> None:
+    """Register compose Prometheus counters once per process.
+
+    Example:
+        >>> from thot.compose.composer import _ensure_metrics
+        >>> _ensure_metrics()
+    """
     global _METRICS_READY
     if _METRICS_READY:
         return
@@ -43,6 +49,13 @@ def _ensure_metrics() -> None:
 
 
 def _jinja_env() -> Environment:
+    """Build a sandboxed Jinja2 environment for markdown templates.
+
+    Example:
+        >>> from thot.compose.composer import _jinja_env
+        >>> _jinja_env().from_string("{{ topic }}").render(topic="Acme")
+        'Acme'
+    """
     return Environment(
         loader=BaseLoader(),
         autoescape=select_autoescape(enabled_extensions=()),
@@ -52,11 +65,38 @@ def _jinja_env() -> Environment:
 
 
 def _clip(items: list[Any], slot: Slot) -> list[Any]:
+    """Truncate ``items`` to ``slot.constraints.max_items``.
+
+    Example:
+        >>> from thot.compose.composer import _clip
+        >>> from thot.compose.template_models import Slot, SlotConstraint
+        >>> _clip([1, 2, 3], Slot(name="x", type="keyword", constraints=SlotConstraint(max_items=2)))
+        [1, 2]
+    """
     max_items = max(0, slot.constraints.max_items)
     return items[:max_items] if max_items else items
 
 
 def _fill_entity(slot: Slot, kg: UserSpaceKG, topic: str) -> SlotFill:
+    """Fill an ``entity`` slot from KG entity search.
+
+    Example:
+        >>> from thot.compose.composer import _fill_entity
+        >>> from thot.compose.kg import UserSpaceKG
+        >>> from thot.compose.template_models import Slot
+        >>> turtle = '''
+        ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        ... @prefix tkeir: <http://tkeir.local/ontology/> .
+        ... <http://ex/c> a tkeir:DocumentChunk ; rdfs:label "chunk-1" ;
+        ...   tkeir:hasMention <http://ex/Acme> .
+        ... <http://ex/Acme> a tkeir:Company ; rdfs:label "Acme" .
+        ... '''
+        >>> kg = UserSpaceKG("fill-ent", use_process_cache=False)
+        >>> _ = kg.load([turtle], document_ids=["doc-a"])
+        >>> fill = _fill_entity(Slot(name="entity", type="entity", label="Acme"), kg, "Acme")
+        >>> fill.filled and (fill.value["label"] if isinstance(fill.value, dict) else fill.value[0]["label"]) == "Acme"
+        True
+    """
     label = slot.label or slot.query or topic
     entities = kg.find_entities(
         label=label or None, limit=slot.constraints.max_items
@@ -97,6 +137,23 @@ def _fill_entity(slot: Slot, kg: UserSpaceKG, topic: str) -> SlotFill:
 
 
 def _fill_keyword(slot: Slot, kg: UserSpaceKG) -> SlotFill:
+    """Fill a ``keyword`` slot from ``tkeir:Keyword`` nodes.
+
+    Example:
+        >>> from thot.compose.composer import _fill_keyword
+        >>> from thot.compose.kg import UserSpaceKG
+        >>> from thot.compose.template_models import Slot
+        >>> turtle = '''
+        ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        ... @prefix tkeir: <http://tkeir.local/ontology/> .
+        ... <http://ex/d> a tkeir:Document ; tkeir:hasKeyword <http://ex/kw> .
+        ... <http://ex/kw> a tkeir:Keyword ; rdfs:label "widgets" .
+        ... '''
+        >>> kg = UserSpaceKG("fill-kw", use_process_cache=False)
+        >>> _ = kg.load([turtle], document_ids=["doc-a"])
+        >>> _fill_keyword(Slot(name="keywords", type="keyword"), kg).value
+        ['widgets']
+    """
     kws = _clip(kg.find_keywords(limit=slot.constraints.max_items), slot)
     if not kws:
         return SlotFill(
@@ -135,6 +192,25 @@ def _fill_keyword(slot: Slot, kg: UserSpaceKG) -> SlotFill:
 
 
 def _fill_svo(slot: Slot, kg: UserSpaceKG, topic: str) -> SlotFill:
+    """Fill an ``svo_pattern`` slot from non-structural triples.
+
+    Example:
+        >>> from thot.compose.composer import _fill_svo
+        >>> from thot.compose.kg import UserSpaceKG
+        >>> from thot.compose.template_models import Slot
+        >>> turtle = '''
+        ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        ... @prefix tkeir: <http://tkeir.local/ontology/> .
+        ... <http://ex/Acme> a tkeir:Company ; rdfs:label "Acme" ;
+        ...   tkeir:createdBy <http://ex/Widget> .
+        ... <http://ex/Widget> a tkeir:Product ; rdfs:label "Widget" .
+        ... '''
+        >>> kg = UserSpaceKG("fill-svo", use_process_cache=False)
+        >>> _ = kg.load([turtle], document_ids=["doc-a"])
+        >>> fill = _fill_svo(Slot(name="facts", type="svo_pattern"), kg, "Acme")
+        >>> fill.filled and "Acme" in fill.value[0]
+        True
+    """
     focus = slot.query or slot.label or topic
     triples = _clip(
         kg.find_svo(focus=focus or None, limit=slot.constraints.max_items),
@@ -165,11 +241,40 @@ def _fill_svo(slot: Slot, kg: UserSpaceKG, topic: str) -> SlotFill:
 
 
 def _expand_slot_query(query: str, topic: str) -> str:
-    """Substitute ``${topic}`` / ``{topic}`` placeholders in SPARQL templates."""
+    """Substitute ``${topic}`` / ``{topic}`` placeholders in SPARQL templates.
+
+    Example:
+        >>> from thot.compose.composer import _expand_slot_query
+        >>> _expand_slot_query('FILTER(?label = "${topic}")', "Acme")
+        'FILTER(?label = "Acme")'
+    """
     return (query or "").replace("${topic}", topic).replace("{topic}", topic)
 
 
 def _fill_sparql(slot: Slot, kg: UserSpaceKG, topic: str) -> SlotFill:
+    """Fill a ``sparql`` slot by running the slot query against the fused graph.
+
+    Example:
+        >>> from thot.compose.composer import _fill_sparql
+        >>> from thot.compose.kg import UserSpaceKG
+        >>> from thot.compose.template_models import Slot
+        >>> turtle = (
+        ...     '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . '
+        ...     '<http://ex/A> rdfs:label "Acme" .'
+        ... )
+        >>> kg = UserSpaceKG("fill-sparql", use_process_cache=False)
+        >>> _ = kg.load([turtle], document_ids=["doc-a"])
+        >>> slot = Slot(
+        ...     name="labels",
+        ...     type="sparql",
+        ...     query=(
+        ...         'SELECT ?label WHERE { ?s '
+        ...         '<http://www.w3.org/2000/01/rdf-schema#label> ?label }'
+        ...     ),
+        ... )
+        >>> _fill_sparql(slot, kg, "Acme").value[0]["label"]
+        'Acme'
+    """
     if not slot.query:
         return SlotFill(
             name=slot.name,
@@ -227,6 +332,18 @@ def _fill_sparql(slot: Slot, kg: UserSpaceKG, topic: str) -> SlotFill:
 
 
 def _evidence_from_fills(fills: list[SlotFill]) -> tuple[list[str], list[str]]:
+    """Collect unique chunk and document ids from prior filled slots.
+
+    Example:
+        >>> from thot.compose.composer import _evidence_from_fills
+        >>> from thot.compose.template_models import SlotFill, SlotProvenance
+        >>> fills = [
+        ...     SlotFill(name="a", filled=True, provenance=SlotProvenance(chunk_ids=["c1"])),
+        ...     SlotFill(name="b", filled=True, provenance=SlotProvenance(document_ids=["d1"])),
+        ... ]
+        >>> _evidence_from_fills(fills)
+        (['c1'], ['d1'])
+    """
     chunks: list[str] = []
     docs: list[str] = []
     for fill in fills:
@@ -302,6 +419,18 @@ def fill_slot(
 
 
 def _slot_fill_from_param_override(slot: Slot, override: Any) -> SlotFill:
+    """Build a filled slot from a caller-supplied param override dict.
+
+    Example:
+        >>> from thot.compose.composer import _slot_fill_from_param_override
+        >>> from thot.compose.template_models import Slot
+        >>> fill = _slot_fill_from_param_override(
+        ...     Slot(name="custom", type="entity"),
+        ...     {"value": "Acme", "provenance": {"chunk_ids": ["c1"]}},
+        ... )
+        >>> fill.filled and fill.provenance.chunk_ids == ["c1"]
+        True
+    """
     if isinstance(override, dict) and "value" in override:
         prov = override.get("provenance") or {}
         return SlotFill(
@@ -329,6 +458,27 @@ def _fill_all_slots(
     writer: SlotWriter,
     params: dict[str, Any],
 ) -> list[SlotFill]:
+    """Fill every slot in ``spec`` respecting param overrides.
+
+    Example:
+        >>> from thot.compose.composer import _fill_all_slots
+        >>> from thot.compose.kg import UserSpaceKG
+        >>> from thot.compose.template_models import TemplateSpec, Slot
+        >>> from thot.compose.writers import DeterministicWriter
+        >>> spec = TemplateSpec(name="t", slots=[Slot(name="entity", type="entity", label="Acme")])
+        >>> turtle = '''
+        ... @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+        ... @prefix tkeir: <http://tkeir.local/ontology/> .
+        ... <http://ex/c> a tkeir:DocumentChunk ; rdfs:label "chunk-1" ;
+        ...   tkeir:hasMention <http://ex/Acme> .
+        ... <http://ex/Acme> a tkeir:Company ; rdfs:label "Acme" .
+        ... '''
+        >>> kg = UserSpaceKG("all-slots", use_process_cache=False)
+        >>> _ = kg.load([turtle], document_ids=["doc-a"])
+        >>> fills = _fill_all_slots(spec, kg=kg, topic="Acme", writer=DeterministicWriter(), params={})
+        >>> fills[0].filled
+        True
+    """
     fills: list[SlotFill] = []
     for slot in spec.slots:
         if slot.name in params and params[slot.name] is not None:
@@ -351,6 +501,21 @@ def _fill_all_slots(
 def _enforce_slot_constraints(
     fills: list[SlotFill], spec: TemplateSpec
 ) -> list[SlotFill]:
+    """Apply min_items / required constraints after reviewer validation.
+
+    Example:
+        >>> from thot.compose.composer import _enforce_slot_constraints
+        >>> from thot.compose.template_models import (
+        ...     Slot, SlotConstraint, SlotFill, TemplateSpec,
+        ... )
+        >>> spec = TemplateSpec(
+        ...     name="t",
+        ...     slots=[Slot(name="items", type="keyword", constraints=SlotConstraint(min_items=2))],
+        ... )
+        >>> fills = [SlotFill(name="items", filled=True, value=["only-one"])]
+        >>> _enforce_slot_constraints(fills, spec)[0].filled
+        False
+    """
     slot_by_name = {s.name: s for s in spec.slots}
     finalized: list[SlotFill] = []
     for fill in fills:
@@ -393,6 +558,24 @@ def _build_render_context(
     topic: str,
     kg: UserSpaceKG,
 ) -> tuple[dict[str, Any], dict[str, list[str]], dict[str, Any], list[str]]:
+    """Build Jinja render context, structured JSON, and unfilled notes.
+
+    Example:
+        >>> from thot.compose.composer import _build_render_context
+        >>> from thot.compose.kg import UserSpaceKG
+        >>> from thot.compose.template_models import SlotFill, SlotProvenance, TemplateSpec
+        >>> spec = TemplateSpec(name="t")
+        >>> kg = UserSpaceKG("ctx", use_process_cache=False)
+        >>> fills = [SlotFill(
+        ...     name="summary", filled=True, value="text",
+        ...     provenance=SlotProvenance(chunk_ids=["c1"]),
+        ... )]
+        >>> structured, citations, ctx, unfilled = _build_render_context(
+        ...     fills, spec=spec, topic="Acme", kg=kg,
+        ... )
+        >>> structured["summary"] == "text" and citations["summary"] == ["c1"]
+        True
+    """
     structured: dict[str, Any] = {}
     citations: dict[str, list[str]] = {}
     unfilled: list[str] = []
@@ -422,6 +605,16 @@ def _render_compose_markdown(
     citations: dict[str, list[str]],
     unfilled: list[str],
 ) -> str:
+    """Render markdown from template and append a citations section.
+
+    Example:
+        >>> from thot.compose.composer import _render_compose_markdown
+        >>> from thot.compose.template_models import TemplateSpec
+        >>> spec = TemplateSpec(name="t", markdown_template="# {{ topic }}")
+        >>> md = _render_compose_markdown(spec, {"topic": "Acme"}, {"summary": ["c1"]}, [])
+        >>> "# Acme" in md and "c1" in md
+        True
+    """
     env = _jinja_env()
     try:
         markdown = env.from_string(spec.markdown_template or "").render(**ctx)

@@ -25,6 +25,15 @@ _SLOT_TAG = re.compile(r"^\[([A-Za-z0-9_]+)\]\s*", re.IGNORECASE)
 
 
 def _parse_json_object(text: str) -> dict[str, Any] | None:
+    """Extract the first JSON object from LLM output (fenced or raw).
+
+    Example:
+        >>> from thot.compose.writers import _parse_json_object
+        >>> _parse_json_object('```json\\n{"text": "hi"}\\n```')["text"]
+        'hi'
+        >>> _parse_json_object("no json") is None
+        True
+    """
     text = (text or "").strip()
     match = _JSON_FENCE.search(text)
     raw = match.group(1) if match else text
@@ -51,7 +60,14 @@ class SlotWriter(Protocol):
         evidence_chunk_ids: list[str],
         evidence_document_ids: list[str],
     ) -> SlotFill:
-        """Return a filled or unfilled slot."""
+        """Return a filled or unfilled slot.
+
+        Example:
+            >>> import inspect
+            >>> from thot.compose.writers import SlotWriter
+            >>> inspect.isfunction(SlotWriter.write)
+            True
+        """
 
 
 class DeterministicWriter:
@@ -83,6 +99,21 @@ class DeterministicWriter:
         evidence_chunk_ids: list[str],
         evidence_document_ids: list[str],
     ) -> SlotFill:
+        """Write grounded prose from KG context or mark slot unfilled.
+
+        Example:
+            >>> from thot.compose.writers import DeterministicWriter
+            >>> from thot.compose.template_models import Slot
+            >>> fill = DeterministicWriter().write(
+            ...     Slot(name="summary", type="freeform_grounded"),
+            ...     topic="Acme",
+            ...     context="- Acme | createdBy | Widget",
+            ...     evidence_chunk_ids=["chunk-1"],
+            ...     evidence_document_ids=["doc-a"],
+            ... )
+            >>> fill.filled
+            True
+        """
         if slot.name in {"open_questions", "open_question"}:
             return SlotFill(
                 name=slot.name,
@@ -134,6 +165,18 @@ class FindingsGroundedWriter:
         document_ids: list[str],
         fallback: DeterministicWriter | None = None,
     ) -> None:
+        """Store findings context and evidence ids for slot-tagged prose.
+
+        Example:
+            >>> from thot.compose.writers import FindingsGroundedWriter
+            >>> w = FindingsGroundedWriter(
+            ...     findings_context="- [summary] Acme launched Widget",
+            ...     chunk_ids=["c1"],
+            ...     document_ids=["d1"],
+            ... )
+            >>> w.chunk_ids
+            ['c1']
+        """
         self.findings_context = (findings_context or "").strip()
         self.chunk_ids = list(chunk_ids or [])
         self.document_ids = list(document_ids or [])
@@ -143,6 +186,14 @@ class FindingsGroundedWriter:
     def prose_for_slot(findings_context: str, slot_name: str) -> str | None:
         """Return slot-tagged bullets, empty string if tags exist but none match,
         or ``None`` when findings are untagged (legacy dump-all mode).
+
+        Example:
+            >>> from thot.compose.writers import FindingsGroundedWriter
+            >>> FindingsGroundedWriter.prose_for_slot(
+            ...     "- [summary] Acme launched Widget\\n- [risks] Supply delay",
+            ...     "summary",
+            ... )
+            '- Acme launched Widget'
         """
         text = (findings_context or "").strip()
         if not text:
@@ -178,6 +229,24 @@ class FindingsGroundedWriter:
         evidence_chunk_ids: list[str],
         evidence_document_ids: list[str],
     ) -> SlotFill:
+        """Prefer slot-tagged findings; fall back to deterministic writer.
+
+        Example:
+            >>> from thot.compose.writers import FindingsGroundedWriter
+            >>> from thot.compose.template_models import Slot
+            >>> w = FindingsGroundedWriter(
+            ...     findings_context="- [summary] Acme launched Widget",
+            ...     chunk_ids=["c1"],
+            ...     document_ids=["d1"],
+            ... )
+            >>> fill = w.write(
+            ...     Slot(name="summary", type="freeform_grounded"),
+            ...     topic="Acme", context="", evidence_chunk_ids=["c1"],
+            ...     evidence_document_ids=["d1"],
+            ... )
+            >>> fill.filled and "Acme" in str(fill.value)
+            True
+        """
         if slot.name in {"open_questions", "open_question"}:
             return self.fallback.write(
                 slot,
@@ -231,6 +300,13 @@ class LlmWriter:
     """Single-shot writer using ``UnifiedLLMWrapper`` + writer agent prompt."""
 
     def __init__(self, llm: Any, *, agent_name: str = "writer") -> None:
+        """Bind an LLM client and writer agent spec name.
+
+        Example:
+            >>> from thot.compose.writers import LlmWriter
+            >>> LlmWriter(None).agent_name
+            'writer'
+        """
         self.llm = llm
         self.agent_name = agent_name
 
@@ -243,6 +319,19 @@ class LlmWriter:
         evidence_chunk_ids: list[str],
         evidence_document_ids: list[str],
     ) -> str:
+        """Build the user prompt for a single-shot writer call.
+
+        Example:
+            >>> from thot.compose.writers import LlmWriter
+            >>> from thot.compose.template_models import Slot
+            >>> prompt = LlmWriter(None)._build_user_prompt(
+            ...     Slot(name="summary", type="freeform_grounded", description="Summary"),
+            ...     topic="Acme", context="facts", evidence_chunk_ids=["c1"],
+            ...     evidence_document_ids=["d1"],
+            ... )
+            >>> "Allowed chunk_ids: ['c1']" in prompt
+            True
+        """
         allowed = evidence_chunk_ids or []
         return (
             f"Slot: {slot.name}\n"
@@ -258,6 +347,18 @@ class LlmWriter:
         )
 
     def _run_llm(self, user: str, system: str, temperature: float) -> str:
+        """Run the async LLM generate call from sync writer code.
+
+        Example:
+            >>> import asyncio
+            >>> from thot.compose.writers import LlmWriter
+            >>> class _FakeLlm:
+            ...     async def generate(self, user, *, system, temperature):
+            ...         return '{"text": "ok", "chunk_ids": ["c1"]}'
+            >>> out = LlmWriter(_FakeLlm())._run_llm("u", "s", 0.0)
+            >>> '"text"' in out
+            True
+        """
         import asyncio
 
         async def _gen() -> str:
@@ -277,6 +378,17 @@ class LlmWriter:
         allowed: list[str],
         evidence_document_ids: list[str],
     ) -> tuple[str, list[str], list[str]]:
+        """Filter LLM citations to allowed chunk and document ids.
+
+        Example:
+            >>> from thot.compose.writers import LlmWriter
+            >>> LlmWriter(None)._grounded_citations(
+            ...     {"text": "hi", "chunk_ids": ["c1", "evil"], "document_ids": ["d1"]},
+            ...     allowed=["c1"],
+            ...     evidence_document_ids=["d1"],
+            ... )
+            ('hi', ['c1'], ['d1'])
+        """
         text = str(data.get("text") or "").strip()
         allowed_set = set(allowed)
         cited = [
@@ -303,6 +415,23 @@ class LlmWriter:
         evidence_chunk_ids: list[str],
         evidence_document_ids: list[str],
     ) -> SlotFill:
+        """Convert validated LLM output into a grounded ``SlotFill``.
+
+        Example:
+            >>> from thot.compose.writers import LlmWriter
+            >>> from thot.compose.template_models import Slot
+            >>> fill = LlmWriter(None)._slot_fill_from_response(
+            ...     Slot(name="summary", type="freeform_grounded"),
+            ...     text="Grounded text",
+            ...     cited=["c1"],
+            ...     docs=["d1"],
+            ...     allowed=["c1"],
+            ...     evidence_chunk_ids=["c1"],
+            ...     evidence_document_ids=["d1"],
+            ... )
+            >>> fill.filled and fill.provenance.chunk_ids == ["c1"]
+            True
+        """
         if not text or (allowed and not cited and not docs):
             return SlotFill(
                 name=slot.name,
@@ -331,6 +460,22 @@ class LlmWriter:
         evidence_chunk_ids: list[str],
         evidence_document_ids: list[str],
     ) -> SlotFill:
+        """Call the writer agent LLM and return a grounded slot fill.
+
+        Example:
+            >>> from thot.compose.writers import LlmWriter
+            >>> from thot.compose.template_models import Slot
+            >>> class _FakeLlm:
+            ...     async def generate(self, user, *, system, temperature):
+            ...         return '{"text": "Summary text", "chunk_ids": ["c1"]}'
+            >>> fill = LlmWriter(_FakeLlm()).write(
+            ...     Slot(name="summary", type="freeform_grounded"),
+            ...     topic="Acme", context="facts",
+            ...     evidence_chunk_ids=["c1"], evidence_document_ids=["d1"],
+            ... )
+            >>> fill.filled
+            True
+        """
         if not evidence_chunk_ids and not evidence_document_ids:
             return SlotFill(
                 name=slot.name,
@@ -384,7 +529,23 @@ class Reviewer:
     """
 
     def validate(self, fills: list[SlotFill]) -> list[SlotFill]:
-        """Return fills with ungrounded values marked unfilled."""
+        """Return fills with ungrounded values marked unfilled.
+
+        Example:
+            >>> from thot.compose.writers import Reviewer
+            >>> from thot.compose.template_models import SlotFill, SlotProvenance
+            >>> ok = SlotFill(
+            ...     name="a", filled=True, value="x",
+            ...     provenance=SlotProvenance(chunk_ids=["c1"]),
+            ... )
+            >>> bad = SlotFill(
+            ...     name="b", filled=True, value="y",
+            ...     provenance=SlotProvenance(chunk_ids=[]),
+            ... )
+            >>> out = Reviewer().validate([ok, bad])
+            >>> out[0].filled and not out[1].filled
+            True
+        """
         reviewed: list[SlotFill] = []
         for fill in fills:
             if not fill.filled:

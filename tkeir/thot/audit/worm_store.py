@@ -22,16 +22,60 @@ LOGGER = logging.getLogger(__name__)
 
 
 class WormSegmentStore:
-    """Write-once JSONL.gz segments with SHA-256 sidecars."""
+    """Write-once JSONL.gz segments with SHA-256 sidecars.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.audit.worm_store import WormSegmentStore
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     store = WormSegmentStore(Path(td))
+        ...     store.list_segments()
+        []
+    """
 
     def __init__(self, root: Path) -> None:
+        """Create WORM root directory when missing.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.audit.worm_store import WormSegmentStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     _ = WormSegmentStore(root)
+            ...     root.is_dir()
+            True
+        """
         self.root = root
         self.root.mkdir(parents=True, exist_ok=True)
 
     def segment_path(self, segment_id: str) -> Path:
+        """Return filesystem path for one segment gzip file.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.audit.worm_store import WormSegmentStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = WormSegmentStore(Path(td))
+            ...     store.segment_path("demo").name
+            'demo.jsonl.gz'
+        """
         return self.root / f"{segment_id}.jsonl.gz"
 
     def sha_path(self, segment_id: str) -> Path:
+        """Return sidecar SHA-256 path for one segment.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.audit.worm_store import WormSegmentStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = WormSegmentStore(Path(td))
+            ...     store.sha_path("demo").name
+            'demo.sha256'
+        """
         return self.root / f"{segment_id}.sha256"
 
     def write_segment(
@@ -100,7 +144,21 @@ class WormSegmentStore:
         return f"worm://{segment_id}"
 
     def read_segment(self, segment_id: str) -> list[ActionRecord]:
-        """Load and verify one segment."""
+        """Load and verify one segment.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.action.models import ActionRecord
+            >>> from thot.audit.worm_store import WormSegmentStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = WormSegmentStore(Path(td))
+            ...     _ = store.write_segment(
+            ...         "r1", [ActionRecord(correlation_id="r" * 32).seal("")]
+            ...     )
+            ...     len(store.read_segment("r1"))
+            1
+        """
         seg_path = self.segment_path(segment_id)
         if not seg_path.is_file():
             raise FileNotFoundError(segment_id)
@@ -120,13 +178,39 @@ class WormSegmentStore:
         return records
 
     def list_segments(self) -> list[str]:
+        """Return sorted segment ids present on disk.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.action.models import ActionRecord
+            >>> from thot.audit.worm_store import WormSegmentStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = WormSegmentStore(Path(td))
+            ...     _ = store.write_segment(
+            ...         "s1", [ActionRecord(correlation_id="s" * 32).seal("")]
+            ...     )
+            ...     store.list_segments()
+            ['s1']
+        """
         return sorted(
             path.name.removesuffix(".jsonl.gz")
             for path in self.root.glob("*.jsonl.gz")
         )
 
     def write_anchor(self, *, record_hash: str, segment_id: str) -> Path:
-        """Persist a daily chain-head anchor."""
+        """Persist a daily chain-head anchor.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.audit.worm_store import WormSegmentStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = WormSegmentStore(Path(td))
+            ...     path = store.write_anchor(record_hash="abc", segment_id="s1")
+            ...     path.is_file()
+            True
+        """
         anchors = self.root / "anchors"
         anchors.mkdir(parents=True, exist_ok=True)
         day = utc_now_rfc3339()[:10]

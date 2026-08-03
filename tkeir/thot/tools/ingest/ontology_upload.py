@@ -23,7 +23,13 @@ _SAFE_NAME = re.compile(r"[^A-Za-z0-9._-]+")
 
 
 def safe_ontology_filename(name: str | None, *, index: int = 0) -> str:
-    """Sanitize an ontology upload filename for staging on disk."""
+    """Sanitize an ontology upload filename for staging on disk.
+
+    Example:
+        >>> from thot.tools.ingest.ontology_upload import safe_ontology_filename
+        >>> safe_ontology_filename("My Ontology.owl")
+        'My_Ontology.owl'
+    """
     raw = Path(name or f"ontology_{index}.ttl").name
     cleaned = _SAFE_NAME.sub("_", raw).strip("._") or f"ontology_{index}.ttl"
     if Path(cleaned).suffix.lower() not in {
@@ -52,6 +58,16 @@ def stage_ontology_bytes(
 
     Returns:
         Absolute paths to staged files (safe for pipeline derive-from).
+    
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.tools.ingest.ontology_upload import stage_ontology_bytes
+        >>> with tempfile.TemporaryDirectory() as temp_dir:
+        ...     paths = stage_ontology_bytes(Path(temp_dir), [("test.ttl", b"@prefix ex: <http://ex/> .")])
+        ...     len(paths)
+        1
     """
     staging_dir.mkdir(parents=True, exist_ok=True)
     paths: list[str] = []
@@ -82,6 +98,14 @@ def decode_ontology_uploads(raw: Any) -> list[tuple[str, bytes]]:
 
     Raises:
         ValueError: When the payload shape is invalid.
+    
+
+    Example:
+        >>> import base64
+        >>> from thot.tools.ingest.ontology_upload import decode_ontology_uploads
+        >>> b64 = base64.b64encode(b"ttl").decode()
+        >>> decode_ontology_uploads([{"filename": "x.ttl", "content_base64": b64}])
+        [('x.ttl', b'ttl')]
     """
     if raw is None:
         return []
@@ -127,7 +151,13 @@ def decode_ontology_uploads(raw: Any) -> list[tuple[str, bytes]]:
 def strip_client_ontology_paths(
     metadata: dict[str, Any] | None,
 ) -> dict[str, Any] | None:
-    """Remove path-based ontology keys from metadata (server cannot use them)."""
+    """Remove path-based ontology keys from metadata (server cannot use them).
+
+    Example:
+        >>> from thot.tools.ingest.ontology_upload import strip_client_ontology_paths
+        >>> strip_client_ontology_paths({"ontologies": ["/local/path.ttl"], "title": "x"})
+        {'title': 'x'}
+    """
     if not metadata:
         return metadata
     cleaned = dict(metadata)

@@ -144,7 +144,12 @@ def _load_model(
 
 
 def clear_spacy_model_cache() -> None:
-    """Drop cached spaCy models (tests / memory reclaim)."""
+    """Drop cached spaCy models (tests / memory reclaim).
+
+    Example:
+        >>> clear_spacy_model_cache() is None
+        True
+    """
     with _MODEL_CACHE_LOCK:
         _MODEL_CACHE.clear()
 

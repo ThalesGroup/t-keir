@@ -59,11 +59,18 @@ from thot.tools.search.vespa_client import (
 LOGGER = logging.getLogger(__name__)
 
 BATCH_SIZE = 50
-OKF_VERSION = "0.1"
+OKF_VERSION = "0.2"
 
 
 class OkfVespaClient(Protocol):
-    """Minimal Vespa surface used by the exporter (mockable in tests)."""
+    """Minimal Vespa surface used by the exporter (mockable in tests).
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.exporter import VespaOkfBackend
+        >>> inspect.iscoroutinefunction(VespaOkfBackend.list_parent_documents)
+        True
+    """
 
     async def list_parent_documents(
         self,
@@ -72,7 +79,22 @@ class OkfVespaClient(Protocol):
         max_docs: int,
         doc_ids: list[str] | None = None,
     ) -> list[dict[str, Any]]:
-        """Return parent document field dicts for ``user_space``."""
+        """Return parent document field dicts for ``user_space``.
+
+        Args:
+            user_space: Normalized tenant id.
+            max_docs: Maximum parent documents to return.
+            doc_ids: Optional allow-list of source ids.
+
+        Returns:
+            Vespa field dicts shaped like parent documents.
+
+        Example:
+            >>> import inspect
+            >>> from thot.okf.exporter import VespaOkfBackend
+            >>> inspect.iscoroutinefunction(VespaOkfBackend.list_parent_documents)
+            True
+        """
 
     async def list_chunk_ids_for_parent(
         self,
@@ -81,13 +103,45 @@ class OkfVespaClient(Protocol):
         doc_ref: str,
         parent_source_id: str,
     ) -> list[dict[str, Any]]:
-        """Return chunk stubs ``{chunk_id, text_raw}`` for a parent."""
+        """Return chunk stubs ``{chunk_id, text_raw}`` for a parent.
+
+        Args:
+            user_space: Normalized tenant id.
+            doc_ref: Vespa document id for the parent.
+            parent_source_id: Stable source id used in YQL filtering.
+
+        Returns:
+            Chunk stub dicts with ``chunk_id`` and ``text_raw`` keys.
+
+        Example:
+            >>> import inspect
+            >>> from thot.okf.exporter import VespaOkfBackend
+            >>> inspect.iscoroutinefunction(VespaOkfBackend.list_chunk_ids_for_parent)
+            True
+        """
 
 
 class VespaOkfBackend:
-    """Default backend: YQL over ``user`` (streaming) passages."""
+    """Default backend: YQL over ``user`` (streaming) passages.
+
+    Example:
+        >>> from thot.okf.exporter import VespaOkfBackend
+        >>> backend = VespaOkfBackend(vespa=object())
+        >>> backend._vespa is not None
+        True
+    """
 
     def __init__(self, vespa: VespaClient | None = None) -> None:
+        """Wrap a Vespa client (or the process default).
+
+        Args:
+            vespa: Optional client; defaults to :class:`~thot.tools.search.vespa_client.VespaClient`.
+
+        Example:
+            >>> from thot.okf.exporter import VespaOkfBackend
+            >>> VespaOkfBackend(vespa=object())._vespa is not None
+            True
+        """
         self._vespa = vespa or VespaClient()
 
     async def list_parent_documents(
@@ -97,6 +151,27 @@ class VespaOkfBackend:
         max_docs: int,
         doc_ids: list[str] | None = None,
     ) -> list[dict[str, Any]]:
+        """List parent-shaped documents from Vespa streaming passages.
+
+        Args:
+            user_space: Tenant id passed to ``streaming.groupname``.
+            max_docs: Cap on deduplicated parent documents.
+            doc_ids: Optional filter on ``source_ref`` / ids.
+
+        Returns:
+            Field dicts with ``source_doc_id``, ``title``, and ``content``.
+
+        Example:
+            >>> import asyncio
+            >>> from thot.okf.exporter import VespaOkfBackend
+            >>> class _FakeVespa:
+            ...     async def search(self, payload):
+            ...         return {"root": {"children": [{"id": "id:1", "fields": {"userspace_id": "dev@tkeir", "source_ref": "doc-1", "chunk_text": "Hello world."}}]}}
+            >>> backend = VespaOkfBackend(_FakeVespa())
+            >>> docs = asyncio.run(backend.list_parent_documents(user_space="dev@tkeir", max_docs=5))
+            >>> docs[0]["source_doc_id"]
+            'doc-1'
+        """
         space = normalize_user_space(user_space)
         wanted = (
             {normalize_user_space(d) for d in doc_ids or []}
@@ -169,6 +244,27 @@ class VespaOkfBackend:
         doc_ref: str,
         parent_source_id: str,
     ) -> list[dict[str, Any]]:
+        """List chunk stubs linked to one parent document.
+
+        Args:
+            user_space: Tenant id passed to ``streaming.groupname``.
+            doc_ref: Vespa id for the parent (fallback match key).
+            parent_source_id: ``source_ref`` needle for YQL filtering.
+
+        Returns:
+            Chunk stubs with ``chunk_id`` and truncated ``text_raw``.
+
+        Example:
+            >>> import asyncio
+            >>> from thot.okf.exporter import VespaOkfBackend
+            >>> class _ChunkVespa:
+            ...     async def search(self, payload):
+            ...         return {"root": {"children": [{"id": "id:2", "fields": {"userspace_id": "dev@tkeir", "source_ref": "doc-1", "chunk_id": "c1", "chunk_text": "Chunk text."}}]}}
+            >>> backend = VespaOkfBackend(_ChunkVespa())
+            >>> chunks = asyncio.run(backend.list_chunk_ids_for_parent(user_space="dev@tkeir", doc_ref="id:1", parent_source_id="doc-1"))
+            >>> chunks[0]["chunk_id"]
+            'c1'
+        """
         space = normalize_user_space(user_space)
         needle = parent_source_id or doc_ref
         lit = _yql_escape(needle)
@@ -231,6 +327,21 @@ class VespaOkfBackend:
 
 
 def _yql_escape(value: str) -> str:
+    """Escape backslashes and quotes for YQL string literals.
+
+    Args:
+        value: Raw string embedded inside ``"..."`` in YQL.
+
+    Returns:
+        Escaped string safe for double-quoted YQL literals.
+
+    Example:
+        >>> from thot.okf.exporter import _yql_escape
+        >>> _yql_escape('"')
+        '\\\\"'
+        >>> _yql_escape('a\\\\b')
+        'a\\\\\\\\b'
+    """
     return value.replace("\\", "\\\\").replace('"', '\\"')
 
 
@@ -239,6 +350,22 @@ def default_okf_root() -> Path:
 
     New durable bundles belong under ``workspace/users/<space>/okf/`` via
     :func:`user_okf_root`. Prefer that path for writes.
+
+    Returns:
+        Resolved directory for legacy flat bundle storage.
+
+    Example:
+        >>> import os
+        >>> from pathlib import Path
+        >>> from thot.okf.exporter import default_okf_root
+        >>> _saved = os.environ.pop("OKF_ROOT", None)
+        >>> os.environ["OKF_ROOT"] = "/tmp/my-okf"
+        >>> default_okf_root() == Path("/tmp/my-okf").resolve()
+        True
+        >>> if _saved is None:
+        ...     _ = os.environ.pop("OKF_ROOT", None)
+        ... else:
+        ...     os.environ["OKF_ROOT"] = _saved
     """
     raw = os.getenv("OKF_ROOT", "").strip()
     if raw:
@@ -252,7 +379,23 @@ def default_okf_root() -> Path:
 def user_okf_root(
     user_space: str, *, workspace: Path | str | None = None
 ) -> Path:
-    """Per-user OKF directory: ``workspace/users/<space>/okf`` (MinIO-ready)."""
+    """Per-user OKF directory: ``workspace/users/<space>/okf`` (MinIO-ready).
+
+    Args:
+        user_space: Tenant id owning the OKF tree.
+        workspace: Optional workspace root (defaults to process layout).
+
+    Returns:
+        Absolute ``okf`` directory for ``user_space`` (created if needed).
+
+    Example:
+        >>> import tempfile
+        >>> from thot.okf.exporter import user_okf_root
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     root = user_okf_root("dev@tkeir", workspace=td)
+        ...     root.name
+        'okf'
+    """
     from thot.tools.ingest.user_workspace import UserWorkspace
 
     return UserWorkspace(user_space, root=workspace).ensure_okf_layout()
@@ -271,6 +414,24 @@ def resolve_bundle_dir(
       1. Explicit ``output_dir``
       2. Flat ``OKF_ROOT/<bundle_id>`` when ``OKF_ROOT`` is set (tests/legacy)
       3. ``workspace/users/<space>/okf/<bundle_id>`` (default demo layout)
+
+    Args:
+        user_space: Tenant id for the per-user layout.
+        bundle_id: New bundle directory name.
+        output_dir: Explicit override path when set.
+        workspace: Optional workspace root for :func:`user_okf_root`.
+
+    Returns:
+        Absolute path to the bundle directory (not yet created).
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.exporter import resolve_bundle_dir
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     p = resolve_bundle_dir("dev@tkeir", "b1", output_dir=td)
+        ...     p == Path(td).resolve()
+        True
     """
     if output_dir is not None and str(output_dir).strip():
         return Path(output_dir).expanduser().resolve()
@@ -281,6 +442,13 @@ def resolve_bundle_dir(
 
 def first_sentence(text: str, *, language: str = "en") -> str:
     """Return the first sentence of ``text`` (pysbd via SentenceSegmenter).
+
+    Args:
+        text: Input prose to segment.
+        language: pysbd language code (default ``en``).
+
+    Returns:
+        First sentence, or a truncated fallback when segmentation fails.
 
     Example:
         >>> from thot.okf.exporter import first_sentence
@@ -304,7 +472,27 @@ def first_sentence(text: str, *, language: str = "en") -> str:
 
 
 def render_frontmatter(fm: OkfConceptFrontmatter) -> str:
-    """Serialize frontmatter to YAML between ``---`` fences."""
+    """Serialize frontmatter to YAML between ``---`` fences.
+
+    Args:
+        fm: OKF concept frontmatter model.
+
+    Returns:
+        YAML frontmatter block including opening and closing ``---`` lines.
+
+    Example:
+        >>> from thot.okf.exporter import render_frontmatter
+        >>> from thot.okf.models import OkfConceptFrontmatter
+        >>> fm = OkfConceptFrontmatter(
+        ...     type="Document",
+        ...     tkeir_doc_id="d1",
+        ...     tkeir_user_space="dev@tkeir",
+        ...     title="Hi",
+        ... )
+        >>> text = render_frontmatter(fm)
+        >>> text.startswith("---\\n") and text.endswith("---\\n")
+        True
+    """
     data = fm.model_dump(mode="json", exclude_none=True)
     # Stable key order for tests / diffs
     dumped = yaml.safe_dump(
@@ -317,6 +505,23 @@ def render_frontmatter(fm: OkfConceptFrontmatter) -> str:
 
 
 def _content_text(fields: dict[str, Any]) -> str:
+    """Join parent ``content`` field values into one string.
+
+    Args:
+        fields: Vespa or mapped parent field dict.
+
+    Returns:
+        Space-joined list content, a string value, or ``""``.
+
+    Example:
+        >>> from thot.okf.exporter import _content_text
+        >>> _content_text({"content": ["a", "b"]})
+        'a b'
+        >>> _content_text({"content": "plain"})
+        'plain'
+        >>> _content_text({})
+        ''
+    """
     content = fields.get("content")
     if isinstance(content, list):
         return " ".join(str(x) for x in content if x)
@@ -328,6 +533,20 @@ def _content_text(fields: dict[str, Any]) -> str:
 def _keywords_from_fields(
     fields: dict[str, Any], limit: int = 10
 ) -> list[str]:
+    """Collect deduplicated keywords from Vespa tag fields.
+
+    Args:
+        fields: Parent field dict with optional keyword lists.
+        limit: Maximum tags to return.
+
+    Returns:
+        De-duplicated keyword strings (case-insensitive), order preserved.
+
+    Example:
+        >>> from thot.okf.exporter import _keywords_from_fields
+        >>> _keywords_from_fields({"title_keywords": ["A", "a", "B"], "keywords": "C"})
+        ['A', 'B', 'C']
+    """
     tags: list[str] = []
     for key in ("title_keywords", "content_keywords", "keywords"):
         raw = fields.get(key)
@@ -350,6 +569,22 @@ def _keywords_from_fields(
 
 
 def _entities_table(json_ld: str) -> str:
+    """Render a Markdown table from ontology JSON-LD nodes.
+
+    Args:
+        json_ld: JSON-LD document or array serialized as a string.
+
+    Returns:
+        Markdown table or a short placeholder when empty/unparseable.
+
+    Example:
+        >>> from thot.okf.exporter import _entities_table
+        >>> table = _entities_table('[{"@type": "Person", "rdfs:label": "Ada", "frequency": 3}]')
+        >>> "Ada" in table and "Person" in table
+        True
+        >>> _entities_table("")
+        '_No entities available._\\n'
+    """
     if not json_ld or not json_ld.strip():
         return "_No entities available._\n"
     try:
@@ -393,6 +628,21 @@ def _entities_table(json_ld: str) -> str:
 
 
 def _relations_table(kg: UserSpaceKG, *, limit: int = 20) -> str:
+    """Render SVO triples from a loaded :class:`~thot.compose.kg.UserSpaceKG`.
+
+    Args:
+        kg: Loaded per-user knowledge graph.
+        limit: Maximum triple rows.
+
+    Returns:
+        Markdown table or a placeholder when no relations exist.
+
+    Example:
+        >>> from thot.compose.kg import UserSpaceKG
+        >>> from thot.okf.exporter import _relations_table
+        >>> _relations_table(UserSpaceKG("x", use_process_cache=False))
+        '_No relations available._\\n'
+    """
     triples = kg.find_svo(limit=limit)
     if not triples:
         return "_No relations available._\n"
@@ -418,6 +668,34 @@ def _emit_export_action(
     status: str = "success",
     error: str | None = None,
 ) -> str:
+    """Append one OKF export :class:`~thot.action.models.ActionRecord`.
+
+    Args:
+        sink: Action record destination.
+        user_space: Tenant id recorded as actor id.
+        kind: Export kind label stored in ``ext`` and ``rules_fired``.
+        doc_ids: Document ids included in this batch.
+        bundle_id: Target OKF bundle id.
+        status: Execution status (default ``success``).
+        error: Optional error message for failed exports.
+
+    Returns:
+        Sealed ``action_id`` from the appended record.
+
+    Example:
+        >>> from thot.action.sink import InMemoryActionSink
+        >>> from thot.okf.exporter import _emit_export_action
+        >>> sink = InMemoryActionSink()
+        >>> aid = _emit_export_action(
+        ...     sink=sink,
+        ...     user_space="dev@tkeir",
+        ...     kind="okf.export.batch",
+        ...     doc_ids=["d1"],
+        ...     bundle_id="b1",
+        ... )
+        >>> len(aid) > 0 and len(sink) == 1
+        True
+    """
     cid = current_correlation_id() or generate_trace_id()
     record = ActionRecord(
         correlation_id=cid,
@@ -451,6 +729,29 @@ def _emit_export_action(
 def _write_concept_file(
     path: Path, fm: OkfConceptFrontmatter, body: str
 ) -> None:
+    """Write one OKF concept Markdown file with YAML frontmatter.
+
+    Args:
+        path: Destination ``.md`` path (parent dirs created as needed).
+        fm: Frontmatter model serialized via :func:`render_frontmatter`.
+        body: Markdown body without frontmatter fences.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.exporter import _write_concept_file
+        >>> from thot.okf.models import OkfConceptFrontmatter
+        >>> fm = OkfConceptFrontmatter(
+        ...     type="Document",
+        ...     tkeir_doc_id="d1",
+        ...     tkeir_user_space="dev@tkeir",
+        ... )
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     path = Path(td) / "c.md"
+        ...     _write_concept_file(path, fm, "# Body\\n")
+        ...     "tkeir_doc_id" in path.read_text()
+        True
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         render_frontmatter(fm) + "\n" + body.lstrip() + "\n", encoding="utf-8"
@@ -458,6 +759,21 @@ def _write_concept_file(
 
 
 def _safe_concept_filename(doc_id: str) -> str:
+    """Sanitize a document id for use as a concept filename stem.
+
+    Args:
+        doc_id: Raw source or Vespa id.
+
+    Returns:
+        Filesystem-safe stem, or ``document`` when empty after cleaning.
+
+    Example:
+        >>> from thot.okf.exporter import _safe_concept_filename
+        >>> _safe_concept_filename("doc/with spaces.pdf")
+        'doc_with_spaces.pdf'
+        >>> _safe_concept_filename("")
+        'document'
+    """
     cleaned = "".join(
         c if c.isalnum() or c in "-_." else "_" for c in doc_id
     ).strip("._")
@@ -471,6 +787,36 @@ async def _build_concept_markdown(
     chunk_stubs: list[dict[str, Any]],
     kg: UserSpaceKG,
 ) -> tuple[OkfConceptFrontmatter, str, bool]:
+    """Build frontmatter and Markdown body for one concept file.
+
+    Args:
+        fields: Parent Vespa field dict.
+        user_space: Tenant id for ``tkeir_user_space`` and resources.
+        chunk_stubs: Chunk stubs from :meth:`VespaOkfBackend.list_chunk_ids_for_parent`.
+        kg: Loaded knowledge graph for relations and fallback tags.
+
+    Returns:
+        Tuple of frontmatter, Markdown body, and ``True`` when ontology is missing.
+
+    Example:
+        >>> import asyncio
+        >>> from thot.compose.kg import UserSpaceKG
+        >>> from thot.okf.exporter import _build_concept_markdown
+        >>> fields = {"source_doc_id": "d1", "title": "T", "content": ["One. Two."]}
+        >>> kg = UserSpaceKG("dev@tkeir", use_process_cache=False)
+        >>> fm, body, unfilled = asyncio.run(_build_concept_markdown(
+        ...     fields=fields,
+        ...     user_space="dev@tkeir",
+        ...     chunk_stubs=[{"chunk_id": "c1", "text_raw": "Hi."}],
+        ...     kg=kg,
+        ... ))
+        >>> fm.tkeir_doc_id
+        'd1'
+        >>> unfilled
+        True
+        >>> "# T" in body
+        True
+    """
     source = str(
         fields.get("source_doc_id") or fields.get("_vespa_id") or "unknown"
     )
@@ -496,6 +842,8 @@ async def _build_concept_markdown(
     pipeline_sha = fields.get("pipeline_config_sha256") or fields.get(
         "tkeir_pipeline_sha"
     )
+    from thot.okf.models import OkfActorEvent, OkfSourceEntry
+
     fm = OkfConceptFrontmatter(
         type=doc_type,
         title=title,
@@ -503,6 +851,18 @@ async def _build_concept_markdown(
         resource=f"vespa://{user_space}/{source}",
         tags=tags,
         timestamp=datetime.now(timezone.utc),
+        sources=[
+            OkfSourceEntry(
+                id=source,
+                resource=f"vespa://{user_space}/{source}",
+                title=title,
+                author="process:tkeir-okf-export",
+            )
+        ],
+        generated=OkfActorEvent(
+            by="process:tkeir-okf-export",
+            at=datetime.now(timezone.utc),
+        ),
         tkeir_doc_id=source,
         tkeir_user_space=user_space,
         tkeir_chunk_ids=chunk_ids,
@@ -542,7 +902,15 @@ async def export_full(
     vespa_client: OkfVespaClient | None = None,
     action_sink: ActionSink | None = None,
 ) -> OkfExportResult:
-    """Export documents in ``user_space`` as an OKF v0.1 bundle.
+    """Export documents in ``user_space`` as an OKF v0.2 bundle.
+
+    Args:
+        request: Export parameters (space, limits, optional filter ids).
+        vespa_client: Optional Vespa backend (defaults to :class:`VespaOkfBackend`).
+        action_sink: Optional action record sink (defaults to process sink).
+
+    Returns:
+        Bundle metadata, unfilled ontology doc ids, and last action id.
 
     Example:
         >>> import inspect
@@ -611,6 +979,8 @@ async def export_full(
         for stub in chunk_stubs:
             cid = str(stub["chunk_id"])
             excerpt = first_sentence(str(stub.get("text_raw") or ""))
+            from thot.okf.models import OkfActorEvent, OkfSourceEntry
+
             chunk_fm = OkfConceptFrontmatter(
                 type="Chunk",
                 title=f"chunk {cid}",
@@ -618,6 +988,18 @@ async def export_full(
                 resource=f"vespa://{space}/chunk/{cid}",
                 tags=[],
                 timestamp=datetime.now(timezone.utc),
+                sources=[
+                    OkfSourceEntry(
+                        id=cid,
+                        resource=f"vespa://{space}/chunk/{cid}",
+                        title=f"chunk {cid}",
+                        author="process:tkeir-okf-export",
+                    )
+                ],
+                generated=OkfActorEvent(
+                    by="process:tkeir-okf-export",
+                    at=datetime.now(timezone.utc),
+                ),
                 tkeir_doc_id=source,
                 tkeir_user_space=space,
                 tkeir_chunk_ids=[cid],
@@ -716,18 +1098,56 @@ async def export_full(
 
 
 class OkfRagClient(Protocol):
-    """Minimal RAG surface for scoped export."""
+    """Minimal RAG surface for scoped export.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.exporter import HttpOkfRagClient
+        >>> inspect.iscoroutinefunction(HttpOkfRagClient.query)
+        True
+    """
 
     async def query(
         self, query: str, *, user_space: str, hits: int
     ) -> dict[str, Any]:
-        """Return a RAG-like payload with document ids and answer."""
+        """Return a RAG-like payload with document ids and answer.
+
+        Args:
+            query: Natural-language question.
+            user_space: Tenant id sent to the RAG service.
+            hits: Maximum retrieval hits.
+
+        Returns:
+            Dict with ``answer``, ``chunks``, and ``document_ids`` keys.
+
+        Example:
+            >>> import inspect
+            >>> from thot.okf.exporter import HttpOkfRagClient
+            >>> inspect.iscoroutinefunction(HttpOkfRagClient.query)
+            True
+        """
 
 
 class HttpOkfRagClient:
-    """Call ``MCP_RAG_URL`` /rag/query when available."""
+    """Call ``MCP_RAG_URL`` /rag/query when available.
+
+    Example:
+        >>> from thot.okf.exporter import HttpOkfRagClient
+        >>> HttpOkfRagClient(base_url="http://mock").base_url
+        'http://mock'
+    """
 
     def __init__(self, base_url: str | None = None) -> None:
+        """Configure the RAG HTTP base URL.
+
+        Args:
+            base_url: Override; defaults to ``MCP_RAG_URL`` / ``RAG_URL``.
+
+        Example:
+            >>> from thot.okf.exporter import HttpOkfRagClient
+            >>> HttpOkfRagClient(base_url="http://example").base_url
+            'http://example'
+        """
         self.base_url = (
             base_url
             or os.getenv("MCP_RAG_URL")
@@ -738,6 +1158,22 @@ class HttpOkfRagClient:
     async def query(
         self, query: str, *, user_space: str, hits: int
     ) -> dict[str, Any]:
+        """POST ``/rag/query`` and normalize error responses.
+
+        Args:
+            query: Natural-language question.
+            user_space: Sent as ``X-Tkeir-User-Space`` header.
+            hits: Retrieval hit limit in the JSON body.
+
+        Returns:
+            Parsed JSON dict, or an empty fallback on HTTP errors.
+
+        Example:
+            >>> import inspect
+            >>> from thot.okf.exporter import HttpOkfRagClient
+            >>> inspect.iscoroutinefunction(HttpOkfRagClient.query)
+            True
+        """
         import httpx
 
         async with httpx.AsyncClient(timeout=120.0) as client:
@@ -766,6 +1202,23 @@ class HttpOkfRagClient:
 def _document_ids_from_rag(
     payload: dict[str, Any], *, max_docs: int
 ) -> list[str]:
+    """Extract deduplicated document ids from a RAG response payload.
+
+    Args:
+        payload: RAG JSON with ``document_ids``, ``documents``, or ``chunks``.
+        max_docs: Maximum ids to return.
+
+    Returns:
+        De-duplicated document id strings in discovery order.
+
+    Example:
+        >>> from thot.okf.exporter import _document_ids_from_rag
+        >>> _document_ids_from_rag(
+        ...     {"document_ids": ["a", "a", "b"], "chunks": [{"parent_doc_id": "c"}]},
+        ...     max_docs=10,
+        ... )
+        ['a', 'b', 'c']
+    """
     ids: list[str] = []
     for key in ("document_ids", "documents"):
         raw = payload.get(key)
@@ -812,6 +1265,15 @@ async def export_scoped(
     action_sink: ActionSink | None = None,
 ) -> OkfExportResult:
     """Export documents returned by a RAG query as an OKF bundle.
+
+    Args:
+        request: Export request; ``query`` triggers RAG scoping.
+        vespa_client: Optional Vespa backend for parent/chunk fetch.
+        rag_client: Optional RAG client (defaults to :class:`HttpOkfRagClient`).
+        action_sink: Optional action record sink.
+
+    Returns:
+        Scoped bundle with ``query_context.md`` and optional wiki seed.
 
     Example:
         >>> import inspect
@@ -933,7 +1395,27 @@ async def export_scoped(
 
 
 def tar_bundle(bundle_path: Path, dest: Path | None = None) -> Path:
-    """Create a ``.tar.gz`` archive of an OKF bundle directory."""
+    """Create a ``.tar.gz`` archive of an OKF bundle directory.
+
+    Args:
+        bundle_path: Directory to archive.
+        dest: Optional output path; defaults to ``<bundle>.tar.gz``.
+
+    Returns:
+        Path to the written ``.tar.gz`` file.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.exporter import tar_bundle
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     bundle = Path(td) / "bundle"
+        ...     bundle.mkdir()
+        ...     _ = (bundle / "index.md").write_text("# hi\\n")
+        ...     archive = tar_bundle(bundle)
+        ...     archive.is_file()
+        True
+    """
     root = bundle_path.resolve()
     out = dest or root.with_suffix(".tar.gz")
     if out.suffixes[-2:] != [".tar", ".gz"]:
@@ -948,7 +1430,22 @@ def tar_bundle(bundle_path: Path, dest: Path | None = None) -> Path:
 
 
 def delete_bundle(bundle_path: Path) -> None:
-    """Atomically remove a bundle directory (DSR / forget)."""
+    """Atomically remove a bundle directory (DSR / forget).
+
+    Args:
+        bundle_path: Bundle directory to delete (no-op when missing).
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.exporter import delete_bundle
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     bundle = Path(td) / "bundle"
+        ...     bundle.mkdir()
+        ...     delete_bundle(bundle)
+        ...     not bundle.exists()
+        True
+    """
     root = bundle_path.resolve()
     if not root.exists():
         return
@@ -960,7 +1457,20 @@ def delete_bundle(bundle_path: Path) -> None:
 
 
 def cli_main(argv: list[str] | None = None) -> int:
-    """CLI entry: ``tkeir-okf-export``."""
+    """CLI entry: ``tkeir-okf-export``.
+
+    Args:
+        argv: Optional argument vector (defaults to ``sys.argv``).
+
+    Returns:
+        Process exit code (``0`` on success).
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.exporter import cli_main
+        >>> "argv" in inspect.signature(cli_main).parameters
+        True
+    """
     parser = argparse.ArgumentParser(prog="tkeir-okf-export")
     parser.add_argument(
         "--user-space", default=os.getenv("VESPA_USER_SPACE", "dev@tkeir")

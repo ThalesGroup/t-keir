@@ -29,6 +29,15 @@ VALID_INDEX_TARGETS = frozenset({"global", "user", "both"})
 
 
 def _decode_jwt_payload(token: str) -> dict[str, Any]:
+    """Decode the payload segment of a JWT without signature verification.
+
+    Example:
+        >>> import base64, json
+        >>> payload = {"sub": "user1", "scope": "intent:ingest"}
+        >>> raw = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode().rstrip("=")
+        >>> _decode_jwt_payload(f"hdr.{raw}.sig")["sub"]
+        'user1'
+    """
     parts = token.split(".")
     if len(parts) < 2:
         raise ValueError("invalid jwt")
@@ -42,6 +51,12 @@ def _decode_jwt_payload(token: str) -> dict[str, Any]:
 
 
 def _token_has_ingest_scope(payload: dict[str, Any]) -> bool:
+    """Return True when the JWT payload grants ingest scope.
+
+    Example:
+        >>> _token_has_ingest_scope({"scope": "openid intent:ingest"})
+        True
+    """
     scope = payload.get("scope")
     if isinstance(scope, str) and INGEST_SCOPE in scope.split():
         return True
@@ -60,6 +75,12 @@ def _token_has_ingest_scope(payload: dict[str, Any]) -> bool:
 
 
 def _roles_from_payload(payload: dict[str, Any]) -> frozenset[str]:
+    """Extract realm and client roles from a JWT payload.
+
+    Example:
+        >>> _roles_from_payload({"realm_access": {"roles": ["c2-admin"]}})
+        frozenset({'c2-admin'})
+    """
     roles: set[str] = set()
     realm = payload.get("realm_access")
     if isinstance(realm, dict):
@@ -82,7 +103,13 @@ def _roles_from_payload(payload: dict[str, Any]) -> frozenset[str]:
 
 
 def roles_from_authorization(authorization: str | None) -> frozenset[str]:
-    """Extract realm/client roles from a Bearer access token (empty if none)."""
+    """Extract realm/client roles from a Bearer access token (empty if none).
+
+    Example:
+        >>> from thot.tools.ingest.auth import roles_from_authorization
+        >>> roles_from_authorization(None)
+        frozenset()
+    """
     if not authorization or not authorization.startswith("Bearer "):
         return frozenset()
     token = authorization.removeprefix("Bearer ").strip()
@@ -101,6 +128,12 @@ def is_ingest_admin(authorization: str | None) -> bool:
 
     When ``INGEST_AUTH_ENABLED`` is false (local demos), global corpus tools
     remain usable; personal ``/workspace/*`` endpoints still force ``user``.
+    
+
+    Example:
+        >>> from thot.tools.ingest.auth import is_ingest_admin
+        >>> is_ingest_admin(None)
+        True
     """
     settings = ingest_settings()
     if not settings.auth_enabled:
@@ -122,6 +155,12 @@ def resolve_allowed_index_target(
     - Admin (or auth off): may choose ``global`` / ``user`` / ``both``.
     - ``require_admin_for_global``: when True and auth on, non-admins may not
       select a shared index (used by ``/ingest/json-records``).
+    
+
+    Example:
+        >>> from thot.tools.ingest.auth import resolve_allowed_index_target
+        >>> resolve_allowed_index_target("user", authorization=None)
+        'user'
     """
     raw = (requested or "").strip().lower() or None
     admin = is_ingest_admin(authorization)
@@ -161,7 +200,13 @@ def resolve_allowed_index_target(
 def require_admin_ingest(
     authorization: str | None = Header(default=None),
 ) -> str:
-    """Require an admin role for global corpus ingest endpoints."""
+    """Require an admin role for global corpus ingest endpoints.
+
+    Example:
+        >>> from thot.tools.ingest.auth import require_admin_ingest
+        >>> callable(require_admin_ingest)
+        True
+    """
     actor = verify_ingest_authorization(authorization)
     if not is_ingest_admin(authorization):
         raise HTTPException(

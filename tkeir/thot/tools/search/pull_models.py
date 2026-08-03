@@ -35,7 +35,14 @@ _BGE_HF_ALIASES = {
 
 
 def resolve_bge_hf_model_id(model_id: str | None = None) -> str:
-    """Resolve the Hugging Face *source* repo id used only for first download."""
+    """Resolve the Hugging Face *source* repo id used only for first download.
+
+    Example:
+        >>> resolve_bge_hf_model_id("bge-m3")
+        'BAAI/bge-m3'
+        >>> resolve_bge_hf_model_id("BAAI/bge-m3")
+        'BAAI/bge-m3'
+    """
     raw = (model_id or os.getenv("EMBEDDING_MODEL") or "").strip()
     if not raw:
         try:
@@ -66,6 +73,11 @@ def pull_bge_embedding_model(
 
     Returns:
         Absolute path to the local model directory.
+
+    Example:
+        >>> from thot.core.TkeirPaths import bge_m3_model_dir
+        >>> pull_bge_embedding_model() == bge_m3_model_dir()
+        True
     """
     dest = Path(bge_m3_model_dir())
     if not force and local_bge_m3_ready(str(dest)):
@@ -117,7 +129,14 @@ def pull_bge_embedding_model(
 
 
 async def _run_ollama() -> int:
-    """Pull configured Ollama embedding / LLM models and exit with status."""
+    """Pull configured Ollama embedding / LLM models and exit with status.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.search import pull_models
+        >>> inspect.iscoroutinefunction(pull_models._run_ollama)
+        True
+    """
     config = WrapperConfig.from_env()
     LOGGER.info(
         "Pulling models provider=%s embedding=%s llm=%s "
@@ -134,7 +153,13 @@ async def _run_ollama() -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI: ``python -m thot.tools.search.pull_models``."""
+    """CLI: ``python -m thot.tools.search.pull_models``.
+
+    Example:
+        >>> from thot.tools.search.pull_models import main
+        >>> main(["--bge-only"]) == 0
+        True
+    """
     parser = argparse.ArgumentParser(
         description=(
             "Download BGE-M3 into resources/modeling/net/bge-m3 "

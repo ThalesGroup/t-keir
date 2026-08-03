@@ -48,6 +48,11 @@ def normalize_scores(scores: dict[str, float]) -> dict[str, float]:
 
     Returns:
         Normalized scores (empty → empty; constant → all 1.0).
+
+    Example:
+        >>> from thot.tools.search.fusion import normalize_scores
+        >>> normalize_scores({"a": 1.0, "b": 3.0})
+        {'a': 0.0, 'b': 1.0}
     """
     if not scores:
         return {}
@@ -72,6 +77,11 @@ def redistribute_weights(
 
     Returns:
         Weights for active signals only (sum ≈ 1 when any active).
+
+    Example:
+        >>> from thot.tools.search.fusion import redistribute_weights
+        >>> redistribute_weights({"dense": 0.6, "sparse": 0.4}, {"dense"})
+        {'dense': 1.0}
     """
     live = {key: float(weights[key]) for key in active if key in weights}
     total = sum(live.values())
@@ -95,6 +105,14 @@ def weighted_fusion(
 
     Returns:
         Combined doc_id → score.
+
+    Example:
+        >>> from thot.tools.search.fusion import weighted_fusion
+        >>> weighted_fusion(
+        ...     {"dense": {"doc1": 1.0}, "sparse": {"doc1": 0.5}},
+        ...     {"dense": 0.6, "sparse": 0.4},
+        ... )["doc1"]
+        0.8
     """
     active = {name for name, mapping in signal_scores.items() if mapping}
     live_weights = redistribute_weights(weights, active)

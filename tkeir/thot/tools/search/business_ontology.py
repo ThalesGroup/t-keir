@@ -24,7 +24,13 @@ LOGGER = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class ParaphraseBridge:
-    """Claim ↔ document surface-form bridge for paraphrase recall."""
+    """Claim ↔ document surface-form bridge for paraphrase recall.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import ParaphraseBridge
+        >>> ParaphraseBridge(claim='vessel', document='ship').claim
+        'vessel'
+    """
 
     claim: str
     document: str
@@ -32,7 +38,13 @@ class ParaphraseBridge:
 
 @dataclass
 class BusinessConcept:
-    """One business-ontology concept with relational links."""
+    """One business-ontology concept with relational links.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import BusinessConcept
+        >>> BusinessConcept('C1', 'Maritime').preferred_label
+        'Maritime'
+    """
 
     concept_id: str
     preferred_label: str
@@ -45,23 +57,60 @@ class BusinessConcept:
 
 
 class OntologyNormalizer(Protocol):
-    """Minimal normalizer used to build the reverse label index."""
+    """Minimal normalizer used to build the reverse label index.
+
+    Example:
+        >>> class _Norm:
+        ...     def normalize(self, text): return str(text).lower().strip()
+        >>> _Norm().normalize('Maritime')
+        'maritime'
+    """
 
     def normalize(self, text: str) -> str:
-        """Normalize a label / surface form."""
+        """Normalize a label / surface form.
+
+        Example:
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> _Norm().normalize('Maritime')
+            'maritime'
+        """
 
 
 class BusinessOntology:
-    """Graph + reverse index from normalized labels to concept ids."""
+    """Graph + reverse index from normalized labels to concept ids.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+        >>> BusinessOntology([BusinessConcept('C1', 'Maritime')]).concepts['C1'].preferred_label
+        'Maritime'
+    """
 
     def __init__(self, concepts: list[BusinessConcept]) -> None:
+        """Initialize from a list of concepts.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> BusinessOntology([BusinessConcept('C1', 'Maritime')]).concepts['C1'].concept_id
+            'C1'
+        """
         self.concepts: dict[str, BusinessConcept] = {
             concept.concept_id: concept for concept in concepts
         }
         self._label_index: dict[str, str] = {}
 
     def build_label_index(self, normalizer: OntologyNormalizer) -> None:
-        """Index preferred labels, synonyms, surface forms, and bridges."""
+        """Index preferred labels, synonyms, surface forms, and bridges.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> bo = BusinessOntology([BusinessConcept('C1', 'Maritime')])
+            >>> bo.build_label_index(_Norm())
+            >>> bo.resolve('Maritime', _Norm())
+            'C1'
+        """
         from thot.tools.search.lexical_signal import token_stems
 
         index: dict[str, str] = {}
@@ -90,18 +139,46 @@ class BusinessOntology:
         )
 
     def resolve(self, text: str, normalizer: OntologyNormalizer) -> str | None:
-        """Resolve raw text to a concept id via the reverse index."""
+        """Resolve raw text to a concept id via the reverse index.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> bo = BusinessOntology([BusinessConcept('C1', 'Maritime')])
+            >>> bo.build_label_index(_Norm())
+            >>> bo.resolve('maritime', _Norm())
+            'C1'
+        """
         key = normalizer.normalize(text)
         if not key:
             return None
         return self._label_index.get(key)
 
     def resolve_normalized(self, normalized: str) -> str | None:
-        """Resolve an already-normalized string."""
+        """Resolve an already-normalized string.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> bo = BusinessOntology([BusinessConcept('C1', 'Maritime')])
+            >>> bo._label_index['maritime'] = 'C1'
+            >>> bo.resolve_normalized('maritime')
+            'C1'
+        """
         return self._label_index.get(normalized) if normalized else None
 
     def parents_within(self, concept_id: str, max_depth: int) -> set[str]:
-        """Collect ancestor concept ids up to ``max_depth``."""
+        """Collect ancestor concept ids up to ``max_depth``.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> bo = BusinessOntology([
+            ...     BusinessConcept('CHILD', 'Child', broader=['PARENT']),
+            ...     BusinessConcept('PARENT', 'Parent'),
+            ... ])
+            >>> bo.parents_within('CHILD', 2)
+            {'PARENT'}
+        """
         found: set[str] = set()
         frontier = [concept_id]
         for _ in range(max(0, max_depth)):
@@ -122,7 +199,17 @@ class BusinessOntology:
     def is_descendant(
         self, candidate: str, ancestor: str, max_depth: int
     ) -> bool:
-        """Return True if ``candidate`` is under ``ancestor`` within depth."""
+        """Return True if ``candidate`` is under ``ancestor`` within depth.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> bo = BusinessOntology([
+            ...     BusinessConcept('CHILD', 'Child', broader=['PARENT']),
+            ...     BusinessConcept('PARENT', 'Parent'),
+            ... ])
+            >>> bo.is_descendant('CHILD', 'PARENT', 2)
+            True
+        """
         return ancestor in self.parents_within(candidate, max_depth)
 
     def relation(
@@ -131,7 +218,13 @@ class BusinessOntology:
         doc_concept: str,
         max_depth: int,
     ) -> str | None:
-        """Best relation type between two concept ids (or None)."""
+        """Best relation type between two concept ids (or None).
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> BusinessOntology([BusinessConcept('C1', 'Maritime')]).relation('C1', 'C1', 1)
+            'exact'
+        """
         if query_concept == doc_concept:
             return "exact"
         q = self.concepts.get(query_concept)
@@ -152,6 +245,13 @@ class BusinessOntology:
 
 
 def _paraphrase_bridges(raw: dict[str, Any]) -> list[ParaphraseBridge]:
+    """Parse paraphrase bridge rows from a concept mapping.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _paraphrase_bridges
+        >>> _paraphrase_bridges({'paraphrase_bridges': [{'claim': 'a', 'document': 'b'}]})[0].claim
+        'a'
+    """
     bridges: list[ParaphraseBridge] = []
     for row in raw.get("paraphrase_bridges") or []:
         if not isinstance(row, dict):
@@ -166,6 +266,13 @@ def _paraphrase_bridges(raw: dict[str, Any]) -> list[ParaphraseBridge]:
 
 
 def _concept_from_mapping(raw: dict[str, Any]) -> BusinessConcept:
+    """Build a :class:`BusinessConcept` from a YAML/JSON concept row.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _concept_from_mapping
+        >>> _concept_from_mapping({'concept_id': 'C1', 'preferred_label': 'Maritime'}).concept_id
+        'C1'
+    """
     return BusinessConcept(
         concept_id=str(raw["concept_id"]),
         preferred_label=str(raw.get("preferred_label") or raw["concept_id"]),
@@ -190,6 +297,11 @@ def business_ontology_from_data(data: Any) -> BusinessOntology:
 
     Returns:
         Populated :class:`BusinessOntology` (label index not yet built).
+
+    Example:
+        >>> from thot.tools.search.business_ontology import business_ontology_from_data
+        >>> business_ontology_from_data({'concepts': [{'concept_id': 'C1', 'preferred_label': 'Maritime'}]}).concepts['C1'].preferred_label
+        'Maritime'
     """
     if data is None:
         return BusinessOntology([])
@@ -224,6 +336,11 @@ def load_business_ontology(path: Path | str) -> BusinessOntology:
 
     Returns:
         Populated :class:`BusinessOntology` (label index not yet built).
+
+    Example:
+        >>> from thot.tools.search.business_ontology import load_business_ontology
+        >>> load_business_ontology('/nonexistent/path.yaml').concepts
+        {}
     """
     file_path = Path(path)
     if not file_path.is_file():
@@ -241,7 +358,13 @@ def dataset_business_ontology_path(
     dataset: str,
     datasets_dir: Path | str | None = None,
 ) -> Path:
-    """Return ``datasets/<dataset>/business_ontology.yaml``."""
+    """Return ``datasets/<dataset>/business_ontology.yaml``.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import dataset_business_ontology_path
+        >>> str(dataset_business_ontology_path('osint')).endswith('datasets/osint/business_ontology.yaml')
+        True
+    """
     from thot.core.TkeirPaths import repo_root
 
     root = (
@@ -266,6 +389,11 @@ def load_dataset_business_ontology_payload(
 
     Returns:
         ``{concepts: [...]}`` or ``None`` when the file is missing/invalid.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import load_dataset_business_ontology_payload
+        >>> load_dataset_business_ontology_payload('nonexistent-dataset-xyz') is None
+        True
     """
     name = (dataset or "").strip()
     if not name:
@@ -282,7 +410,13 @@ def load_dataset_business_ontology_payload(
 
 
 def _concepts_list(payload: Any) -> list[dict[str, Any]]:
-    """Normalize a request payload to a list of concept dicts."""
+    """Normalize a request payload to a list of concept dicts.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _concepts_list
+        >>> _concepts_list({'concepts': [{'concept_id': 'C1'}]})[0]['concept_id']
+        'C1'
+    """
     if payload is None:
         return []
     if isinstance(payload, list):
@@ -297,7 +431,13 @@ def _concepts_list(payload: Any) -> list[dict[str, Any]]:
 def merge_business_ontology_payloads(
     *payloads: Any,
 ) -> dict[str, Any] | None:
-    """Merge concept lists by ``concept_id`` (later payloads override)."""
+    """Merge concept lists by ``concept_id`` (later payloads override).
+
+    Example:
+        >>> from thot.tools.search.business_ontology import merge_business_ontology_payloads
+        >>> merge_business_ontology_payloads({'concepts': [{'concept_id': 'C1'}]})['concepts'][0]['concept_id']
+        'C1'
+    """
     by_id: dict[str, dict[str, Any]] = {}
     for payload in payloads:
         for row in _concepts_list(payload):
@@ -320,6 +460,11 @@ def resolve_search_business_ontology(
 
     Used by ``/search`` and ``/rag/query`` so live demos always expand against
     ``datasets/<dataset>/business_ontology.yaml`` unless search is disabled.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import resolve_search_business_ontology
+        >>> resolve_search_business_ontology(search_enabled=False) is None
+        True
     """
     name = (dataset or "osint").strip() or "osint"
     file_payload = (
@@ -336,6 +481,11 @@ def business_ontology_to_json_ld(payload: Any) -> str:
     Emits ``owl:Class`` nodes with ``rdfs:label``, ``rdfs:subClassOf`` (from
     ``broader``), and SKOS ``broader`` / ``narrower`` / ``related`` links so
     the fused navigator graph and Python reasoner can walk the taxonomy.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import business_ontology_to_json_ld
+        >>> 'C1' in business_ontology_to_json_ld({'concepts': [{'concept_id': 'C1', 'preferred_label': 'Maritime'}]})
+        True
     """
     concepts = _concepts_list(payload)
     if not concepts:
@@ -414,7 +564,13 @@ def infer_dataset_name(
     dataset: str | None = None,
     source_doc_id: str | None = None,
 ) -> str | None:
-    """Infer dataset id from an explicit arg, document field, or ``beir:`` id."""
+    """Infer dataset id from an explicit arg, document field, or ``beir:`` id.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import infer_dataset_name
+        >>> infer_dataset_name(source_doc_id='beir:scifact:doc1')
+        'scifact'
+    """
     if dataset and str(dataset).strip():
         return str(dataset).strip()
     if document:
@@ -432,7 +588,13 @@ def infer_dataset_name(
 
 
 def _kg_text_slot(text: str, *, label: str = "") -> dict[str, Any]:
-    """Build a subject/property/value slot for a KG triple."""
+    """Build a subject/property/value slot for a KG triple.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _kg_text_slot
+        >>> _kg_text_slot('Acme', label='ORG')['content']
+        'Acme'
+    """
     token = str(text or "").strip()
     return {
         "content": token,
@@ -454,7 +616,13 @@ def _kg_triple(
     confidence: float = 1.0,
     object_label: str = "",
 ) -> dict[str, Any]:
-    """One KG triple with an explicit provenance flag."""
+    """One KG triple with an explicit provenance flag.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _kg_triple
+        >>> _kg_triple(subject='A', predicate='rel:has', obj='B', provenance='external')['provenance']
+        'external'
+    """
     return {
         "subject": _kg_text_slot(subject),
         "property": _kg_text_slot(predicate),
@@ -468,7 +636,13 @@ def _kg_triple(
 
 
 def _parse_json_ld_graph(json_ld: Any) -> list[dict[str, Any]]:
-    """Extract ``@graph`` nodes from a json_ld string or dict."""
+    """Extract ``@graph`` nodes from a json_ld string or dict.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _parse_json_ld_graph
+        >>> _parse_json_ld_graph({'@graph': [{'name': 'Maritime'}]})[0]['name']
+        'Maritime'
+    """
     if not json_ld:
         return []
     data: Any = json_ld
@@ -490,7 +664,13 @@ def _parse_json_ld_graph(json_ld: Any) -> list[dict[str, Any]]:
 
 
 def _json_ld_was_array(json_ld: Any) -> bool:
-    """True when the stored json_ld is a top-level array (NLP pipeline shape)."""
+    """True when the stored json_ld is a top-level array (NLP pipeline shape).
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _json_ld_was_array
+        >>> _json_ld_was_array('[{"name": "x"}]')
+        True
+    """
     if isinstance(json_ld, list):
         return True
     if isinstance(json_ld, str):
@@ -499,7 +679,13 @@ def _json_ld_was_array(json_ld: Any) -> bool:
 
 
 def _json_ld_node_labels(node: dict[str, Any]) -> list[str]:
-    """Collect human labels from a JSON-LD node (schema.org or RDF)."""
+    """Collect human labels from a JSON-LD node (schema.org or RDF).
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _json_ld_node_labels
+        >>> _json_ld_node_labels({'name': 'Maritime'})
+        ['Maritime']
+    """
     labels: list[str] = []
     for key in (
         "name",
@@ -536,6 +722,20 @@ def _enrich_nlp_nodes_with_ontology_paths(
     Pipeline ``document_ontology.json_ld`` uses RDF-style nodes (e.g. Misc for
     ``DARK_ACTIVITY_AIS_OFF``). Attach the broader path so the returned ontology
     shows ``C4ISR/…/DARK_ACTIVITY`` on that same mention.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _enrich_nlp_nodes_with_ontology_paths
+        >>> graph = [{'name': 'Maritime'}]
+        >>> _enrich_nlp_nodes_with_ontology_paths(
+        ...     graph,
+        ...     matched_ids=['C1'],
+        ...     matched_paths=[['C1']],
+        ...     matched_labels=['Maritime'],
+        ...     matched_surfaces=['Maritime'],
+        ...     by_id={'C1': {'preferred_label': 'Maritime'}},
+        ... )
+        >>> graph[0].get('maps_to_concept')
+        'C1'
     """
     path_by_norm: dict[str, tuple[str, list[str], list[str], str]] = {}
     for cid, path, preferred, surface in zip(
@@ -601,14 +801,32 @@ def _enrich_nlp_nodes_with_ontology_paths(
 def _serialize_document_json_ld(
     graph: list[dict[str, Any]], *, as_array: bool
 ) -> str:
-    """Serialize graph preserving NLP array shape when that was the input."""
+    """Serialize graph preserving NLP array shape when that was the input.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _serialize_document_json_ld
+        >>> _serialize_document_json_ld([{'name': 'Maritime'}], as_array=True).startswith('[')
+        True
+    """
     if as_array:
         return json.dumps(graph, ensure_ascii=False)
     return json.dumps({"@graph": graph}, ensure_ascii=False)
 
 
 def _document_entity_labels(document: dict[str, Any]) -> list[str]:
-    """Collect subject/object surface strings from document KG triples."""
+    """Collect subject/object surface strings from document KG triples.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _document_entity_labels
+        >>> _document_entity_labels({
+        ...     'kg': [{
+        ...         'subject': {'content': 'Acme Corp'},
+        ...         'property': {'content': 'rel:has'},
+        ...         'value': {'content': 'Office'},
+        ...     }],
+        ... })
+        ['Acme Corp', 'Office']
+    """
     labels: list[str] = []
     seen: set[str] = set()
     for triple in document.get("kg") or []:
@@ -650,6 +868,11 @@ def select_core_concepts(
 
     Returns:
         List of ``{label, concept_id?, role: "cluster_center"}``.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import select_core_concepts
+        >>> select_core_concepts(['Maritime', 'Naval'])[0]['label']
+        'Maritime'
     """
     cleaned: list[str] = []
     seen: set[str] = set()
@@ -732,6 +955,11 @@ def _concept_broader_paths(
     """Return all root→leaf ``concept_id`` paths via ``broader`` links.
 
     Each path ends with ``concept_id``. Cycles / missing parents are skipped.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _concept_broader_paths
+        >>> _concept_broader_paths('CHILD', {'CHILD': {'broader': ['PARENT']}, 'PARENT': {}})[0][-1]
+        'CHILD'
     """
     cid = str(concept_id or "").strip()
     if not cid:
@@ -771,7 +999,13 @@ def _concept_broader_paths(
 def _path_labels(
     path: list[str], by_id: dict[str, dict[str, Any]]
 ) -> list[str]:
-    """Map a concept_id path to preferred labels."""
+    """Map a concept_id path to preferred labels.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _path_labels
+        >>> _path_labels(['C1'], {'C1': {'preferred_label': 'Maritime'}})
+        ['Maritime']
+    """
     labels: list[str] = []
     for cid in path:
         raw = by_id.get(cid) or {}
@@ -788,7 +1022,13 @@ def _defined_term_node(
     role: str | None = None,
     matched: bool = False,
 ) -> dict[str, Any]:
-    """Build a DefinedTerm JSON-LD node for an external business concept."""
+    """Build a DefinedTerm JSON-LD node for an external business concept.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _defined_term_node
+        >>> _defined_term_node(concept_id='C1', preferred_label='Maritime')['identifier']
+        'C1'
+    """
     node: dict[str, Any] = {
         "@type": "DefinedTerm",
         "name": preferred_label,
@@ -818,6 +1058,11 @@ def _normalize_for_ontology_match(text: str) -> str:
     Underscores, hyphens, and punctuation become spaces so
     ``DARK_ACTIVITY_AIS_OFF`` matches ``DARK_ACTIVITY AIS_OFF`` and
     ``MARITIME_ANALYTICS`` matches ``MARITIME ANALYTICS``.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _normalize_for_ontology_match
+        >>> _normalize_for_ontology_match('DARK_ACTIVITY_AIS_OFF')
+        'dark activity ais off'
     """
     import re
     import unicodedata
@@ -834,7 +1079,13 @@ def _normalize_for_ontology_match(text: str) -> str:
 
 
 def _ontology_match_labels(raw: dict[str, Any], concept_id: str) -> list[str]:
-    """Collect all surface labels used to detect a concept in text."""
+    """Collect all surface labels used to detect a concept in text.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _ontology_match_labels
+        >>> _ontology_match_labels({'preferred_label': 'Maritime'}, 'C1')[0]
+        'Maritime'
+    """
     preferred = str(raw.get("preferred_label") or concept_id).strip()
     labels = [preferred, concept_id]
     # Spaced / underscored concept id variants.
@@ -865,7 +1116,13 @@ def _ontology_match_labels(raw: dict[str, Any], concept_id: str) -> list[str]:
 
 
 def _label_hits_haystack(label: str, haystack_norm: str) -> bool:
-    """True when normalized ``label`` appears as a whole phrase in haystack."""
+    """True when normalized ``label`` appears as a whole phrase in haystack.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import _label_hits_haystack
+        >>> _label_hits_haystack('Maritime', 'report on maritime analytics')
+        True
+    """
     import re
 
     needle = _normalize_for_ontology_match(label)
@@ -901,6 +1158,15 @@ def annotate_document_with_business_ontology(
 
     Returns:
         Document with merged ontology, KG provenance, and ``core_concepts``.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import annotate_document_with_business_ontology
+        >>> doc = annotate_document_with_business_ontology(
+        ...     {'content': ['Maritime analytics'], 'title': ''},
+        ...     {'concepts': [{'concept_id': 'C1', 'preferred_label': 'Maritime'}]},
+        ... )
+        >>> 'document_ontology' in doc
+        True
     """
     concepts = ontology_payload.get("concepts") or []
     if not concepts:
@@ -1209,6 +1475,11 @@ def resolve_index_ontology_payload(
 
     Returns:
         ``(payload_or_none, dataset_name_or_none)``.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import resolve_index_ontology_payload
+        >>> resolve_index_ontology_payload({}, ontology_payload={'concepts': []})[0]
+        {'concepts': []}
     """
     name = infer_dataset_name(document, dataset=dataset)
     if ontology_payload is not None:

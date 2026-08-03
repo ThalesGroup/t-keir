@@ -284,7 +284,15 @@ def run_bm25(
     queries: dict[str, str],
     top_k: int = TOP_K,
 ) -> dict[str, dict[str, float]]:
-    """Run BM25 retrieval for all queries (eval.hybrid_retrieve)."""
+    """Run BM25 retrieval for all queries (eval.hybrid_retrieve).
+
+    Example:
+        >>> run_bm25(  # doctest: +SKIP
+        ...     {"d1": {"text": "cat sat mat"}},
+        ...     {"q1": "cat mat"},
+        ...     top_k=5,
+        ... )
+    """
     from thot.tools.eval.hybrid_retrieve import score_bm25
 
     LOGGER.info("Running BM25 retrieval (top_k=%d)…", top_k)
@@ -298,7 +306,15 @@ def run_dense(
     batch_size: int = 32,
     top_k: int = TOP_K,
 ) -> dict[str, dict[str, float]]:
-    """Run **BGE-M3 dense + sparse** via :func:`score_bge_hybrid` (search)."""
+    """Run **BGE-M3 dense + sparse** via :func:`score_bge_hybrid` (search).
+
+    Example:
+        >>> run_dense(  # doctest: +SKIP
+        ...     {"d1": {"text": "cat sat mat"}},
+        ...     {"q1": "cat mat"},
+        ...     top_k=5,
+        ... )
+    """
     lowered = (model_name or "").strip().lower()
     if "minilm" in lowered:
         raise ValueError(
@@ -376,12 +392,21 @@ def _query_for_report(text: str, limit: int = 800) -> str:
 
     Returns:
         Whitespace-collapsed query string.
+
+    Example:
+        >>> _query_for_report("  hello   world  ", limit=20)
+        'hello world'
     """
     return _truncate(text, limit=limit)
 
 
 def _token_set(text: str) -> set[str]:
-    """Return the set of alphanumeric tokens in ``text``."""
+    """Return the set of alphanumeric tokens in ``text``.
+
+    Example:
+        >>> sorted(_token_set("The cat sat"))
+        ['cat', 'sat', 'the']
+    """
     return set(tokenize(text))
 
 
@@ -424,7 +449,14 @@ def _overlap_stats(query: str, doc: str) -> dict[str, Any]:
 
 
 def _format_token_list(tokens: list[str], limit: int = 12) -> str:
-    """Format a token list for Markdown (capped)."""
+    """Format a token list for Markdown (capped).
+
+    Example:
+        >>> _format_token_list(["cat", "sat"])
+        '`cat`, `sat`'
+        >>> _format_token_list([])
+        '_(none)_'
+    """
     if not tokens:
         return "_(none)_"
     shown = tokens[:limit]
@@ -444,6 +476,14 @@ def _best_gold_overlap(
 
     Returns:
         ``(gold_doc_id, overlap_stats)``; id may be ``None`` when empty.
+
+    Example:
+        >>> corpus = {"g1": {"text": "the cat sat"}, "g2": {"text": "dog ran"}}
+        >>> doc_id, stats = _best_gold_overlap("cat sat", {"g1", "g2"}, corpus)
+        >>> doc_id
+        'g1'
+        >>> stats["coverage"] > 0.5
+        True
     """
     best_id: str | None = None
     best_stats: dict[str, Any] = {
@@ -469,7 +509,20 @@ def _analyze_false_positive(
     rank: int,
     score: float,
 ) -> str:
-    """Explain why an irrelevant top hit likely ranked above gold."""
+    """Explain why an irrelevant top hit likely ranked above gold.
+
+    Example:
+        >>> text = _analyze_false_positive(
+        ...     "cat sat mat",
+        ...     "the cat sat on mat",
+        ...     {"g1"},
+        ...     {"g1": {"text": "dog ran fast"}, "bad": {"text": "cat sat mat"}},
+        ...     rank=1,
+        ...     score=0.9,
+        ... )
+        >>> "Irrelevant document ranked #1" in text
+        True
+    """
     bad = _overlap_stats(query, bad_doc)
     gold_id, gold = _best_gold_overlap(query, gold_ids, corpus)
     lines = [
@@ -512,7 +565,19 @@ def _analyze_false_negative(
     ranked: list[tuple[str, float]],
     corpus: dict[str, dict[str, str]],
 ) -> str:
-    """Explain why a gold document was missing from the top-K."""
+    """Explain why a gold document was missing from the top-K.
+
+    Example:
+        >>> text = _analyze_false_negative(
+        ...     "cat sat mat",
+        ...     "dog ran fast",
+        ...     "g1",
+        ...     [("bad", 0.9)],
+        ...     {"bad": {"text": "cat sat mat"}},
+        ... )
+        >>> "Gold `g1` is absent" in text
+        True
+    """
     gold = _overlap_stats(query, gold_doc)
     top = ranked[:3]
     top_bits: list[str] = []
@@ -553,7 +618,21 @@ def _analyze_near_miss(
     ranked: list[tuple[str, float]],
     corpus: dict[str, dict[str, str]],
 ) -> str:
-    """Explain why gold was retrieved but outside NDCG@10."""
+    """Explain why gold was retrieved but outside NDCG@10.
+
+    Example:
+        >>> text = _analyze_near_miss(
+        ...     "cat sat mat",
+        ...     "the cat sat",
+        ...     "g1",
+        ...     15,
+        ...     0.42,
+        ...     [("bad", 0.9)],
+        ...     {"bad": {"text": "cat sat mat"}},
+        ... )
+        >>> "rank **15**" in text
+        True
+    """
     gold = _overlap_stats(query, gold_doc)
     score_txt = f"{score:.4f}" if score is not None else "n/a"
     competitor = ""

@@ -59,6 +59,13 @@ class McpRuntime:
     """Shared runtime for HTTP and stdio MCP transports."""
 
     def __init__(self) -> None:
+        """Initialize handlers and default authorization from env.
+
+        Example:
+            >>> from thot.mcp.server import McpRuntime
+            >>> isinstance(McpRuntime().handlers, object)
+            True
+        """
         self.handlers = McpHandlers(backend=VespaMcpBackend())
         self.default_authorization: str | None = os.getenv("MCP_AUTHORIZATION")
 
@@ -89,7 +96,10 @@ class McpRuntime:
             ...         return {"user_space": kw["user_space"], "summary": ""}
             >>> rt = McpRuntime()
             >>> rt.handlers = McpHandlers(backend=_Stub())
-            >>> out = asyncio.run(rt.call_tool("search", {"query": "q"}))
+            >>> import contextlib, io
+            >>> buf = io.StringIO()
+            >>> with contextlib.redirect_stdout(buf):
+            ...     out = asyncio.run(rt.call_tool("search", {"query": "q"}))
             >>> out["user_space"]
             'dev@tkeir'
         """
@@ -189,6 +199,14 @@ class McpRuntime:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """FastAPI lifespan: configure logging and attach :class:`McpRuntime`.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.server import lifespan
+            >>> inspect.isfunction(lifespan)
+            True
+    """
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-mcp"))
     app.state.mcp = McpRuntime()
     ThotMetrics.create_counter(
@@ -246,7 +264,14 @@ async def ready() -> dict[str, Any]:
 
 @app.get("/metrics")
 async def metrics() -> Response:
-    """Prometheus metrics exposition."""
+    """Prometheus metrics exposition.
+
+    Example:
+        >>> import inspect
+        >>> from thot.mcp.server import metrics
+        >>> inspect.iscoroutinefunction(metrics)
+        True
+    """
     payload = ThotMetrics.generateMetricsResponse()
     return Response(
         content=payload,
@@ -256,7 +281,14 @@ async def metrics() -> Response:
 
 @app.get("/mcp/tools")
 async def list_tools() -> dict[str, Any]:
-    """List MCP tools (HTTP convenience mirror of ``tools/list``)."""
+    """List MCP tools (HTTP convenience mirror of ``tools/list``).
+
+    Example:
+        >>> import inspect
+        >>> from thot.mcp.server import list_tools
+        >>> inspect.iscoroutinefunction(list_tools)
+        True
+    """
     return {"tools": tools_as_mcp_list()}
 
 
@@ -266,7 +298,14 @@ async def call_tool_http(
     request: Request,
     authorization: str | None = Header(default=None),
 ) -> dict[str, Any]:
-    """Invoke one MCP tool over HTTP (Compose / curl friendly)."""
+    """Invoke one MCP tool over HTTP (Compose / curl friendly).
+
+    Example:
+        >>> import inspect
+        >>> from thot.mcp.server import call_tool_http
+        >>> inspect.iscoroutinefunction(call_tool_http)
+        True
+    """
     runtime: McpRuntime = request.app.state.mcp
     ThotMetrics.increment_counter(
         short_name="mcp_http",
@@ -297,7 +336,14 @@ async def call_tool_http(
 
 
 def main(argv: list[str] | None = None) -> None:
-    """CLI entry: ``tkeir-mcp [--stdio]`` or HTTP on ``MCP_PORT`` (default 8093)."""
+    """CLI entry: ``tkeir-mcp [--stdio]`` or HTTP on ``MCP_PORT`` (default 8093).
+
+    Example:
+        >>> from thot.mcp.server import main
+        >>> import inspect
+        >>> inspect.isfunction(main)
+        True
+    """
     parser = argparse.ArgumentParser(description="T-KEIR MCP server (Phase A)")
     parser.add_argument(
         "--stdio",

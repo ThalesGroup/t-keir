@@ -13,7 +13,13 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 
 
 class ChunkQuestionGeneratorConfiguration:
-    """Load chunk question generator configuration."""
+    """Load chunk question generator configuration.
+    
+        Example:
+            >>> from thot.tasks.chunk_questions.ChunkQuestionGeneratorConfiguration import ChunkQuestionGeneratorConfiguration
+            >>> callable(ChunkQuestionGeneratorConfiguration)
+            True
+    """
 
     def __init__(self):
         """Initialize an empty configuration holder.

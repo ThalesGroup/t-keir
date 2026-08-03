@@ -35,7 +35,7 @@ def test_frontmatter_round_trip():
     data = fm.model_dump(mode="json")
     again = OkfConceptFrontmatter.model_validate(data)
     assert again.type == "Document"
-    assert again.tkeir_okf_version == "0.1"
+    assert again.tkeir_okf_version == "0.2"
     assert again.tkeir_chunk_ids == ["c1"]
 
 

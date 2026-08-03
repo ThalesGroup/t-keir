@@ -22,6 +22,26 @@ from thot.mcp.tools_catalog import TOOLS, get_tool
 def _validate_required(
     schema: dict[str, Any], arguments: dict[str, Any]
 ) -> None:
+    """Raise when a schema ``required`` key is absent from ``arguments``.
+
+    Args:
+        schema: JSON Schema fragment with optional ``required`` list.
+        arguments: Candidate tool arguments.
+
+    Raises:
+        ValueError: When a required key is missing.
+
+    Example:
+        >>> from thot.agent.toolbox import _validate_args
+        >>> _validate_args({"required": ["query"]}, {"query": "x"})
+        >>> try:
+        ...     _validate_args({"required": ["query"]}, {})
+        ... except ValueError as exc:
+        ...     "missing required" in str(exc)
+        ... else:
+        ...     False
+        True
+    """
     for key in schema.get("required") or []:
         if key not in arguments:
             raise ValueError(f"missing required argument: {key}")
@@ -30,6 +50,30 @@ def _validate_required(
 def _validate_no_extra_props(
     schema: dict[str, Any], arguments: dict[str, Any]
 ) -> None:
+    """Raise when ``additionalProperties`` is false and extras are present.
+
+    Args:
+        schema: JSON Schema fragment (may set ``additionalProperties``).
+        arguments: Candidate tool arguments.
+
+    Raises:
+        ValueError: When unexpected keys are supplied.
+
+    Example:
+        >>> from thot.agent.toolbox import _validate_args
+        >>> schema = {
+        ...     "properties": {"query": {"type": "string"}},
+        ...     "additionalProperties": False,
+        ... }
+        >>> _validate_args(schema, {"query": "x"})
+        >>> try:
+        ...     _validate_args(schema, {"query": "x", "extra": 1})
+        ... except ValueError as exc:
+        ...     "unexpected arguments" in str(exc)
+        ... else:
+        ...     False
+        True
+    """
     if schema.get("additionalProperties") is not False:
         return
     allowed = set((schema.get("properties") or {}).keys())
@@ -39,6 +83,28 @@ def _validate_no_extra_props(
 
 
 def _validate_prop_type(key: str, value: Any, prop: dict[str, Any]) -> None:
+    """Raise when ``value`` does not match a property ``type`` constraint.
+
+    Args:
+        key: Argument name (for error messages).
+        value: Candidate argument value.
+        prop: JSON Schema property fragment.
+
+    Raises:
+        ValueError: On type or integer min/max violations.
+
+    Example:
+        >>> from thot.agent.toolbox import _validate_args
+        >>> schema = {"properties": {"limit": {"type": "integer", "minimum": 1}}}
+        >>> _validate_args(schema, {"limit": 5})
+        >>> try:
+        ...     _validate_args(schema, {"limit": "five"})
+        ... except ValueError as exc:
+        ...     "must be integer" in str(exc)
+        ... else:
+        ...     False
+        True
+    """
     expected = prop.get("type")
     type_checks: dict[str, tuple[type, str]] = {
         "string": (str, "string"),
@@ -58,7 +124,24 @@ def _validate_prop_type(key: str, value: Any, prop: dict[str, Any]) -> None:
 
 
 def _validate_args(schema: dict[str, Any], arguments: dict[str, Any]) -> None:
-    """Minimal JSON Schema checks (required + additionalProperties=false)."""
+    """Minimal JSON Schema checks (required + additionalProperties=false).
+
+    Args:
+        schema: Tool input schema fragment.
+        arguments: Candidate tool arguments.
+
+    Raises:
+        ValueError: When validation fails.
+
+    Example:
+        >>> from thot.agent.toolbox import _validate_args
+        >>> schema = {
+        ...     "required": ["query"],
+        ...     "properties": {"query": {"type": "string"}},
+        ...     "additionalProperties": False,
+        ... }
+        >>> _validate_args(schema, {"query": "hello"})
+    """
     _validate_required(schema, arguments)
     _validate_no_extra_props(schema, arguments)
     props = schema.get("properties") or {}
@@ -84,6 +167,22 @@ class ToolRegistry:
         handlers: McpHandlers | None = None,
         outbound: OutboundMcpClient | None = None,
     ) -> None:
+        """Build a registry restricted to ``allow_list`` tool names.
+
+        Args:
+            allow_list: Internal and/or outbound MCP tool names.
+            handlers: Optional in-process MCP handler backend.
+            outbound: Optional outbound MCP client for external tools.
+
+        Raises:
+            ValueError: When ``allow_list`` contains unknown tool names.
+
+        Example:
+            >>> from thot.agent.toolbox import ToolRegistry
+            >>> reg = ToolRegistry(allow_list=["search"])
+            >>> reg.allow_list
+            ['search']
+        """
         self.outbound = outbound
         internal = {t.name for t in TOOLS}
         external = set(outbound.list_names()) if outbound else set()
@@ -95,10 +194,31 @@ class ToolRegistry:
         self.handlers = handlers or McpHandlers()
 
     def list_names(self) -> list[str]:
+        """Return the configured allow-list copy.
+
+        Returns:
+            Tool names permitted for this agent.
+
+        Example:
+            >>> from thot.agent.toolbox import ToolRegistry
+            >>> ToolRegistry(["search", "rag_query"]).list_names()
+            ['search', 'rag_query']
+        """
         return list(self.allow_list)
 
     def tool_specs_for_prompt(self) -> list[dict[str, Any]]:
-        """Compact tool schemas for the LLM system/user prompt."""
+        """Compact tool schemas for the LLM system/user prompt.
+
+        Returns:
+            One dict per allow-listed tool with ``name``, ``description``,
+            and ``inputSchema`` keys.
+
+        Example:
+            >>> from thot.agent.toolbox import ToolRegistry
+            >>> specs = ToolRegistry(["search"]).tool_specs_for_prompt()
+            >>> specs[0]["name"]
+            'search'
+        """
         specs = []
         for name in self.allow_list:
             if self.outbound and self.outbound.has(name):

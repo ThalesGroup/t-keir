@@ -37,6 +37,12 @@ class IngestSettings:
 
 
 def _env_bool(name: str, default: bool) -> bool:
+    """Parse a truthy environment variable.
+
+    Example:
+        >>> _env_bool("MISSING_VAR_FOR_DOCTEST", True)
+        True
+    """
     raw = os.getenv(name)
     if raw is None:
         return default

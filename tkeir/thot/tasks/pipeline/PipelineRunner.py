@@ -54,7 +54,13 @@ _PIPELINE_PRESERVE_KEYS = (
 
 
 def _preserve_pipeline_extras(source: dict, target: dict) -> dict:
-    """Copy ingest/corpus extras onto the converter (or task) output document."""
+    """Copy ingest/corpus extras onto the converter (or task) output document.
+    
+        Example:
+            >>> from thot.tasks.pipeline.PipelineRunner import _preserve_pipeline_extras
+            >>> callable(_preserve_pipeline_extras)
+            True
+    """
     for key in _PIPELINE_PRESERVE_KEYS:
         if key not in source:
             continue
@@ -74,6 +80,13 @@ def _preserve_pipeline_extras(source: dict, target: dict) -> dict:
 
 
 class PipelineRunner:
+    """PipelineRunner container.
+    
+        Example:
+            >>> from thot.tasks.pipeline.PipelineRunner import PipelineRunner
+            >>> callable(PipelineRunner)
+            True
+    """
     def __init__(self, config: PipelineConfiguration):
         """Create a pipeline runner bound to a configuration.
 

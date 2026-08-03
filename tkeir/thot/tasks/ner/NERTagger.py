@@ -31,6 +31,13 @@ _UNDERSCORE_TOKEN_RE = re.compile(r"^[A-Za-z0-9]+(?:_[A-Za-z0-9]+)+$")
 
 
 class SpacyNERFromMWE:
+    """SpacyNERFromMWE container.
+    
+        Example:
+            >>> from thot.tasks.ner.NERTagger import SpacyNERFromMWE
+            >>> callable(SpacyNERFromMWE)
+            True
+    """
     def __init__(self, config: dict = None, call_context=None):
         """Initialize the instance.
 
@@ -129,21 +136,28 @@ class SpacyNERFromMWE:
 
 
 class NERTagger:
+    """NERTagger container.
+    
+        Example:
+            >>> from thot.tasks.ner.NERTagger import NERTagger
+            >>> callable(NERTagger)
+            True
+    """
     def __init__(
         self, config: NERTaggerConfiguration = None, call_context=None
     ):
-        """Initialize tagger
+        """Initialize tagger.
 
         Args:
-            config (NERTaggerConfiguration, optional): The tagger configuration. Defaults to None.
+            config: The tagger configuration.
 
         Raises:
-            ValueError: If configuration is not set
-            ValueError: If language is not managed
+            ValueError: If configuration is not set.
+            ValueError: If language is not managed.
 
-                Example:
-                    >>> callable(NERTagger)
-                    True
+        Example:
+            >>> callable(NERTagger.__init__)
+            True
         """
         if not config:
             raise ValueError("label configuration is mandatory")
@@ -326,10 +340,24 @@ class NERTagger:
     ]
 
     def _nlp_from_tokens(self, tokens):
+        """_nlp_from_tokens helper.
+        
+            Example:
+                >>> from thot.tasks.ner.NERTagger import NERTagger
+                >>> callable(NERTagger._nlp_from_tokens)
+                True
+        """
         doc = self._nlp.tokenizer(tokens)
         return self._nlp(doc, disable=self._NLP_DISABLE)
 
     def _apply_morphosyntax(self, doc, morphosyntax):
+        """_apply_morphosyntax helper.
+        
+            Example:
+                >>> from thot.tasks.ner.NERTagger import NERTagger
+                >>> callable(NERTagger._apply_morphosyntax)
+                True
+        """
         len_doc = len(doc)
         with doc.retokenize() as retokenizer:
             for token_i in range(len_doc):
@@ -340,6 +368,13 @@ class NERTagger:
                 retokenizer.merge(doc[token_i : token_i + 1], attrs=attrs)
 
     def _collect_mapped_entities(self, doc):
+        """_collect_mapped_entities helper.
+        
+            Example:
+                >>> from thot.tasks.ner.NERTagger import NERTagger
+                >>> callable(NERTagger._collect_mapped_entities)
+                True
+        """
         entities = []
         for ent_i in doc.ents:
             if ent_i.label_ not in self._entities_mapping:
@@ -364,6 +399,13 @@ class NERTagger:
         return entities
 
     def _tag_title_section(self, doc_title, tkeir_doc):
+        """_tag_title_section helper.
+        
+            Example:
+                >>> from thot.tasks.ner.NERTagger import NERTagger
+                >>> callable(NERTagger._tag_title_section)
+                True
+        """
         if "title_morphosyntax" not in tkeir_doc:
             raise ValueError("Morphosyntactic tagger MUST be applied")
         if len(doc_title):
@@ -373,6 +415,13 @@ class NERTagger:
         return self._collect_mapped_entities(doc_title)
 
     def _tag_content_section(self, doc_content, tkeir_doc):
+        """_tag_content_section helper.
+        
+            Example:
+                >>> from thot.tasks.ner.NERTagger import NERTagger
+                >>> callable(NERTagger._tag_content_section)
+                True
+        """
         if len(doc_content):
             if "content_morphosyntax" not in tkeir_doc:
                 raise ValueError("Morphosyntactic tagger MUST be applied")
@@ -382,6 +431,13 @@ class NERTagger:
         return self._collect_mapped_entities(doc_content)
 
     def _ner_spans_overlap(self, ner_a, ner_b):
+        """_ner_spans_overlap helper.
+        
+            Example:
+                >>> from thot.tasks.ner.NERTagger import NERTagger
+                >>> callable(NERTagger._ner_spans_overlap)
+                True
+        """
         return (
             (
                 (ner_a["start"] <= ner_b["start"])
@@ -398,6 +454,13 @@ class NERTagger:
         )
 
     def _merge_mwe_ners(self, mwe_ners, existing_ners, doc, target_list):
+        """_merge_mwe_ners helper.
+        
+            Example:
+                >>> from thot.tasks.ner.NERTagger import NERTagger
+                >>> callable(NERTagger._merge_mwe_ners)
+                True
+        """
         for ner_mwe in mwe_ners:
             has_overlap = any(
                 self._ner_spans_overlap(ner_mwe, cmp_ner)

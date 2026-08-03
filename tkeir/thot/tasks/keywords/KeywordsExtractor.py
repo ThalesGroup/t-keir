@@ -23,7 +23,13 @@ from thot.tasks.keywords.KeywordsConfiguration import KeywordsConfiguration
 
 
 class Metric(Enum):
-    """Different metrics that can be used for ranking."""
+    """Different metrics that can be used for ranking.
+    
+        Example:
+            >>> from thot.tasks.keywords.KeywordsExtractor import Metric
+            >>> callable(Metric)
+            True
+    """
 
     DEGREE_TO_FREQUENCY_RATIO = 0  # Uses d(w)/f(w) as the metric
     WORD_DEGREE = 1  # Uses d(w) alone as the metric
@@ -31,7 +37,13 @@ class Metric(Enum):
 
 
 class NLTKRake:
-    """Rapid Automatic Keyword Extraction Algorithm."""
+    """Rapid Automatic Keyword Extraction Algorithm.
+    
+        Example:
+            >>> from thot.tasks.keywords.KeywordsExtractor import NLTKRake
+            >>> callable(NLTKRake)
+            True
+    """
 
     def __init__(
         self,
@@ -343,6 +355,13 @@ class NLTKRake:
 
 
 class KeywordsExtractor:
+    """KeywordsExtractor container.
+    
+        Example:
+            >>> from thot.tasks.keywords.KeywordsExtractor import KeywordsExtractor
+            >>> callable(KeywordsExtractor)
+            True
+    """
     def __init__(
         self, config: KeywordsConfiguration = None, call_context=None
     ):

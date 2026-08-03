@@ -16,6 +16,11 @@ from pathlib import Path
 
 import thot
 
+# Entire ``thot`` tree requires a Google-style docstring with an Example:
+# section on every module-level function and class method (nested defs
+# excluded — cover those via the enclosing function's Example).
+STRICT_EXAMPLE_PREFIXES: tuple[str, ...] = ("thot.",)
+
 
 @dataclass(frozen=True)
 class MissingExample:
@@ -33,19 +38,37 @@ def _module_name(path: Path) -> str:
     return ".".join(rel.with_suffix("").parts)
 
 
-def _has_example(docstring: str | None) -> bool:
+def _is_strict_module(module_name: str) -> bool:
+    return any(module_name.startswith(prefix) for prefix in STRICT_EXAMPLE_PREFIXES)
+
+
+def _has_example(docstring: str | None, *, strict: bool) -> bool:
+    """Return whether ``docstring`` satisfies the Example coverage rule.
+
+    Args:
+        docstring: Function/method docstring (may be None).
+        strict: When True, require a non-empty docstring containing
+            ``Example:`` / ``Examples:``. When False, only flag docstrings
+            that embed ``>>>`` without a Google-style Example section.
+
+    Returns:
+        True when the coverage gate should pass for this symbol.
+
+    Example:
+        >>> from unittests.doc_example_audit import _has_example
+        >>> _has_example(None, strict=False)
+        True
+        >>> _has_example(None, strict=True)
+        False
+        >>> _has_example("Summary.\\n\\nExample:\\n    >>> 1\\n    1", strict=True)
+        True
+    """
     if not docstring:
-        # Not every helper function in thot currently has a docstring.
-        # The doctest runner will still validate any embedded examples.
-        # This gate focuses on ensuring that docstrings containing doctest
-        # prompts (>>>) follow the Google-style "Example:" convention.
-        return True
-    # Most helper functions in thot are documented without doctest snippets.
-    # We only require the Google-style "Example:" section when the docstring
-    # actually contains doctest prompts (>>>), so that simple docstrings
-    # don't fail the coverage gate.
-    has_doctest = ">>>" in docstring
+        return not strict
     has_example_section = "Example:" in docstring or "Examples:" in docstring
+    if strict:
+        return has_example_section
+    has_doctest = ">>>" in docstring
     return has_example_section or not has_doctest
 
 
@@ -83,12 +106,13 @@ def find_missing_examples() -> list[MissingExample]:
             continue
         if not isinstance(tree, ast.Module):
             continue
+        strict = _is_strict_module(module_name)
         for qualname, node, lineno in _iter_functions(tree):
             if not isinstance(
                 node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
             ):
                 continue
-            if not _has_example(ast.get_docstring(node)):
+            if not _has_example(ast.get_docstring(node), strict=strict):
                 missing.append(MissingExample(module_name, qualname, lineno))
     return missing
 

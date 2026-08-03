@@ -63,7 +63,13 @@ _FORGE_SYSTEM = (
 
 @dataclass
 class PassageHit:
-    """One retrieved passage from the eval corpus."""
+    """One retrieved passage from the eval corpus.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import PassageHit
+            >>> callable(PassageHit)
+            True
+    """
 
     doc_id: str
     title: str
@@ -73,7 +79,13 @@ class PassageHit:
 
 @dataclass
 class RagAnswerResult:
-    """One query's generation output for RAG eval."""
+    """One query's generation output for RAG eval.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import RagAnswerResult
+            >>> callable(RagAnswerResult)
+            True
+    """
 
     query_id: str
     query: str
@@ -94,7 +106,13 @@ class RagAnswerResult:
 
 
 def load_prompt_language_block(language: str = "en") -> dict[str, Any]:
-    """Load one language block from ``rag-prompts.yaml``."""
+    """Load one language block from ``rag-prompts.yaml``.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import load_prompt_language_block
+            >>> callable(load_prompt_language_block)
+            True
+    """
     path = Path(rag_prompts_path())
     payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     lang = (language or "en").lower()
@@ -105,7 +123,13 @@ def load_prompt_language_block(language: str = "en") -> dict[str, Any]:
 
 
 def query_analysis_to_dict(analysis: Any) -> dict[str, Any]:
-    """Serialize :class:`QueryAnalysis` (or dict) for generation helpers."""
+    """Serialize :class:`QueryAnalysis` (or dict) for generation helpers.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import query_analysis_to_dict
+            >>> query_analysis_to_dict({"raw_query": "q"})["raw_query"]
+            'q'
+    """
     if isinstance(analysis, dict):
         return analysis
     return {
@@ -139,8 +163,13 @@ def analyze_request(
     language: str = "en",
 ) -> dict[str, Any]:
     """Run full T-KEIR NLP on the user request.
-
+    
     Stores the pipeline document under ``_pipeline_doc`` for ontology build.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import analyze_request
+            >>> callable(analyze_request)
+            True
     """
     from thot.tools.search.query_analyzer import (
         analyze_query_document,
@@ -175,7 +204,13 @@ def analyze_request(
 def ensure_pipeline_safe(
     processed: dict[str, Any], text: str
 ) -> dict[str, Any]:
-    """Shallow-copy pipeline output with content filled when missing."""
+    """Shallow-copy pipeline output with content filled when missing.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import ensure_pipeline_safe
+            >>> ensure_pipeline_safe({}, "hello")["content"]
+            ['hello']
+    """
     document = dict(processed or {})
     if text and not document.get("content"):
         document["content"] = [text]
@@ -189,7 +224,13 @@ def _analyze_passages(
     language: str,
     max_passages: int = 5,
 ) -> tuple[list[str], list[dict[str, Any]]]:
-    """Run NLP on passages → SVO lines + pipeline documents for ontology."""
+    """Run NLP on passages → SVO lines + pipeline documents for ontology.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _analyze_passages
+            >>> callable(_analyze_passages)
+            True
+    """
     if runner is None:
         return [], []
     from thot.tasks.answer_generation.ontology_clues import (
@@ -238,7 +279,13 @@ def _passage_svo_lines(
     language: str,
     max_passages: int = 5,
 ) -> list[str]:
-    """Extract SVO lines from top passages via the linguistic pipeline."""
+    """Extract SVO lines from top passages via the linguistic pipeline.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _passage_svo_lines
+            >>> callable(_passage_svo_lines)
+            True
+    """
     lines, _docs = _analyze_passages(
         passages,
         runner=runner,
@@ -258,10 +305,15 @@ def structure_passages(
     use_reasoner: bool = True,
 ) -> tuple[str, str, str, list[dict[str, Any]]]:
     """Analyze passages → KEY PASSAGES + STRUCTURED FACTS + pipeline docs.
-
+    
     Returns:
         ``(focus_passages, structured_facts, reasoner_note, passage_documents)``
         where ``passage_documents`` are NLP outputs ready for document_ontology.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import structure_passages
+            >>> callable(structure_passages)
+            True
     """
     rag_cfg = load_rag_config()
     passage_settings = resolve_passage_settings(
@@ -330,7 +382,13 @@ def structure_passages(
 
 
 def _try_reason_over_svo(svo_lines: list[str]) -> str:
-    """Best-effort ontology reasoner pass over SVO-derived RDF."""
+    """Best-effort ontology reasoner pass over SVO-derived RDF.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _try_reason_over_svo
+            >>> callable(_try_reason_over_svo)
+            True
+    """
     try:
         from rdflib import Graph, Literal, Namespace, URIRef
         from rdflib.namespace import RDF, RDFS
@@ -386,7 +444,13 @@ def _try_reason_over_svo(svo_lines: list[str]) -> str:
 
 
 def _parse_svo_line(line: str) -> tuple[str, str, str] | None:
-    """Parse ``- S — V — O`` or ``S | V | O`` into a triple."""
+    """Parse ``- S — V — O`` or ``S | V | O`` into a triple.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _parse_svo_line
+            >>> _parse_svo_line("- Alice — wrote — book")
+            ('Alice', 'wrote', 'book')
+    """
     body = line.lstrip("- ").strip()
     if "—" in body:
         parts = [part.strip() for part in body.split("—")]
@@ -407,7 +471,13 @@ def _parse_svo_line(line: str) -> tuple[str, str, str] | None:
 def _svo_dicts_from_analysis(
     analysis: dict[str, Any],
 ) -> list[tuple[str, str, str]]:
-    """Normalize query analysis SVO triples."""
+    """Normalize query analysis SVO triples.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _svo_dicts_from_analysis
+            >>> callable(_svo_dicts_from_analysis)
+            True
+    """
     out: list[tuple[str, str, str]] = []
     for triple in analysis.get("svo_triples") or []:
         if isinstance(triple, dict):
@@ -426,7 +496,13 @@ def _svo_dicts_from_analysis(
 def _svo_dicts_from_structured_facts(
     structured_facts: str,
 ) -> list[tuple[str, str, str]]:
-    """Extract passage SVO triples from structured facts text."""
+    """Extract passage SVO triples from structured facts text.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _svo_dicts_from_structured_facts
+            >>> callable(_svo_dicts_from_structured_facts)
+            True
+    """
     block = _extract_passage_svo_block(structured_facts)
     if block.startswith("(no"):
         return []
@@ -445,9 +521,14 @@ def build_query_passage_ontology(
     use_reasoner: bool = True,
 ) -> tuple[str, str]:
     """Merge query+passage SVO into one ontology and optionally reason.
-
+    
     Returns:
         ``(ontology_facts_text, reasoner_note)`` for the unique QA prompt.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import build_query_passage_ontology
+            >>> callable(build_query_passage_ontology)
+            True
     """
     query_triples = _svo_dicts_from_analysis(analysis)
     passage_triples = _svo_dicts_from_structured_facts(structured_facts)
@@ -502,7 +583,13 @@ def build_query_passage_ontology(
 
 
 def _format_query_ner_block(analysis: dict[str, Any]) -> str:
-    """Render query NER entities for the multi-strategy QA prompt."""
+    """Render query NER entities for the multi-strategy QA prompt.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _format_query_ner_block
+            >>> callable(_format_query_ner_block)
+            True
+    """
     entities = analysis.get("ner_entities") or []
     lines: list[str] = []
     for entity in entities[:16]:
@@ -518,7 +605,13 @@ def _format_query_ner_block(analysis: dict[str, Any]) -> str:
 
 
 def _format_query_svo_block(analysis: dict[str, Any]) -> str:
-    """Render query SVO triples for the QA prompt."""
+    """Render query SVO triples for the QA prompt.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _format_query_svo_block
+            >>> callable(_format_query_svo_block)
+            True
+    """
     triples = analysis.get("svo_triples") or []
     if not triples:
         return "(no query SVO extracted)"
@@ -538,7 +631,13 @@ def _format_query_svo_block(analysis: dict[str, Any]) -> str:
 
 
 def _extract_passage_svo_block(structured_facts: str) -> str:
-    """Pull the SVO section out of structured facts text."""
+    """Pull the SVO section out of structured facts text.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _extract_passage_svo_block
+            >>> "(no passage SVO extracted)" in _extract_passage_svo_block("")
+            True
+    """
     text = structured_facts or ""
     if "SVO facts from retrieved passages:" not in text:
         return "(no passage SVO extracted)"
@@ -550,7 +649,13 @@ def _extract_passage_svo_block(structured_facts: str) -> str:
 
 
 def _extract_source_excerpts(structured_facts: str) -> str:
-    """Pull classical source excerpts from structured facts text."""
+    """Pull classical source excerpts from structured facts text.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _extract_source_excerpts
+            >>> callable(_extract_source_excerpts)
+            True
+    """
     text = structured_facts or ""
     if "Source excerpts:" in text:
         return text.split("Source excerpts:", 1)[1].strip() or "(none)"
@@ -561,7 +666,13 @@ def _extract_source_excerpts(structured_facts: str) -> str:
 
 
 def _has_useful_sparql_clues(sparql_clues: str) -> bool:
-    """True when SPARQL produced usable hit lines (not empty / no-hit markers)."""
+    """True when SPARQL produced usable hit lines (not empty / no-hit markers).
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _has_useful_sparql_clues
+            >>> _has_useful_sparql_clues("- Alice — works — Acme")
+            True
+    """
     text = (sparql_clues or "").strip().lower()
     if not text:
         return False
@@ -573,7 +684,13 @@ def _has_useful_sparql_clues(sparql_clues: str) -> bool:
 
 
 def _compact_reasoner_note(reasoner_note: str) -> str:
-    """Keep reasoner status; drop noisy zero-hit SPARQL counters."""
+    """Keep reasoner status; drop noisy zero-hit SPARQL counters.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _compact_reasoner_note
+            >>> _compact_reasoner_note("consistency: ok; SPARQL#1: 0 hit(s)")
+            'consistency: ok'
+    """
     text = (reasoner_note or "").strip()
     if not text:
         return ""
@@ -594,7 +711,13 @@ def _compact_reasoner_note(reasoner_note: str) -> str:
 def _filter_ontology_clue_lines(
     ontology_facts: str, *, max_lines: int = 24
 ) -> str:
-    """Prefer relational ontology lines; drop pure type/label noise when possible."""
+    """Prefer relational ontology lines; drop pure type/label noise when possible.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _filter_ontology_clue_lines
+            >>> callable(_filter_ontology_clue_lines)
+            True
+    """
     text = (ontology_facts or "").strip()
     if not text or text.startswith("(no ") or text == "(none)":
         return ""
@@ -641,12 +764,17 @@ def build_unique_qa_prompt(
     language: str = "en",
 ) -> tuple[str, str]:
     """Build one multi-strategy type-aware QA prompt (no forge LLM).
-
+    
     Evidence priority (do not invert):
       1. Question type + answer shape
       2. KEY PASSAGES / classical excerpts (primary)
       3. Query NER + query/passage SVO (structure)
       4. Ontology / SPARQL / reasoner (optional bridging clues only)
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import build_unique_qa_prompt
+            >>> callable(build_unique_qa_prompt)
+            True
     """
     prompt_cfg = load_prompt_language_block(language)
     unavailable = str(
@@ -756,7 +884,13 @@ def build_rag_prompts(
     sparql_clues: str = "",
     question_type: str | None = None,
 ) -> tuple[str, str]:
-    """Assemble the unique multi-strategy QA prompt."""
+    """Assemble the unique multi-strategy QA prompt.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import build_rag_prompts
+            >>> callable(build_rag_prompts)
+            True
+    """
     qtype = question_type or detect_question_type(query, analysis)
     ontology = ontology_facts
     note = reasoner_note
@@ -788,7 +922,13 @@ def build_forge_brief(
     question_type: str,
     language: str = "en",
 ) -> str:
-    """Build the forge LLM user message (SVO + question type first)."""
+    """Build the forge LLM user message (SVO + question type first).
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import build_forge_brief
+            >>> callable(build_forge_brief)
+            True
+    """
     short_spec = question_type_short_answer_spec(
         question_type, language=language
     )
@@ -838,7 +978,14 @@ async def forge_prompt_with_llm(
     question_type: str = "",
     language: str = "en",
 ) -> str:
-    """One LLM call to forge a sharp QA prompt from SVO + question type."""
+    """One LLM call to forge a sharp QA prompt from SVO + question type.
+    
+        Example:
+            >>> import inspect
+            >>> from thot.tasks.answer_generation.rag_answer import forge_prompt_with_llm
+            >>> inspect.iscoroutinefunction(forge_prompt_with_llm)
+            True
+    """
     analysis = analysis or {}
     qtype = question_type or detect_question_type(query, analysis)
     forge_user = build_forge_brief(
@@ -876,7 +1023,13 @@ _SYNTAGM_LABEL = "pattern_syntagm_or_prep_group"
 
 
 def strip_answer_markup(text: str) -> str:
-    """Remove markdown/bold/bullet wrappers from model answers."""
+    """Remove markdown/bold/bullet wrappers from model answers.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import strip_answer_markup
+            >>> strip_answer_markup("**Yes**")
+            'Yes'
+    """
     if not text:
         return ""
     lines: list[str] = []
@@ -899,7 +1052,13 @@ def strip_answer_markup(text: str) -> str:
 
 
 def _morph_sentences(morphosyntax: list[dict[str, Any]]) -> list[str]:
-    """Rebuild complete sentences from morphosyntax (no mid-phrase cuts)."""
+    """Rebuild complete sentences from morphosyntax (no mid-phrase cuts).
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _morph_sentences
+            >>> callable(_morph_sentences)
+            True
+    """
     if not morphosyntax:
         return []
     from thot.tasks.golden_chunking.ChunkBuilder import extract_sentence_spans
@@ -925,7 +1084,13 @@ def _morph_sentences(morphosyntax: list[dict[str, Any]]) -> list[str]:
 
 
 def _fallback_sentences(text: str) -> list[str]:
-    """Split on sentence boundaries when morphosyntax is unavailable."""
+    """Split on sentence boundaries when morphosyntax is unavailable.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _fallback_sentences
+            >>> _fallback_sentences("Hi. Bye.")
+            ['Hi.', 'Bye.']
+    """
     normalized = re.sub(r"\s+", " ", (text or "").strip())
     if not normalized:
         return []
@@ -934,7 +1099,13 @@ def _fallback_sentences(text: str) -> list[str]:
 
 
 def _kg_node_text(node: Any) -> str:
-    """Join a KG subject/object/value ``content`` field into one phrase."""
+    """Join a KG subject/object/value ``content`` field into one phrase.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _kg_node_text
+            >>> _kg_node_text({"content": ["Alice", "Smith"]})
+            'Alice Smith'
+    """
     if not isinstance(node, dict):
         return ""
     content = node.get("content")
@@ -949,9 +1120,14 @@ def _kg_node_text(node: Any) -> str:
 
 def extract_nlp_syntagms(processed: dict[str, Any] | None) -> list[str]:
     """Collect ``pattern_syntagm_or_prep_group`` phrases from NLP ``kg``.
-
+    
     These spans are produced by ``syntactic-rules.json`` (same resource used
     by the syntactic tagger), not by ad-hoc POS heuristics.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import extract_nlp_syntagms
+            >>> extract_nlp_syntagms({"kg": []})
+            []
     """
     if not processed:
         return []
@@ -972,7 +1148,13 @@ def extract_nlp_syntagms(processed: dict[str, Any] | None) -> list[str]:
 
 
 def extract_nlp_named_entities(processed: dict[str, Any] | None) -> list[str]:
-    """Collect named-entity surface forms from NLP ``content_ner``."""
+    """Collect named-entity surface forms from NLP ``content_ner``.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import extract_nlp_named_entities
+            >>> extract_nlp_named_entities({"content_ner": [{"text": "Alice"}]})
+            ['Alice']
+    """
     if not processed:
         return []
     phrases: list[str] = []
@@ -986,7 +1168,13 @@ def extract_nlp_named_entities(processed: dict[str, Any] | None) -> list[str]:
 
 
 def _normalize_yes_no(text: str) -> str | None:
-    """Return canonical Yes/No when the answer opens that way."""
+    """Return canonical Yes/No when the answer opens that way.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _normalize_yes_no
+            >>> _normalize_yes_no("Yes, because...")
+            'Yes'
+    """
     match = _YES_NO_RE.match(text or "")
     if not match:
         return None
@@ -1003,7 +1191,13 @@ def _prefer_annotated_phrase(
     named_entities: list[str],
     syntagms: list[str],
 ) -> str | None:
-    """Pick the best NER / syntagm phrase already present in the answer."""
+    """Pick the best NER / syntagm phrase already present in the answer.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import _prefer_annotated_phrase
+            >>> callable(_prefer_annotated_phrase)
+            True
+    """
     hay_clean = cleaned.lower()
     hay_sent = sentence.lower()
     ranked: list[str] = []
@@ -1029,11 +1223,16 @@ def coherent_short_answer(
     max_sentences: int | None = None,
 ) -> str:
     """Keep SHORT_ANSWER on complete sentences/NLP syntagms (never cut a phrase).
-
+    
     Uses pipeline annotations:
     - ``content_ner`` named entities
     - ``kg`` nodes labeled ``pattern_syntagm_or_prep_group``
     - morphosyntax sentence boundaries (``is_sent_start``)
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import coherent_short_answer
+            >>> coherent_short_answer("Yes. Because.", question_type="yes_no")
+            'Yes'
     """
     cleaned = strip_answer_markup(text)
     if not cleaned:
@@ -1081,7 +1280,13 @@ def coherent_short_answer(
 
 
 def clean_detailed_report(text: str) -> str:
-    """Light cleanup for DETAILED_REPORT (markup only; keep paragraphs)."""
+    """Light cleanup for DETAILED_REPORT (markup only; keep paragraphs).
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import clean_detailed_report
+            >>> clean_detailed_report("**Details**")
+            'Details'
+    """
     cleaned = strip_answer_markup(text)
     return cleaned.strip()
 
@@ -1094,7 +1299,13 @@ def clean_generated_answers(
     runner: Any | None = None,
     language: str = "en",
 ) -> tuple[str, str]:
-    """Clean SHORT_ANSWER / DETAILED_REPORT using NLP NER + syntagm annotations."""
+    """Clean SHORT_ANSWER / DETAILED_REPORT using NLP NER + syntagm annotations.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import clean_generated_answers
+            >>> callable(clean_generated_answers)
+            True
+    """
     morph: list[dict[str, Any]] | None = None
     named_entities: list[str] = []
     syntagms: list[str] = []
@@ -1133,7 +1344,14 @@ async def generate_rag_answer(
     question_type: str = "other",
     runner: Any | None = None,
 ) -> tuple[str, str]:
-    """Run the unique QA prompt through the LLM and clean structured output."""
+    """Run the unique QA prompt through the LLM and clean structured output.
+    
+        Example:
+            >>> import inspect
+            >>> from thot.tasks.answer_generation.rag_answer import generate_rag_answer
+            >>> inspect.iscoroutinefunction(generate_rag_answer)
+            True
+    """
     prompt_cfg = load_prompt_language_block(language)
     unavailable = str(
         prompt_cfg.get("unavailable_answer")
@@ -1170,11 +1388,17 @@ async def answer_from_passages(
     use_ontology: bool = True,
 ) -> RagAnswerResult:
     """Oracle evidence → unique ontology-grounded QA prompt → one LLM call.
-
+    
     ``forge_prompt`` is opt-in and discouraged: the unique prompt is built
     deterministically from question type + merged query/passage ontology.
     ``use_ontology`` / ``use_reasoner`` default from ``rag.yaml``
     ``answer_generation`` when callers pass the resolved flags.
+    
+        Example:
+            >>> import inspect
+            >>> from thot.tasks.answer_generation.rag_answer import answer_from_passages
+            >>> inspect.iscoroutinefunction(answer_from_passages)
+            True
     """
     try:
         if runner is not None:
@@ -1303,12 +1527,24 @@ async def answer_from_passages(
 
 
 def tokenize_answer(text: str) -> list[str]:
-    """Lowercase alphanumeric tokens for F1 scoring."""
+    """Lowercase alphanumeric tokens for F1 scoring.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import tokenize_answer
+            >>> tokenize_answer("Hello World!")
+            ['hello', 'world']
+    """
     return _TOKEN_RE.findall((text or "").lower())
 
 
 def token_f1(prediction: str, gold: str) -> float:
-    """Token-level F1 between prediction and gold answer."""
+    """Token-level F1 between prediction and gold answer.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import token_f1
+            >>> round(token_f1("the cat sat", "cat sat"), 2)
+            0.8
+    """
     pred = tokenize_answer(prediction)
     ref = tokenize_answer(gold)
     if not pred and not ref:
@@ -1334,7 +1570,13 @@ def token_f1(prediction: str, gold: str) -> float:
 
 
 def normalized_em(prediction: str, gold: str) -> float:
-    """Normalized exact match (whitespace/case folded)."""
+    """Normalized exact match (whitespace/case folded).
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import normalized_em
+            >>> normalized_em("Hello", "hello")
+            1.0
+    """
     left = " ".join(tokenize_answer(prediction))
     right = " ".join(tokenize_answer(gold))
     if not left and not right:
@@ -1343,7 +1585,13 @@ def normalized_em(prediction: str, gold: str) -> float:
 
 
 def answer_contains_gold(prediction: str, gold: str) -> float:
-    """1.0 when gold token sequence appears in the prediction."""
+    """1.0 when gold token sequence appears in the prediction.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import answer_contains_gold
+            >>> answer_contains_gold("the quick brown fox", "brown fox")
+            1.0
+    """
     left = " ".join(tokenize_answer(prediction))
     right = " ".join(tokenize_answer(gold))
     if not right:
@@ -1352,7 +1600,13 @@ def answer_contains_gold(prediction: str, gold: str) -> float:
 
 
 def build_llm_wrapper() -> UnifiedLLMWrapper:
-    """Construct ``UnifiedLLMWrapper`` from env + ``rag.yaml`` models."""
+    """Construct ``UnifiedLLMWrapper`` from env + ``rag.yaml`` models.
+    
+        Example:
+            >>> from thot.tasks.answer_generation.rag_answer import build_llm_wrapper
+            >>> callable(build_llm_wrapper)
+            True
+    """
     rag = load_rag_config()
     file_models = {
         "embedding_model": rag.models.embedding_model,

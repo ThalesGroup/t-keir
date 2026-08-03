@@ -30,7 +30,12 @@ _NORMALIZER_CACHE: dict[tuple[Any, ...], "TextNormalizer"] = {}
 
 
 class TextNormalizer:
-    """Lemmatize with spaCy, drop stopwords/noise, optionally ASCII-fold."""
+    """Lemmatize with spaCy, drop stopwords/noise, optionally ASCII-fold.
+
+    Example:
+        >>> TextNormalizer.asciifold("café")
+        'cafe'
+    """
 
     def __init__(
         self,
@@ -53,6 +58,9 @@ class TextNormalizer:
             asciifold: When True, strip diacritics after lemmatization.
             disable: Pipeline components to disable for throughput.
             nlp: Optional pre-loaded Language (skips ``spacy.load``).
+
+        Example:
+            >>> TextNormalizer("en_core_web_sm", nlp=spacy.blank("en"))  # doctest: +SKIP
         """
         self.model = model
         self.min_token_length = min_token_length
@@ -84,6 +92,10 @@ class TextNormalizer:
 
         Returns:
             Cached :class:`TextNormalizer` for the resolved spaCy model.
+
+        Example:
+            >>> from thot.tools.search.dual_hybrid_config import DualHybridConfig
+            >>> TextNormalizer.for_language(DualHybridConfig(), "en")  # doctest: +SKIP
         """
         entry = prep.resolve_model(language)
         cache_key = (
@@ -110,6 +122,10 @@ class TextNormalizer:
         """Lemmatize then optionally ASCII-fold a single string.
 
         This is the single code path used at index time and query time.
+
+        Example:
+            >>> nlp = spacy.blank("en")
+            >>> TextNormalizer("blank", nlp=nlp).normalize("running")  # doctest: +SKIP
         """
         if not (text or "").strip():
             return ""
@@ -119,7 +135,12 @@ class TextNormalizer:
         return self.asciifold(joined) if self.asciifold_enabled else joined
 
     def normalize_many(self, texts: Iterable[str]) -> list[str]:
-        """Normalize many strings with ``nlp.pipe`` batching."""
+        """Normalize many strings with ``nlp.pipe`` batching.
+
+        Example:
+            >>> nlp = spacy.blank("en")
+            >>> TextNormalizer("blank", nlp=nlp).normalize_many(["a", "b"])  # doctest: +SKIP
+        """
         items = list(texts)
         if not items:
             return []
@@ -132,6 +153,13 @@ class TextNormalizer:
         return out
 
     def _tokens_from_doc(self, doc: Any) -> list[str]:
+        """Extract content lemmas from a spaCy Doc.
+
+        Example:
+            >>> nlp = spacy.blank("en")
+            >>> doc = nlp("running")
+            >>> TextNormalizer("blank", nlp=nlp)._tokens_from_doc(doc)  # doctest: +SKIP
+        """
         tokens: list[str] = []
         for tok in doc:
             if tok.is_stop or tok.is_punct or tok.is_space:
@@ -146,7 +174,12 @@ class TextNormalizer:
 
     @staticmethod
     def asciifold(text: str) -> str:
-        """Strip combining marks after NFD decomposition."""
+        """Strip combining marks after NFD decomposition.
+
+        Example:
+            >>> TextNormalizer.asciifold("café")
+            'cafe'
+        """
         decomposed = unicodedata.normalize("NFD", text)
         return "".join(
             char for char in decomposed if unicodedata.category(char) != "Mn"
@@ -157,6 +190,12 @@ def document_language(document: dict[str, Any] | None) -> str:
     """Resolve language from a pipeline document (index-time).
 
     Prefers ``language-detection.language`` written by LanguageDetector.
+
+    Example:
+        >>> document_language({"language-detection": {"language": "fr"}})
+        'fr'
+        >>> document_language(None)
+        'en'
     """
     if not document:
         return "en"
@@ -174,6 +213,9 @@ def normalizer_for_language(language: str | None) -> TextNormalizer:
     """Shared factory: load preprocessing from ``rag.yaml`` and resolve model.
 
     Used by indexing and by PassageRetrievalPipeline query path.
+
+    Example:
+        >>> normalizer_for_language("en")  # doctest: +SKIP
     """
     from thot.tools.search.rag_config import load_rag_config
 
@@ -198,6 +240,16 @@ def normalize_document_fields(
 
     Returns:
         ``(title_lemmatized, content_lemmatized)``.
+
+    Example:
+        >>> nlp = spacy.blank("en")
+        >>> normalizer = TextNormalizer("blank", nlp=nlp)
+        >>> normalize_document_fields(
+        ...     title="Hello",
+        ...     content=["world"],
+        ...     language="en",
+        ...     normalizer=normalizer,
+        ... )  # doctest: +SKIP
     """
     if isinstance(content, str):
         segments = [content]
@@ -232,6 +284,11 @@ def normalize_query_texts(
     """Normalize query / expansion strings for lemmatized Vespa fields (query).
 
     Same ``TextNormalizer.normalize`` path as :func:`normalize_document_fields`.
+
+    Example:
+        >>> nlp = spacy.blank("en")
+        >>> normalizer = TextNormalizer("blank", nlp=nlp)
+        >>> normalize_query_texts(["hello"], language="en", normalizer=normalizer)  # doctest: +SKIP
     """
     nlp = normalizer or normalizer_for_language(language)
     return [nlp.normalize(text) for text in texts if (text or "").strip()]

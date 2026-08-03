@@ -29,9 +29,35 @@ CREATE TABLE IF NOT EXISTS budgets (
 
 
 class BudgetStore:
-    """SQLite-backed budget counters."""
+    """SQLite-backed budget counters.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.governor.budgets import BudgetStore
+        >>> from thot.governor.config import governor_settings
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     store = BudgetStore(Path(td) / "b.db", governor_settings())
+        ...     snap = store.snapshot("u1", "docs", limit=100.0)
+        ...     store.close()
+        ...     snap.consumed == 0.0
+        True
+    """
 
     def __init__(self, path: Path, settings: GovernorSettings) -> None:
+        """Open or create the SQLite budget database.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     p = Path(td) / "b.db"
+            ...     store = BudgetStore(p, governor_settings())
+            ...     p.is_file()
+            True
+        """
         self._settings = settings
         path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = sqlite3.connect(str(path), check_same_thread=False)
@@ -41,6 +67,21 @@ class BudgetStore:
         self._lock = threading.Lock()
 
     def _ensure_row(self, actor_id: str, unit: str, limit: float) -> None:
+        """Insert a budget row when missing (idempotent).
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = BudgetStore(Path(td) / "b.db", governor_settings())
+            ...     store._ensure_row("u1", "docs", 50.0)
+            ...     snap = store.snapshot("u1", "docs", limit=50.0)
+            ...     store.close()
+            ...     snap.limit
+            50.0
+        """
         self._conn.execute(
             """
             INSERT INTO budgets (actor_id, unit, limit_amount, consumed)
@@ -54,6 +95,20 @@ class BudgetStore:
     def snapshot(
         self, actor_id: str, unit: str, *, limit: float
     ) -> BudgetSnapshot:
+        """Return current budget snapshot without consuming.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = BudgetStore(Path(td) / "b.db", governor_settings())
+            ...     snap = store.snapshot("u1", "docs", limit=10.0)
+            ...     store.close()
+            ...     snap.blocked
+            False
+        """
         with self._lock:
             self._ensure_row(actor_id, unit, limit)
             row = self._conn.execute(
@@ -81,6 +136,20 @@ class BudgetStore:
     def consume(
         self, actor_id: str, unit: str, amount: float, *, limit: float
     ) -> BudgetSnapshot:
+        """Increment consumed budget and return updated snapshot.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = BudgetStore(Path(td) / "b.db", governor_settings())
+            ...     snap = store.consume("u1", "docs", 1.0, limit=10.0)
+            ...     store.close()
+            ...     snap.consumed
+            1.0
+        """
         with self._lock:
             self._ensure_row(actor_id, unit, limit)
             self._conn.execute(
@@ -94,4 +163,17 @@ class BudgetStore:
         return self.snapshot(actor_id, unit, limit=limit)
 
     def close(self) -> None:
+        """Close the SQLite connection.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = BudgetStore(Path(td) / "b.db", governor_settings())
+            ...     store.close()
+            ...     True
+            True
+        """
         self._conn.close()

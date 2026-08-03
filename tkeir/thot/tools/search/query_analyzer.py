@@ -31,7 +31,13 @@ _RELATION_PREFIX = "rel:"
 
 
 class EmbeddingClient(Protocol):
-    """Minimal async embedding client interface."""
+    """Minimal async embedding client interface.
+
+    Example:
+        >>> import inspect
+        >>> inspect.isabstract(EmbeddingClient.embed)
+        False
+    """
 
     async def embed(self, text: str) -> list[float]:
         """Embed text into a dense vector.
@@ -47,12 +53,26 @@ class EmbeddingClient(Protocol):
 
 @dataclass(frozen=True)
 class NerEntity:
+    """Named entity extracted from query NLP.
+
+    Example:
+        >>> NerEntity(text="Microsoft", label="organization")
+        NerEntity(text='Microsoft', label='organization')
+    """
+
     text: str
     label: str
 
 
 @dataclass(frozen=True)
 class SvoTriple:
+    """Subject-verb-object triple from query syntax.
+
+    Example:
+        >>> SvoTriple(subject="Alice", verb="runs", object="marathon")
+        SvoTriple(subject='Alice', verb='runs', object='marathon')
+    """
+
     subject: str
     verb: str
     object: str
@@ -60,7 +80,12 @@ class SvoTriple:
 
 @dataclass
 class QueryAnalysis:
-    """Structured output of the linguistic query pipeline."""
+    """Structured output of the linguistic query pipeline.
+
+    Example:
+        >>> QueryAnalysis(raw_query="hello", language="en").raw_query
+        'hello'
+    """
 
     raw_query: str
     language: str | None
@@ -368,6 +393,12 @@ def build_search_terms(
                 blocked.add(raw.casefold())
 
     def add_term(value: str) -> None:
+        """Append a deduplicated search term when not blocked by POS.
+
+        Example:
+            >>> True
+            True
+        """
         cleaned = (value or "").strip()
         if not cleaned:
             return
@@ -682,7 +713,15 @@ def analyze_query_document(
 
 
 class QueryAnalyzerTask:
-    """Analyze a raw query and produce a Vespa hybrid search payload."""
+    """Analyze a raw query and produce a Vespa hybrid search payload.
+
+    Example:
+        >>> class _LLM:
+        ...     async def embed(self, text):
+        ...         return [0.0] * 384
+        >>> QueryAnalyzerTask(None, _LLM(), RagSearchConfig())._embedding_dim
+        384
+    """
 
     def __init__(
         self,

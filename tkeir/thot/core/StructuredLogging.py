@@ -30,6 +30,13 @@ TEXT_LOG_DATEFMT = "%H:%M:%S"
 
 
 def _utc_ts() -> str:
+    """Return current UTC time as ISO-8601 with millisecond ``Z`` suffix.
+
+    Example:
+        >>> ts = _utc_ts()
+        >>> ts.endswith("Z") and "T" in ts
+        True
+    """
     return (
         datetime.now(timezone.utc)
         .isoformat(timespec="milliseconds")
@@ -38,7 +45,16 @@ def _utc_ts() -> str:
 
 
 def _record_correlation_id(record: logging.LogRecord) -> str:
-    """Resolve correlation id for a log record (explicit → context → ``-``)."""
+    """Resolve correlation id for a log record (explicit → context → ``-``).
+
+    Example:
+        >>> rec = logging.LogRecord(
+        ...     "t", logging.INFO, __file__, 1, "hi", (), None
+        ... )
+        >>> rec.correlation_id = "abc"
+        >>> _record_correlation_id(rec)
+        'abc'
+    """
     explicit = getattr(record, "correlation_id", None)
     if explicit not in (None, ""):
         return str(explicit)
@@ -50,6 +66,18 @@ class CorrelationIdFilter(logging.Filter):
     """Ensure every record has ``correlation_id`` for formatters."""
 
     def filter(self, record: logging.LogRecord) -> bool:
+        """Stamp ``record.correlation_id`` and allow the record through.
+
+        Example:
+            >>> filt = CorrelationIdFilter()
+            >>> rec = logging.LogRecord(
+            ...     "t", logging.INFO, __file__, 1, "hi", (), None
+            ... )
+            >>> filt.filter(rec)
+            True
+            >>> hasattr(rec, "correlation_id")
+            True
+        """
         record.correlation_id = _record_correlation_id(record)
         return True
 
@@ -58,9 +86,26 @@ class TkeirTextFormatter(logging.Formatter):
     """Human-readable logs with file, function, line, and correlation-id."""
 
     def __init__(self) -> None:
+        """Initialize formatter with :data:`TEXT_LOG_FORMAT`.
+
+        Example:
+            >>> fmt = TkeirTextFormatter()
+            >>> fmt._fmt is not None
+            True
+        """
         super().__init__(fmt=TEXT_LOG_FORMAT, datefmt=TEXT_LOG_DATEFMT)
 
     def format(self, record: logging.LogRecord) -> str:
+        """Format ``record`` as a text line with correlation-id.
+
+        Example:
+            >>> fmt = TkeirTextFormatter()
+            >>> rec = logging.LogRecord(
+            ...     "t", logging.INFO, __file__, 1, "hello", (), None
+            ... )
+            >>> "hello" in fmt.format(rec)
+            True
+        """
         record.correlation_id = _record_correlation_id(record)
         return super().format(record)
 

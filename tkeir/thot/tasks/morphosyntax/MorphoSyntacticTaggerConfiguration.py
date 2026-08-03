@@ -15,7 +15,7 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 class MorphoSyntacticTaggerConfiguration:
     """load morphosyntactic tagger configuration
     A tagger configuration is represented by JSON entry:
-
+    
     Example
     {
     "logger": {
@@ -31,6 +31,11 @@ class MorphoSyntacticTaggerConfiguration:
         }]
     }
     }
+    
+        Example:
+            >>> from thot.tasks.morphosyntax.MorphoSyntacticTaggerConfiguration import MorphoSyntacticTaggerConfiguration
+            >>> callable(MorphoSyntacticTaggerConfiguration)
+            True
     """
 
     def __init__(self):

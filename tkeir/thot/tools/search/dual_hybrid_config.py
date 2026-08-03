@@ -22,19 +22,38 @@ _SPACY_WHEEL = (
 
 
 def _wheel(tag: str) -> str:
+    """Build a spaCy model wheel download URL for ``tag``.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import _wheel
+        >>> _wheel("en_core_web_md-3.6.0").endswith("en_core_web_md-3.6.0-py3-none-any.whl")
+        True
+    """
     return _SPACY_WHEEL.format(tag=tag)
 
 
 @dataclass(frozen=True)
 class SpacyModelEntry:
-    """One spaCy model selectable for a language code."""
+    """One spaCy model selectable for a language code.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import SpacyModelEntry
+        >>> SpacyModelEntry(model="en_core_web_md").model
+        'en_core_web_md'
+    """
 
     model: str
     download: str = ""
 
 
 def _default_spacy_models() -> dict[str, SpacyModelEntry]:
-    """Built-in language → model map (``default`` / ``xx`` is mandatory)."""
+    """Built-in language → model map (``default`` / ``xx`` is mandatory).
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import _default_spacy_models
+        >>> "en" in _default_spacy_models()
+        True
+    """
     return {
         "default": SpacyModelEntry(
             model="xx_ent_wiki_sm",
@@ -86,6 +105,12 @@ def _default_spacy_models() -> dict[str, SpacyModelEntry]:
 def _warn_if_not_unit(
     name: str, weights: dict[str, float], tol: float = 0.05
 ) -> None:
+    """Log a warning when fusion weights do not sum to ~1.0.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import _warn_if_not_unit
+        >>> _warn_if_not_unit("test", {"a": 0.5, "b": 0.5})
+    """
     total = sum(weights.values())
     if abs(total - 1.0) > tol:
         LOGGER.warning(
@@ -97,7 +122,13 @@ def _warn_if_not_unit(
 
 @dataclass(frozen=True)
 class PreprocessingConfig:
-    """SpaCy normalizer settings (model chosen by detected language)."""
+    """SpaCy normalizer settings (model chosen by detected language).
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import PreprocessingConfig
+        >>> PreprocessingConfig().resolve_model("en").model.startswith("en_")
+        True
+    """
 
     min_token_length: int = 3
     drop_numbers: bool = False
@@ -108,7 +139,13 @@ class PreprocessingConfig:
     )
 
     def resolve_model(self, language: str | None) -> SpacyModelEntry:
-        """Pick the spaCy model for ``language``, falling back to ``default``."""
+        """Pick the spaCy model for ``language``, falling back to ``default``.
+
+        Example:
+            >>> from thot.tools.search.dual_hybrid_config import PreprocessingConfig
+            >>> PreprocessingConfig().resolve_model("fr").model.startswith("fr_")
+            True
+        """
         code = (language or "").strip().lower().replace("_", "-")
         if "-" in code:
             code = code.split("-", 1)[0]
@@ -126,7 +163,13 @@ class PreprocessingConfig:
 
 @dataclass(frozen=True)
 class DualRetrievalArms:
-    """Vespa passage retrieval hits / ranking profile."""
+    """Vespa passage retrieval hits / ranking profile.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import DualRetrievalArms
+        >>> DualRetrievalArms().ranking_profile
+        'hybrid'
+    """
 
     hits: int = 100
     ranking_profile: str = "hybrid"
@@ -143,6 +186,11 @@ class NlpSeedExpansionConfig:
 
     ``min_tokens`` / ``min_sentences`` are retained for compatibility; they
     no longer gate whether seeds are applied.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import NlpSeedExpansionConfig
+        >>> NlpSeedExpansionConfig().enabled
+        True
     """
 
     enabled: bool = True
@@ -152,7 +200,13 @@ class NlpSeedExpansionConfig:
 
 @dataclass(frozen=True)
 class QueryExpansionConfig:
-    """Business-ontology query expansion (ontology supplied per query)."""
+    """Business-ontology query expansion (ontology supplied per query).
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import QueryExpansionConfig
+        >>> QueryExpansionConfig().weights["original"]
+        1.0
+    """
 
     enabled: bool = True
     max_terms_per_relation: int = 5
@@ -173,7 +227,13 @@ class QueryExpansionConfig:
 
 @dataclass(frozen=True)
 class RrfConfig:
-    """Reciprocal Rank Fusion (global + user when mode=both)."""
+    """Reciprocal Rank Fusion (global + user when mode=both).
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import RrfConfig
+        >>> RrfConfig().k
+        60
+    """
 
     k: int = 60
     arm_weights: dict[str, float] = field(
@@ -184,7 +244,13 @@ class RrfConfig:
 
 @dataclass(frozen=True)
 class OntologyScoringYaml:
-    """Optional Graph-RAG rescoring of first-stage hits (OntologyRescorer)."""
+    """Optional Graph-RAG rescoring of first-stage hits (OntologyRescorer).
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import OntologyScoringYaml
+        >>> OntologyScoringYaml().match_weights["exact"]
+        1.0
+    """
 
     enabled: bool = True
     match_weights: dict[str, float] = field(
@@ -204,7 +270,13 @@ class OntologyScoringYaml:
 
 @dataclass(frozen=True)
 class ColbertYaml:
-    """BGE-M3 ColBERT MaxSim second stage (production + BEIR)."""
+    """BGE-M3 ColBERT MaxSim second stage (production + BEIR).
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import ColbertYaml
+        >>> ColbertYaml().enabled
+        True
+    """
 
     enabled: bool = True
     top_m: int = 40
@@ -220,14 +292,26 @@ class ColbertYaml:
 
 @dataclass(frozen=True)
 class FinalFusionYaml:
-    """Truncate to the final top-k after ColBERT / OntologyRescorer."""
+    """Truncate to the final top-k after ColBERT / OntologyRescorer.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import FinalFusionYaml
+        >>> FinalFusionYaml().top_k_returned
+        10
+    """
 
     top_k_returned: int = 10
 
 
 @dataclass(frozen=True)
 class FallbackYaml:
-    """Graceful degradation knobs."""
+    """Graceful degradation knobs.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import FallbackYaml
+        >>> FallbackYaml().neutral_score
+        0.5
+    """
 
     neutral_score: float = 0.5
 
@@ -238,6 +322,11 @@ class BusinessOntologyConfig:
 
     Defaults keep ontology on for both index and search; flip either flag in
     ``rag.yaml`` to disable without code changes.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import BusinessOntologyConfig
+        >>> BusinessOntologyConfig().default_dataset
+        'osint'
     """
 
     # Tag document json_ld + chunk concept_ids / ontology_text at index time.
@@ -260,6 +349,11 @@ class IndexDumpConfig:
     When ``save_document`` is true, the dump also stores the full analyzed
     pipeline document (after external-ontology annotation) under
     ``analyzed_document``.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import IndexDumpConfig
+        >>> IndexDumpConfig().path
+        'workspace/index-dumps'
     """
 
     enabled: bool = True
@@ -269,7 +363,13 @@ class IndexDumpConfig:
 
 @dataclass(frozen=True)
 class DualHybridConfig:
-    """Top-level dual-retrieval configuration."""
+    """Top-level dual-retrieval configuration.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import DualHybridConfig
+        >>> DualHybridConfig().search_mode
+        'auto'
+    """
 
     enabled: bool = False
     search_mode: str = "auto"  # auto | global | user | both
@@ -298,7 +398,14 @@ class DualHybridConfig:
 def _spacy_models_from_mapping(
     raw: dict[str, Any] | None,
 ) -> dict[str, SpacyModelEntry]:
-    """Parse ``preprocessing.spacy_models``; require ``default`` or ``xx``."""
+    """Parse ``preprocessing.spacy_models``; require ``default`` or ``xx``.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import _spacy_models_from_mapping
+        >>> models = _spacy_models_from_mapping({"default": "xx_ent_wiki_sm"})
+        >>> models["default"].model
+        'xx_ent_wiki_sm'
+    """
     if not raw:
         return _default_spacy_models()
     merged: dict[str, SpacyModelEntry] = {}
@@ -329,7 +436,13 @@ def _spacy_models_from_mapping(
 
 
 def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
-    """Parse the ``dual_hybrid`` block from ``rag.yaml``."""
+    """Parse the ``dual_hybrid`` block from ``rag.yaml``.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import dual_hybrid_from_mapping
+        >>> dual_hybrid_from_mapping({"enabled": True}).enabled
+        True
+    """
     cfg = raw or {}
     prep = cfg.get("preprocessing") or {}
     retrieval = cfg.get("retrieval") or {}

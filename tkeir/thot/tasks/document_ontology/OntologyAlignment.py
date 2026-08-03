@@ -82,7 +82,13 @@ _STRUCTURAL_PREDICATES = frozenset(
 
 @dataclass(frozen=True)
 class AlignmentSettings:
-    """Configuration for ontology class/property clustering."""
+    """Configuration for ontology class/property clustering.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyAlignment import AlignmentSettings
+            >>> callable(AlignmentSettings)
+            True
+    """
 
     enabled: bool = True
     similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD
@@ -582,12 +588,26 @@ def _collect_document_ner_labels(document: dict) -> list[str]:
 
 
 def _add_ner_label_candidates(candidates: set[str], document: dict) -> None:
+    """_add_ner_label_candidates helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyAlignment import _add_ner_label_candidates
+            >>> callable(_add_ner_label_candidates)
+            True
+    """
     for label in _collect_document_ner_labels(document):
         candidates.add(label)
         candidates.add(title_case_label(label))
 
 
 def _add_ner_head_candidates(candidates: set[str], document: dict) -> None:
+    """_add_ner_head_candidates helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyAlignment import _add_ner_head_candidates
+            >>> callable(_add_ner_head_candidates)
+            True
+    """
     for key in ("title_ner", "content_ner"):
         for span in document.get(key) or []:
             text = str(span.get("text", "")).strip()
@@ -599,6 +619,13 @@ def _add_ner_head_candidates(candidates: set[str], document: dict) -> None:
 
 
 def _add_chunk_entity_candidates(candidates: set[str], document: dict) -> None:
+    """_add_chunk_entity_candidates helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyAlignment import _add_chunk_entity_candidates
+            >>> callable(_add_chunk_entity_candidates)
+            True
+    """
     for chunk in document.get("golden_chunks") or []:
         metadata = chunk.get("metadata") or {}
         for entity_key in metadata.get("primary_entities") or {}:
@@ -610,6 +637,13 @@ def _add_chunk_entity_candidates(candidates: set[str], document: dict) -> None:
 
 
 def _add_kg_head_candidates(candidates: set[str], document: dict) -> None:
+    """_add_kg_head_candidates helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyAlignment import _add_kg_head_candidates
+            >>> callable(_add_kg_head_candidates)
+            True
+    """
     for triple in document.get("kg") or []:
         for part in ("subject", "value"):
             content = (triple.get(part) or {}).get("content", [])
@@ -624,6 +658,13 @@ def _add_kg_head_candidates(candidates: set[str], document: dict) -> None:
 
 
 def _filter_class_candidates(candidates: set[str]) -> list[str]:
+    """_filter_class_candidates helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyAlignment import _filter_class_candidates
+            >>> _filter_class_candidates({"Person", "Entity"})
+            ['Person']
+    """
     return sorted(
         candidate
         for candidate in candidates

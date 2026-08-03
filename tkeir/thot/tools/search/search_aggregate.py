@@ -18,7 +18,12 @@ from typing import Any
 
 @dataclass(frozen=True)
 class AggregatedDocument:
-    """Document-level score built from one or more chunk hits."""
+    """Document-level score built from one or more chunk hits.
+
+    Example:
+        >>> AggregatedDocument("d1", 0.9, ["c1"], title="Doc")
+        AggregatedDocument(document_id='d1', score=0.9, chunk_ids=['c1'], title='Doc', max_chunk_score=0.0, hit_count=0)
+    """
 
     document_id: str
     score: float

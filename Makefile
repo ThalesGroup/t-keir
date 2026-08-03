@@ -350,17 +350,9 @@ install-tesseract: ## Install Tesseract OCR via helper script
 
 init-models: install ## Build tkeir_mwe.pkl from annotation resources (skip if present)
 	$(Q)mkdir -p "$(TRANSFORMERS_CACHE)"
-	$(Q)out="$(TKEIR_DIR)/resources/modeling/tokenizer/en/tkeir_mwe.pkl"; \
-	if [ -f "$$out" ]; then \
-		echo "WARN: annotation model already exists — skipping: $$out"; \
-		echo "      Delete it and re-run 'make init-models' to regenerate."; \
-	else \
-		cd $(TKEIR_DIR) && TRANSFORMERS_CACHE="$(TRANSFORMERS_CACHE)" \
-			$(UV) run --no-sync --python $(PYTHON) \
-			tkeir-create-annotation-resource \
-			--entries-file resources/modeling/tokenizer/en/annotation-resources.json \
-			--output resources/modeling/tokenizer/en/tkeir_mwe.pkl; \
-	fi
+	$(Q)chmod +x "$(TKEIR_DIR)/scripts/init-models.sh"
+	$(Q)cd $(TKEIR_DIR) && TRANSFORMERS_CACHE="$(TRANSFORMERS_CACHE)" \
+		bash scripts/init-models.sh "$(TRANSFORMERS_CACHE)"
 
 setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3 → Vespa → SciDocs)
 	$(MAKE) install
@@ -880,6 +872,7 @@ wipe-runtime: check-docker ## Wipe host + leftover Docker runtime DBs/state (Ves
 		"$(WORKSPACE)/governor" \
 		"$(WORKSPACE)/ingest" \
 		"$(WORKSPACE)/users" \
+		"$(WORKSPACE)/agent" \
 		"$(WORKSPACE)/tmp" \
 		"$(ROOT)/.tkeir-okf" \
 		"$(TKEIR_DIR)/.tkeir-okf" \
@@ -1272,13 +1265,13 @@ TKEIR_AGENT_ORCHESTRATOR_CONFIG ?= $(ROOT)/datasets/$(TKEIR_AGENT_USECASE)/agent
 LLM_GENERATE_TIMEOUT_SECONDS ?= 600
 
 agent: spire-up ## Start tkeir-agent HTTP service (:8092)
-	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)" "$(WORKSPACE)/users"
+	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)" "$(WORKSPACE)/users" "$(WORKSPACE)/agent"
 	$(Q)test -f "$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" || { \
 		echo "Missing agent orchestrator config: $(TKEIR_AGENT_ORCHESTRATOR_CONFIG)"; \
 		echo "Set TKEIR_AGENT_USECASE=osint|enterprise or TKEIR_AGENT_ORCHESTRATOR_CONFIG=…"; \
 		exit 1; \
 	}
-	cd $(TKEIR_DIR) && AGENT_ROOT="$(CURDIR)/.tkeir-agent" \
+	cd $(TKEIR_DIR) && AGENT_ROOT="$(WORKSPACE)/agent" \
 		TKEIR_WORKSPACE="$(WORKSPACE)" \
 		TKEIR_AGENT_USECASE="$(TKEIR_AGENT_USECASE)" \
 		TKEIR_AGENT_ORCHESTRATOR_CONFIG="$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" \

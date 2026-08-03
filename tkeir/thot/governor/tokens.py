@@ -23,17 +23,40 @@ from typing import Any
 
 
 def _b64url(data: bytes) -> str:
+    """URL-safe base64 without padding.
+
+    Example:
+        >>> from thot.governor.tokens import _b64url
+        >>> _b64url(b"hello")
+        'aGVsbG8'
+    """
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
 
 
 def _b64url_decode(data: str) -> bytes:
+    """Decode URL-safe base64 (padding restored automatically).
+
+    Example:
+        >>> from thot.governor.tokens import _b64url, _b64url_decode
+        >>> _b64url_decode(_b64url(b"hello"))
+        b'hello'
+    """
     pad = "=" * (-len(data) % 4)
     return base64.urlsafe_b64decode(data + pad)
 
 
 @dataclass(frozen=True)
 class ActionToken:
-    """Constrained action token (HMAC-signed, TTL ≤ 300s by default)."""
+    """Constrained action token (HMAC-signed, TTL ≤ 300s by default).
+
+    Example:
+        >>> from thot.governor.tokens import ActionToken
+        >>> ActionToken(
+        ...     jti="j1", actor_id="u1", intent="search", audience="tkeir-action",
+        ...     max_budget=1.0, expires_at=100, issued_at=1, constraints={},
+        ... ).intent
+        'search'
+    """
 
     jti: str
     actor_id: str
@@ -68,7 +91,20 @@ class ActionToken:
 
 
 class ActionTokenService:
-    """Mint and verify action tokens; maintain a local revocation list."""
+    """Mint and verify action tokens; maintain a local revocation list.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.governor.tokens import ActionTokenService
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     svc = ActionTokenService(
+        ...         secret=b"demo", revoke_path=Path(td) / "revoked.json"
+        ...     )
+        ...     compact, _ = svc.mint(actor_id="u1", intent="search", jti="x1")
+        ...     svc.verify(compact).jti
+        'x1'
+    """
 
     def __init__(
         self,
@@ -77,6 +113,24 @@ class ActionTokenService:
         revoke_path: Path | None = None,
         default_ttl: int = 300,
     ) -> None:
+        """Initialize token service with secret and revoke-store path.
+
+        Args:
+            secret: HMAC signing key (env ``GOVERNOR_TOKEN_SECRET`` when None).
+            revoke_path: JSON file for revoked jti list.
+            default_ttl: Default token lifetime in seconds (max 300).
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.tokens import ActionTokenService
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     svc = ActionTokenService(
+            ...         secret=b"k", revoke_path=Path(td) / "r.json", default_ttl=60
+            ...     )
+            ...     svc._ttl
+            60
+        """
         self._secret = secret or os.getenv(
             "GOVERNOR_TOKEN_SECRET",
             "dev-governor-token-secret-change-me",
@@ -92,6 +146,19 @@ class ActionTokenService:
         self._load()
 
     def _load(self) -> None:
+        """Load revoked jti set from disk (no-op when file missing).
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.tokens import ActionTokenService
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     svc = ActionTokenService(
+            ...         secret=b"k", revoke_path=Path(td) / "missing.json"
+            ...     )
+            ...     svc._revoked
+            set()
+        """
         if not self._path.is_file():
             return
         try:
@@ -101,6 +168,19 @@ class ActionTokenService:
             self._revoked = set()
 
     def _persist(self) -> None:
+        """Atomically write the revoke list to disk.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.tokens import ActionTokenService
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     path = Path(td) / "revoked.json"
+            ...     svc = ActionTokenService(secret=b"k", revoke_path=path)
+            ...     _ = svc.revoke(jti="p1")
+            ...     path.is_file()
+            True
+        """
         self._path.parent.mkdir(parents=True, exist_ok=True)
         payload = {
             "jtis": sorted(self._revoked),
@@ -273,6 +353,19 @@ class ActionTokenService:
         return revoked
 
     def is_revoked(self, jti: str) -> bool:
-        """Return True when ``jti`` is on the local revoke list."""
+        """Return True when ``jti`` is on the local revoke list.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.tokens import ActionTokenService
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     svc = ActionTokenService(
+            ...         secret=b"k", revoke_path=Path(td) / "r.json"
+            ...     )
+            ...     _ = svc.revoke(jti="dead")
+            ...     svc.is_revoked("dead")
+            True
+        """
         with self._lock:
             return jti in self._revoked

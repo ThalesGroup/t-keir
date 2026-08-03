@@ -187,7 +187,16 @@ class ActionRecord(BaseModel):
     model_config = {"populate_by_name": True}
 
     def to_canonical_dict(self) -> dict[str, Any]:
-        """Serialize excluding ``record_hash`` for chain hashing."""
+        """Serialize excluding ``record_hash`` for chain hashing.
+
+        Example:
+            >>> rec = ActionRecord(correlation_id="c" * 32)
+            >>> d = rec.to_canonical_dict()
+            >>> d["correlation_id"] == "c" * 32
+            True
+            >>> "record_hash" not in d.get("evidence", {})
+            True
+        """
         data = self.model_dump(by_alias=True, mode="json")
         evidence = dict(data.get("evidence") or {})
         evidence.pop("record_hash", None)

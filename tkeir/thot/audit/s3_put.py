@@ -25,6 +25,14 @@ LOGGER = logging.getLogger(__name__)
 
 
 def _sign_key(secret: str, datestamp: str, region: str, service: str) -> bytes:
+    """Derive AWS SigV4 signing key for one request.
+
+    Example:
+        >>> from thot.audit.s3_put import _sign_key
+        >>> key = _sign_key("secret", "20260101", "us-east-1", "s3")
+        >>> len(key) == 32
+        True
+    """
     def _hmac(key: bytes, msg: str) -> bytes:
         return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
 
@@ -84,7 +92,17 @@ def put_object(
     content_type: str = "application/octet-stream",
     extra_headers: dict[str, str] | None = None,
 ) -> str:
-    """PUT an object to an S3-compatible endpoint (path-style). Returns object URI."""
+    """PUT an object to an S3-compatible endpoint (path-style).
+
+    Returns:
+        ``s3://bucket/key`` URI on success.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.s3_put import put_object
+        >>> inspect.isfunction(put_object)
+        True
+    """
     parsed = urlparse(endpoint if "://" in endpoint else f"http://{endpoint}")
     host = parsed.netloc or parsed.path
     scheme = parsed.scheme or "http"
@@ -155,6 +173,15 @@ def put_object(
 
 
 def _retain_until() -> str:
+    """Compute object-lock retain-until timestamp from env retention days.
+
+    Example:
+        >>> import os
+        >>> from thot.audit.s3_put import _retain_until
+        >>> ts = _retain_until()
+        >>> ts.endswith("Z") and "T" in ts
+        True
+    """
     days = int(os.getenv("AUDIT_WORM_RETENTION_DAYS", "30"))
     until = datetime.now(timezone.utc).timestamp() + days * 86400
     return datetime.fromtimestamp(until, tz=timezone.utc).strftime(
@@ -170,7 +197,17 @@ def mirror_worm_segment(
 ) -> str | None:
     """Upload segment + sha256 sidecar when S3 env is configured.
 
-    Returns the S3 URI of the segment, or None when S3 is not configured.
+    Returns:
+        S3 URI of the segment, or None when S3 is not configured.
+
+    Example:
+        >>> import os
+        >>> from thot.audit.s3_put import mirror_worm_segment
+        >>> _ = os.environ.pop("AUDIT_WORM_S3_ENDPOINT", None)
+        >>> mirror_worm_segment(
+        ...     segment_id="demo", compressed=b"x", sha_sidecar=b"y"
+        ... ) is None
+        True
     """
     cfg = s3_settings_from_env()
     if cfg is None:

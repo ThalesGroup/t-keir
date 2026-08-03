@@ -33,7 +33,14 @@ class OutboundTransport(Protocol):
     async def call_tool(
         self, name: str, arguments: dict[str, Any]
     ) -> dict[str, Any]:
-        """Invoke a remote tool and return a JSON-able result."""
+        """Invoke a remote tool and return a JSON-able result.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.client import OutboundTransport
+            >>> inspect.iscoroutinefunction(OutboundTransport.call_tool)
+            True
+        """
 
 
 @dataclass(frozen=True)
@@ -64,6 +71,14 @@ class EgressPolicy:
     def allows_host_port_tool(
         self, host: str, port: int | None, tool: str
     ) -> bool:
+        """Return whether ``host:port`` may invoke ``tool``.
+
+        Example:
+            >>> from thot.mcp.client import EgressPolicy, EgressRule
+            >>> p = EgressPolicy(rules=(EgressRule("127.0.0.1", (8099,), ("echo",)),))
+            >>> p.allows_host_port_tool("127.0.0.1", 8099, "echo")
+            True
+        """
         host_l = (host or "").lower()
         for rule in self.rules:
             if rule.host.lower() != host_l:
@@ -76,6 +91,14 @@ class EgressPolicy:
         return False
 
     def allows_url(self, url: str, *, tool: str) -> bool:
+        """Return whether ``url`` is allowed for ``tool``.
+
+        Example:
+            >>> from thot.mcp.client import EgressPolicy, EgressRule
+            >>> p = EgressPolicy(rules=(EgressRule("127.0.0.1", (8099,), ("echo",)),))
+            >>> p.allows_url("http://127.0.0.1:8099/mcp/call", tool="echo")
+            True
+        """
         parsed = urlparse(url)
         host = parsed.hostname or ""
         port = parsed.port
@@ -84,6 +107,14 @@ class EgressPolicy:
         return self.allows_host_port_tool(host, port, tool)
 
     def check_or_raise(self, url: str, *, tool: str) -> None:
+        """Raise ``PermissionError`` when egress is denied in enforce mode.
+
+        Example:
+            >>> from thot.mcp.client import EgressPolicy
+            >>> EgressPolicy(rules=(), mode="observe").check_or_raise(
+            ...     "http://evil.example/mcp/call", tool="echo",
+            ... )
+        """
         if self.allows_url(url, tool=tool):
             return
         msg = f"egress denied for tool={tool!r} url={url!r}"
@@ -169,15 +200,60 @@ class OutboundMcpClient:
     tools: dict[str, ExternalToolSpec] = field(default_factory=dict)
 
     def register(self, spec: ExternalToolSpec) -> None:
+        """Register one external tool spec.
+
+        Example:
+            >>> from thot.mcp.client import OutboundMcpClient, ExternalToolSpec
+            >>> class _T:
+            ...     async def call_tool(self, name, arguments):
+            ...         return {}
+            >>> client = OutboundMcpClient()
+            >>> client.register(ExternalToolSpec(
+            ...     name="t1", description="d", input_schema={"type": "object"},
+            ...     transport=_T(), base_url="in-process://t1",
+            ... ))
+            >>> client.has("t1")
+            True
+        """
         self.tools[spec.name] = spec
 
     def list_names(self) -> list[str]:
+        """Return sorted registered tool names.
+
+        Example:
+            >>> from thot.mcp.client import OutboundMcpClient, ExternalToolSpec
+            >>> class _T:
+            ...     async def call_tool(self, name, arguments):
+            ...         return {}
+            >>> client = OutboundMcpClient()
+            >>> client.register(ExternalToolSpec(
+            ...     name="b", description="d", input_schema={"type": "object"},
+            ...     transport=_T(), base_url="in-process://b",
+            ... ))
+            >>> client.list_names()
+            ['b']
+        """
         return sorted(self.tools)
 
     def has(self, name: str) -> bool:
+        """Return whether ``name`` is registered.
+
+        Example:
+            >>> from thot.mcp.client import OutboundMcpClient
+            >>> OutboundMcpClient().has("missing")
+            False
+        """
         return name in self.tools
 
     def tool_specs_for_prompt(self) -> list[dict[str, Any]]:
+        """Serialize registered tools for agent prompt injection.
+
+        Example:
+            >>> from thot.mcp.client import default_outbound_client
+            >>> specs = default_outbound_client().tool_specs_for_prompt()
+            >>> specs[0]["name"] == "echo_cite"
+            True
+        """
         return [
             {
                 "name": spec.name,
@@ -195,7 +271,15 @@ class OutboundMcpClient:
         *,
         principal: McpPrincipal,
     ) -> dict[str, Any]:
-        """Call an external tool; wrap result as untrusted data."""
+        """Call an external tool; wrap result as untrusted data.
+
+        Example:
+            >>> import asyncio
+            >>> import inspect
+            >>> from thot.mcp.client import OutboundMcpClient
+            >>> inspect.iscoroutinefunction(OutboundMcpClient.invoke)
+            True
+        """
         if name not in self.tools:
             raise KeyError(f"unknown external tool: {name}")
         spec = self.tools[name]
@@ -232,12 +316,27 @@ class HttpJsonMcpTransport:
     """HTTP transport matching tkeir-mcp ``POST /mcp/call`` shape."""
 
     def __init__(self, base_url: str, *, timeout: float = 60.0) -> None:
+        """Configure HTTP transport for ``POST {base_url}/mcp/call``.
+
+        Example:
+            >>> from thot.mcp.client import HttpJsonMcpTransport
+            >>> HttpJsonMcpTransport("http://127.0.0.1:8093").base_url
+            'http://127.0.0.1:8093'
+        """
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
 
     async def call_tool(
         self, name: str, arguments: dict[str, Any]
     ) -> dict[str, Any]:
+        """POST a JSON tool call to the remote MCP HTTP endpoint.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.client import HttpJsonMcpTransport
+            >>> inspect.iscoroutinefunction(HttpJsonMcpTransport.call_tool)
+            True
+        """
         import httpx
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:

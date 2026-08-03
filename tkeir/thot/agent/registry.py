@@ -24,6 +24,25 @@ _ENV_PATTERN = re.compile(r"\$\{([A-Z0-9_]+)\}")
 
 
 def _expand_env(value: str) -> str:
+    """Expand ``${VAR}`` placeholders using the process environment.
+
+    Args:
+        value: String possibly containing ``${ENV_NAME}`` tokens.
+
+    Returns:
+        String with known variables substituted; unknown tokens left intact.
+
+    Example:
+        >>> import os
+        >>> from thot.agent.registry import _expand_env
+        >>> os.environ["TKEIR_TEST_VAR"] = "hello"
+        >>> _expand_env("model=${TKEIR_TEST_VAR}")
+        'model=hello'
+        >>> _expand_env("x=${UNKNOWN_VAR_XYZ}")
+        'x=${UNKNOWN_VAR_XYZ}'
+        >>> del os.environ["TKEIR_TEST_VAR"]
+    """
+
     def repl(match: re.Match[str]) -> str:
         return os.getenv(match.group(1), match.group(0))
 
@@ -87,7 +106,23 @@ def agent_config_dirs() -> list[Path]:
 
 
 def resolve_agent_path(name: str, *, directory: Path | None = None) -> Path:
-    """Resolve ``<name>.yaml`` across agent config roots."""
+    """Resolve ``<name>.yaml`` across agent config roots.
+
+    Args:
+        name: Agent stem (without ``.yaml``).
+        directory: Optional single root; raises if missing.
+
+    Returns:
+        Path to the agent YAML file.
+
+    Raises:
+        FileNotFoundError: When no matching spec exists.
+
+    Example:
+        >>> from thot.agent.registry import resolve_agent_path
+        >>> resolve_agent_path("researcher").name
+        'researcher.yaml'
+    """
     if directory is not None:
         path = Path(directory) / f"{name}.yaml"
         if path.is_file():

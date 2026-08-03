@@ -37,6 +37,13 @@ from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
 
 
 class SpacyTokenizerPipe:
+    """SpacyTokenizerPipe container.
+    
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe)
+            True
+    """
     def __init__(
         self, nlp: Doc = None, config: dict = None, call_context=None
     ):
@@ -142,9 +149,16 @@ class SpacyTokenizerPipe:
             word = normalized_word
         return word
 
-    def _collect_punctuated_compound(
-        self, doc, token_i, word, max_word_length
+    def _collect_punctuated_compound(        self, doc, token_i, word, max_word_length
     ):
+        """_collect_punctuated_compound helper.
+        
+            Example:
+                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+                >>> callable(SpacyTokenizerPipe._collect_punctuated_compound)
+                True
+        """
+
         wtrie = prefix_trie(self._punctuation_words, word.lower())
         current_pos = token_i + 1
         current_word = word
@@ -165,6 +179,13 @@ class SpacyTokenizerPipe:
         return compound_table
 
     def _build_words_with_mwes(self, doc):
+        """_build_words_with_mwes helper.
+        
+            Example:
+                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+                >>> callable(SpacyTokenizerPipe._build_words_with_mwes)
+                True
+        """
         words = []
         token_compounds = []
         doc_len = len(doc)
@@ -196,6 +217,13 @@ class SpacyTokenizerPipe:
         return words, token_compounds
 
     def _build_words_without_mwes(self, doc):
+        """_build_words_without_mwes helper.
+        
+            Example:
+                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+                >>> callable(SpacyTokenizerPipe._build_words_without_mwes)
+                True
+        """
         words = []
         doc_len = len(doc)
         token_i = 0
@@ -205,11 +233,25 @@ class SpacyTokenizerPipe:
         return words
 
     def _attach_compound_metadata(self, doc, token_compounds):
+        """_attach_compound_metadata helper.
+        
+            Example:
+                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+                >>> callable(SpacyTokenizerPipe._attach_compound_metadata)
+                True
+        """
         doc_len = len(doc)
         for token_i in range(doc_len):
             doc[token_i]._.compound_word = token_compounds[token_i]
 
     def _walk_mwe_trie(self, doc, i, max_pattern_length):
+        """_walk_mwe_trie helper.
+        
+            Example:
+                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+                >>> callable(SpacyTokenizerPipe._walk_mwe_trie)
+                True
+        """
         j = i
         trie = self._mwes["trie"]
         last_trie = None
@@ -259,6 +301,13 @@ class SpacyTokenizerPipe:
         return leaf_at, last_is_hyphen
 
     def _try_merge_mwe_match(self, doc, retokenizer, i, max_pattern_length):
+        """_try_merge_mwe_match helper.
+        
+            Example:
+                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+                >>> callable(SpacyTokenizerPipe._try_merge_mwe_match)
+                True
+        """
         if doc[i].text.lower() not in self._mwes["trie"]:
             return 1
         leaf_at, last_is_hyphen = self._walk_mwe_trie(
@@ -279,6 +328,13 @@ class SpacyTokenizerPipe:
         return j_idx - i
 
     def _try_merge_special_token(self, doc, retokenizer, i):
+        """_try_merge_special_token helper.
+        
+            Example:
+                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+                >>> callable(SpacyTokenizerPipe._try_merge_special_token)
+                True
+        """
         if len(set(doc[i].text) & set(string.punctuation + "\\_")) == len(
             set(doc[i].text)
         ):
@@ -293,6 +349,13 @@ class SpacyTokenizerPipe:
         return False
 
     def _retokenize_compound_patterns(self, doc):
+        """_retokenize_compound_patterns helper.
+        
+            Example:
+                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+                >>> callable(SpacyTokenizerPipe._retokenize_compound_patterns)
+                True
+        """
         with doc.retokenize() as retokenizer:
             i = 0
             n = len(doc)
@@ -351,6 +414,13 @@ def spacy_thot_tokenizer(nlp, name, config: dict = None, call_context=None):
 
 
 class SpacyTokenizer:
+    """SpacyTokenizer container.
+    
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizer
+            >>> callable(SpacyTokenizer)
+            True
+    """
     def __init__(
         self, config: TokenizerConfiguration = None, call_context=None
     ):
@@ -501,8 +571,12 @@ class SpacyTokenizer:
 
 
 class Tokenizer:
-    """
-    Tokenizer helper integrating MWE tokenizer
+    """Tokenizer helper integrating MWE tokenizer
+    
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import Tokenizer
+            >>> callable(Tokenizer)
+            True
     """
 
     def __init__(

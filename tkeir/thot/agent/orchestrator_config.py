@@ -37,6 +37,12 @@ class OrchestratorConfig:
         default_report_form: Default HMI / workflow form key.
         report_form_templates: Form alias → compose template name.
         report_form_slot_hints: Form alias → writer slot hint text.
+
+    Example:
+        >>> from thot.agent.orchestrator_config import OrchestratorConfig
+        >>> cfg = OrchestratorConfig(name="osint", default_report_form="intsum")
+        >>> cfg.name
+        'osint'
     """
 
     name: str = ""

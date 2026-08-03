@@ -60,14 +60,25 @@ _DEFAULT_ENRICH_WORKERS = 8
 
 @dataclass(frozen=True)
 class RagVespaConcurrency:
-    """Worker pools for hit enrichment after search."""
+    """Worker pools for hit enrichment after search.
+
+    Example:
+        >>> RagVespaConcurrency(enrich_workers=4).enrich_workers
+        4
+    """
 
     enrich_workers: int = _DEFAULT_ENRICH_WORKERS
 
 
 @dataclass(frozen=True)
 class RagVespaConfig:
-    """Vespa endpoints, timeouts, and concurrency for search/index."""
+    """Vespa endpoints, timeouts, and concurrency for search/index.
+
+    Example:
+        >>> cfg = RagVespaConfig(url="http://vespa:8080")
+        >>> cfg.url
+        'http://vespa:8080'
+    """
 
     url: str = _DEFAULT_VESPA_URL
     config_url: str = _DEFAULT_VESPA_CONFIG_URL
@@ -80,7 +91,12 @@ class RagVespaConfig:
 
 @dataclass(frozen=True)
 class RagModelsConfig:
-    """Model names for search / index (overridden by env vars when set)."""
+    """Model names for search / index (overridden by env vars when set).
+
+    Example:
+        >>> RagModelsConfig(embedding_model="bge-m3").embedding_model
+        'bge-m3'
+    """
 
     provider: str | None = None
     embedding_model: str | None = None
@@ -91,7 +107,12 @@ class RagModelsConfig:
 
 @dataclass(frozen=True)
 class RagRerankConfig:
-    """Second-stage rerank after Vespa hybrid retrieval."""
+    """Second-stage rerank after Vespa hybrid retrieval.
+
+    Example:
+        >>> RagRerankConfig(enabled=False, candidates=30).candidates
+        30
+    """
 
     enabled: bool = _DEFAULT_RERANK_ENABLED
     candidates: int = _DEFAULT_RERANK_CANDIDATES
@@ -100,7 +121,12 @@ class RagRerankConfig:
 
 @dataclass(frozen=True)
 class RagSearchConfig:
-    """Hybrid Vespa retrieval settings for query analysis."""
+    """Hybrid Vespa retrieval settings for query analysis.
+
+    Example:
+        >>> RagSearchConfig(enabled=True).hits
+        20
+    """
 
     enabled: bool = False
     use_chunk_embedding: bool = True
@@ -119,7 +145,12 @@ class RagSearchConfig:
 
 @dataclass(frozen=True)
 class RagPassageConfig:
-    """KEY PASSAGE sizing for LLM prompt generation."""
+    """KEY PASSAGE sizing for LLM prompt generation.
+
+    Example:
+        >>> RagPassageConfig(count=5, max_chars=2400).count
+        5
+    """
 
     count: int = _DEFAULT_PASSAGE_COUNT
     max_chars: int = _DEFAULT_PASSAGE_MAX_CHARS
@@ -128,7 +159,12 @@ class RagPassageConfig:
 
 @dataclass(frozen=True)
 class RagPromptConfig:
-    """Prompt assembly settings for RAG answer generation."""
+    """Prompt assembly settings for RAG answer generation.
+
+    Example:
+        >>> RagPromptConfig(chunk_context_mode="chunk_excerpts", max_svo_triples=80).max_svo_triples
+        80
+    """
 
     chunk_context_mode: str
     max_svo_triples: int
@@ -181,7 +217,12 @@ class RagPromptConfig:
 
 @dataclass(frozen=True)
 class RagOntologyConfig:
-    """Ontology export settings for the RAG HMI."""
+    """Ontology export settings for the RAG HMI.
+
+    Example:
+        >>> RagOntologyConfig(min_keyword_length=3, max_entities=50, max_keywords=30).max_entities
+        50
+    """
 
     min_keyword_length: int
     max_entities: int
@@ -190,7 +231,12 @@ class RagOntologyConfig:
 
 @dataclass(frozen=True)
 class RagAnswerGenerationConfig:
-    """QA answer-generation toggles (generate-eval + prompt assembly)."""
+    """QA answer-generation toggles (generate-eval + prompt assembly).
+
+    Example:
+        >>> RagAnswerGenerationConfig(use_nlp=False).use_nlp
+        False
+    """
 
     use_nlp: bool = True
     use_ontology: bool = True
@@ -199,7 +245,16 @@ class RagAnswerGenerationConfig:
 
 @dataclass(frozen=True)
 class RagConfig:
-    """Runtime configuration for the Vespa RAG API."""
+    """Runtime configuration for the Vespa RAG API.
+
+    Example:
+        >>> RagConfig(
+        ...     ontology=RagOntologyConfig(min_keyword_length=3, max_entities=10, max_keywords=5),
+        ...     prompt=RagPromptConfig(chunk_context_mode="chunk_excerpts", max_svo_triples=80),
+        ...     search=RagSearchConfig(),
+        ... ).search.hits
+        20
+    """
 
     ontology: RagOntologyConfig
     prompt: RagPromptConfig

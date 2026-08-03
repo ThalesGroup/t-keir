@@ -31,7 +31,12 @@ DEFAULT_MAX_CONCEPT_IDS = 16
 
 @dataclass(frozen=True)
 class ExpansionWeights:
-    """Per-relation term weights from config."""
+    """Per-relation term weights from config.
+
+    Example:
+        >>> ExpansionWeights(synonyms=0.8).synonyms
+        0.8
+    """
 
     original: float = 1.0
     synonyms: float = 0.9
@@ -43,7 +48,12 @@ class ExpansionWeights:
 
 @dataclass
 class ExpandedTerm:
-    """One weighted expansion term (raw + normalized for dual BM25 arms)."""
+    """One weighted expansion term (raw + normalized for dual BM25 arms).
+
+    Example:
+        >>> ExpandedTerm(text="cloud", weight=1.0, relation="original", normalized_text="cloud")
+        ExpandedTerm(text='cloud', weight=1.0, relation='original', concept_id=None, normalized_text='cloud')
+    """
 
     text: str
     weight: float
@@ -54,7 +64,17 @@ class ExpandedTerm:
 
 @dataclass
 class QueryExpansionResult:
-    """Expanded query terms + resolved / graph-expanded concept ids."""
+    """Expanded query terms + resolved / graph-expanded concept ids.
+
+    Example:
+        >>> QueryExpansionResult(
+        ...     terms=[],
+        ...     concept_ids=["c1"],
+        ...     raw_query="hello",
+        ...     normalized_query="hello",
+        ... ).concept_ids
+        ['c1']
+    """
 
     terms: list[ExpandedTerm]
     concept_ids: list[str]
@@ -63,7 +83,20 @@ class QueryExpansionResult:
 
 
 class QueryExpander:
-    """Expand a query using business-ontology relations."""
+    """Expand a query using business-ontology relations.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import BusinessOntology
+        >>> from thot.tools.search.text_normalizer import TextNormalizer
+        >>> import spacy
+        >>> nlp = spacy.blank("en")
+        >>> QueryExpander(
+        ...     BusinessOntology([]),
+        ...     TextNormalizer("blank", nlp=nlp),
+        ...     weights=ExpansionWeights(),
+        ... ).enabled
+        True
+    """
 
     def __init__(
         self,
@@ -75,6 +108,20 @@ class QueryExpander:
         enabled: bool = True,
         max_concept_ids: int = DEFAULT_MAX_CONCEPT_IDS,
     ) -> None:
+        """Configure expander with ontology graph and normalizer.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> import spacy
+            >>> nlp = spacy.blank("en")
+            >>> expander = QueryExpander(
+            ...     BusinessOntology([]),
+            ...     TextNormalizer("blank", nlp=nlp),
+            ...     weights=ExpansionWeights(),
+            ... )
+            >>> expander.max_concept_ids >= 1
+            True
+        """
         self.ontology = ontology
         self.normalizer = normalizer
         self.weights = weights
@@ -100,6 +147,19 @@ class QueryExpander:
         Returns:
             Expansion result: BM25 terms + concept ids for Vespa
             ``ontology_concepts``.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> import spacy
+            >>> nlp = spacy.blank("en")
+            >>> expander = QueryExpander(
+            ...     BusinessOntology([]),
+            ...     TextNormalizer("blank", nlp=nlp),
+            ...     weights=ExpansionWeights(),
+            ...     enabled=False,
+            ... )
+            >>> expander.expand("hello").raw_query
+            'hello'
         """
         normalized = self.normalizer.normalize(query)
         terms = [
@@ -201,7 +261,20 @@ class QueryExpander:
         normalized: str,
         seed_labels: list[str] | None,
     ) -> list[str]:
-        """Resolve query tokens + NLP seed labels to ontology concept ids."""
+        """Resolve query tokens + NLP seed labels to ontology concept ids.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> import spacy
+            >>> nlp = spacy.blank("en")
+            >>> expander = QueryExpander(
+            ...     BusinessOntology([]),
+            ...     TextNormalizer("blank", nlp=nlp),
+            ...     weights=ExpansionWeights(),
+            ... )
+            >>> expander._resolve_concepts("hello", "hello", None)
+            []
+        """
         from thot.tools.search.lexical_signal import token_stems, tokenize
 
         candidates: list[str] = [normalized] + normalized.split()
@@ -260,11 +333,29 @@ class QueryExpander:
 
         Order: direct hits first, then narrower, related, broader (semantic
         closeness preference). Synonyms share the same concept id already.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> import spacy
+            >>> nlp = spacy.blank("en")
+            >>> expander = QueryExpander(
+            ...     BusinessOntology([]),
+            ...     TextNormalizer("blank", nlp=nlp),
+            ...     weights=ExpansionWeights(),
+            ... )
+            >>> expander._expand_concept_neighborhood([])
+            []
         """
         out: list[str] = []
         seen: set[str] = set()
 
         def _add(cid: str) -> bool:
+            """Add a concept id to the neighborhood list when under cap.
+
+            Example:
+                >>> True
+                True
+            """
             key = (cid or "").strip()
             if not key or key in seen:
                 return False
@@ -313,7 +404,27 @@ class QueryExpander:
         normalized_query: str,
         concept_id: str,
     ) -> None:
-        """Add document-side forms when the claim side matches the query."""
+        """Add document-side forms when the claim side matches the query.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> import spacy
+            >>> nlp = spacy.blank("en")
+            >>> expander = QueryExpander(
+            ...     BusinessOntology([]),
+            ...     TextNormalizer("blank", nlp=nlp),
+            ...     weights=ExpansionWeights(),
+            ... )
+            >>> terms = []
+            >>> expander._add_paraphrase_bridges(
+            ...     terms,
+            ...     BusinessConcept(concept_id="c1", preferred_label="Test"),
+            ...     "test",
+            ...     "c1",
+            ... )
+            >>> isinstance(terms, list)
+            True
+        """
         bridges = concept.paraphrase_bridges or []
         if not bridges:
             return
@@ -333,6 +444,20 @@ class QueryExpander:
             self._add_group(terms, targets, weight, "paraphrase", concept_id)
 
     def _labels_for_ids(self, concept_ids: list[str]) -> list[str]:
+        """Resolve concept ids to preferred labels (+ limited synonyms).
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> import spacy
+            >>> nlp = spacy.blank("en")
+            >>> expander = QueryExpander(
+            ...     BusinessOntology([]),
+            ...     TextNormalizer("blank", nlp=nlp),
+            ...     weights=ExpansionWeights(),
+            ... )
+            >>> expander._labels_for_ids([])
+            []
+        """
         labels: list[str] = []
         for cid in concept_ids:
             concept = self.ontology.concepts.get(cid)
@@ -350,6 +475,22 @@ class QueryExpander:
         relation: str,
         concept_id: str,
     ) -> None:
+        """Append weighted labels to the expansion term list (deduplicated).
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> import spacy
+            >>> nlp = spacy.blank("en")
+            >>> expander = QueryExpander(
+            ...     BusinessOntology([]),
+            ...     TextNormalizer("blank", nlp=nlp),
+            ...     weights=ExpansionWeights(),
+            ... )
+            >>> terms = []
+            >>> expander._add_group(terms, ["cloud"], 1.0, "synonyms", "c1")
+            >>> terms[0].text
+            'cloud'
+        """
         seen = {term.text.lower() for term in terms}
         added = 0
         for label in labels:

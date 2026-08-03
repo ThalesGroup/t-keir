@@ -372,14 +372,21 @@ def _labels_for(graph: Graph, subject: Node) -> list[str]:
     return labels
 
 
-def _append_reference_concept(
-    concepts: list[_RefConcept],
+def _append_reference_concept(    concepts: list[_RefConcept],
     seen: set[tuple[str, str, str]],
     graph: Graph,
     uri: URIRef,
     kind: str,
     min_label_length: int,
 ) -> None:
+    """_append_reference_concept helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyDerivation import _append_reference_concept
+            >>> callable(_append_reference_concept)
+            True
+    """
+
     for label in _labels_for(graph, uri):
         if len(label.strip()) < min_label_length:
             continue
@@ -397,14 +404,21 @@ def _append_reference_concept(
         )
 
 
-def _extract_typed_concepts(
-    graph: Graph,
+def _extract_typed_concepts(    graph: Graph,
     concepts: list[_RefConcept],
     seen: set[tuple[str, str, str]],
     rdf_type: Node,
     kind: str,
     min_label_length: int,
 ) -> None:
+    """_extract_typed_concepts helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyDerivation import _extract_typed_concepts
+            >>> callable(_extract_typed_concepts)
+            True
+    """
+
     for uri in graph.subjects(RDF.type, rdf_type):
         if isinstance(uri, URIRef):
             _append_reference_concept(
@@ -412,12 +426,19 @@ def _extract_typed_concepts(
             )
 
 
-def _extract_labeled_concepts(
-    graph: Graph,
+def _extract_labeled_concepts(    graph: Graph,
     concepts: list[_RefConcept],
     seen: set[tuple[str, str, str]],
     min_label_length: int,
 ) -> None:
+    """_extract_labeled_concepts helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyDerivation import _extract_labeled_concepts
+            >>> callable(_extract_labeled_concepts)
+            True
+    """
+
     for subj, _, _ in graph.triples((None, RDFS.label, None)):
         if not isinstance(subj, URIRef):
             continue
@@ -697,13 +718,20 @@ def _copy_matched_axioms(
     return added
 
 
-def _apply_subclass_links(
-    document_graph: Graph,
+def _apply_subclass_links(    document_graph: Graph,
     concepts: list[_RefConcept],
     cfg: DerivationSettings,
     matched_uris: set[URIRef],
     details: list[dict[str, Any]],
 ) -> int:
+    """_apply_subclass_links helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyDerivation import _apply_subclass_links
+            >>> callable(_apply_subclass_links)
+            True
+    """
+
     links = 0
     if not (cfg.match_classes and cfg.add_subclass_links):
         return links
@@ -733,8 +761,7 @@ def _apply_subclass_links(
     return links
 
 
-def _apply_individual_type_link(
-    document_graph: Graph,
+def _apply_individual_type_link(    document_graph: Graph,
     node: URIRef,
     label: str,
     concepts: list[_RefConcept],
@@ -742,6 +769,14 @@ def _apply_individual_type_link(
     matched_uris: set[URIRef],
     details: list[dict[str, Any]],
 ) -> int:
+    """_apply_individual_type_link helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyDerivation import _apply_individual_type_link
+            >>> callable(_apply_individual_type_link)
+            True
+    """
+
     if not (cfg.match_individuals and cfg.add_type_links):
         return 0
     class_hit = _best_match(
@@ -770,8 +805,7 @@ def _apply_individual_type_link(
     return added
 
 
-def _apply_individual_same_as_link(
-    document_graph: Graph,
+def _apply_individual_same_as_link(    document_graph: Graph,
     node: URIRef,
     label: str,
     concepts: list[_RefConcept],
@@ -779,6 +813,14 @@ def _apply_individual_same_as_link(
     matched_uris: set[URIRef],
     details: list[dict[str, Any]],
 ) -> int:
+    """_apply_individual_same_as_link helper.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyDerivation import _apply_individual_same_as_link
+            >>> callable(_apply_individual_same_as_link)
+            True
+    """
+
     if not (cfg.match_individuals and cfg.add_same_as_links):
         return 0
     ind_hit = _best_match(

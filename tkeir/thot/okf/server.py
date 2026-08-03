@@ -2,6 +2,11 @@
 
 OKF bundle export / browse / download / DSR delete.
 
+Example:
+    >>> from thot.okf.server import app
+    >>> app.title
+    'T-KEIR OKF'
+
 Author: Eric Blaudez
 
 Copyright (c) 2026 Thales
@@ -58,12 +63,32 @@ LOGGER = logging.getLogger(__name__)
 
 
 class AppState:
+    """Per-process OKF service state attached to ``FastAPI.state.okf``."""
+
     def __init__(self) -> None:
+        """Initialize store and shared resources for the OKF HTTP service.
+
+        Example:
+            >>> from thot.okf.server import AppState
+            >>> isinstance(AppState().store, OkfBundleStore)
+            True
+        """
         self.store = OkfBundleStore()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Configure logging, metrics, and ``AppState`` at startup.
+
+    Args:
+        app: FastAPI application instance.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import lifespan
+        >>> inspect.isasyncgenfunction(lifespan.__wrapped__)
+        True
+    """
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-okf"))
     app.state.okf = AppState()
     ThotMetrics.create_counter(
@@ -91,20 +116,60 @@ wire_governor_middleware(app, service="tkeir-okf")
 
 
 def _space(authorization: str | None) -> str:
+    """Resolve tenant user-space from the ``Authorization`` header.
+
+    Args:
+        authorization: Bearer token or ``None`` for dev default.
+
+    Returns:
+        Normalized Vespa user-space string.
+
+    Example:
+        >>> from thot.okf.server import _space
+        >>> _space(None)
+        'dev@tkeir'
+    """
     return resolve_vespa_user_space(authorization)
 
 
 def _store(request_app: FastAPI) -> OkfBundleStore:
+    """Return the bundle store from application state.
+
+    Args:
+        request_app: FastAPI app with ``state.okf`` initialized.
+
+    Example:
+        >>> from thot.okf.server import AppState, _store, app
+        >>> app.state.okf = AppState()
+        >>> _store(app) is app.state.okf.store
+        True
+    """
     return request_app.state.okf.store
 
 
 @app.get("/health")
 async def health() -> dict[str, str]:
+    """Liveness probe.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import health
+        >>> inspect.iscoroutinefunction(health)
+        True
+    """
     return {"status": "ok", "service": "tkeir-okf"}
 
 
 @app.get("/ready")
 async def ready() -> dict[str, Any]:
+    """Readiness probe with OKF root path and writability.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import ready
+        >>> inspect.iscoroutinefunction(ready)
+        True
+    """
     root = _store(app).root
     return {
         "status": "ready",
@@ -115,6 +180,14 @@ async def ready() -> dict[str, Any]:
 
 @app.get("/metrics")
 async def metrics() -> Response:
+    """Prometheus metrics exposition endpoint.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import metrics
+        >>> inspect.iscoroutinefunction(metrics)
+        True
+    """
     return Response(
         content=ThotMetrics.generateMetricsResponse(),
         media_type="text/plain; version=0.0.4",
@@ -126,7 +199,14 @@ async def okf_export(
     body: OkfHttpExportBody,
     authorization: str | None = Header(default=None),
 ) -> OkfExportResult:
-    """Start an OKF export. ``user_space`` always comes from auth."""
+    """Start an OKF export. ``user_space`` always comes from auth.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import okf_export
+        >>> inspect.iscoroutinefunction(okf_export)
+        True
+    """
     ThotMetrics.increment_counter(
         short_name="okf_http",
         method="POST",
@@ -150,6 +230,14 @@ async def okf_export(
 async def okf_bundles(
     authorization: str | None = Header(default=None),
 ) -> dict[str, Any]:
+    """List OKF bundles for the authenticated tenant.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import okf_bundles
+        >>> inspect.iscoroutinefunction(okf_bundles)
+        True
+    """
     space = _space(authorization)
     bundles = _store(app).list_bundles(space)
     return {
@@ -159,6 +247,17 @@ async def okf_bundles(
 
 
 def _bundle_missing(space: str, bundle_id: str) -> HTTPException:
+    """Build a 404 when a bundle is not found for the tenant.
+
+    Args:
+        space: Tenant user-space.
+        bundle_id: Requested bundle id.
+
+    Example:
+        >>> from thot.okf.server import _bundle_missing
+        >>> _bundle_missing("dev@tkeir", "abc12345").status_code
+        404
+    """
     return HTTPException(
         status_code=404,
         detail=(
@@ -173,6 +272,14 @@ async def okf_bundle_get(
     concept_id: str | None = None,
     authorization: str | None = Header(default=None),
 ) -> dict[str, Any]:
+    """Return bundle payload or a single concept for the authenticated tenant.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import okf_bundle_get
+        >>> inspect.iscoroutinefunction(okf_bundle_get)
+        True
+    """
     space = _space(authorization)
     payload = _store(app).bundle_payload(
         bundle_id, space, concept_id=concept_id
@@ -188,6 +295,14 @@ async def okf_bundle_download(
     background_tasks: BackgroundTasks,
     authorization: str | None = Header(default=None),
 ) -> FileResponse:
+    """Download a bundle as ``.tar.gz`` for the authenticated tenant.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import okf_bundle_download
+        >>> inspect.iscoroutinefunction(okf_bundle_download)
+        True
+    """
     space = _space(authorization)
     bundle = _store(app).get_bundle(bundle_id, space)
     if bundle is None:
@@ -216,7 +331,14 @@ async def okf_wiki_put(
     body: OkfWikiUpdateBody,
     authorization: str | None = Header(default=None),
 ) -> dict[str, Any]:
-    """Save an edited LLMWiki page into the bundle (``wiki.md``)."""
+    """Save an edited LLMWiki page into the bundle (``wiki.md``).
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import okf_wiki_put
+        >>> inspect.iscoroutinefunction(okf_wiki_put)
+        True
+    """
     ThotMetrics.increment_counter(
         short_name="okf_http",
         method="PUT",
@@ -249,6 +371,12 @@ async def okf_publish_wiki(
     """Copy the bundle LLMWiki page into the user's personal workspace and index it.
 
     Requires ingest at ``INGEST_URL`` (default ``http://127.0.0.1:8091``).
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import okf_publish_wiki
+        >>> inspect.iscoroutinefunction(okf_publish_wiki)
+        True
     """
     ThotMetrics.increment_counter(
         short_name="okf_http",
@@ -343,7 +471,14 @@ async def okf_bundle_delete(
     bundle_id: str,
     authorization: str | None = Header(default=None),
 ) -> dict[str, Any]:
-    """DSR / forget: log deletion ActionRecord and remove the bundle."""
+    """DSR / forget: log deletion ActionRecord and remove the bundle.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import okf_bundle_delete
+        >>> inspect.iscoroutinefunction(okf_bundle_delete)
+        True
+    """
     space = _space(authorization)
     store = _store(app)
     bundle = store.get_bundle(bundle_id, space)
@@ -383,6 +518,17 @@ async def okf_bundle_delete(
 
 
 def main(argv: list[str] | None = None) -> None:  # pragma: no cover
+    """Run the OKF HTTP service with uvicorn.
+
+    Args:
+        argv: Optional CLI arguments (host/port overrides).
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.server import main
+        >>> callable(main)
+        True
+    """
     parser = argparse.ArgumentParser(prog="tkeir-okf")
     parser.add_argument("--host", default=os.getenv("OKF_HOST", "0.0.0.0"))
     parser.add_argument(

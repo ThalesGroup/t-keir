@@ -228,6 +228,14 @@ _SLOW_STAGE_MS = {
 
 
 def _fmt_ms(value: float) -> str:
+    """Format milliseconds (or seconds when large) for smoke reports.
+
+    Example:
+        >>> _fmt_ms(500)
+        '500ms'
+        >>> _fmt_ms(1500)
+        '1.5s'
+    """
     sign = "-" if value < 0 else ""
     magnitude = abs(value)
     if magnitude >= 1000:
@@ -236,6 +244,12 @@ def _fmt_ms(value: float) -> str:
 
 
 def _truncate(text: str, limit: int = 160) -> str:
+    """Collapse whitespace and truncate for report excerpts.
+
+    Example:
+        >>> _truncate("a" * 200, 10)
+        'aaaaaaaaa…'
+    """
     cleaned = " ".join(str(text).split())
     if len(cleaned) <= limit:
         return cleaned
@@ -243,6 +257,12 @@ def _truncate(text: str, limit: int = 160) -> str:
 
 
 def _severity_rank(severity: str) -> int:
+    """Return sort key for alert severity (lower = more urgent).
+
+    Example:
+        >>> _severity_rank("high") < _severity_rank("low")
+        True
+    """
     return {"high": 0, "medium": 1, "low": 2}.get(severity, 9)
 
 
@@ -253,7 +273,15 @@ def _alert(
     severity: str | None = None,
     focus: str | None = None,
 ) -> RankAlert:
-    """Build a RankAlert with default severity/focus from ``_ALERT_FOCUS``."""
+    """Build a RankAlert with default severity/focus from ``_ALERT_FOCUS``.
+
+    Example:
+        >>> alert = _alert("tkeir_error", "boom")
+        >>> alert.code
+        'tkeir_error'
+        >>> alert.severity
+        'high'
+    """
     default_sev, default_focus = _ALERT_FOCUS.get(code, ("medium", ""))
     return RankAlert(
         code=code,
@@ -264,6 +292,12 @@ def _alert(
 
 
 def _doc_text(doc: dict[str, str]) -> str:
+    """Join title and body for lexical similarity scoring.
+
+    Example:
+        >>> _doc_text({"title": "T", "text": "body"})
+        'T body'
+    """
     title = (doc.get("title") or "").strip()
     body = (doc.get("text") or "").strip()
     if title and body:
@@ -272,10 +306,22 @@ def _doc_text(doc: dict[str, str]) -> str:
 
 
 def _token_set(text: str) -> set[str]:
+    """Return lowercase alphanumeric tokens from ``text``.
+
+    Example:
+        >>> sorted(_token_set("The Cat Sat"))
+        ['cat', 'sat', 'the']
+    """
     return {tok.lower() for tok in _TOKEN_RE.findall(text or "")}
 
 
 def _jaccard(left: set[str], right: set[str]) -> float:
+    """Compute Jaccard similarity between two token sets.
+
+    Example:
+        >>> _jaccard({"cat", "sat"}, {"cat", "mat"})
+        0.3333333333333333
+    """
     if not left or not right:
         return 0.0
     return len(left & right) / len(left | right)
@@ -288,7 +334,16 @@ def pick_close_docs(
     exclude: set[str],
     n: int,
 ) -> list[str]:
-    """Return up to ``n`` non-excluded docs closest to ``query_text`` (Jaccard)."""
+    """Return up to ``n`` non-excluded docs closest to ``query_text`` (Jaccard).
+
+    Example:
+        >>> corpus = {
+        ...     "d1": {"text": "cat sat mat"},
+        ...     "d2": {"text": "dog ran"},
+        ... }
+        >>> pick_close_docs("cat mat", corpus, exclude=set(), n=1)
+        ['d1']
+    """
     if n <= 0:
         return []
     qtoks = _token_set(query_text)
@@ -308,7 +363,12 @@ def resolve_focus_query_ids(
     focus_eval_report: bool = True,
     query_ids: list[str] | None = None,
 ) -> list[str]:
-    """Return preferred smoke query ids (CLI override or eval-report focus)."""
+    """Return preferred smoke query ids (CLI override or eval-report focus).
+
+    Example:
+        >>> resolve_focus_query_ids("scifact", query_ids=["1", "3"])
+        ['1', '3']
+    """
     if query_ids:
         return [str(qid).strip() for qid in query_ids if str(qid).strip()]
     if not focus_eval_report:
@@ -361,6 +421,16 @@ def build_smoke_subset(
 
     Returns:
         ``(subset_corpus, subset_queries, subset_qrels, stats)``.
+
+    Example:
+        >>> corpus = {"d1": {"text": "cat sat"}, "d2": {"text": "dog ran"}}
+        >>> queries = {"q1": "cat sat"}
+        >>> qrels = {"q1": {"d1": 1}}
+        >>> sub_c, sub_q, sub_r, stats = build_smoke_subset(
+        ...     corpus, queries, qrels, n_queries=1, n_close=0, rank_docs=1, seed=1
+        ... )
+        >>> stats["gold_docs"]
+        1
     """
     rng = random.Random(seed)
     n_queries = max(1, int(n_queries))
@@ -471,19 +541,34 @@ def build_smoke_subset(
 
 
 def _metric_ndcg10(metrics: Metrics) -> float:
-    """Return NDCG@10 from a Metrics object."""
+    """Return NDCG@10 from a Metrics object.
+
+    Example:
+        >>> _metric_ndcg10(Metrics(ndcg={"NDCG@10": 0.42}))
+        0.42
+    """
     return float(metrics.ndcg.get("NDCG@10", metrics.get("NDCG@10", 0.0)))
 
 
 def _metric_recall10(metrics: Metrics) -> float:
-    """Return Recall@10 when present."""
+    """Return Recall@10 when present.
+
+    Example:
+        >>> _metric_recall10(Metrics(recall={"Recall@10": 0.75}))
+        0.75
+    """
     return float(
         metrics.recall.get("Recall@10", metrics.get("Recall@10", 0.0))
     )
 
 
 def smoke_report_dir(root: Path | None = None) -> Path:
-    """Return ``reports/beir/smoke`` under the repo root."""
+    """Return ``reports/beir/smoke`` under the repo root.
+
+    Example:
+        >>> smoke_report_dir(Path("/tmp/repo")).as_posix()
+        '/tmp/repo/reports/beir/smoke'
+    """
     base = Path(root) if root is not None else Path(repo_root())
     return base / "reports" / "beir" / "smoke"
 
@@ -491,7 +576,12 @@ def smoke_report_dir(root: Path | None = None) -> Path:
 def load_previous_smoke_report(
     out_dir: Path | None = None,
 ) -> dict[str, Any] | None:
-    """Load the last smoke ``report.json`` if present."""
+    """Load the last smoke ``report.json`` if present.
+
+    Example:
+        >>> load_previous_smoke_report(Path("/nonexistent/smoke")) is None
+        True
+    """
     directory = out_dir or smoke_report_dir()
     path = directory / "report.json"
     if not path.is_file():
@@ -546,6 +636,12 @@ _NDCG_EPS = 0.005
 
 
 def _high_alert_count(alerts: list[Any]) -> int:
+    """Count alerts with severity ``high``.
+
+    Example:
+        >>> _high_alert_count([RankAlert(code="x", detail="d", severity="high")])
+        1
+    """
     count = 0
     for alert in alerts or []:
         if isinstance(alert, RankAlert):
@@ -561,6 +657,12 @@ def _dataset_verdict(
     ndcg_delta: float | None,
     high_alerts_delta: int | None,
 ) -> str:
+    """Return per-dataset verdict from NDCG and alert deltas.
+
+    Example:
+        >>> _dataset_verdict(ndcg_delta=0.01, high_alerts_delta=-1)
+        'better'
+    """
     if ndcg_delta is None:
         return "new"
     quality = (
@@ -587,6 +689,11 @@ def compare_smoke_to_previous(
 
     Ranking quality (T-KEIR NDCG@10) is the primary signal; fewer high-severity
     alerts is secondary. Wall clock is reported but does not drive the verdict.
+
+    Example:
+        >>> cmp = compare_smoke_to_previous([], wall_s=1.0, previous=None)
+        >>> cmp.overall
+        'no_baseline'
     """
     if previous is None:
         return SmokeComparison(
@@ -721,7 +828,15 @@ def compare_smoke_to_previous(
 
 
 def render_comparison_section(comparison: SmokeComparison) -> list[str]:
-    """Markdown lines for the vs-previous section."""
+    """Markdown lines for the vs-previous section.
+
+    Example:
+        >>> lines = render_comparison_section(
+        ...     SmokeComparison(overall="no_baseline", summary="first run")
+        ... )
+        >>> lines[0]
+        '## Vs previous report'
+    """
     lines = ["## Vs previous report", ""]
     if comparison.overall == "no_baseline":
         lines.append(comparison.summary)
@@ -786,7 +901,19 @@ def detect_rank_alerts(
     qrels: dict[str, dict[str, int]],
     tkeir_error: str | None,
 ) -> list[RankAlert]:
-    """Flag obvious ranking / strategy failures on the smoke subset."""
+    """Flag obvious ranking / strategy failures on the smoke subset.
+
+    Example:
+        >>> alerts = detect_rank_alerts(
+        ...     bm25=Metrics(ndcg={"NDCG@10": 0.5}),
+        ...     tkeir=Metrics(),
+        ...     tkeir_results={"q1": {}},
+        ...     qrels={"q1": {"d1": 1}},
+        ...     tkeir_error=None,
+        ... )
+        >>> any(a.code == "tkeir_ndcg_zero" for a in alerts)
+        True
+    """
     alerts: list[RankAlert] = []
     if tkeir_error:
         if not str(tkeir_error).startswith("skipped"):
@@ -837,7 +964,13 @@ def detect_rank_alerts(
 
 
 def detect_timing_alerts(timings: StageTimings) -> list[RankAlert]:
-    """Flag stages that dominate wall clock on a smoke-sized run."""
+    """Flag stages that dominate wall clock on a smoke-sized run.
+
+    Example:
+        >>> alerts = detect_timing_alerts(StageTimings(reset_ms=120_000.0))
+        >>> any(a.code == "slow_reset" for a in alerts)
+        True
+    """
     alerts: list[RankAlert] = []
     docs = max(1, timings.docs_indexed)
     queries = max(1, timings.queries)
@@ -887,7 +1020,19 @@ async def _run_tkeir_smoke(
     index_mode: str,
     reindex: bool,
 ) -> tuple[dict[str, dict[str, float]], StageTimings, str | None]:
-    """Index (optional Vespa) + score with production ``retrieve_hybrid``."""
+    """Index (optional Vespa) + score with production ``retrieve_hybrid``.
+
+    Example:
+        >>> asyncio.run(_run_tkeir_smoke(  # doctest: +SKIP
+        ...     "scifact",
+        ...     {"d1": {"text": "test"}},
+        ...     {"q1": "test"},
+        ...     language="en",
+        ...     top_k=5,
+        ...     index_mode="fast",
+        ...     reindex=False,
+        ... ))
+    """
     from thot.tools.eval.beir_tkeir import (
         beir_ontology_for_index,
         beir_ontology_for_search,
@@ -1008,7 +1153,23 @@ def evaluate_smoke_dataset(
     focus_eval_report: bool = True,
     query_ids: list[str] | None = None,
 ) -> SmokeRun:
-    """Load one BEIR corpus, build subset, score BM25 + T-KEIR, time stages."""
+    """Load one BEIR corpus, build subset, score BM25 + T-KEIR, time stages.
+
+    Example:
+        >>> evaluate_smoke_dataset(  # doctest: +SKIP
+        ...     "scifact",
+        ...     Path("datasets"),
+        ...     n_queries=1,
+        ...     n_close=0,
+        ...     rank_docs=1,
+        ...     seed=1,
+        ...     top_k=5,
+        ...     index_mode="fast",
+        ...     language="en",
+        ...     skip_tkeir=True,
+        ...     reindex=False,
+        ... )
+    """
     empty = Metrics()
     path = ensure_dataset(name, datasets_dir)
     if path is None:
@@ -1143,7 +1304,13 @@ def render_smoke_report(
     wall_s: float,
     comparison: SmokeComparison | None = None,
 ) -> str:
-    """Render an action-oriented Markdown smoke report (problems first)."""
+    """Render an action-oriented Markdown smoke report (problems first).
+
+    Example:
+        >>> md = render_smoke_report([], wall_s=1.0)
+        >>> md.startswith("# BEIR smoke evaluation")
+        True
+    """
     lines = [
         "# BEIR smoke evaluation (dev)",
         "",
@@ -1312,6 +1479,11 @@ def write_smoke_reports(
 
     When a previous ``report.json`` exists it is copied to ``report.prev.json``
     before overwrite so the next run can still compare.
+
+    Example:
+        >>> import inspect
+        >>> inspect.isfunction(write_smoke_reports)
+        True
     """
     root = Path(repo_root())
     out_dir = smoke_report_dir(root)
@@ -1418,7 +1590,11 @@ def write_smoke_reports(
 
 
 def cleanup_vespa() -> None:
-    """Wipe BEIR Vespa data after the smoke run."""
+    """Wipe BEIR Vespa data after the smoke run.
+
+    Example:
+        >>> cleanup_vespa()  # doctest: +SKIP
+    """
     from thot.tools.eval.beir_tkeir import reset_vespa_for_beir
 
     LOGGER.warning("Smoke cleanup: wiping Vespa DB")
@@ -1426,7 +1602,13 @@ def cleanup_vespa() -> None:
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    """Parse CLI arguments for the BEIR smoke harness."""
+    """Parse CLI arguments for the BEIR smoke harness.
+
+    Example:
+        >>> args = parse_args(["--skip-tkeir", "--datasets", "scifact"])
+        >>> args.skip_tkeir
+        True
+    """
     parser = argparse.ArgumentParser(
         description=(
             "Fast BEIR smoke eval (<5 min): per query gold + close "
@@ -1536,7 +1718,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI entry: isolate each corpus, time+score, cleanup."""
+    """CLI entry: isolate each corpus, time+score, cleanup.
+
+    Example:
+        >>> main(["--skip-tkeir", "--datasets", "missing-dataset"])  # doctest: +SKIP
+        1
+    """
     args = parse_args(argv)
     setup_logging(args.verbose)
     n_close = (

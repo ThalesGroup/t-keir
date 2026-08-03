@@ -46,6 +46,13 @@ WRITE_INTENTS = frozenset({"ingest", "index", "delete", "okf.export"})
 
 
 def _payload_has_scope(payload: dict, scope: str) -> bool:
+    """Return True when JWT payload includes ``scope``.
+
+    Example:
+        >>> from thot.governor.policy import _payload_has_scope
+        >>> _payload_has_scope({"scope": "intent:search read"}, "intent:search")
+        True
+    """
     raw = payload.get("scope")
     if isinstance(raw, str) and scope in raw.split():
         return True
@@ -65,6 +72,13 @@ def _payload_has_scope(payload: dict, scope: str) -> bool:
 
 
 def _actor_from_payload(payload: dict | None, fallback: str) -> str:
+    """Resolve actor id from JWT ``sub`` or fallback.
+
+    Example:
+        >>> from thot.governor.policy import _actor_from_payload
+        >>> _actor_from_payload({"sub": "alice"}, "svc")
+        'alice'
+    """
     if not payload:
         return fallback
     sub = payload.get("sub")
@@ -72,7 +86,28 @@ def _actor_from_payload(payload: dict | None, fallback: str) -> str:
 
 
 class PolicyEvaluator:
-    """Evaluate HTTP requests against governor controls."""
+    """Evaluate HTTP requests against governor controls.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.governor.approvals import ApprovalQueue
+        >>> from thot.governor.budgets import BudgetStore
+        >>> from thot.governor.config import governor_settings
+        >>> from thot.governor.flags import RuntimeFlagsStore
+        >>> from thot.governor.policy import PolicyEvaluator
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     root = Path(td)
+        ...     s = governor_settings()
+        ...     ev = PolicyEvaluator(
+        ...         s, RuntimeFlagsStore(root / "f.json"),
+        ...         BudgetStore(root / "b.db", s), ApprovalQueue(root / "a.json"),
+        ...     )
+        ...     ev.evaluate_http(
+        ...         method="GET", path="/search", authorization=None, service="svc"
+        ...     ).result
+        'allow'
+    """
 
     def __init__(
         self,
@@ -81,6 +116,26 @@ class PolicyEvaluator:
         budgets: BudgetStore,
         approvals: ApprovalQueue,
     ) -> None:
+        """Wire settings, flags, budgets, and approval queue.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> from thot.governor.flags import RuntimeFlagsStore
+            >>> from thot.governor.policy import PolicyEvaluator
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     s = governor_settings()
+            ...     ev = PolicyEvaluator(
+            ...         s, RuntimeFlagsStore(Path(td) / "f.json"),
+            ...         BudgetStore(Path(td) / "b.db", s),
+            ...         ApprovalQueue(Path(td) / "a.json"),
+            ...     )
+            ...     ev.mode in {"off", "observe", "enforce"}
+            True
+        """
         self.settings = settings
         self.flags = flags
         self.budgets = budgets
@@ -88,6 +143,25 @@ class PolicyEvaluator:
 
     @property
     def mode(self) -> GovernorMode:
+        """Current governor enforcement mode.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> from thot.governor.flags import RuntimeFlagsStore
+            >>> from thot.governor.policy import PolicyEvaluator
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     s = governor_settings()
+            ...     PolicyEvaluator(
+            ...         s, RuntimeFlagsStore(Path(td) / "f.json"),
+            ...         BudgetStore(Path(td) / "b.db", s),
+            ...         ApprovalQueue(Path(td) / "a.json"),
+            ...     ).mode
+            'observe'
+        """
         return self.settings.mode
 
     def evaluate_http(
@@ -98,7 +172,29 @@ class PolicyEvaluator:
         authorization: str | None,
         service: str,
     ) -> PolicyDecision:
-        """Return a policy decision for one HTTP request."""
+        """Return a policy decision for one HTTP request.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> from thot.governor.flags import RuntimeFlagsStore
+            >>> from thot.governor.policy import PolicyEvaluator
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     s = governor_settings()
+            ...     ev = PolicyEvaluator(
+            ...         s, RuntimeFlagsStore(Path(td) / "f.json"),
+            ...         BudgetStore(Path(td) / "b.db", s),
+            ...         ApprovalQueue(Path(td) / "a.json"),
+            ...     )
+            ...     ev.evaluate_http(
+            ...         method="GET", path="/v1/search",
+            ...         authorization=None, service="svc",
+            ...     ).intent
+            'search'
+        """
         if self.settings.mode == "off":
             return PolicyDecision(result="allow", actor_id=service)
 
@@ -183,7 +279,31 @@ class PolicyEvaluator:
         )
 
     def consume_for_intent(self, decision: PolicyDecision) -> None:
-        """Charge budgets after a successful write intent."""
+        """Charge budgets after a successful write intent.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> from thot.governor.flags import RuntimeFlagsStore
+            >>> from thot.governor.policy import PolicyEvaluator
+            >>> from thot.governor.models import PolicyDecision
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     s = governor_settings()
+            ...     ev = PolicyEvaluator(
+            ...         s, RuntimeFlagsStore(Path(td) / "f.json"),
+            ...         BudgetStore(Path(td) / "b.db", s),
+            ...         ApprovalQueue(Path(td) / "a.json"),
+            ...     )
+            ...     ev.consume_for_intent(
+            ...         PolicyDecision(result="allow", intent="ingest", actor_id="u1")
+            ...     )
+            ...     snap = ev.budgets.snapshot("u1", "docs", limit=100.0)
+            ...     snap.consumed >= 1.0
+            True
+        """
         if decision.intent not in WRITE_INTENTS:
             return
         self.budgets.consume(

@@ -15,7 +15,7 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 class NERTaggerConfiguration:
     """load ner configuration
     A ner configuration is represented by JSON entry:
-
+    
     Example
     logger": {
             "logging-level": "debug"
@@ -28,8 +28,11 @@ class NERTaggerConfiguration:
             "use-pre-label":true
         }]
     }
-
-
+    
+        Example:
+            >>> from thot.tasks.ner.NERTaggerConfiguration import NERTaggerConfiguration
+            >>> callable(NERTaggerConfiguration)
+            True
     """
 
     def __init__(self):

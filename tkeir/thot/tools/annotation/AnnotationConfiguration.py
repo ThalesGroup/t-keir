@@ -13,9 +13,15 @@ from thot.core.ConfigurationUtils import load_configuration
 
 
 class AnnotationConfiguration:
-    """load annotation item
-    An annotation item is a part of annotation configuration file;
-    it is represented by JSON entry:
+    """Load annotation configuration entries from JSON.
+
+    An annotation item is one section of an annotation configuration file,
+    represented as a JSON object with ``data`` and ``resources-base-path``.
+
+    Example:
+        >>> from thot.tools.annotation.AnnotationConfiguration import AnnotationConfiguration
+        >>> isinstance(AnnotationConfiguration(), AnnotationConfiguration)
+        True
     """
 
     def __init__(self):

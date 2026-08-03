@@ -27,6 +27,12 @@ _METRICS_READY = False
 
 
 def _ensure_metrics() -> None:
+    """Register MCP tool-call Prometheus counters once per process.
+
+    Example:
+        >>> from thot.mcp.handlers import _ensure_metrics
+        >>> _ensure_metrics()
+    """
     global _METRICS_READY
     if _METRICS_READY:
         return
@@ -50,7 +56,14 @@ class McpBackend(Protocol):
         language: str | None = None,
         search_mode: str | None = None,
     ) -> dict[str, Any]:
-        """Run hybrid search in ``user_space`` (optional dual-hybrid mode)."""
+        """Run hybrid search in ``user_space`` (optional dual-hybrid mode).
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.hybrid_search)
+            True
+        """
 
     async def rag_query(
         self,
@@ -62,7 +75,14 @@ class McpBackend(Protocol):
         generate: bool = True,
         search_mode: str | None = None,
     ) -> dict[str, Any]:
-        """Run RAG (or retrieval-only) in ``user_space``."""
+        """Run RAG (or retrieval-only) in ``user_space``.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.rag_query)
+            True
+        """
 
     async def get_document(
         self,
@@ -71,7 +91,14 @@ class McpBackend(Protocol):
         source_doc_id: str | None = None,
         doc_ref: str | None = None,
     ) -> dict[str, Any]:
-        """Fetch one parent document; must enforce ``user_space``."""
+        """Fetch one parent document; must enforce ``user_space``.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.get_document)
+            True
+        """
 
     async def ontology_from_query(
         self,
@@ -81,10 +108,24 @@ class McpBackend(Protocol):
         user_space: str,
         max_triples: int = 40,
     ) -> dict[str, Any]:
-        """Build ontology summary from docs in ``user_space``."""
+        """Build ontology summary from docs in ``user_space``.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.ontology_from_query)
+            True
+        """
 
     async def okf_bundle_list(self, *, user_space: str) -> dict[str, Any]:
-        """List OKF bundles for ``user_space``."""
+        """List OKF bundles for ``user_space``.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.okf_bundle_list)
+            True
+        """
 
     async def okf_bundle_get(
         self,
@@ -93,28 +134,63 @@ class McpBackend(Protocol):
         bundle_id: str,
         concept_id: str | None = None,
     ) -> dict[str, Any]:
-        """Fetch OKF index / concept markdown for ``user_space``."""
+        """Fetch OKF index / concept markdown for ``user_space``.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.okf_bundle_get)
+            True
+        """
 
     async def workspace_wiki_list(
         self, *, user_space: str, path: str = "wiki"
     ) -> dict[str, Any]:
-        """List personal-space wiki files."""
+        """List personal-space wiki files.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.workspace_wiki_list)
+            True
+        """
 
     async def workspace_wiki_get(
         self, *, user_space: str, path: str
     ) -> dict[str, Any]:
-        """Read one personal-space wiki markdown file."""
+        """Read one personal-space wiki markdown file.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.workspace_wiki_get)
+            True
+        """
 
     async def okf_wiki_put(
         self, *, user_space: str, bundle_id: str, markdown: str
     ) -> dict[str, Any]:
-        """Write LLMWiki markdown into an OKF bundle."""
+        """Write LLMWiki markdown into an OKF bundle.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import McpBackend
+            >>> inspect.iscoroutinefunction(McpBackend.okf_wiki_put)
+            True
+        """
 
 
 class VespaMcpBackend:
     """Default backend using :class:`VespaClient` (+ optional RAG HTTP)."""
 
     def __init__(self, vespa: VespaClient | None = None) -> None:
+        """Create a backend backed by Vespa (or an injected client).
+
+        Example:
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> isinstance(VespaMcpBackend(), VespaMcpBackend)
+            True
+        """
         self._vespa = vespa or VespaClient()
 
     async def hybrid_search(
@@ -126,6 +202,14 @@ class VespaMcpBackend:
         language: str | None = None,
         search_mode: str | None = None,
     ) -> dict[str, Any]:
+        """Run hybrid search against Vespa for one tenant.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.hybrid_search)
+            True
+        """
         space = normalize_user_space(user_space)
         mode = (search_mode or "").strip().lower() or None
         if mode in {"both", "global", "auto"}:
@@ -225,6 +309,14 @@ class VespaMcpBackend:
         generate: bool = True,
         search_mode: str | None = None,
     ) -> dict[str, Any]:
+        """Run RAG or retrieval-only search for one tenant.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.rag_query)
+            True
+        """
         import os
 
         import httpx
@@ -279,6 +371,14 @@ class VespaMcpBackend:
         source_doc_id: str | None = None,
         doc_ref: str | None = None,
     ) -> dict[str, Any]:
+        """Fetch one parent document with tenant isolation checks.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.get_document)
+            True
+        """
         space = normalize_user_space(user_space)
         if not source_doc_id and not doc_ref:
             raise ValueError("source_doc_id or doc_ref is required")
@@ -336,6 +436,14 @@ class VespaMcpBackend:
         user_space: str,
         max_triples: int = 40,
     ) -> dict[str, Any]:
+        """Merge ontology payloads from retrieved documents.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.ontology_from_query)
+            True
+        """
         from thot.tools.search.ontology_utils import (
             merge_rdf_graphs,
             summarize_graph_for_prompt,
@@ -390,6 +498,14 @@ class VespaMcpBackend:
         }
 
     async def okf_bundle_list(self, *, user_space: str) -> dict[str, Any]:
+        """List OKF bundles for the caller's tenant.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.okf_bundle_list)
+            True
+        """
         from thot.okf.store import OkfBundleStore
 
         space = normalize_user_space(user_space)
@@ -407,6 +523,14 @@ class VespaMcpBackend:
         bundle_id: str,
         concept_id: str | None = None,
     ) -> dict[str, Any]:
+        """Fetch OKF bundle payload for the caller's tenant.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.okf_bundle_get)
+            True
+        """
         from thot.okf.store import OkfBundleStore
 
         space = normalize_user_space(user_space)
@@ -423,6 +547,14 @@ class VespaMcpBackend:
     async def workspace_wiki_list(
         self, *, user_space: str, path: str = "wiki"
     ) -> dict[str, Any]:
+        """List markdown wiki files under a workspace path.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.workspace_wiki_list)
+            True
+        """
         from thot.tools.ingest.user_workspace import UserWorkspace
 
         space = normalize_user_space(user_space)
@@ -445,6 +577,14 @@ class VespaMcpBackend:
     async def workspace_wiki_get(
         self, *, user_space: str, path: str
     ) -> dict[str, Any]:
+        """Read one workspace wiki markdown file.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.workspace_wiki_get)
+            True
+        """
         from thot.tools.ingest.user_workspace import UserWorkspace
 
         space = normalize_user_space(user_space)
@@ -479,6 +619,14 @@ class VespaMcpBackend:
     async def okf_wiki_put(
         self, *, user_space: str, bundle_id: str, markdown: str
     ) -> dict[str, Any]:
+        """Write LLMWiki markdown into an OKF bundle.
+
+        Example:
+            >>> import inspect
+            >>> from thot.mcp.handlers import VespaMcpBackend
+            >>> inspect.iscoroutinefunction(VespaMcpBackend.okf_wiki_put)
+            True
+        """
         from thot.okf.store import OkfBundleStore
 
         space = normalize_user_space(user_space)
@@ -510,6 +658,13 @@ class McpHandlers:
     """Dispatch MCP tools with forced ``user_space`` and metrics."""
 
     def __init__(self, backend: McpBackend | None = None) -> None:
+        """Create handlers with an optional injectable backend.
+
+        Example:
+            >>> from thot.mcp.handlers import McpHandlers
+            >>> isinstance(McpHandlers().backend, object)
+            True
+        """
         self.backend: McpBackend = backend or VespaMcpBackend()
 
     async def invoke(

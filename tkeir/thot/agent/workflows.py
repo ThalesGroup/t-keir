@@ -76,7 +76,23 @@ def workflow_config_dirs() -> list[Path]:
 
 
 def resolve_workflow_path(name: str, *, directory: Path | None = None) -> Path:
-    """Resolve ``<name>.yaml`` across workflow config roots."""
+    """Resolve ``<name>.yaml`` across workflow config roots.
+
+    Args:
+        name: Workflow stem (without ``.yaml``).
+        directory: Optional single root; raises if missing.
+
+    Returns:
+        Path to the workflow YAML file.
+
+    Raises:
+        FileNotFoundError: When no matching spec exists.
+
+    Example:
+        >>> from thot.agent.workflows import resolve_workflow_path
+        >>> resolve_workflow_path("content_brief").name
+        'content_brief.yaml'
+    """
     if directory is not None:
         path = Path(directory) / f"{name}.yaml"
         if path.is_file():

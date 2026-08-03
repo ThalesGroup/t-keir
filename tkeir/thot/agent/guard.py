@@ -44,6 +44,13 @@ _METRICS = False
 
 
 def _ensure_metrics() -> None:
+    """Register agent Prometheus counters once per process (idempotent).
+
+    Example:
+        >>> from thot.agent.guard import _ensure_metrics
+        >>> _ensure_metrics()
+        >>> _ensure_metrics()
+    """
     global _METRICS
     if _METRICS:
         return
@@ -65,7 +72,13 @@ def _ensure_metrics() -> None:
 
 @dataclass
 class GuardDecision:
-    """Outcome of a pre-step / pre-tool guard check."""
+    """Outcome of a pre-step / pre-tool guard check.
+
+    Example:
+        >>> from thot.agent.guard import GuardDecision
+        >>> GuardDecision(result="allow").result
+        'allow'
+    """
 
     result: Literal["allow", "deny", "escalate"] = "allow"
     message: str = ""
@@ -95,6 +108,17 @@ class AgentGuard:
     throttle_ratio: float = 0.8
 
     def __post_init__(self) -> None:
+        """Create governor stores under ``root`` after dataclass init.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     g = AgentGuard(Path(td))
+            ...     g.flags.path.name
+            'flags.json'
+        """
         self.root.mkdir(parents=True, exist_ok=True)
         self.flags = RuntimeFlagsStore(self.root / "flags.json")
         self.approvals = ApprovalQueue(self.root / "approvals.json")
@@ -103,10 +127,42 @@ class AgentGuard:
         )
 
     def is_agents_killed(self) -> bool:
+        """Return whether the agents kill-switch flag is active.
+
+        Returns:
+            ``True`` when governor flags mark scope ``agents`` killed.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     g = AgentGuard(Path(td))
+            ...     g.is_agents_killed()
+            False
+        """
         return self.flags.is_killed("agents")
 
     def mint_run_token(self, *, actor_id: str, run_id: str) -> str:
-        """Mint a short-lived action token (TTL ≤ 300s)."""
+        """Mint a short-lived action token (TTL ≤ 300s).
+
+        Args:
+            actor_id: User or tenant id bound to the token.
+            run_id: Run id stored in token constraints.
+
+        Returns:
+            Compact serialized token string for downstream verification.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     g = AgentGuard(Path(td))
+            ...     token = g.mint_run_token(actor_id="alice", run_id="run-1")
+            ...     isinstance(token, str) and len(token) > 0
+            True
+        """
         compact, _token = self.tokens.mint(
             actor_id=actor_id,
             intent="agent.run",
@@ -124,7 +180,30 @@ class AgentGuard:
         *,
         wall_started: float,
     ) -> GuardDecision:
-        """Kill-switch + budget gate before each loop step."""
+        """Kill-switch + budget gate before each loop step.
+
+        Args:
+            state: Run whose usage counters and SPIFFE id may be updated.
+            spec: Agent spec supplying budget limits.
+            wall_started: ``time.monotonic()`` value when the run began.
+
+        Returns:
+            :class:`GuardDecision` with ``allow``, ``deny``, or ``escalate``.
+
+        Example:
+            >>> import tempfile
+            >>> import time
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.models import RunState, AgentSpec
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     g = AgentGuard(Path(td))
+            ...     state = RunState(goal="g", user_space="alice")
+            ...     spec = AgentSpec(name="researcher")
+            ...     dec = g.check_step(state, spec, wall_started=time.monotonic())
+            ...     dec.result
+            'allow'
+        """
         _ensure_metrics()
         if state.cancel_requested:
             return GuardDecision(result="deny", message="cancel requested")
@@ -199,7 +278,33 @@ class AgentGuard:
         ext: dict[str, Any] | None = None,
         chunk_ids: list[str] | None = None,
     ) -> ActionRecord:
-        """Append an ActionRecord for plan/step/tool/handoff."""
+        """Append an ActionRecord for plan/step/tool/handoff.
+
+        Args:
+            kind: Audit action kind (e.g. ``agent.plan``, ``tool.invoke``).
+            state: Run supplying correlation, actor, and SPIFFE metadata.
+            intent: Declared intent stored on the action record.
+            status: Execution status string for the audit trail.
+            decision: Policy decision label (``allow`` / ``deny``).
+            error: Optional error message on failure paths.
+            ext: Extra key/value pairs merged into record ``ext``.
+            chunk_ids: Provenance chunk ids attached to the result.
+
+        Returns:
+            The appended :class:`~thot.action.models.ActionRecord`.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.models import RunState
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     g = AgentGuard(Path(td))
+            ...     state = RunState(goal="g", user_space="alice")
+            ...     rec = g.emit(kind="agent.plan", state=state)
+            ...     rec.ext["action_kind"]
+            'agent.plan'
+        """
         if not state.spiffe_id:
             state.spiffe_id = resolve_agent_spiffe_id(state.agent)
         record = ActionRecord(

@@ -22,6 +22,16 @@ AUDIT_SCOPE = "intent:audit.read"
 
 
 def _decode_jwt_payload(token: str) -> dict[str, Any]:
+    """Decode JWT payload segment without signature verification.
+
+    Example:
+        >>> import base64, json
+        >>> from thot.audit.auth import _decode_jwt_payload
+        >>> payload = {"sub": "u1", "scope": "intent:audit.read"}
+        >>> body = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+        >>> _decode_jwt_payload(f"hdr.{body}.sig")["sub"]
+        'u1'
+    """
     parts = token.split(".")
     if len(parts) < 2:
         raise ValueError("invalid jwt")
@@ -35,6 +45,13 @@ def _decode_jwt_payload(token: str) -> dict[str, Any]:
 
 
 def _token_has_audit_scope(payload: dict[str, Any]) -> bool:
+    """Return True when payload carries audit read scope.
+
+    Example:
+        >>> from thot.audit.auth import _token_has_audit_scope
+        >>> _token_has_audit_scope({"scope": "intent:audit.read"})
+        True
+    """
     scope = payload.get("scope")
     if isinstance(scope, str) and AUDIT_SCOPE in scope.split():
         return True
@@ -53,7 +70,15 @@ def _token_has_audit_scope(payload: dict[str, Any]) -> bool:
 
 
 def verify_audit_authorization(authorization: str | None) -> str:
-    """Validate bearer token for audit read operations."""
+    """Validate bearer token for audit read operations.
+
+    Example:
+        >>> from thot.audit.config import audit_settings
+        >>> from thot.audit.auth import verify_audit_authorization
+        >>> audit_settings.cache_clear()
+        >>> verify_audit_authorization(None)
+        'anonymous'
+    """
     settings = audit_settings()
     if not settings.auth_enabled:
         return "anonymous"
@@ -78,5 +103,12 @@ def verify_audit_authorization(authorization: str | None) -> str:
 async def require_audit_auth(
     authorization: str | None = Header(default=None),
 ) -> str:
-    """FastAPI dependency for audit endpoints."""
+    """FastAPI dependency for audit endpoints.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.auth import require_audit_auth
+        >>> inspect.iscoroutinefunction(require_audit_auth)
+        True
+    """
     return verify_audit_authorization(authorization)

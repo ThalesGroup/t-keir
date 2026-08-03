@@ -35,6 +35,12 @@ def doc_id_from_content(content: bytes) -> str:
 
 
 def _filename_from_url(url: str, fallback: str | None) -> str:
+    """Derive a filename from a URL or explicit fallback.
+
+    Example:
+        >>> _filename_from_url("file:///tmp/report.pdf", None)
+        'report.pdf'
+    """
     if fallback:
         return fallback
     parsed = urlparse(url)

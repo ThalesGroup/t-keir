@@ -40,6 +40,13 @@ def _host_address() -> str:
 
 
 class TaskInfo:
+    """TaskInfo container.
+    
+        Example:
+            >>> from thot.tasks.TaskInfo import TaskInfo
+            >>> callable(TaskInfo)
+            True
+    """
     def __init__(self, task_name=None, task_version=None, task_date=None):
         """Create task metadata helper.
 

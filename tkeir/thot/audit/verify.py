@@ -19,7 +19,13 @@ from thot.audit.worm_store import WormSegmentStore
 
 @dataclass
 class VerifyReport:
-    """Outcome of ``verify_chain``."""
+    """Outcome of ``verify_chain``.
+
+    Example:
+        >>> from thot.audit.verify import VerifyReport
+        >>> VerifyReport(ok=True, records_checked=2).ok
+        True
+    """
 
     ok: bool
     records_checked: int = 0
@@ -67,7 +73,24 @@ def verify_store(
     hot: HotStore,
     worm: WormSegmentStore | None = None,
 ) -> VerifyReport:
-    """Verify hot chain and optional WORM segment integrity."""
+    """Verify hot chain and optional WORM segment integrity.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.action.models import ActionRecord
+        >>> from thot.audit.hot_store import SqliteHotStore
+        >>> from thot.audit.verify import verify_store
+        >>> from thot.audit.worm_store import WormSegmentStore
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     root = Path(td)
+        ...     hot = SqliteHotStore(root / "hot.db")
+        ...     _ = hot.append(ActionRecord(correlation_id="q" * 32))
+        ...     report = verify_store(hot, WormSegmentStore(root / "worm"))
+        ...     hot.close()
+        ...     report.ok and report.records_checked == 1
+        True
+    """
     records = hot.iter_all()
     report = verify_hot_chain(records)
     if worm is None:

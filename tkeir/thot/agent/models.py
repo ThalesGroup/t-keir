@@ -19,7 +19,13 @@ from thot.action.models import new_action_id, utc_now_rfc3339
 
 
 class BudgetLimits(BaseModel):
-    """Per-run consumable budgets."""
+    """Per-run consumable budgets.
+
+    Example:
+        >>> from thot.agent.models import BudgetLimits
+        >>> BudgetLimits(tool_calls=10).tool_calls
+        10
+    """
 
     llm_tokens: int = 20000
     tool_calls: int = 15
@@ -28,7 +34,13 @@ class BudgetLimits(BaseModel):
 
 
 class StopCondition(BaseModel):
-    """When the single-agent loop must halt."""
+    """When the single-agent loop must halt.
+
+    Example:
+        >>> from thot.agent.models import StopCondition
+        >>> StopCondition(max_steps=5).max_steps
+        5
+    """
 
     max_steps: int = 12
 
@@ -38,6 +50,11 @@ class AgentSpec(BaseModel):
 
     Persona ``*_prompt`` agents may set wiki generation fields used by the
     ``okf_iterative_wiki`` builtin (HMI passes ``prompt_name`` / ``wiki_agent``).
+
+    Example:
+        >>> from thot.agent.models import AgentSpec
+        >>> AgentSpec(name="researcher", tools=["search"]).name
+        'researcher'
     """
 
     name: str
@@ -76,7 +93,13 @@ class AgentSpec(BaseModel):
 
 
 class GroundedFinding(BaseModel):
-    """One claim with mandatory provenance."""
+    """One claim with mandatory provenance.
+
+    Example:
+        >>> from thot.agent.models import GroundedFinding
+        >>> GroundedFinding(claim="Acme launched Widget", chunk_ids=["c1"]).claim
+        'Acme launched Widget'
+    """
 
     claim: str
     chunk_ids: list[str] = Field(default_factory=list)
@@ -85,7 +108,17 @@ class GroundedFinding(BaseModel):
 
 
 class GroundedFindings(BaseModel):
-    """Researcher output contract."""
+    """Researcher output contract.
+
+    Example:
+        >>> from thot.agent.models import GroundedFinding, GroundedFindings
+        >>> out = GroundedFindings(
+        ...     goal="summarize",
+        ...     findings=[GroundedFinding(claim="fact")],
+        ... )
+        >>> out.schema_
+        'grounded_findings_v1'
+    """
 
     schema_: str = Field(default="grounded_findings_v1", alias="schema")
     goal: str = ""
@@ -97,7 +130,13 @@ class GroundedFindings(BaseModel):
 
 
 class OkfEnrichmentFindingModel(BaseModel):
-    """One ``okf_enrichment_v1`` finding (mirrors thot.okf.models)."""
+    """One ``okf_enrichment_v1`` finding (mirrors thot.okf.models).
+
+    Example:
+        >>> from thot.agent.models import OkfEnrichmentFindingModel
+        >>> OkfEnrichmentFindingModel(concept_id="doc-1", claim="enriched").concept_id
+        'doc-1'
+    """
 
     concept_id: str
     claim: str = ""
@@ -108,7 +147,13 @@ class OkfEnrichmentFindingModel(BaseModel):
 
 
 class OkfEnrichmentResult(BaseModel):
-    """OKF curator output contract."""
+    """OKF curator output contract.
+
+    Example:
+        >>> from thot.agent.models import OkfEnrichmentResult
+        >>> OkfEnrichmentResult(schema="okf_enrichment_v1").schema_
+        'okf_enrichment_v1'
+    """
 
     schema_: str = Field(default="okf_enrichment_v1", alias="schema")
     findings: list[OkfEnrichmentFindingModel] = Field(default_factory=list)
@@ -119,14 +164,26 @@ class OkfEnrichmentResult(BaseModel):
 
 
 class ToolCall(BaseModel):
-    """Parsed tool invocation from the LLM."""
+    """Parsed tool invocation from the LLM.
+
+    Example:
+        >>> from thot.agent.models import ToolCall
+        >>> ToolCall(name="search", arguments={"query": "q"}).name
+        'search'
+    """
 
     name: str
     arguments: dict[str, Any] = Field(default_factory=dict)
 
 
 class StepRecord(BaseModel):
-    """One reason→act→observe step persisted under ``steps/NNN.json``."""
+    """One reason→act→observe step persisted under ``steps/NNN.json``.
+
+    Example:
+        >>> from thot.agent.models import StepRecord
+        >>> StepRecord(step_index=0).step_index
+        0
+    """
 
     step_index: int
     started_at: str = Field(default_factory=utc_now_rfc3339)
@@ -143,7 +200,13 @@ class StepRecord(BaseModel):
 
 
 class BudgetUsage(BaseModel):
-    """Live counters for a run."""
+    """Live counters for a run.
+
+    Example:
+        >>> from thot.agent.models import BudgetUsage
+        >>> BudgetUsage(tool_calls=3).tool_calls
+        3
+    """
 
     llm_tokens: int = 0
     tool_calls: int = 0
@@ -152,7 +215,13 @@ class BudgetUsage(BaseModel):
 
 
 class RunSpec(BaseModel):
-    """Inbound create-run request."""
+    """Inbound create-run request.
+
+    Example:
+        >>> from thot.agent.models import RunSpec
+        >>> RunSpec(goal="analyze quarterly report").goal
+        'analyze quarterly report'
+    """
 
     agent: str = "researcher"
     workflow: str | None = None
@@ -162,7 +231,13 @@ class RunSpec(BaseModel):
 
 
 class Handoff(BaseModel):
-    """Explicit supervisor→worker (or worker→worker) handoff record."""
+    """Explicit supervisor→worker (or worker→worker) handoff record.
+
+    Example:
+        >>> from thot.agent.models import Handoff
+        >>> Handoff(from_agent="supervisor", to_agent="researcher").to_agent
+        'researcher'
+    """
 
     handoff_id: str = Field(default_factory=new_action_id)
     from_agent: str
@@ -174,7 +249,13 @@ class Handoff(BaseModel):
 
 
 class WorkflowAgentStep(BaseModel):
-    """One sequential agent phase in a workflow."""
+    """One sequential agent phase in a workflow.
+
+    Example:
+        >>> from thot.agent.models import WorkflowAgentStep
+        >>> WorkflowAgentStep(agent="researcher").agent
+        'researcher'
+    """
 
     id: str = ""
     agent: str
@@ -184,7 +265,13 @@ class WorkflowAgentStep(BaseModel):
 
 
 class WorkflowComposeStep(BaseModel):
-    """Final templated deliverable step."""
+    """Final templated deliverable step.
+
+    Example:
+        >>> from thot.agent.models import WorkflowComposeStep
+        >>> WorkflowComposeStep(template="synthesis_note").template
+        'synthesis_note'
+    """
 
     id: str = "compose"
     template: str = "synthesis_note"
@@ -192,7 +279,13 @@ class WorkflowComposeStep(BaseModel):
 
 
 class WorkflowStep(BaseModel):
-    """Workflow step: agent, compose, or builtin (e.g. OKF scoped export)."""
+    """Workflow step: agent, compose, or builtin (e.g. OKF scoped export).
+
+    Example:
+        >>> from thot.agent.models import WorkflowStep
+        >>> WorkflowStep(agent="researcher", id="research").agent
+        'researcher'
+    """
 
     id: str = ""
     agent: str | None = None
@@ -206,7 +299,13 @@ class WorkflowStep(BaseModel):
 
 
 class WorkflowSpec(BaseModel):
-    """Loaded from ``tkeir/configs/workflows/*.yaml`` or ``datasets/*/workflows/``."""
+    """Loaded from ``tkeir/configs/workflows/*.yaml`` or ``datasets/*/workflows/``.
+
+    Example:
+        >>> from thot.agent.models import WorkflowSpec
+        >>> WorkflowSpec(name="content_brief").name
+        'content_brief'
+    """
 
     name: str
     version: int = 1
@@ -218,7 +317,13 @@ class WorkflowSpec(BaseModel):
 
 
 class RunState(BaseModel):
-    """Persisted run manifest."""
+    """Persisted run manifest.
+
+    Example:
+        >>> from thot.agent.models import RunState
+        >>> RunState(goal="investigate", user_space="dev@tkeir").status
+        'queued'
+    """
 
     schema_: str = Field(default="tkeir.agent.run.v1", alias="schema")
     run_id: str = Field(default_factory=new_action_id)

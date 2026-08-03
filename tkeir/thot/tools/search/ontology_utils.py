@@ -92,6 +92,14 @@ _STRUCTURAL_PREDICATE_LABELS = frozenset(
 
 
 def _is_structural_predicate_label(predicate: str) -> bool:
+    """Is structural predicate label.
+    
+        Example:
+            >>> from thot.tools.search.ontology_utils import _is_structural_predicate_label
+            >>> _is_structural_predicate_label("hasKeyword")
+            True
+        """
+
     compact = (
         (predicate or "")
         .casefold()
@@ -806,6 +814,14 @@ def _distinctive_query_phrases(query_text: str) -> list[str]:
 
 
 def _chunk_prompt_text(chunk: Any) -> str:
+    """Chunk prompt text.
+    
+        Example:
+            >>> from thot.tools.search.ontology_utils import _chunk_prompt_text
+            >>> _chunk_prompt_text({"text_raw": "Hello"})
+            'hello'
+        """
+
     raw = (
         chunk.text_raw
         if hasattr(chunk, "text_raw")
@@ -994,6 +1010,13 @@ def _collect_entity_chunks_for_retrieved(
     2. ``DocumentChunk --hasStatement-->`` subjects and their objects (kg SVO)
     3. Parent ``Document --hasMention-->`` when the label appears in chunk text
        (document-level ``content_ner`` reinforcement)
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _collect_entity_chunks_for_retrieved
+        >>> from rdflib import Graph
+        >>> ents, docs = _collect_entity_chunks_for_retrieved(Graph(), [], {})
+        >>> ents == {} and docs == {}
+        True
     """
     chunk_texts = chunk_texts or {}
     entity_chunks: dict[tuple[str, str], set[str]] = defaultdict(set)
@@ -1089,6 +1112,12 @@ def _collect_keyword_chunks_for_docs(
     When ``chunk_texts`` is empty (e.g. basket brief with analyzed RDF but no
     Vespa hits yet), attach keywords to all chunks of the parent document so
     the Ontology navigator is still populated.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _collect_keyword_chunks_for_docs
+        >>> from rdflib import Graph
+        >>> dict(_collect_keyword_chunks_for_docs(Graph(), {}, {}, min_keyword_length=3))
+        {}
     """
     keyword_chunks: dict[str, set[str]] = defaultdict(set)
     require_text_match = bool(chunk_texts)
@@ -1116,7 +1145,13 @@ def _collect_keyword_chunks_for_docs(
 
 
 def _count_label_occurrences(label: str, text: str) -> int:
-    """Count case-insensitive whole-phrase occurrences of ``label`` in text."""
+    """Count case-insensitive whole-phrase occurrences of ``label`` in text.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _count_label_occurrences
+        >>> _count_label_occurrences("Paris", "Paris is Paris.")
+        2
+    """
     needle = (label or "").strip()
     haystack = text or ""
     if len(needle) < 2 or not haystack:
@@ -1142,6 +1177,11 @@ def _surface_weight(
         ``(weight, mention_count, text_hits)`` where ``mention_count`` is the
         number of contributing chunks and ``text_hits`` is the sum of
         occurrences in those chunk texts.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _surface_weight
+        >>> _surface_weight("Paris", ["c1"], {"c1": "Paris is nice."})[0] > 0
+        True
     """
     ids = [str(cid) for cid in chunk_ids if str(cid).strip()]
     mention_count = len(ids)
@@ -1162,6 +1202,11 @@ def _aggregate_relation_weights(
 
     Identical ``(source_label, predicate, target_label)`` edges from different
     chunk/parent ontologies add their counts (fuse sum).
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _aggregate_relation_weights
+        >>> dict(_aggregate_relation_weights([]))
+        {}
     """
     counts: dict[tuple[str, str, str], float] = defaultdict(float)
     for document in _unique_rdf_documents(rdf_documents):
@@ -1221,6 +1266,16 @@ def _strip_technical_ontology_predicates(graph: Graph) -> None:
     ``importanceScore`` / ``linkWeight`` / hypergraph support counters are fuse
     ranking signals for HMI weight maps, not ontological relations — strip them
     from the RDF before JSON-LD export.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _strip_technical_ontology_predicates, TKEIR
+        >>> from rdflib import Graph, Literal, URIRef
+        >>> graph = Graph()
+        >>> node = URIRef("http://ex/A")
+        >>> _ = graph.add((node, TKEIR.importanceScore, Literal(1.0)))
+        >>> _strip_technical_ontology_predicates(graph)
+        >>> len(graph)
+        0
     """
     for predicate in (
         TKEIR.importanceScore,
@@ -1445,7 +1500,13 @@ def build_hmi_ontology(
 
 
 def _surface_in_text(label: str, text: str) -> bool:
-    """True when ``label`` appears in chunk text (case-insensitive phrase)."""
+    """True when ``label`` appears in chunk text (case-insensitive phrase).
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _surface_in_text
+        >>> _surface_in_text("Paris", "The capital is Paris.")
+        True
+    """
     needle = (label or "").strip()
     hay = text or ""
     if len(needle) < 2 or not hay:
@@ -1462,6 +1523,11 @@ def _surface_tokens_in_text(
 
     Used for kg object slots whose phrases are longer than a retrieved chunk
     window (e.g. ``consistent with a ship-to-ship transfer``).
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _surface_tokens_in_text
+        >>> _surface_tokens_in_text("ship transfer", "observed ship activity")
+        True
     """
     if _surface_in_text(label, text):
         return True
@@ -1477,6 +1543,14 @@ def _surface_tokens_in_text(
 
 
 def _ner_type_label(raw: str) -> str:
+    """Ner type label.
+    
+        Example:
+            >>> from thot.tools.search.ontology_utils import _ner_type_label
+            >>> _ner_type_label("person")
+            'Person'
+        """
+
     text = (raw or "entity").strip() or "entity"
     return text[:1].upper() + text[1:] if text else "Entity"
 
@@ -1504,6 +1578,16 @@ def enrich_hmi_ontology_from_analyzed_documents(
     Only surfaces evidenced in the chunk text are attached (no ingest change).
     External / business ontology already present in ``hmi`` is kept; NLP
     signals are merged in and preferred when capping.
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import enrich_hmi_ontology_from_analyzed_documents
+        >>> enrich_hmi_ontology_from_analyzed_documents(
+        ...     {"entities": [], "keywords": [], "relations": []},
+        ...     analyzed_documents={},
+        ...     chunk_parent_ids={},
+        ...     chunk_texts={},
+        ... )["entities"]
+        []
     """
     from thot.tools.search.chunk_ontology import _kg_node_text
 

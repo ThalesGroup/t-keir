@@ -24,6 +24,14 @@ from thot.governor.models import KillScope
 
 
 def main(args: list[str] | None = None) -> None:
+    """CLI entry for flags, kill switch, and budget snapshots.
+
+    Example:
+        >>> import inspect
+        >>> from thot.governor.cli import main
+        >>> callable(main) and inspect.isfunction(main)
+        True
+    """
     parser = argparse.ArgumentParser(description="T-KEIR governor CLI")
     sub = parser.add_subparsers(dest="command", required=True)
 

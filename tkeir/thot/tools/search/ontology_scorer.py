@@ -26,7 +26,13 @@ _WORD_RE = re.compile(r"[^\W\d_][\w]{1,}", re.UNICODE)
 
 @dataclass(frozen=True)
 class OntologyMatchWeights:
-    """Match-type weights from config."""
+    """Match-type weights from config.
+
+    Example:
+        >>> from thot.tools.search.ontology_scorer import OntologyMatchWeights
+        >>> OntologyMatchWeights().exact
+        1.0
+    """
 
     exact: float = 1.0
     synonym: float = 0.9
@@ -37,7 +43,13 @@ class OntologyMatchWeights:
 
 @dataclass
 class OntologyScorerConfig:
-    """Runtime knobs for overlap scoring."""
+    """Runtime knobs for overlap scoring.
+
+    Example:
+        >>> from thot.tools.search.ontology_scorer import OntologyScorerConfig
+        >>> OntologyScorerConfig().neutral_score
+        0.5
+    """
 
     enabled: bool = True
     match_weights: OntologyMatchWeights = OntologyMatchWeights()
@@ -47,7 +59,18 @@ class OntologyScorerConfig:
 
 
 class OntologyScorer:
-    """Score documents by concept overlap through the business ontology."""
+    """Score documents by concept overlap through the business ontology.
+
+    Example:
+        >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+        >>> from thot.tools.search.ontology_scorer import OntologyScorer, OntologyScorerConfig
+        >>> class _Norm:
+        ...     def normalize(self, text): return str(text).lower().strip()
+        >>> bo = BusinessOntology([BusinessConcept("C1", "Maritime")])
+        >>> scorer = OntologyScorer(bo, _Norm(), OntologyScorerConfig())
+        >>> scorer.score(["C1"], ["C1"])
+        1.0
+    """
 
     def __init__(
         self,
@@ -55,6 +78,16 @@ class OntologyScorer:
         normalizer: TextNormalizer,
         config: OntologyScorerConfig,
     ) -> None:
+        """Wire ontology, normalizer, and scoring config.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> from thot.tools.search.ontology_scorer import OntologyScorer, OntologyScorerConfig
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> OntologyScorer(BusinessOntology([]), _Norm(), OntologyScorerConfig()).config.enabled
+            True
+        """
         self.ontology = ontology
         self.normalizer = normalizer
         self.config = config
@@ -63,7 +96,17 @@ class OntologyScorer:
     def extract_document_concepts(
         self, json_ld: str | dict[str, Any]
     ) -> list[str]:
-        """Extract concept ids / normalized strings from document json_ld."""
+        """Extract concept ids / normalized strings from document json_ld.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> from thot.tools.search.ontology_scorer import OntologyScorer, OntologyScorerConfig
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> scorer = OntologyScorer(BusinessOntology([]), _Norm(), OntologyScorerConfig())
+            >>> scorer.extract_document_concepts('[{"identifier": "C1"}]')
+            ['c1', 'C1']
+        """
         if isinstance(json_ld, str):
             if not json_ld.strip():
                 return []
@@ -99,7 +142,17 @@ class OntologyScorer:
     def concepts_for_document(
         self, source_doc_id: str, json_ld: str
     ) -> list[str]:
-        """Cached concept extraction keyed by document id."""
+        """Cached concept extraction keyed by document id.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> from thot.tools.search.ontology_scorer import OntologyScorer, OntologyScorerConfig
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> scorer = OntologyScorer(BusinessOntology([]), _Norm(), OntologyScorerConfig())
+            >>> scorer.concepts_for_document("doc1", '[{"identifier": "C1"}]')
+            ['c1', 'C1']
+        """
         cached = self._doc_cache.get(source_doc_id)
         if cached is not None:
             return cached
@@ -115,7 +168,17 @@ class OntologyScorer:
         concept_ids: list[str] | None = None,
         linked_concept_ids: list[str] | None = None,
     ) -> list[str]:
-        """Prefer indexed chunk concept fields; else document json_ld."""
+        """Prefer indexed chunk concept fields; else document json_ld.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> from thot.tools.search.ontology_scorer import OntologyScorer, OntologyScorerConfig
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> scorer = OntologyScorer(BusinessOntology([]), _Norm(), OntologyScorerConfig())
+            >>> scorer.concepts_for_hit("doc1", concept_ids=["C1", "C2"])
+            ['C1', 'C2']
+        """
         indexed: list[str] = []
         seen: set[str] = set()
         for raw in list(concept_ids or []) + list(linked_concept_ids or []):
@@ -142,7 +205,18 @@ class OntologyScorer:
         query_concept_ids: list[str],
         document_concepts: list[str],
     ) -> float:
-        """Best-match ontology overlap in ``[0, 1]`` (or neutral)."""
+        """Best-match ontology overlap in ``[0, 1]`` (or neutral).
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> from thot.tools.search.ontology_scorer import OntologyScorer, OntologyScorerConfig
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> bo = BusinessOntology([BusinessConcept("C1", "Maritime")])
+            >>> scorer = OntologyScorer(bo, _Norm(), OntologyScorerConfig())
+            >>> scorer.score(["C1"], ["C1"])
+            1.0
+        """
         if not self.config.enabled:
             return self.config.neutral_score
         if not query_concept_ids:
@@ -186,6 +260,23 @@ class OntologyRescorer:
     """Blend first-stage ranks with ontology overlap (optional Graph-RAG stage).
 
     Controlled by ``dual_hybrid.ontology_scoring.enabled`` (default false).
+
+    Example:
+        >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+        >>> from thot.tools.search.ontology_scorer import (
+        ...     OntologyRescorer,
+        ...     OntologyScorer,
+        ...     OntologyScorerConfig,
+        ... )
+        >>> class _Norm:
+        ...     def normalize(self, text): return str(text).lower().strip()
+        >>> bo = BusinessOntology([BusinessConcept("C1", "Maritime")])
+        >>> rescorer = OntologyRescorer(
+        ...     OntologyScorer(bo, _Norm(), OntologyScorerConfig()),
+        ...     weight=0.0,
+        ... )
+        >>> rescorer.rescore(["C1"], [("doc1", 0.9, ["C1"])])
+        [('doc1', 0.9)]
     """
 
     def __init__(
@@ -194,6 +285,23 @@ class OntologyRescorer:
         *,
         weight: float = 0.13,
     ) -> None:
+        """Store scorer and blend weight for ontology rescoring.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessOntology
+            >>> from thot.tools.search.ontology_scorer import (
+            ...     OntologyRescorer,
+            ...     OntologyScorer,
+            ...     OntologyScorerConfig,
+            ... )
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> rescorer = OntologyRescorer(
+            ...     OntologyScorer(BusinessOntology([]), _Norm(), OntologyScorerConfig())
+            ... )
+            >>> rescorer.weight
+            0.13
+        """
         self.scorer = scorer
         self.weight = max(0.0, min(1.0, float(weight)))
 
@@ -207,6 +315,23 @@ class OntologyRescorer:
         Returns:
             ``(doc_id, blended_score)`` best first. When disabled / no query
             concepts / weight=0, returns first-stage order unchanged.
+
+        Example:
+            >>> from thot.tools.search.business_ontology import BusinessConcept, BusinessOntology
+            >>> from thot.tools.search.ontology_scorer import (
+            ...     OntologyRescorer,
+            ...     OntologyScorer,
+            ...     OntologyScorerConfig,
+            ... )
+            >>> class _Norm:
+            ...     def normalize(self, text): return str(text).lower().strip()
+            >>> bo = BusinessOntology([BusinessConcept("C1", "Maritime")])
+            >>> rescorer = OntologyRescorer(
+            ...     OntologyScorer(bo, _Norm(), OntologyScorerConfig()),
+            ...     weight=0.0,
+            ... )
+            >>> rescorer.rescore(["C1"], [("doc1", 0.9, ["C1"])])
+            [('doc1', 0.9)]
         """
         if (
             not self.scorer.config.enabled
@@ -235,7 +360,13 @@ class OntologyRescorer:
 
 
 def _collect_identifiers(node: Any, out: list[str] | None = None) -> list[str]:
-    """Collect identifier / @id / concept_id strings from JSON-LD."""
+    """Collect identifier / @id / concept_id strings from JSON-LD.
+
+    Example:
+        >>> from thot.tools.search.ontology_scorer import _collect_identifiers
+        >>> _collect_identifiers({"identifier": "C1", "name": "Maritime"})
+        ['C1']
+    """
     if out is None:
         out = []
     if isinstance(node, dict):
@@ -256,7 +387,13 @@ def _collect_identifiers(node: Any, out: list[str] | None = None) -> list[str]:
 
 
 def _collect_labels(node: Any, out: list[str] | None = None) -> list[str]:
-    """Walk JSON-LD-ish structures collecting string labels."""
+    """Walk JSON-LD-ish structures collecting string labels.
+
+    Example:
+        >>> from thot.tools.search.ontology_scorer import _collect_labels
+        >>> _collect_labels({"name": "Maritime", "nested": {"label": "Naval"}})
+        ['Maritime', 'Naval']
+    """
     if out is None:
         out = []
     if isinstance(node, dict):

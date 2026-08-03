@@ -133,7 +133,13 @@ def slug_to_predicate_name(slug: str) -> str:
 
 @dataclass(frozen=True)
 class OntologyVocabulary:
-    """Per-document class and predicate vocabulary from clustering."""
+    """Per-document class and predicate vocabulary from clustering.
+    
+        Example:
+            >>> from thot.tasks.document_ontology.OntologyVocabulary import OntologyVocabulary
+            >>> callable(OntologyVocabulary)
+            True
+    """
 
     ner_class_map: dict[str, str] = field(default_factory=dict)
     node_classes: frozenset[str] = field(default_factory=frozenset)

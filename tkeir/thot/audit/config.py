@@ -18,7 +18,21 @@ from pathlib import Path
 
 @dataclass(frozen=True)
 class AuditSettings:
-    """Runtime settings for audit API, archiver, and sinks."""
+    """Runtime settings for audit API, archiver, and sinks.
+
+    Example:
+        >>> from pathlib import Path
+        >>> from thot.audit.config import AuditSettings
+        >>> s = AuditSettings(
+        ...     hot_store_url="sqlite:///tmp/hot.db",
+        ...     worm_root=Path("/tmp/worm"),
+        ...     subject_keys_path=Path("/tmp/keys.db"),
+        ...     host="127.0.0.1", port=8093,
+        ...     auth_enabled=False, dev_token=None, sink_mode="dual",
+        ... )
+        >>> s.port
+        8093
+    """
 
     hot_store_url: str | None
     worm_root: Path
@@ -31,6 +45,19 @@ class AuditSettings:
 
 
 def _env_bool(name: str, default: bool) -> bool:
+    """Parse a boolean environment variable.
+
+    Example:
+        >>> import os
+        >>> from thot.audit.config import _env_bool
+        >>> _ = os.environ.pop("AUDIT_TEST_BOOL", None)
+        >>> _env_bool("AUDIT_TEST_BOOL", False)
+        False
+        >>> os.environ["AUDIT_TEST_BOOL"] = "on"
+        >>> _env_bool("AUDIT_TEST_BOOL", False)
+        True
+        >>> del os.environ["AUDIT_TEST_BOOL"]
+    """
     raw = os.getenv(name)
     if raw is None:
         return default
@@ -39,7 +66,18 @@ def _env_bool(name: str, default: bool) -> bool:
 
 @lru_cache(maxsize=1)
 def audit_settings() -> AuditSettings:
-    """Load audit settings once per process."""
+    """Load audit settings once per process.
+
+    Returns:
+        Cached ``AuditSettings`` instance.
+
+    Example:
+        >>> from thot.audit.config import audit_settings
+        >>> audit_settings.cache_clear()
+        >>> s = audit_settings()
+        >>> s.port > 0
+        True
+    """
     from thot.core.TkeirPaths import repo_root
 
     workspace_env = os.getenv("TKEIR_WORKSPACE") or os.getenv("WORKSPACE")

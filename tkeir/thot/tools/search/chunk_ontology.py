@@ -45,11 +45,33 @@ _EXPANSION_HUB_PREFIXES = (
 
 
 def _is_expansion_hub(concept_id: str) -> bool:
+    """Return whether a concept id is a cross-cutting expansion hub.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import _is_expansion_hub
+        >>> _is_expansion_hub("CAUSAL_INCREASE")
+        True
+        >>> _is_expansion_hub("MARITIME_ANALYTICS")
+        False
+    """
     cid = (concept_id or "").strip().upper()
     return any(cid.startswith(prefix) for prefix in _EXPANSION_HUB_PREFIXES)
 
 
 def _labels_from_concept_row(raw: dict[str, Any]) -> list[str]:
+    """Collect searchable labels from one business-ontology concept row.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import _labels_from_concept_row
+        >>> _labels_from_concept_row(
+        ...     {
+        ...         "concept_id": "C1",
+        ...         "preferred_label": "Maritime",
+        ...         "synonyms": ["Naval"],
+        ...     }
+        ... )
+        ['Maritime', 'Naval']
+    """
     labels = [str(raw.get("preferred_label") or raw.get("concept_id") or "")]
     labels.extend(str(x) for x in raw.get("synonyms") or [] if x)
     labels.extend(str(x) for x in raw.get("surface_forms") or [] if x)
@@ -73,6 +95,17 @@ def _expansion_labels_for_row(
 
     Causal / directionality hubs return empty — their synonym lists are too
     generic for ranking. Other concepts keep preferred + bridge partners.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import _expansion_labels_for_row
+        >>> _expansion_labels_for_row(
+        ...     {
+        ...         "concept_id": "C1",
+        ...         "preferred_label": "Maritime",
+        ...         "paraphrase_bridges": [{"claim": "ship", "document": "vessel"}],
+        ...     }
+        ... )
+        ['Maritime', 'ship', 'vessel']
     """
     cid = str(raw.get("concept_id") or "").strip()
     if _is_expansion_hub(cid):
@@ -103,7 +136,16 @@ def _expansion_labels_for_row(
 
 
 def _bridge_hit_in_text(raw: dict[str, Any], haystack_cf: str) -> bool:
-    """True when any paraphrase-bridge side appears in the chunk."""
+    """True when any paraphrase-bridge side appears in the chunk.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import _bridge_hit_in_text
+        >>> _bridge_hit_in_text(
+        ...     {"paraphrase_bridges": [{"claim": "vessel", "document": "ship"}]},
+        ...     "the vessel departed",
+        ... )
+        True
+    """
     for bridge in raw.get("paraphrase_bridges") or []:
         if not isinstance(bridge, dict):
             continue
@@ -115,7 +157,13 @@ def _bridge_hit_in_text(raw: dict[str, Any], haystack_cf: str) -> bool:
 
 
 def _label_in_text(label: str, haystack_cf: str) -> bool:
-    """True when ``label`` appears in casefolded text with token boundaries."""
+    """True when ``label`` appears in casefolded text with token boundaries.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import _label_in_text
+        >>> _label_in_text("Maritime", "naval maritime analytics")
+        True
+    """
     cleaned = (label or "").strip()
     if len(cleaned) < 3:
         return False
@@ -126,14 +174,28 @@ def _label_in_text(label: str, haystack_cf: str) -> bool:
 
 
 def _chunk_match_text(chunk: dict[str, Any]) -> str:
-    """Body text used to decide whether a concept belongs to this chunk."""
+    """Body text used to decide whether a concept belongs to this chunk.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import _chunk_match_text
+        >>> _chunk_match_text({"text_raw": "Hello world"})
+        'Hello world'
+    """
     return str(
         chunk.get("text_raw") or chunk.get("search_vector_payload") or ""
     ).strip()
 
 
 def extract_concepts_from_json_ld(json_ld: str | dict[str, Any]) -> list[str]:
-    """Collect concept identifiers / short labels from document JSON-LD."""
+    """Collect concept identifiers / short labels from document JSON-LD.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import extract_concepts_from_json_ld
+        >>> extract_concepts_from_json_ld(
+        ...     '[{"identifier": "C1", "name": "Maritime Analytics"}]'
+        ... )
+        ['C1', 'Maritime Analytics']
+    """
     if isinstance(json_ld, str):
         if not json_ld.strip():
             return []
@@ -180,6 +242,11 @@ def _kg_node_text(node: Any) -> str:
 
     Real kg slots use ``content`` / ``lemma_content`` (lists or strings), not
     ``text`` / ``lemma``. Also accept simple string nodes and alternate keys.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import _kg_node_text
+        >>> _kg_node_text({"content": ["Acme Corp"]})
+        'Acme Corp'
     """
     if node is None:
         return ""
@@ -223,7 +290,15 @@ def _kg_node_text(node: Any) -> str:
 
 
 def extract_svo_concept_labels(document: dict[str, Any]) -> list[str]:
-    """Pull entity-like strings from SVO / kg structures on the document."""
+    """Pull entity-like strings from SVO / kg structures on the document.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import extract_svo_concept_labels
+        >>> extract_svo_concept_labels(
+        ...     {"kg": [{"subject": {"content": "Acme"}, "value": {"content": "Widget"}}]}
+        ... )
+        ['Acme', 'Widget']
+    """
     labels: list[str] = []
     seen: set[str] = set()
 
@@ -264,7 +339,15 @@ def extract_svo_concept_labels(document: dict[str, Any]) -> list[str]:
 
 
 def extract_ner_concept_labels(document: dict[str, Any]) -> list[str]:
-    """Pull surface strings from ``content_ner`` / ``title_ner`` / chunk entities."""
+    """Pull surface strings from ``content_ner`` / ``title_ner`` / chunk entities.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import extract_ner_concept_labels
+        >>> extract_ner_concept_labels(
+        ...     {"content_ner": [{"text": "Paris", "label": "GPE"}]}
+        ... )
+        ['Paris']
+    """
     labels: list[str] = []
     seen: set[str] = set()
 
@@ -313,6 +396,22 @@ def match_external_concepts(
 
     Returns:
         ``(concept_ids, linked_concept_ids, labels)``.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import match_external_concepts
+        >>> match_external_concepts(
+        ...     "Maritime analytics in the Red Sea",
+        ...     {
+        ...         "concepts": [
+        ...             {
+        ...                 "concept_id": "MARITIME",
+        ...                 "preferred_label": "Maritime",
+        ...                 "broader": [],
+        ...             }
+        ...         ]
+        ...     },
+        ... )
+        (['MARITIME'], [], ['Maritime'])
     """
     if not ontology_payload or not text.strip():
         return [], [], []
@@ -418,6 +517,15 @@ def chunk_ontology_fields(
     Note: at search / RAG time, ``kg`` / ``content_ner`` / ``keywords`` are
     re-read from ``analyzed_document.json`` for display fusion — this index
     helper does not change the ingest NLP strategy.
+
+    Example:
+        >>> from thot.tools.search.chunk_ontology import chunk_ontology_fields
+        >>> fields = chunk_ontology_fields(
+        ...     {"text_raw": "Maritime analytics"},
+        ...     {"document_ontology": {"json_ld": '[{"identifier": "MARITIME"}]'}},
+        ... )
+        >>> "concept_ids" in fields and "ontology_text" in fields
+        True
     """
     ontology = document.get("document_ontology") or {}
     json_ld = ontology.get("json_ld") or ontology.get(

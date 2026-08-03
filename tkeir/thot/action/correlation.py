@@ -66,7 +66,13 @@ def generate_trace_id() -> str:
 
 
 def _new_span_id() -> str:
-    """Return a new 16-hex W3C span-id (non-zero)."""
+    """Return a new 16-hex W3C span-id (non-zero).
+
+    Example:
+        >>> sid = _new_span_id()
+        >>> len(sid) == 16 and int(sid, 16) != 0
+        True
+    """
     while True:
         value = secrets.token_hex(8)
         if int(value, 16) != 0:
@@ -138,27 +144,65 @@ def correlation_from_headers(
 
 
 def set_trace_context(ctx: TraceContext) -> Token:
-    """Bind ``ctx`` to the current contextvar; return a reset token."""
+    """Bind ``ctx`` to the current contextvar; return a reset token.
+
+    Example:
+        >>> ctx = TraceContext("e" * 32, "01HTESTACTIONID00000000000")
+        >>> token = set_trace_context(ctx)
+        >>> get_trace_context() is ctx
+        True
+        >>> reset_trace_context(token)
+    """
     return _trace_ctx.set(ctx)
 
 
 def reset_trace_context(token: Token) -> None:
-    """Restore the previous trace context from ``token``."""
+    """Restore the previous trace context from ``token``.
+
+    Example:
+        >>> ctx = TraceContext("f" * 32, "01HTESTACTIONID00000000000")
+        >>> token = set_trace_context(ctx)
+        >>> reset_trace_context(token)
+        >>> get_trace_context() is None
+        True
+    """
     _trace_ctx.reset(token)
 
 
 def get_trace_context() -> TraceContext | None:
-    """Return the bound :class:`TraceContext`, if any."""
+    """Return the bound :class:`TraceContext`, if any.
+
+    Example:
+        >>> bound = get_trace_context()
+        >>> bound is None or isinstance(bound, TraceContext)
+        True
+    """
     return _trace_ctx.get()
 
 
 def current_correlation_id() -> str | None:
-    """Return the bound correlation id, or ``None``."""
+    """Return the bound correlation id, or ``None``.
+
+    Example:
+        >>> ctx = TraceContext("a" * 32, "01HTESTACTIONID00000000000")
+        >>> token = set_trace_context(ctx)
+        >>> current_correlation_id() == "a" * 32
+        True
+        >>> reset_trace_context(token)
+    """
     ctx = _trace_ctx.get()
     return None if ctx is None else ctx.correlation_id
 
 
 def current_action_id() -> str | None:
-    """Return the bound action id, or ``None``."""
+    """Return the bound action id, or ``None``.
+
+    Example:
+        >>> ctx = TraceContext("b" * 32, "01HTESTACTIONID00000000000")
+        >>> token = set_trace_context(ctx)
+        >>> current_action_id() == "01HTESTACTIONID00000000000"
+        True
+        >>> reset_trace_context(token)
+    """
     ctx = _trace_ctx.get()
     return None if ctx is None else ctx.action_id

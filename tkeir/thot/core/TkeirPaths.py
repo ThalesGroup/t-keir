@@ -71,6 +71,11 @@ def net_models_dir() -> str:
 
     Returns:
         Absolute path to ``resources/modeling/net``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import net_models_dir
+        >>> net_models_dir().endswith("resources/modeling/net")
+        True
     """
     return os.path.join(package_root(), "resources", "modeling", "net")
 
@@ -80,6 +85,11 @@ def bge_m3_model_dir() -> str:
 
     Returns:
         Absolute path to ``resources/modeling/net/bge-m3``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import bge_m3_model_dir
+        >>> bge_m3_model_dir().endswith("resources/modeling/net/bge-m3")
+        True
     """
     return os.path.join(net_models_dir(), "bge-m3")
 
@@ -214,7 +224,16 @@ def evaluation_generate_report_path() -> str:
 
 
 def evaluation_rag_report_path() -> str:
-    """Deprecated alias for :func:`evaluation_generate_report_path`."""
+    """Deprecated alias for :func:`evaluation_generate_report_path`.
+
+    Example:
+        >>> from thot.core.TkeirPaths import (
+        ...     evaluation_rag_report_path,
+        ...     evaluation_generate_report_path,
+        ... )
+        >>> evaluation_rag_report_path() == evaluation_generate_report_path()
+        True
+    """
     return evaluation_generate_report_path()
 
 

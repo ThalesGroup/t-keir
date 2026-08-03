@@ -55,6 +55,13 @@ def ensure_golden_chunks_for_index(document: dict[str, Any]) -> dict[str, Any]:
 
     When NLP produced no chunks, synthesize one from content/title so
     passages can still be embedded and upserted.
+    
+
+    Example:
+        >>> from thot.tools.ingest.index_passages import ensure_golden_chunks_for_index
+        >>> doc = ensure_golden_chunks_for_index({"source_doc_id": "d1", "title": "Hi"})
+        >>> doc["golden_chunks"][0]["text_raw"]
+        'Hi'
     """
     chunks = document.get("golden_chunks") or []
     for chunk in chunks:
@@ -124,6 +131,15 @@ def _ontology_fields_for_chunk(
     Concept ids feed Vespa ``ontology_concepts``. Expansion labels are kept for
     dumps / analysis only — sparse vectors stay pure BGE-M3. Document
     ``core_concepts`` stay on the analyzed dump, not on every passage.
+
+    Example:
+        >>> chunk = {"text_raw": "Maritime analytics"}
+        >>> document = {
+        ...     "document_ontology": {"json_ld": '[{"identifier": "MARITIME"}]'},
+        ... }
+        >>> concepts, _labels = _ontology_fields_for_chunk(chunk, document, None)
+        >>> "MARITIME" in concepts
+        True
     """
     fields = chunk_ontology_fields(
         chunk, document, ontology_payload=ontology_payload
@@ -158,7 +174,16 @@ def _ontology_concept_list(
     document: dict[str, Any],
     ontology_payload: dict[str, Any] | None,
 ) -> list[str]:
-    """Build ``ontology_concepts`` from SVO / json_ld / external ontology."""
+    """Build ``ontology_concepts`` from SVO / json_ld / external ontology.
+
+    Example:
+        >>> chunk = {"text_raw": "Maritime analytics"}
+        >>> document = {
+        ...     "document_ontology": {"json_ld": '[{"identifier": "MARITIME"}]'},
+        ... }
+        >>> "MARITIME" in _ontology_concept_list(chunk, document, None)
+        True
+    """
     concepts, _labels = _ontology_fields_for_chunk(
         chunk, document, ontology_payload
     )
@@ -166,7 +191,12 @@ def _ontology_concept_list(
 
 
 def _resolve_index_dump_dir(dump: IndexDumpConfig) -> Path:
-    """Resolve dump directory (absolute, or relative to repo root)."""
+    """Resolve dump directory (absolute, or relative to repo root).
+
+    Example:
+        >>> _resolve_index_dump_dir(IndexDumpConfig(path="reports/index_dumps")).name
+        'index_dumps'
+    """
     raw = (
         dump.path or IndexDumpConfig().path
     ).strip() or IndexDumpConfig().path
@@ -177,7 +207,12 @@ def _resolve_index_dump_dir(dump: IndexDumpConfig) -> Path:
 
 
 def _safe_dump_stem(source_ref: str) -> str:
-    """Filesystem-safe stem from a document / BEIR source ref."""
+    """Filesystem-safe stem from a document / BEIR source ref.
+
+    Example:
+        >>> _safe_dump_stem("beir/scifact/doc-1")
+        'beir_scifact_doc-1'
+    """
     cleaned = _SAFE_NAME_RE.sub("_", (source_ref or "document").strip())
     cleaned = cleaned.strip("._") or "document"
     return cleaned[:180]
@@ -197,6 +232,20 @@ def _write_index_dump(
     ``dump.save_document`` is true, also stores the full analyzed pipeline
     document (with external ontology + KG provenance) under
     ``analyzed_document``.
+
+    Example:
+        >>> import tempfile
+        >>> from thot.tools.search.dual_hybrid_config import IndexDumpConfig
+        >>> with tempfile.TemporaryDirectory() as temp_dir:
+        ...     dump = IndexDumpConfig(enabled=True, path=temp_dir)
+        ...     path = _write_index_dump(
+        ...         dump=dump,
+        ...         source_ref="doc1",
+        ...         dataset=None,
+        ...         passages=[{"chunk_id": "c1"}],
+        ...     )
+        ...     path is not None and path.is_file()
+        True
     """
     if not dump.enabled or not passages:
         return None
@@ -232,6 +281,20 @@ def _passage_fields(
     embedding_dim: int,
     userspace_id: str | None = None,
 ) -> dict[str, Any]:
+    """Build Vespa passage field dict for one golden chunk.
+
+    Example:
+        >>> fields = _passage_fields(
+        ...     chunk={"chunk_id": "c1", "text_raw": "hello"},
+        ...     document={"source_doc_id": "doc1"},
+        ...     dense=[0.1, 0.2],
+        ...     sparse={"3": 0.5},
+        ...     ontology_concepts=["c1"],
+        ...     embedding_dim=2,
+        ... )
+        >>> fields["source_ref"]
+        'doc1'
+    """
     text = chunk_embedding_text(chunk) or str(chunk.get("text_raw") or "")
     source_ref = str(
         document.get("source_doc_id")
@@ -278,6 +341,13 @@ async def index_pipeline_document(
 
     Returns:
         Document/passage counts and timings.
+    
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.index_passages import index_pipeline_document
+        >>> inspect.iscoroutinefunction(index_pipeline_document)
+        True
     """
     from thot.tools.search.user_space import resolve_vespa_user_space
     from thot.tools.search.vespa_client import normalize_user_space

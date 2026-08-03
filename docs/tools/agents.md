@@ -24,7 +24,7 @@ RAG — see [MCP — Who uses it](mcp.md#who-uses-it-external-vs-agents).
 POST /agent/runs { agent | workflow, goal, params }
         │
         ▼
-   RunStore (.tkeir-agent/runs/{id}/)
+   RunStore (workspace/agent/runs/{id}/)
         │
    ┌────┴────────────────────────────┐
    │ single agent          workflow  │
@@ -405,10 +405,12 @@ These call **other** MCP servers; they are unrelated to whether local
 
 ## Run store layout
 
-Root: `AGENT_ROOT` (Make: `.tkeir-agent/`).
+Root: ``AGENT_ROOT`` (Make default: ``workspace/agent/``; override with
+``AGENT_ROOT=…``). Legacy ``.tkeir-agent/`` at the repo root is no longer the
+default.
 
 ```text
-.tkeir-agent/
+workspace/agent/
   runs/{run_id}/
     run.manifest.json # RunState
     blackboard.json # append-only handoff / findings log
@@ -448,7 +450,7 @@ Open [http://localhost:3000/agents](http://localhost:3000/agents) with
 
 | Variable | Default / notes |
 |----------|-----------------|
-| `AGENT_ROOT` | Run store root (Make sets `.tkeir-agent`) |
+| `AGENT_ROOT` | Run store root (Make sets `workspace/agent`) |
 | `AGENT_HOST` / `AGENT_PORT` | `0.0.0.0` / `8092` |
 | `PROVIDER` / `LLM_MODEL` | Same stack as RAG |
 | `MCP_RAG_URL` | RAG base URL for tool handlers |

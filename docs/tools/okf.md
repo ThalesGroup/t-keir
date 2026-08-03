@@ -1,25 +1,29 @@
 # OKF (Open Knowledge Format) — tkeir-okf
 
-> Phase F — export the enriched T-KEIR index as OKF v0.1 bundles; curate and
-> compose with the new `okf_wiki_brief` workflow.
+> Phase F — export the enriched T-KEIR index as **OKF v0.2** bundles per the
+> [Google OKF SPEC](../okf/SPEC.md)
+> ([upstream](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md));
+> curate and compose with `okf_wiki_brief` / `llm_wiki` workflows.
 
 ## What OKF is
 
-OKF v0.1 ([spec](https://okf.md/spec)) represents knowledge as a **directory of
-UTF-8 Markdown files with YAML frontmatter**. The only required field in every
-concept file is `type`. T-KEIR adds producer extensions (`tkeir_*`) that
-conformant consumers ignore (§9).
+OKF v0.2 represents knowledge as a **directory of UTF-8 Markdown files with
+YAML frontmatter**. The only required field in every concept file is `type`.
+Optional SPEC families cover provenance (`sources`), trust (`generated` /
+`verified`), and lifecycle (`status`, `stale_after`). T-KEIR adds producer
+extensions (`tkeir_*`) that conformant consumers ignore.
 
 ```text
 bundle/
 ├── index.md
 ├── log.md
 ├── query_context.md # scoped exports only
-├── wiki.md          # LLMWiki page (scoped exports)
+├── wiki.md          # LLMWiki page (scoped exports / iterative wiki)
 ├── concepts/<doc>.md
 └── chunks/<id>.md
 ```
 
+Vendored full text: [docs/okf/SPEC.md](../okf/SPEC.md).
 ## Where bundles live (workspace / MinIO-ready)
 
 Demo durable OKF + LLM Wiki bundles are written under the shared workspace tree,

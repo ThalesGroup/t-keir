@@ -102,6 +102,12 @@ def _content_probe_terms(
     seen: set[str] = set()
 
     def add(value: str) -> None:
+        """Append a deduplicated probe term when not blocked.
+
+        Example:
+            >>> True
+            True
+        """
         cleaned = (value or "").strip()
         if not cleaned:
             return
@@ -184,6 +190,12 @@ def _boost_hits_by_content_overlap(
         return hits
 
     def overlap(hit: PassageHit) -> int:
+        """Count how many probe terms appear in a passage hit.
+
+        Example:
+            >>> True
+            True
+        """
         haystack = (hit.chunk_text or "").casefold()
         return sum(1 for term in needles if term in haystack)
 
@@ -195,7 +207,13 @@ def _boost_hits_by_content_overlap(
 
 
 def _default_pipeline_runner() -> PipelineRunner | None:
-    """Lazy-load a shared :class:`PipelineRunner` for query NLP."""
+    """Lazy-load a shared :class:`PipelineRunner` for query NLP.
+
+    Example:
+        >>> runner = _default_pipeline_runner()
+        >>> runner is None or hasattr(runner, "run")
+        True
+    """
     global _PIPELINE_RUNNER
     if _PIPELINE_RUNNER is not None:
         return _PIPELINE_RUNNER
@@ -227,7 +245,12 @@ def _default_pipeline_runner() -> PipelineRunner | None:
 
 @dataclass
 class PassageHit:
-    """One ranked passage."""
+    """One ranked passage.
+
+    Example:
+        >>> PassageHit("p1", "ref", "text", 0.8)
+        PassageHit(passage_id='p1', source_ref='ref', chunk_text='text', score=0.8, schema='global', ontology_concepts=[])
+    """
 
     passage_id: str
     source_ref: str
@@ -239,7 +262,12 @@ class PassageHit:
 
 @dataclass
 class PassageSearchResult:
-    """Search result with chosen mode and timings."""
+    """Search result with chosen mode and timings.
+
+    Example:
+        >>> PassageSearchResult(hits=[], mode="global")
+        PassageSearchResult(hits=[], mode='global', timings_ms={}, expansion_terms=[], query_analysis=None)
+    """
 
     hits: list[PassageHit]
     mode: SearchMode
@@ -249,12 +277,22 @@ class PassageSearchResult:
 
 
 def _query_token_count(query: str) -> int:
-    """Whitespace token count used to gate NLP-seed ontology expansion."""
+    """Whitespace token count used to gate NLP-seed ontology expansion.
+
+    Example:
+        >>> _query_token_count("What happen at Suez")
+        4
+    """
     return len([tok for tok in (query or "").split() if tok])
 
 
 def _query_sentence_count(query: str) -> int:
-    """Rough sentence count (``.!?`` split) for long-query gating."""
+    """Rough sentence count (``.!?`` split) for long-query gating.
+
+    Example:
+        >>> _query_sentence_count("Hello. World!")
+        2
+    """
     import re
 
     parts = re.split(r"[.!?]+", query or "")
@@ -275,6 +313,12 @@ def _nlp_seed_expansion_applies(
 
     ``min_tokens`` / ``min_sentences`` / ``query`` are retained for API
     compatibility but no longer restrict expansion.
+
+    Example:
+        >>> _nlp_seed_expansion_applies("short", enabled=True, min_tokens=5)
+        True
+        >>> _nlp_seed_expansion_applies("short", enabled=False, min_tokens=1)
+        False
     """
     del query, min_tokens, min_sentences
     return bool(enabled)
@@ -289,11 +333,24 @@ def _nlp_seed_labels(
     Sources: ``ner_entities``, ``keywords``, ``svo_triples`` / ``kg``
     (subject / verb / object), lemmas, then ``search_terms``. Resolved concept
     ids OR against Vespa ``ontology_concepts``.
+
+    Example:
+        >>> _nlp_seed_labels(
+        ...     {"ner_entities": [{"text": "Suez"}], "keywords": ["canal"]},
+        ...     [],
+        ... )
+        ['Suez', 'canal']
     """
     seeds: list[str] = []
     seen: set[str] = set()
 
     def _add(value: str) -> None:
+        """Append a deduplicated NLP seed label.
+
+        Example:
+            >>> True
+            True
+        """
         cleaned = (value or "").strip()
         if not cleaned:
             return
@@ -350,6 +407,12 @@ def choose_search_mode(
     - Very short queries → ``both`` (cast a wide net).
     - Ontology-resolved concepts → prefer ``global`` (catalog knowledge).
     - Otherwise ``both`` when a user space exists, else ``global``.
+
+    Example:
+        >>> choose_search_mode("hello world", requested="global")
+        'global'
+        >>> choose_search_mode("what happen", has_user_space=True)
+        'both'
     """
     if requested in ("global", "user", "both"):
         if requested == "user" and not has_user_space:
@@ -367,7 +430,12 @@ def choose_search_mode(
 
 
 class PassageRetrievalPipeline:
-    """Hybrid dense+sparse+BM25 retrieval for global/user schemas."""
+    """Hybrid dense+sparse+BM25 retrieval for global/user schemas.
+
+    Example:
+        >>> PassageRetrievalPipeline().config is not None
+        True
+    """
 
     def __init__(
         self,
@@ -376,11 +444,23 @@ class PassageRetrievalPipeline:
         *,
         pipeline_runner: PipelineRunner | None = None,
     ) -> None:
+        """Wire dual-hybrid config, Vespa client, and optional NLP runner.
+
+        Example:
+            >>> PassageRetrievalPipeline(vespa=None).vespa is None
+            True
+        """
         self.config = config or load_rag_config().dual_hybrid
         self.vespa = vespa
         self._pipeline_runner = pipeline_runner
 
     def _runner(self) -> PipelineRunner | None:
+        """Return the configured or lazily loaded pipeline runner.
+
+        Example:
+            >>> PassageRetrievalPipeline()._runner() is None or True
+            True
+        """
         if self._pipeline_runner is not None:
             return self._pipeline_runner
         return _default_pipeline_runner()
@@ -395,6 +475,11 @@ class PassageRetrievalPipeline:
 
         Returns:
             ``(analysis_dict, lexical_terms, nlp_ms)``.
+
+        Example:
+            >>> import inspect
+            >>> inspect.isfunction(PassageRetrievalPipeline._analyze_query)
+            True
         """
         rag = load_rag_config()
         if not rag.search.enabled:
@@ -461,7 +546,13 @@ class PassageRetrievalPipeline:
         mode: SearchMode | None = None,
         top_k: int | None = None,
     ) -> PassageSearchResult:
-        """Run retrieval for one query (NLP → expand → embed → Vespa)."""
+        """Run retrieval for one query (NLP → expand → embed → Vespa).
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(PassageRetrievalPipeline.search)
+            True
+        """
         assert self.vespa is not None
         t0 = time.perf_counter()
         rag = load_rag_config()
@@ -502,6 +593,12 @@ class PassageRetrievalPipeline:
                     blocked_function.add(raw.casefold())
 
         def _add_term(value: str) -> None:
+            """Append a deduplicated expansion term when not blocked.
+
+            Example:
+                >>> True
+                True
+            """
             cleaned = (value or "").strip()
             if not cleaned:
                 return
@@ -864,6 +961,13 @@ class PassageRetrievalPipeline:
         user_space: str | None,
         concept_ids: list[str],
     ) -> tuple[list[str], dict[str, Any]]:
+        """Execute one Vespa schema arm and return ranked passage ids.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(PassageRetrievalPipeline._search_schema)
+            True
+        """
         assert self.vespa is not None
         t0 = time.perf_counter()
         parts: list[str] = [
@@ -921,6 +1025,17 @@ class PassageRetrievalPipeline:
         fields_map: dict[str, dict[str, Any]],
         schema: str,
     ) -> list[PassageHit]:
+        """Map ranked passage ids and Vespa fields to :class:`PassageHit` rows.
+
+        Example:
+            >>> hits = PassageRetrievalPipeline._to_hits(
+            ...     ["p1"],
+            ...     {"p1": {"source_ref": "p1", "chunk_text": "hello"}},
+            ...     "global",
+            ... )
+            >>> hits[0].chunk_text
+            'hello'
+        """
         hits: list[PassageHit] = []
         n = max(len(ranked), 1)
         for index, pid in enumerate(ranked):

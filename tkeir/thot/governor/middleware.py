@@ -69,6 +69,31 @@ def _build_blocked_record(
     ended: str,
     policy,
 ) -> ActionRecord:
+    """Build an audit ActionRecord for a governor-blocked request.
+
+    Example:
+        >>> from starlette.requests import Request
+        >>> from thot.governor.middleware import _build_blocked_record
+        >>> from thot.governor.models import PolicyDecision
+        >>> async def receive():
+        ...     return {"type": "http.request", "body": b"", "more_body": False}
+        >>> scope = {
+        ...     "type": "http", "asgi": {"version": "3.0"}, "http_version": "1.1",
+        ...     "method": "POST", "path": "/ingest", "raw_path": b"/ingest",
+        ...     "query_string": b"", "headers": [], "client": ("127.0.0.1", 1),
+        ...     "server": ("test", 80),
+        ... }
+        >>> req = Request(scope, receive)
+        >>> policy = PolicyDecision(
+        ...     result="deny", actor_id="u1", intent="ingest", message="blocked"
+        ... )
+        >>> rec = _build_blocked_record(
+        ...     req, service="svc", started="2026-01-01T00:00:00Z",
+        ...     ended="2026-01-01T00:00:01Z", policy=policy,
+        ... )
+        >>> rec.execution.status
+        'blocked'
+    """
     body = b""
     ctx = correlation_from_headers(
         request.headers.get(TRACEPARENT_HEADER),
@@ -109,7 +134,15 @@ def _build_blocked_record(
 
 
 class GovernorEnforceMiddleware(BaseHTTPMiddleware):
-    """Block or escalate requests when governor mode is enforce."""
+    """Block or escalate requests when governor mode is enforce.
+
+    Example:
+        >>> from starlette.applications import Starlette
+        >>> from thot.governor.middleware import GovernorEnforceMiddleware
+        >>> mw = GovernorEnforceMiddleware(Starlette())
+        >>> mw._service is not None
+        True
+    """
 
     def __init__(
         self,
@@ -119,6 +152,14 @@ class GovernorEnforceMiddleware(BaseHTTPMiddleware):
         service: str | None = None,
         evaluator: PolicyEvaluator | None = None,
     ) -> None:
+        """Configure middleware with optional sink, service name, and evaluator.
+
+        Example:
+            >>> from starlette.applications import Starlette
+            >>> from thot.governor.middleware import GovernorEnforceMiddleware
+            >>> GovernorEnforceMiddleware(Starlette(), service="demo")._service
+            'demo'
+        """
         super().__init__(app)
         self._sink = sink if sink is not None else default_action_sink()
         self._service = service or _service_name()
@@ -126,6 +167,29 @@ class GovernorEnforceMiddleware(BaseHTTPMiddleware):
         self._evaluator_error: str | None = None
 
     def _get_evaluator(self) -> PolicyEvaluator:
+        """Lazy-init policy evaluator from governor settings.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from starlette.applications import Starlette
+            >>> from thot.governor.approvals import ApprovalQueue
+            >>> from thot.governor.budgets import BudgetStore
+            >>> from thot.governor.config import governor_settings
+            >>> from thot.governor.flags import RuntimeFlagsStore
+            >>> from thot.governor.middleware import GovernorEnforceMiddleware
+            >>> from thot.governor.policy import PolicyEvaluator
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     s = governor_settings()
+            ...     ev = PolicyEvaluator(
+            ...         s, RuntimeFlagsStore(Path(td) / "f.json"),
+            ...         BudgetStore(Path(td) / "b.db", s),
+            ...         ApprovalQueue(Path(td) / "a.json"),
+            ...     )
+            ...     mw = GovernorEnforceMiddleware(Starlette(), evaluator=ev)
+            ...     mw._get_evaluator() is ev
+            True
+        """
         if self._evaluator is not None:
             return self._evaluator
         settings = governor_settings()
@@ -145,6 +209,14 @@ class GovernorEnforceMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable
     ) -> Response:
+        """Evaluate governor policy and optionally block the request.
+
+        Example:
+            >>> import inspect
+            >>> from thot.governor.middleware import GovernorEnforceMiddleware
+            >>> inspect.iscoroutinefunction(GovernorEnforceMiddleware.dispatch)
+            True
+        """
         path = request.url.path
         if path in _SKIP_ENFORCE_PATHS:
             return await call_next(request)

@@ -37,9 +37,23 @@ LOGGER = logging.getLogger(__name__)
 
 
 class AppState:
-    """Shared audit runtime."""
+    """Shared audit runtime attached to ``FastAPI.state.audit``.
+
+    Example:
+        >>> from thot.audit.app import AppState
+        >>> isinstance(AppState().worm.list_segments(), list)
+        True
+    """
 
     def __init__(self) -> None:
+        """Initialize hot store, WORM store, and subject key store.
+
+        Example:
+            >>> from thot.audit.app import AppState
+            >>> state = AppState()
+            >>> state.settings.port > 0
+            True
+        """
         settings = audit_settings()
         self.settings = settings
         self.hot: HotStore | None = open_hot_store(settings.hot_store_url)
@@ -49,6 +63,14 @@ class AppState:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Configure logging and audit ``AppState`` at startup.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import lifespan
+        >>> inspect.isasyncgenfunction(lifespan.__wrapped__)
+        True
+    """
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-audit"))
     app.state.audit = AppState()
     try:
@@ -78,12 +100,28 @@ app.add_middleware(
 
 
 class ActionsResponse(BaseModel):
+    """Paginated action query response.
+
+    Example:
+        >>> from thot.audit.app import ActionsResponse
+        >>> ActionsResponse(total=0).total
+        0
+    """
+
     total: int
     items: list[dict[str, Any]] = Field(default_factory=list)
 
 
 @app.get("/health")
 async def health() -> dict[str, str]:
+    """Liveness probe (requires hot store).
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import health
+        >>> inspect.iscoroutinefunction(health)
+        True
+    """
     state: AppState = app.state.audit
     if state.hot is None:
         raise HTTPException(status_code=503, detail="Hot store unavailable")
@@ -92,6 +130,14 @@ async def health() -> dict[str, str]:
 
 @app.get("/ready")
 async def ready() -> dict[str, str]:
+    """Readiness probe (requires hot store).
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import ready
+        >>> inspect.iscoroutinefunction(ready)
+        True
+    """
     state: AppState = app.state.audit
     if state.hot is None:
         raise HTTPException(status_code=503, detail="Hot store unavailable")
@@ -100,6 +146,14 @@ async def ready() -> dict[str, str]:
 
 @app.get("/metrics")
 async def metrics() -> Response:
+    """Prometheus metrics exposition endpoint.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import metrics
+        >>> inspect.iscoroutinefunction(metrics)
+        True
+    """
     ThotMetrics.create_counter(
         short_name="audit_http",
         function_name="tkeir_audit_http_requests_total",
@@ -122,6 +176,14 @@ async def list_actions(
     offset: int = Query(default=0, ge=0),
     _actor: str = Depends(require_audit_auth),
 ) -> ActionsResponse:
+    """Query sealed ActionRecords from the hot store.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import list_actions
+        >>> inspect.iscoroutinefunction(list_actions)
+        True
+    """
     state: AppState = app.state.audit
     if state.hot is None:
         raise HTTPException(status_code=503, detail="Hot store unavailable")
@@ -147,6 +209,14 @@ async def audit_report(
     format: str = Query(default="json", pattern="^(json|html)$"),
     _actor: str = Depends(require_audit_auth),
 ):
+    """Build JSON or HTML audit report for one correlation id.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import audit_report
+        >>> inspect.iscoroutinefunction(audit_report)
+        True
+    """
     state: AppState = app.state.audit
     if state.hot is None:
         raise HTTPException(status_code=503, detail="Hot store unavailable")
@@ -160,6 +230,14 @@ async def audit_report(
 async def trigger_archive(
     _actor: str = Depends(require_audit_auth),
 ) -> dict[str, str | None]:
+    """Export unarchived hot-store records to WORM.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import trigger_archive
+        >>> inspect.iscoroutinefunction(trigger_archive)
+        True
+    """
     state: AppState = app.state.audit
     if state.hot is None:
         raise HTTPException(status_code=503, detail="Hot store unavailable")
@@ -171,6 +249,14 @@ async def trigger_archive(
 async def audit_verify(
     _actor: str = Depends(require_audit_auth),
 ) -> dict[str, Any]:
+    """Verify hot-store hash chain and WORM segment integrity.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import audit_verify
+        >>> inspect.iscoroutinefunction(audit_verify)
+        True
+    """
     state: AppState = app.state.audit
     if state.hot is None:
         raise HTTPException(status_code=503, detail="Hot store unavailable")
@@ -184,7 +270,14 @@ async def audit_verify(
 
 
 def main() -> None:
-    """CLI entry: server or maintenance subcommands."""
+    """CLI entry: server or maintenance subcommands.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.app import main
+        >>> callable(main)
+        True
+    """
     import sys
 
     if len(sys.argv) > 1 and sys.argv[1] in {

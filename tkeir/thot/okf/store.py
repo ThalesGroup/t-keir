@@ -36,9 +36,29 @@ from thot.tools.search.vespa_client import normalize_user_space
 
 
 class OkfBundleStore:
-    """Read/list/delete per-user OKF bundles under the workspace tree."""
+    """Read/list/delete per-user OKF bundles under the workspace tree.
+
+    Example:
+        >>> import tempfile
+        >>> from thot.okf.store import OkfBundleStore
+        >>> store = OkfBundleStore(root=tempfile.mkdtemp())
+        >>> store.root.is_dir()
+        True
+    """
 
     def __init__(self, root: Path | str | None = None) -> None:
+        """Create a store rooted at ``root`` or the default OKF layout.
+
+        Args:
+            root: Optional flat legacy root; creates the directory when set.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.okf.store import OkfBundleStore
+            >>> store = OkfBundleStore(root=tempfile.mkdtemp())
+            >>> store.flat_root is not None
+            True
+        """
         # Explicit root → legacy flat layout (unit tests / migration tools).
         self.flat_root: Path | None = (
             Path(root).expanduser().resolve() if root is not None else None
@@ -48,12 +68,33 @@ class OkfBundleStore:
 
     @property
     def root(self) -> Path:
-        """Compatibility: flat root when set, else default legacy OKF_ROOT path."""
+        """Compatibility: flat root when set, else default legacy OKF_ROOT path.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> OkfBundleStore(root=td).root == __import__("pathlib").Path(td).resolve()
+            True
+        """
         if self.flat_root is not None:
             return self.flat_root
         return default_okf_root()
 
     def _legacy_flat_root(self) -> Path | None:
+        """Resolve a legacy flat OKF root for migration fallbacks.
+
+        Returns:
+            Existing flat root path, or ``None`` when none is configured.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> store = OkfBundleStore(root=td)
+            >>> store._legacy_flat_root() == __import__("pathlib").Path(td).resolve()
+            True
+        """
         if self.flat_root is not None:
             return self.flat_root
         if os.getenv("OKF_ROOT", "").strip():
@@ -69,11 +110,39 @@ class OkfBundleStore:
         return None
 
     def _user_okf_dir(self, user_space: str) -> Path:
+        """Return the OKF directory for ``user_space``.
+
+        Args:
+            user_space: Tenant identifier.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> store = OkfBundleStore(root=td)
+            >>> store._user_okf_dir("dev@tkeir") == __import__("pathlib").Path(td).resolve()
+            True
+        """
         if self.flat_root is not None:
             return self.flat_root
         return user_okf_root(user_space)
 
     def _candidate_dirs(self, user_space: str, bundle_id: str) -> list[Path]:
+        """List bundle directories to probe for ``bundle_id``.
+
+        Args:
+            user_space: Tenant identifier.
+            bundle_id: Bundle directory name.
+
+        Example:
+            >>> import tempfile
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> store = OkfBundleStore(root=td)
+            >>> dirs = store._candidate_dirs("dev@tkeir", "b1")
+            >>> len(dirs) >= 1 and dirs[0].name == "b1"
+            True
+        """
         bid = (bundle_id or "").strip()
         if not bid:
             return []
@@ -88,9 +157,50 @@ class OkfBundleStore:
         return out
 
     def _meta_path(self, bundle_dir: Path) -> Path:
+        """Return the ``.tkeir-meta.json`` path for a bundle directory.
+
+        Args:
+            bundle_dir: Bundle root on disk.
+
+        Example:
+            >>> from pathlib import Path
+            >>> from thot.okf.store import OkfBundleStore
+            >>> OkfBundleStore()._meta_path(Path("/tmp/b")).name
+            '.tkeir-meta.json'
+        """
         return bundle_dir / ".tkeir-meta.json"
 
     def _load_bundle(self, bundle_dir: Path) -> OkfBundle | None:
+        """Load bundle metadata from sidecar JSON or directory layout.
+
+        Args:
+            bundle_dir: Bundle root on disk.
+
+        Returns:
+            Parsed bundle metadata, or ``None`` when the directory is invalid.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> bdir = Path(td) / "b1"
+            >>> bdir.mkdir()
+            >>> _ = (bdir / "index.md").write_text("# I\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id="b1",
+            ...     user_space="dev@tkeir",
+            ...     concept_count=1,
+            ...     path=str(bdir),
+            ... )
+            >>> _ = (bdir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> loaded = OkfBundleStore(root=td)._load_bundle(bdir)
+            >>> loaded is not None and loaded.bundle_id == "b1"
+            True
+        """
         meta = self._meta_path(bundle_dir)
         resolved = str(bundle_dir.resolve())
         if meta.is_file():
@@ -113,7 +223,38 @@ class OkfBundleStore:
         )
 
     def list_bundles(self, user_space: str) -> list[OkfBundle]:
-        """List bundles owned by ``user_space``."""
+        """List bundles owned by ``user_space``.
+
+        Args:
+            user_space: Tenant identifier.
+
+        Returns:
+            Sorted bundle metadata for the tenant.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "test-bundle"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=1,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> bundles = OkfBundleStore(root=td).list_bundles("dev@tkeir")
+            >>> len(bundles) == 1 and bundles[0].bundle_id == bid
+            True
+        """
         space = normalize_user_space(user_space)
         seen: set[str] = set()
         out: list[OkfBundle] = []
@@ -137,7 +278,39 @@ class OkfBundleStore:
         return out
 
     def get_bundle(self, bundle_id: str, user_space: str) -> OkfBundle | None:
-        """Return bundle metadata when tenant matches (or path is under tenant OKF)."""
+        """Return bundle metadata when tenant matches (or path is under tenant OKF).
+
+        Args:
+            bundle_id: Bundle directory name.
+            user_space: Tenant identifier.
+
+        Returns:
+            Bundle metadata, or ``None`` when not found or not owned.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "get-bundle"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=1,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> b = OkfBundleStore(root=td).get_bundle(bid, "dev@tkeir")
+            >>> b is not None and b.bundle_id == bid
+            True
+        """
         space = normalize_user_space(user_space)
         user_root = self._user_okf_dir(space).resolve()
         for path in self._candidate_dirs(space, bundle_id):
@@ -162,6 +335,38 @@ class OkfBundleStore:
         return None
 
     def get_index(self, bundle_id: str, user_space: str) -> str | None:
+        """Return ``index.md`` text for a tenant-owned bundle.
+
+        Args:
+            bundle_id: Bundle directory name.
+            user_space: Tenant identifier.
+
+        Returns:
+            Index markdown, or ``None`` when the bundle or file is missing.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "idx-bundle"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=1,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> OkfBundleStore(root=td).get_index(bid, "dev@tkeir")
+            '# Index\\n'
+        """
         bundle = self.get_bundle(bundle_id, user_space)
         if bundle is None:
             return None
@@ -173,6 +378,40 @@ class OkfBundleStore:
     def get_concept(
         self, bundle_id: str, concept_id: str, user_space: str
     ) -> str | None:
+        """Return one concept markdown file from a bundle.
+
+        Args:
+            bundle_id: Bundle directory name.
+            concept_id: Relative concept path (with or without ``.md``).
+            user_space: Tenant identifier.
+
+        Returns:
+            Concept markdown, or ``None`` when not found.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "concept-bundle"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> _ = (bundle_dir / "foo.md").write_text("# Foo\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=2,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> OkfBundleStore(root=td).get_concept(bid, "foo", "dev@tkeir")
+            '# Foo\\n'
+        """
         bundle = self.get_bundle(bundle_id, user_space)
         if bundle is None:
             return None
@@ -191,6 +430,39 @@ class OkfBundleStore:
         return path.read_text(encoding="utf-8")
 
     def list_concepts(self, bundle_id: str, user_space: str) -> list[str]:
+        """List concept ids (relative paths without ``.md``) in a bundle.
+
+        Args:
+            bundle_id: Bundle directory name.
+            user_space: Tenant identifier.
+
+        Returns:
+            Sorted concept ids; empty when the bundle is missing.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "list-concepts"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> _ = (bundle_dir / "foo.md").write_text("# Foo\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=2,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> OkfBundleStore(root=td).list_concepts(bid, "dev@tkeir")
+            ['foo']
+        """
         bundle = self.get_bundle(bundle_id, user_space)
         if bundle is None:
             return []
@@ -211,11 +483,80 @@ class OkfBundleStore:
         )
 
     def get_wiki(self, bundle_id: str, user_space: str) -> str | None:
-        """Return ``wiki.md`` content when present."""
+        """Return ``wiki.md`` content when present.
+
+        Args:
+            bundle_id: Bundle directory name.
+            user_space: Tenant identifier.
+
+        Returns:
+            Wiki markdown, or ``None`` when missing.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "wiki-bundle"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> _ = (bundle_dir / "wiki.md").write_text("# Wiki\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=2,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> OkfBundleStore(root=td).get_wiki(bid, "dev@tkeir")
+            '# Wiki\\n'
+        """
         return self.get_concept(bundle_id, "wiki", user_space)
 
     def put_wiki(self, bundle_id: str, user_space: str, markdown: str) -> str:
-        """Overwrite ``wiki.md`` for a tenant-owned bundle. Returns absolute path."""
+        """Overwrite ``wiki.md`` for a tenant-owned bundle. Returns absolute path.
+
+        Args:
+            bundle_id: Bundle directory name.
+            user_space: Tenant identifier.
+            markdown: Non-empty wiki markdown body.
+
+        Returns:
+            Absolute path to the written ``wiki.md`` file.
+
+        Raises:
+            FileNotFoundError: When the bundle does not exist.
+            ValueError: When ``markdown`` is empty.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "put-wiki"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=1,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> path = OkfBundleStore(root=td).put_wiki(bid, "dev@tkeir", "# Updated\\n")
+            >>> path.endswith("wiki.md")
+            True
+        """
         bundle = self.get_bundle(bundle_id, user_space)
         if bundle is None:
             raise FileNotFoundError("bundle not found")
@@ -244,6 +585,41 @@ class OkfBundleStore:
         return str(wiki_path)
 
     def delete(self, bundle_id: str, user_space: str) -> bool:
+        """Remove a tenant-owned bundle directory from disk.
+
+        Args:
+            bundle_id: Bundle directory name.
+            user_space: Tenant identifier.
+
+        Returns:
+            ``True`` when the bundle existed and was deleted.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "del-bundle"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=1,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> store = OkfBundleStore(root=td)
+            >>> store.delete(bid, "dev@tkeir")
+            True
+            >>> store.get_bundle(bid, "dev@tkeir") is None
+            True
+        """
         bundle = self.get_bundle(bundle_id, user_space)
         if bundle is None:
             return False
@@ -253,7 +629,40 @@ class OkfBundleStore:
     def bundle_payload(
         self, bundle_id: str, user_space: str, *, concept_id: str | None = None
     ) -> dict[str, Any] | None:
-        """Payload for MCP ``okf_bundle_get``."""
+        """Payload for MCP ``okf_bundle_get``.
+
+        Args:
+            bundle_id: Bundle directory name.
+            user_space: Tenant identifier.
+            concept_id: When set, return only that concept's markdown.
+
+        Returns:
+            JSON-serializable bundle payload, or ``None`` when not found.
+
+        Example:
+            >>> import json, tempfile
+            >>> from pathlib import Path
+            >>> from thot.okf.models import OkfBundle
+            >>> from thot.okf.store import OkfBundleStore
+            >>> td = tempfile.mkdtemp()
+            >>> root = Path(td)
+            >>> bid = "payload-bundle"
+            >>> bundle_dir = root / bid
+            >>> bundle_dir.mkdir()
+            >>> _ = (bundle_dir / "index.md").write_text("# Index\\n")
+            >>> meta = OkfBundle(
+            ...     bundle_id=bid,
+            ...     user_space="dev@tkeir",
+            ...     concept_count=1,
+            ...     path=str(bundle_dir),
+            ... )
+            >>> _ = (bundle_dir / ".tkeir-meta.json").write_text(
+            ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+            ... )
+            >>> payload = OkfBundleStore(root=td).bundle_payload(bid, "dev@tkeir")
+            >>> payload is not None and payload["bundle_id"] == bid
+            True
+        """
         bundle = self.get_bundle(bundle_id, user_space)
         if bundle is None:
             return None
@@ -291,6 +700,35 @@ def migrate_flat_okf_into_workspace(
     """Move legacy flat ``OKF_ROOT/<id>`` bundles into ``users/<space>/okf/<id>``.
 
     Returns list of migrated bundle ids. Skips when destination already exists.
+
+    Args:
+        flat_root: Source flat OKF root; defaults to ``default_okf_root()``.
+        workspace: Destination workspace root for ``UserWorkspace``.
+
+    Returns:
+        Bundle ids that were moved into the workspace layout.
+
+    Example:
+        >>> import json, tempfile
+        >>> from pathlib import Path
+        >>> from thot.okf.models import OkfBundle
+        >>> from thot.okf.store import migrate_flat_okf_into_workspace
+        >>> flat = Path(tempfile.mkdtemp())
+        >>> ws = Path(tempfile.mkdtemp())
+        >>> bdir = flat / "m1"
+        >>> bdir.mkdir()
+        >>> _ = (bdir / "index.md").write_text("# I\\n")
+        >>> meta = OkfBundle(
+        ...     bundle_id="m1",
+        ...     user_space="dev@tkeir",
+        ...     concept_count=1,
+        ...     path=str(bdir),
+        ... )
+        >>> _ = (bdir / ".tkeir-meta.json").write_text(
+        ...     json.dumps({"bundle": meta.model_dump(mode="json")})
+        ... )
+        >>> migrate_flat_okf_into_workspace(flat, workspace=ws)
+        ['m1']
     """
     from thot.tools.ingest.user_workspace import UserWorkspace
 

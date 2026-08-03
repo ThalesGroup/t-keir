@@ -74,6 +74,12 @@ def document_extras_from_metadata(
     ``ontologies`` must already be **server-local staged paths** produced from
     client-uploaded bytes (never client filesystem paths). Legacy path keys in
     metadata are ignored for derive-from.
+    
+
+    Example:
+        >>> from thot.tools.ingest.worker import document_extras_from_metadata
+        >>> document_extras_from_metadata({"corpus": "demo"})["corpus"]
+        'demo'
     """
     from thot.tasks.document_ontology.OntologyLexicon import (
         normalize_ontology_path_list,
@@ -102,12 +108,27 @@ def document_extras_from_metadata(
 
 
 def _default_pipeline_config_path(settings: IngestSettings) -> Path:
+    """Return the pipeline config path from settings or the default.
+
+    Example:
+        >>> from thot.tools.ingest.config import ingest_settings
+        >>> _default_pipeline_config_path(ingest_settings()).name
+        'pipeline.yaml'
+    """
     if settings.pipeline_config_path.is_file():
         return settings.pipeline_config_path
     return Path(configs_dir()) / "pipeline.yaml"
 
 
 def _load_runner(config_path: Path) -> PipelineRunner:
+    """Load a :class:`PipelineRunner` from a YAML config file.
+
+    Example:
+        >>> from thot.tools.ingest.config import ingest_settings
+        >>> runner = _load_runner(_default_pipeline_config_path(ingest_settings()))
+        >>> runner is not None
+        True
+    """
     config = PipelineConfiguration()
     with config_path.open(encoding="utf-8") as handle:
         config.load(handle)
@@ -116,7 +137,14 @@ def _load_runner(config_path: Path) -> PipelineRunner:
 
 @lru_cache(maxsize=4)
 def _cached_runner(config_path: str) -> PipelineRunner:
-    """Reuse one PipelineRunner (and spaCy models) per config path."""
+    """Reuse one PipelineRunner (and spaCy models) per config path.
+
+    Example:
+        >>> from thot.tools.ingest.config import ingest_settings
+        >>> path = str(_default_pipeline_config_path(ingest_settings()).resolve())
+        >>> _cached_runner(path) is _cached_runner(path)
+        True
+    """
     return _load_runner(Path(config_path))
 
 
@@ -131,6 +159,12 @@ def ensure_source_doc_id(
     Pre-converted corpus JSON (title/content only) skips the converter, which
     normally stamps ``source_doc_id``. Fall back to ``source``, then a stable
     ingest URI from the content digest / filename.
+    
+
+    Example:
+        >>> from thot.tools.ingest.worker import ensure_source_doc_id
+        >>> ensure_source_doc_id({"source": "s1"})["source_doc_id"]
+        's1'
     """
     existing = document.get("source_doc_id")
     if isinstance(existing, str) and existing.strip():
@@ -166,6 +200,12 @@ def run_pipeline_on_bytes(
     ``datatype`` selects the converter input type. Default ``None`` uses
     auto-detection (same as ingest). Pass ``\"raw\"`` to force
     :class:`~thot.tasks.converters.RawTextConverter.RawTextConverter`.
+    
+
+    Example:
+        >>> from thot.tools.ingest.worker import run_pipeline_on_bytes
+        >>> callable(run_pipeline_on_bytes)
+        True
     """
     from thot.tools.ingest.fetch import doc_id_from_content
 
@@ -254,6 +294,13 @@ async def _default_index(
     dataset: str | None = None,
     ontology_payload: dict[str, Any] | None = None,
 ) -> int:
+    """Index one analyzed document into Vespa (default worker index hook).
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(_default_index)
+        True
+    """
     async with VespaClient() as vespa:
         result = await index_pipeline_document(
             document,
@@ -278,6 +325,18 @@ class IngestWorker:
         pipeline_fn: PipelineFn | None = None,
         index_fn: IndexFn | None = None,
     ) -> None:
+        """Bind worker to ``store`` and optional pipeline/index overrides.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.tools.ingest.store import IngestStore
+            >>> from thot.tools.ingest.worker import IngestWorker
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     worker = IngestWorker(IngestStore(Path(temp_dir)))
+            ...     worker.store.root.name == Path(temp_dir).name
+            True
+        """
         self.store = store
         self.settings = settings or ingest_settings()
         self._pipeline_fn = pipeline_fn
@@ -286,12 +345,36 @@ class IngestWorker:
         self._pipeline_sem = asyncio.Semaphore(self.settings.max_concurrency)
 
     def _embedder_info(self) -> EmbedderInfo:
+        """Build embedder fingerprint metadata for ingest manifests.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.tools.ingest.store import IngestStore
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     worker = IngestWorker(IngestStore(Path(temp_dir)))
+            ...     worker._embedder_info().model
+            'bge-m3'
+        """
         provider = os.getenv("PROVIDER", "ollama")
         model = os.getenv("EMBEDDING_MODEL", "bge-m3")
         digest = embedder_fingerprint(provider=provider, model=model)
         return EmbedderInfo(model=model, provider=provider, sha256=digest)
 
     def _runner(self, config_path: Path) -> PipelineRunner:
+        """Return a pipeline runner (cached unless a custom pipeline_fn is set).
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.tools.ingest.store import IngestStore
+            >>> from thot.tools.ingest.config import ingest_settings
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     worker = IngestWorker(IngestStore(Path(temp_dir)))
+            ...     runner = worker._runner(_default_pipeline_config_path(ingest_settings()))
+            ...     runner is not None
+            True
+        """
         if self._pipeline_fn is not None:
             return _load_runner(config_path)
         return _cached_runner(str(config_path.resolve()))
@@ -304,7 +387,13 @@ class IngestWorker:
         correlation_id: str,
         document_extras: dict[str, Any] | None,
     ) -> dict[str, Any]:
-        """Call injected pipeline_fn; pass extras when the callable accepts them."""
+        """Call injected pipeline_fn; pass extras when the callable accepts them.
+
+        Example:
+            >>> import inspect
+            >>> inspect.isfunction(IngestWorker._invoke_pipeline_fn)
+            True
+        """
         assert self._pipeline_fn is not None
         fn = self._pipeline_fn
         try:
@@ -333,7 +422,13 @@ class IngestWorker:
         space: str,
         existing_job: IngestJob | None,
     ) -> IngestJob | None:
-        """Assert governor scope and ensure job record. Return failed job or None."""
+        """Assert governor scope and ensure job record. Return failed job or None.
+
+        Example:
+            >>> import inspect
+            >>> inspect.isfunction(IngestWorker._bootstrap_job)
+            True
+        """
         try:
             GovernorClient().assert_scope_active("ingest")
         except RuntimeError as exc:
@@ -365,7 +460,28 @@ class IngestWorker:
         return None
 
     def _fail_fetch(self, ingest_id: str, exc: FetchError) -> IngestJob:
-        """Mark job failed and write DLQ after a source fetch error."""
+        """Mark job failed and write DLQ after a source fetch error.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.tools.ingest.store import IngestStore
+            >>> from thot.tools.ingest.models import IngestJob, IngestJobStatus
+            >>> from thot.action.models import utc_now_rfc3339
+            >>> from thot.tools.ingest.fetch import FetchError
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     store = IngestStore(Path(temp_dir))
+            ...     store.ensure_layout()
+            ...     now = utc_now_rfc3339()
+            ...     _ = store.write_job(IngestJob(
+            ...         ingest_id="i1", correlation_id="c1",
+            ...         status=IngestJobStatus.PENDING, created_at=now, updated_at=now,
+            ...     ))
+            ...     worker = IngestWorker(store)
+            ...     job = worker._fail_fetch("i1", FetchError("bad url"))
+            ...     job.status.value
+            'failed'
+        """
         self.store.update_job(
             ingest_id,
             status=IngestJobStatus.FAILED,
@@ -388,7 +504,17 @@ class IngestWorker:
         doc_id: str,
         key: str,
     ) -> IngestJob | None:
-        """Return NOOP job update when an indexed/noop idempotency hit exists."""
+        """Return NOOP job update when an indexed/noop idempotency hit exists.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.tools.ingest.store import IngestStore
+            >>> with tempfile.TemporaryDirectory() as temp_dir:
+            ...     worker = IngestWorker(IngestStore(Path(temp_dir)))
+            ...     worker._idempotent_noop_job(ingest_id="i1", doc_id="d1", key="k1") is None
+            True
+        """
         existing = self.store.get_idempotency_record(key)
         if existing is None:
             return None
@@ -412,7 +538,14 @@ class IngestWorker:
         dataset: str | None,
         request_payload: Any,
     ) -> dict[str, Any] | None:
-        """Load ``datasets/<dataset>/business_ontology.yaml`` and merge request."""
+        """Load ``datasets/<dataset>/business_ontology.yaml`` and merge request.
+
+        Example:
+            >>> IngestWorker._resolve_business_ontology_payload(
+            ...     dataset="missing", request_payload=None,
+            ... ) is None
+            True
+        """
         from thot.tools.search.business_ontology import (
             load_dataset_business_ontology_payload,
             merge_business_ontology_payloads,
@@ -445,7 +578,14 @@ class IngestWorker:
         document_extras: dict[str, Any] | None = None,
         index_target: str = "both",
     ) -> IngestJob:
-        """Fetch (when needed), stage, pipeline, and optionally index."""
+        """Fetch (when needed), stage, pipeline, and optionally index.
+
+        Example:
+            >>> import inspect
+            >>> from thot.tools.ingest.worker import IngestWorker
+            >>> inspect.iscoroutinefunction(IngestWorker.process_source)
+            True
+        """
         from thot.tools.search.user_space import resolve_vespa_user_space
 
         existing_job = self.store.read_job(ingest_id)
@@ -684,7 +824,14 @@ class IngestWorker:
             return job
 
     async def retry_from_dlq(self, ingest_id: str) -> IngestJob:
-        """Re-queue a failed ingest from its DLQ record."""
+        """Re-queue a failed ingest from its DLQ record.
+
+        Example:
+            >>> import inspect
+            >>> from thot.tools.ingest.worker import IngestWorker
+            >>> inspect.iscoroutinefunction(IngestWorker.retry_from_dlq)
+            True
+        """
         dlq = self.store.read_dlq(ingest_id)
         if dlq is None:
             raise KeyError(f"No DLQ record for ingest_id={ingest_id}")

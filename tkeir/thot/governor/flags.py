@@ -28,6 +28,14 @@ _ALL_SCOPES: tuple[KillScope, ...] = (
 
 
 def _default_flags() -> RuntimeFlags:
+    """Return a fresh default flags document with all scopes inactive.
+
+    Example:
+        >>> from thot.governor.flags import _default_flags
+        >>> flags = _default_flags()
+        >>> flags.scopes["inference"].active
+        False
+    """
     return RuntimeFlags(
         updated_at=utc_now_rfc3339(),
         scopes={scope: KillSwitchState() for scope in _ALL_SCOPES},
@@ -35,9 +43,31 @@ def _default_flags() -> RuntimeFlags:
 
 
 class RuntimeFlagsStore:
-    """Thread-safe JSON-backed runtime flags."""
+    """Thread-safe JSON-backed runtime flags.
+
+    Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.governor.flags import RuntimeFlagsStore
+        >>> with tempfile.TemporaryDirectory() as td:
+        ...     store = RuntimeFlagsStore(Path(td) / "flags.json")
+        ...     store.is_killed("ingest")
+        False
+    """
 
     def __init__(self, path: Path) -> None:
+        """Open or create the flags JSON file at ``path``.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.flags import RuntimeFlagsStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     p = Path(td) / "flags.json"
+            ...     store = RuntimeFlagsStore(p)
+            ...     p.is_file()
+            True
+        """
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
@@ -52,10 +82,33 @@ class RuntimeFlagsStore:
             self._write(self._flags)
 
     def _read(self) -> RuntimeFlags:
+        """Load flags from disk.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.flags import RuntimeFlagsStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = RuntimeFlagsStore(Path(td) / "flags.json")
+            ...     isinstance(store._read(), RuntimeFlags)
+            True
+        """
         payload = json.loads(self.path.read_text(encoding="utf-8"))
         return RuntimeFlags.model_validate(payload)
 
     def _write(self, flags: RuntimeFlags) -> None:
+        """Atomically persist flags to disk.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.flags import RuntimeFlagsStore, _default_flags
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = RuntimeFlagsStore(Path(td) / "flags.json")
+            ...     store._write(_default_flags())
+            ...     store.path.stat().st_size > 0
+            True
+        """
         tmp = self.path.with_suffix(".tmp")
         tmp.write_text(
             json.dumps(
@@ -68,6 +121,18 @@ class RuntimeFlagsStore:
         tmp.replace(self.path)
 
     def snapshot(self) -> RuntimeFlags:
+        """Return a deep copy of the current flags.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.governor.flags import RuntimeFlagsStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     store = RuntimeFlagsStore(Path(td) / "flags.json")
+            ...     snap = store.snapshot()
+            ...     snap is not store._flags
+            True
+        """
         with self._lock:
             return self._flags.model_copy(deep=True)
 

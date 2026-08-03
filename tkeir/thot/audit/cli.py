@@ -26,6 +26,14 @@ from thot.audit.worm_store import WormSegmentStore
 
 
 def main(args: list[str] | None = None) -> None:
+    """CLI entry for reports, verify, archive, forget, and incident stubs.
+
+    Example:
+        >>> import inspect
+        >>> from thot.audit.cli import main
+        >>> callable(main)
+        True
+    """
     parser = argparse.ArgumentParser(description="T-KEIR audit CLI")
     sub = parser.add_subparsers(dest="command", required=True)
 

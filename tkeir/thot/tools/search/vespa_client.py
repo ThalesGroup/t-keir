@@ -209,6 +209,10 @@ def global_vespa_id(passage_id: str) -> str:
 
     Returns:
         ``id:default:global::…`` document reference.
+
+    Example:
+        >>> global_vespa_id("beir:scifact:42#chunk-0").startswith("id:default:global::")
+        True
     """
     digest = hashlib.sha256(passage_id.encode("utf-8")).hexdigest()[:40]
     return f"id:default:global::{digest}"
@@ -223,6 +227,10 @@ def user_vespa_id(passage_id: str, *, user_space: str | None = None) -> str:
 
     Returns:
         ``id:default:user:g=<space>:…`` document reference.
+
+    Example:
+        >>> user_vespa_id("chunk-1", user_space="demo").startswith("id:default:user:g=demo:")
+        True
     """
     group = normalize_user_space(user_space)
     digest = hashlib.sha256(passage_id.encode("utf-8")).hexdigest()[:40]
@@ -232,12 +240,22 @@ def user_vespa_id(passage_id: str, *, user_space: str | None = None) -> str:
 def document_vespa_id(
     source_doc_id: str, *, user_space: str | None = None
 ) -> str:
-    """Compatibility alias → :func:`user_vespa_id` (streaming user schema)."""
+    """Compatibility alias → :func:`user_vespa_id` (streaming user schema).
+
+    Example:
+        >>> document_vespa_id("file://doc.pdf", user_space="demo").startswith("id:default:user:g=demo:")
+        True
+    """
     return user_vespa_id(source_doc_id, user_space=user_space)
 
 
 def chunk_vespa_id(chunk_id: str, *, user_space: str | None = None) -> str:
-    """Compatibility alias → :func:`user_vespa_id`."""
+    """Compatibility alias → :func:`user_vespa_id`.
+
+    Example:
+        >>> chunk_vespa_id("doc.pdf#chunk-0", user_space="demo").startswith("id:default:user:g=demo:")
+        True
+    """
     return user_vespa_id(chunk_id, user_space=user_space)
 
 
@@ -245,7 +263,12 @@ def build_chunk_tensor(
     embedding: list[float],
     embedding_dim: int = 1024,
 ) -> list[float]:
-    """Truncate a dense embedding to the schema dimension."""
+    """Truncate a dense embedding to the schema dimension.
+
+    Example:
+        >>> build_chunk_tensor([1.0, 2.0, 3.0], embedding_dim=2)
+        [1.0, 2.0]
+    """
     values = [float(x) for x in embedding[:embedding_dim]]
     if len(values) < embedding_dim:
         values.extend([0.0] * (embedding_dim - len(values)))
@@ -361,6 +384,19 @@ def build_multi_field_contains_or_clause(
 
 @dataclass(frozen=True)
 class VespaConfig:
+    """Frozen Vespa HTTP endpoint and embedding settings.
+
+    Example:
+        >>> VespaConfig(
+        ...     document_api_url="http://localhost:8080/document/v1",
+        ...     search_api_url="http://localhost:8080/search/",
+        ...     config_server_url_base="http://localhost:19071",
+        ...     timeout_seconds=60.0,
+        ...     embedding_dim=1024,
+        ... ).embedding_dim
+        1024
+    """
+
     document_api_url: str
     search_api_url: str
     config_server_url_base: str
@@ -441,7 +477,12 @@ class VespaConfig:
 
 
 class VespaClient:
-    """Async HTTP client for Vespa document indexing and hybrid search."""
+    """Async HTTP client for Vespa document indexing and hybrid search.
+
+    Example:
+        >>> VespaClient().config.embedding_dim > 0
+        True
+    """
 
     def __init__(
         self,
@@ -582,6 +623,11 @@ class VespaClient:
             user_space: Streaming group (required when ``streaming``).
             streaming: When True, use ``…/group/<space>/<key>`` (user schema).
                 When False, use ``…/docid/<key>`` (global index schema).
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient._upsert_fields)
+            True
         """
         if streaming:
             group = normalize_user_space(user_space or self._config.user_space)
@@ -609,7 +655,13 @@ class VespaClient:
         fields: dict[str, Any],
         passage_id: str,
     ) -> None:
-        """Create or update a ``global`` (index-mode) passage."""
+        """Create or update a ``global`` (index-mode) passage.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.upsert_global_passage)
+            True
+        """
         _, _, _group, key = _parse_vespa_id(global_vespa_id(passage_id))
         await self._upsert_fields(
             "default", "global", key, fields, streaming=False
@@ -622,7 +674,13 @@ class VespaClient:
         *,
         user_space: str | None = None,
     ) -> None:
-        """Create or update a ``user`` (streaming) passage."""
+        """Create or update a ``user`` (streaming) passage.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.upsert_user_passage)
+            True
+        """
         space = normalize_user_space(user_space or self._config.user_space)
         payload = dict(fields)
         payload.setdefault("userspace_id", space)
@@ -639,14 +697,26 @@ class VespaClient:
         *,
         user_space: str | None = None,
     ) -> bool:
-        """Delete one ``user`` (streaming) passage by logical ``chunk_id``."""
+        """Delete one ``user`` (streaming) passage by logical ``chunk_id``.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.delete_user_passage)
+            True
+        """
         space = normalize_user_space(user_space or self._config.user_space)
         return await self.delete_document_ref(
             user_vespa_id(passage_id, user_space=space)
         )
 
     async def delete_document_ref(self, doc_ref: str) -> bool:
-        """Delete a Vespa document by full ``id:…`` reference. False if missing."""
+        """Delete a Vespa document by full ``id:…`` reference. False if missing.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.delete_document_ref)
+            True
+        """
         namespace, schema, group, key = _parse_vespa_id(doc_ref)
         if group:
             url = (
@@ -677,7 +747,13 @@ class VespaClient:
         user_space: str | None = None,
         hits: int = 200,
     ) -> list[str]:
-        """Return Vespa document ids in the user group for ``source_ref``."""
+        """Return Vespa document ids in the user group for ``source_ref``.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.find_user_vespa_ids_by_source_ref)
+            True
+        """
         space = normalize_user_space(user_space or self._config.user_space)
         ref = sanitize_vespa_string(source_ref)
         if not ref:
@@ -722,7 +798,13 @@ class VespaClient:
         user_space: str | None = None,
         passage_ids: list[str] | None = None,
     ) -> dict[str, Any]:
-        """Delete streaming passages for a source_ref (catalog and/or search)."""
+        """Delete streaming passages for a source_ref (catalog and/or search).
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.delete_user_passages_by_source_ref)
+            True
+        """
         space = normalize_user_space(user_space or self._config.user_space)
         deleted = 0
         missing = 0
@@ -755,7 +837,13 @@ class VespaClient:
         *,
         user_space: str | None = None,
     ) -> None:
-        """Compatibility shim → :meth:`upsert_user_passage` (no parent schema)."""
+        """Compatibility shim → :meth:`upsert_user_passage` (no parent schema).
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.upsert_document)
+            True
+        """
         await self.upsert_user_passage(
             fields, source_doc_id, user_space=user_space
         )
@@ -767,11 +855,23 @@ class VespaClient:
         *,
         user_space: str | None = None,
     ) -> None:
-        """Compatibility shim → :meth:`upsert_user_passage`."""
+        """Compatibility shim → :meth:`upsert_user_passage`.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.upsert_chunk)
+            True
+        """
         await self.upsert_user_passage(fields, chunk_id, user_space=user_space)
 
     async def get_document_by_ref(self, doc_ref: str) -> dict[str, Any]:
-        """Fetch passage fields by Vespa document reference (global or user)."""
+        """Fetch passage fields by Vespa document reference (global or user).
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.get_document_by_ref)
+            True
+        """
         namespace, schema, group, key = _parse_vespa_id(doc_ref)
         schema = schema or "global"
         if group:
@@ -813,6 +913,12 @@ class VespaClient:
 
         Prefer :class:`~thot.tools.search.passage_retrieval.PassageRetrievalPipeline`
         for production search.
+
+        Example:
+            >>> client = VespaClient()
+            >>> payload = client.build_hybrid_search_payload("hello", [0.0] * client.config.embedding_dim)
+            >>> "yql" in payload and payload["hits"] == 20
+            True
         """
         text_clause = build_field_contains_or_clause("chunk_text", query_text)
         yql_parts = [
@@ -844,7 +950,13 @@ class VespaClient:
         user_space: str | None = None,
         schema: str = "user",
     ) -> dict[str, Any]:
-        """Run hybrid dense + BM25 search over ``global`` or ``user``."""
+        """Run hybrid dense + BM25 search over ``global`` or ``user``.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.hybrid_search)
+            True
+        """
         payload = self.build_hybrid_search_payload(
             query_text,
             q_dense,

@@ -1,5 +1,12 @@
 # T-KEIR
 
+[![CI](https://github.com/ThalesGroup/t-keir/actions/workflows/ci.yml/badge.svg)](https://github.com/ThalesGroup/t-keir/actions/workflows/ci.yml)
+[![Security](https://github.com/ThalesGroup/t-keir/actions/workflows/security.yml/badge.svg)](https://github.com/ThalesGroup/t-keir/actions/workflows/security.yml)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://thalesgroup.github.io/t-keir)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/ThalesGroup/t-keir/releases)
+
 **T-KEIR 2.0.0** is a document analysis and retrieval toolkit by Thales.
 It runs a unified NLP pipeline on documents, indexes them in [Vespa](https://vespa.ai/),
 exposes hybrid search plus RAG through a FastAPI backend and a Next.js HMI,

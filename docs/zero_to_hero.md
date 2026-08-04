@@ -66,7 +66,7 @@ bundles — see [OKF](tools/okf.md) and [§4.5](#45-okf-export-and-wiki-brief-p0
 | Tool | Why | Check |
 |------|-----|-------|
 | Git | Clone the repo | `git --version` |
-| [uv](https://docs.astral.sh/uv/) | Python 3.11 env | `uv --version` |
+| [uv](https://docs.astral.sh/uv/) | Python **3.10–3.12** (default **3.11**) | `uv --version` |
 | Make | All entrypoints | `make --version` |
 | Docker Desktop / Colima / Engine | Vespa + Compose | `docker info` |
 | Node.js 20+ | HMI (`tkeir-hmi`) | `node -v` |
@@ -106,14 +106,16 @@ From the **repository root**:
 make setup
 ```
 
-This creates the `tkeir` uv environment (Python 3.11), installs the package,
-pulls spaCy models, builds the MWE trie if missing, and downloads BGE-M3 into
-`tkeir/resources/modeling/net/bge-m3` (skipped when already present).
+This creates the `tkeir` uv environment (default **Python 3.11**; supported
+range **3.10–3.12**, see [Python versions](installation.md#python-versions)),
+installs the package, pulls spaCy models, builds the MWE trie if missing, and
+downloads BGE-M3 into `tkeir/resources/modeling/net/bge-m3` (skipped when
+already present). Use `make setup PYTHON=3.12` for another supported minor.
 
 **Checkpoint:**
 
 ```bash
-cd tkeir && uv run --python 3.11 python -c "import thot; print(thot.__version__)"
+cd tkeir && uv run --python "${PYTHON:-3.11}" python -c "import thot; print(thot.__version__)"
 ls resources/modeling/net/bge-m3/config.json
 ```
 ### 3.2 Run the bundled quickstart

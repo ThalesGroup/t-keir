@@ -14,14 +14,77 @@ For Compose, Kubernetes, and secured cluster profiles, see
 | Tool | Notes |
 |---|---|
 | **Git** | Clone and version identity (`make build`, `make tag`) |
-| **[uv](https://docs.astral.sh/uv/getting-started/installation/)** | Python package manager (installs Python **3.11** if needed) |
+| **[uv](https://docs.astral.sh/uv/getting-started/installation/)** | Python package manager (installs the selected Python if needed) |
 | **Make** | GNU Make or BSD Make (macOS Command Line Tools) |
 | **Docker** (optional) | Required for the [dev container](devcontainer.md), Vespa, and security scans |
 | **curl** / **jq** (optional) | Required for `make rag-query` and `make smoke-test` |
 
 Supported host platforms: Linux (Ubuntu / AlmaLinux / similar), macOS, WSL2.
 
-Python **≥ 3.10** is required; the Makefile defaults to **3.11** (`PYTHON=3.11`).
+### Python versions
+
+`tkeir/pyproject.toml` declares `requires-python = ">=3.10,<3.13"`.
+
+| Version | Status |
+|---|---|
+| **3.10**, **3.11**, **3.12** | Supported |
+| **3.11** | Default (`Makefile` `PYTHON ?= 3.11`, `.python-version`, CI, Compose/dev images) |
+| **3.13+** | Out of range until `requires-python` is widened and dependencies are validated |
+
+Use another supported minor with:
+
+```bash
+make setup PYTHON=3.12
+# or
+cd tkeir && uv sync --python 3.12 --group dev --group models
+```
+
+CI and Docker only exercise **3.11**; spaCy / torch / numpy pins are less proven on
+3.12. The optional `owl` extra (`owlapy`) requires **Python ≥ 3.11**.
+
+#### Install Python 3.11 with pyenv
+
+[pyenv](https://github.com/pyenv/pyenv) is useful when you want a system-managed
+3.11 interpreter that Make / `uv` can pick up (alongside or instead of
+`uv python install`).
+
+**macOS (Homebrew):**
+
+```bash
+brew update
+brew install pyenv
+```
+
+**Linux:** follow the [pyenv installer](https://github.com/pyenv/pyenv-installer)
+(or distro packages), then add the usual shell init to `~/.bashrc` /
+`~/.zshrc`:
+
+```bash
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+```
+
+Install and select **3.11** (patch version may vary; `pyenv install -l | grep '^  3.11'` lists builds):
+
+```bash
+pyenv install 3.11
+pyenv global 3.11          # or: pyenv local 3.11  (writes .python-version in cwd)
+python --version          # expect Python 3.11.x
+which python              # should resolve under ~/.pyenv/shims
+```
+
+From the **repository root**, T-KEIR already ships `tkeir/.python-version` with
+`3.11`. With pyenv init loaded, entering the tree selects that version. Then:
+
+```bash
+make setup                # uses PYTHON=3.11 by default
+# or explicitly:
+make setup PYTHON=3.11
+```
+
+`uv` can also download its own 3.11 (`uv python install 3.11`) without pyenv;
+use pyenv when you prefer a shared host interpreter for tools outside uv.
 
 ## 1. Clone the repository
 
@@ -58,7 +121,7 @@ Verify:
 
 ```bash
 make verify-lockfile
-cd tkeir && uv run --python 3.11 python -c "import thot; print('OK', thot.__file__)"
+cd tkeir && uv run --python "${PYTHON:-3.11}" python -c "import thot; print('OK', thot.__file__)"
 ```
 
 ### Option B — Dev container (recommended for a clean, reproducible env)

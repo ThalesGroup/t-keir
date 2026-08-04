@@ -3,7 +3,7 @@
 [![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/ThalesGroup/t-keir/actions/workflows/ci.yml)
 [![Security](https://img.shields.io/badge/Security-supply%20chain-2088FF?logo=githubactions&logoColor=white)](https://github.com/ThalesGroup/t-keir/actions/workflows/security.yml)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://thalesgroup.github.io/t-keir)
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.10–3.12](https://img.shields.io/badge/python-3.10%E2%80%933.12-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/ThalesGroup/t-keir/releases)
 
@@ -14,6 +14,37 @@ and includes an **agentic layer** (MCP tools, multi-agent workflows, ontology-dr
 templates) under the platform governor.
 
 Full documentation: [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io/t-keir)
+
+### Python versions
+
+| Version | Status |
+|---|---|
+| **3.10**, **3.11**, **3.12** | Supported (`requires-python = ">=3.10,<3.13"`) |
+| **3.11** | Default for Makefile, CI, Docker images, and the [dev container](docs/devcontainer.md) |
+| **3.13+** | Not supported yet |
+
+Override the toolchain with `make setup PYTHON=3.12` (or `uv sync --python 3.12`).
+CI and images only exercise **3.11**; treat other minors as supported but less
+proven. The optional `owl` extra needs **≥ 3.11**. Details:
+[Installation](docs/installation.md#python-versions).
+
+**Python 3.11 with [pyenv](https://github.com/pyenv/pyenv)** (host install):
+
+```bash
+# macOS
+brew install pyenv
+# then add pyenv init to your shell (see pyenv README / docs below)
+
+pyenv install 3.11
+pyenv global 3.11          # or: pyenv local 3.11
+python --version          # Python 3.11.x
+
+# from the repository root
+make setup                # default PYTHON=3.11
+```
+
+Full steps (Linux shell init, `uv` alternative):  
+[Installation — Install Python 3.11 with pyenv](docs/installation.md#install-python-311-with-pyenv).
 
 ## What it does
 

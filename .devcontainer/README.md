@@ -1,7 +1,9 @@
 # Dev Container — quick entry
 
-Use this folder to develop T-KEIR inside Docker with Python 3.11, `uv`, Tesseract,
-and access to the host Docker socket (for Vespa).
+Use this folder to develop T-KEIR inside Docker with Python 3.11 (project
+default; package supports **3.10–3.12** — see
+[Installation — Python versions](../docs/installation.md#python-versions)),
+`uv`, Tesseract, and access to the host Docker socket (for Vespa).
 
 **Full guide:** [docs/devcontainer.md](../docs/devcontainer.md)
 

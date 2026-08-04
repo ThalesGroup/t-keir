@@ -169,7 +169,6 @@ All runtime and optional Python dependencies from the locked dependency set
 | murmurhash | 1.0.15 | MIT License | https://github.com/explosion/murmurhash |
 | narwhals | 2.23.0 | MIT | https://github.com/narwhals-dev/narwhals |
 | networkx | 3.6.1 | BSD-3-Clause | https://networkx.org/ |
-| nltk | 3.10.0 | Apache Software License | https://www.nltk.org/ |
 | numpy | 1.26.4 | BSD License | https://numpy.org |
 | olefile | 0.47 | BSD License | https://www.decalage.info/python/olefileio |
 | onnxruntime | 1.20.1 | MIT License | https://onnxruntime.ai |

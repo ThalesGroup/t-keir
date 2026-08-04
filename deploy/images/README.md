@@ -38,7 +38,7 @@ present (`make images` or `make image-lib` first).
 
 ## Disk / BuildKit I/O errors
 
-`Input/output error` while installing sympy/nltk or on
+`Input/output error` while installing large wheels (e.g. sympy) or on
 `COPY --from=builder …/.venv` usually means the **host or Docker Desktop disk
 is full / corrupted**, not a bad Dockerfile. Check free space (`df -h`); Docker
 Desktop alone can consume hundreds of GiB under

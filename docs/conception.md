@@ -303,7 +303,7 @@ Writes `keywords`; may synthesize a missing `title`.
 |--|--|
 | **Modules** | `KeywordsExtractor` (`NLTKRake`), `TitleGenerator`, `KeywordRules` |
 | **Config** | `configs/keywords.yaml`; `keywords-rules.json` |
-| **Libraries** | Uses morphosyntax fields; **nltk** available in the stack |
+| **Libraries** | Uses morphosyntax fields; built-in RAKE (`NLTKRake`, no `nltk` package) |
 
 **Algorithms / custom logic**
 
@@ -621,7 +621,7 @@ jobs/ dlq/ publishes/
 | APIs | **FastAPI**, **uvicorn**, **python-multipart** |
 | Observability | **OpenTelemetry** → Prometheus |
 | Templating | **Jinja2** |
-| Text utils | **beautifulsoup4**, **emoji**, **fold-to-ascii**, **pandas**, **nltk** |
+| Text utils | **beautifulsoup4**, **emoji**, **fold-to-ascii**, **pandas** |
 | HMI | **Next.js**, **React**, **next-auth** |
 | Optional | **mcp**, **spiffe**, **beir** (eval), **psycopg** (audit) |
 

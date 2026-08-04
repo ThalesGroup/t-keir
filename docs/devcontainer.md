@@ -1,7 +1,9 @@
 # Dev Container
 
 The repository ships a VS Code / Cursor **Dev Container** for a reproducible T-KEIR
-development environment with Python 3.11, `uv`, Tesseract OCR, and Docker socket access
+development environment with Python 3.11 (project default; hosts may use
+3.10–3.12 — see [Python versions](installation.md#python-versions)), `uv`,
+Tesseract OCR, and Docker socket access
 (required for Vespa).
 
 Configuration lives in `.devcontainer/` (`devcontainer.json`, `docker-compose.yml`,

@@ -65,7 +65,12 @@ Published HTML (when available): [ThalesGroup.github.io/t-keir](https://thalesgr
 
 ## Installation
 
-**Python ≥ 3.10** (3.11 recommended) and [uv](https://docs.astral.sh/uv/getting-started/installation/).
+**Python 3.10–3.12** (`requires-python = ">=3.10,<3.13"`). **3.11** is the
+default for Make, CI, and images; override with `make setup PYTHON=3.12`.
+**3.13+** is not supported yet. See
+[Installation — Python versions](../docs/installation.md#python-versions).
+
+Also requires [uv](https://docs.astral.sh/uv/getting-started/installation/).
 Git is required to clone the repository.
 
 From the **repository root** (recommended):

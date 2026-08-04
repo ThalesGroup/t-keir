@@ -21,7 +21,7 @@ Optional RAG path: NLP golden chunks → BGE-M3 embed
 (group = Keycloak principal or `dev@tkeir`) →
 `PassageRetrievalPipeline` → FastAPI RAG (`tkeir-rag`).
 
-T-KEIR uses spaCy, NLTK, and local FlagEmbedding / Hugging Face models where configured.
+T-KEIR uses spaCy and local FlagEmbedding / Hugging Face models where configured.
 
 ## Agentic layer
 

@@ -17,7 +17,9 @@ REST `_svc.py` / `_client.py` services were removed.
 
 ## Requirements
 
-- Python **≥ 3.10** (Makefile default **3.11**)
+- Python **3.10–3.12** (`requires-python = ">=3.10,<3.13"`); Makefile / CI default
+  **3.11** (`make setup PYTHON=3.12` to override). **3.13+** not supported yet.
+  See [Installation — Python versions](docs/installation.md#python-versions).
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - Docker (Vespa, Compose, dev container)
 - Tesseract OCR (optional, scanned PDFs)

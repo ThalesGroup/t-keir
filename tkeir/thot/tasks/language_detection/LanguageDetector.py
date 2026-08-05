@@ -21,12 +21,13 @@ from thot.tasks.TaskInfo import TaskInfo
 @dataclass
 class LanguageDetectionResult:
     """LanguageDetectionResult container.
-    
-        Example:
-            >>> from thot.tasks.language_detection.LanguageDetector import LanguageDetectionResult
-            >>> callable(LanguageDetectionResult)
-            True
+
+    Example:
+        >>> from thot.tasks.language_detection.LanguageDetector import LanguageDetectionResult
+        >>> callable(LanguageDetectionResult)
+        True
     """
+
     language: str
     confidence: float
 
@@ -48,11 +49,11 @@ class LanguageDetectionResult:
 
 class LanguageDetector:
     """Detect language using langdetect with a safe fallback.
-    
-        Example:
-            >>> from thot.tasks.language_detection.LanguageDetector import LanguageDetector
-            >>> callable(LanguageDetector)
-            True
+
+    Example:
+        >>> from thot.tasks.language_detection.LanguageDetector import LanguageDetector
+        >>> callable(LanguageDetector)
+        True
     """
 
     MIN_TEXT_LENGTH = 20

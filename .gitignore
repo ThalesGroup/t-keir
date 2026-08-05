@@ -29,7 +29,9 @@ reports/
 results/
 coverage-reports/
 .tkeir-agent/
-# Prefer workspace/agent (Make default); keep legacy root path ignored too.
+# Prefer workspace/agent and workspace/.tkeir-okf (Make defaults); keep legacy
+# repo-root paths ignored too.
+.tkeir-okf/
 .tkeir-compose/
 # Generated EU compliance OPA inputs (keep directory via .gitkeep)
 compliance/opa/input/*

@@ -25,12 +25,13 @@ from thot.tasks.document_ontology.ShaclValidator import validate_document_graph
 @dataclass
 class SelfHealingSettings:
     """SelfHealingSettings container.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.SelfHealingLoop import SelfHealingSettings
-            >>> callable(SelfHealingSettings)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.SelfHealingLoop import SelfHealingSettings
+        >>> callable(SelfHealingSettings)
+        True
     """
+
     max_repair_attempts: int = 2
 
 

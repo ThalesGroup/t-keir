@@ -26,11 +26,11 @@ _MIN_TERM_LEN = 3
 @dataclass
 class OntologyClueBundle:
     """Merged ontology facts + SPARQL/reasoner clues for the QA prompt.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import OntologyClueBundle
-            >>> callable(OntologyClueBundle)
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import OntologyClueBundle
+        >>> callable(OntologyClueBundle)
+        True
     """
 
     ontology_facts: str = ""
@@ -48,11 +48,11 @@ def ensure_pipeline_document(
     text: str = "",
 ) -> dict[str, Any]:
     """Copy a pipeline doc and set a stable ``source_doc_id`` for URI minting.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import ensure_pipeline_document
-            >>> ensure_pipeline_document({}, source_id="d1", text="hi")["source_doc_id"]
-            'd1'
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import ensure_pipeline_document
+        >>> ensure_pipeline_document({}, source_id="d1", text="hi")["source_doc_id"]
+        'd1'
     """
     document = dict(processed or {})
     document["source_doc_id"] = source_id
@@ -63,11 +63,11 @@ def ensure_pipeline_document(
 
 def build_document_ontology_json_ld(document: dict[str, Any]) -> str:
     """Build JSON-LD for one analyzed T-KEIR document (passage or query).
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import build_document_ontology_json_ld
-            >>> callable(build_document_ontology_json_ld)
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import build_document_ontology_json_ld
+        >>> callable(build_document_ontology_json_ld)
+        True
     """
     from thot.tasks.document_ontology.OntologyBuilder import (
         build_document_graph,
@@ -80,11 +80,11 @@ def build_document_ontology_json_ld(document: dict[str, Any]) -> str:
 
 def merge_passage_ontology_json_lds(json_lds: list[str]) -> tuple[Any, str]:
     """Merge passage JSON-LD payloads → ``(rdflib.Graph, merged_json_ld)``.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import merge_passage_ontology_json_lds
-            >>> len(merge_passage_ontology_json_lds([])[1])
-            2
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import merge_passage_ontology_json_lds
+        >>> len(merge_passage_ontology_json_lds([])[1])
+        2
     """
     from thot.tools.search.ontology_utils import (
         merge_rdf_graphs,
@@ -105,11 +105,11 @@ def _terms_from_pipeline_document(
     document: dict[str, Any] | None,
 ) -> list[str]:
     """Harvest subject/object labels from a query pipeline document KG.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import _terms_from_pipeline_document
-            >>> _terms_from_pipeline_document({"kg": [{"subject": {"content": ["Alice"]}}]})
-            ['Alice']
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import _terms_from_pipeline_document
+        >>> _terms_from_pipeline_document({"kg": [{"subject": {"content": ["Alice"]}}]})
+        ['Alice']
     """
     if not document:
         return []
@@ -142,11 +142,11 @@ def _analysis_morphosyntax(
     query_document: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     """Return morphosyntax tokens from analysis or pipeline documents.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import _analysis_morphosyntax
-            >>> callable(_analysis_morphosyntax)
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import _analysis_morphosyntax
+        >>> callable(_analysis_morphosyntax)
+        True
     """
     morph = analysis.get("morphosyntax")
     if isinstance(morph, list) and morph:
@@ -166,11 +166,11 @@ def _content_token_keys(
     query_document: dict[str, Any] | None = None,
 ) -> set[str]:
     """Lowercased content-bearing surfaces from morphosyntax (UD POS).
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import _content_token_keys
-            >>> callable(_content_token_keys)
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import _content_token_keys
+        >>> callable(_content_token_keys)
+        True
     """
     from thot.tools.search.query_refiner import (
         meaningful_tokens_from_morphosyntax,
@@ -188,11 +188,11 @@ def _content_token_keys(
 
 def _is_content_phrase(text: str, content_keys: set[str]) -> bool:
     """True if phrase has content tokens, or no POS filter is available.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import _is_content_phrase
-            >>> _is_content_phrase("hello world", {"hello"})
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import _is_content_phrase
+        >>> _is_content_phrase("hello world", {"hello"})
+        True
     """
     if not text:
         return False
@@ -207,13 +207,13 @@ def _is_content_phrase(text: str, content_keys: set[str]) -> bool:
 
 def _append_term(terms: list[str], text: str | None) -> None:
     """Append a non-empty term string.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import _append_term
-            >>> terms = []
-            >>> _append_term(terms, "  alpha  ")
-            >>> terms
-            ['alpha']
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import _append_term
+        >>> terms = []
+        >>> _append_term(terms, "  alpha  ")
+        >>> terms
+        ['alpha']
     """
     value = str(text or "").strip()
     if value:
@@ -227,12 +227,12 @@ def _query_focus_terms(
     query_document: dict[str, Any] | None = None,
 ) -> list[str]:
     """Collect SPARQL focus terms from NLP analysis (language-agnostic).
-    
+
     Prefer pipeline KG / NER / keywords / lemmas / search_terms / SVO. Filter
     SVO and morph fallbacks with Universal Dependencies POS (via existing
     helpers), never with language-specific stopword lists. ``query`` is unused
     for tokenization when NLP is present.
-    
+
         Example:
             >>> from thot.tasks.answer_generation.ontology_clues import _query_focus_terms
             >>> callable(_query_focus_terms)
@@ -310,11 +310,11 @@ def _query_focus_terms(
 
 def _sparql_string_literal(value: str) -> str:
     """Escape a value for use inside a SPARQL string literal.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import _sparql_string_literal
-            >>> _sparql_string_literal("hello")
-            'hello'
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import _sparql_string_literal
+        >>> _sparql_string_literal("hello")
+        'hello'
     """
     return (
         value.replace("\\", "\\\\")
@@ -332,11 +332,11 @@ def generate_sparql_from_query_ontology(
     limit: int = 30,
 ) -> list[str]:
     """Generate up to three SPARQL SELECT queries from the query ontology.
-    
+
     1. Label-oriented fact harvest for focus terms
     2. Multi-hop bridge between the two strongest entities (when available)
     3. Class / type focus for the top entity-like term
-    
+
         Example:
             >>> from thot.tasks.answer_generation.ontology_clues import generate_sparql_from_query_ontology
             >>> len(generate_sparql_from_query_ontology({"search_terms": ["Alice"]}, "Who is Alice?")) >= 1
@@ -430,10 +430,10 @@ def propose_queries_for_navigator(
     chunk_keywords: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, str]]:
     """Build Navigator proposals from returned-chunk importance + ontology.
-    
+
     The three SPARQL chips are driven by the most important entity/keyword
     terms across retrieved chunks (not by generic business-ontology popularity).
-    
+
         Example:
             >>> from thot.tasks.answer_generation.ontology_clues import propose_queries_for_navigator
             >>> propose_queries_for_navigator(None, "q")[0]["kind"]
@@ -471,11 +471,11 @@ def propose_queries_for_navigator(
 
 def _format_sparql_binding_row(row: Any) -> str:
     """Render one SPARQL result row as a compact clue line.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import _format_sparql_binding_row
-            >>> _format_sparql_binding_row({"sl": "Alice", "ol": "Bob"})
-            'Alice — Bob'
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import _format_sparql_binding_row
+        >>> _format_sparql_binding_row({"sl": "Alice", "ol": "Bob"})
+        'Alice — Bob'
     """
     if isinstance(row, dict):
         parts: list[str] = []
@@ -513,11 +513,11 @@ def run_sparql_on_merged(
     limit_rows: int = 20,
 ) -> tuple[str, list[str]]:
     """Execute SPARQL queries via ``query_merged_ontology``; return clue text.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import run_sparql_on_merged
-            >>> callable(run_sparql_on_merged)
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import run_sparql_on_merged
+        >>> callable(run_sparql_on_merged)
+        True
     """
     from thot.tools.search.ontology_reasoner import query_merged_ontology
 
@@ -553,11 +553,11 @@ def run_reasoner_on_merged(
     merged_json_ld: str,
 ) -> str:
     """Run consistency (+ optional infer) on the merged passage ontology.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.ontology_clues import run_reasoner_on_merged
-            >>> callable(run_reasoner_on_merged)
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.ontology_clues import run_reasoner_on_merged
+        >>> callable(run_reasoner_on_merged)
+        True
     """
     from thot.tools.search.ontology_reasoner import query_merged_ontology
 
@@ -618,14 +618,14 @@ def build_ontology_clues(
     use_reasoner: bool = True,
 ) -> OntologyClueBundle:
     """Merge passage ontologies, SPARQL from query, reason — return prompt clues.
-    
+
     Steps:
       1. ``build_document_graph`` per passage (and query) via document_ontology
       2. ``merge_rdf_graphs`` on passage JSON-LD
       3. Generate SPARQL from query ontology terms; run on merged graph
       4. Optional consistency / infer reasoner
       5. Summarize graph + SPARQL hits as LLM clues
-    
+
         Example:
             >>> from thot.tasks.answer_generation.ontology_clues import build_ontology_clues
             >>> callable(build_ontology_clues)
@@ -683,10 +683,10 @@ def build_ontology_clues(
 
 def format_clues_for_prompt(bundle: OntologyClueBundle) -> str:
     """Format merged passage ontology summary for the QA prompt.
-    
+
     SPARQL hit lines stay in ``bundle.sparql_clues`` and are injected via the
     dedicated SPARQL CLUES block (avoid duplicating them here).
-    
+
         Example:
             >>> from thot.tasks.answer_generation.ontology_clues import OntologyClueBundle, format_clues_for_prompt
             >>> "fact" in format_clues_for_prompt(OntologyClueBundle(ontology_facts="fact"))

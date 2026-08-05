@@ -10,12 +10,9 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
 from thot.action.models import ActionRecord
 from thot.action.sink import InMemoryActionSink
-from thot.audit.hot_store import HotStore, SqliteHotStore
+from thot.audit.hot_store import HotStore
 
 
 class HotStoreActionSink:

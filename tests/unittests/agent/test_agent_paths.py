@@ -44,7 +44,9 @@ def test_frontmatter_emits_spec_families():
     )
     text = render_frontmatter(fm)
     assert "type: Document" in text
-    assert "tkeir_okf_version: '0.2'" in text or "tkeir_okf_version: 0.2" in text
+    assert (
+        "tkeir_okf_version: '0.2'" in text or "tkeir_okf_version: 0.2" in text
+    )
     assert "generated:" in text
     assert "process:tkeir-okf-export" in text
     assert "sources:" in text

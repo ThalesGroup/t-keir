@@ -28,6 +28,8 @@ INTENT_SCOPE = {
     "generate": "intent:generate",
     "tool.invoke": "intent:tool.invoke",
     "okf.export": "intent:okf.export",
+    "collect": "intent:collect",
+    "collect.read": "intent:collect",
 }
 
 INTENT_KILL_SCOPE: dict[str, KillScope | None] = {
@@ -40,6 +42,8 @@ INTENT_KILL_SCOPE: dict[str, KillScope | None] = {
     "generate": "agents",
     "tool.invoke": "agents",
     "okf.export": "inference",
+    "collect": "inference",
+    "collect.read": None,
 }
 
 WRITE_INTENTS = frozenset({"ingest", "index", "delete", "okf.export"})

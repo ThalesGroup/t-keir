@@ -1,0 +1,40 @@
+# Collector topic → business ontology / RDF derive-from mapping.
+#
+# Request body ``topic`` selects a row. Per-document language (detected from
+# page markdown) further refines ontology via ``by_language`` or
+# ``workspace/collector/topics/<topic>/<lang>/``.
+#
+# Workspace override (wins when present):
+#   workspace/collector/topics/<topic>/business_ontology.yaml
+#   workspace/collector/topics/<topic>/ontologies/*.ttl|*.owl|*.rdf
+#   workspace/collector/topics/<topic>/<lang>/business_ontology.yaml
+#   workspace/collector/topics/<topic>/<lang>/ontologies/*
+
+default_topic: osint
+
+topics:
+  osint:
+    description: Maritime / C2 OSINT business ontology
+    business_ontology_dataset: osint
+    ontology_paths: []
+    by_language:
+      en:
+        business_ontology_dataset: osint
+      fr:
+        business_ontology_dataset: osint
+  scifact:
+    description: SciFact scientific claims
+    business_ontology_dataset: scifact
+    ontology_paths: []
+  fiqa:
+    description: Financial QA
+    business_ontology_dataset: fiqa
+    ontology_paths: []
+  arguana:
+    description: Argument retrieval
+    business_ontology_dataset: arguana
+    ontology_paths: []
+  scidocs:
+    description: SciDocs document similarity
+    business_ontology_dataset: scidocs
+    ontology_paths: []

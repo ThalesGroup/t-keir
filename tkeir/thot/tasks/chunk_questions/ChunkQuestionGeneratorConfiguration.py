@@ -14,11 +14,11 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 
 class ChunkQuestionGeneratorConfiguration:
     """Load chunk question generator configuration.
-    
-        Example:
-            >>> from thot.tasks.chunk_questions.ChunkQuestionGeneratorConfiguration import ChunkQuestionGeneratorConfiguration
-            >>> callable(ChunkQuestionGeneratorConfiguration)
-            True
+
+    Example:
+        >>> from thot.tasks.chunk_questions.ChunkQuestionGeneratorConfiguration import ChunkQuestionGeneratorConfiguration
+        >>> callable(ChunkQuestionGeneratorConfiguration)
+        True
     """
 
     def __init__(self):

@@ -213,6 +213,48 @@ hybrid biases toward dense; T-KEIR must not dilute it with BM25/ontology noise).
 
 There is **no** question-embedding arm and **no** separate document schema.
 
+### `business_ontology`
+
+External SKOS-like catalog loaded from
+`datasets/<name>/business_ontology.yaml`. Used at **index** time (annotate
+passages / `json_ld` / concept ids) and at **search / RAG / reporter** time
+(query expansion + optional overlap scoring). Parsed into
+`BusinessOntologyConfig` (`thot.tools.search.dual_hybrid_config`).
+
+```yaml
+dual_hybrid:
+  business_ontology:
+    index_enabled: true
+    search_enabled: true
+    default_dataset: osint   # → datasets/osint/business_ontology.yaml
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `index_enabled` | bool | `true` | Annotate documents with the dataset YAML during ingest / `index_pipeline_document` |
+| `search_enabled` | bool | `true` | Auto-load the dataset YAML on `/search`, `/rag/query`, and ontology reasoner when the client omits a full payload |
+| `default_dataset` | string | `osint` | Folder name under `datasets/` → `datasets/<default_dataset>/business_ontology.yaml` |
+
+**Request overrides (non-breaking):**
+
+| Source | Field | Behaviour |
+|--------|-------|-----------|
+| HMI / API | `business_ontology_dataset` | Selects `datasets/<id>/business_ontology.yaml` instead of `default_dataset` |
+| HMI / API | `business_ontology` | Inline YAML/JSON payload; **merged** with the dataset file when both are present |
+| HMI `config.json` | `businessOntologyDataset` | Default picker value (falls back to `osint`) |
+| Ingest | `business_ontology_dataset` on `/ingest/json-records`, `/workspace/index` | Stamped into NLP extras for annotation |
+
+Known catalogs on disk (also listed in the HMI picker): `osint`, `scifact`,
+`fiqa`, `arguana`, `scidocs`. Collector topics map to the same ids via
+`configs/collector/topics.yaml`.
+
+When `search_enabled` is true and the client sends neither a dataset nor a
+payload, the server loads `default_dataset`. Set `search_enabled: false` (or
+`index_enabled: false`) to disable without code changes.
+
+Related: `query_expansion` / `ontology_scoring` consume the resolved payload;
+they do not load the YAML themselves.
+
 ### `average_field_length`
 
 Passed to Vespa `rank-properties` as `bm25(field).averageFieldLength`.  
@@ -224,8 +266,10 @@ Estimate from a corpus with `python scripts/measure_field_lengths.py -i <pipelin
 
 ### `query_expansion`
 
-Expands the query using the **per-request** `business_ontology` (SKOS-like concepts).  
-Not loaded from disk in the API.
+Expands the query using the **resolved** business ontology (SKOS-like
+concepts): request `business_ontology` payload and/or
+`datasets/<business_ontology_dataset|default_dataset>/business_ontology.yaml`
+(see [`business_ontology`](#business_ontology) above).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -343,6 +387,22 @@ Loaded alongside `rag.yaml` by the RAG FastAPI app. Edit strings carefully: they
 3. Change `embedding_dim` → regenerate schemas **and** re-embed the corpus (BGE-M3 dim is 1024).
 4. Validate with `make beir-smoke` / `make eval-smoke` (production config only; no smoke-local fusion retunes).
 5. Rollback to QueryAnalyzer path: `dual_hybrid.enabled: false` (see [migration runbook](../runbooks/dual-hybrid-migration.md)).
+
+---
+
+## `ranking.freshness` — optional score blend
+
+Opt-in passage freshness using `doc_timestamp` (see
+[vespa_retention_migration.md](../vespa_retention_migration.md)).
+
+| Key | Type | Default | Notes |
+|-----|------|---------|-------|
+| `enabled` | bool | `false` | **Leave false** for non-regression; enabling changes scores |
+| `field` | string | `doc_timestamp` | Vespa attribute used as age base |
+| `max_age_seconds` | int | `604800` | Age clamp (7 days) |
+| `weight` | float | `0.25` | Blend weight when enabled |
+
+Validate with `make beir-smoke` before production if you turn this on.
 
 ---
 

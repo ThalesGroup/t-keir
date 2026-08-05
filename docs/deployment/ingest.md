@@ -42,7 +42,9 @@ For files such as `datasets/osint/c2_middle_east_multi_source_1000_v3_en.json`
 1. Each record becomes one Markdown document (title, text, and every attribute).
 2. Source id is `{filename_stem}/{doc_id}` (e.g. `c2_middle_east_…/C2-202606-0001`).
 3. Non-narrative fields are promoted to `record_concept_ids` → Vespa
-   `ontology_concepts` (dense + sparse still come from the NLP/embed path).
+   `ontology_concepts`, and copied into document `metadata` (domain-agnostic:
+   OSINT `pir_ref`, enterprise `kri_ref`, nested objects, …). Dense + sparse
+   still come from the NLP/embed path.
 4. Default index target is **`global`**.
 
 HMI: **Admin → Global corpus ingest** posts to `/api/ingest/ingest/json-records`

@@ -14,12 +14,13 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 
 class ConverterConfiguration:
     """ConverterConfiguration container.
-    
-        Example:
-            >>> from thot.tasks.converters.ConverterConfiguration import ConverterConfiguration
-            >>> callable(ConverterConfiguration)
-            True
+
+    Example:
+        >>> from thot.tasks.converters.ConverterConfiguration import ConverterConfiguration
+        >>> callable(ConverterConfiguration)
+        True
     """
+
     def __init__(self):
         """Initialize empty converter configuration holders.
 

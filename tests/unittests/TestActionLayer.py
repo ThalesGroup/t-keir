@@ -108,6 +108,10 @@ def test_action_schema_file_exists():
 def test_intent_for_path():
     assert intent_for_path("/rag/query") == "search"
     assert intent_for_path("/search") == "search"
+    assert intent_for_path("/collect") == "collect"
+    assert intent_for_path("/collect/batch") == "collect"
+    assert intent_for_path("/topics") == "collect.read"
+    assert intent_for_path("/dedupe") == "collect.read"
 
 
 def test_middleware_sets_correlation_and_records():

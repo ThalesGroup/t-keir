@@ -586,7 +586,7 @@ async def ingest_document(
 
     Staged paths under ``INGEST_ROOT`` are passed to NER, syntax, and
     document-ontology for that document only.
-    
+
 
     Example:
         >>> import inspect
@@ -708,7 +708,7 @@ async def ingest_json_records(
 
     Accepts multipart ``file`` upload **or** JSON body with ``dataset_path``
     (resolved under the repo ``datasets/`` tree for admin demos).
-    
+
 
     Example:
         >>> import inspect
@@ -814,6 +814,10 @@ async def ingest_json_records(
 
     batch_id = new_action_id()
     correlation_id = _correlation_id()
+    bo_dataset = (
+        str(options.business_ontology_dataset or "").strip()
+        or _default_business_ontology_dataset()
+    )
     jobs: list[IngestAcceptedResponse] = []
     for doc in documents:
         meta = dict(doc.get("metadata") or {})
@@ -825,6 +829,10 @@ async def ingest_json_records(
         )
         extras["index_target"] = target
         extras["title"] = doc.get("title")
+        extras["dataset"] = bo_dataset
+        extras["business_ontology_dataset"] = bo_dataset
+        if options.business_ontology is not None:
+            extras["business_ontology"] = options.business_ontology
         md_bytes = str(doc["markdown"]).encode("utf-8")
         accepted = _queue_job(
             source_uri=f"json-record://{batch_id}/{doc['doc_id']}",
@@ -936,7 +944,7 @@ async def ingest_status(
     HMI progress polling must stay lightweight: loading every manifest on each
     tick overloaded the server and left transient ``poll_error`` statuses that
     never counted as done, so the progress bar stalled below 100%.
-    
+
 
     Example:
         >>> import inspect
@@ -1026,7 +1034,7 @@ async def workspace_tree(
 
     Also heals catalog rows stuck on ``indexing`` when their ingest jobs
     have already finished (success / noop / failed).
-    
+
 
     Example:
         >>> import inspect
@@ -1085,7 +1093,7 @@ async def workspace_upload(
     When the upload is a record-oriented JSON corpus (``{records:[…]}``),
     each record is converted to Markdown and saved as
     ``{directory}/{corpus_stem}/{doc_id}.md`` (personal workspace only).
-    
+
 
     Example:
         >>> import inspect
@@ -1343,7 +1351,7 @@ async def workspace_copy_to(
     to the basename so they are visible without deep navigation). Only
     allowlisted targets (``commander``) are accepted. Destination catalog
     entries are ``pending`` so the recipient can choose what to index.
-    
+
 
     Example:
         >>> import inspect
@@ -1542,7 +1550,7 @@ async def workspace_index(
     Loads ``datasets/<business_ontology_dataset>/business_ontology.yaml``,
     runs the NLP pipeline, annotates the analyzed document with matched
     concepts, then indexes into the personal ``user`` streaming group.
-    
+
 
     Example:
         >>> import inspect

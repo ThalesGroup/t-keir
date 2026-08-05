@@ -99,9 +99,12 @@ class OkfBundleStore:
             return self.flat_root
         if os.getenv("OKF_ROOT", "").strip():
             return default_okf_root()
-        # Soft-read fallback for older demo bundles still under .tkeir-okf
+        # Soft-read fallback for older demo bundles still under flat roots
+        from thot.tools.ingest.user_workspace import workspace_root
+
         for candidate in (
             default_okf_root(),
+            workspace_root() / ".tkeir-okf",
             Path.cwd().resolve() / ".tkeir-okf",
             Path.cwd().resolve().parent / ".tkeir-okf",
         ):

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { CorrelationIdBadge } from "@/components/correlation-id";
+import { BusinessOntologySelect } from "@/components/business-ontology-select";
 import { OntologyCoverageMeter } from "@/components/ontology-coverage-meter";
 import { OntologyNavigator } from "@/components/ontology-navigator";
 import { OntologyReasonGraph } from "@/components/ontology-reason-graph";
@@ -28,6 +29,7 @@ import {
   querySearch,
   RagApiError,
 } from "@/lib/api";
+import { resolveBusinessOntologyDataset } from "@/lib/business-ontology-datasets";
 import {
   chunkOntologyHaystacks,
   coverageAgainstHaystacks,
@@ -94,6 +96,9 @@ export function SearchPanel({
   const [info, setInfo] = useState<string | null>(null);
   const [response, setResponse] = useState<SearchResponse | null>(null);
   const [correlationId, setCorrelationId] = useState<string | null>(null);
+  const [businessOntologyDataset, setBusinessOntologyDataset] = useState(() =>
+    resolveBusinessOntologyDataset(runtimeConfig?.businessOntologyDataset),
+  );
 
   const [boBusy, setBoBusy] = useState(false);
   const [boPayload, setBoPayload] = useState<Record<string, unknown> | null>(
@@ -224,7 +229,7 @@ export function SearchPanel({
           query,
           language,
           hits,
-          ...ontologyQueryOptions(runtimeConfig),
+          ...ontologyQueryOptions(runtimeConfig, businessOntologyDataset),
           ...(boPayload ? { business_ontology: boPayload } : {}),
         });
         setResponse(result.response);
@@ -325,6 +330,14 @@ export function SearchPanel({
       <SearchHeader loading={loading} onSearch={handleSearch} />
 
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed px-3 py-2">
+        <BusinessOntologySelect
+          value={businessOntologyDataset}
+          onChange={setBusinessOntologyDataset}
+          disabled={loading || boBusy}
+          label="Dataset"
+          className="min-w-[10rem]"
+          triggerClassName="h-9"
+        />
         <label
           className={cn(
             "inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md border px-3 text-sm",
@@ -371,8 +384,8 @@ export function SearchPanel({
           </Badge>
         ) : (
           <span className="text-xs text-muted-foreground">
-            Sent as <code>business_ontology</code> on search — otherwise dataset{" "}
-            <code>{defaultDataset}</code>
+            Optional file override — otherwise dataset{" "}
+            <code>{businessOntologyDataset || defaultDataset}</code>
           </span>
         )}
       </div>

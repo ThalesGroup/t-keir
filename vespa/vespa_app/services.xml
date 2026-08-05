@@ -11,27 +11,64 @@
     </http>
   </container>
 
-  <!-- Catalog: HNSW index mode (schema global inherits doc_base). -->
+  <!-- Catalog: HNSW index mode (schema global inherits doc_base).
+       Document keep-selection (retention): pin OR unset/zero TTL OR
+       within [doc_timestamp, doc_timestamp+TTL). Unset fields are null in
+       Vespa — null TTL must keep the document (opt-in expiry). -->
   <content id="global" version="1.0">
     <redundancy>1</redundancy>
-    <documents>
-      <document type="global" mode="index" />
+    <documents garbage-collection="true" garbage-collection-interval="3600">
+      <document type="global" mode="index"
+                selection="global.pinned = true or global.freshness_ttl_seconds = null or global.freshness_ttl_seconds &lt;= 0 or (global.freshness_ttl_seconds &gt; 0 and now() &lt; global.doc_timestamp + global.freshness_ttl_seconds)" />
     </documents>
     <nodes>
       <node distribution-key="0" hostalias="node1" />
     </nodes>
+    <!-- Proton tuning: throttle flush/compaction impact on query latency.
+         GC interval is garbage-collection-interval above (default 3600 s). -->
+    <engine>
+      <proton>
+        <tuning>
+          <searchnode>
+            <flushstrategy>
+              <native>
+                <component>
+                  <diskbloatfactor>0.25</diskbloatfactor>
+                </component>
+              </native>
+            </flushstrategy>
+          </searchnode>
+        </tuning>
+      </proton>
+    </engine>
   </content>
 
   <!-- Per-user streaming (schema user inherits doc_base).
        Document ids MUST use g=<user_space>:… and queries MUST set
-       streaming.groupname. -->
+       streaming.groupname. Same retention keep-selection as global. -->
   <content id="user" version="1.0">
     <redundancy>1</redundancy>
-    <documents>
-      <document type="user" mode="streaming" />
+    <documents garbage-collection="true" garbage-collection-interval="3600">
+      <document type="user" mode="streaming"
+                selection="user.pinned = true or user.freshness_ttl_seconds = null or user.freshness_ttl_seconds &lt;= 0 or (user.freshness_ttl_seconds &gt; 0 and now() &lt; user.doc_timestamp + user.freshness_ttl_seconds)" />
     </documents>
     <nodes>
       <node distribution-key="0" hostalias="node1" />
     </nodes>
+    <engine>
+      <proton>
+        <tuning>
+          <searchnode>
+            <flushstrategy>
+              <native>
+                <component>
+                  <diskbloatfactor>0.25</diskbloatfactor>
+                </component>
+              </native>
+            </flushstrategy>
+          </searchnode>
+        </tuning>
+      </proton>
+    </engine>
   </content>
 </services>

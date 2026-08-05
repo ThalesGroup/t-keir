@@ -55,7 +55,7 @@ def ensure_golden_chunks_for_index(document: dict[str, Any]) -> dict[str, Any]:
 
     When NLP produced no chunks, synthesize one from content/title so
     passages can still be embedded and upserted.
-    
+
 
     Example:
         >>> from thot.tools.ingest.index_passages import ensure_golden_chunks_for_index
@@ -341,7 +341,7 @@ async def index_pipeline_document(
 
     Returns:
         Document/passage counts and timings.
-    
+
 
     Example:
         >>> import inspect

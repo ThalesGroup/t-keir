@@ -10,11 +10,8 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
-from thot.action.models import ActionRecord, new_action_id, utc_now_rfc3339
-from thot.audit.hot_store import HotStore, SqliteHotStore
+from thot.action.models import new_action_id, utc_now_rfc3339
+from thot.audit.hot_store import HotStore
 from thot.audit.worm_store import WormSegmentStore
 
 
@@ -30,6 +27,10 @@ def archive_unarchived(
         Segment id when records were archived, else ``None``.
 
     Example:
+        >>> import tempfile
+        >>> from pathlib import Path
+        >>> from thot.action.models import ActionRecord
+        >>> from thot.audit.hot_store import SqliteHotStore
         >>> with tempfile.TemporaryDirectory() as td:
         ...     root = Path(td)
         ...     hot = SqliteHotStore(root / "hot.db")

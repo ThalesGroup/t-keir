@@ -42,12 +42,13 @@ from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
 
 class PipelineConfiguration:
     """PipelineConfiguration container.
-    
-        Example:
-            >>> from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
-            >>> callable(PipelineConfiguration)
-            True
+
+    Example:
+        >>> from thot.tasks.pipeline.PipelineConfiguration import PipelineConfiguration
+        >>> callable(PipelineConfiguration)
+        True
     """
+
     TASK_CONFIG_CLASSES = {
         "converter": ConverterConfiguration,
         "tokenizer": TokenizerConfiguration,

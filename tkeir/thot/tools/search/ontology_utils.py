@@ -93,12 +93,12 @@ _STRUCTURAL_PREDICATE_LABELS = frozenset(
 
 def _is_structural_predicate_label(predicate: str) -> bool:
     """Is structural predicate label.
-    
-        Example:
-            >>> from thot.tools.search.ontology_utils import _is_structural_predicate_label
-            >>> _is_structural_predicate_label("hasKeyword")
-            True
-        """
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _is_structural_predicate_label
+        >>> _is_structural_predicate_label("hasKeyword")
+        True
+    """
 
     compact = (
         (predicate or "")
@@ -815,12 +815,12 @@ def _distinctive_query_phrases(query_text: str) -> list[str]:
 
 def _chunk_prompt_text(chunk: Any) -> str:
     """Chunk prompt text.
-    
-        Example:
-            >>> from thot.tools.search.ontology_utils import _chunk_prompt_text
-            >>> _chunk_prompt_text({"text_raw": "Hello"})
-            'hello'
-        """
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _chunk_prompt_text
+        >>> _chunk_prompt_text({"text_raw": "Hello"})
+        'hello'
+    """
 
     raw = (
         chunk.text_raw
@@ -1544,12 +1544,12 @@ def _surface_tokens_in_text(
 
 def _ner_type_label(raw: str) -> str:
     """Ner type label.
-    
-        Example:
-            >>> from thot.tools.search.ontology_utils import _ner_type_label
-            >>> _ner_type_label("person")
-            'Person'
-        """
+
+    Example:
+        >>> from thot.tools.search.ontology_utils import _ner_type_label
+        >>> _ner_type_label("person")
+        'Person'
+    """
 
     text = (raw or "entity").strip() or "entity"
     return text[:1].upper() + text[1:] if text else "Entity"

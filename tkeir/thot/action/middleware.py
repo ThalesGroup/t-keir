@@ -48,6 +48,10 @@ _PATH_INTENT = {
     "/search": "search",
     "/ingest/document": "ingest",
     "/ingest/batch": "ingest",
+    "/collect": "collect",
+    "/collect/batch": "collect",
+    "/topics": "collect.read",
+    "/dedupe": "collect.read",
     "/audit/actions": "audit.read",
     "/audit/report": "audit.read",
     "/audit/verify": "audit.read",
@@ -82,6 +86,8 @@ def intent_for_path(path: str) -> str:
     Example:
         >>> intent_for_path("/rag/query")
         'search'
+        >>> intent_for_path("/collect")
+        'collect'
         >>> intent_for_path("/unknown")
         'search'
     """

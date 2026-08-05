@@ -188,7 +188,7 @@ def record_to_markdown(record: dict[str, Any], *, source: str) -> str:
         - **source:** `stem/doc_id`
         - **attr:** value
           - **nested:** value
-    
+
 
     Example:
         >>> from thot.tools.ingest.json_records import record_to_markdown
@@ -290,6 +290,33 @@ def extract_record_concepts(
     return concepts[:max_concepts]
 
 
+def _record_structured_metadata(record: dict[str, Any]) -> dict[str, Any]:
+    """Copy every non-narrative field into ingest metadata (domain-agnostic).
+
+    Skips title/text/body/content/… (see ``_NARRATIVE_KEYS``) and id keys.
+    Nested objects and lists are kept as-is so enterprise / OSINT / other
+    corpora all retain their structured attributes.
+
+    Example:
+        >>> from thot.tools.ingest.json_records import _record_structured_metadata
+        >>> meta = _record_structured_metadata(
+        ...     {"title": "T", "text": "body", "kri_ref": "KRI-02", "domain": "X"}
+        ... )
+        >>> meta["kri_ref"], "title" in meta, "text" in meta
+        ('KRI-02', False, False)
+    """
+    skip_ids = {k.casefold() for k in _ID_KEYS}
+    out: dict[str, Any] = {}
+    for key, value in record.items():
+        key_s = str(key)
+        if key_s.casefold() in _NARRATIVE_KEYS or key_s.casefold() in skip_ids:
+            continue
+        if value is None or value == "" or value == []:
+            continue
+        out[key_s] = value
+    return out
+
+
 def split_record_documents(
     payload: Any,
     *,
@@ -306,8 +333,9 @@ def split_record_documents(
       - ``markdown``: full markdown body
       - ``filename``: ``{stem}__{doc_id}.md``
       - ``record_concept_ids``: concepts from structured fields
-      - ``metadata``: classification / domain / … for ingest extras
-    
+      - ``metadata``: all non-narrative record fields (+ corpus / title /
+        doc_type / language) for ingest extras
+
 
     Example:
         >>> from thot.tools.ingest.json_records import split_record_documents
@@ -333,20 +361,15 @@ def split_record_documents(
             "corpus": stem,
             "title": title,
             "doc_type": _scalar_to_str(
-                record.get("domain") or record.get("source_type") or "osint"
+                record.get("domain")
+                or record.get("source_type")
+                or record.get("doc_type")
+                or "record"
             ),
             "language": _scalar_to_str(record.get("language") or "en") or "en",
         }
-        for key in (
-            "classification",
-            "domain",
-            "originator",
-            "pir_ref",
-            "topic_id",
-        ):
-            value = record.get(key)
-            if value is not None and value != "" and value != []:
-                meta[key] = value
+        # Domain-agnostic: OSINT pir_ref, enterprise kri_ref, nested location, …
+        meta.update(_record_structured_metadata(record))
         safe_id = re.sub(r"[^\w.\-]+", "_", doc_id)
         out.append(
             {
@@ -386,7 +409,7 @@ def workspace_markdown_files_from_json(
 
     Each item: ``path`` (relative under workspace files/), ``doc_id``,
     ``markdown`` (str), ``title``. Returns ``None`` when not a record corpus.
-    
+
 
     Example:
         >>> import json

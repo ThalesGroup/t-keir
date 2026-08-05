@@ -58,7 +58,7 @@ def stage_ontology_bytes(
 
     Returns:
         Absolute paths to staged files (safe for pipeline derive-from).
-    
+
 
     Example:
         >>> import tempfile
@@ -98,7 +98,7 @@ def decode_ontology_uploads(raw: Any) -> list[tuple[str, bytes]]:
 
     Raises:
         ValueError: When the payload shape is invalid.
-    
+
 
     Example:
         >>> import base64

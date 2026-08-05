@@ -24,11 +24,11 @@ from thot.tasks.TaskInfo import TaskInfo
 
 class ChunkQuestionGenerator:
     """Generate synthetic retrieval questions for golden chunks.
-    
-        Example:
-            >>> from thot.tasks.chunk_questions.ChunkQuestionGenerator import ChunkQuestionGenerator
-            >>> callable(ChunkQuestionGenerator)
-            True
+
+    Example:
+        >>> from thot.tasks.chunk_questions.ChunkQuestionGenerator import ChunkQuestionGenerator
+        >>> callable(ChunkQuestionGenerator)
+        True
     """
 
     def __init__(

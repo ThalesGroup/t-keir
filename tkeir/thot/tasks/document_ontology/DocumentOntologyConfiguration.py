@@ -14,11 +14,11 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 
 class DocumentOntologyConfiguration:
     """Load document ontology configuration.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.DocumentOntologyConfiguration import DocumentOntologyConfiguration
-            >>> callable(DocumentOntologyConfiguration)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.DocumentOntologyConfiguration import DocumentOntologyConfiguration
+        >>> callable(DocumentOntologyConfiguration)
+        True
     """
 
     def __init__(self):

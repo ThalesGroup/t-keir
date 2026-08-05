@@ -1,7 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  BusinessOntologyFilePicker,
+  EMPTY_BUSINESS_ONTOLOGY_FILE,
+  type BusinessOntologyFileValue,
+} from "@/components/business-ontology-file-picker";
+import { resolveBusinessOntologyDataset } from "@/lib/business-ontology-datasets";
 import { apiFetch } from "@/src/auth/useApiClient";
+import { useAuth } from "@/src/auth/AuthProvider";
 
 type IndexTarget = "global" | "user" | "both";
 
@@ -113,11 +120,14 @@ async function fetchStatusesInBatches(
 }
 
 export function GlobalIngestPanel() {
+  const { runtimeConfig } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [usePreset, setUsePreset] = useState(true);
   const indexTarget: IndexTarget = "global";
   const [limit, setLimit] = useState<string>("20");
   const [offset, setOffset] = useState<string>("0");
+  const [businessOntology, setBusinessOntology] =
+    useState<BusinessOntologyFileValue>(EMPTY_BUSINESS_ONTOLOGY_FILE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [accepted, setAccepted] = useState<JsonRecordsAccepted | null>(null);
@@ -276,14 +286,20 @@ export function GlobalIngestPanel() {
         throw new Error("Offset must be >= 0");
       }
 
-      const options = {
+      const options: Record<string, unknown> = {
         split_records: true,
         index_target: indexTarget,
         offset: offsetN,
         limit: limitN ?? null,
         dataset_path: usePreset && !file ? PRESET_DATASET : null,
         filename: file?.name ?? undefined,
+        business_ontology_dataset: resolveBusinessOntologyDataset(
+          runtimeConfig?.businessOntologyDataset,
+        ),
       };
+      if (businessOntology.payload) {
+        options.business_ontology = businessOntology.payload;
+      }
 
       let response: Response;
       if (file) {
@@ -403,6 +419,21 @@ export function GlobalIngestPanel() {
             />
           </label>
         </div>
+
+        <BusinessOntologyFilePicker
+          value={businessOntology}
+          onChange={setBusinessOntology}
+          disabled={busy}
+          label="Business ontology file"
+          emptyHint={`Optional — default dataset “${resolveBusinessOntologyDataset(runtimeConfig?.businessOntologyDataset)}”`}
+        />
+        <p className="text-xs text-muted-foreground">
+          Applied after NLP. Upload a{" "}
+          <code className="text-[10px]">.yaml</code> /{" "}
+          <code className="text-[10px]">.json</code> ontology, or leave empty
+          to use the configured default dataset file.
+        </p>
+
         <p className="text-xs text-muted-foreground">
           Indexes into the shared Vespa <strong>global</strong> catalog (visible
           to all users). Personal files belong under My files → user streaming

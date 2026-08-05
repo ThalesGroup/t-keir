@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Render Vespa .sd files for doc_base / global / user from rag.yaml.
 
+Retention / TTL fields (`doc_timestamp`, `freshness_ttl_seconds`, `pinned`,
+`pin_reason`, `source_type`) live in ``templates/doc_base.sd.j2`` so both
+``global`` and ``user`` inherit them. Keep-selection + GC interval are in
+``vespa/vespa_app/services.xml`` (see ``docs/vespa_retention_migration.md``).
+
 Usage:
     python scripts/generate_vespa_schemas.py
     python scripts/generate_vespa_schemas.py --check

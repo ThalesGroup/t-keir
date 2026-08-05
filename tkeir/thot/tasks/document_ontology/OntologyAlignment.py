@@ -83,11 +83,11 @@ _STRUCTURAL_PREDICATES = frozenset(
 @dataclass(frozen=True)
 class AlignmentSettings:
     """Configuration for ontology class/property clustering.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyAlignment import AlignmentSettings
-            >>> callable(AlignmentSettings)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import AlignmentSettings
+        >>> callable(AlignmentSettings)
+        True
     """
 
     enabled: bool = True
@@ -589,11 +589,11 @@ def _collect_document_ner_labels(document: dict) -> list[str]:
 
 def _add_ner_label_candidates(candidates: set[str], document: dict) -> None:
     """_add_ner_label_candidates helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyAlignment import _add_ner_label_candidates
-            >>> callable(_add_ner_label_candidates)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _add_ner_label_candidates
+        >>> callable(_add_ner_label_candidates)
+        True
     """
     for label in _collect_document_ner_labels(document):
         candidates.add(label)
@@ -602,11 +602,11 @@ def _add_ner_label_candidates(candidates: set[str], document: dict) -> None:
 
 def _add_ner_head_candidates(candidates: set[str], document: dict) -> None:
     """_add_ner_head_candidates helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyAlignment import _add_ner_head_candidates
-            >>> callable(_add_ner_head_candidates)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _add_ner_head_candidates
+        >>> callable(_add_ner_head_candidates)
+        True
     """
     for key in ("title_ner", "content_ner"):
         for span in document.get(key) or []:
@@ -620,11 +620,11 @@ def _add_ner_head_candidates(candidates: set[str], document: dict) -> None:
 
 def _add_chunk_entity_candidates(candidates: set[str], document: dict) -> None:
     """_add_chunk_entity_candidates helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyAlignment import _add_chunk_entity_candidates
-            >>> callable(_add_chunk_entity_candidates)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _add_chunk_entity_candidates
+        >>> callable(_add_chunk_entity_candidates)
+        True
     """
     for chunk in document.get("golden_chunks") or []:
         metadata = chunk.get("metadata") or {}
@@ -638,11 +638,11 @@ def _add_chunk_entity_candidates(candidates: set[str], document: dict) -> None:
 
 def _add_kg_head_candidates(candidates: set[str], document: dict) -> None:
     """_add_kg_head_candidates helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyAlignment import _add_kg_head_candidates
-            >>> callable(_add_kg_head_candidates)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _add_kg_head_candidates
+        >>> callable(_add_kg_head_candidates)
+        True
     """
     for triple in document.get("kg") or []:
         for part in ("subject", "value"):
@@ -659,11 +659,11 @@ def _add_kg_head_candidates(candidates: set[str], document: dict) -> None:
 
 def _filter_class_candidates(candidates: set[str]) -> list[str]:
     """_filter_class_candidates helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyAlignment import _filter_class_candidates
-            >>> _filter_class_candidates({"Person", "Entity"})
-            ['Person']
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyAlignment import _filter_class_candidates
+        >>> _filter_class_candidates({"Person", "Entity"})
+        ['Person']
     """
     return sorted(
         candidate

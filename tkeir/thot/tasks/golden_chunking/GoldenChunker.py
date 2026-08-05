@@ -24,12 +24,13 @@ from thot.tasks.TaskInfo import TaskInfo
 
 class GoldenChunker:
     """GoldenChunker container.
-    
-        Example:
-            >>> from thot.tasks.golden_chunking.GoldenChunker import GoldenChunker
-            >>> callable(GoldenChunker)
-            True
+
+    Example:
+        >>> from thot.tasks.golden_chunking.GoldenChunker import GoldenChunker
+        >>> callable(GoldenChunker)
+        True
     """
+
     def __init__(
         self,
         config: GoldenChunkerConfiguration | None = None,

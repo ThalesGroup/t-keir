@@ -147,11 +147,11 @@ Details: [vespa/README.md](vespa/README.md), [docs/tools/vespa_rag.md](docs/tool
 ### 4. Hybrid demo — `./start_services.sh` (recommended)
 
 One-command launcher for the full local stack in **tmux**: Vespa + Keycloak +
-SPIRE (Docker), then ingest, RAG, governor, audit, OKF, agent, and HMI on the
-host, with health gates between windows.
+SPIRE + SearXNG (Docker), then collector, ingest, RAG, governor, audit, OKF,
+agent, and HMI on the host, with health gates between windows.
 
 ```bash
-# Prerequisites: make setup (+ make pull-vespa), Docker, tmux, Ollama on host
+# Prerequisites: make setup (pulls Vespa + SearXNG), Docker, tmux, Ollama on host
 ./start_services.sh
 # or: bash start_services.sh --no-attach
 ```

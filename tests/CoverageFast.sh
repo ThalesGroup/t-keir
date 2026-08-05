@@ -56,6 +56,7 @@ ACTIVE_TESTS=(
     unittests/TestConfigurationUtils.py
     unittests/TestQueryAnalyzer.py
     unittests/TestOkfModels.py
+    unittests/tools/test_collector.py
     unittests/TestOkfExporter.py
     unittests/TestOkfApplicator.py
     unittests/TestOkfMcpTools.py

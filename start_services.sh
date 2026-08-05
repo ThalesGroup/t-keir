@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Title: start_services.sh — tmux orchestrator for hybrid demo Makefile targets.
 #
-# Starts Vespa (vespa-up + bootstrap) → Keycloak → SPIRE → ingest → RAG →
-# governor → audit → OKF → agent → HMI in dedicated tmux windows with health gates.
+# Starts Vespa (vespa-up + bootstrap) → Keycloak → SPIRE → SearXNG → collector →
+# ingest → RAG → governor → audit → OKF → agent → HMI in dedicated tmux windows
+# with health gates.
 #
 # Usage:
 #   ./start_services.sh              # create session and attach
@@ -40,6 +41,8 @@ TMUX_CMD=""
 TIMEOUT_VESPA="${TIMEOUT_VESPA:-180}"
 TIMEOUT_KEYCLOAK="${TIMEOUT_KEYCLOAK:-180}"
 TIMEOUT_SPIRE="${TIMEOUT_SPIRE:-180}"
+TIMEOUT_SEARXNG="${TIMEOUT_SEARXNG:-90}"
+TIMEOUT_COLLECTOR="${TIMEOUT_COLLECTOR:-180}"
 TIMEOUT_INGEST="${TIMEOUT_INGEST:-180}"
 TIMEOUT_RAG="${TIMEOUT_RAG:-180}"
 TIMEOUT_GOVERNOR="${TIMEOUT_GOVERNOR:-180}"
@@ -301,6 +304,12 @@ main() {
 
   start_window "[SPIRE]" "make spire-up"
   wait_spire "$TIMEOUT_SPIRE"
+
+  start_window "[SEARXNG]" "make searxng-up"
+  wait_http "SearXNG" "http://127.0.0.1:8888/healthz" "$TIMEOUT_SEARXNG"
+
+  start_window "[COLLECTOR]" "make collector-up"
+  wait_http "Collector" "http://127.0.0.1:8096/health" "$TIMEOUT_COLLECTOR"
 
   # index-up = schema init + long-running ingest (:8091)
   start_window "[INDEX]" "make index-up"

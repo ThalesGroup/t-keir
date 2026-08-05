@@ -142,6 +142,8 @@ dual_hybrid:
         bm25: 0.10
   # Tag passages with datasets/<name>/business_ontology.yaml at index time /
   # auto-load that YAML on /search and /rag/query (merge with request payload).
+  # See docs/configuration/rag.yaml.md → dual_hybrid.business_ontology
+  # (default_dataset selects datasets/<id>/business_ontology.yaml).
   business_ontology:
     index_enabled: true
     search_enabled: true
@@ -205,3 +207,13 @@ dual_hybrid:
     top_k_returned: 10
   fallback:
     neutral_score: 0.5
+
+# Optional passage freshness blend (opt-in). When enabled=false (default),
+# ranking scores are unchanged — non-regression contract.
+# See docs/vespa_retention_migration.md before turning this on in production.
+ranking:
+  freshness:
+    enabled: false          # opt-in, false by default → no regression
+    field: doc_timestamp
+    max_age_seconds: 604800 # 7 days
+    weight: 0.25            # blended into final score when enabled

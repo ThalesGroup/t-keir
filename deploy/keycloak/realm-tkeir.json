@@ -108,6 +108,15 @@
         "include.in.token.scope": "true",
         "display.on.consent.screen": "false"
       }
+    },
+    {
+      "name": "intent:collect",
+      "description": "Declared intent: web collect",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
     }
   ],
   "clients": [
@@ -182,7 +191,8 @@
         "roles",
         "intent:search",
         "intent:ingest",
-        "intent:index"
+        "intent:index",
+        "intent:collect"
       ]
     },
     {
@@ -254,6 +264,7 @@
         "intent:delete",
         "intent:audit.read",
         "intent:admin.override",
+        "intent:collect",
         "offline_access"
       ]
     },

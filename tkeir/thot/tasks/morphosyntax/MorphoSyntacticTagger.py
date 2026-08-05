@@ -24,12 +24,13 @@ from thot.tasks.TaskInfo import TaskInfo
 
 class MorphoSyntacticTagger:
     """MorphoSyntacticTagger container.
-    
-        Example:
-            >>> from thot.tasks.morphosyntax.MorphoSyntacticTagger import MorphoSyntacticTagger
-            >>> callable(MorphoSyntacticTagger)
-            True
+
+    Example:
+        >>> from thot.tasks.morphosyntax.MorphoSyntacticTagger import MorphoSyntacticTagger
+        >>> callable(MorphoSyntacticTagger)
+        True
     """
+
     def __init__(
         self,
         config: MorphoSyntacticTaggerConfiguration = None,
@@ -133,11 +134,11 @@ class MorphoSyntacticTagger:
 
     def _token_assignment(self, tok_i):
         """_token_assignment helper.
-        
-            Example:
-                >>> from thot.tasks.morphosyntax.MorphoSyntacticTagger import MorphoSyntacticTagger
-                >>> callable(MorphoSyntacticTagger._token_assignment)
-                True
+
+        Example:
+            >>> from thot.tasks.morphosyntax.MorphoSyntacticTagger import MorphoSyntacticTagger
+            >>> callable(MorphoSyntacticTagger._token_assignment)
+            True
         """
         return self._retag_punct(
             {
@@ -151,11 +152,11 @@ class MorphoSyntacticTagger:
 
     def _concept_triples_for_token(self, tok_i):
         """_concept_triples_for_token helper.
-        
-            Example:
-                >>> from thot.tasks.morphosyntax.MorphoSyntacticTagger import MorphoSyntacticTagger
-                >>> callable(MorphoSyntacticTagger._concept_triples_for_token)
-                True
+
+        Example:
+            >>> from thot.tasks.morphosyntax.MorphoSyntacticTagger import MorphoSyntacticTagger
+            >>> callable(MorphoSyntacticTagger._concept_triples_for_token)
+            True
         """
         if not self._add_concept_in_kg or not isinstance(
             tok_i._.advanced_tag, list
@@ -181,11 +182,11 @@ class MorphoSyntacticTagger:
 
     def _process_doc_tokens(self, doc_tokens):
         """_process_doc_tokens helper.
-        
-            Example:
-                >>> from thot.tasks.morphosyntax.MorphoSyntacticTagger import MorphoSyntacticTagger
-                >>> callable(MorphoSyntacticTagger._process_doc_tokens)
-                True
+
+        Example:
+            >>> from thot.tasks.morphosyntax.MorphoSyntacticTagger import MorphoSyntacticTagger
+            >>> callable(MorphoSyntacticTagger._process_doc_tokens)
+            True
         """
         morphosyntax = []
         kg = []

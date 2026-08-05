@@ -30,7 +30,7 @@ endif
 	deps-check deps-update deps-update-safe verify-lockfile tag changelog \
 	bom sbom aibom trivy owasp-dependency-check security-report \
 	docs docs-build docs-pdf pipeline quickstart ci-deps ci pre-commit clean devcontainer \
-	sync pull-models pull-bge-model pull-vespa start init bootstrap vespa-check test-vespa test-vespa-py \
+	sync pull-models pull-bge-model pull-vespa pull-searxng start init bootstrap vespa-check test-vespa test-vespa-py \
 	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
 	beir-eval beir-smoke generate-eval rag-eval beir-rag-eval eval eval-smoke clean-db vespa-clean logs \
 	images images-push images-sign \
@@ -40,6 +40,7 @@ endif
 	hmi-install hmi-lint hmi-typecheck hmi-build hmi-up \
 	k3d-up k3d-down helm-deps helm-lint helm-template cluster-install cluster-plan cluster-uninstall \
 	k3s-server k3s-agent k3s-check cilium-install lima-k3s-up lima-k3s-down \
+	searxng-up collector collector-up \
 	keycloak-export-realm keycloak-sync-demo-users keycloak-purge-demo-users seal kubeflow-install kubeflow-uninstall kubeflow-register-models kubeflow-run-ingest \
 	lineage-report audit-evidence annex-iv \
 	datasets datasets-ontologies datasets-download datasets-ingest datasets-ingest-user datasets-ingest-admin \
@@ -78,6 +79,12 @@ HMI_DIR := $(ROOT)/tkeir-hmi
 VESPA_DIR := $(ROOT)/vespa
 # Host P0 Vespa image (matches vespa/start_vespa.sh and deploy/versions.lock.yaml).
 VESPA_IMAGE ?= vespaengine/vespa
+# Host web collector meta-search (JSON API on :8888).
+SEARXNG_IMAGE ?= docker.io/searxng/searxng:latest
+SEARXNG_NAME ?= searxng
+SEARXNG_PORT ?= 8888
+COLLECTOR_PORT ?= 8096
+SEARXNG_URL ?= http://127.0.0.1:$(SEARXNG_PORT)
 TESTS_DIR := $(ROOT)/tests
 CONFIGS_DIR := $(TKEIR_DIR)/configs
 SCRIPTS_DIR := $(ROOT)/scripts
@@ -88,6 +95,11 @@ DIST_DIR := $(ROOT)/dist
 BUILD_STAMP := $(DIST_DIR)/.build_timestamp
 
 WORKSPACE ?= $(ROOT)/workspace
+# Flat OKF fallback (default_okf_root when OKF_ROOT unset). Per-user bundles:
+# $(WORKSPACE)/users/<space>/okf/<bundle_id>/
+OKF_FLAT_ROOT ?= $(WORKSPACE)/.tkeir-okf
+# Agent run store (default_agent_root when AGENT_ROOT unset).
+AGENT_ROOT ?= $(WORKSPACE)/agent
 PIPELINE_CONFIG ?= $(CONFIGS_DIR)/pipeline.yaml
 PIPELINE_INPUT ?= $(ROOT)/tests/fixtures/test-raw/raw
 PIPELINE_OUTPUT ?= $(WORKSPACE)/tmp/pipeline-out
@@ -234,6 +246,7 @@ export UV PYTHON COMPOSE TRIVY_IMAGE OWASP_DC_IMAGE OWASP_DC_FAIL_CVSS TRIVY_SEV
 export BOM_SPEC_VERSION BOM_REPORT_DIR BOM_CONFIG BOM_PYTHON
 export PIPELINE_CONFIG PIPELINE_INPUT PIPELINE_OUTPUT PIPELINE_TYPE
 export TRANSFORMERS_CACHE HF_HOME HUGGINGFACE_HUB_CACHE WORKSPACE DOCS_PORT
+export OKF_FLAT_ROOT AGENT_ROOT
 export COVERAGE_FAIL_UNDER SECURITY_REPORT_DIR
 export VERSION GIT_COMMIT GIT_BRANCH BUILD_DATE
 export VERBOSE
@@ -251,8 +264,9 @@ help: ## Show available targets (VERBOSE=1 prints recipes)
 		| awk 'BEGIN {FS = ":.*?##[[:space:]]*"}; {printf "  \033[36mmake %-28s\033[0m %s\n", $$1, $$2}' \
 		| sort
 	$(Q)printf '%s\n' ""
-	$(Q)printf '%s\n' "Python packages: thot.tools.ingest | thot.tools.search | thot.tools.eval"
+	$(Q)printf '%s\n' "Python packages: thot.tools.ingest | thot.tools.search | thot.tools.collector | thot.tools.eval"
 	$(Q)printf '%s\n' "Common vars: PIPELINE_* INDEX_INPUT RAG_QUERY BEIR_* COVERAGE_FAIL_UNDER VERSION WORKSPACE VERBOSE"
+	$(Q)printf '%s\n' "Workspace:   WORKSPACE=$(WORKSPACE)  OKF_FLAT_ROOT=$(OKF_FLAT_ROOT)  AGENT_ROOT=$(AGENT_ROOT)"
 	$(Q)printf '%s\n' "Image vars:  IMAGE_REGISTRY IMAGE_TAG PLATFORMS MODEL_MODE"
 	$(Q)printf '%s\n' "Compose:     PROFILES=$(PROFILES) (core,auth,ingest,audit,governor,observability,objectstore,mcp,agents,spire)"
 
@@ -354,19 +368,22 @@ init-models: install ## Build tkeir_mwe.pkl from annotation resources (skip if p
 	$(Q)cd $(TKEIR_DIR) && TRANSFORMERS_CACHE="$(TRANSFORMERS_CACHE)" \
 		bash scripts/init-models.sh "$(TRANSFORMERS_CACHE)"
 
-setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3 → Vespa → SciDocs)
+setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3 → Vespa → SearXNG → SciDocs)
 	$(MAKE) install
 	$(MAKE) install-spacy-models
 	$(MAKE) install-tesseract
 	$(MAKE) init-models
 	$(MAKE) pull-bge-model
 	$(MAKE) pull-vespa
+	$(MAKE) pull-searxng
 	$(MAKE) scidocs-download
 	$(Q)echo ""
 	$(Q)echo "Setup complete."
 	$(Q)echo "  Run pipeline: make pipeline"
 	$(Q)echo "  Or demo:      make quickstart"
 	$(Q)echo "  Vespa:        make bootstrap   # start container + deploy schemas"
+	$(Q)echo "  SearXNG:      make searxng-up  # meta-search on :$(SEARXNG_PORT)"
+	$(Q)echo "  Collector:    make collector   # query → fetch → return markdown docs"
 	$(Q)echo "  Index:        make index          # thot.tools.ingest"
 	$(Q)echo "  Search/RAG:   make rag            # thot.tools.search"
 	$(Q)echo "  Eval smoke:   make eval-smoke     # thot.tools.eval"
@@ -563,6 +580,12 @@ PIP_AUDIT_IGNORE += --ignore-vuln PYSEC-2026-1996
 PIP_AUDIT_IGNORE += --ignore-vuln PYSEC-2026-3447
 # GHSA-537c-gmf6-5ccf — cryptography>=48 blocked by optional spiffe extra (cryptography<47) | fix blocked by: spiffe upstream | target resolution: 2026-09-01 | ticket: N/A
 PIP_AUDIT_IGNORE += --ignore-vuln GHSA-537c-gmf6-5ccf
+# PYSEC-2026-3552 — cryptography>=50 blocked by optional spiffe extra (cryptography<47) | fix blocked by: spiffe upstream | target resolution: 2026-09-01 | ticket: N/A
+PIP_AUDIT_IGNORE += --ignore-vuln PYSEC-2026-3552
+# PYSEC-2026-3553 — cryptography>=49 blocked by optional spiffe extra (cryptography<47) | fix blocked by: spiffe upstream | target resolution: 2026-09-01 | ticket: N/A
+PIP_AUDIT_IGNORE += --ignore-vuln PYSEC-2026-3553
+# PYSEC-2026-3554 — cryptography>=49 blocked by optional spiffe extra (cryptography<47) | fix blocked by: spiffe upstream | target resolution: 2026-09-01 | ticket: N/A
+PIP_AUDIT_IGNORE += --ignore-vuln PYSEC-2026-3554
 
 pip-audit: ci-deps ## Scan Python dependencies for known CVEs
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
@@ -855,7 +878,7 @@ compose-down: check-docker ## Stop Compose stack (VOLUMES=1 also removes volumes
 # All Compose profiles used by the hybrid / full demo (infra + optional services).
 DEMO_COMPOSE_PROFILES ?= core,auth,ingest,audit,governor,observability,objectstore,mcp,agents,spire,okf
 # Host ports used by hybrid demo services (rag/ingest/agent/audit/governor/okf/hmi).
-DEMO_HOST_PORTS ?= 3000 8090 8091 8092 8093 8094 8095
+DEMO_HOST_PORTS ?= 3000 8090 8091 8092 8093 8094 8095 8096 8888
 
 wipe-runtime: check-docker ## Wipe host + leftover Docker runtime DBs/state (Vespa, audit, governor, …)
 	$(Q)echo "Wiping host Vespa data volume…"
@@ -866,20 +889,21 @@ wipe-runtime: check-docker ## Wipe host + leftover Docker runtime DBs/state (Ves
 			echo "  docker volume rm $$vols"; \
 			docker volume rm $$vols >/dev/null 2>&1 || true; \
 		fi
-	$(Q)echo "Wiping host runtime state under workspace / .tkeir-* …"
+	$(Q)echo "Wiping host runtime state under $(WORKSPACE)…"
 	$(Q)rm -rf \
 		"$(WORKSPACE)/audit" \
 		"$(WORKSPACE)/governor" \
 		"$(WORKSPACE)/ingest" \
 		"$(WORKSPACE)/users" \
-		"$(WORKSPACE)/agent" \
+		"$(AGENT_ROOT)" \
 		"$(WORKSPACE)/tmp" \
-		"$(ROOT)/.tkeir-okf" \
-		"$(TKEIR_DIR)/.tkeir-okf" \
+		"$(WORKSPACE)/searxng/data" \
+		"$(WORKSPACE)/collector" \
+		"$(OKF_FLAT_ROOT)" \
 		"$(ROOT)/.tkeir-agent" \
 		"$(COMPOSE_OUT)"
 	$(Q)if [ -n "$(strip $(OKF_ROOT))" ]; then rm -rf "$(OKF_ROOT)"; fi
-	$(Q)echo "Runtime DBs/state wiped."
+	$(Q)echo "Runtime DBs/state wiped (incl. $(OKF_FLAT_ROOT) and $(AGENT_ROOT))."
 
 down: check-docker ## Stop all demo services and wipe DBs/state (KEEP_DATA=1 to preserve)
 	$(Q)echo "Purging Keycloak demo personas (best-effort, while auth is still up)…"
@@ -890,6 +914,9 @@ down: check-docker ## Stop all demo services and wipe DBs/state (KEEP_DATA=1 to 
 	$(Q)echo "Stopping host Vespa container (if any)…"
 	-$(Q)docker stop vespa >/dev/null 2>&1 || true
 	-$(Q)docker rm vespa >/dev/null 2>&1 || true
+	$(Q)echo "Stopping SearXNG container (if any)…"
+	-$(Q)docker stop "$(SEARXNG_NAME)" >/dev/null 2>&1 || true
+	-$(Q)docker rm "$(SEARXNG_NAME)" >/dev/null 2>&1 || true
 	$(Q)echo "Stopping host demo listeners on ports $(DEMO_HOST_PORTS) (best-effort)…"
 	-$(Q)for p in $(DEMO_HOST_PORTS); do \
 		pids=$$(lsof -tiTCP:$$p -sTCP:LISTEN 2>/dev/null || true); \
@@ -1133,6 +1160,50 @@ pull-vespa: check-docker ## Pull Vespa Docker image (VESPA_IMAGE=$(VESPA_IMAGE))
 	$(Q)echo "Pulling $(VESPA_IMAGE)…"
 	docker pull "$(VESPA_IMAGE)"
 
+pull-searxng: check-docker ## Pull SearXNG Docker image (SEARXNG_IMAGE=$(SEARXNG_IMAGE))
+	$(Q)echo "Pulling $(SEARXNG_IMAGE)…"
+	docker pull "$(SEARXNG_IMAGE)"
+	$(Q)mkdir -p "$(WORKSPACE)/searxng/config" "$(WORKSPACE)/searxng/data"
+	$(Q)if [ ! -f "$(WORKSPACE)/searxng/config/settings.yml" ]; then \
+		cp "$(TKEIR_DIR)/resources/searxng/settings.yml" "$(WORKSPACE)/searxng/config/settings.yml"; \
+		echo "Installed default SearXNG settings → $(WORKSPACE)/searxng/config/settings.yml"; \
+	fi
+
+searxng-up: check-docker ## Start SearXNG on :$(SEARXNG_PORT) (volumes under WORKSPACE/searxng)
+	$(Q)mkdir -p "$(WORKSPACE)/searxng/config" "$(WORKSPACE)/searxng/data"
+	$(Q)if [ ! -f "$(WORKSPACE)/searxng/config/settings.yml" ]; then \
+		cp "$(TKEIR_DIR)/resources/searxng/settings.yml" "$(WORKSPACE)/searxng/config/settings.yml"; \
+		echo "Installed default SearXNG settings → $(WORKSPACE)/searxng/config/settings.yml"; \
+	fi
+	$(Q)if docker ps -a --format '{{.Names}}' | grep -qx '$(SEARXNG_NAME)'; then \
+		echo "Removing existing container $(SEARXNG_NAME)…"; \
+		docker rm -f "$(SEARXNG_NAME)" >/dev/null; \
+	fi
+	$(Q)echo "Starting $(SEARXNG_NAME) on :$(SEARXNG_PORT) (image=$(SEARXNG_IMAGE))…"
+	docker run --name "$(SEARXNG_NAME)" -d \
+		-p "$(SEARXNG_PORT):8080" \
+		-v "$(WORKSPACE)/searxng/config/:/etc/searxng/" \
+		-v "$(WORKSPACE)/searxng/data/:/var/cache/searxng/" \
+		"$(SEARXNG_IMAGE)"
+	$(Q)echo "SearXNG UI/API: $(SEARXNG_URL)  (JSON: $(SEARXNG_URL)/search?q=test&format=json)"
+
+collector: ## [collector] Start tkeir-collector API (:$(COLLECTOR_PORT)) — return markdown, no NLP/store
+	$(Q)mkdir -p "$(WORKSPACE)/collector" "$(WORKSPACE)/searxng/config" "$(WORKSPACE)/searxng/data" \
+		"$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)" "$(GOVERNOR_STATE_ROOT)"
+	cd $(TKEIR_DIR) && \
+		TKEIR_WORKSPACE="$(WORKSPACE)" \
+		TKEIR_REPO_ROOT="$(ROOT)" \
+		TKEIR_SERVICE=tkeir-collector \
+		SEARXNG_URL="$(SEARXNG_URL)" \
+		COLLECTOR_PORT="$(COLLECTOR_PORT)" \
+		GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
+		$(AUDIT_HOST_ENV) \
+		$(UV) run --no-sync --python $(PYTHON) python -m thot.tools.collector
+
+collector-up: collector ## Alias for make collector
+
+.PHONY: pull-searxng searxng-up collector collector-up
+
 # VESPA_PULL=1 allows start_vespa.sh to docker-pull when the image is missing.
 VESPA_PULL ?= 0
 
@@ -1265,13 +1336,13 @@ TKEIR_AGENT_ORCHESTRATOR_CONFIG ?= $(ROOT)/datasets/$(TKEIR_AGENT_USECASE)/agent
 LLM_GENERATE_TIMEOUT_SECONDS ?= 600
 
 agent: spire-up ## Start tkeir-agent HTTP service (:8092)
-	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)" "$(WORKSPACE)/users" "$(WORKSPACE)/agent"
+	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)" "$(WORKSPACE)/users" "$(AGENT_ROOT)"
 	$(Q)test -f "$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" || { \
 		echo "Missing agent orchestrator config: $(TKEIR_AGENT_ORCHESTRATOR_CONFIG)"; \
 		echo "Set TKEIR_AGENT_USECASE=osint|enterprise or TKEIR_AGENT_ORCHESTRATOR_CONFIG=…"; \
 		exit 1; \
 	}
-	cd $(TKEIR_DIR) && AGENT_ROOT="$(WORKSPACE)/agent" \
+	cd $(TKEIR_DIR) && AGENT_ROOT="$(AGENT_ROOT)" \
 		TKEIR_WORKSPACE="$(WORKSPACE)" \
 		TKEIR_AGENT_USECASE="$(TKEIR_AGENT_USECASE)" \
 		TKEIR_AGENT_ORCHESTRATOR_CONFIG="$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" \
@@ -1344,16 +1415,19 @@ compose-list: ## List ontology-driven templates
 	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.compose --list
 
 OKF_URL ?= http://localhost:8095
-# Optional legacy flat OKF dir (tests / migration). New bundles go to
-# workspace/users/<space>/okf/<bundle_id>/ when OKF_ROOT is unset.
+# OKF storage layout (TKEIR_WORKSPACE=$(WORKSPACE)):
+#   - Per-user (default writes): $(WORKSPACE)/users/<space>/okf/<bundle_id>/
+#   - Flat fallback:             $(OKF_FLAT_ROOT)  (= $(WORKSPACE)/.tkeir-okf)
+#   - Explicit override:         OKF_ROOT=/path   (tests / one-off)
 OKF_ROOT ?=
 OKF_PORT ?= 8095
 OKF_QUERY ?=
 OKF_MAX_DOCS ?= 50
 USER_SPACE ?= dev@tkeir
 
-okf: ## Start OKF server (port 8095; governor stays on 8094)
-	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)" "$(WORKSPACE)/users" "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
+okf: ## Start OKF server (:8095; bundles under WORKSPACE users/…/okf or OKF_FLAT_ROOT)
+	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)" "$(WORKSPACE)/users" \
+		"$(OKF_FLAT_ROOT)" "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
 	cd $(TKEIR_DIR) && TKEIR_WORKSPACE="$(WORKSPACE)" OKF_PORT="$(OKF_PORT)" \
 		$(if $(strip $(OKF_ROOT)),OKF_ROOT="$(OKF_ROOT)",) \
 		GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
@@ -1457,7 +1531,8 @@ audit-up: ## Start audit API on host (:8093) reading workspace/audit
 audit-worm-list: ## List audit WORM segment files under workspace/audit/worm
 	$(Q)ls -lah "$(AUDIT_WORM_ROOT)"
 
-okf-export: ## CLI export: make okf-export QUERY="..." USER_SPACE=dev@tkeir
+okf-export: ## CLI export → WORKSPACE/users/<space>/okf (or OKF_FLAT_ROOT / OKF_ROOT)
+	$(Q)mkdir -p "$(WORKSPACE)/users" "$(OKF_FLAT_ROOT)"
 	cd $(TKEIR_DIR) && TKEIR_WORKSPACE="$(WORKSPACE)" \
 		$(if $(strip $(OKF_ROOT)),OKF_ROOT="$(OKF_ROOT)",) \
 		$(UV) run --python $(PYTHON) python -m thot.okf.exporter \
@@ -1466,14 +1541,14 @@ okf-export: ## CLI export: make okf-export QUERY="..." USER_SPACE=dev@tkeir
 		$(if $(strip $(OKF_QUERY)$(QUERY)),--query "$(or $(OKF_QUERY),$(QUERY))",) \
 		$(if $(strip $(OUTPUT)),--output "$(OUTPUT)",)
 
-okf-migrate-workspace: ## Move legacy .tkeir-okf bundles into workspace/users/<space>/okf/
+okf-migrate-workspace: ## Move flat OKF (OKF_FLAT_ROOT) → workspace/users/<space>/okf/
+	$(Q)mkdir -p "$(WORKSPACE)/users" "$(OKF_FLAT_ROOT)"
 	cd $(TKEIR_DIR) && TKEIR_WORKSPACE="$(WORKSPACE)" \
 		$(UV) run --python $(PYTHON) python -c \
 		'from pathlib import Path; from thot.okf.store import migrate_flat_okf_into_workspace; \
-roots=[Path("../.tkeir-okf").resolve(), Path(".tkeir-okf").resolve()]; \
-moved=[]; \
-[moved.extend(migrate_flat_okf_into_workspace(r)) for r in roots if r.is_dir()]; \
-print("migrated", len(moved), "bundles", moved)'
+root=Path(r"$(OKF_FLAT_ROOT)").resolve(); \
+moved=migrate_flat_okf_into_workspace(root) if root.is_dir() else []; \
+print("migrated", len(moved), "bundles from", str(root), "→", moved)'
 
 okf-workflow: check-curl check-jq ## Run OKF agent workflow (WORKFLOW=llm_wiki|okf_wiki_brief)
 	$(MAKE) workflow-run WORKFLOW="$(or $(WORKFLOW),llm_wiki)" \

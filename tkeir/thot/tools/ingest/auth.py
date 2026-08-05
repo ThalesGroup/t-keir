@@ -128,7 +128,7 @@ def is_ingest_admin(authorization: str | None) -> bool:
 
     When ``INGEST_AUTH_ENABLED`` is false (local demos), global corpus tools
     remain usable; personal ``/workspace/*`` endpoints still force ``user``.
-    
+
 
     Example:
         >>> from thot.tools.ingest.auth import is_ingest_admin
@@ -155,7 +155,7 @@ def resolve_allowed_index_target(
     - Admin (or auth off): may choose ``global`` / ``user`` / ``both``.
     - ``require_admin_for_global``: when True and auth on, non-admins may not
       select a shared index (used by ``/ingest/json-records``).
-    
+
 
     Example:
         >>> from thot.tools.ingest.auth import resolve_allowed_index_target

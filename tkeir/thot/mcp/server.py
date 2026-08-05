@@ -201,11 +201,11 @@ class McpRuntime:
 async def lifespan(app: FastAPI):
     """FastAPI lifespan: configure logging and attach :class:`McpRuntime`.
 
-        Example:
-            >>> import inspect
-            >>> from thot.mcp.server import lifespan
-            >>> inspect.isfunction(lifespan)
-            True
+    Example:
+        >>> import inspect
+        >>> from thot.mcp.server import lifespan
+        >>> inspect.isfunction(lifespan)
+        True
     """
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-mcp"))
     app.state.mcp = McpRuntime()

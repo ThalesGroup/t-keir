@@ -9,6 +9,7 @@ import type {
 import { enrichQueryResponse } from "@/lib/report";
 import { apiFetch } from "@/src/auth/useApiClient";
 import type { RuntimeConfig } from "@/src/config/runtimeConfig";
+import { resolveBusinessOntologyDataset } from "@/lib/business-ontology-datasets";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "/api";
@@ -16,6 +17,7 @@ const API_BASE =
 /** Ontology dump + business-ontology dataset fields for /search and /rag/query. */
 export function ontologyQueryOptions(
   runtimeConfig: RuntimeConfig | null | undefined,
+  datasetOverride?: string | null,
 ): Pick<
   QueryRequest,
   "analyzed_documents_path" | "business_ontology_dataset"
@@ -23,8 +25,10 @@ export function ontologyQueryOptions(
   return {
     analyzed_documents_path:
       runtimeConfig?.analyzedDocumentsPath?.trim() || "workspace/ingest",
-    business_ontology_dataset:
-      runtimeConfig?.businessOntologyDataset?.trim() || "osint",
+    business_ontology_dataset: resolveBusinessOntologyDataset(
+      runtimeConfig?.businessOntologyDataset,
+      datasetOverride,
+    ),
   };
 }
 

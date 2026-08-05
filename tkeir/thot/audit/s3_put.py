@@ -33,6 +33,7 @@ def _sign_key(secret: str, datestamp: str, region: str, service: str) -> bytes:
         >>> len(key) == 32
         True
     """
+
     def _hmac(key: bytes, msg: str) -> bytes:
         return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
 

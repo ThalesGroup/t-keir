@@ -15,7 +15,7 @@ from thot.core.LoggerConfiguration import LoggerConfiguration
 class TokenizerConfiguration:
     """load tokenizer configuration
     A tokenizer configuration is represented by JSON entry:
-    
+
     Example
     logger": {
             "logging-level": "debug"
@@ -28,7 +28,7 @@ class TokenizerConfiguration:
             }]
         }
     }
-    
+
         Example:
             >>> from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
             >>> callable(TokenizerConfiguration)

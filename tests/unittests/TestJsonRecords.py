@@ -72,6 +72,14 @@ def test_split_and_load():
     )
     assert doc["filename"].endswith(".md")
     assert doc["record_concept_ids"]
+    # Domain-agnostic metadata: all non-narrative fields, not an OSINT allowlist.
+    assert doc["metadata"]["classification"] == "UNCLASSIFIED"
+    assert doc["metadata"]["domain"] == "OSINT_SOCMINT"
+    assert doc["metadata"]["location"]["country"] == "Egypt"
+    assert doc["metadata"]["tags"] == ["maritime", "suez"]
+    # title is an ingest promo field; narrative body is excluded
+    assert doc["metadata"]["title"] == "OSINT Report - Suez"
+    assert "text" not in doc["metadata"]
 
     loaded = load_and_split(
         json.dumps(SAMPLE).encode(),
@@ -79,6 +87,28 @@ def test_split_and_load():
         limit=1,
     )
     assert loaded[0]["doc_id"] == "C2-202606-0001"
+
+
+def test_split_metadata_keeps_enterprise_fields():
+    payload = {
+        "records": [
+            {
+                "doc_id": "ENT-1",
+                "title": "Sanctions note",
+                "text": "Open-source filing.",
+                "kri_ref": "KRI-02",
+                "jurisdiction": "Nicosia",
+                "primary_entity": "DESERT FALCON",
+                "domain": "OPEN_SOURCE_ANALYTICS",
+            }
+        ]
+    }
+    doc = split_record_documents(payload, filename="enterprise.json")[0]
+    assert doc["metadata"]["kri_ref"] == "KRI-02"
+    assert doc["metadata"]["jurisdiction"] == "Nicosia"
+    assert doc["metadata"]["primary_entity"] == "DESERT FALCON"
+    assert doc["metadata"]["doc_type"] == "OPEN_SOURCE_ANALYTICS"
+    assert "text" not in doc["metadata"]
 
 
 def test_workspace_markdown_files_from_json():

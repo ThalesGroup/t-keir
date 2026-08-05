@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { AgentRunActivity } from "@/components/agent-run-activity";
+import { BusinessOntologySelect } from "@/components/business-ontology-select";
 import { MarkdownContent } from "@/components/markdown-content";
 import { OntologyNavigator } from "@/components/ontology-navigator";
 import { OntologyReasonGraph } from "@/components/ontology-reason-graph";
@@ -27,6 +28,7 @@ import {
   querySearch,
   RagApiError,
 } from "@/lib/api";
+import { resolveBusinessOntologyDataset } from "@/lib/business-ontology-datasets";
 import { weightMapsFromOntology } from "@/lib/ontology-graph";
 import {
   LLM_WIKI_WORKFLOW,
@@ -89,6 +91,13 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
 
   const [query, setQuery] = useState(persona.goal);
   const [hits, setHits] = useState(20);
+  const [businessOntologyDataset, setBusinessOntologyDataset] = useState(() =>
+    resolveBusinessOntologyDataset(runtimeConfig?.businessOntologyDataset),
+  );
+  const ontologyOpts = useMemo(
+    () => ontologyQueryOptions(runtimeConfig, businessOntologyDataset),
+    [runtimeConfig, businessOntologyDataset],
+  );
   const [busy, setBusy] = useState(false);
   /** Which part of the fused Grab→wiki pipeline is active (for button label). */
   const [pipelinePhase, setPipelinePhase] = useState<"idle" | "grab" | "wiki">(
@@ -197,7 +206,7 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
         hits,
         // Dual Vespa schemas (global + user) — required for wiki evidence.
         search_mode: "both",
-        ...ontologyQueryOptions(runtimeConfig),
+        ...ontologyOpts,
       });
       setSearchResponse(response);
       setOntology(response.ontology ?? null);
@@ -252,7 +261,7 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
         language: "en",
         hits: 40,
         search_mode: "both",
-        ...ontologyQueryOptions(runtimeConfig),
+        ...ontologyOpts,
         ontology_json_ld: mergeOntologyJsonLd(jsonLdParts),
       });
       const aligned = alignOntologyToWikiEvidence(
@@ -492,7 +501,7 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
         language: "en",
         hits,
         search_mode: "both",
-        ...ontologyQueryOptions(runtimeConfig),
+        ...ontologyOpts,
       });
       setSearchResponse(response);
       setOntology(response.ontology ?? null);
@@ -861,6 +870,12 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
               disabled={busy}
             />
           </label>
+          <BusinessOntologySelect
+            value={businessOntologyDataset}
+            onChange={setBusinessOntologyDataset}
+            disabled={busy}
+            className="min-w-[11rem]"
+          />
           <Button
             type="submit"
             disabled={busy || !agentAvailable || !query.trim()}

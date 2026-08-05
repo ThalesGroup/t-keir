@@ -38,12 +38,13 @@ from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
 
 class SpacyTokenizerPipe:
     """SpacyTokenizerPipe container.
-    
-        Example:
-            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-            >>> callable(SpacyTokenizerPipe)
-            True
+
+    Example:
+        >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+        >>> callable(SpacyTokenizerPipe)
+        True
     """
+
     def __init__(
         self, nlp: Doc = None, config: dict = None, call_context=None
     ):
@@ -149,14 +150,15 @@ class SpacyTokenizerPipe:
             word = normalized_word
         return word
 
-    def _collect_punctuated_compound(        self, doc, token_i, word, max_word_length
+    def _collect_punctuated_compound(
+        self, doc, token_i, word, max_word_length
     ):
         """_collect_punctuated_compound helper.
-        
-            Example:
-                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-                >>> callable(SpacyTokenizerPipe._collect_punctuated_compound)
-                True
+
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe._collect_punctuated_compound)
+            True
         """
 
         wtrie = prefix_trie(self._punctuation_words, word.lower())
@@ -180,11 +182,11 @@ class SpacyTokenizerPipe:
 
     def _build_words_with_mwes(self, doc):
         """_build_words_with_mwes helper.
-        
-            Example:
-                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-                >>> callable(SpacyTokenizerPipe._build_words_with_mwes)
-                True
+
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe._build_words_with_mwes)
+            True
         """
         words = []
         token_compounds = []
@@ -218,11 +220,11 @@ class SpacyTokenizerPipe:
 
     def _build_words_without_mwes(self, doc):
         """_build_words_without_mwes helper.
-        
-            Example:
-                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-                >>> callable(SpacyTokenizerPipe._build_words_without_mwes)
-                True
+
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe._build_words_without_mwes)
+            True
         """
         words = []
         doc_len = len(doc)
@@ -234,11 +236,11 @@ class SpacyTokenizerPipe:
 
     def _attach_compound_metadata(self, doc, token_compounds):
         """_attach_compound_metadata helper.
-        
-            Example:
-                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-                >>> callable(SpacyTokenizerPipe._attach_compound_metadata)
-                True
+
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe._attach_compound_metadata)
+            True
         """
         doc_len = len(doc)
         for token_i in range(doc_len):
@@ -246,11 +248,11 @@ class SpacyTokenizerPipe:
 
     def _walk_mwe_trie(self, doc, i, max_pattern_length):
         """_walk_mwe_trie helper.
-        
-            Example:
-                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-                >>> callable(SpacyTokenizerPipe._walk_mwe_trie)
-                True
+
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe._walk_mwe_trie)
+            True
         """
         j = i
         trie = self._mwes["trie"]
@@ -302,11 +304,11 @@ class SpacyTokenizerPipe:
 
     def _try_merge_mwe_match(self, doc, retokenizer, i, max_pattern_length):
         """_try_merge_mwe_match helper.
-        
-            Example:
-                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-                >>> callable(SpacyTokenizerPipe._try_merge_mwe_match)
-                True
+
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe._try_merge_mwe_match)
+            True
         """
         if doc[i].text.lower() not in self._mwes["trie"]:
             return 1
@@ -329,11 +331,11 @@ class SpacyTokenizerPipe:
 
     def _try_merge_special_token(self, doc, retokenizer, i):
         """_try_merge_special_token helper.
-        
-            Example:
-                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-                >>> callable(SpacyTokenizerPipe._try_merge_special_token)
-                True
+
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe._try_merge_special_token)
+            True
         """
         if len(set(doc[i].text) & set(string.punctuation + "\\_")) == len(
             set(doc[i].text)
@@ -350,11 +352,11 @@ class SpacyTokenizerPipe:
 
     def _retokenize_compound_patterns(self, doc):
         """_retokenize_compound_patterns helper.
-        
-            Example:
-                >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
-                >>> callable(SpacyTokenizerPipe._retokenize_compound_patterns)
-                True
+
+        Example:
+            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizerPipe
+            >>> callable(SpacyTokenizerPipe._retokenize_compound_patterns)
+            True
         """
         with doc.retokenize() as retokenizer:
             i = 0
@@ -415,12 +417,13 @@ def spacy_thot_tokenizer(nlp, name, config: dict = None, call_context=None):
 
 class SpacyTokenizer:
     """SpacyTokenizer container.
-    
-        Example:
-            >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizer
-            >>> callable(SpacyTokenizer)
-            True
+
+    Example:
+        >>> from thot.tasks.tokenizer.Tokenizer import SpacyTokenizer
+        >>> callable(SpacyTokenizer)
+        True
     """
+
     def __init__(
         self, config: TokenizerConfiguration = None, call_context=None
     ):
@@ -572,11 +575,11 @@ class SpacyTokenizer:
 
 class Tokenizer:
     """Tokenizer helper integrating MWE tokenizer
-    
-        Example:
-            >>> from thot.tasks.tokenizer.Tokenizer import Tokenizer
-            >>> callable(Tokenizer)
-            True
+
+    Example:
+        >>> from thot.tasks.tokenizer.Tokenizer import Tokenizer
+        >>> callable(Tokenizer)
+        True
     """
 
     def __init__(

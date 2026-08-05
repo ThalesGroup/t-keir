@@ -1,0 +1,78 @@
+# SearXNG settings for T-KEIR web collector.
+# Canonical copy: tkeir/resources/searxng/settings.yml
+# Copied to workspace/searxng/config/settings.yml on `make searxng-up`
+# (and `make pull-searxng`) when that file is missing.
+# JSON format is required by tkeir-collector.
+#
+# Docs: https://docs.searxng.org/admin/settings/settings.html
+# Engines: https://docs.searxng.org/admin/settings/settings_engines.html
+
+# Inherit image defaults, but keep only engines useful for open-web collect
+# (no API keys). Override / re-enable individual engines in `engines:` below.
+use_default_settings:
+  engines:
+    keep_only:
+      - duckduckgo
+      - brave
+      - bing
+      - startpage
+      - mojeek
+      - qwant
+      - wikipedia
+      - wikidata
+      - google
+      - yahoo
+      - seznam
+      - currency
+
+general:
+  instance_name: "tkeir-searxng"
+  enable_metrics: false
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "en"
+  formats:
+    - html
+    - json
+
+server:
+  # Bound inside the container; host maps WORKSPACE via docker -v.
+  bind_address: "0.0.0.0"
+  port: 8080
+  secret_key: "tkeir-dev-change-me"
+  limiter: false
+  image_proxy: false
+
+ui:
+  static_use_hash: true
+
+# Explicit engine overrides (merged by `name` onto the keep_only set).
+# Add API tokens here if you enable key-gated engines later.
+engines:
+  - name: duckduckgo
+    disabled: false
+  - name: brave
+    disabled: false
+  - name: bing
+    disabled: false
+  - name: startpage
+    disabled: false
+  - name: mojeek
+    disabled: false
+  - name: qwant
+    disabled: false
+  - name: wikipedia
+    disabled: false
+  - name: wikidata
+    disabled: false
+  - name: google
+    # Often rate-limited / CAPTCHA from datacenter IPs; leave on for diversity.
+    disabled: false
+  - name: yahoo
+    disabled: false
+  - name: seznam
+    disabled: false
+  - name: currency
+    disabled: false

@@ -23,6 +23,8 @@ to `deploy/compose/.env` (never commit secrets). Deep tables also live on
 | 8093 | **Audit** *or* **MCP** (same default — remap if both profiles) |
 | 8094 | Governor |
 | 8095 | OKF |
+| 8096 | Web collector (`tkeir-collector`) |
+| 8888 | SearXNG |
 | 11434 | Ollama (often on the host) |
 
 ## Cross-cutting
@@ -196,6 +198,20 @@ Resolved by `UnifiedLLMWrapper` (`PROVIDER` → provider-specific defaults).
 | `GOVERNOR_URL` | `http://localhost:8094` | Governor proxy |
 | `OKF_URL` | `http://localhost:8095` | OKF proxy |
 | `AUDIT_URL` | `http://localhost:8093` | Audit proxy |
+
+## Web collector / SearXNG
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `SEARXNG_URL` | `http://127.0.0.1:8888` | Meta-search origin for `tkeir-collector` |
+| `SEARXNG_IMAGE` | `docker.io/searxng/searxng:latest` | Image for `make pull-searxng` / `searxng-up` |
+| `SEARXNG_PORT` | `8888` | Host port mapped to container `:8080` |
+| `COLLECTOR_PORT` | `8096` | Collector FastAPI port |
+| `COLLECTOR_MAX_RESULTS` | `5` | Default SearXNG hit cap |
+| `COLLECTOR_SIMHASH_MAX_HAMMING` | `3` | Near-duplicate Hamming threshold |
+| `COLLECTOR_BATCH_CONCURRENCY` | `4` | Max parallel queries in `/collect/batch` |
+| `COLLECTOR_CORS_ORIGINS` | HMI origins | CORS allow-list |
+| `TKEIR_SERVICE` | `tkeir-collector` (via Make) | JSON logs / ActionRecords |
 
 Plus Auth / Keycloak variables above.
 

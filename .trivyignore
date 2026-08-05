@@ -16,3 +16,9 @@ PYSEC-2026-1996
 # cryptography 46.x ships OpenSSL advisory; upgrade to 48+ blocked by optional
 # spiffe extra (cryptography<47). Same ignore as Makefile PIP_AUDIT_IGNORE.
 GHSA-537c-gmf6-5ccf
+# Same cryptography pin block (Trivy CVE IDs; pip-audit uses PYSEC-2026-3552/3553/3554).
+CVE-2026-69247
+CVE-2026-69249
+PYSEC-2026-3552
+PYSEC-2026-3553
+PYSEC-2026-3554

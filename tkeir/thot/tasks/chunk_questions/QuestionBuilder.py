@@ -16,12 +16,13 @@ from dataclasses import dataclass
 @dataclass
 class QuestionGenerationSettings:
     """QuestionGenerationSettings container.
-    
-        Example:
-            >>> from thot.tasks.chunk_questions.QuestionBuilder import QuestionGenerationSettings
-            >>> callable(QuestionGenerationSettings)
-            True
+
+    Example:
+        >>> from thot.tasks.chunk_questions.QuestionBuilder import QuestionGenerationSettings
+        >>> callable(QuestionGenerationSettings)
+        True
     """
+
     min_questions: int = 3
     max_questions: int = 5
     enable_multilingual: bool = True

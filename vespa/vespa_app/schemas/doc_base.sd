@@ -4,6 +4,7 @@
 
 
 
+
 schema doc_base {
     document doc_base {
         # Stable id / parent reference (e.g. beir:scifact:42 or ingest digest).
@@ -22,6 +23,40 @@ schema doc_base {
         # Ontology / SVO-derived concept ids (Graph-RAG style).
         field ontology_concepts type array<string> {
             indexing: summary | attribute
+        }
+        # Unix epoch seconds when the document was authored / ingested (TTL base).
+        field doc_timestamp type long {
+            indexing: summary | attribute
+            attribute {
+                fast-search
+                fast-access
+            }
+            rank: filter
+        }
+        # TTL in seconds; 0 or unset ⇒ no expiry (non-regression default).
+        field freshness_ttl_seconds type int {
+            indexing: summary | attribute
+            attribute {
+                fast-access
+            }
+        }
+        # When true, document is never expired by GC selection.
+        field pinned type bool {
+            indexing: summary | attribute
+            attribute {
+                fast-search
+                fast-access
+            }
+        }
+        # Human-readable reason for pinning (audit / ops).
+        field pin_reason type string {
+            indexing: summary | attribute
+        }
+        # Provenance class (e.g. beir, ingest, collector, wiki).
+        field source_type type string {
+            indexing: summary | attribute
+            attribute: fast-search
+            rank: filter
         }
     }
 }

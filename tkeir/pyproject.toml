@@ -90,6 +90,7 @@ tkeir-agent = "thot.agent.service:main"
 tkeir-compose = "thot.compose.__main__:main"
 tkeir-okf = "thot.okf.server:main"
 tkeir-okf-export = "thot.okf.exporter:cli_main"
+tkeir-collector = "thot.tools.collector.app:main"
 
 [dependency-groups]
 dev = [
@@ -133,9 +134,12 @@ directory = ".."
 [tool.hatch.build.targets.wheel]
 packages = ["thot"]
 
+# Do not force-include ``resources/modeling`` (multi-GB embedding caches).
+# Runtime resolves resources via TkeirPaths against the repo / workspace.
 [tool.hatch.build.targets.wheel.force-include]
 "configs" = "tkeir/configs"
-"resources" = "tkeir/resources"
+"resources/searxng" = "tkeir/resources/searxng"
+"resources/ontologies" = "tkeir/resources/ontologies"
 "thot/action/schemas" = "thot/action/schemas"
 "thot/tools/ingest/schemas" = "thot/tools/ingest/schemas"
 

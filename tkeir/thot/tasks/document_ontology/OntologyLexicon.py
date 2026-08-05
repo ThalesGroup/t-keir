@@ -125,11 +125,11 @@ def stamp_document_ontologies(
 
 def _token_texts(tokens: list[Any]) -> list[str]:
     """_token_texts helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyLexicon import _token_texts
-            >>> _token_texts([{"text": "Hi"}, {"token": "there"}])
-            ['Hi', 'there']
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyLexicon import _token_texts
+        >>> _token_texts([{"text": "Hi"}, {"token": "there"}])
+        ['Hi', 'there']
     """
     texts: list[str] = []
     for tok in tokens:
@@ -142,11 +142,11 @@ def _token_texts(tokens: list[Any]) -> list[str]:
 
 def _normalize_phrase(text: str) -> tuple[str, ...]:
     """_normalize_phrase helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyLexicon import _normalize_phrase
-            >>> _normalize_phrase("Hello World")
-            ('hello', 'world')
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyLexicon import _normalize_phrase
+        >>> _normalize_phrase("Hello World")
+        ('hello', 'world')
     """
     parts = [p for p in text.strip().lower().split() if p]
     return tuple(parts)
@@ -157,11 +157,11 @@ def _cached_label_phrases(
     paths_key: tuple[str, ...],
 ) -> tuple[tuple[str, ...], ...]:
     """Load reference ontologies and return normalized multi-token phrases.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyLexicon import _cached_label_phrases
-            >>> callable(_cached_label_phrases)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyLexicon import _cached_label_phrases
+        >>> callable(_cached_label_phrases)
+        True
     """
     if not paths_key:
         return ()

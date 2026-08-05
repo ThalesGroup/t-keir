@@ -15,12 +15,13 @@ from thot.core.ThotLogger import ThotLogger
 
 class RawTextConverter:
     """RawTextConverter container.
-    
-        Example:
-            >>> from thot.tasks.converters.RawTextConverter import RawTextConverter
-            >>> callable(RawTextConverter)
-            True
+
+    Example:
+        >>> from thot.tasks.converters.RawTextConverter import RawTextConverter
+        >>> callable(RawTextConverter)
+        True
     """
+
     @staticmethod
     def convert(data: bytes, source_doc_id: str, call_context=None):
         """Decode bytes as UTF-8 text and strip HTML markup when present.

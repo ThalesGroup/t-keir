@@ -30,12 +30,13 @@ _NOUN_LIKE_POS = frozenset({"NOUN", "PROPN"})
 @dataclass(frozen=True)
 class SentenceSpan:
     """SentenceSpan container.
-    
-        Example:
-            >>> from thot.tasks.golden_chunking.ChunkBuilder import SentenceSpan
-            >>> callable(SentenceSpan)
-            True
+
+    Example:
+        >>> from thot.tasks.golden_chunking.ChunkBuilder import SentenceSpan
+        >>> callable(SentenceSpan)
+        True
     """
+
     start: int
     end: int
 
@@ -53,12 +54,13 @@ class SentenceSpan:
 @dataclass
 class ChunkSettings:
     """ChunkSettings container.
-    
-        Example:
-            >>> from thot.tasks.golden_chunking.ChunkBuilder import ChunkSettings
-            >>> callable(ChunkSettings)
-            True
+
+    Example:
+        >>> from thot.tasks.golden_chunking.ChunkBuilder import ChunkSettings
+        >>> callable(ChunkSettings)
+        True
     """
+
     target_min_tokens: int = 300
     target_max_tokens: int = 500
     high_ner_density_max_tokens: int = 250

@@ -19,6 +19,8 @@ The script lives at the **repository root** next to the `Makefile`:
 | `[VESPA]` | `make vespa-up && make bootstrap` | config `:19071`, query `:8080`, app deployed |
 | `[KEYCLOAK]` | `make keycloak-up` + `make keycloak-sync-demo-users` | realm + demo personas (`analyst`, `humint`, …) with roles/clearance |
 | `[SPIRE]` | `make spire-up` | SPIRE server healthy + agent running |
+| `[SEARXNG]` | `make searxng-up` | SearXNG `:8888/healthz` |
+| `[COLLECTOR]` | `make collector-up` | collector `:8096/health` |
 | `[INDEX]` | `make index-up` | ingest `:8091/health` |
 | `[RAG]` | `make rag-up` | RAG `:8090/health` |
 | `[GOVERNOR]` | `make governor-up` | governor `:8094/health` |

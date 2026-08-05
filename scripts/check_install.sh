@@ -195,6 +195,16 @@ else
   warn "tmux not found (optional; needed for ./start_services.sh). macOS: brew install tmux"
 fi
 
+# SearXNG image (optional until collector / start_services)
+if [[ "${SKIP_DOCKER:-0}" != "1" ]] && have docker; then
+  if docker image inspect docker.io/searxng/searxng:latest >/dev/null 2>&1 \
+    || docker image inspect searxng/searxng:latest >/dev/null 2>&1; then
+    pass "searxng image: present"
+  else
+    warn "searxng image not pulled (optional). Run: make pull-searxng"
+  fi
+fi
+
 # Ollama optional
 if have ollama; then
   pass "ollama: present ($(version_of ollama --version))"

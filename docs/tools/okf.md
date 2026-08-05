@@ -40,9 +40,10 @@ This layout is intended to map 1:1 to object storage later
 (`s3://…/users/<user_space>/okf/<bundle_id>/…`).
 
 - Host Make: set `TKEIR_WORKSPACE` (default `./workspace`); leave `OKF_ROOT`
-  unset for the per-user layout.
-- `OKF_ROOT` remains an optional **flat** override for tests / legacy
-  (`.tkeir-okf/<bundle_id>`). Migrate with `make okf-migrate-workspace`.
+  unset for the per-user layout (`workspace/users/<space>/okf/`).
+- Flat fallback (when `OKF_ROOT` is unset): **`workspace/.tkeir-okf/`**.
+  Set `OKF_ROOT` only for tests / explicit overrides. Migrate old repo-root
+  `.tkeir-okf` trees with `make okf-migrate-workspace`.
 
 ## Who uses it
 
@@ -196,4 +197,5 @@ tkeir/thot/okf/
 
 See [Agents](agents.md), [MCP](mcp.md).
 
-**Checkpoint:** `.tkeir-okf/<bundle_id>/index.md` exists after `make okf-export`.
+**Checkpoint:** `workspace/users/<space>/okf/<bundle_id>/index.md` (or
+`workspace/.tkeir-okf/<bundle_id>/`) exists after `make okf-export`.

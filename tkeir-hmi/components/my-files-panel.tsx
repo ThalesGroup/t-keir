@@ -21,12 +21,14 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BusinessOntologyFilePicker, EMPTY_BUSINESS_ONTOLOGY_FILE, type BusinessOntologyFileValue } from "@/components/business-ontology-file-picker";
 import { MarkdownContent } from "@/components/markdown-content";
 import {
   MyFilesBasketBrief,
   type BasketIndexOptions,
   type BasketItem,
 } from "@/components/my-files-basket-brief";
+import { resolveBusinessOntologyDataset } from "@/lib/business-ontology-datasets";
 import { useAuth } from "@/src/auth/AuthProvider";
 import { apiFetch } from "@/src/auth/useApiClient";
 import { cn } from "@/lib/utils";
@@ -103,6 +105,8 @@ export function MyFilesPanel() {
   );
   const indexPathsRef = useRef<Set<string>>(new Set());
   const [basket, setBasket] = useState<BasketItem[]>([]);
+  const [businessOntology, setBusinessOntology] =
+    useState<BusinessOntologyFileValue>(EMPTY_BUSINESS_ONTOLOGY_FILE);
 
   const canShareToCommander =
     !authEnabled || SHARE_ROLES.some((role) => roles.includes(role));
@@ -467,30 +471,38 @@ export function MyFilesPanel() {
     setError(null);
     setInfo(null);
     try {
-      const boDataset =
-        runtimeConfig?.businessOntologyDataset?.trim() || "osint";
+      const boDataset = resolveBusinessOntologyDataset(
+        runtimeConfig?.businessOntologyDataset,
+      );
+      const body: Record<string, unknown> = {
+        paths,
+        business_ontology_dataset: boDataset,
+      };
+      if (businessOntology.payload) {
+        body.business_ontology = businessOntology.payload;
+      }
       const res = await apiFetch("/api/ingest/workspace/index", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          paths,
-          business_ontology_dataset: boDataset,
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(await readError(res));
-      const body = (await res.json()) as {
+      const resBody = (await res.json()) as {
         queued_count?: number;
         queued?: { path?: string }[];
         errors?: { path: string; error: string }[];
         business_ontology_dataset?: string;
       };
-      const errCount = body.errors?.length ?? 0;
-      const queuedPaths = (body.queued ?? [])
+      const errCount = resBody.errors?.length ?? 0;
+      const queuedPaths = (resBody.queued ?? [])
         .map((item: { path?: string }) => item.path)
         .filter((path): path is string => Boolean(path));
+      const ontologyLabel = businessOntology.filename
+        ? businessOntology.filename
+        : resBody.business_ontology_dataset || boDataset;
       setInfo(
-        `Queued ${body.queued_count ?? 0} file(s) for NLP + user index` +
-          ` (business ontology: ${body.business_ontology_dataset || boDataset})` +
+        `Queued ${resBody.queued_count ?? 0} file(s) for NLP + user index` +
+          ` (business ontology: ${ontologyLabel})` +
           (errCount ? ` (${errCount} failed)` : ""),
       );
       if (queuedPaths.length > 0) {
@@ -555,10 +567,10 @@ export function MyFilesPanel() {
     setError(null);
     setInfo(null);
     try {
-      const boDataset =
-        options?.business_ontology_dataset?.trim() ||
-        runtimeConfig?.businessOntologyDataset?.trim() ||
-        "osint";
+      const boDataset = resolveBusinessOntologyDataset(
+        runtimeConfig?.businessOntologyDataset,
+        options?.business_ontology_dataset,
+      );
       const body: Record<string, unknown> = {
         paths,
         business_ontology_dataset: boDataset,
@@ -622,12 +634,9 @@ export function MyFilesPanel() {
         <p className="mt-2 text-sm text-muted-foreground">
           Import documents into your private workspace (stored only — not
           indexed yet). Select files and use Index selected to run the NLP
-          pipeline with the configured business ontology (
-          <code>
-            {runtimeConfig?.businessOntologyDataset?.trim() || "osint"}
-          </code>
-          ) into your Vespa user streaming group. Add indexed files to the
-          basket to generate a RAG brief and explore the merged ontology.
+          pipeline with the chosen business ontology into your Vespa user
+          streaming group. Add indexed files to the basket to generate a RAG
+          brief and explore the merged ontology.
           Markdown is viewable in-place. Record-oriented JSON corpora are
           split into one <code>{"{doc_id}.md"}</code> file per record.
           Analyst, HUMINT, and Watch can send selected files to the commander{" "}
@@ -845,16 +854,26 @@ export function MyFilesPanel() {
             </Button>
           )}
           {canIndexSelected && (
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              disabled={busy || selectedCount === 0}
-              onClick={() => void indexSelected()}
-            >
-              <Database className="h-4 w-4" />
-              Index selected
-            </Button>
+            <>
+              <BusinessOntologyFilePicker
+                value={businessOntology}
+                onChange={setBusinessOntology}
+                disabled={busy}
+                label="Ontology file"
+                className="min-w-[12rem] flex-1"
+                emptyHint={`Default: ${resolveBusinessOntologyDataset(runtimeConfig?.businessOntologyDataset)}`}
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                disabled={busy || selectedCount === 0}
+                onClick={() => void indexSelected()}
+              >
+                <Database className="h-4 w-4" />
+                Index selected
+              </Button>
+            </>
           )}
           <Button
             type="button"

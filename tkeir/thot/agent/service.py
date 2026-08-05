@@ -34,8 +34,8 @@ from thot.agent.guard import AgentGuard
 from thot.agent.loop import AgentLoop
 from thot.agent.models import RunState
 from thot.agent.orchestrator import Orchestrator
-from thot.agent.publish import publish_run
 from thot.agent.paths import default_agent_root
+from thot.agent.publish import publish_run
 from thot.agent.registry import list_agent_names, load_agent_spec
 from thot.agent.runs import RunStore
 from thot.agent.spiffe import (

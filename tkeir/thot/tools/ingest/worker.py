@@ -74,7 +74,7 @@ def document_extras_from_metadata(
     ``ontologies`` must already be **server-local staged paths** produced from
     client-uploaded bytes (never client filesystem paths). Legacy path keys in
     metadata are ignored for derive-from.
-    
+
 
     Example:
         >>> from thot.tools.ingest.worker import document_extras_from_metadata
@@ -159,7 +159,7 @@ def ensure_source_doc_id(
     Pre-converted corpus JSON (title/content only) skips the converter, which
     normally stamps ``source_doc_id``. Fall back to ``source``, then a stable
     ingest URI from the content digest / filename.
-    
+
 
     Example:
         >>> from thot.tools.ingest.worker import ensure_source_doc_id
@@ -200,7 +200,7 @@ def run_pipeline_on_bytes(
     ``datatype`` selects the converter input type. Default ``None`` uses
     auto-detection (same as ingest). Pass ``\"raw\"`` to force
     :class:`~thot.tasks.converters.RawTextConverter.RawTextConverter`.
-    
+
 
     Example:
         >>> from thot.tools.ingest.worker import run_pipeline_on_bytes

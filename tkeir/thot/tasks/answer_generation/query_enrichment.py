@@ -33,17 +33,17 @@ def enrich_first_stage_runs(
     language: str = "en",
 ) -> dict[str, dict[str, float]]:
     """NLP + ontology expand + OntologyRescorer for long queries only.
-    
+
     Args:
         corpus: BEIR-style corpus.
         queries: ``qid → text``.
         first_stage: RRF (or other) runs to re-score.
         ontology_payload: ``datasets/<name>/business_ontology.yaml`` content.
         language: Query NLP language.
-    
+
     Returns:
         Possibly re-ordered / re-scored first-stage runs (same shape).
-    
+
         Example:
             >>> from thot.tasks.answer_generation.query_enrichment import enrich_first_stage_runs
             >>> enrich_first_stage_runs({}, {}, {"q1": {}}, ontology_payload=None)
@@ -243,11 +243,11 @@ def enrich_first_stage_runs(
 
 def _load_query_pipeline_runner() -> Any | None:
     """Lazy-load PipelineRunner for query NLP (shared with passage search).
-    
-        Example:
-            >>> from thot.tasks.answer_generation.query_enrichment import _load_query_pipeline_runner
-            >>> callable(_load_query_pipeline_runner)
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.query_enrichment import _load_query_pipeline_runner
+        >>> callable(_load_query_pipeline_runner)
+        True
     """
     try:
         from thot.tools.search.passage_retrieval import (
@@ -267,11 +267,11 @@ def _analyze_query_nlp(
     language: str,
 ) -> tuple[dict[str, Any] | None, list[str]]:
     """Run linguistic pipeline; return ``(analysis_dict, search_terms)``.
-    
-        Example:
-            >>> from thot.tasks.answer_generation.query_enrichment import _analyze_query_nlp
-            >>> callable(_analyze_query_nlp)
-            True
+
+    Example:
+        >>> from thot.tasks.answer_generation.query_enrichment import _analyze_query_nlp
+        >>> callable(_analyze_query_nlp)
+        True
     """
     try:
         from thot.tools.search.query_analyzer import (

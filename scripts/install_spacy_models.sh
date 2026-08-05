@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install spaCy language models (wheel download with spacy download fallback).
+# Install spaCy language models (direct wheel install; no project rebuild).
 # Skips download when all required models are already importable.
 
 set -euo pipefail
@@ -8,7 +8,6 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TKEIR_DIR="${ROOT}/tkeir"
 UV="${UV:-uv}"
 PYTHON="${PYTHON:-3.11}"
-MAX_ATTEMPTS="${MAX_ATTEMPTS:-3}"
 FORCE_SPACY_MODELS="${FORCE_SPACY_MODELS:-0}"
 
 if ! command -v "${UV}" >/dev/null 2>&1; then
@@ -16,16 +15,18 @@ if ! command -v "${UV}" >/dev/null 2>&1; then
     exit 1
 fi
 
-SPACY_MODELS=(
-    en_core_web_sm
-    en_core_web_md
-    fr_core_news_sm
-    fr_core_news_md
-    xx_ent_wiki_sm
+# Keep versions aligned with tkeir/pyproject.toml [dependency-groups].models
+SPACY_MODEL_WHEELS=(
+    "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl"
+    "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl"
+    "https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.6.0/fr_core_news_sm-3.6.0-py3-none-any.whl"
+    "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl"
+    "https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.6.0/xx_ent_wiki_sm-3.6.0-py3-none-any.whl"
 )
 
 models_already_present() {
     cd "${TKEIR_DIR}"
+    # --no-sync: never rebuild the editable tkeir package just to probe imports
     "${UV}" run --no-sync --python "${PYTHON}" python - <<'PY'
 import importlib.util
 import sys
@@ -52,23 +53,19 @@ if [ "${FORCE_SPACY_MODELS}" != "1" ] && models_already_present; then
     exit 0
 fi
 
-install_with_uv() {
-    local attempt=1
-    while [ "${attempt}" -le "${MAX_ATTEMPTS}" ]; do
-        if "${UV}" sync --directory "${TKEIR_DIR}" --group models; then
-            return 0
-        fi
-        echo "spaCy model sync failed (attempt ${attempt}/${MAX_ATTEMPTS})" >&2
-        attempt=$((attempt + 1))
-        sleep 5
-    done
-    return 1
-}
+echo "Installing spaCy model wheels into ${TKEIR_DIR}/.venv (uv pip)…"
+# Install wheels only — do not `uv sync` the project (that rebuilds editable
+# tkeir and can hang while hatchling walks multi-GB resources/modeling).
+cd "${TKEIR_DIR}"
+"${UV}" pip install --python "${PYTHON}" "${SPACY_MODEL_WHEELS[@]}"
 
-install_with_spacy_download() {
-    echo "Falling back to python -m spacy download ..." >&2
-    cd "${TKEIR_DIR}"
-    "${UV}" run --no-sync --python "${PYTHON}" python - <<'PY'
+if models_already_present; then
+    echo "spaCy models installed via uv pip"
+    exit 0
+fi
+
+echo "Falling back to python -m spacy download ..." >&2
+"${UV}" run --no-sync --python "${PYTHON}" python - <<'PY'
 import subprocess
 import sys
 
@@ -86,12 +83,4 @@ for model in models:
         check=True,
     )
 PY
-}
-
-if install_with_uv; then
-    echo "spaCy models installed via uv sync --group models"
-    exit 0
-fi
-
-install_with_spacy_download
 echo "spaCy models installed via spacy download"

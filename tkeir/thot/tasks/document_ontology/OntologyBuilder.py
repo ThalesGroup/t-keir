@@ -35,12 +35,13 @@ NUMERIC_RE = re.compile(r"^-?\d+(?:[.,]\d+)?%?$")
 @dataclass(frozen=True)
 class OntologyBuildSettings:
     """OntologyBuildSettings container.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import OntologyBuildSettings
-            >>> callable(OntologyBuildSettings)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import OntologyBuildSettings
+        >>> callable(OntologyBuildSettings)
+        True
     """
+
     include_title_triples: bool = True
     include_content_triples: bool = True
     min_keyword_length: int = 3
@@ -184,12 +185,13 @@ def _doc_key(document: dict) -> str:
 @dataclass(frozen=True)
 class DocumentFieldSpec:
     """DocumentFieldSpec container.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import DocumentFieldSpec
-            >>> callable(DocumentFieldSpec)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import DocumentFieldSpec
+        >>> callable(DocumentFieldSpec)
+        True
     """
+
     field_type: str
     morph_key: str
     ner_key: str
@@ -551,11 +553,11 @@ def _statement_uri(
     object_text: str,
 ) -> URIRef:
     """Stable URI for a reified SPO statement within a document.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import _statement_uri
-            >>> str(_statement_uri("doc1", "A", "B", "C")).startswith("http")
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import _statement_uri
+        >>> str(_statement_uri("doc1", "A", "B", "C")).startswith("http")
+        True
     """
     digest = hashlib.sha256(
         f"{subject_text}\0{verb_text}\0{object_text}".encode("utf-8")
@@ -569,11 +571,11 @@ def _link_concept_to_chunk(
     concept_uri: URIRef,
 ) -> None:
     """Attach a shared concept to a chunk sub-ontology (hyperedge incidence).
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import _link_concept_to_chunk
-            >>> callable(_link_concept_to_chunk)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import _link_concept_to_chunk
+        >>> callable(_link_concept_to_chunk)
+        True
     """
     graph.add((chunk_uri, TKEIR.hasMention, concept_uri))
     graph.add((concept_uri, TKEIR.mentionedIn, chunk_uri))
@@ -593,14 +595,14 @@ def _add_svo_hypergraph(
     doc_key: str = "",
 ) -> URIRef | None:
     """Materialize SPO and reify it under chunk sub-ontologies.
-    
+
     Hyper-graph shape:
-    
+
     - Shared concept nodes (S/O) reused across chunks (set intersection).
     - ``Statement`` nodes carry (subject, predicate, object) and ``inChunk``.
     - Each ``DocumentChunk`` is a sub-ontology: ``hasStatement`` / ``hasMention``.
     - Direct ``S --P--> O`` edges remain for reasoners / SPARQL.
-    
+
         Example:
             >>> from thot.tasks.document_ontology.OntologyBuilder import _add_svo_hypergraph
             >>> callable(_add_svo_hypergraph)
@@ -688,11 +690,11 @@ def _iter_chunk_scopes(
     doc_key: str,
 ) -> list[tuple[URIRef, str, int, int]]:
     """Return ``(chunk_uri, chunk_id, token_start, token_end)`` from golden chunks.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import _iter_chunk_scopes
-            >>> callable(_iter_chunk_scopes)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import _iter_chunk_scopes
+        >>> callable(_iter_chunk_scopes)
+        True
     """
     scopes: list[tuple[URIRef, str, int, int]] = []
     for index, chunk in enumerate(document.get("golden_chunks") or []):
@@ -715,11 +717,11 @@ def _chunk_uris_for_positions(
     unmatched_to_all: bool = False,
 ) -> list[URIRef]:
     """Map token positions to owning chunk URIs (sub-ontology containers).
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import _chunk_uris_for_positions
-            >>> callable(_chunk_uris_for_positions)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import _chunk_uris_for_positions
+        >>> callable(_chunk_uris_for_positions)
+        True
     """
     if not scopes:
         return []
@@ -741,11 +743,11 @@ def _ensure_chunk_nodes(
     scopes: list[tuple[URIRef, str, int, int]],
 ) -> None:
     """Create DocumentChunk nodes and document→chunk containment.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import _ensure_chunk_nodes
-            >>> callable(_ensure_chunk_nodes)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import _ensure_chunk_nodes
+        >>> callable(_ensure_chunk_nodes)
+        True
     """
     for chunk_uri, chunk_id, _start, _end in scopes:
         graph.add((chunk_uri, RDF.type, TKEIR.DocumentChunk))
@@ -758,11 +760,11 @@ def _ensure_chunk_nodes(
 
 def _annotate_hypergraph_support(graph: Graph, doc_uri: URIRef) -> None:
     """Weight concepts/chunks/document by cross-chunk sub-ontology intersection.
-    
+
     - ``chunkSupport`` on concepts: number of chunks that mention them
     - ``sharedConceptCount`` on chunks: concepts with support ≥ 2
     - ``intersectionWeight`` on document: sum of sharedConceptCount
-    
+
         Example:
             >>> from thot.tasks.document_ontology.OntologyBuilder import _annotate_hypergraph_support
             >>> callable(_annotate_hypergraph_support)
@@ -816,7 +818,8 @@ def _annotate_hypergraph_support(graph: Graph, doc_uri: URIRef) -> None:
     )
 
 
-def _add_keyword_to_graph(    graph: Graph,
+def _add_keyword_to_graph(
+    graph: Graph,
     doc_uri: URIRef,
     doc_key: str,
     keyword: dict,
@@ -825,11 +828,11 @@ def _add_keyword_to_graph(    graph: Graph,
     seen_keywords: set[str],
 ) -> None:
     """_add_keyword_to_graph helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import _add_keyword_to_graph
-            >>> callable(_add_keyword_to_graph)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import _add_keyword_to_graph
+        >>> callable(_add_keyword_to_graph)
+        True
     """
 
     text = str(keyword.get("text", "")).strip()
@@ -869,7 +872,8 @@ def _add_keyword_to_graph(    graph: Graph,
     graph.add((doc_uri, TKEIR.hasKeyword, keyword_uri))
 
 
-def _enrich_field_analysis(    graph: Graph,
+def _enrich_field_analysis(
+    graph: Graph,
     document: dict,
     doc_uri: URIRef,
     doc_key: str,
@@ -884,11 +888,11 @@ def _enrich_field_analysis(    graph: Graph,
     scopes: list[tuple[URIRef, str, int, int]] | None = None,
 ) -> None:
     """_enrich_field_analysis helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import _enrich_field_analysis
-            >>> callable(_enrich_field_analysis)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import _enrich_field_analysis
+        >>> callable(_enrich_field_analysis)
+        True
     """
 
     morphosyntax = document.get(spec.morph_key) or []
@@ -938,17 +942,18 @@ def _enrich_field_analysis(    graph: Graph,
         )
 
 
-def _enrich_tags(    graph: Graph,
+def _enrich_tags(
+    graph: Graph,
     doc_uri: URIRef,
     doc_key: str,
     document: dict,
 ) -> None:
     """_enrich_tags helper.
-    
-        Example:
-            >>> from thot.tasks.document_ontology.OntologyBuilder import _enrich_tags
-            >>> callable(_enrich_tags)
-            True
+
+    Example:
+        >>> from thot.tasks.document_ontology.OntologyBuilder import _enrich_tags
+        >>> callable(_enrich_tags)
+        True
     """
 
     seen_tags: set[str] = set()
@@ -977,10 +982,10 @@ def _enrich_golden_chunks(
     scopes: list[tuple[URIRef, str, int, int]] | None = None,
 ) -> None:
     """Create chunk sub-ontologies and attach NER mentions.
-    
+
     SPO triples are attached earlier via position-mapped ``kg`` (hypergraph).
     Golden-chunk ``svo_triplets`` are skipped here to avoid duplicate Statements.
-    
+
         Example:
             >>> from thot.tasks.document_ontology.OntologyBuilder import _enrich_golden_chunks
             >>> callable(_enrich_golden_chunks)

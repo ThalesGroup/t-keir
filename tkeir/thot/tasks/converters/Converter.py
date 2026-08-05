@@ -69,12 +69,13 @@ def _conversion_info(data_type: str, size: int, **extra) -> dict:
 
 class Converter:
     """Converter container.
-    
-        Example:
-            >>> from thot.tasks.converters.Converter import Converter
-            >>> callable(Converter)
-            True
+
+    Example:
+        >>> from thot.tasks.converters.Converter import Converter
+        >>> callable(Converter)
+        True
     """
+
     def __init__(self, config=None):
         """Initialize converter with optional configuration.
 

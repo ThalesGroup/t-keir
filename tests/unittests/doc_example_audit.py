@@ -39,7 +39,9 @@ def _module_name(path: Path) -> str:
 
 
 def _is_strict_module(module_name: str) -> bool:
-    return any(module_name.startswith(prefix) for prefix in STRICT_EXAMPLE_PREFIXES)
+    return any(
+        module_name.startswith(prefix) for prefix in STRICT_EXAMPLE_PREFIXES
+    )
 
 
 def _has_example(docstring: str | None, *, strict: bool) -> bool:

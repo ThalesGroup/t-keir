@@ -382,7 +382,8 @@ Details: [OKF](tools/okf.md).
 workflow, also run `make agent` ([§4.4](#44-agents-on-osint-and-enterprise-demo-data-p0)).
 
 **1. Query-scoped export (CLI)** — RAG selects the documents; T-KEIR writes a
-bundle under `.tkeir-okf/`:
+bundle under `workspace/users/<space>/okf/` (flat fallback:
+`workspace/.tkeir-okf/`):
 
 ```bash
 # Terminal A — RAG must be up
@@ -397,9 +398,11 @@ make okf-export \
 make okf-export USER_SPACE=dev@tkeir OKF_MAX_DOCS=20
 ```
 
-**Checkpoint:** `.tkeir-okf/<bundle_id>/index.md` exists. A scoped export also
-has `query_context.md` with the query and linked concepts. Open a concept file
-under `concepts/` — frontmatter includes `type` plus T-KEIR `tkeir_*` fields.
+**Checkpoint:** `workspace/users/dev@tkeir/okf/<bundle_id>/index.md` exists (or
+`workspace/.tkeir-okf/<bundle_id>/` when using the flat layout). A scoped export
+also has `query_context.md` with the query and linked concepts. Open a concept
+file under `concepts/` — frontmatter includes `type` plus T-KEIR `tkeir_*`
+fields.
 
 **2. HTTP API + HMI browser** — optional when you want list/download from the UI:
 
@@ -428,9 +431,10 @@ make okf-workflow \
 ```
 
 **Checkpoint:** the workflow run reaches `status=succeeded` with
-`compose_result`; the curated bundle under `.tkeir-okf/` shows enrichments in
-concept notes / `log.md`. Enterprise theme works the same with
-`TOPIC="Project ATLAS"` and a matching `GOAL`.
+`compose_result`; the curated bundle under `workspace/users/…/okf/` (or
+`workspace/.tkeir-okf/`) shows enrichments in concept notes / `log.md`.
+Enterprise theme works the same with `TOPIC="Project ATLAS"` and a matching
+`GOAL`.
 
 ---
 

@@ -346,13 +346,18 @@ def _yql_escape(value: str) -> str:
 
 
 def default_okf_root() -> Path:
-    """Return legacy flat ``OKF_ROOT`` when set (tests / migration only).
+    """Return flat OKF root under the shared workspace (or ``OKF_ROOT``).
 
-    New durable bundles belong under ``workspace/users/<space>/okf/`` via
-    :func:`user_okf_root`. Prefer that path for writes.
+    Preference:
+
+    1. ``OKF_ROOT`` when set (tests / explicit override)
+    2. ``<workspace>/.tkeir-okf`` (same durable tree as ingest / users / agent)
+
+    Per-tenant writes still prefer :func:`user_okf_root`
+    (``workspace/users/<space>/okf``).
 
     Returns:
-        Resolved directory for legacy flat bundle storage.
+        Resolved directory for flat bundle storage.
 
     Example:
         >>> import os
@@ -370,10 +375,9 @@ def default_okf_root() -> Path:
     raw = os.getenv("OKF_ROOT", "").strip()
     if raw:
         return Path(raw).expanduser().resolve()
-    cwd = Path.cwd().resolve()
-    if cwd.name == "tkeir":
-        return (cwd.parent / ".tkeir-okf").resolve()
-    return (cwd / ".tkeir-okf").resolve()
+    from thot.tools.ingest.user_workspace import workspace_root
+
+    return (workspace_root() / ".tkeir-okf").resolve()
 
 
 def user_okf_root(

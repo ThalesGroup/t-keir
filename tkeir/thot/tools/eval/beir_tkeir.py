@@ -456,7 +456,7 @@ def require_beir_business_ontology(
     Callers decide whether to apply it via ``rag.yaml``
     ``dual_hybrid.business_ontology.index_enabled`` /
     ``search_enabled``.
-    
+
 
     Example:
         >>> require_beir_business_ontology("missing-dataset") is None

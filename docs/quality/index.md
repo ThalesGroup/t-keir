@@ -1,6 +1,6 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-08-03 19:59 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-08-05 09:13 UTC**.
 
 How this dashboard is produced, which Actions upload artefacts, and gate
 thresholds: **[CI, reports & Actions](../ci/index.md)** ·
@@ -19,18 +19,18 @@ Scoped line coverage from `make coverage` / `CoverageFast.sh` (same
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Scoped line coverage | 90.25% | ≥ 90% | PASS |
-| Full ``thot/`` XML line-rate | 57.80% | informational | — |
-| Statements (scoped) | 6544 | — | — |
-| Covered lines | 5906 | — | — |
-| Missing lines | 638 | — | — |
+| Scoped line coverage | 90.69% | ≥ 90% | PASS |
+| Full ``thot/`` XML line-rate | 70.00% | informational | — |
+| Statements (scoped) | 6571 | — | — |
+| Covered lines | 5959 | — | — |
+| Missing lines | 612 | — | — |
 
 ### Coverage report (TOTAL)
 
 ```
 Name                                                                                                  Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                  6544    638    90%
+TOTAL                                                                                                  6571    612    91%
 ```
 
 Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
@@ -44,10 +44,10 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Average CC | 5.06 | ≤ 7.0 | PASS |
+| Average CC | 5.04 | ≤ 7.0 | PASS |
 | Grade | B | B or better | PASS |
-| Functions at grade D+ | 50 | 0 | FAIL |
-| Lowest MI module | thot/tasks/answer_generation/rag_answer.py (0.00) | ≥ 20 preferred | — |
+| Functions at grade D+ | 51 | 0 | FAIL |
+| Lowest MI module | thot/tools/search/ontology_utils.py (0.00) | ≥ 20 preferred | — |
 
 ### Risk reference table
 
@@ -63,8 +63,8 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 ### Full report (summary)
 
 ```
-2154 blocks (classes, functions, methods) analyzed.
-Average complexity: B (5.064066852367688)
+2221 blocks (classes, functions, methods) analyzed.
+Average complexity: B (5.042323277802791)
 
 Full per-function JSON: reports/quality/radon_cc.json
 ```
@@ -80,7 +80,7 @@ All runtime and optional Python dependencies from the locked dependency set
 |---------|---------|---------|-----|
 | accelerate | 1.14.0 | Apache Software License | https://github.com/huggingface/accelerate |
 | aiohappyeyeballs | 2.7.1 | Python Software Foundation License | https://github.com/aio-libs/aiohappyeyeballs |
-| aiohttp | 3.14.1 | Apache-2.0 AND MIT | https://github.com/aio-libs/aiohttp |
+| aiohttp | 3.14.3 | Apache-2.0 AND MIT | https://github.com/aio-libs/aiohttp |
 | aiosignal | 1.4.0 | Apache Software License | https://github.com/aio-libs/aiosignal |
 | annotated-doc | 0.0.4 | MIT | https://github.com/fastapi/annotated-doc |
 | annotated-types | 0.7.0 | MIT License | https://github.com/annotated-types/annotated-types |

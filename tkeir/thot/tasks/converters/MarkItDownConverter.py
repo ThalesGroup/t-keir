@@ -38,12 +38,13 @@ DATATYPE_EXTENSIONS = {
 
 class MarkItDownConverter:
     """MarkItDownConverter container.
-    
-        Example:
-            >>> from thot.tasks.converters.MarkItDownConverter import MarkItDownConverter
-            >>> callable(MarkItDownConverter)
-            True
+
+    Example:
+        >>> from thot.tasks.converters.MarkItDownConverter import MarkItDownConverter
+        >>> callable(MarkItDownConverter)
+        True
     """
+
     _engine = None
 
     @classmethod

@@ -188,6 +188,20 @@ class JsonRecordsIngestRequest(BaseModel):
     # Server-side dataset path relative to repo / TKEIR_WORKSPACE (admin demos).
     dataset_path: str | None = None
     filename: str | None = None
+    business_ontology_dataset: str | None = Field(
+        default=None,
+        description=(
+            "datasets/<name>/business_ontology.yaml for NLP annotation "
+            "(default: rag.yaml dual_hybrid.business_ontology.default_dataset)"
+        ),
+    )
+    business_ontology: dict[str, Any] | list[Any] | None = Field(
+        default=None,
+        description=(
+            "Inline business-ontology payload (YAML/JSON concepts). When set, "
+            "merged over the dataset file during NLP annotation."
+        ),
+    )
 
 
 class JsonRecordsAcceptedResponse(BaseModel):

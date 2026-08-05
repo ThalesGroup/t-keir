@@ -1,6 +1,6 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-08-05 09:13 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-08-05 10:27 UTC**.
 
 How this dashboard is produced, which Actions upload artefacts, and gate
 thresholds: **[CI, reports & Actions](../ci/index.md)** ·
@@ -20,7 +20,7 @@ Scoped line coverage from `make coverage` / `CoverageFast.sh` (same
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
 | Scoped line coverage | 90.69% | ≥ 90% | PASS |
-| Full ``thot/`` XML line-rate | 70.00% | informational | — |
+| Full ``thot/`` XML line-rate | 69.99% | informational | — |
 | Statements (scoped) | 6571 | — | — |
 | Covered lines | 5959 | — | — |
 | Missing lines | 612 | — | — |

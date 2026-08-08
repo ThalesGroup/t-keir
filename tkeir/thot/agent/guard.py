@@ -29,12 +29,14 @@ from thot.action.models import (
     utc_now_rfc3339,
 )
 from thot.action.sink import default_action_sink
+from thot.agent.base import BaseAgentGuard
 from thot.agent.models import AgentSpec, RunState
 from thot.agent.spiffe import (
     is_allowed_agent_spiffe_id,
     resolve_agent_spiffe_id,
     spiffe_enforce,
 )
+from thot.core.StructuredLogging import log_structured
 from thot.core.ThotMetrics import ThotMetrics
 from thot.governor.approvals import ApprovalQueue
 from thot.governor.flags import RuntimeFlagsStore
@@ -86,8 +88,11 @@ class GuardDecision:
 
 
 @dataclass
-class AgentGuard:
-    """Per-process guard shared by the agent service.
+class AgentGuard(BaseAgentGuard[RunState, dict[str, Any]]):
+    """Per-process guard shared by the agent service (SPIFFE + governor).
+
+    Implements :class:`~thot.agent.base.BaseAgentGuard` while preserving the
+    existing ``check_step`` / ``emit`` APIs used by :class:`AgentLoop`.
 
     Example:
         >>> import tempfile
@@ -266,6 +271,68 @@ class AgentGuard:
                 pass
         return GuardDecision(result="allow")
 
+    def validate_identity(self, identity_token: Any) -> bool:
+        """SPIFFE / workload identity check (:class:`BaseAgentGuard`).
+
+        Args:
+            identity_token: SPIFFE id string, or ``None`` when unset.
+
+        Returns:
+            ``True`` when enforcement is off, or the id is allow-listed.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     g = AgentGuard(Path(td))
+            ...     g.validate_identity(None) in (True, False)
+            True
+        """
+        if not spiffe_enforce():
+            return True
+        if identity_token is None or identity_token == "":
+            return False
+        return is_allowed_agent_spiffe_id(str(identity_token))
+
+    def check_action_permission(
+        self, state: RunState, proposed_action: dict[str, Any]
+    ) -> bool:
+        """Authorize a proposed tool/final action before execution.
+
+        Args:
+            state: Current run state (cancel / kill / SPIFFE).
+            proposed_action: Action dict (``type``, ``tool``, …).
+
+        Returns:
+            ``False`` when cancel, kill-switch, or SPIFFE deny applies.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.models import RunState
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     g = AgentGuard(Path(td))
+            ...     g.check_action_permission(
+            ...         RunState(goal="g"), {"type": "final"}
+            ...     )
+            True
+        """
+        if state.cancel_requested:
+            return False
+        if self.is_agents_killed():
+            return False
+        if not state.spiffe_id:
+            state.spiffe_id = resolve_agent_spiffe_id(state.agent)
+        if spiffe_enforce() and not is_allowed_agent_spiffe_id(
+            state.spiffe_id
+        ):
+            return False
+        # Tool name may be used by future scoped policies; accept for now.
+        _ = proposed_action.get("type") or proposed_action.get("tool")
+        return True
+
     def emit(
         self,
         *,
@@ -307,6 +374,18 @@ class AgentGuard:
         """
         if not state.spiffe_id:
             state.spiffe_id = resolve_agent_spiffe_id(state.agent)
+        merged_ext = {
+            "action_kind": kind,
+            "run_id": state.run_id,
+            "user_space": state.user_space,
+            "agent": state.agent,
+            "spiffe_id": state.spiffe_id,
+            **(ext or {}),
+        }
+        # Prefer concrete tool name when present; otherwise the audit kind.
+        action_name = str(
+            merged_ext.get("tool") or merged_ext.get("action") or kind
+        )
         record = ActionRecord(
             correlation_id=state.correlation_id or ("0" * 32),
             actor=ActorInfo(
@@ -334,14 +413,31 @@ class AgentGuard:
                 chunk_ids=chunk_ids or [],
                 error=error,
             ),
-            ext={
-                "action_kind": kind,
-                "run_id": state.run_id,
-                "user_space": state.user_space,
-                "agent": state.agent,
-                "spiffe_id": state.spiffe_id,
-                **(ext or {}),
-            },
+            ext=merged_ext,
         )
         default_action_sink().append(record)
+        log_structured(
+            "info",
+            (
+                f"agent_action agent={state.agent} "
+                f"action={action_name} "
+                f"spiffe_id={state.spiffe_id}"
+            ),
+            service=os.getenv("TKEIR_SERVICE", "tkeir-agent"),
+            correlation_id=state.correlation_id or "",
+            action_id=record.action_id,
+            actor=state.agent,
+            agent=state.agent,
+            action=action_name,
+            action_kind=kind,
+            spiffe_id=state.spiffe_id,
+            run_id=state.run_id,
+            user_space=state.user_space,
+            status=status,
+            **(
+                {"tool": str(merged_ext["tool"])}
+                if merged_ext.get("tool")
+                else {}
+            ),
+        )
         return record

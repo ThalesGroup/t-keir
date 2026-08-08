@@ -10,8 +10,10 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
+import json
 import os
-from typing import Callable, Literal
+import time
+from typing import Any, Callable, Literal
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -57,7 +59,22 @@ _PATH_INTENT = {
     "/audit/verify": "audit.read",
     "/audit/archive": "audit.read",
     "/okf/export": "okf.export",
+    "/agent/runs": "agent.run",
+    "/agent/agents": "agent.read",
+    "/agent/workflows": "agent.read",
 }
+
+# Keys handlers may attach via ``request.state.action_log`` (and JSON extras).
+_ACTION_LOG_KEYS = (
+    "agent",
+    "workflow",
+    "run_id",
+    "spiffe_id",
+    "user_space",
+    "goal",
+    "run_status",
+    "tool",
+)
 
 
 def _env_name() -> str:
@@ -88,10 +105,24 @@ def intent_for_path(path: str) -> str:
         'search'
         >>> intent_for_path("/collect")
         'collect'
+        >>> intent_for_path("/agent/runs")
+        'agent.run'
+        >>> intent_for_path("/agent/runs/abc/cancel")
+        'agent.cancel'
         >>> intent_for_path("/unknown")
         'search'
     """
-    return _PATH_INTENT.get(path, "search")
+    if path in _PATH_INTENT:
+        return _PATH_INTENT[path]
+    if path.startswith("/agent/"):
+        if path.endswith("/publish"):
+            return "agent.publish"
+        if path.endswith("/cancel"):
+            return "agent.cancel"
+        if path.startswith("/agent/runs/"):
+            return "agent.run"
+        return "agent"
+    return "search"
 
 
 def request_body_hash(body: bytes) -> str:
@@ -102,6 +133,111 @@ def request_body_hash(body: bytes) -> str:
         True
     """
     return sha256_hex(body)
+
+
+def _run_id_from_path(path: str) -> str | None:
+    """Extract ``run_id`` from ``/agent/runs/{run_id}[/…]`` paths.
+
+    Example:
+        >>> _run_id_from_path("/agent/runs/abc/cancel")
+        'abc'
+        >>> _run_id_from_path("/health") is None
+        True
+    """
+    parts = [p for p in path.split("/") if p]
+    if len(parts) >= 3 and parts[0] == "agent" and parts[1] == "runs":
+        return parts[2]
+    return None
+
+
+def _safe_json_object(body: bytes) -> dict[str, Any]:
+    """Parse a JSON object body; return ``{}`` on any failure.
+
+    Example:
+        >>> _safe_json_object(b'{"a": 1}')
+        {'a': 1}
+        >>> _safe_json_object(b"not-json")
+        {}
+    """
+    if not body:
+        return {}
+    try:
+        data = json.loads(body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _coerce_log_value(value: Any, *, max_len: int = 160) -> str | None:
+    """Normalize a log field to a short string (or ``None`` to omit).
+
+    Example:
+        >>> _coerce_log_value(True)
+        'true'
+        >>> _coerce_log_value("  ") is None
+        True
+    """
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    text = str(value).strip()
+    if not text:
+        return None
+    if len(text) > max_len:
+        return text[: max_len - 1] + "…"
+    return text
+
+
+def _handler_action_log(request: Request) -> dict[str, str]:
+    """Collect optional structured fields set by route handlers.
+
+    Example:
+        >>> from starlette.requests import Request
+        >>> req = Request(
+        ...     {"type": "http", "method": "GET", "path": "/", "headers": [], "query_string": b""}
+        ... )
+        >>> req.state.action_log = {"agent": "wiki"}
+        >>> _handler_action_log(req)
+        {'agent': 'wiki'}
+    """
+    raw = getattr(request.state, "action_log", None)
+    if not isinstance(raw, dict):
+        return {}
+    out: dict[str, str] = {}
+    for key in _ACTION_LOG_KEYS:
+        if key not in raw:
+            continue
+        coerced = _coerce_log_value(
+            raw[key], max_len=200 if key == "goal" else 160
+        )
+        if coerced is not None:
+            out[key] = coerced
+    return out
+
+
+def _body_action_hints(path: str, body: bytes) -> dict[str, str]:
+    """Best-effort agent/workflow/goal hints from a create-run JSON body.
+
+    Example:
+        >>> _body_action_hints("/agent/runs", b'{"agent": "wiki"}')
+        {'agent': 'wiki'}
+        >>> _body_action_hints("/health", b'{"agent": "wiki"}')
+        {}
+    """
+    if path != "/agent/runs" or not body:
+        return {}
+    data = _safe_json_object(body)
+    out: dict[str, str] = {}
+    for key in ("agent", "workflow", "goal"):
+        coerced = _coerce_log_value(
+            data.get(key), max_len=200 if key == "goal" else 120
+        )
+        if coerced is not None:
+            out[key] = coerced
+    return out
 
 
 class ActionCorrelationMiddleware(BaseHTTPMiddleware):
@@ -146,6 +282,7 @@ class ActionCorrelationMiddleware(BaseHTTPMiddleware):
         )
         token = set_trace_context(ctx)
         started = utc_now_rfc3339()
+        wall_started = time.monotonic()
         body = await request.body()
 
         async def receive():
@@ -162,14 +299,15 @@ class ActionCorrelationMiddleware(BaseHTTPMiddleware):
             reset_trace_context(token)
             raise
         ended = utc_now_rfc3339()
+        duration_ms = int((time.monotonic() - wall_started) * 1000)
         response.headers[CORRELATION_HEADER] = ctx.correlation_id
         response.headers[TRACEPARENT_HEADER] = ctx.traceparent()
 
         path = request.url.path
+        method = request.method.upper()
         if path not in _SKIP_RECORD_PATHS:
-            req_hash = sha256_hex(
-                f"{request.method}|{path}|{request_body_hash(body)}"
-            )
+            intent = intent_for_path(path)
+            req_hash = sha256_hex(f"{method}|{path}|{request_body_hash(body)}")
             ExecStatus = Literal[
                 "success",
                 "failure",
@@ -188,13 +326,18 @@ class ActionCorrelationMiddleware(BaseHTTPMiddleware):
                 )
                 if governor_decision.result != "allow":
                     exec_status = "blocked"
+            extras = _body_action_hints(path, body)
+            extras.update(_handler_action_log(request))
+            path_run_id = _run_id_from_path(path)
+            if path_run_id and "run_id" not in extras:
+                extras["run_id"] = path_run_id
             record = ActionRecord(
                 action_id=ctx.action_id,
                 correlation_id=ctx.correlation_id,
                 occurred_at=started,
                 actor=ActorInfo(type="service", id=self._service),
                 intent=IntentInfo(
-                    declared=intent_for_path(path),
+                    declared=intent,
                     scope_source="manual",
                 ),
                 context=ActionContext(
@@ -212,20 +355,50 @@ class ActionCorrelationMiddleware(BaseHTTPMiddleware):
                 result=ResultInfo(error=error),
             )
             record.ext["http"] = {
-                "method": request.method,
+                "method": method,
                 "path": path,
                 "status": status,
+                "duration_ms": duration_ms,
             }
+            if extras:
+                record.ext["request"] = extras
             self._sink.append(record)
+
+            detail_bits = [
+                f"{method} {path}",
+                f"-> {status}",
+                f"({duration_ms}ms)",
+                f"intent={intent}",
+            ]
+            for key in (
+                "agent",
+                "workflow",
+                "run_id",
+                "spiffe_id",
+                "user_space",
+                "run_status",
+            ):
+                if key in extras:
+                    detail_bits.append(f"{key}={extras[key]}")
+            if extras.get("goal"):
+                detail_bits.append(f"goal={extras['goal']!r}")
+            if error:
+                detail_bits.append(f"error={error[:120]!r}")
+
             log_structured(
                 "info",
-                "request completed",
+                "request completed " + " ".join(detail_bits),
                 service=self._service,
                 correlation_id=ctx.correlation_id,
                 action_id=ctx.action_id,
-                actor=self._service,
+                actor=extras.get("agent") or self._service,
                 http_status=status,
                 path=path,
+                method=method,
+                intent=intent,
+                duration_ms=duration_ms,
+                status=exec_status,
+                **extras,
             )
 
         reset_trace_context(token)

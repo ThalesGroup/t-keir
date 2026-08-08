@@ -9,6 +9,11 @@
 
 # Inherit image defaults, but keep only engines useful for open-web collect
 # (no API keys). Override / re-enable individual engines in `engines:` below.
+#
+# wikidata is omitted on purpose: its engine `init()` hits
+# https://query.wikidata.org/sparql and often gets HTTP 403 from Docker /
+# residential-blocked IPs, which leaves the processor unregistered and noisy
+# logs. Wikipedia covers encyclopedia hits without SPARQL bootstrap.
 use_default_settings:
   engines:
     keep_only:
@@ -19,7 +24,6 @@ use_default_settings:
       - mojeek
       - qwant
       - wikipedia
-      - wikidata
       - google
       - yahoo
       - seznam
@@ -64,8 +68,6 @@ engines:
   - name: qwant
     disabled: false
   - name: wikipedia
-    disabled: false
-  - name: wikidata
     disabled: false
   - name: google
     # Often rate-limited / CAPTCHA from datacenter IPs; leave on for diversity.

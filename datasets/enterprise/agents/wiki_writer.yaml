@@ -49,6 +49,8 @@ tools:
   - okf_bundle_get
   - workspace_wiki_list
   - workspace_wiki_get
+terminal_tools:
+  - okf_wiki_put
 budgets:
   llm_tokens: 25000
   tool_calls: 10

@@ -84,7 +84,10 @@ TOOLS: tuple[ToolSpec, ...] = (
             "Retrieval-augmented generation scoped to the caller's "
             "user_space. Returns answer, report_markdown, ontology summary, "
             "and grounded chunks when the RAG backend is available. "
-            "Pass search_mode='both' to fuse global + user indexes."
+            "Pass search_mode='both' to fuse global + user indexes. "
+            "Optional wiki_extract/use_wiki inject prior OKF synthesis. "
+            "For templated answers prefer agent workflow rag_with_wiki "
+            "(POST /agent/runs on AGENT_URL)."
         ),
         intent="search",
         handler="rag_query",
@@ -109,6 +112,44 @@ TOOLS: tuple[ToolSpec, ...] = (
                     "enum": ["auto", "global", "user", "both"],
                     "description": (
                         "Dual-hybrid index mode. Use 'both' for global + user."
+                    ),
+                },
+                "use_wiki": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": (
+                        "When true, inject wiki_extract into the RAG prompt"
+                    ),
+                },
+                "wiki_extract": {
+                    "type": "string",
+                    "description": (
+                        "OKF wiki Answer/Structured-facts extract for generation"
+                    ),
+                },
+                "wiki_bundle_id": {
+                    "type": "string",
+                    "description": "Optional OKF bundle id (audit / resolve)",
+                },
+                "agent_id": {
+                    "type": "string",
+                    "description": (
+                        "Optional wiki/answer agent id (forwarded; not executed)"
+                    ),
+                },
+                "answer_template": {
+                    "type": "string",
+                    "description": (
+                        "Optional compose template name (e.g. otan_sitrep); "
+                        "prefer agent rag_with_wiki for template fill"
+                    ),
+                },
+                "stop_at_wiki_extract": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": (
+                        "When true with use_wiki, skip answer generation and "
+                        "return the wiki extract only"
                     ),
                 },
             },

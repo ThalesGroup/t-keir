@@ -67,6 +67,25 @@ def test_osint_dataset_agent_pack_discovered():
     assert "osint" in resolve_workflow_path("persona_j2_analyst").as_posix()
 
 
+def test_enterprise_dataset_agent_pack_discovered():
+    from thot.agent.registry import agent_config_dirs, resolve_agent_path
+    from thot.agent.workflows import (
+        resolve_workflow_path,
+        workflow_config_dirs,
+    )
+
+    assert any(
+        p.as_posix().endswith("datasets/enterprise/agents")
+        for p in agent_config_dirs()
+    )
+    assert any(
+        p.as_posix().endswith("datasets/enterprise/workflows")
+        for p in workflow_config_dirs()
+    )
+    assert "enterprise" in resolve_agent_path("ceo_analyser").as_posix()
+    assert "enterprise" in resolve_workflow_path("persona_ceo").as_posix()
+
+
 def test_parse_tool_and_final():
     tool = parse_agent_message(
         '```json\n{"tool": "search", "arguments": {"query": "x"}}\n```'

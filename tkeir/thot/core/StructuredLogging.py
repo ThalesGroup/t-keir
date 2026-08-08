@@ -143,9 +143,28 @@ class JsonLogFormatter(logging.Formatter):
             "logger": record.name,
             "msg": record.getMessage(),
         }
-        for key in ("http_status", "path"):
+        for key in (
+            "http_status",
+            "path",
+            "method",
+            "intent",
+            "duration_ms",
+            "agent",
+            "action",
+            "action_kind",
+            "spiffe_id",
+            "tool",
+            "user_space",
+            "status",
+            "run_id",
+            "workflow",
+            "goal",
+            "run_status",
+        ):
             if hasattr(record, key):
-                payload[key] = getattr(record, key)
+                value = getattr(record, key)
+                if value not in (None, ""):
+                    payload[key] = value
         if record.exc_info:
             payload["exc_info"] = self.formatException(record.exc_info)
         return json.dumps(payload, ensure_ascii=False)

@@ -32,7 +32,7 @@ def okf_client(tmp_path: Path, monkeypatch):
     # Import app after governor mode is off so middleware is not wired.
     import importlib
 
-    import thot.okf.server as okf_server
+    import thot.tools.okf.app as okf_server
 
     importlib.reload(okf_server)
     with TestClient(okf_server.app) as client:
@@ -132,7 +132,7 @@ def test_missing_bundle_404(okf_client):
 def test_put_wiki_editable(okf_client):
     client, tmp_path, _mod = okf_client
     bundle_id = _seed_bundle(tmp_path)
-    markdown = "---\ntype: Wiki\ntitle: Edited\ntkeir_doc_id: wiki:edited\ntkeir_user_space: dev@tkeir\n---\n\n# Edited\n\nBody.\n"
+    markdown = "---\ntype: Wiki\ntitle: Edited\ntkeir_doc_id: wiki:edited\ntkeir_user_space: dev@tkeir\n---\n\n# Edited\n\n## Answer\n\nBody open.\n\n## Evidence\n\n- x\n"
     resp = client.put(
         f"/okf/bundles/{bundle_id}/wiki",
         json={"markdown": markdown},
@@ -143,6 +143,14 @@ def test_put_wiki_editable(okf_client):
     assert detail["has_wiki"] is True
     assert "Edited" in detail["wiki_md"]
     assert (tmp_path / bundle_id / "wiki.md").is_file()
+    extract = client.get(f"/okf/bundles/{bundle_id}/wiki-extract").json()
+    assert "Body open" in extract["extract"]
+    assert "Evidence" not in extract["extract"]
+    match = client.get(
+        "/okf/wikis/match", params={"q": "Edited Body", "threshold": 0.01}
+    )
+    assert match.status_code == 200
+    assert match.json()["found"] is True
 
 
 def test_export_and_delete(okf_client):

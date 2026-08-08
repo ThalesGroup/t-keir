@@ -74,6 +74,12 @@ class McpBackend(Protocol):
         language: str | None = None,
         generate: bool = True,
         search_mode: str | None = None,
+        use_wiki: bool = False,
+        wiki_extract: str | None = None,
+        wiki_bundle_id: str | None = None,
+        agent_id: str | None = None,
+        answer_template: str | None = None,
+        stop_at_wiki_extract: bool = False,
     ) -> dict[str, Any]:
         """Run RAG (or retrieval-only) in ``user_space``.
 
@@ -308,6 +314,12 @@ class VespaMcpBackend:
         language: str | None = None,
         generate: bool = True,
         search_mode: str | None = None,
+        use_wiki: bool = False,
+        wiki_extract: str | None = None,
+        wiki_bundle_id: str | None = None,
+        agent_id: str | None = None,
+        answer_template: str | None = None,
+        stop_at_wiki_extract: bool = False,
     ) -> dict[str, Any]:
         """Run RAG or retrieval-only search for one tenant.
 
@@ -334,6 +346,18 @@ class VespaMcpBackend:
             }
             if mode:
                 payload_body["search_mode"] = mode
+            if use_wiki:
+                payload_body["use_wiki"] = True
+            if wiki_extract:
+                payload_body["wiki_extract"] = str(wiki_extract)
+            if wiki_bundle_id:
+                payload_body["wiki_bundle_id"] = str(wiki_bundle_id)
+            if agent_id:
+                payload_body["agent_id"] = str(agent_id)
+            if answer_template:
+                payload_body["answer_template"] = str(answer_template)
+            if stop_at_wiki_extract:
+                payload_body["stop_at_wiki_extract"] = True
             async with httpx.AsyncClient(timeout=120.0) as client:
                 response = await client.post(
                     f"{rag_url}/rag/query",
@@ -734,6 +758,14 @@ class McpHandlers:
                 language=args.get("language"),
                 generate=bool(args.get("generate", True)),
                 search_mode=args.get("search_mode"),
+                use_wiki=bool(args.get("use_wiki", False)),
+                wiki_extract=args.get("wiki_extract"),
+                wiki_bundle_id=args.get("wiki_bundle_id"),
+                agent_id=args.get("agent_id"),
+                answer_template=args.get("answer_template"),
+                stop_at_wiki_extract=bool(
+                    args.get("stop_at_wiki_extract", False)
+                ),
             )
         if tool_name == "ontology_query":
             return await self.backend.ontology_from_query(

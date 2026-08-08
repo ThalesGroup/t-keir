@@ -5,7 +5,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { resolvePersonaWorkflowPreset } from "@/lib/persona-workflows";
+import {
+  RAG_WITH_WIKI_WORKFLOW,
+  resolvePersonaWorkflowPreset,
+} from "@/lib/persona-workflows";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/src/auth/AuthProvider";
 import { apiFetch } from "@/src/auth/useApiClient";
@@ -37,7 +40,7 @@ type RunPayload = {
   } | null;
 };
 
-type Mode = "researcher" | "persona";
+type Mode = "researcher" | "persona" | "rag_wiki";
 
 function newId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -110,7 +113,7 @@ export function AgentDialog({
     () => resolvePersonaWorkflowPreset({ roles, activePersonaId }),
     [roles, activePersonaId],
   );
-  const [mode, setMode] = useState<Mode>("persona");
+  const [mode, setMode] = useState<Mode>("rag_wiki");
   const [draft, setDraft] = useState(initialGoal || preset.goal);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [busy, setBusy] = useState(false);
@@ -176,15 +179,31 @@ export function AgentDialog({
       const body =
         mode === "researcher"
           ? { agent: "researcher", goal }
-          : {
-              workflow: preset.workflow,
-              goal,
-              params: {
-                topic: preset.topic || goal,
-                report_form: preset.reportForm,
-                query: goal,
-              },
-            };
+          : mode === "rag_wiki"
+            ? {
+                workflow: RAG_WITH_WIKI_WORKFLOW,
+                goal,
+                params: {
+                  topic: preset.topic || goal,
+                  query: goal,
+                  report_form: preset.reportForm,
+                  answer_template: preset.answerTemplate,
+                  use_wiki: true,
+                  wiki_agent: preset.wikiPrompt,
+                  prompt_name: preset.wikiPrompt,
+                  search_mode: "both",
+                  stop_at_wiki_extract: false,
+                },
+              }
+            : {
+                workflow: preset.workflow,
+                goal,
+                params: {
+                  topic: preset.topic || goal,
+                  report_form: preset.reportForm,
+                  query: goal,
+                },
+              };
       const res = await apiFetch("/api/agent/agent/runs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -199,7 +218,11 @@ export function AgentDialog({
       }
 
       const modeLabel =
-        mode === "researcher" ? "researcher" : preset.workflow;
+        mode === "researcher"
+          ? "researcher"
+          : mode === "rag_wiki"
+            ? RAG_WITH_WIKI_WORKFLOW
+            : preset.workflow;
       setMessages((prev) => [
         ...prev,
         {
@@ -236,13 +259,25 @@ export function AgentDialog({
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       <p className="text-xs text-muted-foreground">
-        Ask grounded questions via tkeir-agent. Default workflow:{" "}
-        <code className="rounded bg-muted px-1 py-0.5">{preset.workflow}</code>{" "}
-        ({preset.label} / {preset.reportForm}). Claims without chunk citations
-        are dropped.
+        Ask grounded questions via tkeir-agent. Default:{" "}
+        <code className="rounded bg-muted px-1 py-0.5">
+          {RAG_WITH_WIKI_WORKFLOW}
+        </code>{" "}
+        ({preset.label} / {preset.answerTemplate}). Claims without chunk
+        citations are dropped.
       </p>
 
       <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant={mode === "rag_wiki" ? "default" : "outline"}
+          className="h-7"
+          disabled={busy}
+          onClick={() => setMode("rag_wiki")}
+        >
+          RAG + wiki ({preset.answerTemplate})
+        </Button>
         <Button
           type="button"
           size="sm"

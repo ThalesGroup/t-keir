@@ -24,11 +24,21 @@ approvals).
    `<untrusted>` envelopes.
 4. Ship base agents as YAML (`configs/agents/`) and workflows as YAML
    (`configs/workflows/`); sequential orchestration first.
-5. Service: `tkeir-agent` on `:8092`.
+5. Service: `tkeir-agent` on `:8092` lives under **`thot.tools.agent`**
+   (HTTP tool). Library agents are :class:`~thot.agent.agent.Agent` instances
+   in `thot.agent`; the service hosts an :class:`~thot.agent.agent.AgentSet`
+   loaded from one or more YAML config directories (`--config-dir`,
+   `TKEIR_AGENT_CONFIG_DIRS`, optional `--agents` allow-list).
 6. **Workload identity:** every agent run carries a SPIFFE ID
    (`spiffe://{trust}/agent/{name}`) on `RunState` and
    `ActionRecord.actor.spiffe_id` ([ADR-0008](0008-spire-agent-identity.md)).
    Governor enforce mode denies agent steps without an allow-listed ID.
+7. **Decoupling (2026-08):** engine-agnostic
+   `BaseAgent` / `DecisionEngine` / `BaseAgentGuard` in `thot.agent.base`;
+   general `LLMAgent` has no wiki coupling and is used by `thot.tools.agent`
+   for single-agent HTTP runs; LLM-Wiki is
+   `WikiGeneratorWorkflow` under `thot.agent.workflows` (orchestrator
+   builtins delegate here).
 
 ## Consequences
 

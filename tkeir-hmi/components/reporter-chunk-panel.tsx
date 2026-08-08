@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight, Layers } from "lucide-react";
 import { ReporterChunkCard } from "@/components/reporter-chunk-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { OntologyCoverage } from "@/lib/ontology-coverage";
 import type { FusedOntology, SearchChunkHit } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,8 @@ interface ReporterChunkPanelProps {
   evidenceChunkIds?: Set<string> | null;
   /** Soft-highlight these chunks (e.g. wiki citations) without hiding others. */
   highlightChunkIds?: Set<string> | null;
+  /** External BO coverage keyed by chunk id (when a BO file is loaded). */
+  chunkCoverageById?: Map<string, OntologyCoverage> | null;
   defaultOpen?: boolean;
   className?: string;
   title?: string;
@@ -28,6 +31,7 @@ export function ReporterChunkPanel({
   activeChunkIds,
   evidenceChunkIds = null,
   highlightChunkIds = null,
+  chunkCoverageById = null,
   defaultOpen = false,
   className,
   title = "Retrieved chunks",
@@ -120,6 +124,7 @@ export function ReporterChunkPanel({
                         activeChunkIds.has(chunk.chunk_id)
                       }
                       defaultOpen={index === 0 || cited}
+                      boCoverage={chunkCoverageById?.get(chunk.chunk_id) ?? null}
                     />
                   </div>
                 );

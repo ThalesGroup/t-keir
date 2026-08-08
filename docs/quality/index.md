@@ -1,6 +1,6 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-08-05 10:27 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-08-08 10:33 UTC**.
 
 How this dashboard is produced, which Actions upload artefacts, and gate
 thresholds: **[CI, reports & Actions](../ci/index.md)** ·
@@ -19,18 +19,18 @@ Scoped line coverage from `make coverage` / `CoverageFast.sh` (same
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Scoped line coverage | 90.69% | ≥ 90% | PASS |
-| Full ``thot/`` XML line-rate | 69.99% | informational | — |
-| Statements (scoped) | 6571 | — | — |
-| Covered lines | 5959 | — | — |
-| Missing lines | 612 | — | — |
+| Scoped line coverage | 91.16% | ≥ 90% | PASS |
+| Full ``thot/`` XML line-rate | 69.78% | informational | — |
+| Statements (scoped) | 6598 | — | — |
+| Covered lines | 6015 | — | — |
+| Missing lines | 583 | — | — |
 
 ### Coverage report (TOTAL)
 
 ```
 Name                                                                                                  Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                  6571    612    91%
+TOTAL                                                                                                  6598    583    91%
 ```
 
 Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
@@ -63,8 +63,8 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 ### Full report (summary)
 
 ```
-2221 blocks (classes, functions, methods) analyzed.
-Average complexity: B (5.042323277802791)
+2305 blocks (classes, functions, methods) analyzed.
+Average complexity: B (5.0364425162689805)
 
 Full per-function JSON: reports/quality/radon_cc.json
 ```

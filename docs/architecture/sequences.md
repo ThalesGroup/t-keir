@@ -92,7 +92,7 @@ Checkpoint: password grant with `tkeir-cli` yields `preferred_username` in the a
 
 ## Agent / workflow execution path
 
-`POST /agent/runs` on `tkeir-agent` (`thot.agent.service`) enqueues
+`POST /agent/runs` on `tkeir-agent` (`thot.tools.agent`) enqueues
 `RunState`, then `AgentLoop` or `Orchestrator`. `AgentGuard` checks kill
 switch scope `agents`, budgets, and SPIFFE; emits `ActionRecord`s.
 

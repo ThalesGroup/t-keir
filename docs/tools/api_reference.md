@@ -117,7 +117,7 @@ HTTP: `POST /rag/ontology/query` — examples in [Vespa RAG](vespa_rag.md).
 |---|---|
 | `tkeir-create-annotation-resource` | Build `tkeir_mwe.pkl` from lexicon JSON |
 
-## Agent service (`thot.agent.service`) — CLI `tkeir-agent`
+## Agent service (`thot.tools.agent`) — CLI `tkeir-agent`
 
 | Endpoint / symbol | Purpose |
 |---|---|

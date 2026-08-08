@@ -18,7 +18,7 @@ from pathlib import Path
 import yaml
 
 from thot.agent.models import AgentSpec
-from thot.core.TkeirPaths import configs_dir, repo_root
+from thot.core.TkeirPaths import configs_dir
 
 _ENV_PATTERN = re.compile(r"\$\{([A-Z0-9_]+)\}")
 
@@ -66,43 +66,27 @@ def agent_config_dirs() -> list[Path]:
     Dataset-specific agents live under ``datasets/<pack>/agents/`` (for
     example OSINT persona agents under ``datasets/osint/agents/``). Docker
     images may also ship packs under ``<package>/packs/<pack>/agents/``.
+    When ``TKEIR_AGENT_USECASE`` (or aliases) is set, that pack is searched
+    before other packs so colliding stems (e.g. ``wiki_writer``) resolve to
+    the active usecase.
 
     Example:
         >>> from thot.agent.registry import agent_config_dirs
         >>> any(p.name == "agents" for p in agent_config_dirs())
         True
     """
-    from thot.core.TkeirPaths import package_root
+    from thot.agent.pack_paths import (
+        dataset_pack_subdir_dirs,
+        dedupe_paths,
+        extra_config_dirs_from_env,
+    )
 
-    roots: list[Path] = [agents_dir()]
-    for base in (
-        Path(repo_root()) / "datasets",
-        Path(package_root()) / "packs",
-    ):
-        if not base.is_dir():
-            continue
-        for pack in sorted(base.iterdir()):
-            if not pack.is_dir() or pack.name.startswith("."):
-                continue
-            candidate = pack / "agents"
-            if candidate.is_dir():
-                roots.append(candidate)
-    extra = os.getenv("TKEIR_AGENT_CONFIG_DIRS", "").strip()
-    if extra:
-        for part in extra.split(os.pathsep):
-            path = Path(part).expanduser()
-            if path.is_dir():
-                roots.append(path)
-    # Preserve order, drop duplicates.
-    seen: set[Path] = set()
-    unique: list[Path] = []
-    for root in roots:
-        key = root.resolve()
-        if key in seen:
-            continue
-        seen.add(key)
-        unique.append(root)
-    return unique
+    roots: list[Path] = [
+        agents_dir(),
+        *dataset_pack_subdir_dirs("agents"),
+        *extra_config_dirs_from_env("TKEIR_AGENT_CONFIG_DIRS"),
+    ]
+    return dedupe_paths(roots)
 
 
 def resolve_agent_path(name: str, *, directory: Path | None = None) -> Path:
@@ -188,3 +172,57 @@ def list_agent_names(*, directory: Path | None = None) -> list[str]:
             continue
         names.update(p.stem for p in root.glob("*.yaml"))
     return sorted(names)
+
+
+def agent_catalog_entry(name: str, *, directory: Path | None = None) -> dict:
+    """Return catalog metadata for one agent (no full system prompts).
+
+    Example:
+        >>> from thot.agent.registry import agent_catalog_entry
+        >>> entry = agent_catalog_entry("researcher")
+        >>> entry["name"] == "researcher" and "tools" in entry
+        True
+    """
+    spec = load_agent_spec(name, directory=directory)
+    has_wiki = bool(
+        (spec.wiki_merge_system_prompt or "").strip()
+        or (spec.wiki_structured_facts_seed or "").strip()
+        or spec.wiki_information_priority_keys
+        or name.endswith("_prompt")
+        or name == "okf_wiki_prompt"
+    )
+    return {
+        "name": spec.name,
+        "version": spec.version,
+        "role": spec.role,
+        "tools": list(spec.tools or []),
+        "output_contract": spec.output_contract,
+        "has_wiki_prompt": has_wiki,
+        "wiki_information_priority_keys": list(
+            spec.wiki_information_priority_keys or []
+        ),
+    }
+
+
+def list_agent_catalog(
+    *,
+    directory: Path | None = None,
+    wiki_only: bool = False,
+) -> list[dict]:
+    """List agent catalog entries for RAG/OKF/HMI discovery.
+
+    Example:
+        >>> from thot.agent.registry import list_agent_catalog
+        >>> isinstance(list_agent_catalog(), list)
+        True
+    """
+    out: list[dict] = []
+    for name in list_agent_names(directory=directory):
+        try:
+            entry = agent_catalog_entry(name, directory=directory)
+        except (OSError, ValueError, FileNotFoundError):
+            continue
+        if wiki_only and not entry.get("has_wiki_prompt"):
+            continue
+        out.append(entry)
+    return out

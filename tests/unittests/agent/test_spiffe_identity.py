@@ -66,7 +66,7 @@ def test_enforce_flag(monkeypatch):
     assert spiffe_enforce() is False
 
 
-def test_guard_emit_sets_spiffe_id(tmp_path: Path, monkeypatch):
+def test_guard_emit_sets_spiffe_id(tmp_path: Path, monkeypatch, caplog):
     monkeypatch.setenv("SPIFFE_MODE", "dev")
     monkeypatch.delenv("SPIFFE_ID", raising=False)
     monkeypatch.setenv("SPIFFE_ENFORCE", "false")
@@ -77,9 +77,21 @@ def test_guard_emit_sets_spiffe_id(tmp_path: Path, monkeypatch):
         user_space="demo-user",
         correlation_id="a" * 32,
     )
-    record = guard.emit(kind="agent.plan", state=state)
+    with caplog.at_level("INFO", logger="tkeir"):
+        record = guard.emit(
+            kind="tool.invoke",
+            state=state,
+            ext={"tool": "search_chunks"},
+        )
     assert record.actor.spiffe_id == "spiffe://tkeir.local/agent/researcher"
     assert state.spiffe_id == record.actor.spiffe_id
+    assert any(
+        "agent_action" in r.message
+        and "agent=researcher" in r.message
+        and "action=search_chunks" in r.message
+        and "spiffe_id=spiffe://tkeir.local/agent/researcher" in r.message
+        for r in caplog.records
+    )
 
 
 def test_guard_denies_missing_spiffe_when_enforced(

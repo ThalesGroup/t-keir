@@ -12,8 +12,13 @@ import {
 } from "lucide-react";
 
 import { AgentRunActivity } from "@/components/agent-run-activity";
-import { BusinessOntologySelect } from "@/components/business-ontology-select";
+import {
+  BusinessOntologyFilePicker,
+  EMPTY_BUSINESS_ONTOLOGY_FILE,
+  type BusinessOntologyFileValue,
+} from "@/components/business-ontology-file-picker";
 import { MarkdownContent } from "@/components/markdown-content";
+import { OntologyCoverageMeter } from "@/components/ontology-coverage-meter";
 import { OntologyNavigator } from "@/components/ontology-navigator";
 import { OntologyReasonGraph } from "@/components/ontology-reason-graph";
 import { ReporterChunkPanel } from "@/components/reporter-chunk-panel";
@@ -29,6 +34,12 @@ import {
   RagApiError,
 } from "@/lib/api";
 import { resolveBusinessOntologyDataset } from "@/lib/business-ontology-datasets";
+import {
+  chunkOntologyHaystacks,
+  coverageAgainstHaystacks,
+  extractBoConcepts,
+  fusedOntologyHaystacks,
+} from "@/lib/ontology-coverage";
 import { weightMapsFromOntology } from "@/lib/ontology-graph";
 import {
   LLM_WIKI_WORKFLOW,
@@ -91,12 +102,23 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
 
   const [query, setQuery] = useState(persona.goal);
   const [hits, setHits] = useState(20);
-  const [businessOntologyDataset, setBusinessOntologyDataset] = useState(() =>
-    resolveBusinessOntologyDataset(runtimeConfig?.businessOntologyDataset),
+  const [businessOntology, setBusinessOntology] =
+    useState<BusinessOntologyFileValue>(EMPTY_BUSINESS_ONTOLOGY_FILE);
+  const defaultOntologyDataset = resolveBusinessOntologyDataset(
+    runtimeConfig?.businessOntologyDataset,
   );
   const ontologyOpts = useMemo(
-    () => ontologyQueryOptions(runtimeConfig, businessOntologyDataset),
-    [runtimeConfig, businessOntologyDataset],
+    () => ontologyQueryOptions(runtimeConfig, defaultOntologyDataset),
+    [runtimeConfig, defaultOntologyDataset],
+  );
+  const searchOntologyExtras = useMemo(
+    () => ({
+      ...ontologyOpts,
+      ...(businessOntology.payload
+        ? { business_ontology: businessOntology.payload }
+        : {}),
+    }),
+    [ontologyOpts, businessOntology.payload],
   );
   const [busy, setBusy] = useState(false);
   /** Which part of the fused Grab→wiki pipeline is active (for button label). */
@@ -159,6 +181,39 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
     [ontology, wikiOntology],
   );
 
+  const boConcepts = useMemo(
+    () => extractBoConcepts(businessOntology.payload),
+    [businessOntology.payload],
+  );
+
+  const fusedCoverage = useMemo(
+    () =>
+      coverageAgainstHaystacks(
+        boConcepts,
+        fusedOntologyHaystacks(displayWikiOntology ?? ontology),
+      ),
+    [boConcepts, displayWikiOntology, ontology],
+  );
+
+  const chunkCoverageById = useMemo(() => {
+    const map = new Map<
+      string,
+      ReturnType<typeof coverageAgainstHaystacks>
+    >();
+    if (boConcepts.length === 0) return map;
+    const surfaceOntology = displayWikiOntology ?? ontology;
+    for (const chunk of retrievedChunks) {
+      map.set(
+        chunk.chunk_id,
+        coverageAgainstHaystacks(
+          boConcepts,
+          chunkOntologyHaystacks(chunk, surfaceOntology),
+        ),
+      );
+    }
+    return map;
+  }, [boConcepts, displayWikiOntology, ontology, retrievedChunks]);
+
   const displayWikiWeights = useMemo(
     () => weightMapsFromOntology(displayWikiOntology),
     [displayWikiOntology],
@@ -206,13 +261,26 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
         hits,
         // Dual Vespa schemas (global + user) — required for wiki evidence.
         search_mode: "both",
-        ...ontologyOpts,
+        ...searchOntologyExtras,
       });
       setSearchResponse(response);
       setOntology(response.ontology ?? null);
       const chunks = [...response.chunks].sort((a, b) => b.score - a.score);
+      const boLabel = businessOntology.filename
+        ? ` · BO “${businessOntology.filename}” (${boConcepts.length || businessOntology.conceptCount} concepts)`
+        : "";
+      let coverageLabel = "";
+      if (businessOntology.payload) {
+        const cov = coverageAgainstHaystacks(
+          extractBoConcepts(businessOntology.payload),
+          fusedOntologyHaystacks(response.ontology ?? null),
+        );
+        if (cov.total > 0) {
+          coverageLabel = ` · BO coverage ${Math.round(cov.ratio * 100)}% (${cov.matched}/${cov.total})`;
+        }
+      }
       setInfo(
-        `Retrieved ${response.documents.length} document(s), ${response.chunks.length} chunk(s) via dual-index (global+user). Generating persona wiki…`,
+        `Retrieved ${response.documents.length} document(s), ${response.chunks.length} chunk(s) via dual-index (global+user)${boLabel}${coverageLabel}. Generating persona wiki…`,
       );
       // Let React paint Grab results before the wiki agent starts.
       await sleep(50);
@@ -261,7 +329,7 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
         language: "en",
         hits: 40,
         search_mode: "both",
-        ...ontologyOpts,
+        ...searchOntologyExtras,
         ontology_json_ld: mergeOntologyJsonLd(jsonLdParts),
       });
       const aligned = alignOntologyToWikiEvidence(
@@ -383,6 +451,7 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
           max_docs: 8,
           max_wiki_chunks: grabChunks.length,
           search_mode: "both",
+          use_wiki: true,
           prompt_name: wikiPrompt,
           wiki_agent: wikiPrompt,
           chunks: grabChunks,
@@ -501,7 +570,7 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
         language: "en",
         hits,
         search_mode: "both",
-        ...ontologyOpts,
+        ...searchOntologyExtras,
       });
       setSearchResponse(response);
       setOntology(response.ontology ?? null);
@@ -839,58 +908,61 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
       {/* Query + primary action */}
       <section className="space-y-3 rounded-lg border p-4">
         <form
-          className="flex flex-col gap-3 lg:flex-row lg:items-end"
+          className="space-y-3"
           onSubmit={(event) => {
             event.preventDefault();
             void grabAndGenerateWiki();
           }}
         >
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Intelligence question or topic…"
-            disabled={busy}
-            className="flex-1"
-          />
-          <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-            Documents
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
             <Input
-              type="number"
-              min={1}
-              max={100}
-              value={hits}
-              onChange={(event) => {
-                const parsed = Number.parseInt(event.target.value, 10);
-                if (!Number.isNaN(parsed)) {
-                  setHits(Math.min(100, Math.max(1, parsed)));
-                }
-              }}
-              className="w-24"
-              aria-label="Number of documents to retrieve"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Intelligence question or topic…"
               disabled={busy}
+              className="flex-1"
             />
-          </label>
-          <BusinessOntologySelect
-            value={businessOntologyDataset}
-            onChange={setBusinessOntologyDataset}
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Documents
+              <Input
+                type="number"
+                min={1}
+                max={100}
+                value={hits}
+                onChange={(event) => {
+                  const parsed = Number.parseInt(event.target.value, 10);
+                  if (!Number.isNaN(parsed)) {
+                    setHits(Math.min(100, Math.max(1, parsed)));
+                  }
+                }}
+                className="w-24"
+                aria-label="Number of documents to retrieve"
+                disabled={busy}
+              />
+            </label>
+            <Button
+              type="submit"
+              disabled={busy || !agentAvailable || !query.trim()}
+            >
+              {busy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <BookOpen className="h-4 w-4" />
+              )}
+              {grabBusy
+                ? "Retrieving…"
+                : wikiBusy
+                  ? "Generating wiki…"
+                  : "Grab & generate wiki"}
+            </Button>
+          </div>
+          <BusinessOntologyFilePicker
+            value={businessOntology}
+            onChange={setBusinessOntology}
             disabled={busy}
-            className="min-w-[11rem]"
+            label="Ontology file"
+            emptyHint={`Optional — default “${defaultOntologyDataset}”`}
           />
-          <Button
-            type="submit"
-            disabled={busy || !agentAvailable || !query.trim()}
-          >
-            {busy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <BookOpen className="h-4 w-4" />
-            )}
-            {grabBusy
-              ? "Retrieving…"
-              : wikiBusy
-                ? "Generating wiki…"
-                : "Grab & generate wiki"}
-          </Button>
         </form>
         <p className="text-xs text-muted-foreground">
           Retrieves dual-index passages, shows them below, then folds them into
@@ -1015,6 +1087,22 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
               </p>
             )}
 
+            {boConcepts.length > 0 ? (
+              displayWikiOntology || ontology ? (
+                <OntologyCoverageMeter
+                  coverage={fusedCoverage}
+                  title="External BO ↔ Grab + Wiki ontology"
+                  showDetails
+                />
+              ) : (
+                <p className="text-[11px] text-muted-foreground">
+                  External BO loaded ({boConcepts.length} concepts) — run Grab
+                  &amp; generate wiki to measure coverage against the fused
+                  graph.
+                </p>
+              )
+            ) : null}
+
             {ontologyLoading && !displayWikiOntology?.json_ld ? (
               <div className="flex min-h-[16rem] flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -1073,6 +1161,7 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
               defaultOpen
               title="Grab (search) results"
               highlightChunkIds={wikiEvidenceChunkIds}
+              chunkCoverageById={chunkCoverageById}
               className="min-h-0 flex-1 overflow-hidden"
             />
 

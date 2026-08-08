@@ -24,6 +24,21 @@ export interface QueryRequest {
   search_mode?: "auto" | "global" | "user" | "both" | string;
   /** Restrict retrieval to these workspace/Vespa source_ref values */
   source_refs?: string[];
+  /** Prefer wiki_extract in the RAG prompt when generating */
+  use_wiki?: boolean;
+  /** Optional OKF wiki Answer/Structured-facts extract */
+  wiki_extract?: string;
+  /** Optional OKF bundle id (audit / resolve extract) */
+  wiki_bundle_id?: string;
+  /** Optional agent / wiki prompt id (forwarded; not executed by RAG) */
+  agent_id?: string;
+  /** Optional compose template name for agent answer_generate */
+  answer_template?: string;
+  /**
+   * When true with use_wiki, skip answer generation and return the wiki
+   * extract (and chunks) only. Agent rag_with_wiki skips answer_generate.
+   */
+  stop_at_wiki_extract?: boolean;
 }
 
 export interface RetrievedChunk {

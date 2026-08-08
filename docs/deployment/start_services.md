@@ -14,20 +14,20 @@ The script lives at the **repository root** next to the `Makefile`:
 
 ## What it starts
 
-| Window | Command | Ready when |
-|--------|---------|------------|
-| `[VESPA]` | `make vespa-up && make bootstrap` | config `:19071`, query `:8080`, app deployed |
-| `[KEYCLOAK]` | `make keycloak-up` + `make keycloak-sync-demo-users` | realm + demo personas (`analyst`, `humint`, …) with roles/clearance |
-| `[SPIRE]` | `make spire-up` | SPIRE server healthy + agent running |
-| `[SEARXNG]` | `make searxng-up` | SearXNG `:8888/healthz` |
-| `[COLLECTOR]` | `make collector-up` | collector `:8096/health` |
-| `[INDEX]` | `make index-up` | ingest `:8091/health` |
-| `[RAG]` | `make rag-up` | RAG `:8090/health` |
-| `[GOVERNOR]` | `make governor-up` | governor `:8094/health` |
-| `[AUDIT]` | `make audit-up` | audit `:8093/health` |
-| `[OKF]` | `make okf-up` | OKF `:8095/health` |
-| `[AGENT]` | `make agent` | agent `:8092/health` |
-| `[HMI]` | `make hmi-up` | UI `http://localhost:3000` |
+| Window | Command | Pane stays on | Ready when |
+|--------|---------|---------------|------------|
+| `[VESPA]` | `make vespa-up && make bootstrap` | `docker logs -f vespa` | config `:19071`, query `:8080`, app deployed |
+| `[KEYCLOAK]` | `make keycloak-up` + demo sync | `docker logs -f` keycloak (+ db) | realm + demo personas (`analyst`, `humint`, …) |
+| `[SPIRE]` | `make spire-up` | `docker logs -f` server + agent | SPIRE server healthy + agent running |
+| `[SEARXNG]` | `make searxng-up` | `docker logs -f searxng` | SearXNG `:8888/healthz` |
+| `[COLLECTOR]` | `make collector-up` | host process (bash on exit) | collector `:8096/health` |
+| `[INDEX]` | `make index-up` | host process (bash on exit) | ingest `:8091/health` |
+| `[RAG]` | `make rag-up` | host process (bash on exit) | RAG `:8090/health` |
+| `[GOVERNOR]` | `make governor-up` | host process (bash on exit) | governor `:8094/health` |
+| `[AUDIT]` | `make audit-up` | host process (bash on exit) | audit `:8093/health` |
+| `[OKF]` | `make okf-up` | host process (bash on exit) | OKF `:8095/health` |
+| `[AGENT]` | `make agent` | host process (bash on exit) | agent `:8092/health` |
+| `[HMI]` | `make hmi-up` | host process (bash on exit) | UI `http://localhost:3000` |
 
 Before creating the session it runs **`make check-install`** so the host
 toolchain (uv, Docker, spaCy, Node, …) is verified. Skip with
@@ -84,7 +84,7 @@ Shown permanently in the status bar:
 | Key | Action |
 |-----|--------|
 | `TAB` | Next service window |
-| `CTRL+R` | Restart the active pane (`respawn-pane -k` → re-run that `make …`) |
+| `CTRL+R` | Restart the active pane (`respawn-pane -k` → re-run that `make …`; Docker panes re-attach `docker logs -f`) |
 | `ESC` | Global shutdown: `make down` + kill the tmux session |
 
 `remain-on-exit` is on, so pane logs stay visible if a process exits.

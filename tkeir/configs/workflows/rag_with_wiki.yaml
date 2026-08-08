@@ -1,0 +1,50 @@
+name: rag_with_wiki
+version: 1
+description: >
+  Search → optional wiki_upsert (reuse closest user wiki via index.md;
+  single-pass LLM update) → answer_generate with a compose template
+  (e.g. otan_sitrep / otan_intsum / synthesis_note). Prefers params.chunks
+  from HMI Grab when present. Set stop_at_wiki_extract=true to skip
+  answer_generate after wiki upsert. Legacy okf_iterative_wiki is not used.
+template: synthesis_note
+budgets:
+  llm_tokens: 120000
+  tool_calls: 20
+  wall_seconds: 600
+steps:
+  - id: search
+    builtin: search_chunks
+    params_from: [query, topic, chunks, hits, search_mode, language]
+    output_key: chunks
+
+  - id: wiki
+    builtin: wiki_upsert
+    params_from:
+      [
+        query,
+        topic,
+        chunks,
+        use_wiki,
+        wiki_match_threshold,
+        max_wiki_chunks,
+        prompt_name,
+        wiki_agent,
+      ]
+    output_key: wiki_extract
+
+  - id: answer
+    builtin: answer_generate
+    params_from:
+      [
+        query,
+        topic,
+        chunks,
+        wiki_extract,
+        wiki_excerpt,
+        wiki_markdown,
+        answer_template,
+        template,
+        report_form,
+        stop_at_wiki_extract,
+      ]
+    output_key: answer_markdown

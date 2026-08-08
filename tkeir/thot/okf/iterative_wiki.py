@@ -53,29 +53,6 @@ HARD RULES:
    when filling Structured facts or Evidence.
 """
 
-# Default priority keys for compact_information_for_prompt (form-agnostic).
-_DEFAULT_INFORMATION_PRIORITY_KEYS: tuple[str, ...] = (
-    "evaluation",
-    "admiralty",
-    "location",
-    "pir",
-    "domain",
-    "source_type",
-    "source_category",
-    "classification",
-    "dtg",
-    "originator",
-    "correlation",
-    "doc_id",
-    "precedence",
-    "mgrs",
-    "country",
-    "maritime",
-    "kri",
-    "risk",
-    "jurisdiction",
-)
-
 
 def seed_iterative_wiki(
     *,
@@ -192,12 +169,17 @@ def compact_information_for_prompt(
     max_chars: int = 1400,
     priority_keys: list[str] | tuple[str, ...] | None = None,
 ) -> str:
-    """Keep Information metadata short but retain key analyst fields.
+    """Keep Information metadata short; optionally prioritize caller keys.
+
+    Ranking is **use-case dependent** — pass persona/agent
+    ``wiki_information_priority_keys`` (or equivalent). With no keys, line
+    order is preserved and only ``max_chars`` truncation applies.
 
     Args:
         information: Raw ``## Information`` block text.
         max_chars: Maximum returned character count.
-        priority_keys: Keys whose lines are ranked first (defaults apply).
+        priority_keys: Optional substrings whose lines are ranked first.
+            Empty / ``None`` means no reordering.
 
     Returns:
         Trimmed information block, truncated with an ellipsis when needed.
@@ -215,24 +197,22 @@ def compact_information_for_prompt(
     text = (information or "").strip()
     if not text:
         return ""
-    priority = (
-        tuple(priority_keys)
-        if priority_keys
-        else _DEFAULT_INFORMATION_PRIORITY_KEYS
-    )
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
     if not lines:
-        return text[:max_chars]
-    ranked: list[str] = []
-    rest: list[str] = []
-    for line in lines:
-        low = line.casefold()
-        if any(key.casefold() in low for key in priority):
-            ranked.append(line)
-        else:
-            rest.append(line)
-    ordered = ranked + rest
-    out = "\n".join(ordered)
+        out = text
+    elif priority_keys:
+        priority = tuple(priority_keys)
+        ranked: list[str] = []
+        rest: list[str] = []
+        for line in lines:
+            low = line.casefold()
+            if any(key.casefold() in low for key in priority):
+                ranked.append(line)
+            else:
+                rest.append(line)
+        out = "\n".join(ranked + rest)
+    else:
+        out = "\n".join(lines)
     if len(out) > max_chars:
         out = out[:max_chars].rstrip() + "\n…[information truncated]"
     return out
@@ -809,6 +789,93 @@ async def build_wiki_single_pass(
         str(raw or ""),
         fallback=skeleton,
     )
+    return ensure_sources_section(wiki, usable)
+
+
+_DEFAULT_WIKI_UPSERT_SYSTEM = """\
+You UPDATE an existing OKF LLMWiki (type: Wiki) with NEW evidence only.
+Keep the wiki compact. Prefer editing Answer / Structured facts / Evidence /
+Sources over rewriting from scratch. Cite chunk_id= on new claims.
+Output ONLY the full updated wiki markdown (YAML frontmatter + body).
+Do not invent facts outside the provided wiki extract and new chunks.
+"""
+
+
+async def build_wiki_upsert_pass(
+    *,
+    llm: Any,
+    query: str,
+    chunks: list[dict[str, str]],
+    current_wiki: str,
+    max_chunks: int = 4,
+    max_chunk_chars: int = 900,
+    max_wiki_chars: int = 3200,
+    temperature: float = 0.1,
+    system: str | None = None,
+    structured_facts_seed: str | None = None,
+    information_priority_keys: list[str] | tuple[str, ...] | None = None,
+) -> str:
+    """Single small LLM call: existing wiki + top-K delta chunks → updated wiki.
+
+    Unlike ``build_wiki_single_pass`` / iterative fold, this keeps prompts small
+    by clipping the current wiki and limiting chunk count/size.
+
+    Example:
+        >>> import inspect
+        >>> from thot.okf.iterative_wiki import build_wiki_upsert_pass
+        >>> inspect.iscoroutinefunction(build_wiki_upsert_pass)
+        True
+    """
+    from thot.okf.wiki_match import extract_wiki_sections
+
+    usable = [
+        c
+        for c in enrich_chunks_with_sibling_information(chunks)
+        if (c.get("text_raw") or "").strip()
+        or (c.get("information") or "").strip()
+    ][: max(1, min(int(max_chunks), 8))]
+    wiki_base = (current_wiki or "").strip()
+    if not wiki_base:
+        wiki_base = seed_iterative_wiki(
+            query=query, structured_facts_seed=structured_facts_seed
+        )
+    wiki_excerpt = extract_wiki_sections(
+        wiki_base, max_chars=max(400, int(max_wiki_chars))
+    )
+    if not usable:
+        return ensure_sources_section(wiki_base, [])
+    blocks = [
+        _format_chunk_block(
+            chunk,
+            index,
+            len(usable),
+            priority_keys=information_priority_keys,
+            max_chars=max_chunk_chars,
+        )
+        for index, chunk in enumerate(usable, start=1)
+    ]
+    prompt = "\n".join(
+        [
+            f"Analyst query / request:\n{query.strip()}",
+            "",
+            "Current wiki extract (authoritative prior; preserve grounded facts):",
+            "===== WIKI EXTRACT START =====",
+            wiki_excerpt,
+            "===== WIKI EXTRACT END =====",
+            "",
+            f"NEW evidence ({len(usable)} chunks) — merge deltas only:",
+            "",
+            *blocks,
+            "",
+            "Return the FULL updated wiki markdown only.",
+        ]
+    )
+    raw = await llm.generate(
+        prompt,
+        system=(system or "").strip() or _DEFAULT_WIKI_UPSERT_SYSTEM,
+        temperature=temperature,
+    )
+    wiki = extract_wiki_markdown(str(raw or ""), fallback=wiki_base)
     return ensure_sources_section(wiki, usable)
 
 

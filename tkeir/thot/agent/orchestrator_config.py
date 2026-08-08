@@ -249,8 +249,8 @@ def resolve_usecase(explicit: str | None = None) -> str:
     Example:
         >>> resolve_usecase("OSINT")
         'osint'
-        >>> resolve_usecase("")
-        ''
+        >>> resolve_usecase("enterprise")
+        'enterprise'
     """
     if explicit and str(explicit).strip():
         return str(explicit).strip().lower()

@@ -18,11 +18,27 @@ def test_agent_health_and_ready(agent_client):
 def test_agent_catalogues(agent_client):
     agents = agent_client.get("/agent/agents")
     assert agents.status_code == 200
-    assert isinstance(agents.json().get("agents"), list)
+    payload = agents.json()
+    assert isinstance(payload.get("agents"), list)
+    assert isinstance(payload.get("catalog"), list)
+
+    wiki = agent_client.get("/agent/agents", params={"wiki": "true"})
+    assert wiki.status_code == 200
+    wiki_body = wiki.json()
+    assert wiki_body.get("catalog")
+    assert all(e.get("has_wiki_prompt") for e in wiki_body["catalog"])
+
+    templates = agent_client.get("/agent/templates")
+    assert templates.status_code == 200
+    names = templates.json().get("templates") or []
+    assert "otan_sitrep" in names or "synthesis_note" in names
 
     workflows = agent_client.get("/agent/workflows")
     assert workflows.status_code == 200
-    assert isinstance(workflows.json().get("workflows"), list)
+    wfs = workflows.json().get("workflows") or []
+    assert isinstance(wfs, list)
+    assert "rag_with_wiki" in wfs
+    assert "llm_wiki" in wfs
 
 
 def test_create_run_requires_goal(agent_client):

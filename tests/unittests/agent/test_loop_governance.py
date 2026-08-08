@@ -256,8 +256,8 @@ def test_ungrounded_claims_become_unfilled(tmp_path: Path):
     assert out.result.unfilled
 
 
-def test_successful_okf_wiki_put_auto_finalizes(tmp_path: Path):
-    """Writer models often re-call okf_wiki_put; success must end the phase."""
+def test_successful_terminal_tool_auto_finalizes(tmp_path: Path):
+    """Terminal tools end the phase on ok:true (models often re-call them)."""
     from thot.agent.models import GroundedFinding, GroundedFindings
 
     store = RunStore(tmp_path)
@@ -267,7 +267,6 @@ def test_successful_okf_wiki_put_auto_finalizes(tmp_path: Path):
     toolbox = ToolRegistry(
         ["okf_wiki_put"], handlers=McpHandlers(backend=backend)
     )
-    # Without auto-final, this would call put twice then hit max_steps.
     put = (
         '```json\n{"tool":"okf_wiki_put","arguments":'
         '{"bundle_id":"b1","markdown":"# Wiki\\n## Answer\\nok"}}\n```'
@@ -296,6 +295,7 @@ def test_successful_okf_wiki_put_auto_finalizes(tmp_path: Path):
             _spec(
                 name="llm_wiki_writer",
                 tools=["okf_wiki_put"],
+                terminal_tools=["okf_wiki_put"],
                 stop=StopCondition(max_steps=3),
             ),
             finalize=False,
@@ -307,8 +307,36 @@ def test_successful_okf_wiki_put_auto_finalizes(tmp_path: Path):
     assert llm.calls == 1
     assert out.result is not None
     assert out.result.findings[0].chunk_ids == ["c1"]
-    assert "okf:wiki" in out.result.findings[0].document_ids
+    assert "tool:okf_wiki_put" in out.result.findings[0].document_ids
     assert "okf_wiki_put:" in out.result.notes
+
+
+def test_build_prompt_has_no_wiki_domain(tmp_path: Path):
+    """Generic loop prompt must not inject wiki/report domain params."""
+    store = RunStore(tmp_path)
+    guard = AgentGuard(tmp_path / "gov")
+
+    class _StubLlm:
+        async def generate(self, prompt, **kw):
+            return "{}"
+
+    loop = AgentLoop(store=store, guard=guard, llm=_StubLlm())
+    state = RunState(
+        goal="investigate",
+        params={
+            "wiki_markdown": "# Secret wiki",
+            "has_llm_wiki": "true",
+            "report_form": "intsum",
+            "report_form_slots": "slots",
+            "bundle_id": "b1",
+        },
+    )
+    prompt = loop._build_prompt(_spec(), state, [], ToolRegistry(["search"]))
+    assert "Secret wiki" not in prompt
+    assert "PRIMARY SOURCE" not in prompt
+    assert "BEGIN LLM WIKI" not in prompt
+    assert "report_form" not in prompt
+    assert "Goal: investigate" in prompt
 
 
 def test_toolbox_rejects_cross_tenant_result():

@@ -89,6 +89,14 @@ Response fields:
 
 Schemas are generated from `tkeir/configs/rag.yaml` via `make schemas`.
 
+**Preferred answer path:** agent workflow `rag_with_wiki`
+(`search_chunks` → `wiki_upsert` → `answer_generate`) on `:8092`.
+Legacy `POST /rag/query` may still generate in-process; optional fields
+`use_wiki` / `wiki_extract` / `agent_id` / `answer_template` forward wiki
+context or audit metadata (template fill remains agent-owned).
+Set `stop_at_wiki_extract=true` with `use_wiki` to skip answer generation
+and return the wiki extract (plus chunks) only.
+
 ### `POST /documents/analyze` (NLP only)
 
 Multipart upload → converter + full pipeline → analyzed document JSON.

@@ -152,10 +152,18 @@ def test_workflow_registry():
 
     assert "llm_wiki" in list_workflow_names()
     llm_wiki = load_workflow("llm_wiki")
-    assert any(s.builtin == "okf_scoped_export" for s in llm_wiki.steps)
-    assert any(s.builtin == "okf_iterative_wiki" for s in llm_wiki.steps)
+    assert any(s.builtin == "wiki_upsert" for s in llm_wiki.steps)
+    assert not any(s.builtin == "okf_iterative_wiki" for s in llm_wiki.steps)
     assert [s.agent for s in llm_wiki.steps if s.agent] == []
     assert all(s.compose is None for s in llm_wiki.steps)
+
+    assert "rag_with_wiki" in list_workflow_names()
+    rag_wiki = load_workflow("rag_with_wiki")
+    assert [s.builtin for s in rag_wiki.steps] == [
+        "search_chunks",
+        "wiki_upsert",
+        "answer_generate",
+    ]
 
     for persona in (
         "j2_analyst",
@@ -175,7 +183,7 @@ def test_workflow_registry():
         assert any(s.compose is not None for s in persona_wf.steps)
         analyse = next(s for s in persona_wf.steps if s.id == "analyse")
         write = next(s for s in persona_wf.steps if s.id == "write")
-        assert "{wiki_excerpt}" in analyse.goal_template
+        assert "{wiki_markdown}" in analyse.goal_template
         assert "{report_form_slots}" in write.goal_template
 
 
@@ -284,6 +292,10 @@ def test_injection_suite():
     assert "<untrusted" in wrapped
     assert (
         refuse_intent_escalation(malicious, allow_list=["search"]) is not None
+    )
+    assert (
+        refuse_intent_escalation('{"tool": "delete"}', allow_list=["search"])
+        is not None
     )
     assert_tool_allowlisted("search", ["search", "echo_cite"])
     with pytest.raises(PermissionError):

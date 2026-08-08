@@ -17,7 +17,7 @@ from pathlib import Path
 from unittest.mock import AsyncMock
 
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 
 from thot.action.correlation import (
@@ -112,6 +112,9 @@ def test_intent_for_path():
     assert intent_for_path("/collect/batch") == "collect"
     assert intent_for_path("/topics") == "collect.read"
     assert intent_for_path("/dedupe") == "collect.read"
+    assert intent_for_path("/agent/runs") == "agent.run"
+    assert intent_for_path("/agent/runs/abc123/cancel") == "agent.cancel"
+    assert intent_for_path("/agent/runs/abc123/publish") == "agent.publish"
 
 
 def test_middleware_sets_correlation_and_records():
@@ -135,6 +138,61 @@ def test_middleware_sets_correlation_and_records():
     assert len(records) == 1
     assert records[0].intent.declared == "search"
     assert records[0].evidence.record_hash
+
+
+def test_middleware_request_completed_log_includes_context(capsys):
+    from thot.core.StructuredLogging import configure_json_logging
+
+    sink = InMemoryActionSink()
+    app = FastAPI()
+    app.add_middleware(
+        ActionCorrelationMiddleware, sink=sink, service="tkeir-agent"
+    )
+
+    @app.post("/agent/runs")
+    def create(request: Request):
+        request.state.action_log = {
+            "agent": "researcher",
+            "run_id": "run-1",
+            "spiffe_id": "spiffe://tkeir.local/agent/researcher",
+            "user_space": "demo@tkeir",
+            "goal": "find evidence",
+            "run_status": "queued",
+        }
+        return {"run_id": "run-1"}
+
+    configure_json_logging(service="tkeir-agent")
+    client = TestClient(app)
+    response = client.post(
+        "/agent/runs",
+        json={
+            "agent": "researcher",
+            "goal": "find evidence",
+        },
+    )
+    assert response.status_code == 200
+    captured = capsys.readouterr().out
+    line = [ln for ln in captured.splitlines() if "request completed" in ln][
+        -1
+    ]
+    payload = json.loads(line)
+    assert payload["method"] == "POST"
+    assert payload["path"] == "/agent/runs"
+    assert payload["intent"] == "agent.run"
+    assert payload["http_status"] == 200
+    assert isinstance(payload.get("duration_ms"), int)
+    assert payload["agent"] == "researcher"
+    assert payload["run_id"] == "run-1"
+    assert payload["spiffe_id"] == "spiffe://tkeir.local/agent/researcher"
+    assert "find evidence" in payload["msg"]
+    assert payload["msg"].startswith("request completed POST /agent/runs")
+    assert sink.list_by_correlation(response.headers[CORRELATION_HEADER])
+    assert (
+        sink.list_by_correlation(response.headers[CORRELATION_HEADER])[0].ext[
+            "request"
+        ]["agent"]
+        == "researcher"
+    )
 
 
 def test_middleware_respects_traceparent():

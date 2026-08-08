@@ -50,6 +50,14 @@ export function AgentRunActivity({
         {activity?.agentLabel ? (
           <Badge variant="secondary">{activity.agentLabel}</Badge>
         ) : null}
+        {activity?.spiffeId ? (
+          <code
+            className="max-w-full truncate text-[11px] text-muted-foreground"
+            title={activity.spiffeId}
+          >
+            {activity.spiffeId}
+          </code>
+        ) : null}
         {typeof activity?.stepCount === "number" && activity.stepCount > 0 ? (
           <span className="text-xs text-muted-foreground">
             {activity.stepCount} step{activity.stepCount === 1 ? "" : "s"}
@@ -101,18 +109,34 @@ export function AgentRunActivity({
                 Recent steps
               </p>
               <ul className="max-h-40 space-y-1 overflow-y-auto font-mono text-[11px] leading-snug">
-                {activity.recentSteps.map((s) => (
-                  <li key={s.step_index} className="text-muted-foreground">
-                    <span className="text-foreground">[{s.step_index}]</span>{" "}
-                    {s.status}
-                    {s.tool_call?.name ? ` · ${s.tool_call.name}` : ""}
-                    {s.thought_excerpt
-                      ? ` — ${s.thought_excerpt.slice(0, 100)}${
-                          s.thought_excerpt.length > 100 ? "…" : ""
-                        }`
-                      : ""}
-                  </li>
-                ))}
+                {activity.recentSteps.map((s) => {
+                  const actionName = s.tool_call?.name || s.status;
+                  return (
+                    <li key={s.step_index} className="text-muted-foreground">
+                      <span className="text-foreground">[{s.step_index}]</span>{" "}
+                      <span className="text-foreground">
+                        {activity.agentLabel || "agent"}
+                      </span>
+                      {" · "}
+                      <span className="text-foreground">{actionName}</span>
+                      {activity.spiffeId ? (
+                        <>
+                          {" · "}
+                          <span title={activity.spiffeId}>
+                            {activity.spiffeId.length > 48
+                              ? `${activity.spiffeId.slice(0, 48)}…`
+                              : activity.spiffeId}
+                          </span>
+                        </>
+                      ) : null}
+                      {s.thought_excerpt
+                        ? ` — ${s.thought_excerpt.slice(0, 100)}${
+                            s.thought_excerpt.length > 100 ? "…" : ""
+                          }`
+                        : ""}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ) : running ? (

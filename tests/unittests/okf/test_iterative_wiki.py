@@ -11,6 +11,7 @@ from thot.okf.iterative_wiki import (
     build_merge_prompt,
     build_wiki_iteratively,
     build_wiki_single_pass,
+    build_wiki_upsert_pass,
     chunks_from_params,
     compact_information_for_prompt,
     create_evidence_bundle,
@@ -249,8 +250,18 @@ def test_compact_information_priority_and_truncate():
             "- **other:** " + ("z" * 2000),
         ]
     )
-    out = compact_information_for_prompt(blob, max_chars=200)
-    assert "evaluation" in out
+    # Without keys: preserve order, only truncate.
+    plain = compact_information_for_prompt(blob, max_chars=80)
+    assert plain.startswith("- **noise_field:**")
+    assert "information truncated" in plain
+    # With persona keys: rank matching lines first.
+    out = compact_information_for_prompt(
+        blob,
+        max_chars=200,
+        priority_keys=["evaluation", "location"],
+    )
+    assert out.startswith("- **evaluation:**")
+    assert "location" in out
     assert "information truncated" in out
     assert compact_information_for_prompt("") == ""
     assert compact_information_for_prompt("   \n  ") == ""
@@ -365,6 +376,27 @@ class _FakeLlm:
             "- AIS disabled (chunk_id=c1)\n\n## Sources\n"
             "- chunk_id=`c1` ← parent=`d1`\n"
         )
+
+
+def test_build_wiki_upsert_pass_single_call():
+    llm = _FakeLlm()
+    wiki = asyncio.run(
+        build_wiki_upsert_pass(
+            llm=llm,
+            query="MT RED SEA EAGLE",
+            chunks=[
+                {
+                    "chunk_id": "c1",
+                    "parent_doc_id": "d1",
+                    "text_raw": "AIS disabled near Beirut.",
+                }
+            ],
+            current_wiki="# Prior\n\n## Answer\n\nOld.\n",
+            max_chunks=4,
+        )
+    )
+    assert llm.calls == 1
+    assert "Answer" in wiki or "AIS" in wiki
 
 
 def test_build_wiki_iteratively_is_single_llm_call():

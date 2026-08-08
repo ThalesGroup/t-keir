@@ -49,7 +49,7 @@ generated content is approval-gated (`origin=agent-generated`).
 | BEIR eval / smoke | `make eval` / `make eval-smoke` | `thot.tools.eval.beir_*` |
 | Annotation MWE trie | `tkeir-create-annotation-resource` | `thot.tools.annotation.create_annotation_resource` |
 | MCP server | `tkeir-mcp` | `thot.mcp.server` |
-| Agent / workflow service | `tkeir-agent` | `thot.agent.service` |
+| Agent / workflow HTTP tool | `tkeir-agent` | `thot.tools.agent` |
 | Template compose CLI | `tkeir-compose` / `python -m thot.compose` | `thot.compose` |
 
 Python packages under `thot/tools/`: **`ingest/`** (index), **`search/`**

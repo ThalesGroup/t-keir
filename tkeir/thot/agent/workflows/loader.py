@@ -11,20 +11,19 @@ Licensed under the MIT License.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import yaml
 
 from thot.agent.models import WorkflowSpec, WorkflowStep
-from thot.core.TkeirPaths import configs_dir, repo_root
+from thot.core.TkeirPaths import configs_dir
 
 
 def workflows_dir() -> Path:
     """Return the core workflows configuration directory.
 
     Example:
-        >>> from thot.agent.workflows import workflows_dir
+        >>> from thot.agent.workflows.loader import workflows_dir
         >>> workflows_dir().name
         'workflows'
     """
@@ -34,62 +33,34 @@ def workflows_dir() -> Path:
 def workflow_config_dirs() -> list[Path]:
     """Return search roots for workflow YAML (core configs + dataset packs).
 
-    Dataset-specific workflows live under ``datasets/<pack>/workflows/``
-    (for example OSINT persona flows under ``datasets/osint/workflows/``).
-    Docker images may also ship packs under ``<package>/packs/<pack>/workflows/``.
+    When ``TKEIR_AGENT_USECASE`` (or aliases) is set, that pack is searched
+    before other packs so colliding stems (e.g. ``llm_wiki``) resolve to the
+    active usecase.
 
     Example:
-        >>> from thot.agent.workflows import workflow_config_dirs
+        >>> from thot.agent.workflows.loader import workflow_config_dirs
         >>> any(p.name == "workflows" for p in workflow_config_dirs())
         True
     """
-    from thot.core.TkeirPaths import package_root
+    from thot.agent.pack_paths import (
+        dataset_pack_subdir_dirs,
+        dedupe_paths,
+        extra_config_dirs_from_env,
+    )
 
-    roots: list[Path] = [workflows_dir()]
-    for base in (
-        Path(repo_root()) / "datasets",
-        Path(package_root()) / "packs",
-    ):
-        if not base.is_dir():
-            continue
-        for pack in sorted(base.iterdir()):
-            if not pack.is_dir() or pack.name.startswith("."):
-                continue
-            candidate = pack / "workflows"
-            if candidate.is_dir():
-                roots.append(candidate)
-    extra = os.getenv("TKEIR_WORKFLOW_CONFIG_DIRS", "").strip()
-    if extra:
-        for part in extra.split(os.pathsep):
-            path = Path(part).expanduser()
-            if path.is_dir():
-                roots.append(path)
-    seen: set[Path] = set()
-    unique: list[Path] = []
-    for root in roots:
-        key = root.resolve()
-        if key in seen:
-            continue
-        seen.add(key)
-        unique.append(root)
-    return unique
+    roots: list[Path] = [
+        workflows_dir(),
+        *dataset_pack_subdir_dirs("workflows"),
+        *extra_config_dirs_from_env("TKEIR_WORKFLOW_CONFIG_DIRS"),
+    ]
+    return dedupe_paths(roots)
 
 
 def resolve_workflow_path(name: str, *, directory: Path | None = None) -> Path:
     """Resolve ``<name>.yaml`` across workflow config roots.
 
-    Args:
-        name: Workflow stem (without ``.yaml``).
-        directory: Optional single root; raises if missing.
-
-    Returns:
-        Path to the workflow YAML file.
-
-    Raises:
-        FileNotFoundError: When no matching spec exists.
-
     Example:
-        >>> from thot.agent.workflows import resolve_workflow_path
+        >>> from thot.agent.workflows.loader import resolve_workflow_path
         >>> resolve_workflow_path("content_brief").name
         'content_brief.yaml'
     """
@@ -112,7 +83,7 @@ def load_workflow(name: str, *, directory: Path | None = None) -> WorkflowSpec:
     """Load ``<name>.yaml`` into a :class:`WorkflowSpec`.
 
     Example:
-        >>> from thot.agent.workflows import load_workflow
+        >>> from thot.agent.workflows.loader import load_workflow
         >>> wf = load_workflow("content_brief")
         >>> wf.name
         'content_brief'
@@ -150,7 +121,7 @@ def list_workflow_names(*, directory: Path | None = None) -> list[str]:
     """List available workflow YAML stems (core + dataset packs).
 
     Example:
-        >>> from thot.agent.workflows import list_workflow_names
+        >>> from thot.agent.workflows.loader import list_workflow_names
         >>> "content_brief" in list_workflow_names()
         True
     """

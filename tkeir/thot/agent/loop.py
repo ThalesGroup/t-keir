@@ -235,51 +235,61 @@ def _findings_from_final(
     )
 
 
-def _is_successful_wiki_put(
-    tool_name: str, observation: dict[str, Any]
+def _is_successful_terminal_tool(
+    tool_name: str,
+    observation: dict[str, Any],
+    *,
+    terminal_tools: list[str],
 ) -> bool:
-    """True when ``okf_wiki_put`` persisted wiki.md successfully.
+    """True when ``tool_name`` is terminal and observation reports success.
 
     Args:
         tool_name: Invoked tool name from the agent message.
         observation: Tool observation dict returned by the registry.
+        terminal_tools: Names from :attr:`AgentSpec.terminal_tools`.
 
     Returns:
-        ``True`` only for a successful ``okf_wiki_put`` with ``ok: true``.
+        ``True`` when the tool is listed and ``ok`` is true without ``error``.
 
     Example:
-        >>> from thot.agent.loop import _is_successful_wiki_put
-        >>> _is_successful_wiki_put("okf_wiki_put", {"ok": True})
+        >>> from thot.agent.loop import _is_successful_terminal_tool
+        >>> _is_successful_terminal_tool(
+        ...     "okf_wiki_put", {"ok": True}, terminal_tools=["okf_wiki_put"]
+        ... )
         True
-        >>> _is_successful_wiki_put("search", {"ok": True})
+        >>> _is_successful_terminal_tool(
+        ...     "search", {"ok": True}, terminal_tools=["okf_wiki_put"]
+        ... )
         False
     """
     return (
-        tool_name == "okf_wiki_put"
+        tool_name in terminal_tools
         and isinstance(observation, dict)
         and observation.get("ok") is True
         and not observation.get("error")
     )
 
 
-def _findings_after_wiki_put(
+def _findings_after_terminal_tool(
     state: RunState,
     observation: dict[str, Any],
     *,
     phase_goal: str,
+    tool_name: str,
 ) -> GroundedFindings:
-    """Keep reviewed findings; mark wiki persistence in notes/document_ids.
+    """Keep prior findings; annotate provenance from a terminal tool result.
 
     Args:
         state: Current run state (may already hold prior findings).
-        observation: Successful ``okf_wiki_put`` observation dict.
+        observation: Successful terminal-tool observation dict.
         phase_goal: Goal string for the auto-finalized result.
+        tool_name: Tool that completed successfully.
 
     Returns:
-        Findings annotated with ``okf:wiki`` provenance and wiki notes.
+        Findings annotated with tool provenance and notes.
 
     Example:
-        >>> from thot.agent.loop import _findings_after_wiki_put
+        >>> from thot.agent.loop import _findings_after_terminal_tool
         >>> from thot.agent.models import RunState, GroundedFindings, GroundedFinding
         >>> state = RunState(
         ...     goal="g",
@@ -287,20 +297,30 @@ def _findings_after_wiki_put(
         ...         findings=[GroundedFinding(claim="x", chunk_ids=["c1"])]
         ...     ),
         ... )
-        >>> out = _findings_after_wiki_put(
-        ...     state, {"ok": True, "path": "/w"}, phase_goal="g",
+        >>> out = _findings_after_terminal_tool(
+        ...     state,
+        ...     {"ok": True, "path": "/w"},
+        ...     phase_goal="g",
+        ...     tool_name="okf_wiki_put",
         ... )
-        >>> "okf:wiki" in out.findings[0].document_ids
+        >>> "tool:okf_wiki_put" in out.findings[0].document_ids
         True
     """
-    notes = f"okf_wiki_put:{observation.get('path') or observation.get('bundle_id') or 'ok'}"
+    ref = (
+        observation.get("path")
+        or observation.get("bundle_id")
+        or observation.get("id")
+        or "ok"
+    )
+    notes = f"{tool_name}:{ref}"
+    doc_tag = f"tool:{tool_name}"
     if state.result and state.result.findings:
         findings = [
             GroundedFinding(
                 claim=finding.claim,
                 chunk_ids=list(finding.chunk_ids),
                 document_ids=list(
-                    dict.fromkeys([*finding.document_ids, "okf:wiki"])
+                    dict.fromkeys([*finding.document_ids, doc_tag])
                 ),
                 confidence=finding.confidence,
             )
@@ -316,9 +336,9 @@ def _findings_after_wiki_put(
         goal=phase_goal,
         findings=[
             GroundedFinding(
-                claim="LLMWiki written answering the query",
+                claim=f"{tool_name} completed successfully",
                 chunk_ids=[],
-                document_ids=["okf:wiki"],
+                document_ids=[doc_tag],
                 confidence=0.9,
             )
         ],
@@ -772,7 +792,7 @@ class AgentLoop:
             finalize=finalize,
         )
 
-    def _complete_after_successful_wiki_put(
+    def _complete_after_terminal_tool(
         self,
         state: RunState,
         step: StepRecord,
@@ -781,16 +801,18 @@ class AgentLoop:
         phase_goal: str,
         step_index: int,
         finalize: bool,
+        tool_name: str,
     ) -> RunState:
-        """Auto-finalize after a successful ``okf_wiki_put`` tool observation.
+        """Auto-finalize after a successful terminal tool observation.
 
         Args:
-            state: Run receiving wiki-annotated findings.
-            step: Step that invoked ``okf_wiki_put``.
+            state: Run receiving annotated findings.
+            step: Step that invoked the terminal tool.
             observation: Tool result dict with ``ok: true``.
             phase_goal: Goal string for the synthesized findings.
             step_index: Current step index for completion counters.
             finalize: When true, mark run ``succeeded``.
+            tool_name: Terminal tool that completed.
 
         Returns:
             Updated run state after :meth:`_finish_with_findings`.
@@ -816,20 +838,25 @@ class AgentLoop:
             ...     state = RunState(goal="g")
             ...     _ = store.write_state(state)
             ...     step = StepRecord(step_index=0)
-            ...     out = loop._complete_after_successful_wiki_put(
+            ...     out = loop._complete_after_terminal_tool(
             ...         state, step, {"ok": True, "path": "/w"},
             ...         phase_goal="g", step_index=0, finalize=True,
+            ...         tool_name="okf_wiki_put",
             ...     )
             ...     out.status
             'succeeded'
         """
         LOGGER.info(
-            "auto-finalizing after successful okf_wiki_put run_id=%s step=%s",
+            "auto-finalizing after successful terminal tool=%s run_id=%s step=%s",
+            tool_name,
             state.run_id,
             step_index,
         )
-        findings = _findings_after_wiki_put(
-            state, observation, phase_goal=phase_goal
+        findings = _findings_after_terminal_tool(
+            state,
+            observation,
+            phase_goal=phase_goal,
+            tool_name=tool_name,
         )
         return self._finish_with_findings(
             state,
@@ -1203,7 +1230,7 @@ class AgentLoop:
             spec: Agent specification (tools, budgets, prompts, stop).
             authorization: Optional Authorization header for MCP principal.
             step_offset: Base index when continuing a multi-phase workflow.
-            finalize: When true, mark run succeeded on final/wiki completion.
+            finalize: When true, mark run succeeded on final/terminal-tool completion.
             goal_override: Optional phase goal replacing ``state.goal``.
 
         Returns:
@@ -1289,6 +1316,21 @@ class AgentLoop:
                 self.store.write_state(state)
                 return state
 
+            proposed = {
+                "type": "tool",
+                "tool": tool_name,
+                "arguments": arguments,
+            }
+            if not self.guard.check_action_permission(state, proposed):
+                state.status = "failed"
+                state.error = (
+                    f"AgentGuard blocked tool {tool_name!r} "
+                    f"(spiffe_id={state.spiffe_id!r})"
+                )
+                state.ended_at = utc_now_rfc3339()
+                self.store.write_state(state)
+                return state
+
             observation = await self._invoke_tool(
                 state,
                 step,
@@ -1306,16 +1348,21 @@ class AgentLoop:
                 observation=observation,
                 history=history,
             )
-            # okf_wiki_put is a terminal write: models often re-call it instead
-            # of emitting final=true after ok:true (burns max_steps).
-            if _is_successful_wiki_put(tool_name, observation):
-                return self._complete_after_successful_wiki_put(
+            # Tools listed on AgentSpec.terminal_tools end the phase on success
+            # (models often re-invoke instead of emitting final=true).
+            if _is_successful_terminal_tool(
+                tool_name,
+                observation,
+                terminal_tools=list(spec.terminal_tools or []),
+            ):
+                return self._complete_after_terminal_tool(
                     state,
                     step,
                     observation,
                     phase_goal=phase_goal,
                     step_index=step_index,
                     finalize=finalize,
+                    tool_name=tool_name,
                 )
 
         return self._fail_max_steps(state)
@@ -1333,7 +1380,7 @@ class AgentLoop:
 
         Args:
             spec: Agent spec supplying system prompt metadata (unused here).
-            state: Run state (goal, params, prior findings, wiki block).
+            state: Run state (goal, prior findings).
             history: Recent conversation turns included in the prompt tail.
             toolbox: Registry whose tool schemas are embedded as JSON.
             goal: Optional override for the displayed goal line.
@@ -1388,42 +1435,10 @@ class AgentLoop:
                 )
             except Exception:  # noqa: BLE001
                 prior = ""
-        params_hint = ""
-        wiki_block = ""
-        if state.params:
-            interesting = {
-                k: state.params[k]
-                for k in (
-                    "report_form",
-                    "report_form_slots",
-                    "bundle_id",
-                    "use_existing_wiki",
-                    "has_llm_wiki",
-                    "topic",
-                )
-                if k in state.params
-            }
-            if interesting:
-                params_hint = (
-                    "\nRun params: "
-                    + json.dumps(interesting, ensure_ascii=False)
-                    + "\n"
-                )
-            wiki = str(state.params.get("wiki_markdown") or "").strip()
-            if wiki:
-                wiki_block = (
-                    "\nPRIMARY SOURCE — Phase-2 LLM Wiki (edited; treat as "
-                    "authoritative fact base for this report; do not rebuild "
-                    "research from scratch):\n"
-                    "----- BEGIN LLM WIKI -----\n"
-                    f"{wiki}\n"
-                    "----- END LLM WIKI -----\n"
-                )
+        # Domain context belongs in the phase goal from the caller/orchestrator.
         return (
             f"Goal: {goal if goal is not None else state.goal}\n"
             f"user_space: {state.user_space}\n"
-            f"{params_hint}"
-            f"{wiki_block}"
             f"{prior}"
             f"Available tools (JSON Schema):\n{tools_json}\n\n"
             f"Recent history:\n{hist or '(none)'}\n\n"

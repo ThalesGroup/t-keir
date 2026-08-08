@@ -1,9 +1,10 @@
 """Title: tkeir-okf FastAPI service (:8095).
 
-OKF bundle export / browse / download / DSR delete.
+HTTP service for OKF bundle export / browse / download / DSR delete.
+Core OKF library remains in ``thot.okf``.
 
 Example:
-    >>> from thot.okf.server import app
+    >>> from thot.tools.okf.app import app
     >>> app.title
     'T-KEIR OKF'
 
@@ -69,7 +70,7 @@ class AppState:
         """Initialize store and shared resources for the OKF HTTP service.
 
         Example:
-            >>> from thot.okf.server import AppState
+            >>> from thot.tools.okf.app import AppState
             >>> isinstance(AppState().store, OkfBundleStore)
             True
         """
@@ -85,7 +86,7 @@ async def lifespan(app: FastAPI):
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import lifespan
+        >>> from thot.tools.okf.app import lifespan
         >>> inspect.isasyncgenfunction(lifespan.__wrapped__)
         True
     """
@@ -125,7 +126,7 @@ def _space(authorization: str | None) -> str:
         Normalized Vespa user-space string.
 
     Example:
-        >>> from thot.okf.server import _space
+        >>> from thot.tools.okf.app import _space
         >>> _space(None)
         'dev@tkeir'
     """
@@ -139,7 +140,7 @@ def _store(request_app: FastAPI) -> OkfBundleStore:
         request_app: FastAPI app with ``state.okf`` initialized.
 
     Example:
-        >>> from thot.okf.server import AppState, _store, app
+        >>> from thot.tools.okf.app import AppState, _store, app
         >>> app.state.okf = AppState()
         >>> _store(app) is app.state.okf.store
         True
@@ -153,7 +154,7 @@ async def health() -> dict[str, str]:
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import health
+        >>> from thot.tools.okf.app import health
         >>> inspect.iscoroutinefunction(health)
         True
     """
@@ -166,7 +167,7 @@ async def ready() -> dict[str, Any]:
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import ready
+        >>> from thot.tools.okf.app import ready
         >>> inspect.iscoroutinefunction(ready)
         True
     """
@@ -184,7 +185,7 @@ async def metrics() -> Response:
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import metrics
+        >>> from thot.tools.okf.app import metrics
         >>> inspect.iscoroutinefunction(metrics)
         True
     """
@@ -203,7 +204,7 @@ async def okf_export(
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import okf_export
+        >>> from thot.tools.okf.app import okf_export
         >>> inspect.iscoroutinefunction(okf_export)
         True
     """
@@ -234,7 +235,7 @@ async def okf_bundles(
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import okf_bundles
+        >>> from thot.tools.okf.app import okf_bundles
         >>> inspect.iscoroutinefunction(okf_bundles)
         True
     """
@@ -254,7 +255,7 @@ def _bundle_missing(space: str, bundle_id: str) -> HTTPException:
         bundle_id: Requested bundle id.
 
     Example:
-        >>> from thot.okf.server import _bundle_missing
+        >>> from thot.tools.okf.app import _bundle_missing
         >>> _bundle_missing("dev@tkeir", "abc12345").status_code
         404
     """
@@ -276,7 +277,7 @@ async def okf_bundle_get(
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import okf_bundle_get
+        >>> from thot.tools.okf.app import okf_bundle_get
         >>> inspect.iscoroutinefunction(okf_bundle_get)
         True
     """
@@ -299,7 +300,7 @@ async def okf_bundle_download(
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import okf_bundle_download
+        >>> from thot.tools.okf.app import okf_bundle_download
         >>> inspect.iscoroutinefunction(okf_bundle_download)
         True
     """
@@ -325,6 +326,85 @@ async def okf_bundle_download(
     )
 
 
+@app.get("/okf/bundles/{bundle_id}/wiki-extract")
+async def okf_wiki_extract(
+    bundle_id: str,
+    max_chars: int = 2400,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    """Return Answer (+ Structured facts) extract from ``wiki.md`` for RAG/agents.
+
+    No LLM — storage helper only. ``user_space`` comes from auth.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.okf.app import okf_wiki_extract
+        >>> inspect.iscoroutinefunction(okf_wiki_extract)
+        True
+    """
+    from thot.okf.wiki_match import wiki_extract_for_bundle
+
+    space = _space(authorization)
+    payload = wiki_extract_for_bundle(
+        bundle_id,
+        space,
+        store=_store(app),
+        max_chars=max(200, min(int(max_chars or 2400), 12000)),
+    )
+    if not payload.get("found"):
+        raise _bundle_missing(space, bundle_id)
+    return payload
+
+
+@app.get("/okf/wikis/match")
+async def okf_wiki_match(
+    q: str,
+    threshold: float = 0.15,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    """Find the closest user wiki by scoring ``index.md`` against ``q``.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.okf.app import okf_wiki_match
+        >>> inspect.iscoroutinefunction(okf_wiki_match)
+        True
+    """
+    from thot.okf.wiki_match import find_closest_wiki
+
+    space = _space(authorization)
+    query = (q or "").strip()
+    if not query:
+        raise HTTPException(status_code=400, detail="q is required")
+    match = find_closest_wiki(
+        space,
+        query,
+        store=_store(app),
+        threshold=float(threshold),
+    )
+    if match is None:
+        return {
+            "found": False,
+            "user_space": space,
+            "query": query,
+            "threshold": float(threshold),
+            "match": None,
+        }
+    return {
+        "found": True,
+        "user_space": space,
+        "query": query,
+        "threshold": float(threshold),
+        "match": {
+            "bundle_id": match.bundle_id,
+            "score": match.score,
+            "title": match.title,
+            "path": match.path,
+            "query": match.query,
+        },
+    }
+
+
 @app.put("/okf/bundles/{bundle_id}/wiki")
 async def okf_wiki_put(
     bundle_id: str,
@@ -335,7 +415,7 @@ async def okf_wiki_put(
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import okf_wiki_put
+        >>> from thot.tools.okf.app import okf_wiki_put
         >>> inspect.iscoroutinefunction(okf_wiki_put)
         True
     """
@@ -374,7 +454,7 @@ async def okf_publish_wiki(
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import okf_publish_wiki
+        >>> from thot.tools.okf.app import okf_publish_wiki
         >>> inspect.iscoroutinefunction(okf_publish_wiki)
         True
     """
@@ -475,7 +555,7 @@ async def okf_bundle_delete(
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import okf_bundle_delete
+        >>> from thot.tools.okf.app import okf_bundle_delete
         >>> inspect.iscoroutinefunction(okf_bundle_delete)
         True
     """
@@ -525,7 +605,7 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover
 
     Example:
         >>> import inspect
-        >>> from thot.okf.server import main
+        >>> from thot.tools.okf.app import main
         >>> callable(main)
         True
     """
@@ -538,7 +618,7 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover
     import uvicorn
 
     uvicorn.run(
-        "thot.okf.server:app",
+        "thot.tools.okf.app:app",
         host=args.host,
         port=args.port,
         reload=False,

@@ -1,6 +1,10 @@
-"""Title: Agent HTTP service
+"""Title: Agent FastAPI service (``tkeir-agent`` on :8092).
 
-``tkeir-agent`` FastAPI service (single-agent + Phase D workflows).
+HTTP tool surface for single-agent loops and Phase D workflows.
+Library agents live in ``thot.agent`` (:class:`~thot.agent.agent.Agent` /
+:class:`~thot.agent.agent.AgentSet`).
+
+Run with ``python -m thot.tools.agent`` or the ``tkeir-agent`` entry point.
 
 Author: Eric Blaudez
 
@@ -30,13 +34,13 @@ from thot.action.correlation import (
 )
 from thot.action.middleware import ActionCorrelationMiddleware
 from thot.action.models import utc_now_rfc3339
+from thot.agent.agent import AgentSet
 from thot.agent.guard import AgentGuard
-from thot.agent.loop import AgentLoop
+from thot.agent.llm_agent import LLMAgent
 from thot.agent.models import RunState
 from thot.agent.orchestrator import Orchestrator
 from thot.agent.paths import default_agent_root
 from thot.agent.publish import publish_run
-from thot.agent.registry import list_agent_names, load_agent_spec
 from thot.agent.runs import RunStore
 from thot.agent.spiffe import (
     is_allowed_agent_spiffe_id,
@@ -44,6 +48,7 @@ from thot.agent.spiffe import (
     spiffe_enforce,
 )
 from thot.agent.workflows import list_workflow_names, load_workflow
+from thot.compose.registry import list_template_names, load_template
 from thot.core.LlmWrapper import UnifiedLLMWrapper
 from thot.core.StructuredLogging import configure_json_logging
 from thot.core.ThotMetrics import ThotMetrics
@@ -51,6 +56,55 @@ from thot.mcp.client import default_outbound_client
 from thot.tools.search.user_space import resolve_vespa_user_space
 
 LOGGER = logging.getLogger(__name__)
+
+# Process-wide config set (overridden by ``main()`` / tests via ``configure_agents``).
+_AGENT_SET: AgentSet | None = None
+
+
+def configure_agents(
+    agent_set: AgentSet | None = None,
+    *,
+    config_dirs: list[Path | str] | None = None,
+    names: list[str] | None = None,
+) -> AgentSet:
+    """Install the agent configuration set used by this process.
+
+    Args:
+        agent_set: Pre-built set; when set, ``config_dirs`` / ``names`` ignored.
+        config_dirs: Extra/override agent YAML roots (passed to
+            :meth:`AgentSet.from_default` when ``agent_set`` is omitted).
+        names: Optional allow-list of agent stems.
+
+    Returns:
+        The active :class:`AgentSet`.
+
+    Example:
+        >>> from thot.agent.agent import AgentSet
+        >>> from thot.tools.agent.app import configure_agents
+        >>> s = configure_agents(AgentSet.from_default(names=["researcher"]))
+        >>> "researcher" in s
+        True
+    """
+    global _AGENT_SET
+    if agent_set is not None:
+        _AGENT_SET = agent_set
+    else:
+        _AGENT_SET = AgentSet.from_default(names=names, extra_dirs=config_dirs)
+    return _AGENT_SET
+
+
+def get_agent_set() -> AgentSet:
+    """Return the process agent set, loading defaults on first use.
+
+    Example:
+        >>> from thot.tools.agent.app import get_agent_set
+        >>> isinstance(get_agent_set(), AgentSet)
+        True
+    """
+    global _AGENT_SET
+    if _AGENT_SET is None:
+        _AGENT_SET = AgentSet.from_default()
+    return _AGENT_SET
 
 
 def _resolve_space(authorization: str | None) -> str:
@@ -63,21 +117,58 @@ def _resolve_space(authorization: str | None) -> str:
         Normalized user-space string.
 
     Example:
-        >>> from thot.agent.service import _resolve_space
+        >>> from thot.tools.agent.app import _resolve_space
         >>> _resolve_space(None)
         'dev@tkeir'
     """
     return resolve_vespa_user_space(authorization)
 
 
+def _stamp_action_log(request: Request, **fields: Any) -> None:
+    """Attach structured fields for the middleware ``request completed`` log.
+
+    Args:
+        request: Current FastAPI/Starlette request.
+        **fields: Agent/run metadata (``agent``, ``run_id``, ``spiffe_id``, …).
+
+    Example:
+        >>> from starlette.requests import Request
+        >>> from thot.tools.agent.app import _stamp_action_log
+        >>> scope = {
+        ...     "type": "http",
+        ...     "asgi": {"version": "3.0"},
+        ...     "http_version": "1.1",
+        ...     "method": "GET",
+        ...     "path": "/",
+        ...     "raw_path": b"/",
+        ...     "query_string": b"",
+        ...     "headers": [],
+        ...     "client": ("127.0.0.1", 0),
+        ...     "server": ("127.0.0.1", 80),
+        ...     "scheme": "http",
+        ... }
+        >>> req = Request(scope)
+        >>> _stamp_action_log(req, agent="researcher", run_id="r1")
+        >>> req.state.action_log["agent"]
+        'researcher'
+    """
+    existing = getattr(request.state, "action_log", None)
+    payload = dict(existing) if isinstance(existing, dict) else {}
+    for key, value in fields.items():
+        if value is None or value == "":
+            continue
+        payload[key] = value
+    request.state.action_log = payload
+
+
 class AppState:
     """Per-process agent service state attached to ``FastAPI.state.agent``."""
 
-    def __init__(self) -> None:
-        """Initialize run store, guard, LLM placeholder, and MCP client.
+    def __init__(self, agent_set: AgentSet | None = None) -> None:
+        """Initialize run store, guard, LLM placeholder, MCP client, agents.
 
         Example:
-            >>> from thot.agent.service import AppState
+            >>> from thot.tools.agent.app import AppState
             >>> from thot.agent.runs import RunStore
             >>> isinstance(AppState().store, RunStore)
             True
@@ -91,6 +182,7 @@ class AppState:
         self.guard = AgentGuard(gov_root)
         self.llm: Any = None
         self.outbound = default_outbound_client()
+        self.agents = agent_set or get_agent_set()
         self._tasks: set[asyncio.Task[Any]] = set()
 
 
@@ -103,12 +195,12 @@ async def lifespan(app: FastAPI):
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import lifespan
+        >>> from thot.tools.agent.app import lifespan
         >>> inspect.isasyncgenfunction(lifespan.__wrapped__)
         True
     """
     configure_json_logging(service=os.getenv("TKEIR_SERVICE", "tkeir-agent"))
-    state = AppState()
+    state = AppState(agent_set=get_agent_set())
     state.store.ensure_layout()
     state.llm = UnifiedLLMWrapper()
     app.state.agent = state
@@ -151,13 +243,13 @@ async def _execute_run(
     """Background task: run workflow or single-agent loop for ``run_id``.
 
     Args:
-        app_state: Shared service state (store, guard, LLM).
+        app_state: Shared service state (store, guard, LLM, agent set).
         run_id: Persisted run identifier.
         authorization: Optional Bearer token for tool calls.
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import _execute_run
+        >>> from thot.tools.agent.app import _execute_run
         >>> inspect.iscoroutinefunction(_execute_run)
         True
     """
@@ -175,13 +267,24 @@ async def _execute_run(
             )
             await orch.run(state, workflow, authorization=authorization)
             return
-        spec = load_agent_spec(state.agent)
-        loop = AgentLoop(
+        try:
+            spec = app_state.agents.load_spec(state.agent)
+        except KeyError as exc:
+            raise FileNotFoundError(str(exc)) from exc
+        # General-purpose LLMAgent (wiki-agnostic) wraps AgentLoop.
+        agent = LLMAgent(
             store=app_state.store,
             guard=app_state.guard,
             llm=app_state.llm,
+            spec=spec,
         )
-        await loop.run(state, spec, authorization=authorization)
+        await agent.run(
+            state,
+            identity_context=state.spiffe_id,
+            state=state,
+            spec=spec,
+            authorization=authorization,
+        )
     except Exception as exc:  # noqa: BLE001
         LOGGER.exception("agent run %s crashed", run_id)
         state = app_state.store.read_state(run_id) or state
@@ -198,7 +301,7 @@ async def health() -> dict[str, str]:
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import health
+        >>> from thot.tools.agent.app import health
         >>> inspect.iscoroutinefunction(health)
         True
     """
@@ -211,7 +314,7 @@ async def ready(request: Request) -> dict[str, Any]:
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import ready
+        >>> from thot.tools.agent.app import ready
         >>> inspect.iscoroutinefunction(ready)
         True
     """
@@ -219,8 +322,9 @@ async def ready(request: Request) -> dict[str, Any]:
     workload_id = resolve_agent_spiffe_id("tkeir-agent")
     return {
         "status": "ready",
-        "agents": list_agent_names(),
+        "agents": state.agents.names(),
         "workflows": list_workflow_names(),
+        "config_dirs": [str(p) for p in state.agents.config_dirs],
         "root": str(state.root),
         "spiffe_id": workload_id,
         "spiffe_enforce": spiffe_enforce(),
@@ -233,7 +337,7 @@ async def metrics() -> Response:
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import metrics
+        >>> from thot.tools.agent.app import metrics
         >>> inspect.iscoroutinefunction(metrics)
         True
     """
@@ -242,16 +346,73 @@ async def metrics() -> Response:
 
 
 @app.get("/agent/agents")
-async def agents() -> dict[str, Any]:
-    """List configured agent spec names.
+async def agents(request: Request, wiki: bool = False) -> dict[str, Any]:
+    """List configured agents with catalog metadata.
+
+    Query ``wiki=true`` to return only wiki-capable ``*_prompt`` agents.
+    The set is the configuration bundle this service process was started with.
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import agents
+        >>> from thot.tools.agent.app import agents
         >>> inspect.iscoroutinefunction(agents)
         True
     """
-    return {"agents": list_agent_names()}
+    state: AppState = request.app.state.agent
+    catalog = state.agents.catalog(wiki_only=bool(wiki))
+    return {
+        "agents": [e["name"] for e in catalog],
+        "catalog": catalog,
+        "config_dirs": [str(p) for p in state.agents.config_dirs],
+        "config_dirs_env": "TKEIR_AGENT_CONFIG_DIRS",
+    }
+
+
+@app.get("/agent/agents/{agent_name}")
+async def agent_detail(agent_name: str, request: Request) -> dict[str, Any]:
+    """Return catalog metadata for one agent in this service's set.
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.agent.app import agent_detail
+        >>> inspect.iscoroutinefunction(agent_detail)
+        True
+    """
+    state: AppState = request.app.state.agent
+    try:
+        return state.agents.get(agent_name).catalog_entry()
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.get("/agent/templates")
+async def templates() -> dict[str, Any]:
+    """List compose answer/report template names (OTAN forms, etc.).
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.agent.app import templates
+        >>> inspect.iscoroutinefunction(templates)
+        True
+    """
+    names = list_template_names()
+    catalog: list[dict[str, Any]] = []
+    for name in names:
+        try:
+            spec = load_template(name)
+        except (OSError, ValueError, FileNotFoundError):
+            catalog.append({"name": name})
+            continue
+        catalog.append(
+            {
+                "name": spec.name,
+                "version": getattr(spec, "version", 1),
+                "title": getattr(spec, "title", "") or "",
+                "description": (getattr(spec, "description", "") or "")[:240],
+                "slot_count": len(getattr(spec, "slots", []) or []),
+            }
+        )
+    return {"templates": names, "catalog": catalog}
 
 
 @app.get("/agent/workflows")
@@ -260,7 +421,7 @@ async def workflows() -> dict[str, Any]:
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import workflows
+        >>> from thot.tools.agent.app import workflows
         >>> inspect.iscoroutinefunction(workflows)
         True
     """
@@ -277,7 +438,7 @@ async def create_run(
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import create_run
+        >>> from thot.tools.agent.app import create_run
         >>> inspect.iscoroutinefunction(create_run)
         True
     """
@@ -288,10 +449,11 @@ async def create_run(
         except FileNotFoundError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
     else:
-        try:
-            load_agent_spec(body.agent)
-        except FileNotFoundError as exc:
-            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        if body.agent not in app_state.agents:
+            raise HTTPException(
+                status_code=404,
+                detail=f"agent not in service configuration: {body.agent!r}",
+            )
 
     cid = current_correlation_id() or generate_trace_id()
     space = _resolve_space(authorization)
@@ -329,6 +491,16 @@ async def create_run(
     app_state._tasks.add(task)
     task.add_done_callback(app_state._tasks.discard)
 
+    _stamp_action_log(
+        request,
+        agent=agent_name,
+        workflow=run.workflow,
+        run_id=run.run_id,
+        spiffe_id=run.spiffe_id,
+        user_space=run.user_space,
+        goal=run.goal,
+        run_status=run.status,
+    )
     return {
         "run_id": run.run_id,
         "status": run.status,
@@ -345,7 +517,7 @@ async def get_run(run_id: str, request: Request) -> dict[str, Any]:
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import get_run
+        >>> from thot.tools.agent.app import get_run
         >>> inspect.iscoroutinefunction(get_run)
         True
     """
@@ -353,6 +525,16 @@ async def get_run(run_id: str, request: Request) -> dict[str, Any]:
     state = app_state.store.read_state(run_id)
     if state is None:
         raise HTTPException(status_code=404, detail="run not found")
+    _stamp_action_log(
+        request,
+        agent=state.agent,
+        workflow=state.workflow,
+        run_id=state.run_id,
+        spiffe_id=state.spiffe_id,
+        user_space=state.user_space,
+        goal=state.goal,
+        run_status=state.status,
+    )
     steps = app_state.store.list_steps(run_id)
     blackboard: list[Any] = []
     bb_path = app_state.store.blackboard_path(run_id)
@@ -382,7 +564,7 @@ async def cancel_run(run_id: str, request: Request) -> dict[str, Any]:
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import cancel_run
+        >>> from thot.tools.agent.app import cancel_run
         >>> inspect.iscoroutinefunction(cancel_run)
         True
     """
@@ -390,6 +572,16 @@ async def cancel_run(run_id: str, request: Request) -> dict[str, Any]:
     state = app_state.store.request_cancel(run_id)
     if state is None:
         raise HTTPException(status_code=404, detail="run not found")
+    _stamp_action_log(
+        request,
+        agent=state.agent,
+        workflow=state.workflow,
+        run_id=state.run_id,
+        spiffe_id=state.spiffe_id,
+        user_space=state.user_space,
+        goal=state.goal,
+        run_status=state.status,
+    )
     return {"run_id": run_id, "status": state.status, "cancel_requested": True}
 
 
@@ -407,7 +599,7 @@ async def publish_agent_run(
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import publish_agent_run
+        >>> from thot.tools.agent.app import publish_agent_run
         >>> inspect.iscoroutinefunction(publish_agent_run)
         True
     """
@@ -415,6 +607,16 @@ async def publish_agent_run(
     state = app_state.store.read_state(run_id)
     if state is None:
         raise HTTPException(status_code=404, detail="run not found")
+    _stamp_action_log(
+        request,
+        agent=state.agent,
+        workflow=state.workflow,
+        run_id=state.run_id,
+        spiffe_id=state.spiffe_id,
+        user_space=state.user_space,
+        goal=state.goal,
+        run_status=state.status,
+    )
     payload = body or PublishBody()
     result = publish_run(
         store=app_state.store,
@@ -439,24 +641,52 @@ def main(argv: list[str] | None = None) -> None:
     """Run the agent HTTP service with uvicorn.
 
     Args:
-        argv: Optional CLI arguments (host/port overrides).
+        argv: Optional CLI arguments (host/port/config overrides).
 
     Example:
         >>> import inspect
-        >>> from thot.agent.service import main
+        >>> from thot.tools.agent.app import main
         >>> callable(main)
         True
     """
-    parser = argparse.ArgumentParser(description="T-KEIR agent service")
+    parser = argparse.ArgumentParser(
+        description=(
+            "T-KEIR agent HTTP service (tool). "
+            "Hosts a set of library agents from YAML configuration dirs."
+        )
+    )
     parser.add_argument("--host", default=os.getenv("AGENT_HOST", "0.0.0.0"))
     parser.add_argument(
         "--port", type=int, default=int(os.getenv("AGENT_PORT", "8092"))
     )
+    parser.add_argument(
+        "--config-dir",
+        action="append",
+        default=[],
+        metavar="DIR",
+        help=(
+            "Agent YAML directory (repeatable). Appended to the default "
+            "search path / TKEIR_AGENT_CONFIG_DIRS."
+        ),
+    )
+    parser.add_argument(
+        "--agents",
+        default=os.getenv("TKEIR_AGENT_NAMES", ""),
+        help=(
+            "Comma-separated agent name allow-list. Empty = all agents found "
+            "in the configuration directories."
+        ),
+    )
     args = parser.parse_args(argv)
+    names = [n.strip() for n in str(args.agents or "").split(",") if n.strip()]
+    configure_agents(
+        config_dirs=list(args.config_dir) or None,
+        names=names or None,
+    )
     import uvicorn
 
     uvicorn.run(
-        "thot.agent.service:app",
+        "thot.tools.agent.app:app",
         host=args.host,
         port=args.port,
         reload=False,

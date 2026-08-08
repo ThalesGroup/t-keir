@@ -3,7 +3,7 @@
 > Phase F — export the enriched T-KEIR index as **OKF v0.2** bundles per the
 > [Google OKF SPEC](../okf/SPEC.md)
 > ([upstream](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md));
-> curate and compose with `okf_wiki_brief` / `llm_wiki` workflows.
+> curate and compose with `rag_with_wiki` / `llm_wiki` / `okf_wiki_brief`.
 
 ## What OKF is
 
@@ -52,7 +52,7 @@ This layout is intended to map 1:1 to object storage later
 | Operators / CLI | `tkeir-okf-export`, `make okf-export` |
 | HTTP clients / HMI | `tkeir-okf` `:8095`, `/okf` in the HMI |
 | Agents | `okf_bundle_list` / `okf_bundle_get` via in-process `McpHandlers` |
-| Workflows | `llm_wiki` (scoped export → analyse → review → wiki write); `okf_wiki_brief` (curate → compose) |
+| Workflows | `rag_with_wiki` (search → wiki_upsert → answer_generate); `llm_wiki` (wiki_upsert only); `okf_wiki_brief` (curate → compose) |
 
 ## Static export (`tkeir-okf-export`)
 
@@ -99,23 +99,41 @@ YAML: `configs/agents/okf_curator.yaml`. Tools: `search`, `rag_query`,
 (enrichments recovered from `notes` JSON; `claim` + `chunk_ids` keep the
 AgentLoop provenance filter).
 
-## Workflow: `llm_wiki`
+## Workflow: `llm_wiki` / `rag_with_wiki`
+
+**Default wiki path (single-pass upsert — no iterative fold):**
 
 ```text
-scope_bundle (builtin: okf_scoped_export)
- → iterative_wiki (builtin: okf_iterative_wiki)
+# llm_wiki (Reporter Grab already supplied params.chunks)
+wiki_upsert   # match closest user wiki via index.md OR create skeleton
+              # → one LLM call (wiki extract + top-K chunks) → put wiki.md
+
+# rag_with_wiki (primary HMI / MCP answer path)
+search_chunks → wiki_upsert → answer_generate (compose template e.g. otan_sitrep)
 ```
 
-Folds Grab/export chunks into a detailed answer-first `wiki.md` using a persona
-`*_prompt` agent (`params.prompt_name` / `wiki_agent`:
-`wiki_structured_facts_seed` + `wiki_merge_system_prompt`). No separate
-`llm_wiki_*` tool-loop agents.
+`wiki_upsert` scores each user OKF bundle’s `index.md` (+ wiki title / query)
+against the request query. Reuse when Jaccard ≥ `WIKI_MATCH_THRESHOLD`
+(default `0.15`); otherwise create a new evidence bundle.
 
-The HMI **Reporter** / **LLM Wiki** tabs run this via **Grab & generate wiki**,
-then open the page for Save / Add to My files / Send to commander.
+Persona `*_prompt` agents supply `wiki_structured_facts_seed` +
+`wiki_merge_system_prompt` via `params.prompt_name` / `wiki_agent`.
+
+Legacy `okf_iterative_wiki` remains callable only when
+`params.wiki_mode=iterative` (not the default).
+
+Wiki extract for RAG / agents (no LLM on OKF):
+
+```text
+GET /okf/bundles/{id}/wiki-extract?max_chars=2400
+GET /okf/wikis/match?q=…&threshold=0.15
+```
+
+The HMI **Reporter** runs `llm_wiki` after Grab; Agents default to
+`rag_with_wiki` for templated answers.
 
 ```bash
-make okf-workflow WORKFLOW=llm_wiki \
+make okf-workflow WORKFLOW=rag_with_wiki \
  GOAL="Tell me everything about MT RED SEA EAGLE" \
  TOPIC="MT RED SEA EAGLE"
 ```
@@ -141,6 +159,8 @@ make okf-workflow \
 | `POST` | `/okf/export` | Export (auth `user_space`; body may include `query`) |
 | `GET` | `/okf/bundles` | List caller's bundles |
 | `GET` | `/okf/bundles/{id}` | Metadata + index (+ optional `?concept_id=`) |
+| `GET` | `/okf/bundles/{id}/wiki-extract` | Answer (+ Structured facts) clip; no LLM |
+| `GET` | `/okf/wikis/match` | Closest user wiki by `index.md` Jaccard (`q`, `threshold`) |
 | `GET` | `/okf/bundles/{id}/download` | `.tar.gz` |
 | `DELETE` | `/okf/bundles/{id}` | DSR forget (ActionRecord + atomic remove) |
 | `GET` | `/health` `/ready` `/metrics` | Ops |
@@ -184,15 +204,17 @@ tkeir_okf_version: "0.1"
 - Governor intent `intent:okf.export` on `POST /okf/export`.
 - ActionRecords: `ext.action_kind=okf.export.batch|full|scoped|delete`.
 
-## Layout (`thot/okf/`)
+## Layout
 
 ```text
-tkeir/thot/okf/
- models.py # OkfConcept*, OkfBundle, OkfExport*, enrichment
- exporter.py # export_full / export_scoped / CLI
- applicator.py # apply curator enrichments
- store.py # tenant-scoped list/get/delete
- server.py # tkeir-okf FastAPI
+tkeir/thot/okf/                 # library
+  models.py                    # OkfConcept*, OkfBundle, OkfExport*, enrichment
+  exporter.py                  # export_full / export_scoped / CLI
+  applicator.py                # apply curator enrichments
+  store.py                     # tenant-scoped list/get/delete
+  wiki.py / iterative_wiki.py  # LLMWiki helpers
+tkeir/thot/tools/okf/          # FastAPI service (tkeir-okf)
+  app.py                       # HTTP routes on :8095
 ```
 
 See [Agents](agents.md), [MCP](mcp.md).

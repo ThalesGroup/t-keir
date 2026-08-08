@@ -519,7 +519,8 @@ Deep dive: [Agents](tools/agents.md) · [Templates](tools/templates.md) ·
 3. **Tenant isolation** — `user_space` from JWT / `VESPA_USER_SPACE`; tool args
    cannot override it; results are checked to match the principal.
 4. **Untrusted tool content** — observations wrapped in `<untrusted>`;
-   injection / escalation heuristics in `safety.py`.
+   injection / escalation checks in `safety.py` (structured tool shapes +
+   allow-list; not English NLP).
 5. **Governed** — kill scope `agents`, per-run budgets, ActionRecords with
    `actor.spiffe_id` (
    [SPIRE / SPIFFE](deployment/spire.md)).
@@ -600,7 +601,7 @@ jobs/ dlq/ publishes/
 | Provenance filter | `_findings_from_final` | Drop uncited claims → `unfilled` |
 | Tool allow-list + schema check | `toolbox.ToolRegistry` | Required args, no extras, tenant strip |
 | Untrusted envelope | `safety.wrap_untrusted` | Isolate tool text from instructions |
-| Injection / escalation refuse | `safety.detect_injection` | Heuristic redaction / refusal |
+| Injection / escalation refuse | `safety.detect_injection` / structured tool shapes | Refuse injection markers or non-allow-listed tool names in machine-readable call forms |
 | Sequential handoff blackboard | `orchestrator` + `runs` | Explicit provenance between phases |
 | Budget throttle / block | `guard.AgentGuard` | 80% / 100% of limits + ApprovalQueue |
 | Approval-gated publish | `publish.py` | `origin=agent-generated` staging |

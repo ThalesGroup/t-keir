@@ -173,6 +173,49 @@ class QueryRequest(BaseModel):
             "(typically user:<space>:<path>). Forces search_mode=user."
         ),
     )
+    agent_id: str | None = Field(
+        default=None,
+        description=(
+            "Optional agent / wiki prompt id for audit when HMI forwards to "
+            "agent workflows (RAG does not load agent YAML)."
+        ),
+    )
+    answer_template: str | None = Field(
+        default=None,
+        description=(
+            "Optional compose template name (e.g. otan_sitrep) for agent "
+            "answer_generate; ignored by in-process RAG generation."
+        ),
+    )
+    wiki_extract: str | None = Field(
+        default=None,
+        description=(
+            "Optional OKF wiki Answer/Structured-facts extract injected above "
+            "chunk passages when generating an answer."
+        ),
+    )
+    wiki_bundle_id: str | None = Field(
+        default=None,
+        description=(
+            "Optional OKF bundle id; when wiki_extract is empty, callers may "
+            "resolve extract via OKF GET .../wiki-extract."
+        ),
+    )
+    use_wiki: bool = Field(
+        default=False,
+        description=(
+            "When true, prefer wiki_extract in the RAG prompt; false keeps "
+            "chunk-only generation."
+        ),
+    )
+    stop_at_wiki_extract: bool = Field(
+        default=False,
+        description=(
+            "When true with use_wiki, skip answer generation and return the "
+            "wiki extract (and retrieved chunks) only. Agent workflows with "
+            "wiki_upsert honour the same flag by skipping answer_generate."
+        ),
+    )
 
 
 class RetrievedChunk(BaseModel):
@@ -3147,6 +3190,19 @@ async def rag_query(
         business_ontology_payload=business_ontology_payload,
     )
 
+    wiki_block = ""
+    if bool(getattr(request, "use_wiki", False)):
+        wiki_block = str(getattr(request, "wiki_extract", None) or "").strip()
+    if wiki_block:
+        wiki_block = wiki_block[:4000]
+        prefix = (
+            "OKF WIKI EXTRACT (authoritative prior synthesis; "
+            "still cite chunk passages below):\n"
+            f"{wiki_block}\n\n"
+        )
+        user_prompt = prefix + user_prompt
+        input_prompt = prefix + input_prompt
+
     if not retrieved_chunks:
         return _build_rag_unavailable_response(
             state=state,
@@ -3162,6 +3218,41 @@ async def rag_query(
             vespa_query_json=vespa_query_json,
             step_started=step_started,
             request_started=request_started,
+            query_analysis=(
+                query_analysis if isinstance(query_analysis, dict) else None
+            ),
+        )
+
+    stop_at_wiki = bool(getattr(request, "use_wiki", False)) and bool(
+        getattr(request, "stop_at_wiki_extract", False)
+    )
+    if stop_at_wiki:
+        short_answer = wiki_block or unavailable_answer
+        detailed_report = wiki_block or ""
+        used_chunk_evidence = False
+        _log_rag_step(
+            "answer-building",
+            step_started,
+            generated=False,
+            stop_at_wiki_extract=True,
+            chunks=len(retrieved_chunks),
+        )
+        _log_rag_step(
+            "rag-query-total", request_started, query=repr(query_text)
+        )
+        return _build_rag_success_response(
+            state=state,
+            query_text=query_text,
+            request=request,
+            retrieved_chunks=retrieved_chunks,
+            parsed_hits=parsed_hits,
+            ontology=ontology,
+            unavailable_answer=unavailable_answer,
+            input_prompt=input_prompt,
+            vespa_query_json=vespa_query_json,
+            short_answer=short_answer,
+            detailed_report=detailed_report,
+            used_chunk_evidence=used_chunk_evidence,
             query_analysis=(
                 query_analysis if isinstance(query_analysis, dict) else None
             ),

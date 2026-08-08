@@ -14,6 +14,7 @@ Package: `tkeir/thot/tools/collector/` (`tkeir-collector` CLI).
 make setup                 # includes: make pull-searxng
 make searxng-up            # docker on :8888, volumes under workspace/searxng/
 make collector             # API on :8096
+make collector-query       # sample POST /collect (COLLECTOR_QUERY=…)
 ```
 
 Or use `./start_services.sh` (starts `[SEARXNG]` then `[COLLECTOR]` after SPIRE).
@@ -27,9 +28,10 @@ $(WORKSPACE)/searxng/data/     → /var/cache/searxng/
 
 Default settings are copied from `tkeir/resources/searxng/settings.yml` on first
 pull/up (JSON search format must stay enabled for the collector). The template
-keeps a curated `engines:` list (`duckduckgo`, `brave`, `bing`, …) via
-`use_default_settings.engines.keep_only`. To refresh an existing workspace
-copy after editing the template:
+keeps a curated `engines:` list (`duckduckgo`, `brave`, `bing`, `wikipedia`, …) via
+`use_default_settings.engines.keep_only` (**wikidata** is excluded: its SPARQL
+bootstrap often gets HTTP 403 from Docker IPs and fails engine init). To refresh
+an existing workspace copy after editing the template:
 
 ```bash
 cp tkeir/resources/searxng/settings.yml workspace/searxng/config/settings.yml
@@ -48,6 +50,9 @@ make searxng-up
 | `POST` | `/collect/batch` | Multiple queries in parallel (shared dedupe) |
 
 ```bash
+make collector-query COLLECTOR_QUERY="maritime AIS anomaly"
+
+# or:
 curl -sS http://127.0.0.1:8096/collect \
   -H 'Content-Type: application/json' \
   -d '{"query":"maritime AIS anomaly","topic":"osint","max_results":3}'
@@ -153,4 +158,5 @@ Declared intents: `collect` (`POST /collect`, `/collect/batch`), `collect.read`
 |--------|--------|
 | `pull-searxng` | `docker pull` + seed settings |
 | `searxng-up` | `docker run` with workspace mounts |
+| `searxng-down` | Stop/remove container (keeps `workspace/searxng/`) |
 | `collector` / `collector-up` | Start FastAPI service |

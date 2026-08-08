@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   orderWorkflowNames,
+  RAG_WITH_WIKI_WORKFLOW,
   resolvePersonaWorkflowPreset,
 } from "@/lib/persona-workflows";
 import { apiFetch } from "@/src/auth/useApiClient";
@@ -19,6 +20,7 @@ type RunPayload = {
     goal?: string;
     workflow?: string | null;
     agent?: string;
+    spiffe_id?: string | null;
     error?: string | null;
     correlation_id?: string;
     usage?: Record<string, number>;
@@ -53,6 +55,7 @@ export function AgentRunMonitor() {
   const [topic, setTopic] = useState(preset.topic);
   const [reportForm, setReportForm] = useState(preset.reportForm);
   const [useExistingWiki, setUseExistingWiki] = useState(false);
+  const [stopAtWikiExtract, setStopAtWikiExtract] = useState(false);
   const [workflow, setWorkflow] = useState(preset.workflow);
   const [workflows, setWorkflows] = useState<string[]>([preset.workflow]);
   const [runId, setRunId] = useState<string | null>(null);
@@ -77,9 +80,14 @@ export function AgentRunMonitor() {
         }
         const body = (await res.json()) as { workflows?: string[] };
         if (body.workflows?.length) {
-          const ordered = orderWorkflowNames(body.workflows, preset.workflow);
+          const preferred = body.workflows.includes(RAG_WITH_WIKI_WORKFLOW)
+            ? RAG_WITH_WIKI_WORKFLOW
+            : preset.workflow;
+          const ordered = orderWorkflowNames(body.workflows, preferred);
           setWorkflows(ordered);
-          if (body.workflows.includes(preset.workflow)) {
+          if (body.workflows.includes(preferred)) {
+            setWorkflow(preferred);
+          } else if (body.workflows.includes(preset.workflow)) {
             setWorkflow(preset.workflow);
           } else if (body.workflows.includes("otan_c2_brief")) {
             setWorkflow("otan_c2_brief");
@@ -142,8 +150,17 @@ export function AgentRunMonitor() {
           goal: goal.trim(),
           params: {
             topic: topic.trim() || goal.trim(),
+            query: goal.trim(),
             report_form: reportForm,
+            answer_template:
+              workflow === RAG_WITH_WIKI_WORKFLOW
+                ? preset.answerTemplate
+                : reportForm,
+            use_wiki: "true",
+            wiki_agent: preset.wikiPrompt,
+            prompt_name: preset.wikiPrompt,
             use_existing_wiki: useExistingWiki ? "true" : "false",
+            stop_at_wiki_extract: stopAtWikiExtract ? "true" : "false",
           },
         }),
       });
@@ -280,6 +297,19 @@ export function AgentRunMonitor() {
               </label>
             </>
           ) : null}
+          {workflow === RAG_WITH_WIKI_WORKFLOW || workflow === "llm_wiki" ? (
+            <label className="flex items-center gap-2 text-sm sm:col-span-2">
+              <input
+                type="checkbox"
+                checked={stopAtWikiExtract}
+                onChange={(e) => setStopAtWikiExtract(e.target.checked)}
+                disabled={busy}
+              />
+              <span>
+                Stop at wiki extract (skip templated answer generation)
+              </span>
+            </label>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => void startRun()} disabled={busy || !goal.trim()}>
@@ -342,6 +372,14 @@ export function AgentRunMonitor() {
                 {payload?.run?.agent ?? "—"} / {payload?.run?.workflow ?? "—"}
               </dd>
             </div>
+            {payload?.run?.spiffe_id ? (
+              <div className="sm:col-span-2">
+                <dt className="text-muted-foreground">SPIRE identity</dt>
+                <dd className="break-all font-mono text-xs">
+                  {payload.run.spiffe_id}
+                </dd>
+              </div>
+            ) : null}
             <div className="sm:col-span-2">
               <dt className="text-muted-foreground">Goal</dt>
               <dd>{payload?.run?.goal ?? goal}</dd>
@@ -384,15 +422,20 @@ export function AgentRunMonitor() {
             <div>
               <h3 className="mb-1 text-sm font-medium">Steps</h3>
               <ul className="max-h-48 space-y-1 overflow-y-auto text-xs font-mono">
-                {payload.steps.map((s) => (
-                  <li key={s.step_index}>
-                    [{s.step_index}] {s.status}
-                    {s.tool_call?.name ? ` tool=${s.tool_call.name}` : ""}
-                    {s.thought_excerpt
-                      ? ` — ${s.thought_excerpt.slice(0, 80)}`
-                      : ""}
-                  </li>
-                ))}
+                {payload.steps.map((s) => {
+                  const actionName = s.tool_call?.name || s.status;
+                  const agentName = payload?.run?.agent || "agent";
+                  const spiffeId = payload?.run?.spiffe_id;
+                  return (
+                    <li key={s.step_index}>
+                      [{s.step_index}] {agentName} · {actionName}
+                      {spiffeId ? ` · ${spiffeId}` : ""}
+                      {s.thought_excerpt
+                        ? ` — ${s.thought_excerpt.slice(0, 80)}`
+                        : ""}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ) : null}

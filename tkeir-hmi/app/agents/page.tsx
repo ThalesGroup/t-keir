@@ -44,9 +44,16 @@ export default function AgentsPage() {
               <code>persona_ctf_commander</code>, <code>persona_admin</code>
             </li>
             <li>
+              <span className="font-medium text-foreground">rag_with_wiki</span>{" "}
+              — search chunks → wiki_upsert (reuse closest OKF via index.md) →
+              answer_generate (compose template e.g.{" "}
+              <code>otan_sitrep</code>)
+            </li>
+            <li>
               <span className="font-medium text-foreground">llm_wiki</span> —
-              scoped OKF export → iterative persona wiki (
-              <code>*_prompt</code>)
+              single-pass wiki_upsert with persona <code>*_prompt</code>{" "}
+              (Reporter Grab path; legacy iterative only with{" "}
+              <code>wiki_mode=iterative</code>)
             </li>
             <li>
               <span className="font-medium text-foreground">otan_c2_brief</span>{" "}

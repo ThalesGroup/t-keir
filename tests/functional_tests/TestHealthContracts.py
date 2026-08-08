@@ -19,7 +19,7 @@ def test_ingest_health_ready_metrics(ingest_harness):
 def test_okf_health_ready(tmp_path, monkeypatch):
     monkeypatch.setenv("OKF_ROOT", str(tmp_path / "okf"))
     monkeypatch.setenv("GOVERNOR_MODE", "off")
-    from thot.okf import server as okf_server
+    import thot.tools.okf.app as okf_server
 
     with TestClient(okf_server.app) as client:
         health = client.get("/health")

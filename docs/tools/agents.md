@@ -26,33 +26,46 @@ POST /agent/runs { agent | workflow, goal, params }
         ▼
    RunStore (workspace/agent/runs/{id}/)
         │
-   ┌────┴────────────────────────────┐
-   │ single agent          workflow  │
-   │ AgentLoop             Orchestrator (sequential)
-   │   reason → act →      │ research → analyze → compose
-   │   observe → final     │ Handoff + blackboard
-   └────┬──────────────────┴─────────┘
+   ┌────┴──────────────────────────────────────────┐
+   │ single agent                 workflow         │
+   │ LLMAgent → AgentLoop         Orchestrator     │
+   │   reason → act →             │ agent steps → AgentLoop
+   │   observe → final            │ wiki_* → WikiGeneratorWorkflow
+   │                              │ compose / builtins
+   └────┬─────────────────────────┴────────────────┘
         │
    ToolRegistry ──► McpHandlers (Vespa RAG)
                  └► OutboundMcpClient (egress allow-list)
         │
-   AgentGuard ──► kill / budgets / ActionRecords / SPIFFE
+   AgentGuard (BaseAgentGuard) ──► kill / budgets / ActionRecords / SPIFFE
         │
    optional Publish ──► ApprovalQueue → AGENT_ROOT/publishes/
 ```
 
+**Layers (keep wiki out of the general agent):**
+
+| Layer | Types | Responsibility |
+|-------|--------|----------------|
+| Engine-agnostic | `BaseAgent`, `DecisionEngine`, `BaseAgentGuard` | Contracts only — no T-KEIR domain |
+| General LLM | `LLMAgent` | ReAct via `AgentLoop`; tools + goal; **no** OKF/wiki imports |
+| Domain | `WikiGeneratorWorkflow` | Match/create wiki, upsert / iterative fold |
+| HTTP | `thot.tools.agent` | Hosts `AgentSet`; single-agent runs use `LLMAgent` |
+
 | Module | Role |
 |--------|------|
-| `service.py` | FastAPI app (`tkeir-agent`), create/poll/cancel/publish |
-| `registry.py` | Load `configs/agents/*.yaml` + `datasets/*/agents/` → `AgentSpec` |
-| `workflows.py` | Load `configs/workflows/*.yaml` + `datasets/*/workflows/` → `WorkflowSpec` |
-| `loop.py` | Single-agent reason→act→observe until final / budget / kill |
-| `orchestrator.py` | Sequential multi-agent plan + compose step |
-| `toolbox.py` | Allow-listed tool invoke + schema validation |
-| `safety.py` | `<untrusted>` envelopes, injection / escalation heuristics |
-| `guard.py` | Governor flags, budgets, ActionRecords, SPIFFE |
-| `runs.py` | Filesystem run store (manifest, steps, blackboard, DLQ) |
-| `publish.py` | Approval-gated staging of agent markdown |
+| **`thot.agent.base`** | Engine-agnostic `BaseAgent` / `DecisionEngine` / `BaseAgentGuard` |
+| **`thot.agent.llm_agent`** | General-purpose `LLMAgent` (ReAct via `AgentLoop`, no wiki coupling) |
+| **`thot.agent.agent`** | Library :class:`Agent` / :class:`AgentSet` (identified YAML roles) |
+| `thot.agent.registry` | Load `configs/agents/*.yaml` + `datasets/*/agents/` → `AgentSpec` |
+| `thot.agent.workflows` | YAML workflow loader + domain pipelines (`WikiGeneratorWorkflow`) |
+| `thot.agent.loop` | Single-agent reason→act→observe until final / budget / kill |
+| `thot.agent.orchestrator` | Sequential multi-agent plan + compose; wiki builtins delegate to `WikiGeneratorWorkflow` |
+| `thot.agent.toolbox` | Allow-listed tool invoke + schema validation |
+| `thot.agent.safety` | `<untrusted>` envelopes, injection / escalation heuristics |
+| `thot.agent.guard` | Governor flags, budgets, ActionRecords, SPIFFE (`BaseAgentGuard`) |
+| `thot.agent.runs` | Filesystem run store (manifest, steps, blackboard, DLQ) |
+| `thot.agent.publish` | Approval-gated staging of agent markdown |
+| **`thot.tools.agent`** | FastAPI HTTP tool (`tkeir-agent` :8092) hosting an `AgentSet` |
 | `spiffe.py` | Dev / workload SPIFFE id for `actor.spiffe_id` |
 | `models.py` | Pydantic specs: agents, workflows, runs, findings |
 
@@ -61,8 +74,10 @@ POST /agent/runs { agent | workflow, goal, params }
 ## Quick start
 
 ```bash
-# From repository root — agent service on :8092
+# From repository root — agent HTTP tool on :8092
 make agent
+# equivalent: python -m thot.tools.agent
+# optional: --config-dir DIR (repeatable), --agents name1,name2
 
 # Single researcher
 make agent-run GOAL="Summarize SITREP findings about Objective ALPHA" AGENT=researcher
@@ -97,8 +112,32 @@ required.
 | `GET` | `/agent/runs/{id}` | Manifest, steps, handoffs, compose_result, budgets |
 | `POST` | `/agent/runs/{id}/cancel` | Request cancel |
 | `POST` | `/agent/runs/{id}/publish` | Stage / approve publish of compose markdown |
+| `GET` | `/agent/agents` | Catalog (`?wiki=true` → wiki-capable `*_prompt`) |
+| `GET` | `/agent/agents/{name}` | One catalog entry |
+| `GET` | `/agent/templates` | Compose answer/report templates (`otan_sitrep`, …) |
 | `GET` | `/agent/workflows` | List workflow names |
 | `GET` | `/health` `/ready` `/metrics` | Ops |
+
+**Preferred RAG → wiki → answer run:**
+
+```json
+{
+  "workflow": "rag_with_wiki",
+  "goal": "Gulf of Aden SITREP",
+  "params": {
+    "query": "Gulf of Aden SITREP",
+    "use_wiki": true,
+    "wiki_agent": "moc_watch_prompt",
+    "answer_template": "otan_sitrep",
+    "search_mode": "both",
+    "stop_at_wiki_extract": false
+  }
+}
+```
+
+Set ``stop_at_wiki_extract: true`` to end after ``wiki_upsert`` (no
+``answer_generate``). The same flag on ``POST /rag/query`` skips in-process
+answer generation when ``use_wiki`` is set.
 
 **Create run body (single agent):**
 
@@ -158,7 +197,7 @@ and dataset packs (OSINT personas live under `datasets/osint/agents/`).
 | Agent | Role |
 |-------|------|
 | **`<persona>_{analyser,reviewer,writer}`** | RED HORIZON personas (j2_analyst, moc_watch, j2x_humint, ctf_commander, admin) |
-| **`<persona>_prompt`** | OKF wiki seed + merge system for `okf_iterative_wiki` (not a tool-loop agent) |
+| **`<persona>_prompt`** | OKF wiki seed + merge system for `wiki_upsert` (not a tool-loop agent) |
 | **`wiki_writer`** | Answer-first OKF LLMWiki writer used by `otan_c2_brief` |
 
 ### Shipped workflows (core — `tkeir/configs/workflows/`)
@@ -167,6 +206,7 @@ and dataset packs (OSINT personas live under `datasets/osint/agents/`).
 |----------|----------|-------------|
 | **content_brief** | researcher → analyst → compose | `synthesis_note` |
 | **okf_wiki_brief** | scoped OKF → okf_curator → compose | bundle + `synthesis_note` |
+| **rag_with_wiki** | search_chunks → wiki_upsert → answer_generate | compose template (e.g. `otan_sitrep`) |
 
 ### OSINT pack (`datasets/osint/workflows/`)
 
@@ -174,7 +214,7 @@ and dataset packs (OSINT personas live under `datasets/osint/agents/`).
 |----------|----------|-------------|
 | **persona_*** | analyse → review → write → OTAN compose | INTSUM / SITREP / SPOTREP / Commander's Brief |
 | **otan_c2_brief** | scoped OKF → researcher → reviewer → wiki_writer → OTAN compose | OTAN form + LLMWiki |
-| **llm_wiki** | scoped OKF → `okf_iterative_wiki` (persona `*_prompt`) | detailed `wiki.md` |
+| **llm_wiki** | `wiki_upsert` (persona `*_prompt`; match via `index.md`) | detailed `wiki.md` |
 
 **OTAN C2 params** (HMI Agents page or API):
 
@@ -201,6 +241,10 @@ hardcoded in the orchestrator:
 Select with `params.usecase` / `params.dataset`, or env `TKEIR_AGENT_USECASE`
 (also `TKEIR_DATASET` / `TKEIR_BUSINESS_ONTOLOGY_DATASET`). Override path:
 `TKEIR_AGENT_ORCHESTRATOR_CONFIG`.
+
+The same usecase also **prefers** that pack when agent/workflow YAML stems
+collide across packs (e.g. `wiki_writer`, `llm_wiki`):
+`datasets/<usecase>/agents|workflows` is searched before other packs.
 
 **Reporter Phase 3** passes the edited Phase-2 LLM Wiki as the report base:
 
@@ -452,6 +496,10 @@ Open [http://localhost:3000/agents](http://localhost:3000/agents) with
 |----------|-----------------|
 | `AGENT_ROOT` | Run store root (Make sets `workspace/agent`) |
 | `AGENT_HOST` / `AGENT_PORT` | `0.0.0.0` / `8092` |
+| `AGENT_URL` | `http://localhost:8092` (HMI / Make) |
+| `TKEIR_AGENT_CONFIG_DIRS` | Extra agent YAML roots (`os.pathsep`-separated) |
+| `TKEIR_AGENT_NAMES` | Optional comma allow-list of agent stems for this process |
+| `WIKI_MATCH_THRESHOLD` | Jaccard floor for wiki reuse (default `0.15`) |
 | `PROVIDER` / `LLM_MODEL` | Same stack as RAG |
 | `MCP_RAG_URL` | RAG base URL for tool handlers |
 | `VESPA_USER_SPACE` | Auth-off tenant |
@@ -473,3 +521,20 @@ Compose profile: `PROFILES=…,agents` (image `tkeir-agent`).
    to an agent’s `tools` or a workflow step `tools` list.
 4. **New template** — see [Templates](templates.md); reference it from a
    workflow `compose.template`.
+5. **Library (in-process)** — prefer `LLMAgent` for goal+tools loops; keep
+   wiki/OKF in `WikiGeneratorWorkflow` (or a new module under
+   `thot.agent.workflows`), not inside `LLMAgent` / `AgentLoop`.
+
+```python
+from thot.agent import LLMAgent, WikiGeneratorWorkflow
+from thot.agent.guard import AgentGuard
+from thot.agent.runs import RunStore
+
+# General ReAct agent (HTTP single-agent path uses the same type)
+agent = LLMAgent(store=store, guard=guard, llm=llm, spec=spec)
+await agent.run(state, identity_context=state.spiffe_id, state=state, spec=spec)
+
+# Domain wiki upsert (orchestrator builtins call this)
+wiki = WikiGeneratorWorkflow(store=store, guard=guard, llm=llm)
+await wiki.run_upsert(state)
+```

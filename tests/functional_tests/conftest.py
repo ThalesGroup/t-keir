@@ -73,7 +73,7 @@ def agent_client(monkeypatch, tmp_path):
     monkeypatch.setenv("SPIFFE_MODE", "dev")
     monkeypatch.setenv("SPIFFE_ENFORCE", "false")
 
-    from thot.agent import service as agent_app
+    from thot.tools.agent import app as agent_app
 
     llm = MagicMock()
     llm.verify_provider = AsyncMock()

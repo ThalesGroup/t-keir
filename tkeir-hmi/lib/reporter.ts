@@ -126,6 +126,7 @@ export type AgentRunPayload = {
     error?: string | null;
     steps_completed?: number;
     delegation_chain?: string[];
+    spiffe_id?: string | null;
     params?: Record<string, unknown>;
     result?: {
       findings?: Array<{ claim: string; chunk_ids?: string[] }>;
@@ -165,9 +166,15 @@ const WORKFLOW_PHASE_LABELS: Record<string, string> = {
   scope_bundle: "Scoping an OKF bundle from your query",
   okf_scoped_export: "Exporting grounded evidence into an OKF bundle",
   "builtin:okf_scoped_export": "Exporting grounded evidence into an OKF bundle",
-  iterative_wiki: "Folding evidence into a detailed persona wiki",
-  okf_iterative_wiki: "Folding evidence into a detailed persona wiki",
-  "builtin:okf_iterative_wiki": "Folding evidence into a detailed persona wiki",
+  iterative_wiki: "Updating persona wiki (single-pass upsert)",
+  okf_iterative_wiki: "Updating persona wiki (legacy iterative)",
+  "builtin:okf_iterative_wiki": "Updating persona wiki (legacy iterative)",
+  wiki_upsert: "Matching / upserting persona wiki",
+  "builtin:wiki_upsert": "Matching / upserting persona wiki",
+  answer_generate: "Generating templated answer",
+  "builtin:answer_generate": "Generating templated answer",
+  search_chunks: "Retrieving grounded chunks",
+  "builtin:search_chunks": "Retrieving grounded chunks",
   analyse: "Analysing grounded evidence for the wiki",
   review: "Reviewing citations and rejecting ungrounded claims",
   write_wiki: "Writing the OKF wiki page",
@@ -190,6 +197,7 @@ export type AgentRunActivitySummary = {
   detail: string | null;
   phaseLabel: string | null;
   agentLabel: string | null;
+  spiffeId: string | null;
   toolLabel: string | null;
   stepCount: number;
   recentSteps: AgentRunStep[];
@@ -238,6 +246,10 @@ export function describeAgentRunActivity(
     labelForAgentOrPhase(lastHandoff?.to_agent) ||
     null;
   const agentLabel = payload.run.agent || lastHandoff?.to_agent || null;
+  const spiffeId =
+    typeof payload.run.spiffe_id === "string" && payload.run.spiffe_id.trim()
+      ? payload.run.spiffe_id.trim()
+      : null;
   const toolLabel = labelForTool(lastStep?.tool_call?.name);
 
   let headline: string;
@@ -276,6 +288,7 @@ export function describeAgentRunActivity(
     detail,
     phaseLabel,
     agentLabel,
+    spiffeId,
     toolLabel,
     stepCount: steps.length,
     recentSteps: steps.slice(-8).reverse(),

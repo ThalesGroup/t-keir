@@ -3,7 +3,9 @@
 Supervisor plan comes from ``WorkflowSpec`` YAML. Each agent phase runs the
 existing :class:`AgentLoop`; compose phases use ``thot.compose``. Builtin
 steps (e.g. OKF scoped export) run in-process helpers. Explicit
-:class:`Handoff` records and an append-only blackboard carry provenance.
+:class:`Handoff` records and an append-only blackboard carry decision context
+between agents (memory / delegation). Index provenance lives on findings and
+tool observations when those tools are used — not on the handoff contract.
 
 Author: Eric Blaudez
 
@@ -15,6 +17,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -231,35 +234,6 @@ def _seed_wiki_params(state: RunState) -> None:
     state.params = params
 
 
-def _chunk_ids_from_state(state: RunState) -> list[str]:
-    """Collect unique chunk ids from grounded findings on ``state``.
-
-    Args:
-        state: Run state with optional ``result`` findings.
-
-    Returns:
-        Sorted unique chunk id strings (empty when no findings).
-
-    Example:
-        >>> from thot.agent.models import GroundedFinding, GroundedFindings, RunState
-        >>> from thot.agent.orchestrator import _chunk_ids_from_state
-        >>> state = RunState(
-        ...     goal="g",
-        ...     result=GroundedFindings(
-        ...         findings=[GroundedFinding(claim="c", chunk_ids=["b", "a"])]
-        ...     ),
-        ... )
-        >>> _chunk_ids_from_state(state)
-        ['a', 'b']
-    """
-    if state.result is None:
-        return []
-    out: list[str] = []
-    for finding in state.result.findings:
-        out.extend(finding.chunk_ids)
-    return sorted(set(out))
-
-
 def _prior_findings_json(state: RunState) -> str:
     """Serialize prior grounded findings for goal templates.
 
@@ -437,6 +411,34 @@ class Orchestrator:
         self.outbound = outbound or default_outbound_client()
         self.handlers = handlers
 
+    def _wiki_workflow(self) -> Any:
+        """Lazy :class:`~thot.agent.workflows.wiki_generator.WikiGeneratorWorkflow`.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> from thot.agent.runs import RunStore
+            >>> from thot.agent.workflows.wiki_generator import (
+            ...     WikiGeneratorWorkflow,
+            ... )
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     orch = Orchestrator(
+            ...         store=RunStore(root),
+            ...         guard=AgentGuard(root / "gov"),
+            ...         llm=object(),
+            ...     )
+            ...     isinstance(orch._wiki_workflow(), WikiGeneratorWorkflow)
+            True
+        """
+        from thot.agent.workflows.wiki_generator import WikiGeneratorWorkflow
+
+        return WikiGeneratorWorkflow(
+            store=self.store, guard=self.guard, llm=self.llm
+        )
+
     async def run(
         self,
         state: RunState,
@@ -573,7 +575,6 @@ class Orchestrator:
             to_agent=f"builtin:{wf_step.builtin}",
             reason=f"workflow:{workflow.name}:{wf_step.id}",
             payload_summary=wf_step.builtin,
-            chunk_ids=_chunk_ids_from_state(state),
         )
         state.handoffs.append(handoff)
         state.delegation_chain = list(
@@ -588,7 +589,6 @@ class Orchestrator:
                 "from": handoff.from_agent,
                 "to": handoff.to_agent,
                 "reason": handoff.reason,
-                "chunk_ids": handoff.chunk_ids,
                 "provenance": "orchestrator",
                 "builtin": wf_step.builtin,
             },
@@ -603,13 +603,28 @@ class Orchestrator:
                 "handoff_id": handoff.handoff_id,
                 "builtin": wf_step.builtin,
             },
-            chunk_ids=handoff.chunk_ids,
         )
 
         if wf_step.builtin == "okf_scoped_export":
             state = await self._run_okf_scoped_export(state, wf_step)
         elif wf_step.builtin == "okf_iterative_wiki":
-            state = await self._run_okf_iterative_wiki(state, wf_step)
+            # Legacy path — default to wiki_upsert unless wiki_mode=iterative.
+            mode = (
+                str((state.params or {}).get("wiki_mode") or "")
+                .strip()
+                .lower()
+            )
+            wiki_wf = self._wiki_workflow()
+            if mode == "iterative":
+                state = await wiki_wf.run_iterative(state)
+            else:
+                state = await wiki_wf.run_upsert(state)
+        elif wf_step.builtin == "wiki_upsert":
+            state = await self._wiki_workflow().run_upsert(state)
+        elif wf_step.builtin == "answer_generate":
+            state = await self._run_answer_generate(state, wf_step)
+        elif wf_step.builtin == "search_chunks":
+            state = await self._run_search_chunks(state, wf_step)
         else:
             state.status = "failed"
             state.error = f"unknown builtin step: {wf_step.builtin!r}"
@@ -700,37 +715,17 @@ class Orchestrator:
     ) -> list[dict[str, str]]:
         """Prefer HMI grab/search chunks; else load bundle evidence_chunks.json.
 
-        Args:
-            params: Run params that may contain ``grab_chunks`` / ``chunks``.
-            root: OKF bundle directory for persisted evidence.
-
-        Returns:
-            List of evidence chunk dicts with ``chunk_id`` and ``text_raw``.
-
         Example:
             >>> import tempfile
             >>> from pathlib import Path
             >>> from thot.agent.orchestrator import Orchestrator
             >>> with tempfile.TemporaryDirectory() as td:
-            ...     root = Path(td)
-            ...     chunks = Orchestrator._wiki_chunks_for_bundle(
-            ...         {"grab_chunks": [{"chunk_id": "c1", "text_raw": "hi"}]},
-            ...         root,
-            ...     )
-            ...     chunks[0]["chunk_id"]
-            'c1'
+            ...     Orchestrator._wiki_chunks_for_bundle({}, Path(td))
+            []
         """
-        from thot.okf.iterative_wiki import (
-            chunks_from_params,
-            load_evidence_chunks,
-            write_evidence_chunks,
-        )
+        from thot.agent.workflows.wiki_generator import WikiGeneratorWorkflow
 
-        chunks = chunks_from_params(params)
-        if chunks:
-            write_evidence_chunks(root, chunks)
-            return chunks
-        return load_evidence_chunks(root)
+        return WikiGeneratorWorkflow.wiki_chunks_for_bundle(params, root)
 
     @staticmethod
     def _seed_or_load_wiki(
@@ -743,47 +738,29 @@ class Orchestrator:
     ) -> str:
         """Return existing wiki or a persona/OKF seed skeleton.
 
-        Args:
-            bundle_id: OKF bundle identifier.
-            user_space: Tenant streaming group.
-            query: Analyst query for the seed title.
-            wiki_cfg: Persona wiki config (``structured_facts_seed``).
-            store: OKF bundle store.
-
-        Returns:
-            Wiki markdown (existing or freshly seeded).
-
         Example:
-            >>> import tempfile
-            >>> from thot.okf.store import OkfBundleStore
+            >>> class _Store:
+            ...     def get_wiki(self, *_a, **_k):
+            ...         return "# Existing\\nbody"
             >>> from thot.agent.orchestrator import Orchestrator
-            >>> store = OkfBundleStore(root=tempfile.mkdtemp())
-            >>> wiki = Orchestrator._seed_or_load_wiki(
-            ...     bundle_id="b1",
-            ...     user_space="dev@tkeir",
-            ...     query="topic",
+            >>> Orchestrator._seed_or_load_wiki(
+            ...     bundle_id="b",
+            ...     user_space="u",
+            ...     query="q",
             ...     wiki_cfg={"structured_facts_seed": ""},
-            ...     store=store,
-            ... )
-            >>> wiki.startswith("---")
+            ...     store=_Store(),
+            ... ).startswith("# Existing")
             True
         """
-        from thot.okf.iterative_wiki import seed_iterative_wiki
+        from thot.agent.workflows.wiki_generator import WikiGeneratorWorkflow
 
-        try:
-            initial = store.get_wiki(bundle_id, user_space) or ""
-        except Exception:  # noqa: BLE001
-            initial = ""
-        if (
-            not initial.strip()
-            or "_OKF wiki" in initial
-            or "_Iterative wiki" in initial
-        ):
-            return seed_iterative_wiki(
-                query=query,
-                structured_facts_seed=wiki_cfg["structured_facts_seed"],
-            )
-        return initial
+        return WikiGeneratorWorkflow.seed_or_load_wiki(
+            bundle_id=bundle_id,
+            user_space=user_space,
+            query=query,
+            wiki_cfg=wiki_cfg,
+            store=store,
+        )
 
     @staticmethod
     def _findings_from_wiki_chunks(
@@ -794,62 +771,363 @@ class Orchestrator:
         path: Any,
         prompt_name: str,
     ) -> Any:
-        """Build GroundedFindings from folded evidence chunks.
-
-        Args:
-            chunks: Evidence chunk dicts from grab/search or OKF bundle.
-            max_chunks: Maximum chunks to fold into findings.
-            query: Run query stored on the findings goal.
-            path: Wiki file path for provenance notes.
-            prompt_name: Persona prompt agent name for notes.
-
-        Returns:
-            :class:`~thot.agent.models.GroundedFindings` with one claim per chunk.
+        """Build grounded findings stubs from wiki evidence chunks.
 
         Example:
             >>> from thot.agent.orchestrator import Orchestrator
             >>> out = Orchestrator._findings_from_wiki_chunks(
-            ...     [{"chunk_id": "c1", "text_raw": "hello", "parent_doc_id": "d1"}],
-            ...     max_chunks=1,
+            ...     [{"chunk_id": "c1", "text_raw": "fact", "parent_doc_id": "d1"}],
+            ...     max_chunks=2,
             ...     query="q",
-            ...     path="/tmp/wiki.md",
-            ...     prompt_name="demo",
+            ...     path="/tmp/w",
+            ...     prompt_name="p",
             ... )
-            >>> out.findings[0].chunk_ids
-            ['c1']
+            >>> out.findings[0].claim
+            'fact'
         """
-        from thot.agent.models import GroundedFinding, GroundedFindings
+        from thot.agent.workflows.wiki_generator import WikiGeneratorWorkflow
 
-        findings: list[GroundedFinding] = []
-        for chunk in chunks[:max_chunks]:
-            cid = chunk.get("chunk_id") or ""
-            if not cid:
-                continue
-            excerpt = (chunk.get("text_raw") or "").strip().replace("\n", " ")
-            parent = (chunk.get("parent_doc_id") or "").strip()
-            findings.append(
-                GroundedFinding(
-                    claim=f"Evidence folded from chunk {cid}: {excerpt[:180]}",
-                    chunk_ids=[cid],
-                    document_ids=[parent] if parent else [],
-                    confidence=0.7,
-                )
-            )
-        return GroundedFindings(
-            goal=query,
-            findings=findings[:40],
-            unfilled=(
-                []
-                if findings
-                else ["no evidence chunks available for iterative wiki"]
-            ),
-            notes=f"okf_iterative_wiki path={path} prompt={prompt_name}",
+        return WikiGeneratorWorkflow.findings_from_wiki_chunks(
+            chunks,
+            max_chunks=max_chunks,
+            query=query,
+            path=path,
+            prompt_name=prompt_name,
         )
+
+    async def _run_search_chunks(
+        self, state: RunState, wf_step: WorkflowStep
+    ) -> RunState:
+        """Retrieve chunks via RAG ``POST /search`` (no answer generation).
+
+        Prefers ``params.chunks`` / ``params.grab_chunks`` when already set
+        (HMI Grab path). Otherwise calls the RAG search HTTP API.
+
+        Example:
+            >>> import inspect
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> inspect.iscoroutinefunction(Orchestrator._run_search_chunks)
+            True
+        """
+        import httpx
+
+        _ = wf_step
+        params = dict(state.params or {})
+        query = str(
+            params.get("query") or params.get("topic") or state.goal or ""
+        ).strip()
+        if not query:
+            return self._fail_builtin(
+                state, error="search_chunks: missing query"
+            )
+        existing = params.get("chunks") or params.get("grab_chunks")
+        if isinstance(existing, list) and existing:
+            state.params = {**params, "chunks": existing}
+            self.store.append_blackboard(
+                state.run_id,
+                {
+                    "kind": "builtin",
+                    "builtin": "search_chunks",
+                    "source": "params.chunks",
+                    "chunk_count": len(existing),
+                    "provenance": "orchestrator",
+                },
+            )
+            self.store.write_state(state)
+            return state
+
+        rag_url = os.getenv("RAG_URL", "http://127.0.0.1:8090").rstrip("/")
+        try:
+            hits = max(1, min(int(params.get("hits") or 20), 100))
+        except (TypeError, ValueError):
+            hits = 20
+        body: dict[str, Any] = {
+            "query": query,
+            "language": str(params.get("language") or "en"),
+            "hits": hits,
+            "search_mode": str(params.get("search_mode") or "both"),
+        }
+        headers: dict[str, str] = {"Content-Type": "application/json"}
+        auth = str(params.get("authorization") or "").strip()
+        if auth:
+            headers["Authorization"] = auth
+        try:
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                resp = await client.post(
+                    f"{rag_url}/search", headers=headers, json=body
+                )
+            resp.raise_for_status()
+            payload = resp.json()
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.exception("search_chunks failed")
+            return self._fail_builtin(
+                state, error=f"search_chunks: {_format_exc(exc)}"
+            )
+        chunks = payload.get("chunks") or payload.get("hits") or []
+        if not isinstance(chunks, list):
+            chunks = []
+        state.params = {**params, "chunks": chunks, "query": query}
+        self.store.append_blackboard(
+            state.run_id,
+            {
+                "kind": "builtin",
+                "builtin": "search_chunks",
+                "source": "rag_search",
+                "chunk_count": len(chunks),
+                "provenance": "orchestrator",
+            },
+        )
+        self.store.write_state(state)
+        return state
+
+    async def _run_wiki_upsert(
+        self, state: RunState, wf_step: WorkflowStep
+    ) -> RunState:
+        """Delegate to :class:`~thot.agent.workflows.wiki_generator.WikiGeneratorWorkflow`.
+
+        Example:
+            >>> import inspect
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> inspect.iscoroutinefunction(Orchestrator._run_wiki_upsert)
+            True
+        """
+        _ = wf_step
+        return await self._wiki_workflow().run_upsert(state)
+
+    def _answer_stop_at_wiki(
+        self, state: RunState, params: dict[str, Any]
+    ) -> RunState | None:
+        """Handle ``stop_at_wiki_extract`` short-circuit; else return ``None``.
+
+        Example:
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from thot.agent.guard import AgentGuard
+            >>> from thot.agent.models import RunState
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> from thot.agent.runs import RunStore
+            >>> with tempfile.TemporaryDirectory() as td:
+            ...     root = Path(td)
+            ...     orch = Orchestrator(
+            ...         store=RunStore(root),
+            ...         guard=AgentGuard(root / "gov"),
+            ...         llm=object(),
+            ...     )
+            ...     orch._answer_stop_at_wiki(RunState(goal="g"), {}) is None
+            True
+        """
+        if not _truthy(params.get("stop_at_wiki_extract")):
+            return None
+        wiki = str(
+            params.get("wiki_extract")
+            or params.get("wiki_excerpt")
+            or params.get("wiki_markdown")
+            or ""
+        ).strip()
+        state.params = {
+            **params,
+            "answer_markdown": "",
+            "stopped_at": "wiki_extract",
+            "wiki_extract": wiki,
+        }
+        self.store.append_blackboard(
+            state.run_id,
+            {
+                "kind": "builtin",
+                "builtin": "answer_generate",
+                "skipped": True,
+                "reason": "stop_at_wiki_extract",
+                "wiki_chars": len(wiki),
+                "provenance": "orchestrator",
+            },
+        )
+        self.store.write_state(state)
+        return state
+
+    @staticmethod
+    def _answer_resolve_template(params: dict[str, Any]) -> str:
+        """Map run params to a compose template name.
+
+        Example:
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> Orchestrator._answer_resolve_template(
+            ...     {"answer_template": "synthesis_note"}
+            ... )
+            'synthesis_note'
+        """
+        from thot.agent.orchestrator_config import load_orchestrator_config
+
+        raw_template = str(
+            params.get("answer_template")
+            or params.get("template")
+            or params.get("report_form")
+            or ""
+        ).strip()
+        usecase = str(
+            params.get("usecase") or params.get("dataset") or ""
+        ).strip()
+        cfg = load_orchestrator_config(usecase=usecase or None)
+        mapped = cfg.template_for(raw_template) if raw_template else None
+        return (
+            mapped
+            or raw_template
+            or cfg.template_for(cfg.default_report_form)
+            or "synthesis_note"
+        )
+
+    @staticmethod
+    def _answer_findings_from_sources(
+        *, wiki: str, chunks_raw: list[Any]
+    ) -> tuple[str, list[str], list[str]]:
+        """Build findings prose + id lists from wiki extract and grab chunks.
+
+        Example:
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> prose, cids, _ = Orchestrator._answer_findings_from_sources(
+            ...     wiki="",
+            ...     chunks_raw=[{"chunk_id": "c1", "text_raw": "hello world"}],
+            ... )
+            >>> "c1" in cids and "hello" in prose
+            True
+        """
+        findings_lines: list[str] = []
+        chunk_ids: list[str] = []
+        doc_ids: list[str] = []
+        if wiki:
+            findings_lines.append(
+                f"- [executive_summary] Wiki prior:\n{wiki[:1200]}"
+            )
+            findings_lines.append(f"- [situation] Wiki prior:\n{wiki[:1200]}")
+        for raw in chunks_raw[:12]:
+            if not isinstance(raw, dict):
+                continue
+            cid = str(raw.get("chunk_id") or "").strip()
+            text = str(
+                raw.get("text_raw")
+                or raw.get("text")
+                or raw.get("content")
+                or ""
+            ).strip()
+            parent = str(
+                raw.get("parent_doc_id") or raw.get("document_id") or ""
+            ).strip()
+            if not text:
+                continue
+            if cid:
+                chunk_ids.append(cid)
+            if parent:
+                doc_ids.append(parent)
+            clip = text[:600]
+            findings_lines.append(f"- [situation] {clip} (chunk_id={cid})")
+            findings_lines.append(
+                f"- [executive_summary] {clip} (chunk_id={cid})"
+            )
+        return "\n".join(findings_lines), chunk_ids, doc_ids
+
+    async def _run_answer_generate(
+        self, state: RunState, wf_step: WorkflowStep
+    ) -> RunState:
+        """Fill a compose template from chunks (+ optional wiki extract).
+
+        Example:
+            >>> import inspect
+            >>> from thot.agent.orchestrator import Orchestrator
+            >>> inspect.iscoroutinefunction(Orchestrator._run_answer_generate)
+            True
+        """
+        from thot.compose.composer import compose
+        from thot.compose.kg import UserSpaceKG
+        from thot.compose.writers import FindingsGroundedWriter
+        from thot.okf.wiki_match import extract_wiki_sections
+
+        _ = wf_step
+        params = dict(state.params or {})
+        stopped = self._answer_stop_at_wiki(state, params)
+        if stopped is not None:
+            return stopped
+
+        query = str(
+            params.get("query") or params.get("topic") or state.goal or ""
+        ).strip()
+        template = self._answer_resolve_template(params)
+        chunks_raw = params.get("chunks") or params.get("grab_chunks") or []
+        if not isinstance(chunks_raw, list):
+            chunks_raw = []
+
+        wiki = str(
+            params.get("wiki_extract")
+            or params.get("wiki_excerpt")
+            or params.get("wiki_markdown")
+            or ""
+        ).strip()
+        if wiki:
+            wiki = extract_wiki_sections(wiki, max_chars=2400)
+
+        findings_prose, chunk_ids, doc_ids = (
+            self._answer_findings_from_sources(
+                wiki=wiki, chunks_raw=chunks_raw
+            )
+        )
+        if not findings_prose.strip():
+            return self._fail_builtin(
+                state, error="answer_generate: no chunks or wiki extract"
+            )
+
+        writer = FindingsGroundedWriter(
+            findings_context=findings_prose,
+            chunk_ids=chunk_ids,
+            document_ids=doc_ids,
+        )
+        kg = UserSpaceKG(state.user_space, use_process_cache=False)
+        try:
+            result = compose(
+                template,
+                kg=kg,
+                topic=query or state.goal,
+                params={**params, "wiki_excerpt": wiki, "query": query},
+                writer=writer,
+            )
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.exception("answer_generate failed")
+            return self._fail_builtin(
+                state, error=f"answer_generate: {_format_exc(exc)}"
+            )
+
+        markdown = str(getattr(result, "markdown", "") or "")
+        state.params = {
+            **params,
+            "answer_markdown": markdown,
+            "answer_template": template,
+            "wiki_extract": wiki,
+        }
+        state.compose_result = result.model_dump(by_alias=True, mode="json")
+        state.agent = "answer_generate"
+        self.store.append_blackboard(
+            state.run_id,
+            {
+                "kind": "builtin",
+                "builtin": "answer_generate",
+                "template": template,
+                "chunk_count": len(chunk_ids),
+                "has_wiki": bool(wiki),
+                "answer_chars": len(markdown),
+                "provenance": "orchestrator",
+            },
+        )
+        self.guard.emit(
+            kind="agent.answer",
+            state=state,
+            intent="generate",
+            ext={"template": template},
+            chunk_ids=chunk_ids,
+        )
+        self.store.write_state(state)
+        return state
 
     async def _run_okf_iterative_wiki(
         self, state: RunState, wf_step: WorkflowStep
     ) -> RunState:
-        """Build wiki.md by folding evidence chunks via a single LLM pass.
+        """Delegate legacy iterative wiki to :class:`WikiGeneratorWorkflow`.
 
         Example:
             >>> import inspect
@@ -857,132 +1135,12 @@ class Orchestrator:
             >>> inspect.iscoroutinefunction(Orchestrator._run_okf_iterative_wiki)
             True
         """
-        from thot.okf.iterative_wiki import build_wiki_iteratively
-        from thot.okf.store import OkfBundleStore
-
-        params = dict(state.params or {})
-        query = str(
-            params.get("query") or params.get("topic") or state.goal or ""
-        ).strip()
-        bundle_id = str(params.get("bundle_id") or "").strip()
-        root = self._bundle_root(state, bundle_id)
-        if root is None:
-            return self._fail_builtin(
-                state,
-                error=(
-                    "okf_iterative_wiki: missing bundle_id / bundle directory"
-                ),
-            )
-
-        wiki_cfg = self._resolve_wiki_prompt_config(params)
-        chunks = self._wiki_chunks_for_bundle(params, root)
-        # Default 6 — detailed persona merges on local Ollama; cap still 12.
-        max_chunks = max(1, min(int(params.get("max_wiki_chunks") or 6), 12))
-        store = OkfBundleStore()
-        initial = self._seed_or_load_wiki(
-            bundle_id=bundle_id,
-            user_space=state.user_space,
-            query=query,
-            wiki_cfg=wiki_cfg,
-            store=store,
-        )
-
-        def _progress(wiki_text: str, index: int, total: int) -> None:
-            try:
-                store.put_wiki(bundle_id, state.user_space, wiki_text)
-            except Exception:  # noqa: BLE001
-                LOGGER.debug("mid-wiki put failed", exc_info=True)
-            self.store.append_blackboard(
-                state.run_id,
-                {
-                    "kind": "wiki_progress",
-                    "builtin": "okf_iterative_wiki",
-                    "bundle_id": bundle_id,
-                    "chunk_index": index,
-                    "chunk_total": total,
-                    "wiki_chars": len(wiki_text),
-                    "prompt_name": wiki_cfg["prompt_name"],
-                    "provenance": "orchestrator",
-                },
-            )
-            self.store.write_state(state)
-
-        try:
-            wiki = await build_wiki_iteratively(
-                llm=self.llm,
-                query=query,
-                chunks=chunks,
-                initial_wiki=initial,
-                max_chunks=max_chunks,
-                on_progress=_progress,
-                system=wiki_cfg["merge_system"],
-                structured_facts_seed=wiki_cfg["structured_facts_seed"],
-                information_priority_keys=wiki_cfg["priority_keys"],
-            )
-            path = store.put_wiki(bundle_id, state.user_space, wiki)
-        except Exception as exc:  # noqa: BLE001
-            LOGGER.exception("okf_iterative_wiki failed")
-            return self._fail_builtin(
-                state, error=f"okf_iterative_wiki: {_format_exc(exc)}"
-            )
-
-        slim = {
-            k: v
-            for k, v in params.items()
-            if k not in {"chunks", "grab_chunks"}
-        }
-        state.params = {
-            **slim,
-            "wiki_markdown": wiki,
-            "wiki_excerpt": wiki,
-            "has_llm_wiki": "true",
-            "wiki_chunk_count": len(chunks[:max_chunks]),
-            "prompt_name": wiki_cfg["prompt_name"],
-            "wiki_agent": wiki_cfg["prompt_name"],
-        }
-        state.result = self._findings_from_wiki_chunks(
-            chunks,
-            max_chunks=max_chunks,
-            query=query,
-            path=path,
-            prompt_name=wiki_cfg["prompt_name"],
-        )
-        self.store.append_blackboard(
-            state.run_id,
-            {
-                "kind": "builtin",
-                "builtin": "okf_iterative_wiki",
-                "bundle_id": bundle_id,
-                "chunk_count": len(chunks[:max_chunks]),
-                "wiki_chars": len(wiki),
-                "path": str(path),
-                "prompt_name": wiki_cfg["prompt_name"],
-                "provenance": "orchestrator",
-            },
-        )
-        self.guard.emit(
-            kind="okf.wiki.iterative",
-            state=state,
-            intent="okf.wiki",
-            ext={
-                "bundle_id": bundle_id,
-                "chunk_count": len(chunks[:max_chunks]),
-                "prompt_name": wiki_cfg["prompt_name"],
-            },
-        )
-        self.store.write_state(state)
-        return state
+        _ = wf_step
+        return await self._wiki_workflow().run_iterative(state)
 
     @staticmethod
     def _resolve_wiki_prompt_config(params: dict[str, Any]) -> dict[str, Any]:
         """Load persona ``*_prompt`` agent wiki seed/system from run params.
-
-        Args:
-            params: Run params with ``wiki_agent`` / ``prompt_name``.
-
-        Returns:
-            Dict with ``prompt_name``, ``structured_facts_seed``,
-            ``merge_system``, and ``priority_keys``.
 
         Example:
             >>> from thot.agent.orchestrator import Orchestrator
@@ -990,35 +1148,9 @@ class Orchestrator:
             >>> cfg["prompt_name"]
             ''
         """
-        from thot.agent.registry import load_agent_spec
+        from thot.agent.workflows.wiki_generator import WikiGeneratorWorkflow
 
-        name = str(
-            params.get("wiki_agent")
-            or params.get("prompt_name")
-            or params.get("wiki_prompt_agent")
-            or ""
-        ).strip()
-        empty: dict[str, Any] = {
-            "prompt_name": name,
-            "structured_facts_seed": "",
-            "merge_system": "",
-            "priority_keys": [],
-        }
-        if not name:
-            return empty
-        try:
-            spec = load_agent_spec(name)
-        except FileNotFoundError:
-            LOGGER.warning("wiki prompt agent not found: %s", name)
-            return empty
-        return {
-            "prompt_name": name,
-            "structured_facts_seed": (
-                (spec.wiki_structured_facts_seed or "").strip()
-            ),
-            "merge_system": (spec.wiki_merge_system_prompt or "").strip(),
-            "priority_keys": list(spec.wiki_information_priority_keys or []),
-        }
+        return WikiGeneratorWorkflow.resolve_wiki_prompt_config(params)
 
     async def _run_okf_scoped_export(
         self, state: RunState, wf_step: WorkflowStep
@@ -1250,7 +1382,6 @@ class Orchestrator:
             to_agent=wf_step.agent,
             reason=f"workflow:{workflow.name}:{wf_step.id}",
             payload_summary=phase_goal[:240],
-            chunk_ids=_chunk_ids_from_state(state),
         )
         state.handoffs.append(handoff)
         state.agent = wf_step.agent
@@ -1264,7 +1395,6 @@ class Orchestrator:
                 "from": handoff.from_agent,
                 "to": handoff.to_agent,
                 "reason": handoff.reason,
-                "chunk_ids": handoff.chunk_ids,
                 "provenance": "orchestrator",
             },
         )
@@ -1277,7 +1407,6 @@ class Orchestrator:
                 "to_agent": handoff.to_agent,
                 "handoff_id": handoff.handoff_id,
             },
-            chunk_ids=handoff.chunk_ids,
         )
         self.store.write_state(state)
 

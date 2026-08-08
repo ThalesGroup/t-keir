@@ -40,7 +40,8 @@ endif
 	hmi-install hmi-lint hmi-typecheck hmi-build hmi-up \
 	k3d-up k3d-down helm-deps helm-lint helm-template cluster-install cluster-plan cluster-uninstall \
 	k3s-server k3s-agent k3s-check cilium-install lima-k3s-up lima-k3s-down \
-	searxng-up collector collector-up \
+	searxng-up searxng-down collector collector-up collector-query \
+
 	keycloak-export-realm keycloak-sync-demo-users keycloak-purge-demo-users seal kubeflow-install kubeflow-uninstall kubeflow-register-models kubeflow-run-ingest \
 	lineage-report audit-evidence annex-iv \
 	datasets datasets-ontologies datasets-download datasets-ingest datasets-ingest-user datasets-ingest-admin \
@@ -84,6 +85,11 @@ SEARXNG_IMAGE ?= docker.io/searxng/searxng:latest
 SEARXNG_NAME ?= searxng
 SEARXNG_PORT ?= 8888
 COLLECTOR_PORT ?= 8096
+COLLECTOR_URL ?= http://127.0.0.1:$(COLLECTOR_PORT)
+COLLECTOR_QUERY ?= maritime AIS anomaly
+COLLECTOR_TOPIC ?= osint
+COLLECTOR_LANGUAGE ?= en
+COLLECTOR_MAX_RESULTS ?= 3
 SEARXNG_URL ?= http://127.0.0.1:$(SEARXNG_PORT)
 TESTS_DIR := $(ROOT)/tests
 CONFIGS_DIR := $(TKEIR_DIR)/configs
@@ -264,8 +270,8 @@ help: ## Show available targets (VERBOSE=1 prints recipes)
 		| awk 'BEGIN {FS = ":.*?##[[:space:]]*"}; {printf "  \033[36mmake %-28s\033[0m %s\n", $$1, $$2}' \
 		| sort
 	$(Q)printf '%s\n' ""
-	$(Q)printf '%s\n' "Python packages: thot.tools.ingest | thot.tools.search | thot.tools.collector | thot.tools.eval"
-	$(Q)printf '%s\n' "Common vars: PIPELINE_* INDEX_INPUT RAG_QUERY BEIR_* COVERAGE_FAIL_UNDER VERSION WORKSPACE VERBOSE"
+	$(Q)printf '%s\n' "Python packages: thot.tools.ingest | thot.tools.search | thot.tools.collector | thot.tools.okf | thot.tools.eval"
+	$(Q)printf '%s\n' "Common vars: PIPELINE_* INDEX_INPUT RAG_QUERY COLLECTOR_QUERY BEIR_* COVERAGE_FAIL_UNDER VERSION WORKSPACE VERBOSE"
 	$(Q)printf '%s\n' "Workspace:   WORKSPACE=$(WORKSPACE)  OKF_FLAT_ROOT=$(OKF_FLAT_ROOT)  AGENT_ROOT=$(AGENT_ROOT)"
 	$(Q)printf '%s\n' "Image vars:  IMAGE_REGISTRY IMAGE_TAG PLATFORMS MODEL_MODE"
 	$(Q)printf '%s\n' "Compose:     PROFILES=$(PROFILES) (core,auth,ingest,audit,governor,observability,objectstore,mcp,agents,spire)"
@@ -295,14 +301,14 @@ check-git: ## Require a git working tree
 	$(Q)git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { \
 		echo "This directory is not inside a git repository"; exit 1; }
 
-check-jq: ## Require jq (rag-query / smoke-test)
+check-jq: ## Require jq (rag-query / collector-query / smoke-test)
 	$(Q)command -v jq >/dev/null 2>&1 || { \
-		echo "jq is required (used by rag-query / smoke-test). Install: https://stedolan.github.io/jq/"; \
+		echo "jq is required (used by rag-query / collector-query / smoke-test). Install: https://stedolan.github.io/jq/"; \
 		exit 1; }
 
-check-curl: ## Require curl (rag-query / smoke-test)
+check-curl: ## Require curl (rag-query / collector-query / smoke-test)
 	$(Q)command -v curl >/dev/null 2>&1 || { \
-		echo "curl is required (used by rag-query / smoke-test). Install: https://curl.se/"; \
+		echo "curl is required (used by rag-query / collector-query / smoke-test). Install: https://curl.se/"; \
 		exit 1; }
 
 check-python-version: check-uv ## Require uv-managed Python (see PYTHON=)
@@ -383,7 +389,7 @@ setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3 �
 	$(Q)echo "  Or demo:      make quickstart"
 	$(Q)echo "  Vespa:        make bootstrap   # start container + deploy schemas"
 	$(Q)echo "  SearXNG:      make searxng-up  # meta-search on :$(SEARXNG_PORT)"
-	$(Q)echo "  Collector:    make collector   # query → fetch → return markdown docs"
+	$(Q)echo "  Collector:    make collector && make collector-query COLLECTOR_QUERY=\"maritime AIS\""
 	$(Q)echo "  Index:        make index          # thot.tools.ingest"
 	$(Q)echo "  Search/RAG:   make rag            # thot.tools.search"
 	$(Q)echo "  Eval smoke:   make eval-smoke     # thot.tools.eval"
@@ -1187,6 +1193,11 @@ searxng-up: check-docker ## Start SearXNG on :$(SEARXNG_PORT) (volumes under WOR
 		"$(SEARXNG_IMAGE)"
 	$(Q)echo "SearXNG UI/API: $(SEARXNG_URL)  (JSON: $(SEARXNG_URL)/search?q=test&format=json)"
 
+searxng-down: check-docker ## Stop/remove SearXNG container (keeps WORKSPACE/searxng volumes)
+	-$(Q)docker stop "$(SEARXNG_NAME)" >/dev/null 2>&1 || true
+	-$(Q)docker rm "$(SEARXNG_NAME)" >/dev/null 2>&1 || true
+	$(Q)echo "Stopped $(SEARXNG_NAME) (config/data under $(WORKSPACE)/searxng kept)"
+
 collector: ## [collector] Start tkeir-collector API (:$(COLLECTOR_PORT)) — return markdown, no NLP/store
 	$(Q)mkdir -p "$(WORKSPACE)/collector" "$(WORKSPACE)/searxng/config" "$(WORKSPACE)/searxng/data" \
 		"$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)" "$(GOVERNOR_STATE_ROOT)"
@@ -1202,7 +1213,18 @@ collector: ## [collector] Start tkeir-collector API (:$(COLLECTOR_PORT)) — ret
 
 collector-up: collector ## Alias for make collector
 
-.PHONY: pull-searxng searxng-up collector collector-up
+collector-query: check-curl check-jq ## [collector] Sample curl against collector API (/collect)
+	curl -fsS "$(COLLECTOR_URL)/collect" \
+		-H "Content-Type: application/json" \
+		-d "$$(jq -nc \
+			--arg query "$(COLLECTOR_QUERY)" \
+			--arg topic "$(COLLECTOR_TOPIC)" \
+			--arg language "$(COLLECTOR_LANGUAGE)" \
+			--argjson max_results $(COLLECTOR_MAX_RESULTS) \
+			'{query:$$query,topic:$$topic,language:$$language,max_results:$$max_results}')" \
+		| jq .
+
+.PHONY: pull-searxng searxng-up searxng-down collector collector-up collector-query
 
 # VESPA_PULL=1 allows start_vespa.sh to docker-pull when the image is missing.
 VESPA_PULL ?= 0
@@ -1346,10 +1368,10 @@ agent: spire-up ## Start tkeir-agent HTTP service (:8092)
 		TKEIR_WORKSPACE="$(WORKSPACE)" \
 		TKEIR_AGENT_USECASE="$(TKEIR_AGENT_USECASE)" \
 		TKEIR_AGENT_ORCHESTRATOR_CONFIG="$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" \
-		SPIFFE_ENFORCE="${SPIFFE_ENFORCE:-true}" \
+		SPIFFE_ENFORCE="$${SPIFFE_ENFORCE:-true}" \
 		LLM_GENERATE_TIMEOUT_SECONDS="$(LLM_GENERATE_TIMEOUT_SECONDS)" \
 		$(AUDIT_HOST_ENV) \
-		$(UV) run --python $(PYTHON) python -m thot.agent.service
+		$(UV) run --python $(PYTHON) python -m thot.tools.agent
 
 agent-run: check-curl check-jq ## Create agent run and poll (GOAL=… AGENT=researcher)
 	$(Q)resp=$$(curl -fsS "$(AGENT_URL)/agent/runs" \
@@ -1433,7 +1455,7 @@ okf: ## Start OKF server (:8095; bundles under WORKSPACE users/…/okf or OKF_FL
 		GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
 		INGEST_URL="$(or $(INGEST_URL),$(INGEST_API_URL))" \
 		$(AUDIT_HOST_ENV) \
-		$(UV) run --python $(PYTHON) python -m thot.okf.server
+		$(UV) run --python $(PYTHON) python -m thot.tools.okf
 
 # ---------------------------------------------------------------------------
 # Demo runners — start each major component explicitly

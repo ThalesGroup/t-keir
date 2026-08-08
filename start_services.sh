@@ -3,7 +3,8 @@
 #
 # Starts Vespa (vespa-up + bootstrap) → Keycloak → SPIRE → SearXNG → collector →
 # ingest → RAG → governor → audit → OKF → agent → HMI in dedicated tmux windows
-# with health gates.
+# with health gates. Docker windows (Vespa / Keycloak / SPIRE / SearXNG) follow
+# \`docker logs -f\` after start instead of dropping to a shell.
 #
 # Usage:
 #   ./start_services.sh              # create session and attach
@@ -205,12 +206,25 @@ configure_session() {
 # re-run the same service command.
 WINDOW_INDEX=-1
 
+_start_pane() {
+  local title="$1"
+  local pane_script="$2"
+  WINDOW_INDEX=$((WINDOW_INDEX + 1))
+
+  if (( WINDOW_INDEX == 0 )); then
+    "$TMUX_CMD" new-session -d -s "$SESSION" -c "$ROOT" -n "$title" \
+      bash -lc "$pane_script"
+    configure_session
+  else
+    "$TMUX_CMD" new-window -t "$SESSION" -c "$ROOT" -n "$title" \
+      bash -lc "$pane_script"
+  fi
+}
+
 start_window() {
   local title="$1"
   local cmd="$2"
   local pane_script
-  WINDOW_INDEX=$((WINDOW_INDEX + 1))
-
   # shellcheck disable=SC2016
   pane_script="$(cat <<EOF
 cd $(printf '%q' "$ROOT") || exit 1
@@ -222,17 +236,71 @@ printf '\\n[%s] exited %s — CTRL+R to restart, ESC for make down\\n' $(printf 
 exec bash
 EOF
 )"
-
-  if (( WINDOW_INDEX == 0 )); then
-    "$TMUX_CMD" new-session -d -s "$SESSION" -c "$ROOT" -n "$title" \
-      bash -lc "$pane_script"
-    configure_session
-  else
-    "$TMUX_CMD" new-window -t "$SESSION" -c "$ROOT" -n "$title" \
-      bash -lc "$pane_script"
-  fi
-
+  _start_pane "$title" "$pane_script"
   log "started window ${WINDOW_INDEX} ${title}: ${cmd}"
+}
+
+# Docker infra windows: run the up target, then follow container logs (no bash).
+# Extra args are container names for \`docker logs -f\`. CTRL+R re-runs up + follow.
+start_docker_window() {
+  local title="$1"
+  local cmd="$2"
+  shift 2
+  local containers=("$@")
+  local pane_script containers_q="" c
+  [[ ${#containers[@]} -gt 0 ]] || die "start_docker_window: need at least one container name"
+
+  for c in "${containers[@]}"; do
+    containers_q+=" $(printf '%q' "$c")"
+  done
+
+  # shellcheck disable=SC2016
+  pane_script="$(cat <<EOF
+cd $(printf '%q' "$ROOT") || exit 1
+printf '\\n==> %s\\n\\n' $(printf '%q' "$cmd")
+${cmd}
+status=\$?
+if [[ \$status -ne 0 ]]; then
+  printf '\\n[%s] start failed (exit %s) — CTRL+R to retry, ESC for make down\\n' \\
+    $(printf '%q' "$title") "\$status"
+  exec bash
+fi
+
+follow_logs() {
+  local containers=($containers_q)
+  local c pids=()
+  printf '\\n==> docker logs -f --tail=100 %s\\n\\n' "\${containers[*]}"
+  cleanup() {
+    local p
+    for p in "\${pids[@]:-}"; do
+      kill "\$p" 2>/dev/null || true
+    done
+  }
+  trap cleanup EXIT INT TERM
+  if [[ \${#containers[@]} -eq 1 ]]; then
+    docker logs -f --tail=100 "\${containers[0]}"
+    return \$?
+  fi
+  for c in "\${containers[@]}"; do
+    (
+      docker logs -f --tail=100 "\$c" 2>&1 | while IFS= read -r line || [[ -n "\$line" ]]; do
+        printf '[%s] %s\\n' "\$c" "\$line"
+      done
+    ) &
+    pids+=(\$!)
+  done
+  wait
+}
+
+follow_logs
+status=\$?
+printf '\\n[%s] docker logs exited %s — CTRL+R to restart, ESC for make down\\n' \\
+  $(printf '%q' "$title") "\$status"
+exec bash
+EOF
+)"
+  _start_pane "$title" "$pane_script"
+  log "started window ${WINDOW_INDEX} ${title}: ${cmd} → docker logs -f ${containers[*]}"
 }
 
 # ---------------------------------------------------------------------------
@@ -288,12 +356,13 @@ main() {
   log "root=$ROOT KEEP_DATA=$KEEP_DATA"
 
   # Container first (no image pull), then deploy schemas so :8080 serves the app.
-  start_window "[VESPA]" "make vespa-up && make bootstrap"
+  # Docker panes follow container logs (CTRL+R re-runs up + logs).
+  start_docker_window "[VESPA]" "make vespa-up && make bootstrap" vespa
   wait_http "Vespa config" "http://127.0.0.1:19071/state/v1/health" "$TIMEOUT_VESPA"
   wait_http "Vespa query" "http://127.0.0.1:8080/state/v1/health" "$TIMEOUT_VESPA"
   wait_http "Vespa application" "http://127.0.0.1:19071/application/v2/tenant/default/application/default" "$TIMEOUT_VESPA"
 
-  start_window "[KEYCLOAK]" "make keycloak-up"
+  start_docker_window "[KEYCLOAK]" "make keycloak-up" tkeir-keycloak tkeir-keycloak-db
   wait_http "Keycloak" "http://127.0.0.1:8082/realms/tkeir" "$TIMEOUT_KEYCLOAK"
   # Re-sync personas/roles/clearance after Keycloak is healthy (idempotent).
   log "registering Keycloak demo personas (make keycloak-sync-demo-users)…"
@@ -302,10 +371,10 @@ main() {
   fi
   log "Keycloak demo personas registered"
 
-  start_window "[SPIRE]" "make spire-up"
+  start_docker_window "[SPIRE]" "make spire-up" tkeir-spire-server tkeir-spire-agent
   wait_spire "$TIMEOUT_SPIRE"
 
-  start_window "[SEARXNG]" "make searxng-up"
+  start_docker_window "[SEARXNG]" "make searxng-up" searxng
   wait_http "SearXNG" "http://127.0.0.1:8888/healthz" "$TIMEOUT_SEARXNG"
 
   start_window "[COLLECTOR]" "make collector-up"

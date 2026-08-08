@@ -164,6 +164,9 @@ Resolved by `UnifiedLLMWrapper` (`PROVIDER` → provider-specific defaults).
 | `AGENT_ROOT` | `workspace/agent` (Compose: `/var/tkeir/agent`) | Run / publish store |
 | `AGENT_HOST` / `AGENT_PORT` | `0.0.0.0` / `8092` | Agent HTTP |
 | `AGENT_URL` | `http://localhost:8092` | HMI / Make |
+| `TKEIR_AGENT_CONFIG_DIRS` | unset | Extra agent YAML dirs (`:` / `;` separated) |
+| `TKEIR_AGENT_NAMES` | unset | Comma allow-list of agent stems for `tkeir-agent` |
+| `WIKI_MATCH_THRESHOLD` | `0.15` | Jaccard floor to reuse closest user wiki |
 | `AGENT_PUBLISH_OBSERVE_AUTO` | `1` | Auto-publish in observe mode |
 | `SPIFFE_MODE` | `dev` | `off` \| `dev` \| `workload` |
 | `SPIFFE_TRUST_DOMAIN` | `tkeir.local` | Trust domain |

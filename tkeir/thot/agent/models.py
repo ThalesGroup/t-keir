@@ -49,7 +49,10 @@ class AgentSpec(BaseModel):
     """Loaded from ``tkeir/configs/agents/*.yaml`` or ``datasets/*/agents/``.
 
     Persona ``*_prompt`` agents may set wiki generation fields used by the
-    ``okf_iterative_wiki`` builtin (HMI passes ``prompt_name`` / ``wiki_agent``).
+    ``wiki_upsert`` builtin (HMI passes ``prompt_name`` / ``wiki_agent``).
+
+    Prefer constructing an identified :class:`~thot.agent.agent.Agent` via
+    ``Agent.load(name)`` rather than using the raw spec alone.
 
     Example:
         >>> from thot.agent.models import AgentSpec
@@ -66,7 +69,10 @@ class AgentSpec(BaseModel):
     budgets: BudgetLimits = Field(default_factory=BudgetLimits)
     stop: StopCondition = Field(default_factory=StopCondition)
     output_contract: str = "grounded_findings_v1"
-    temperature: float = 0.1
+    temperature: float = 0.0
+    # Tools whose successful observation (``ok: true``) ends the agent phase
+    # without waiting for a separate ``final: true`` model message.
+    terminal_tools: list[str] = Field(default_factory=list)
     # --- OKF wiki generation (persona prompt agents) ---
     wiki_structured_facts_seed: str = Field(
         default="",
@@ -87,7 +93,7 @@ class AgentSpec(BaseModel):
         default_factory=list,
         description=(
             "Optional priority substrings for compact_information_for_prompt "
-            "when ranking ## Information metadata lines."
+            "(persona/use-case specific; empty = preserve Information line order)."
         ),
     )
 
@@ -233,6 +239,9 @@ class RunSpec(BaseModel):
 class Handoff(BaseModel):
     """Explicit supervisor→worker (or worker→worker) handoff record.
 
+    Carries decision/memory context between agents. Index/RAG provenance
+    stays on findings or tool observations — not on the handoff itself.
+
     Example:
         >>> from thot.agent.models import Handoff
         >>> Handoff(from_agent="supervisor", to_agent="researcher").to_agent
@@ -244,7 +253,6 @@ class Handoff(BaseModel):
     to_agent: str
     reason: str = ""
     payload_summary: str = ""
-    chunk_ids: list[str] = Field(default_factory=list)
     at: str = Field(default_factory=utc_now_rfc3339)
 
 

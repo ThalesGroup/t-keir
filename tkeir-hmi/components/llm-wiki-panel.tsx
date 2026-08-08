@@ -282,7 +282,9 @@ export function LlmWikiPanel() {
             query: goal,
             topic: goal,
             max_docs: 40,
-            max_wiki_chunks: 24,
+            max_wiki_chunks: 8,
+            use_wiki: true,
+            search_mode: "both",
           },
         }),
       });

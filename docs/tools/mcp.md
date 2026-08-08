@@ -31,7 +31,7 @@ require the local `tkeir-mcp` process.
 | Tool | Intent | Purpose |
 |------|--------|---------|
 | `search` | `intent:search` | Hybrid retrieval in `user_space` |
-| `rag_query` | `intent:search` | RAG (or retrieval-only if `MCP_RAG_URL` unset) |
+| `rag_query` | `intent:search` | RAG (or retrieval-only if `MCP_RAG_URL` unset); optional `use_wiki` / `wiki_extract` / `answer_template`. Prefer agent `rag_with_wiki` for templated answers |
 | `ontology_query` | `intent:search` | Merge parent RDF + prompt summary |
 | `document_get` | `intent:search` | Fetch one parent doc (cross-tenant denied) |
 

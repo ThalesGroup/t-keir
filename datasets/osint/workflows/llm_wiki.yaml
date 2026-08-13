@@ -1,19 +1,16 @@
 name: llm_wiki
-version: 5
+version: 8
 description: >
-  LLM Wiki workflow: match the closest user OKF wiki via index.md (or create
-  a skeleton bundle from Grab/search chunks), then update wiki.md with a
-  single-pass LLM upsert (no iterative chunk fold). Prefer params.chunks from
-  Reporter Grab when present. Grab/search should use search_mode=both.
-  params.prompt_name / wiki_agent selects a persona *_prompt agent
-  (wiki_structured_facts_seed + wiki_merge_system_prompt). Caps at
-  max_wiki_chunks (default 4, hard max 8). Legacy okf_iterative_wiki remains
-  available only when wiki_mode=iterative on that builtin.
+  LLM Wiki workflow: golden chunks are BGE-M3 agglomerative-clustered, then
+  packed into as few fold calls as fit prompt_char_budget (default 14k chars
+  ≈ 3.5k tokens in). max_fold_calls caps packs (default 3; Osiris uses 2).
+  Near-centroid chunks keep quality; Sources still cite all URLs. Optional
+  timeline_agent adds ## Timeline (one extra call). Set wiki_fold=cluster.
 template: synthesis_note
 budgets:
   llm_tokens: 120000
   tool_calls: 20
-  wall_seconds: 600
+  wall_seconds: 1800
 steps:
   - id: wiki
     builtin: wiki_upsert
@@ -22,10 +19,22 @@ steps:
         query,
         topic,
         chunks,
+        clusters,
+        preclustered,
         use_wiki,
         wiki_match_threshold,
         max_wiki_chunks,
+        max_chunk_chars,
+        max_wiki_chars,
         prompt_name,
         wiki_agent,
+        timeline_agent,
+        wiki_fold,
+        wiki_mode,
+        cluster_similarity,
+        max_clusters,
+        per_cluster_for_llm,
+        prompt_char_budget,
+        max_fold_calls,
       ]
     output_key: wiki_markdown

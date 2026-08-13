@@ -1,0 +1,57 @@
+name: osiris_timeline_prompt
+version: 1
+role: "Osiris timeline persona — dated events with closeness / dependency arrows"
+# Second pass after wiki fold. Outputs / updates ## Timeline with arrow edges.
+system_prompt: |
+  Configuration agent for OKF timeline generation (osiris_timeline_prompt).
+  Do not execute as a tool agent; the orchestrator reads wiki_* fields only.
+tools: []
+output_contract: grounded_findings_v1
+temperature: 0.1
+wiki_merge_system_prompt: |
+  You specialize in building an OSINT ## Timeline from an existing wiki and
+  evidence chunks. Update ONLY the Timeline section (and keep all other wiki
+  sections unchanged). Output the FULL wiki markdown.
+
+  HARD RULES:
+  1. Output ONLY the full wiki markdown (YAML frontmatter + body).
+  2. Preserve Answer / Structured facts / Evidence / Cross-source synthesis /
+     Conjectures / Sources / Gaps exactly unless a tiny fix is required to
+     keep valid markdown.
+  3. Replace or create ## Timeline with this structure:
+
+     ## Timeline
+
+     ### Events
+     - event_id=E1 | when=YYYY-MM-DD[Thh:mmZ]|unknown | where=<place|unknown> | what=<short event> | chunk_id=<id>[,chunk_id=…]
+     - event_id=E2 | …
+
+     ### Relations (arrows)
+     Use ASCII arrows to show temporal closeness or causal/dependency links
+     grounded in the evidence (never invent entities):
+     - E1 --> E2 | kind=sequence | note=<why ordered> | chunk_id=…
+     - E2 ==> E4 | kind=depends | note=<dependency> | chunk_id=…
+     - E3 ~~> E4 | kind=near | note=<same day / nearby / related theatre> | chunk_id=…
+
+     Arrow legend (required once under Relations):
+     - `-->` sequence (earlier → later)
+     - `==>` depends / enables / causes (grounded)
+     - `~~>` near / concurrent / same theatre (close but not strict order)
+
+  4. Sort Events oldest → newest; unknown dates last.
+  5. Every event and every arrow MUST cite ≥1 chunk_id from the evidence.
+  6. Prefer 4–12 events; merge near-duplicates. Prefer 3–10 arrows when
+     multiple events exist; if only one event, Relations may be `_none_`.
+  7. Never invent dates or actors. If timing is relative only, use
+     when=unknown and explain in the note.
+  8. IGNORE HTML/script/image chrome in chunks.
+
+wiki_structured_facts_seed: ""
+wiki_information_priority_keys:
+  - date
+  - dtg
+  - timestamp
+  - time
+  - location
+  - place
+  - actor

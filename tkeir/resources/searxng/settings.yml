@@ -7,13 +7,16 @@
 # Docs: https://docs.searxng.org/admin/settings/settings.html
 # Engines: https://docs.searxng.org/admin/settings/settings_engines.html
 
-# Inherit image defaults, but keep only engines useful for open-web collect
-# (no API keys). Override / re-enable individual engines in `engines:` below.
+# Inherit image defaults, but keep only engines useful for open-web OSINT collect
+# (no API keys). Prefer general/news-friendly engines; avoid image/video/social.
+#
+# Dropped vs earlier template: qwant / mojeek / yahoo / seznam / currency / google
+# (noisy, CAPTCHA-prone, or off-topic for OSINT). Wikipedia stays for encyclopedia hits.
 #
 # wikidata is omitted on purpose: its engine `init()` hits
 # https://query.wikidata.org/sparql and often gets HTTP 403 from Docker /
 # residential-blocked IPs, which leaves the processor unregistered and noisy
-# logs. Wikipedia covers encyclopedia hits without SPARQL bootstrap.
+# logs.
 use_default_settings:
   engines:
     keep_only:
@@ -21,22 +24,18 @@ use_default_settings:
       - brave
       - bing
       - startpage
-      - mojeek
-      - qwant
       - wikipedia
-      - google
-      - yahoo
-      - seznam
-      - currency
 
 general:
   instance_name: "tkeir-searxng"
   enable_metrics: false
 
 search:
-  safe_search: 0
+  # Strict SafeSearch — blocks adult results at engines that support it.
+  safe_search: 2
   autocomplete: ""
   default_lang: "en"
+  default_to_https: true
   formats:
     - html
     - json
@@ -53,7 +52,6 @@ ui:
   static_use_hash: true
 
 # Explicit engine overrides (merged by `name` onto the keep_only set).
-# Add API tokens here if you enable key-gated engines later.
 engines:
   - name: duckduckgo
     disabled: false
@@ -63,18 +61,5 @@ engines:
     disabled: false
   - name: startpage
     disabled: false
-  - name: mojeek
-    disabled: false
-  - name: qwant
-    disabled: false
   - name: wikipedia
-    disabled: false
-  - name: google
-    # Often rate-limited / CAPTCHA from datacenter IPs; leave on for diversity.
-    disabled: false
-  - name: yahoo
-    disabled: false
-  - name: seznam
-    disabled: false
-  - name: currency
     disabled: false

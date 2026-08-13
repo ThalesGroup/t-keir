@@ -34,6 +34,20 @@ class CollectorSettings:
     user_agent: str
     simhash_max_hamming: int
     batch_concurrency: int
+    # OSINT-oriented SearXNG defaults (override via env / request body).
+    searx_categories: str
+    searx_engines: str
+    searx_safesearch: int
+    searx_time_range: str
+    # Allowlist of reliable OSINT host suffixes (YAML path).
+    osint_sources_path: str
+    # Osiris origin for /feed routing (e.g. http://127.0.0.1:3000).
+    osiris_base_url: str
+    # tkeir-agent for live wiki (golden chunks → llm_wiki).
+    agent_url: str
+    # Background wiki interval loop (0 = off). Per-feed wiki still always runs.
+    wiki_enabled: bool
+    wiki_interval_s: int
 
 
 def collector_settings() -> CollectorSettings:
@@ -48,6 +62,16 @@ def collector_settings() -> CollectorSettings:
         >>> s.port > 0
         True
     """
+    from thot.tools.collector.quality import resolve_osint_sources_path
+    from thot.tools.collector.forge_config import ensure_workspace_forge_config
+
+    wiki_interval = max(0, int(os.getenv("COLLECTOR_WIKI_INTERVAL_S", "0")))
+    wiki_enabled_env = os.getenv("COLLECTOR_WIKI_ENABLED", "false").strip().lower()
+    wiki_enabled = wiki_enabled_env in {"1", "true", "yes", "on"} and wiki_interval > 0
+
+    ws = workspace_root()
+    ensure_workspace_forge_config(ws)
+
     return CollectorSettings(
         host=os.getenv("COLLECTOR_HOST", "0.0.0.0"),
         port=int(os.getenv("COLLECTOR_PORT", "8096")),
@@ -55,7 +79,7 @@ def collector_settings() -> CollectorSettings:
             "/"
         ),
         workspace=workspace_root(),
-        max_results=max(1, int(os.getenv("COLLECTOR_MAX_RESULTS", "5"))),
+        max_results=max(1, int(os.getenv("COLLECTOR_MAX_RESULTS", "6"))),
         fetch_timeout_s=float(os.getenv("COLLECTOR_FETCH_TIMEOUT_S", "30")),
         user_agent=os.getenv(
             "COLLECTOR_USER_AGENT",
@@ -67,6 +91,29 @@ def collector_settings() -> CollectorSettings:
         batch_concurrency=max(
             1, int(os.getenv("COLLECTOR_BATCH_CONCURRENCY", "4"))
         ),
+        searx_categories=os.getenv(
+            "COLLECTOR_SEARX_CATEGORIES", "general,news,science"
+        ).strip()
+        or "general,news,science",
+        searx_engines=os.getenv(
+            "COLLECTOR_SEARX_ENGINES",
+            "duckduckgo,brave,startpage,wikipedia",
+        ).strip(),
+        searx_safesearch=max(
+            0, min(2, int(os.getenv("COLLECTOR_SEARX_SAFESEARCH", "2")))
+        ),
+        searx_time_range=os.getenv("COLLECTOR_SEARX_TIME_RANGE", "").strip(),
+        osint_sources_path=str(resolve_osint_sources_path()),
+        osiris_base_url=os.getenv(
+            "OSIRIS_BASE_URL",
+            os.getenv("COLLECTOR_OSIRIS_URL", "http://127.0.0.1:3000"),
+        ).rstrip("/"),
+        agent_url=os.getenv(
+            "AGENT_URL",
+            os.getenv("COLLECTOR_AGENT_URL", "http://127.0.0.1:8092"),
+        ).rstrip("/"),
+        wiki_enabled=wiki_enabled,
+        wiki_interval_s=wiki_interval,
     )
 
 

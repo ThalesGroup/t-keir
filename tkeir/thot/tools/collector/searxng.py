@@ -56,6 +56,9 @@ async def searxng_search(
     timeout_s: float = 30.0,
     language: str | None = None,
     categories: str | None = None,
+    engines: str | None = None,
+    safesearch: int | None = None,
+    time_range: str | None = None,
 ) -> list[dict[str, str]]:
     """Query SearXNG ``/search?format=json`` and return normalized hits.
 
@@ -65,7 +68,10 @@ async def searxng_search(
         max_results: Cap on returned hits.
         timeout_s: HTTP timeout.
         language: Optional ``language`` query param.
-        categories: Optional ``categories`` query param.
+        categories: Optional ``categories`` query param (e.g. ``general,news``).
+        engines: Optional comma-separated engine names.
+        safesearch: Optional ``0`` / ``1`` / ``2`` (strict).
+        time_range: Optional ``day`` / ``week`` / ``month`` / ``year``.
 
     Returns:
         Normalized result dicts.
@@ -84,6 +90,12 @@ async def searxng_search(
         params["language"] = language
     if categories:
         params["categories"] = categories
+    if engines:
+        params["engines"] = engines
+    if safesearch is not None:
+        params["safesearch"] = str(int(safesearch))
+    if time_range:
+        params["time_range"] = time_range
     url = f"{base_url.rstrip('/')}/search"
     try:
         async with httpx.AsyncClient(

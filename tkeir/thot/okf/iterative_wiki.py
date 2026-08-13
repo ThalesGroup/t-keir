@@ -108,6 +108,18 @@ def seed_iterative_wiki(
         [
             "## Evidence",
             "",
+            "## Timeline",
+            "",
+            "_Filled by timeline persona: Events + Relations arrows._",
+            "",
+            "## Cross-source synthesis",
+            "",
+            "_Link claims across distinct sources; cite ≥2 chunk_ids per bullet._",
+            "",
+            "## Conjectures",
+            "",
+            "- _none grounded_",
+            "",
             "## Sources",
             "",
             "## Gaps",
@@ -584,6 +596,65 @@ def extract_wiki_markdown(raw: str, *, fallback: str) -> str:
     return fallback
 
 
+def ensure_osiris_panel_sections(wiki: str) -> str:
+    """Ensure Timeline / Cross-source / Conjectures panels exist for the UI.
+
+    When LLM folds timeout or strip sections, Osiris loses the highlighted
+    panels. Re-inject empty placeholders before Sources/Gaps without wiping
+    existing content.
+    """
+    text = (wiki or "").rstrip()
+    if not text:
+        return text
+
+    def _has(heading: str) -> bool:
+        return bool(
+            re.search(rf"(?im)^##\s+{re.escape(heading)}\s*$", text)
+        )
+
+    inserts: list[tuple[str, str]] = []
+    if not _has("Timeline") and not _has("Events"):
+        inserts.append(
+            (
+                "Timeline",
+                "## Timeline\n\n"
+                "### Events\n\n"
+                "- _pending dated events_\n\n"
+                "### Relations\n\n"
+                "- _pending arrows_\n",
+            )
+        )
+    if not (
+        _has("Cross-source synthesis")
+        or _has("Event correlation")
+        or _has("Cross-source")
+    ):
+        inserts.append(
+            (
+                "Cross-source synthesis",
+                "## Cross-source synthesis\n\n"
+                "- _pending multi-source links_\n",
+            )
+        )
+    if not _has("Conjectures"):
+        inserts.append(
+            (
+                "Conjectures",
+                "## Conjectures\n\n- _none grounded_\n",
+            )
+        )
+    if not inserts:
+        return text + ("\n" if not text.endswith("\n") else "")
+
+    block = "\n\n".join(body for _, body in inserts)
+    # Insert before Sources or Gaps; else append.
+    for anchor in (r"(?im)^##\s+Sources\b", r"(?im)^##\s+Gaps\b"):
+        m = re.search(anchor, text)
+        if m:
+            return text[: m.start()].rstrip() + "\n\n" + block + "\n\n" + text[m.start() :]
+    return text + "\n\n" + block + "\n"
+
+
 def ensure_sources_section(wiki: str, chunks: list[dict[str, str]]) -> str:
     """Guarantee a Sources section listing every processed chunk_id.
 
@@ -650,6 +721,139 @@ def _chunk_narrative_budget(total_chunks: int) -> int:
     n = max(1, int(total_chunks or 1))
     # Aim for ≤ ~14k narrative chars across the batch (plus system + wiki seed).
     return max(1000, min(2800, 14000 // n))
+
+
+def estimate_chars_to_tokens(chars: int) -> int:
+    """Rough token estimate for English/OSINT prose (~4 chars/token)."""
+    return max(1, int(chars) // 4)
+
+
+def estimate_fold_prompt_chars(
+    *,
+    wiki_chars: int,
+    chunk_count: int,
+    max_chunk_chars: int,
+    query_chars: int = 400,
+    system_chars: int = 1800,
+) -> int:
+    """Estimate one cluster-fold prompt size (chars) before calling the LLM."""
+    n = max(1, int(chunk_count))
+    per = max(400, min(int(max_chunk_chars), 14000 // n))
+    # Overhead: wrappers, headers, separators (~800) + per-chunk headers (~120).
+    return (
+        int(system_chars)
+        + int(query_chars)
+        + 800
+        + max(0, int(wiki_chars))
+        + n * (per + 120)
+    )
+
+
+def pack_clusters_for_llm_budget(
+    clusters: list[list[dict[str, Any]]],
+    *,
+    wiki_chars: int,
+    max_chunk_chars: int,
+    prompt_char_budget: int = 14000,
+    max_fold_calls: int = 3,
+    query_chars: int = 400,
+    system_chars: int = 1800,
+) -> list[list[dict[str, Any]]]:
+    """Merge agglomerative clusters into as few LLM fold calls as fit the budget.
+
+    Quality rule: keep near-centroid chunks; only *pack* whole clusters together
+    when the combined prompt stays under ``prompt_char_budget``. Cap the number
+    of fold calls at ``max_fold_calls`` (timeline is a separate call).
+
+    Example:
+        >>> packs = pack_clusters_for_llm_budget(
+        ...     [[{"chunk_id": "a", "text_raw": "x" * 200}]],
+        ...     wiki_chars=500,
+        ...     max_chunk_chars=800,
+        ...     prompt_char_budget=14000,
+        ... )
+        >>> len(packs) == 1
+        True
+    """
+    groups = [list(g) for g in clusters if g]
+    if not groups:
+        return []
+    budget = max(6000, int(prompt_char_budget))
+    max_calls = max(1, min(8, int(max_fold_calls)))
+
+    def _fits(batch: list[dict[str, Any]], wiki_c: int) -> bool:
+        return (
+            estimate_fold_prompt_chars(
+                wiki_chars=wiki_c,
+                chunk_count=len(batch),
+                max_chunk_chars=max_chunk_chars,
+                query_chars=query_chars,
+                system_chars=system_chars,
+            )
+            <= budget
+        )
+
+    # Later folds see a larger wiki — reserve less for evidence after call 1.
+    packs: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+    # Call 1 starts from a short seed; subsequent calls assume a grown wiki.
+    wiki_for_pack = max(800, min(int(wiki_chars), budget // 3))
+
+    for group in groups:
+        candidate = current + list(group)
+        if current and not _fits(candidate, wiki_for_pack):
+            packs.append(current)
+            current = list(group)
+            # After first pack, assume wiki grew; shrink evidence room.
+            wiki_for_pack = max(wiki_for_pack, min(budget // 2, max(wiki_chars, 4000)))
+            if not _fits(current, wiki_for_pack):
+                # Single huge cluster: still send it (fold will truncate per-chunk).
+                packs.append(current)
+                current = []
+            if len(packs) >= max_calls:
+                break
+            continue
+        if not current and not _fits(list(group), wiki_for_pack):
+            packs.append(list(group))
+            wiki_for_pack = max(wiki_for_pack, min(budget // 2, max(wiki_chars, 4000)))
+            if len(packs) >= max_calls:
+                break
+            continue
+        current = candidate
+
+    if current and len(packs) < max_calls:
+        packs.append(current)
+    elif current and packs:
+        # Overflow into last pack (fold truncates) rather than drop evidence.
+        packs[-1].extend(current)
+
+    # If we stopped early due to max_calls, fold remaining into the last pack.
+    if len(packs) >= max_calls and groups:
+        used_ids = {
+            str(c.get("chunk_id") or id(c))
+            for pack in packs
+            for c in pack
+        }
+        leftover: list[dict[str, Any]] = []
+        for group in groups:
+            for c in group:
+                key = str(c.get("chunk_id") or id(c))
+                if key not in used_ids:
+                    leftover.append(c)
+                    used_ids.add(key)
+        if leftover:
+            packs[-1].extend(leftover)
+
+    LOGGER.info(
+        "fold packing: clusters=%s → packs=%s sizes=%s budget_chars=%s "
+        "(~%s tokens in)",
+        len(groups),
+        len(packs),
+        [len(p) for p in packs],
+        budget,
+        estimate_chars_to_tokens(budget),
+    )
+    return packs
 
 
 def _format_chunk_block(
@@ -801,6 +1005,339 @@ Do not invent facts outside the provided wiki extract and new chunks.
 """
 
 
+_DEFAULT_CHUNK_FOLD_SYSTEM = """\
+You UPDATE an existing OKF LLMWiki by folding ONE new evidence chunk.
+Preserve all prior grounded facts, citations, Timeline entries, and
+Cross-source synthesis. Integrate new claims with chunk_id= citations.
+Never invent hard facts. Prefer expanding Answer / Evidence / Timeline /
+Cross-source synthesis / Conjectures over rewriting from scratch.
+Strip any HTML, script, or image chrome from the chunk — keep prose only.
+Output ONLY the full updated wiki markdown (YAML frontmatter + body).
+"""
+
+
+_DEFAULT_CLUSTER_FOLD_SYSTEM = """\
+You UPDATE an existing OKF LLMWiki by folding ONE evidence CLUSTER
+(semantically related chunks). Preserve prior grounded facts and citations.
+Integrate every chunk in the cluster with chunk_id= cites. Prefer dated
+claims in Answer / Evidence / Structured facts. Never invent hard facts.
+Strip HTML/script/image chrome. Output ONLY the full updated wiki markdown.
+"""
+
+
+_DEFAULT_TIMELINE_SYSTEM = """\
+You update ONLY the ## Timeline section of an OKF wiki: dated events plus
+arrow relations (--> sequence, ==> depends, ~~> near). Preserve Answer /
+Evidence / all other sections unchanged. Cite chunk_id= on every event and
+arrow. Output the FULL wiki markdown.
+"""
+
+
+def _wiki_context_for_fold(current_wiki: str, *, max_chars: int) -> str:
+    """Pass enough of the live wiki so iterative folds cannot drop Answer."""
+    text = (current_wiki or "").strip()
+    if not text:
+        return "(empty wiki — start from seed structure)"
+    budget = max(2000, int(max_chars))
+    if len(text) <= budget:
+        return text
+    # Prefer keeping Answer + Structured facts + tail (Sources).
+    from thot.okf.wiki_match import extract_wiki_sections
+
+    head = extract_wiki_sections(text, max_chars=budget // 2, include_structured=True)
+    tail = text[-(budget // 2) :].lstrip()
+    return (
+        head
+        + "\n\n…[middle sections omitted for prompt budget]…\n\n"
+        + tail
+    )
+
+
+async def fold_one_chunk_into_wiki(
+    *,
+    llm: Any,
+    query: str,
+    chunk: dict[str, str],
+    current_wiki: str,
+    index: int,
+    total: int,
+    temperature: float = 0.1,
+    system: str | None = None,
+    information_priority_keys: list[str] | tuple[str, ...] | None = None,
+    max_chunk_chars: int = 2800,
+    max_wiki_chars: int = 14000,
+) -> str:
+    """Fold a single evidence chunk into the current wiki (true iterative step)."""
+    block = _format_chunk_block(
+        chunk,
+        index,
+        total,
+        priority_keys=information_priority_keys,
+        max_chars=max_chunk_chars,
+    )
+    wiki_excerpt = _wiki_context_for_fold(
+        current_wiki, max_chars=max(4000, int(max_wiki_chars))
+    )
+    prompt = "\n".join(
+        [
+            f"Analyst query / request:\n{query.strip()}",
+            "",
+            f"Fold evidence chunk {index}/{total} into the wiki. Keep prior "
+            "content; add new grounded claims with dates when known.",
+            "",
+            "Current wiki (authoritative prior):",
+            "===== WIKI START =====",
+            wiki_excerpt,
+            "===== WIKI END =====",
+            "",
+            "NEW evidence chunk:",
+            block,
+            "",
+            "Return the FULL updated wiki markdown only.",
+        ]
+    )
+    raw = await llm.generate(
+        prompt,
+        system=(system or "").strip() or _DEFAULT_CHUNK_FOLD_SYSTEM,
+        temperature=temperature,
+    )
+    return extract_wiki_markdown(str(raw or ""), fallback=current_wiki)
+
+
+async def fold_cluster_into_wiki(
+    *,
+    llm: Any,
+    query: str,
+    cluster: list[dict[str, str]],
+    current_wiki: str,
+    index: int,
+    total: int,
+    temperature: float = 0.1,
+    system: str | None = None,
+    information_priority_keys: list[str] | tuple[str, ...] | None = None,
+    max_chunk_chars: int = 2200,
+    max_wiki_chars: int = 14000,
+) -> str:
+    """Fold one BGE-clustered group of chunks into the wiki (one LLM call)."""
+    n = max(1, len(cluster))
+    per = max(800, min(int(max_chunk_chars), 14000 // n))
+    blocks = [
+        _format_chunk_block(
+            chunk,
+            i,
+            n,
+            priority_keys=information_priority_keys,
+            max_chars=per,
+        )
+        for i, chunk in enumerate(cluster, start=1)
+    ]
+    wiki_excerpt = _wiki_context_for_fold(
+        current_wiki, max_chars=max(5000, int(max_wiki_chars))
+    )
+    prompt = "\n".join(
+        [
+            f"Analyst query / request:\n{query.strip()}",
+            "",
+            f"Fold evidence CLUSTER {index}/{total} "
+            f"({n} chunk(s) near the agglomerative cluster center) into a "
+            "COMPREHENSIVE world-situation wiki. Expand ## Answer with "
+            "multi-paragraph dated narrative covering what/who/where/when/"
+            "so-what. Keep prior sections; emphasize dates / theatres.",
+            "",
+            "Current wiki (authoritative prior — preserve and enrich):",
+            "===== WIKI START =====",
+            wiki_excerpt,
+            "===== WIKI END =====",
+            "",
+            "NEW evidence cluster:",
+            *blocks,
+            "",
+            "Return the FULL updated wiki markdown only.",
+        ]
+    )
+    system_prompt = (system or "").strip() or _DEFAULT_CLUSTER_FOLD_SYSTEM
+    try:
+        raw = await llm.generate(
+            prompt,
+            system=system_prompt,
+            temperature=temperature,
+        )
+    except TimeoutError:
+        # Local Ollama often stalls on huge fold prompts — retry once leaner.
+        LOGGER.warning(
+            "fold_cluster timeout cluster=%s/%s — retrying with truncated prompt",
+            index,
+            total,
+        )
+        lean_wiki = _wiki_context_for_fold(
+            current_wiki, max_chars=max(3500, int(max_wiki_chars) // 2)
+        )
+        lean_per = max(500, min(900, per // 2))
+        lean_blocks = [
+            _format_chunk_block(
+                chunk,
+                i,
+                n,
+                priority_keys=information_priority_keys,
+                max_chars=lean_per,
+            )
+            for i, chunk in enumerate(cluster, start=1)
+        ]
+        lean_prompt = "\n".join(
+            [
+                f"Analyst query:\n{query.strip()[:800]}",
+                "",
+                f"Fold CLUSTER {index}/{total} into the wiki. Keep ## Answer "
+                "and prior sections; add dated facts only.",
+                "",
+                "===== WIKI START =====",
+                lean_wiki,
+                "===== WIKI END =====",
+                "",
+                "NEW evidence:",
+                *lean_blocks,
+                "",
+                "Return FULL updated wiki markdown only.",
+            ]
+        )
+        raw = await llm.generate(
+            lean_prompt,
+            system=system_prompt,
+            temperature=temperature,
+        )
+    return extract_wiki_markdown(str(raw or ""), fallback=current_wiki)
+
+
+def _section_body(markdown: str, heading: str) -> str | None:
+    """Return body under ``## <heading>`` or None."""
+    pattern = re.compile(
+        rf"(?ims)^##\s+{re.escape(heading)}\s*\n(.*?)(?=^##\s+|\Z)"
+    )
+    m = pattern.search(markdown or "")
+    return m.group(1).strip() if m else None
+
+
+def merge_timeline_into_wiki(prior_wiki: str, timeline_wiki: str) -> str:
+    """Keep the situation report; splice ## Timeline from ``timeline_wiki``.
+
+    If the timeline model dropped Answer / Evidence, restore them from
+    ``prior_wiki`` instead of shipping an empty report.
+    """
+    prior = (prior_wiki or "").strip()
+    updated = (timeline_wiki or "").strip()
+    if not updated:
+        return prior
+    if not prior:
+        return updated
+
+    prior_answer = _section_body(prior, "Answer")
+    updated_answer = _section_body(updated, "Answer")
+    # Timeline-only (or Answer stripped) → graft Timeline into prior report.
+    if prior_answer and not updated_answer:
+        tl = _section_body(updated, "Timeline")
+        if not tl and "## Timeline" in updated:
+            # Whole body is mostly timeline.
+            tl_m = re.search(
+                r"(?ims)^##\s+Timeline\s*\n.*?(?=^##\s+Sources\b|\Z)",
+                updated,
+            )
+            tl = tl_m.group(0).strip() if tl_m else updated
+        else:
+            tl = f"## Timeline\n\n{tl}" if tl else ""
+        if not tl:
+            return prior
+        # Remove old Timeline from prior, insert before Sources (or append).
+        base = re.sub(
+            r"(?ims)^##\s+Timeline\s*\n.*?(?=^##\s+|\Z)",
+            "",
+            prior,
+        ).rstrip()
+        src_m = re.search(r"(?im)^##\s+Sources\b", base)
+        if src_m:
+            return (
+                base[: src_m.start()].rstrip()
+                + "\n\n"
+                + tl.strip()
+                + "\n\n"
+                + base[src_m.start() :].lstrip()
+            ).strip() + "\n"
+        return (base + "\n\n" + tl.strip() + "\n").strip() + "\n"
+
+    # Both have Answer — prefer longer narrative body.
+    if prior_answer and updated_answer and len(prior_answer) > len(updated_answer) * 1.4:
+        tl = _section_body(updated, "Timeline")
+        if tl:
+            return merge_timeline_into_wiki(
+                prior, f"## Timeline\n\n{tl}\n"
+            )
+    return updated
+
+
+async def build_timeline_pass(
+    *,
+    llm: Any,
+    query: str,
+    chunks: list[dict[str, str]],
+    current_wiki: str,
+    temperature: float = 0.1,
+    system: str | None = None,
+    information_priority_keys: list[str] | tuple[str, ...] | None = None,
+    max_chunk_chars: int = 1600,
+    max_wiki_chars: int = 24000,
+    max_chunks: int = 24,
+) -> str:
+    """Second-pass LLM: build ## Timeline with event arrows; keep rest of wiki."""
+    usable = [
+        c
+        for c in enrich_chunks_with_sibling_information(chunks)
+        if (c.get("text_raw") or "").strip()
+        or (c.get("information") or "").strip()
+    ][: max(1, min(int(max_chunks), 40))]
+    # Pass the FULL report (not Answer-only extract) so the model cannot
+    # "forget" Answer / Evidence when rewriting.
+    wiki_full = (current_wiki or "").strip()
+    if len(wiki_full) > max(2000, int(max_wiki_chars)):
+        wiki_full = wiki_full[: int(max_wiki_chars)].rstrip() + "\n…[truncated]"
+    blocks = [
+        _format_chunk_block(
+            chunk,
+            i,
+            len(usable),
+            priority_keys=information_priority_keys,
+            max_chars=max_chunk_chars,
+        )
+        for i, chunk in enumerate(usable, start=1)
+    ]
+    prompt = "\n".join(
+        [
+            f"Analyst query / request:\n{query.strip()}",
+            "",
+            "Build / replace ## Timeline with dated Events and Relations "
+            "arrows (--> sequence, ==> depends, ~~> near).",
+            "CRITICAL: Return the FULL wiki. Preserve ## Answer, Structured "
+            "facts, Evidence, Cross-source synthesis, Conjectures, Sources, "
+            "Gaps verbatim — only add/replace ## Timeline.",
+            "",
+            "Current wiki (MUST be preserved except Timeline):",
+            "===== WIKI START =====",
+            wiki_full,
+            "===== WIKI END =====",
+            "",
+            "Evidence chunks for dating and links:",
+            *blocks,
+            "",
+            "Return the FULL updated wiki markdown only.",
+        ]
+    )
+    raw = await llm.generate(
+        prompt,
+        system=(system or "").strip() or _DEFAULT_TIMELINE_SYSTEM,
+        temperature=temperature,
+    )
+    updated = extract_wiki_markdown(str(raw or ""), fallback=current_wiki)
+    return merge_timeline_into_wiki(current_wiki, updated)
+
+
 async def build_wiki_upsert_pass(
     *,
     llm: Any,
@@ -833,7 +1370,7 @@ async def build_wiki_upsert_pass(
         for c in enrich_chunks_with_sibling_information(chunks)
         if (c.get("text_raw") or "").strip()
         or (c.get("information") or "").strip()
-    ][: max(1, min(int(max_chunks), 8))]
+    ][: max(1, min(int(max_chunks), 12))]
     wiki_base = (current_wiki or "").strip()
     if not wiki_base:
         wiki_base = seed_iterative_wiki(
@@ -891,39 +1428,27 @@ async def build_wiki_iteratively(
     system: str | None = None,
     structured_facts_seed: str | None = None,
     information_priority_keys: list[str] | tuple[str, ...] | None = None,
+    sequential: bool = False,
+    cluster: bool = False,
+    cluster_similarity: float = 0.55,
+    max_clusters: int = 8,
+    max_chunk_chars: int = 2800,
+    max_wiki_chars: int = 24000,
+    prebuilt_clusters: list[list[dict[str, str]]] | None = None,
+    per_cluster_for_llm: int = 5,
+    prompt_char_budget: int = 14000,
+    max_fold_calls: int = 3,
 ) -> str:
     """Fold chunks into a wiki via LLM.
 
-    Default path is a **single** LLM call over at most ``max_chunks`` (6).
-    Sequential per-chunk merges are intentionally avoided — they routinely
-    exceed Reporter poll windows (15–30+ minutes for ~24 chunks).
-
-    Persona ``*_prompt`` agents supply ``structured_facts_seed`` /
-    ``system`` / ``information_priority_keys`` via the orchestrator.
-
-    Args:
-        llm: Async LLM client exposing ``generate(prompt, ...)``.
-        query: Analyst query or request text.
-        chunks: Normalized evidence chunk dicts.
-        initial_wiki: Optional starting wiki when no chunks are usable.
-        max_chunks: Upper bound on chunks folded (hard-capped at 12).
-        temperature: Sampling temperature for the merge call.
-        on_progress: Optional ``(wiki, done, total)`` callback.
-        system: Optional system prompt override.
-        structured_facts_seed: Optional Structured facts seed markdown.
-        information_priority_keys: Optional Information compaction keys.
-
-    Returns:
-        Full wiki markdown after merge and Sources enforcement.
-
-    Example:
-        >>> import inspect
-        >>> from thot.okf.iterative_wiki import build_wiki_iteratively
-        >>> inspect.iscoroutinefunction(build_wiki_iteratively)
-        True
+    Modes:
+      - ``cluster=True``: BGE agglomerative → pack clusters into ≤``max_fold_calls``
+        LLM folds that fit ``prompt_char_budget`` (quality via near-centroids)
+      - ``sequential=True``: one LLM call per chunk (slow; avoid for local LLMs)
+      - else: single-pass merge over at most ``max_chunks``
     """
-    # Hard cap: never fold more than 12 chunks even if caller asks for more.
-    capped = max(1, min(int(max_chunks or 6), 12))
+    # Hard cap raised: situation reports need enough textual material.
+    capped = max(1, min(int(max_chunks or 6), 48))
     enriched = enrich_chunks_with_sibling_information(chunks)
     usable = [
         c
@@ -932,12 +1457,151 @@ async def build_wiki_iteratively(
         or (c.get("information") or "").strip()
     ][:capped]
     seed_kwargs = {"structured_facts_seed": structured_facts_seed}
-    if not usable:
+    if not usable and not prebuilt_clusters:
         return ensure_sources_section(
             (initial_wiki or "").strip()
             or seed_iterative_wiki(query=query, **seed_kwargs),
             [],
         )
+
+    if cluster:
+        from thot.okf.chunk_cluster import cluster_chunks_agglomerative
+
+        per_center = max(2, min(6, int(per_cluster_for_llm or 3)))
+        if prebuilt_clusters:
+            # Rare path: caller already clustered; still pick near-centroids.
+            from thot.okf.chunk_cluster import select_near_centroids
+
+            full = [
+                [
+                    c
+                    for c in enrich_chunks_with_sibling_information(
+                        [x for x in group if isinstance(x, dict)]
+                    )
+                    if (c.get("text_raw") or "").strip()
+                    or (c.get("information") or "").strip()
+                ]
+                for group in prebuilt_clusters
+                if group
+            ]
+            full = [g for g in full if g]
+            clusters = select_near_centroids(full, per_cluster=per_center)
+            LOGGER.info(
+                "Wiki build: prebuilt clusters=%s → near-centroid fold sizes=%s",
+                [len(g) for g in full],
+                [len(g) for g in clusters],
+            )
+        else:
+            # Design step 6: Wiki Agent BGE embed + agglomerative, then fold
+            # only a few chunks nearest each cluster center.
+            clusters = cluster_chunks_agglomerative(
+                usable,
+                similarity_threshold=cluster_similarity,
+                max_clusters=max(1, int(max_clusters)),
+                per_cluster_for_llm=per_center,
+            )
+            LOGGER.info(
+                "Wiki build: agent agglomerative + near-centroid fold "
+                "clusters=%s sizes=%s from %s chunks",
+                len(clusters),
+                [len(g) for g in clusters],
+                len(usable),
+            )
+        if not clusters:
+            clusters = [usable] if usable else []
+
+        wiki = (initial_wiki or "").strip() or seed_iterative_wiki(
+            query=query, **seed_kwargs
+        )
+        packs = pack_clusters_for_llm_budget(
+            clusters,
+            wiki_chars=len(wiki),
+            max_chunk_chars=max_chunk_chars,
+            prompt_char_budget=prompt_char_budget,
+            max_fold_calls=max_fold_calls,
+            query_chars=len(query or ""),
+            system_chars=len(system or "") or 1800,
+        )
+        total = len(packs)
+        folded: list[dict[str, str]] = []
+        for i, group in enumerate(packs, start=1):
+            # Later packs: shrink wiki context so more room stays for evidence.
+            wiki_budget = (
+                int(max_wiki_chars)
+                if i == 1
+                else max(4000, min(int(max_wiki_chars), int(prompt_char_budget) // 2))
+            )
+            try:
+                wiki = await fold_cluster_into_wiki(
+                    llm=llm,
+                    query=query,
+                    cluster=group,
+                    current_wiki=wiki,
+                    index=i,
+                    total=total,
+                    temperature=temperature,
+                    system=system,
+                    information_priority_keys=information_priority_keys,
+                    max_chunk_chars=max_chunk_chars,
+                    max_wiki_chars=wiki_budget,
+                )
+            except TimeoutError as exc:
+                # Keep prior folds so Timeline / Cross-source panels survive.
+                LOGGER.warning(
+                    "fold pack %s/%s timed out — keeping partial wiki (%s chars): %s",
+                    i,
+                    total,
+                    len(wiki or ""),
+                    exc,
+                )
+                note = (
+                    f"\n\n> _Fold pack {i}/{total} timed out; "
+                    "prior sections retained._\n"
+                )
+                if note.strip() not in (wiki or ""):
+                    wiki = (wiki or "") + note
+                continue
+            folded.extend(group)
+            # Sources cite all usable golden chunks (URL refs), not only centers.
+            wiki = ensure_sources_section(wiki, usable if usable else folded)
+            if callable(on_progress):
+                try:
+                    on_progress(wiki, i, total)
+                except Exception:  # noqa: BLE001
+                    LOGGER.debug("on_progress failed", exc_info=True)
+        return ensure_osiris_panel_sections(wiki)
+
+    if sequential:
+        LOGGER.info(
+            "Wiki build: sequential fold over %s chunk(s) (cap=%s)",
+            len(usable),
+            capped,
+        )
+        wiki = (initial_wiki or "").strip() or seed_iterative_wiki(
+            query=query, **seed_kwargs
+        )
+        total = len(usable)
+        for i, chunk in enumerate(usable, start=1):
+            wiki = await fold_one_chunk_into_wiki(
+                llm=llm,
+                query=query,
+                chunk=chunk,
+                current_wiki=wiki,
+                index=i,
+                total=total,
+                temperature=temperature,
+                system=system,
+                information_priority_keys=information_priority_keys,
+                max_chunk_chars=max_chunk_chars,
+                max_wiki_chars=max_wiki_chars,
+            )
+            wiki = ensure_sources_section(wiki, usable[:i])
+            if callable(on_progress):
+                try:
+                    on_progress(wiki, i, total)
+                except Exception:  # noqa: BLE001
+                    LOGGER.debug("wiki on_progress failed", exc_info=True)
+        return ensure_sources_section(wiki, usable)
 
     LOGGER.info(
         "Wiki build: single-pass over %s chunk(s) (cap=%s)",

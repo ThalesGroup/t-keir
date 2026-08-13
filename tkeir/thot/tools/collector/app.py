@@ -14,7 +14,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
@@ -187,12 +187,41 @@ async def lifespan(app: FastAPI):
         True
     """
     from thot.tools.collector.service import load_dedupe_index
+    from thot.tools.collector.quality import (
+        bundled_osint_sources_path,
+        clear_osint_sources_cache,
+        load_osint_sources,
+        workspace_osint_sources_path,
+    )
+    from thot.tools.collector.forge_config import (
+        clear_forge_config_cache,
+        ensure_workspace_forge_config,
+        load_forge_config,
+    )
 
     configure_json_logging(
         service=os.getenv("TKEIR_SERVICE", "tkeir-collector")
     )
     _ensure_collector_metrics()
     settings = collector_settings()
+    # Seed workspace allowlist from bundled default when missing.
+    ws_sources = workspace_osint_sources_path(settings.workspace)
+    if not ws_sources.is_file():
+        bundled = bundled_osint_sources_path()
+        if bundled.is_file():
+            ws_sources.parent.mkdir(parents=True, exist_ok=True)
+            ws_sources.write_text(bundled.read_text(encoding="utf-8"), encoding="utf-8")
+            log_structured(
+                "info",
+                "seeded OSINT allowlist",
+                service=SERVICE_NAME,
+                path=str(ws_sources),
+            )
+    clear_osint_sources_cache()
+    allow_enabled, allow_hosts, allow_path = load_osint_sources()
+    forge_path = ensure_workspace_forge_config(settings.workspace)
+    clear_forge_config_cache()
+    forge_cfg = load_forge_config()
     state = AppState(settings)
     log_structured(
         "info",
@@ -201,6 +230,12 @@ async def lifespan(app: FastAPI):
         searxng_url=settings.searxng_url,
         port=settings.port,
         simhash_max_hamming=settings.simhash_max_hamming,
+        osint_sources_path=allow_path,
+        osint_allowlist_enabled=allow_enabled,
+        osint_allowlist_hosts=len(allow_hosts),
+        forge_config=str(forge_path),
+        forge_save_queries=forge_cfg.save_queries,
+        forge_nlp_enabled=forge_cfg.nlp.enabled,
     )
     state.dedupe = load_dedupe_index(settings)
     log_structured(
@@ -211,9 +246,24 @@ async def lifespan(app: FastAPI):
         dedupe_path=str(state.dedupe.path),
     )
     app.state.collector = state
+    # Optional background wiki loop (default: disabled via interval=0).
+    # Per-feed wiki always uses tkeir-agent (AGENT_URL) from best golden chunks.
+    from thot.tools.collector.wiki_loop import WIKI_LOOP
+
+    WIKI_LOOP.agent_url = settings.agent_url
+    if settings.wiki_enabled and settings.wiki_interval_s > 0:
+        WIKI_LOOP.start(settings.wiki_interval_s)
+        log_structured(
+            "info",
+            "wiki loop started",
+            service=SERVICE_NAME,
+            interval_s=settings.wiki_interval_s,
+            agent_url=settings.agent_url,
+        )
     try:
         yield
     finally:
+        WIKI_LOOP.stop()
         app.state.collector = None
 
 
@@ -257,6 +307,20 @@ class CollectRequest(BaseModel):
     )
     max_results: int | None = Field(default=None, ge=1, le=25)
     language: str | None = None
+    categories: str | None = Field(
+        default=None,
+        description="SearXNG categories (default: general,news,science)",
+    )
+    engines: str | None = Field(
+        default=None,
+        description="Comma-separated SearXNG engine names",
+    )
+    safesearch: int | None = Field(
+        default=None, ge=0, le=2, description="0 off / 1 moderate / 2 strict"
+    )
+    time_range: str | None = Field(
+        default=None, description="day | week | month | year"
+    )
 
 
 class CollectQueryItem(BaseModel):
@@ -271,6 +335,10 @@ class CollectQueryItem(BaseModel):
     topic: str | None = None
     max_results: int | None = Field(default=None, ge=1, le=25)
     language: str | None = None
+    categories: str | None = None
+    engines: str | None = None
+    safesearch: int | None = Field(default=None, ge=0, le=2)
+    time_range: str | None = None
 
 
 class CollectBatchRequest(BaseModel):
@@ -366,6 +434,31 @@ async def ready() -> dict[str, Any]:
     }
 
 
+@app.get("/status")
+async def pipeline_status(probe_agent: bool = True) -> dict[str, Any]:
+    """Live pipeline phase + ETA (optionally probes wiki agent run).
+
+    Osiris should poll this during READ / wiki produce.
+    """
+    from thot.tools.collector.pipeline_status import PIPELINE_STATUS
+    from thot.tools.collector.wiki_loop import WIKI_LOOP
+
+    snap = PIPELINE_STATUS.snapshot(probe_agent=bool(probe_agent))
+    wiki = WIKI_LOOP.snapshot()
+    snap["wiki"] = {
+        "status": wiki.get("status"),
+        "producing": wiki.get("producing"),
+        "wiki_ready": wiki.get("wiki_ready"),
+        "iteration": wiki.get("iteration"),
+        "run_id": wiki.get("run_id"),
+        "markdown_chars": len(str(wiki.get("markdown") or "")),
+        "sources": len(wiki.get("sources") or []),
+    }
+    if wiki.get("run_id") and not snap.get("run_id"):
+        snap["run_id"] = wiki.get("run_id")
+    return snap
+
+
 @app.get("/metrics")
 async def metrics() -> Response:
     """Prometheus exposition (OpenTelemetry → Prometheus).
@@ -430,6 +523,10 @@ async def collect(body: CollectRequest) -> dict[str, Any]:
             topic=body.topic,
             max_results=body.max_results,
             language=body.language,
+            categories=body.categories,
+            engines=body.engines,
+            safesearch=body.safesearch,
+            time_range=body.time_range,
             dedupe=state.dedupe,
             correlation_id=_correlation_id(),
         )
@@ -499,6 +596,274 @@ async def collect_batch(body: CollectBatchRequest) -> dict[str, Any]:
             status=502,
         )
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+class FeedRequest(BaseModel):
+    """POST /feed — optional Osiris data / pre-forged queries."""
+
+    data: dict[str, Any] | None = None
+    queries: list[dict[str, Any]] | None = None
+    max_queries: int = Field(default=40, ge=1, le=50)
+    max_results_per_query: int | None = Field(default=None, ge=1, le=25)
+    map_center: dict[str, float] | None = None
+    produce_wiki: bool = True
+    # Osiris specialized business ontology (external BO for NLP annotate).
+    business_ontology: dict[str, Any] | list[Any] | None = None
+    business_ontology_yaml: str | None = None
+
+
+class WikiStartRequest(BaseModel):
+    """POST /wiki/start — enable iterative wiki loop."""
+
+    interval_s: int = Field(default=120, ge=0, le=86400)
+    topic: str | None = None
+
+
+class WikiProduceRequest(BaseModel):
+    """POST /wiki — one-shot wiki with optional Osiris business ontology."""
+
+    topic: str | None = None
+    business_ontology: dict[str, Any] | list[Any] | None = None
+    business_ontology_yaml: str | None = None
+
+
+async def _run_feed(
+    *,
+    data: dict[str, Any] | None = None,
+    queries: list[dict[str, Any]] | None = None,
+    max_queries: int = 40,
+    max_results_per_query: int | None = None,
+    map_center: dict[str, float] | None = None,
+    produce_wiki: bool = True,
+    business_ontology: Any = None,
+    business_ontology_yaml: str | None = None,
+) -> dict[str, Any]:
+    """User-triggered feed; wiki always via agent from best golden chunks."""
+    from thot.tools.collector.feed import build_feed
+    from thot.tools.collector.wiki_loop import WIKI_LOOP
+
+    state = _state()
+    WIKI_LOOP.agent_url = state.settings.agent_url
+    feed = await build_feed(
+        state.settings,
+        data=data,
+        queries=queries,
+        max_queries=max_queries,
+        max_results_per_query=max_results_per_query,
+        map_center=map_center,
+        dedupe=state.dedupe,
+        include_wiki=True,
+        wiki_state=None,
+    )
+    if produce_wiki and feed.get("documents"):
+        wiki_snap = await WIKI_LOOP.produce_once(
+            list(feed.get("documents") or []),
+            topic="osiris-live",
+            agent_url=state.settings.agent_url,
+            business_ontology=business_ontology,
+            business_ontology_yaml=business_ontology_yaml,
+            osiris_base_url=state.settings.osiris_base_url,
+        )
+        feed["wiki"] = wiki_snap
+    else:
+        snap = WIKI_LOOP.snapshot()
+        feed["wiki"] = snap if (snap.get("markdown") or "").strip() else None
+    return feed
+
+
+@app.get("/feed")
+async def feed_get(
+    max_queries: int = 40,
+    hits: int = 5,
+    lat: float | None = None,
+    lng: float | None = None,
+    produce_wiki: bool = True,
+) -> dict[str, Any]:
+    """User-triggered: Osiris → forge → SearXNG → markdown + agent wiki."""
+    center = (
+        {"lat": lat, "lng": lng}
+        if lat is not None and lng is not None
+        else None
+    )
+    try:
+        return await _run_feed(
+            max_queries=max_queries,
+            max_results_per_query=hits,
+            map_center=center,
+            produce_wiki=produce_wiki,
+        )
+    except Exception as exc:  # noqa: BLE001
+        log_structured(
+            "error",
+            "feed failed",
+            service=SERVICE_NAME,
+            path="/feed",
+            error=str(exc),
+        )
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/feed")
+async def feed_post(body: FeedRequest) -> dict[str, Any]:
+    """Same as GET /feed with optional ``data`` / ``queries`` body."""
+    try:
+        return await _run_feed(
+            data=body.data,
+            queries=body.queries,
+            max_queries=body.max_queries,
+            max_results_per_query=body.max_results_per_query,
+            map_center=body.map_center,
+            produce_wiki=body.produce_wiki,
+            business_ontology=body.business_ontology,
+            business_ontology_yaml=body.business_ontology_yaml,
+        )
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.get("/wiki")
+async def wiki_get() -> dict[str, Any]:
+    """Latest live wiki snapshot produced by the collector."""
+    from thot.tools.collector.wiki_loop import WIKI_LOOP
+
+    return WIKI_LOOP.snapshot()
+
+
+@app.post("/wiki")
+async def wiki_post(request: Request) -> dict[str, Any]:
+    """Produce wiki from last feed documents (sources kept).
+
+    Body ``async: true`` (default) enqueues background production and returns
+    immediately with ``status=producing`` — poll ``GET /wiki`` until done.
+    Set ``async: false`` for a blocking wait (may exceed proxy timeouts).
+    """
+    from thot.tools.collector.feed import get_last_feed
+    from thot.tools.collector.wiki_loop import WIKI_LOOP
+
+    state = _state()
+    WIKI_LOOP.agent_url = state.settings.agent_url
+    body_data: dict[str, Any] = {}
+    try:
+        body_data = await request.json()
+        if not isinstance(body_data, dict):
+            body_data = {}
+    except Exception:  # noqa: BLE001
+        body_data = {}
+    topic = (
+        str(body_data.get("topic") or request.query_params.get("topic") or "")
+        .strip()
+        or "osiris-live"
+    )
+    business_ontology = body_data.get("business_ontology")
+    business_ontology_yaml = body_data.get("business_ontology_yaml")
+    if isinstance(business_ontology_yaml, (bytes, bytearray)):
+        business_ontology_yaml = business_ontology_yaml.decode("utf-8", "replace")
+    if business_ontology_yaml is not None:
+        business_ontology_yaml = str(business_ontology_yaml)
+
+    async_mode = body_data.get("async", body_data.get("async_mode", True))
+    if isinstance(async_mode, str):
+        async_mode = async_mode.strip().lower() not in {"0", "false", "no"}
+    else:
+        async_mode = bool(async_mode)
+
+    feed = get_last_feed() or {}
+    docs = list(feed.get("documents") or [])
+    if not docs:
+        if async_mode:
+            # Never block the HTTP response on a full feed rebuild — that was
+            # reintroducing the Next.js ~5min "fetch failed" on wiki enqueue.
+            raise HTTPException(
+                status_code=400,
+                detail="No collected documents — run GET/POST /feed first (produce_wiki=false), then POST /wiki",
+            )
+        built = await _run_feed(
+            max_queries=40,
+            max_results_per_query=3,
+            produce_wiki=False,
+            business_ontology=business_ontology,
+            business_ontology_yaml=business_ontology_yaml,
+        )
+        docs = list(built.get("documents") or [])
+    if not docs:
+        raise HTTPException(
+            status_code=400,
+            detail="No collected documents — run GET /feed first",
+        )
+
+    kwargs = {
+        "topic": topic,
+        "agent_url": state.settings.agent_url,
+        "business_ontology": business_ontology,
+        "business_ontology_yaml": business_ontology_yaml,
+        "osiris_base_url": state.settings.osiris_base_url,
+    }
+    if async_mode:
+        return WIKI_LOOP.enqueue_produce(docs, **kwargs)
+    return await WIKI_LOOP.produce_once(docs, **kwargs)
+
+
+@app.post("/wiki/start")
+async def wiki_start(body: WikiStartRequest) -> dict[str, Any]:
+    """Start iterative wiki updates every ``interval_s`` (0 = stop)."""
+    from thot.tools.collector.wiki_loop import WIKI_LOOP
+
+    if body.interval_s <= 0:
+        return WIKI_LOOP.stop()
+    snap = WIKI_LOOP.start(body.interval_s)
+    # Kick an immediate iteration when feed exists.
+    from thot.tools.collector.feed import get_last_feed
+
+    feed = get_last_feed() or {}
+    docs = list(feed.get("documents") or [])
+    if docs:
+        await WIKI_LOOP.produce_once(docs, topic=body.topic or "osiris-live")
+        snap = WIKI_LOOP.snapshot()
+    return snap
+
+
+@app.post("/wiki/stop")
+async def wiki_stop() -> dict[str, Any]:
+    """Stop the iterative wiki loop."""
+    from thot.tools.collector.wiki_loop import WIKI_LOOP
+
+    return WIKI_LOOP.stop()
+
+
+@app.get("/wiki/saved")
+async def wiki_saved_latest() -> dict[str, Any]:
+    """Return the latest dated wiki panel bundle (wiki + queries + docs…)."""
+    from thot.tools.collector.wiki_store import load_wiki_bundle
+
+    bundle = load_wiki_bundle(_state().settings.workspace, None)
+    if not bundle:
+        raise HTTPException(status_code=404, detail="No saved wiki yet")
+    return bundle
+
+
+@app.get("/wiki/saved/list")
+async def wiki_saved_list(limit: int = 50) -> dict[str, Any]:
+    """List saved wiki bundles newest-first."""
+    from thot.tools.collector.wiki_store import list_wiki_bundles
+
+    rows = list_wiki_bundles(
+        _state().settings.workspace,
+        limit=max(1, min(200, int(limit or 50))),
+    )
+    return {"ok": True, "count": len(rows), "bundles": rows}
+
+
+@app.get("/wiki/saved/{bundle_id}")
+async def wiki_saved_get(bundle_id: str) -> dict[str, Any]:
+    """Return one saved wiki panel bundle by id (or ``latest``)."""
+    from thot.tools.collector.wiki_store import load_wiki_bundle
+
+    bundle = load_wiki_bundle(_state().settings.workspace, bundle_id)
+    if not bundle:
+        raise HTTPException(
+            status_code=404, detail=f"Wiki bundle not found: {bundle_id}"
+        )
+    return bundle
 
 
 def main() -> None:

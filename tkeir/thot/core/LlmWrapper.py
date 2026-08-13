@@ -268,8 +268,8 @@ class WrapperConfig:
         generate_timeout = (
             float(generate_timeout_raw)
             if generate_timeout_raw
-            # Persona wiki merges (detailed OKF fold) often need >5m on local Ollama.
-            else max(http_timeout, 600.0)
+            # Local Ollama wiki folds often need >10m under CPU contention.
+            else max(http_timeout, 900.0)
         )
         return cls(
             provider=provider,

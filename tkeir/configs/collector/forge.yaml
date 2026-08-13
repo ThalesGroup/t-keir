@@ -1,0 +1,54 @@
+# Collector query forge configuration
+#
+# Resolve order (first existing file wins):
+#   1. $COLLECTOR_FORGE_CONFIG  (absolute path)
+#   2. workspace/collector/forge.yaml  (local override)
+#   3. tkeir/configs/collector/forge.yaml  (bundled default)
+#
+# Adult / junk filtering is done via the OSINT host allowlist
+# (osint_sources.yaml) — do NOT put -porn style exclusions in queries.
+
+# Persist forged queries under workspace/collector/forged_queries/
+save_queries: true
+
+# Leave empty — negative keyword spam hurts SearXNG relevance.
+exclude: ""
+
+# Default topic cue when API family is unknown (kept short).
+default_boost: "news"
+
+# Per-API topic boost tokens (deduped; max ~3 words applied).
+topic_boost:
+  fires: "wildfire"
+  earthquakes: "earthquake"
+  weather: "weather alert"
+  gdelt: "disaster"
+  gdelt_events: "news"
+  news: "news"
+  malware: "malware"
+  cyber: "cyber attack"
+  maritime: "maritime"
+  conflict: "conflict"
+
+# Reverse-geocode seed coords → city/region/country for place tokens.
+geocode:
+  enabled: true
+  # Nominatim (OpenStreetMap) — requires a descriptive User-Agent.
+  url: "https://nominatim.openstreetmap.org/reverse"
+  timeout_s: 8
+  # Cache under workspace/collector/geocode_cache.json
+  cache: true
+
+# Open Osiris seed URLs → clean markdown → NLP (SVO/keywords) → forge.
+nlp_forge:
+  enabled: true
+  # Diversified across API families (round-robin); was 12 and malware-heavy.
+  max_seeds: 40
+  max_queries_per_seed: 3
+  max_queries_total: 64
+  fetch_timeout_s: 12
+  max_chars: 8000
+  use_svo: true
+  use_keywords: true
+  # Always put seed title / snippet into forged queries when present.
+  require_title_or_snippet: true

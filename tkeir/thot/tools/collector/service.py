@@ -30,6 +30,7 @@ from thot.tools.collector.dedupe import (
     CollectorDedupeIndex,
     dedupe_index_for_workspace,
 )
+from thot.tools.collector.quality import filter_search_hits
 from thot.tools.collector.searxng import searxng_search
 
 LOGGER = logging.getLogger(__name__)
@@ -118,6 +119,10 @@ async def collect_markdown(
     topic: str | None = None,
     max_results: int | None = None,
     language: str | None = None,
+    categories: str | None = None,
+    engines: str | None = None,
+    safesearch: int | None = None,
+    time_range: str | None = None,
     dedupe: CollectorDedupeIndex | None = None,
     correlation_id: str | None = None,
 ) -> dict[str, Any]:
@@ -138,13 +143,27 @@ async def collect_markdown(
     started = utc_now_rfc3339()
     index = dedupe or load_dedupe_index(settings)
     limit = max_results if max_results is not None else settings.max_results
-    hits = await searxng_search(
+    cats = (categories or settings.searx_categories or "").strip() or None
+    engs = (engines if engines is not None else settings.searx_engines or "").strip() or None
+    safe = (
+        safesearch
+        if safesearch is not None
+        else settings.searx_safesearch
+    )
+    tr = (time_range if time_range is not None else settings.searx_time_range or "").strip() or None
+    raw_hits = await searxng_search(
         query,
         base_url=settings.searxng_url,
-        max_results=limit,
+        # Over-fetch: allowlist drops most general-web noise.
+        max_results=max(limit * 6, limit + 8),
         timeout_s=settings.fetch_timeout_s,
         language=language,
+        categories=cats,
+        engines=engs,
+        safesearch=safe,
+        time_range=tr,
     )
+    hits = filter_search_hits(raw_hits)[: max(1, int(limit))]
     documents: list[dict[str, Any]] = []
     duplicates: list[dict[str, Any]] = []
     errors: list[dict[str, str]] = []
@@ -170,10 +189,29 @@ async def collect_markdown(
                 raw, filename=filename, content_type=ctype
             )
             if not body.strip():
-                errors.append(
-                    {"url": url, "error": "empty markdown after conversion"}
-                )
-                continue
+                # Fall back to SearXNG snippet so the wiki still gets prose.
+                snippet = str(hit.get("content") or hit.get("snippet") or "").strip()
+                if len(snippet) >= 80:
+                    body = snippet
+                else:
+                    errors.append(
+                        {"url": url, "error": "empty markdown after conversion"}
+                    )
+                    continue
+            from thot.tools.collector.convert import is_substantive_markdown
+
+            if not is_substantive_markdown(body, min_chars=120):
+                snippet = str(hit.get("content") or hit.get("snippet") or "").strip()
+                if len(snippet) >= 80:
+                    body = f"{body}\n\n{snippet}".strip() if body.strip() else snippet
+                if not is_substantive_markdown(body, min_chars=80):
+                    errors.append(
+                        {
+                            "url": url,
+                            "error": "non-substantive markdown (chrome/junk)",
+                        }
+                    )
+                    continue
             hit_dedupe = index.probe_and_register(url, body)
             if hit_dedupe.is_duplicate:
                 duplicates.append(
@@ -230,6 +268,39 @@ async def collect_markdown(
             )
         except Exception as exc:  # noqa: BLE001
             LOGGER.info("collect failed for %s: %s", url, exc)
+            # Still try to keep the SearXNG snippet as a thin document.
+            snippet = str(hit.get("content") or hit.get("snippet") or "").strip()
+            title = (hit.get("title") or "").strip() or url
+            if len(snippet) >= 80:
+                collected_at = utc_now_rfc3339()
+                markdown = format_collected_markdown(
+                    snippet,
+                    title=title,
+                    source_url=url,
+                    query=query,
+                    topic=topic,
+                    engine=hit.get("engine"),
+                    snippet=snippet,
+                    collected_at=collected_at,
+                    content_type="text/plain",
+                )
+                documents.append(
+                    {
+                        "url": url,
+                        "title": title,
+                        "snippet": snippet,
+                        "engine": hit.get("engine"),
+                        "topic": topic,
+                        "query": query,
+                        "filename": markdown_filename(url, title),
+                        "markdown_chars": len(markdown),
+                        "markdown": markdown,
+                        "simhash": None,
+                        "collected_at": collected_at,
+                        "fetch_fallback": "snippet",
+                    }
+                )
+                continue
             log_structured(
                 "warning",
                 "collect url failed",
@@ -350,6 +421,10 @@ async def collect_queries_batch(
                 topic=item.get("topic"),
                 max_results=item.get("max_results"),
                 language=item.get("language"),
+                categories=item.get("categories"),
+                engines=item.get("engines"),
+                safesearch=item.get("safesearch"),
+                time_range=item.get("time_range"),
                 dedupe=index,
                 correlation_id=correlation_id,
             )

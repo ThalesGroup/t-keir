@@ -100,19 +100,82 @@ def _strip_noise_html(data: bytes) -> bytes:
 
 
 def clean_markdown(text: str) -> str:
-    """Normalize whitespace and drop control characters from markdown.
+    """Normalize whitespace and drop control / chrome junk from markdown.
+
+    Strips leftover ``<script>``, HTML tags, images, and data-URI noise that
+    otherwise pollute wiki evidence chunks.
 
     Example:
         >>> clean_markdown("Hello\\x00  \\n\\n\\nWorld")
         'Hello\\n\\nWorld'
+        >>> "<script" not in clean_markdown('<script>alert(1)</script>\\nPara')
+        True
     """
     cleaned = _CTRL_RE.sub("", text or "")
     cleaned = cleaned.replace("\r\n", "\n").replace("\r", "\n")
+    # Drop script/style blocks that survived HTML→MD conversion.
+    cleaned = re.sub(
+        r"(?is)<script\b[^>]*>.*?</script>",
+        " ",
+        cleaned,
+    )
+    cleaned = re.sub(
+        r"(?is)<style\b[^>]*>.*?</style>",
+        " ",
+        cleaned,
+    )
+    cleaned = re.sub(
+        r"(?is)<noscript\b[^>]*>.*?</noscript>",
+        " ",
+        cleaned,
+    )
+    # Markdown / HTML images and data URIs.
+    cleaned = re.sub(r"!\[([^\]]*)\]\([^)]+\)", r"\1", cleaned)
+    cleaned = re.sub(r"(?is)<img\b[^>]*/?>", " ", cleaned)
+    cleaned = re.sub(r"(?i)data:[a-z0-9.+/-]+;base64,[a-z0-9+/=\s]+", " ", cleaned)
+    # Remaining HTML tags → space (keep text content already extracted).
+    cleaned = re.sub(r"(?is)</?(?:div|span|p|br|hr|table|tr|td|th|ul|ol|li|a|font|center|section|article|header|footer|nav|iframe|object|embed|svg|path|button|input|form|meta|link)\b[^>]*>", " ", cleaned)
+    cleaned = re.sub(r"(?is)</?[a-z][\w:-]*\b[^>]*>", " ", cleaned)
+    # Collapse MarkItDown leftover link-only chrome lines / empty headings.
+    cleaned = re.sub(r"(?m)^\s*#{1,6}\s*$", "", cleaned)
     cleaned = re.sub(r"[ \t]+\n", "\n", cleaned)
     cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
-    # Collapse MarkItDown leftover link-only chrome lines.
     cleaned = re.sub(r"\n{2,}(#{1,6}\s+)", r"\n\n\1", cleaned)
+    # Drop lines that are almost only punctuation / URLs with no prose.
+    kept: list[str] = []
+    for line in cleaned.split("\n"):
+        s = line.strip()
+        if not s:
+            kept.append("")
+            continue
+        if re.fullmatch(r"https?://\S+", s):
+            continue
+        if s.count("{") + s.count("}") > 4 and len(s) < 200:
+            continue
+        if re.search(r"(?i)\bfunction\s*\(|document\.|window\.|cookie\b", s) and len(s) > 80:
+            continue
+        kept.append(line)
+    cleaned = "\n".join(kept)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
     return cleaned.strip()
+
+
+def is_substantive_markdown(text: str, *, min_chars: int = 180) -> bool:
+    """True when markdown looks like readable prose (not chrome/junk)."""
+    body = clean_markdown(text or "")
+    if len(body) < min_chars:
+        return False
+    words = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ0-9]{3,}", body)
+    if len(words) < 25:
+        return False
+    junk_hits = len(
+        re.findall(
+            r"(?i)<script|onclick=|^\s*\{|function\s*\(|document\.cookie",
+            body,
+        )
+    )
+    return junk_hits == 0
+
 
 
 def bytes_to_markdown(

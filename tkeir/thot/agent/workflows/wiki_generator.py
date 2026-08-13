@@ -403,24 +403,231 @@ class WikiGeneratorWorkflow:
 
         chunks = self.wiki_chunks_for_bundle(params, root)
         current = okf.get_wiki(bundle_id, state.user_space) or ""
-        max_chunks = max(1, min(int(params.get("max_wiki_chunks") or 4), 8))
+        # Situation reports need ample evidence — raise defaults + hard max.
+        max_chunks = max(1, min(int(params.get("max_wiki_chunks") or 24), 48))
         try:
-            wiki = await build_wiki_upsert_pass(
-                llm=self.llm,
-                query=query,
-                chunks=chunks,
-                current_wiki=current,
-                max_chunks=max_chunks,
-                system=wiki_cfg["merge_system"],
-                structured_facts_seed=wiki_cfg["structured_facts_seed"],
-                information_priority_keys=wiki_cfg["priority_keys"],
-            )
+            max_chunk_chars = int(params.get("max_chunk_chars") or 2200)
+        except (TypeError, ValueError):
+            max_chunk_chars = 2200
+        try:
+            max_wiki_chars = int(params.get("max_wiki_chars") or 24000)
+        except (TypeError, ValueError):
+            max_wiki_chars = 24000
+        # Persona prompts may request larger folds, but respect caller caps when
+        # already set (collector lean budgets for local Ollama).
+        if wiki_cfg.get("merge_system"):
+            if "max_chunk_chars" not in params:
+                max_chunk_chars = max(max_chunk_chars, 1600)
+            if "max_wiki_chars" not in params:
+                max_wiki_chars = max(max_wiki_chars, 14000)
+        fold_mode = str(
+            params.get("wiki_fold") or params.get("wiki_mode") or ""
+        ).strip().lower()
+        use_cluster = fold_mode in {"cluster", "bge", "agglomerative"}
+        sequential = fold_mode in {"sequential", "iterative", "chunk"}
+        try:
+            cluster_sim = float(params.get("cluster_similarity") or 0.55)
+        except (TypeError, ValueError):
+            cluster_sim = 0.55
+        try:
+            max_clusters = int(params.get("max_clusters") or 8)
+        except (TypeError, ValueError):
+            max_clusters = 8
+        try:
+            per_cluster_llm = int(params.get("per_cluster_for_llm") or 5)
+        except (TypeError, ValueError):
+            per_cluster_llm = 5
+        per_cluster_llm = max(2, min(6, per_cluster_llm))
+        try:
+            prompt_char_budget = int(params.get("prompt_char_budget") or 14000)
+        except (TypeError, ValueError):
+            prompt_char_budget = 14000
+        prompt_char_budget = max(6000, min(32000, prompt_char_budget))
+        try:
+            max_fold_calls = int(params.get("max_fold_calls") or 3)
+        except (TypeError, ValueError):
+            max_fold_calls = 3
+        max_fold_calls = max(1, min(6, max_fold_calls))
+        try:
+            if use_cluster or sequential:
+                from thot.okf.iterative_wiki import build_wiki_iteratively
+
+                LOGGER.info(
+                    "wiki_upsert fold=%s chunks=%s clusters_cap=%s "
+                    "per_cluster=%s packs_cap=%s budget_chars=%s "
+                    "preclustered=%s",
+                    "cluster" if use_cluster else "sequential",
+                    max_chunks,
+                    max_clusters,
+                    per_cluster_llm,
+                    max_fold_calls,
+                    prompt_char_budget,
+                    bool(params.get("clusters") or params.get("preclustered")),
+                )
+
+                def _progress(wiki_text: str, index: int, total: int) -> None:
+                    try:
+                        okf.put_wiki(bundle_id, state.user_space, wiki_text)
+                    except Exception:  # noqa: BLE001
+                        LOGGER.debug("mid-wiki put failed", exc_info=True)
+                    self.store.append_blackboard(
+                        state.run_id,
+                        {
+                            "kind": "wiki_progress",
+                            "builtin": "wiki_upsert",
+                            "bundle_id": bundle_id,
+                            "chunk_index": index,
+                            "chunk_total": total,
+                            "wiki_chars": len(wiki_text),
+                            "fold": "cluster" if use_cluster else "sequential",
+                            "prompt_name": wiki_cfg["prompt_name"],
+                            "provenance": "wiki_generator",
+                        },
+                    )
+                    self.store.write_state(state)
+
+                wiki = await build_wiki_iteratively(
+                    llm=self.llm,
+                    query=query,
+                    chunks=chunks,
+                    initial_wiki=current,
+                    max_chunks=max_chunks,
+                    on_progress=_progress,
+                    system=wiki_cfg["merge_system"],
+                    structured_facts_seed=wiki_cfg["structured_facts_seed"],
+                    information_priority_keys=wiki_cfg["priority_keys"],
+                    sequential=sequential and not use_cluster,
+                    cluster=use_cluster,
+                    cluster_similarity=cluster_sim,
+                    max_clusters=max_clusters,
+                    max_chunk_chars=max_chunk_chars,
+                    max_wiki_chars=max_wiki_chars,
+                    per_cluster_for_llm=per_cluster_llm,
+                    prompt_char_budget=prompt_char_budget,
+                    max_fold_calls=max_fold_calls,
+                    prebuilt_clusters=(
+                        list(params.get("clusters") or [])
+                        if _truthy(params.get("preclustered"))
+                        or bool(params.get("clusters"))
+                        else None
+                    ),
+                )
+            else:
+                wiki = await build_wiki_upsert_pass(
+                    llm=self.llm,
+                    query=query,
+                    chunks=chunks,
+                    current_wiki=current,
+                    max_chunks=max_chunks,
+                    max_chunk_chars=max_chunk_chars,
+                    max_wiki_chars=max_wiki_chars,
+                    system=wiki_cfg["merge_system"],
+                    structured_facts_seed=wiki_cfg["structured_facts_seed"],
+                    information_priority_keys=wiki_cfg["priority_keys"],
+                )
+
+            # Optional second persona: arrow timeline from dated evidence.
+            timeline_name = str(
+                params.get("timeline_agent")
+                or params.get("timeline_prompt")
+                or ""
+            ).strip()
+            if timeline_name:
+                from thot.okf.iterative_wiki import build_timeline_pass
+
+                tl_cfg = self.resolve_wiki_prompt_config(
+                    {"wiki_agent": timeline_name, "prompt_name": timeline_name}
+                )
+                LOGGER.info("wiki timeline pass agent=%s", timeline_name)
+                try:
+                    wiki = await build_timeline_pass(
+                        llm=self.llm,
+                        query=query,
+                        chunks=chunks,
+                        current_wiki=wiki,
+                        system=tl_cfg.get("merge_system") or None,
+                        information_priority_keys=tl_cfg.get("priority_keys")
+                        or None,
+                        max_chunk_chars=max(1200, max_chunk_chars // 2),
+                        max_wiki_chars=max_wiki_chars,
+                        max_chunks=max_chunks,
+                    )
+                    self.store.append_blackboard(
+                        state.run_id,
+                        {
+                            "kind": "wiki_timeline",
+                            "builtin": "wiki_upsert",
+                            "bundle_id": bundle_id,
+                            "timeline_agent": timeline_name,
+                            "wiki_chars": len(wiki),
+                            "provenance": "wiki_generator",
+                        },
+                    )
+                except Exception as tl_exc:  # noqa: BLE001
+                    # Keep Answer / Cross-source / Conjectures if timeline stalls.
+                    LOGGER.warning(
+                        "wiki timeline pass failed — keeping prior wiki: %s",
+                        tl_exc,
+                    )
+                    self.store.append_blackboard(
+                        state.run_id,
+                        {
+                            "kind": "wiki_timeline_error",
+                            "builtin": "wiki_upsert",
+                            "bundle_id": bundle_id,
+                            "error": str(tl_exc),
+                            "provenance": "wiki_generator",
+                        },
+                    )
+
+            from thot.okf.iterative_wiki import ensure_osiris_panel_sections
+
+            wiki = ensure_osiris_panel_sections(wiki)
             path = okf.put_wiki(bundle_id, state.user_space, wiki)
         except Exception as exc:  # noqa: BLE001
             LOGGER.exception("wiki_upsert failed")
+            # Salvage mid-fold wiki so Osiris keeps Timeline / synthesis panels.
+            salvaged = ""
+            try:
+                salvaged = str(locals().get("wiki") or "").strip()
+            except Exception:  # noqa: BLE001
+                salvaged = ""
+            if not salvaged and bundle_id:
+                try:
+                    salvaged = (okf.get_wiki(bundle_id, state.user_space) or "").strip()
+                except Exception:  # noqa: BLE001
+                    salvaged = ""
+            if salvaged:
+                from thot.okf.iterative_wiki import ensure_osiris_panel_sections
+
+                salvaged = ensure_osiris_panel_sections(salvaged)
+                try:
+                    okf.put_wiki(bundle_id, state.user_space, salvaged)
+                except Exception:  # noqa: BLE001
+                    pass
+                state.status = "succeeded"
+                state.error = f"wiki_upsert_partial: {_format_exc(exc)}"
+                state.ended_at = utc_now_rfc3339()
+                state.params = {
+                    **dict(state.params or {}),
+                    "bundle_id": bundle_id,
+                    "wiki_markdown": salvaged,
+                    "wiki_excerpt": extract_wiki_sections(
+                        salvaged, max_chars=2400
+                    ),
+                    "wiki_extract": extract_wiki_sections(
+                        salvaged, max_chars=2400
+                    ),
+                    "has_llm_wiki": "true",
+                    "wiki_partial": "true",
+                    "prompt_name": wiki_cfg["prompt_name"],
+                    "wiki_agent": wiki_cfg["prompt_name"],
+                }
+                self.store.write_state(state)
+                return state
             return self._fail(state, error=f"wiki_upsert: {_format_exc(exc)}")
 
-        excerpt = extract_wiki_sections(wiki, max_chars=2400)
+        excerpt = extract_wiki_sections(wiki, max_chars=max(2400, max_wiki_chars // 2))
         slim = {
             k: v
             for k, v in params.items()
@@ -543,6 +750,7 @@ class WikiGeneratorWorkflow:
                 system=wiki_cfg["merge_system"],
                 structured_facts_seed=wiki_cfg["structured_facts_seed"],
                 information_priority_keys=wiki_cfg["priority_keys"],
+                sequential=True,
             )
             path = okf.put_wiki(bundle_id, state.user_space, wiki)
         except Exception as exc:  # noqa: BLE001

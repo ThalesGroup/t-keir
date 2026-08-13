@@ -28,7 +28,7 @@ $(WORKSPACE)/searxng/data/     → /var/cache/searxng/
 
 Default settings are copied from `tkeir/resources/searxng/settings.yml` on first
 pull/up (JSON search format must stay enabled for the collector). The template
-keeps a curated `engines:` list (`duckduckgo`, `brave`, `bing`, `wikipedia`, …) via
+keeps a curated `engines:` list (`duckduckgo`, `brave`, `startpage`, `wikipedia`, …) via
 `use_default_settings.engines.keep_only` (**wikidata** is excluded: its SPARQL
 bootstrap often gets HTTP 403 from Docker IPs and fails engine init). To refresh
 an existing workspace copy after editing the template:
@@ -38,10 +38,81 @@ cp tkeir/resources/searxng/settings.yml workspace/searxng/config/settings.yml
 make searxng-up
 ```
 
+## OSINT source allowlist
+
+Search hits are filtered to **reliable OSINT hosts** before pages are fetched.
+Allowlisting lives **only on the collector** (Osiris does not re-filter).
+
+| Path | Role |
+|------|------|
+| `tkeir/configs/collector/osint_sources.yaml` | Bundled default |
+| `workspace/collector/osint_sources.yaml` | Local override (wins when present) |
+| `$COLLECTOR_OSINT_SOURCES` | Absolute path override |
+
+Edit the workspace copy to add/remove domains. Matching is by host suffix
+(`nasa.gov` allows `firms.modaps.eosdis.nasa.gov`). Set `enabled: false` to
+disable allowlisting (not recommended).
+
+## Feed routing (`/feed`) — user-triggered only
+
+Default flow (no auto listen; wiki always via agent):
+
+1. User clicks **READ T-KEIR** in Osiris
+2. Osiris calls `GET /api/tkeir` → collector `GET /feed`
+3. Collector pulls Osiris APIs (`OSIRIS_BASE_URL`)
+4. Forge SearXNG queries → search → allowlist → markdown
+5. Rank best golden chunks (BGE-M3 sparse) → `tkeir-agent` `llm_wiki`
+6. Return `{ queries, documents, results, wiki }` — wiki always keeps sources
+
+```bash
+export OSIRIS_BASE_URL=http://127.0.0.1:3000
+export AGENT_URL=http://127.0.0.1:8092   # make agent
+make collector
+
+# Same call Osiris makes on READ T-KEIR (includes agent wiki):
+curl -sS "http://127.0.0.1:8096/feed?max_queries=6&hits=3"
+
+# Skip wiki step only:
+curl -sS "http://127.0.0.1:8096/feed?max_queries=6&hits=3&produce_wiki=false"
+```
+
+## Live wiki (`/wiki`) — agent + golden chunks + sources + ontology
+
+**Always computed by the agent service** from the best golden chunks. Sources
+(URLs) are kept on every chunk and enforced in the wiki `## Sources` section.
+
+Osiris sends `resources/osiris_ontology.yaml` as ``business_ontology_yaml`` on
+`/feed` and `/wiki`. The collector applies it via
+``annotate_document_with_business_ontology`` (same external-BO path as the NLP
+pipeline) and returns ``wiki.bo_coverage`` for the Osiris wiki UI.
+
+| Env | Default | Meaning |
+|-----|---------|---------|
+| `AGENT_URL` | `http://127.0.0.1:8092` | tkeir-agent for `llm_wiki` |
+| `OSIRIS_ONTOLOGY_PATH` | sibling `t-keir-osiris/resources/osiris_ontology.yaml` | Fallback BO file |
+| `COLLECTOR_WIKI_ENABLED` | `false` | Hard gate for boot-time interval loop |
+| `COLLECTOR_WIKI_INTERVAL_S` | `0` | `0` = no background loop |
+
+```bash
+# Refresh wiki from last feed (Osiris REFRESH WIKI):
+curl -sS -X POST http://127.0.0.1:8096/wiki
+
+# Optional iterative loop (explicit start only):
+curl -sS -X POST http://127.0.0.1:8096/wiki/start \
+  -H 'Content-Type: application/json' \
+  -d '{"interval_s":120}'
+
+curl -sS -X POST http://127.0.0.1:8096/wiki/stop
+```
+
 ## API
 
 | Method | Path | Purpose |
 |--------|------|---------|
+| `GET`/`POST` | `/feed` | Osiris → forge → SearXNG → markdown feed (+ wiki) |
+| `GET`/`POST` | `/wiki` | Live wiki snapshot / one-shot produce |
+| `POST` | `/wiki/start` | Start iterative wiki (`interval_s`) |
+| `POST` | `/wiki/stop` | Stop wiki loop |
 | `GET` | `/health` | Liveness |
 | `GET` | `/ready` | Dedupe loaded + SearXNG `/healthz` |
 | `GET` | `/metrics` | Prometheus exposition (OTel / `ThotMetrics`) |

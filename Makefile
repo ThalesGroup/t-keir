@@ -1207,6 +1207,11 @@ collector: ## [collector] Start tkeir-collector API (:$(COLLECTOR_PORT)) — ret
 		TKEIR_SERVICE=tkeir-collector \
 		SEARXNG_URL="$(SEARXNG_URL)" \
 		COLLECTOR_PORT="$(COLLECTOR_PORT)" \
+		OSIRIS_BASE_URL="$${OSIRIS_BASE_URL:-http://127.0.0.1:3000}" \
+		AGENT_URL="$${AGENT_URL:-http://127.0.0.1:8092}" \
+		OSIRIS_ONTOLOGY_PATH="$${OSIRIS_ONTOLOGY_PATH:-$(ROOT)/../t-keir-osiris/resources/osiris_ontology.yaml}" \
+		COLLECTOR_WIKI_ENABLED="$${COLLECTOR_WIKI_ENABLED:-false}" \
+		COLLECTOR_WIKI_INTERVAL_S="$${COLLECTOR_WIKI_INTERVAL_S:-0}" \
 		GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
 		$(AUDIT_HOST_ENV) \
 		$(UV) run --no-sync --python $(PYTHON) python -m thot.tools.collector

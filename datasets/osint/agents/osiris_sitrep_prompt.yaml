@@ -1,0 +1,94 @@
+name: osiris_sitrep_prompt
+version: 2
+role: "Osiris live wiki — detailed OSINT situation report with cross-source synthesis"
+# Used by collector → llm_wiki when params.wiki_agent=osiris_sitrep_prompt.
+system_prompt: |
+  Configuration agent for OKF wiki generation (osiris_sitrep_prompt).
+  Do not execute as a tool agent; the orchestrator reads wiki_* fields only.
+tools: []
+output_contract: grounded_findings_v1
+temperature: 0.15
+wiki_merge_system_prompt: |
+  You build a DETAILED OKF LLMWiki (Google OKF concept type: Wiki) for an
+  Osiris map / news situation report. Fold EVERY evidence chunk into one wiki.
+  When updating iteratively, preserve prior grounded content and integrate
+  the new chunk fully (do not thin-summarize prior Answer / Evidence).
+
+  HARD RULES:
+  1. Output ONLY the full wiki markdown (YAML frontmatter + body).
+  2. Required sections IN THIS ORDER:
+     Answer → Structured facts → Timeline → Evidence →
+     Cross-source synthesis → Conjectures → Sources → Gaps.
+     Prefer Actors & entities / Geospatial when grounded.
+  3. Never invent hard facts (names, dates, places, figures) that are not in
+     chunk text or Information metadata. Soft analytical links are allowed
+     ONLY under ## Conjectures.
+  4. IGNORE and never copy: HTML tags, <script>, CSS, image markdown, data URIs,
+     cookie banners, nav chrome, or raw URLs with no prose context. If a chunk
+     is mostly junk, skip it and note under Gaps.
+  5. ## Answer must be a multi-paragraph narrative (not a one-liner). Cover
+     what / who / where / when / how known / so-what. Explicitly connect
+     related events across different chunk_ids when the texts support it.
+     Answer must be LONGER and richer than the Sources list.
+  6. ## Timeline (required): chronological bullets
+     `- YYYY-MM-DD [or unknown] — <event> (chunk_id=<id>)`
+     Extract every dated/time-referenced event from contributing chunks.
+     Sort oldest → newest. Deduplicate near-identical events; keep best cite.
+  7. Preserve and fill the Structured facts checklist — expand `_unknown_`
+     into concrete multi-clause values when grounded; cite `chunk_id=` on
+     every filled line.
+  8. ## Evidence density: at least 2–4 atomic claims per contributing chunk
+     when the text supports it (`- <claim> (chunk_id=<id>)`). Keep concrete
+     entities, DTGs, locations, figures, and quoted phrases.
+  9. ## Cross-source synthesis (required when ≥2 distinct parent sources):
+     Write 2–6 bullets that COMPARE or LINK claims from different sources.
+     Each bullet MUST cite at least two distinct chunk_ids. Cover agreements,
+     contradictions, complementary detail, and geographic/temporal overlap.
+     Display this as a first-class analytical section — not a stub.
+     If only one source is present, write one bullet stating that limitation.
+  10. ## Conjectures (labeled hypotheses):
+      Propose 1–5 cautious analytical hypotheses when ≥2 chunks support a link.
+      Format:
+      `- [conjecture · confidence=low|medium] <hypothesis> (chunk_id=A, chunk_id=B)`
+      Never present a conjecture as fact; if insufficient, `_none grounded_`.
+  11. ## Sources: short list only — `- chunk_id=<id> ← parent=<doc or url>`
+      Do NOT dump article text into Sources. Narrative belongs in Answer /
+      Evidence / Timeline / Cross-source synthesis.
+  12. Prefer depth over brevity. Do NOT thin-summarize names, identifiers,
+      coordinates, or figures when present.
+
+wiki_structured_facts_seed: |
+  ## Structured facts (Osiris situation checklist)
+
+  Keep `_unknown_` until grounded; cite `chunk_id=` when known.
+
+  ### Focus
+  - primary_subject: _unknown_
+  - geographic_focus: _unknown_
+  - time_window: _unknown_
+  - threat_or_theme: _unknown_
+
+  ### Picture
+  - situation_summary: _unknown_
+  - key_actors: _unknown_
+  - related_incidents: _unknown_
+  - open_questions: _unknown_
+
+  ### Watch
+  - indicators_to_monitor: _unknown_
+  - recommended_follow_up: _unknown_
+  - confidence_overall: _unknown_
+
+wiki_information_priority_keys:
+  - location
+  - place
+  - country
+  - region
+  - dtg
+  - timestamp
+  - actor
+  - source
+  - malware
+  - disaster
+  - conflict
+  - query

@@ -1,0 +1,147 @@
+# OSINT source allowlist for tkeir-collector / Osiris.
+#
+# Only search hits whose hostname matches an entry are kept
+# (exact match OR subdomain: host == entry OR host.endswith("." + entry)).
+#
+# Resolve order (first existing file wins):
+#   1. $COLLECTOR_OSINT_SOURCES  (absolute path)
+#   2. workspace/collector/osint_sources.yaml  (local override)
+#   3. tkeir/configs/collector/osint_sources.yaml  (bundled default)
+#
+# Osiris mirrors this file at config/collector/osint_sources.yaml
+# (override with $OSINT_SOURCES_PATH or $COLLECTOR_OSINT_SOURCES).
+#
+# Set enabled: false to disable allowlisting (not recommended).
+
+enabled: true
+
+hosts:
+  # ── Space / Earth observation / fire ──
+  - nasa.gov
+  - usgs.gov
+  - noaa.gov
+  - weather.gov
+  - esa.int
+  - eumetsat.int
+  - copernicus.eu
+  - globalforestwatch.org
+  - earthdata.nasa.gov
+
+  # ── Disaster / humanitarian ──
+  - gdacs.org
+  - reliefweb.int
+  - unocha.org
+  - who.int
+  - cdc.gov
+  - fema.gov
+
+  # ── Conflict / geopolitics OSINT ──
+  - acleddata.com
+  - crisisgroup.org
+  - sipri.org
+  - iiss.org
+  - understandingwar.org
+  - liveuamap.com
+  - bellingcat.com
+  - recordedfuture.com
+  - janes.com
+  - stratfor.com
+  - cfr.org
+  - brookings.edu
+  - rand.org
+
+  # ── Cyber / malware ──
+  - abuse.ch
+  - malwarebazaar.com
+  - threatfox.abuse.ch
+  - urlhaus.abuse.ch
+  - cisa.gov
+  - mitre.org
+  - first.org
+  - circl.lu
+  - krebssecurity.com
+  - bleepingcomputer.com
+  - krebsonsecurity.com
+  - malwarebytes.com
+  - virustotal.com
+  - cloudflare.com
+  - crowdstrike.com
+  - mandiant.com
+  - unit42.paloaltonetworks.com
+  - securelist.com
+
+  # ── Maritime / aviation ──
+  - marinetraffic.com
+  - vesselfinder.com
+  - equasis.org
+  - imo.org
+  - nato.int
+  - flightradar24.com
+  - ads-b.exchange
+  - opensky-network.org
+
+  # ── Wire / major news ──
+  - reuters.com
+  - apnews.com
+  - bbc.com
+  - bbc.co.uk
+  - theguardian.com
+  - nytimes.com
+  - washingtonpost.com
+  - aljazeera.com
+  - france24.com
+  - dw.com
+  - afp.com
+  - economist.com
+  - ft.com
+  - bloomberg.com
+  - wsj.com
+  - npr.org
+  - pbs.org
+  - cnn.com
+  - abcnews.go.com
+  - cbsnews.com
+  - nbcnews.com
+  - politico.com
+  - foreignpolicy.com
+  - theatlantic.com
+  - time.com
+  - newsweek.com
+
+  # ── Regional / specialized ──
+  - kyivindependent.com
+  - meduza.io
+  - themoscowtimes.com
+  - scmp.com
+  - japantimes.co.jp
+  - asahi.com
+  - nhk.or.jp
+  - rfa.org
+  - voanews.com
+
+  # ── Science / academic ──
+  - nature.com
+  - science.org
+  - sciencemag.org
+  - springer.com
+  - wiley.com
+  - elsevier.com
+  - arxiv.org
+  - nih.gov
+  - europa.eu
+  - un.org
+
+  # ── Reference ──
+  - wikipedia.org
+  - wikimedia.org
+  - wikidata.org
+
+  # ── Tech / security press ──
+  - arstechnica.com
+  - wired.com
+  - theregister.com
+  - darkreading.com
+  - securityweek.com
+  - thehackernews.com
+  - zdnet.com
+  - techcrunch.com

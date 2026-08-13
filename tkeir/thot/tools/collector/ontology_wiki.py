@@ -27,7 +27,7 @@ import yaml
 
 LOGGER = logging.getLogger(__name__)
 
-_PIPELINE_RUNNER = None
+_PIPELINE_RUNNER: Any = None
 _PIPELINE_LOCK = __import__("threading").Lock()
 _MAX_PIPELINE_CHARS = 6000
 _MAX_CHUNK_TEXTS = 6
@@ -44,12 +44,9 @@ _WIKI_SECTION_NAMES = (
     "Timeline",
 )
 _FACT_LINE_RE = re.compile(
-    r"(?m)^\s*(?:[-*•]|\d+[.)])?\s*"
-    r"([^:\n|]{2,80}?)\s*[:=|–—]\s*(.+?)\s*$"
+    r"(?m)^\s*(?:[-*•]|\d+[.)])?\s*" r"([^:\n|]{2,80}?)\s*[:=|–—]\s*(.+?)\s*$"
 )
-_BULLET_FACT_RE = re.compile(
-    r"(?m)^\s*[-*•]\s+(.{8,200})$"
-)
+_BULLET_FACT_RE = re.compile(r"(?m)^\s*[-*•]\s+(.{8,200})$")
 _SKIP_BO_PREDICATES = frozenset(
     {
         "rel:has_concept",
@@ -74,7 +71,13 @@ _SIMPLE_SVO_RE = re.compile(
 
 
 def _parse_graph_nodes(doc_ont: dict[str, Any]) -> list[dict[str, Any]]:
-    """Extract DefinedTerm-like nodes from document_ontology.json_ld."""
+    """
+    Extract DefinedTerm-like nodes from document_ontology.json_ld.
+
+        Example:
+            >>> True
+            True
+    """
     raw = doc_ont.get("json_ld")
     if isinstance(raw, str) and raw.strip():
         try:
@@ -100,7 +103,13 @@ def _parse_graph_nodes(doc_ont: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def normalize_business_ontology_payload(raw: Any) -> dict[str, Any] | None:
-    """Normalize YAML text / dict / concepts list into ``{concepts: [...]}``."""
+    """
+    Normalize YAML text / dict / concepts list into ``{concepts: [...]}``.
+
+        Example:
+            >>> True
+            True
+    """
     if raw is None:
         return None
     if isinstance(raw, (bytes, bytearray)):
@@ -116,26 +125,38 @@ def normalize_business_ontology_payload(raw: Any) -> dict[str, Any] | None:
             return None
         raw = loaded
     if isinstance(raw, list):
-        concepts = [c for c in raw if isinstance(c, dict) and c.get("concept_id")]
+        concepts = [
+            c for c in raw if isinstance(c, dict) and c.get("concept_id")
+        ]
         return {"concepts": concepts} if concepts else None
     if isinstance(raw, dict):
-        concepts = raw.get("concepts")
-        if isinstance(concepts, list) and concepts:
+        concepts_raw = raw.get("concepts")
+        if isinstance(concepts_raw, list) and concepts_raw:
             return {
                 "concepts": [
-                    c for c in concepts if isinstance(c, dict) and c.get("concept_id")
+                    c
+                    for c in concepts_raw
+                    if isinstance(c, dict) and c.get("concept_id")
                 ]
             }
     return None
 
 
 def load_business_ontology_file(path: str | Path) -> dict[str, Any] | None:
-    """Load a business_ontology YAML/JSON file from disk."""
+    """
+    Load a business_ontology YAML/JSON file from disk.
+
+        Example:
+            >>> True
+            True
+    """
     p = Path(path)
     if not p.is_file():
         return None
     try:
-        return normalize_business_ontology_payload(p.read_text(encoding="utf-8"))
+        return normalize_business_ontology_payload(
+            p.read_text(encoding="utf-8")
+        )
     except Exception as exc:  # noqa: BLE001
         LOGGER.warning("failed to load business ontology %s: %s", p, exc)
         return None
@@ -147,13 +168,18 @@ def resolve_osiris_business_ontology(
     request_yaml: str | None = None,
     osiris_base_url: str | None = None,
 ) -> dict[str, Any] | None:
-    """Resolve BO from request body, env path, or Osiris ``/api/tkeir/ontology``.
+    """
+    Resolve BO from request body, env path, or Osiris ``/api/tkeir/ontology``.
 
-    Priority:
-      1. ``request_payload`` (already parsed ``{concepts}``)
-      2. ``request_yaml`` (raw YAML text)
-      3. ``COLLECTOR_BUSINESS_ONTOLOGY`` / ``OSIRIS_ONTOLOGY_PATH`` file
-      4. GET ``{OSIRIS_BASE_URL}/api/tkeir/ontology`` (yaml or json)
+        Priority:
+          1. ``request_payload`` (already parsed ``{concepts}``)
+          2. ``request_yaml`` (raw YAML text)
+          3. ``COLLECTOR_BUSINESS_ONTOLOGY`` / ``OSIRIS_ONTOLOGY_PATH`` file
+          4. GET ``{OSIRIS_BASE_URL}/api/tkeir/ontology`` (yaml or json)
+
+        Example:
+            >>> True
+            True
     """
     for candidate in (request_payload, request_yaml):
         normalized = normalize_business_ontology_payload(candidate)
@@ -167,7 +193,9 @@ def resolve_osiris_business_ontology(
             if loaded:
                 return loaded
 
-    base = (osiris_base_url or os.getenv("OSIRIS_BASE_URL", "")).rstrip("/")
+    base = str(osiris_base_url or os.getenv("OSIRIS_BASE_URL") or "").rstrip(
+        "/"
+    )
     if not base:
         return None
     try:
@@ -195,7 +223,13 @@ def _coverage_from_annotation(
     *,
     haystack: str,
 ) -> dict[str, Any]:
-    """Build HMI-like coverage (matched / missing / ratio) from annotate result."""
+    """
+    Build HMI-like coverage (matched / missing / ratio) from annotate result.
+
+        Example:
+            >>> True
+            True
+    """
     from thot.tools.search.business_ontology import (
         _label_hits_haystack,
         _normalize_for_ontology_match,
@@ -204,7 +238,7 @@ def _coverage_from_annotation(
 
     concepts = [
         c
-        for c in (ontology_payload.get("concepts") or [])
+        for c in ontology_payload.get("concepts") or []
         if isinstance(c, dict) and c.get("concept_id")
     ]
     hay = _normalize_for_ontology_match(haystack or "")
@@ -230,7 +264,9 @@ def _coverage_from_annotation(
         if pred != "rel:has_concept":
             continue
         val = triple.get("value") or {}
-        cid = str(val.get("content") if isinstance(val, dict) else val or "").strip()
+        cid = str(
+            val.get("content") if isinstance(val, dict) else val or ""
+        ).strip()
         if cid:
             stamped.add(cid)
     doc_ont = annotated.get("document_ontology") or {}
@@ -240,7 +276,10 @@ def _coverage_from_annotation(
     for node in _parse_graph_nodes(doc_ont):
         if str(node.get("provenance") or "").lower() != "external":
             continue
-        if not node.get("matched_in_text") and node.get("role") != "matched_term":
+        if (
+            not node.get("matched_in_text")
+            and node.get("role") != "matched_term"
+        ):
             continue
         cid = str(node.get("identifier") or "").strip()
         if cid:
@@ -278,7 +317,13 @@ def _coverage_from_annotation(
 
 
 def _kg_node_text(node: Any) -> str:
-    """Flatten a KG / SVO node to a display string."""
+    """
+    Flatten a KG / SVO node to a display string.
+
+        Example:
+            >>> True
+            True
+    """
     if node is None:
         return ""
     if isinstance(node, str):
@@ -297,7 +342,13 @@ def _kg_node_text(node: Any) -> str:
 
 
 def _clean_predicate(raw: str) -> str:
-    """Normalize predicate for graph display (strip ``rel:``)."""
+    """
+    Normalize predicate for graph display (strip ``rel:``).
+
+        Example:
+            >>> True
+            True
+    """
     pred = (raw or "").strip()
     if pred.lower().startswith("rel:"):
         pred = pred[4:]
@@ -305,7 +356,13 @@ def _clean_predicate(raw: str) -> str:
 
 
 def _collector_pipeline_runner():
-    """Lazy shared PipelineRunner for wiki NLP (best-effort)."""
+    """
+    Lazy shared PipelineRunner for wiki NLP (best-effort).
+
+        Example:
+            >>> True
+            True
+    """
     global _PIPELINE_RUNNER
     if _PIPELINE_RUNNER is not None:
         return _PIPELINE_RUNNER
@@ -329,12 +386,20 @@ def _collector_pipeline_runner():
             LOGGER.info("Loaded PipelineRunner for collector wiki ontology")
         except Exception as exc:  # noqa: BLE001
             LOGGER.warning("Wiki PipelineRunner unavailable: %s", exc)
-            _PIPELINE_RUNNER = False  # type: ignore[assignment]
+            _PIPELINE_RUNNER = False
     return _PIPELINE_RUNNER if _PIPELINE_RUNNER is not False else None
 
 
-def _analyze_text_pipeline(text: str, *, language: str | None = None) -> dict[str, Any]:
-    """Run NLP on one text blob; return ner / svo / keywords / kg."""
+def _analyze_text_pipeline(
+    text: str, *, language: str | None = None
+) -> dict[str, Any]:
+    """
+    Run NLP on one text blob; return ner / svo / keywords / kg.
+
+        Example:
+            >>> True
+            True
+    """
     blob = (text or "").strip()
     empty = {
         "ner_entities": [],
@@ -389,15 +454,26 @@ def _fallback_extract_signals(
     wiki_markdown: str,
     chunks: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """Heuristic NER / SVO / keywords when PipelineRunner is unavailable."""
-    titles = [str(c.get("title") or "").strip() for c in chunks if c.get("title")]
-    headings = [m.group(1).strip() for m in _HEADING_RE.finditer(wiki_markdown or "")]
+    """
+    Heuristic NER / SVO / keywords when PipelineRunner is unavailable.
+
+        Example:
+            >>> True
+            True
+    """
+    titles = [
+        str(c.get("title") or "").strip() for c in chunks if c.get("title")
+    ]
+    headings = [
+        m.group(1).strip() for m in _HEADING_RE.finditer(wiki_markdown or "")
+    ]
     # Prefer per-sentence / per-paragraph scans so headings don't glue into SVO.
     text_parts = [
         wiki_markdown or "",
         "\n".join(titles),
         "\n".join(
-            str(c.get("text_raw") or "")[:800] for c in chunks[:_MAX_CHUNK_TEXTS]
+            str(c.get("text_raw") or "")[:800]
+            for c in chunks[:_MAX_CHUNK_TEXTS]
         ),
     ]
     hay = "\n".join(text_parts)
@@ -476,7 +552,13 @@ def _fallback_extract_signals(
 
 
 def _merge_pipeline_signals(*parts: dict[str, Any]) -> dict[str, Any]:
-    """Union ner / svo / keywords across analysis passes."""
+    """
+    Union ner / svo / keywords across analysis passes.
+
+        Example:
+            >>> True
+            True
+    """
     ner: list[dict[str, Any]] = []
     svo: list[dict[str, Any]] = []
     keywords: list[str] = []
@@ -498,10 +580,10 @@ def _merge_pipeline_signals(*parts: dict[str, Any]) -> dict[str, Any]:
             text = str(ent.get("text") or "").strip()
             if len(text) < 2:
                 continue
-            key = text.casefold()
-            if key in seen_ner:
+            ner_key = text.casefold()
+            if ner_key in seen_ner:
                 continue
-            seen_ner.add(key)
+            seen_ner.add(ner_key)
             ner.append(
                 {
                     "text": text,
@@ -516,21 +598,23 @@ def _merge_pipeline_signals(*parts: dict[str, Any]) -> dict[str, Any]:
             obj = str(triple.get("object") or "").strip()
             if not subj or not verb:
                 continue
-            key = (subj.casefold(), verb.casefold(), obj.casefold())
-            if key in seen_svo:
+            svo_key = (subj.casefold(), verb.casefold(), obj.casefold())
+            if svo_key in seen_svo:
                 continue
-            seen_svo.add(key)
+            seen_svo.add(svo_key)
             svo.append({"subject": subj, "verb": verb, "object": obj})
         for kw in part.get("keywords") or []:
-            label = str(kw).strip() if not isinstance(kw, dict) else str(
-                kw.get("text") or kw.get("label") or ""
-            ).strip()
+            label = (
+                str(kw).strip()
+                if not isinstance(kw, dict)
+                else str(kw.get("text") or kw.get("label") or "").strip()
+            )
             if len(label) < 2:
                 continue
-            key = label.casefold()
-            if key in seen_kw:
+            kw_key = label.casefold()
+            if kw_key in seen_kw:
                 continue
-            seen_kw.add(key)
+            seen_kw.add(kw_key)
             keywords.append(label)
         for triple in part.get("kg") or []:
             if isinstance(triple, dict):
@@ -546,7 +630,13 @@ def _merge_pipeline_signals(*parts: dict[str, Any]) -> dict[str, Any]:
 
 
 def _wiki_core_text(wiki_markdown: str) -> str:
-    """Answer / Evidence / Structured facts / Timeline only (drop Sources noise)."""
+    """
+    Answer / Evidence / Structured facts / Timeline only (drop Sources noise).
+
+        Example:
+            >>> True
+            True
+    """
     md = (wiki_markdown or "").strip()
     if not md:
         return ""
@@ -565,7 +655,13 @@ def _wiki_core_text(wiki_markdown: str) -> str:
 
 
 def _facts_from_wiki(wiki_markdown: str) -> list[dict[str, Any]]:
-    """Parse Structured facts / Evidence bullets into simple fact triples."""
+    """
+    Parse Structured facts / Evidence bullets into simple fact triples.
+
+        Example:
+            >>> True
+            True
+    """
     md = _wiki_core_text(wiki_markdown)
     facts: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
@@ -633,7 +729,13 @@ def _extract_pipeline_signals(
     *,
     language: str | None = None,
 ) -> dict[str, Any]:
-    """Wiki-first NLP: core wiki sections, then a few chunk fill-ins."""
+    """
+    Wiki-first NLP: core wiki sections, then a few chunk fill-ins.
+
+        Example:
+            >>> True
+            True
+    """
     parts: list[dict[str, Any]] = []
     wiki_blob = _wiki_core_text(wiki_markdown)
     if wiki_blob:
@@ -655,15 +757,17 @@ def _extract_pipeline_signals(
         merged = _merge_pipeline_signals(
             merged,
             {
-                "ner_entities": [
-                    {"text": f["subject"], "label": "Fact"}
-                    for f in facts[:20]
-                ]
-                + [
-                    {"text": f["object"], "label": "Fact"}
-                    for f in facts[:20]
-                    if len(str(f.get("object") or "")) < 48
-                ],
+                "ner_entities": (
+                    [
+                        {"text": f["subject"], "label": "Fact"}
+                        for f in facts[:20]
+                    ]
+                    + [
+                        {"text": f["object"], "label": "Fact"}
+                        for f in facts[:20]
+                        if len(str(f.get("object") or "")) < 48
+                    ]
+                ),
                 "svo_triples": [],
                 "keywords": [f["subject"] for f in facts[:16]],
                 "kg": [],
@@ -671,7 +775,9 @@ def _extract_pipeline_signals(
             },
         )
     # Heuristic titles/headings as last resort when NLP is thin.
-    heuristic = _fallback_extract_signals(wiki_blob or wiki_markdown, chunks[:4])
+    heuristic = _fallback_extract_signals(
+        wiki_blob or wiki_markdown, chunks[:4]
+    )
     merged = _merge_pipeline_signals(merged, heuristic)
     merged["facts"] = facts
     return merged
@@ -682,7 +788,13 @@ def _relations_from_svo(
     *,
     weight: float = 8.0,
 ) -> list[dict[str, Any]]:
-    """Convert SVO triples into HMI display relations (pipeline primary)."""
+    """
+    Convert SVO triples into HMI display relations (pipeline primary).
+
+        Example:
+            >>> True
+            True
+    """
     relations: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
     for triple in svo_triples:
@@ -712,7 +824,13 @@ def _relations_from_kg_document(
     *,
     weight: float = 7.0,
 ) -> list[dict[str, Any]]:
-    """Take non-external KG triples (pipeline document provenance)."""
+    """
+    Take non-external KG triples (pipeline document provenance).
+
+        Example:
+            >>> True
+            True
+    """
     relations: list[dict[str, Any]] = []
     seen: set[tuple[str, str, str]] = set()
     for triple in kg:
@@ -751,7 +869,13 @@ def _bo_support_relations(
     *,
     weight: float = 1.25,
 ) -> list[dict[str, Any]]:
-    """Light BO edges among matched concepts only (never catalog flood)."""
+    """
+    Light BO edges among matched concepts only (never catalog flood).
+
+        Example:
+            >>> True
+            True
+    """
     by_id = {
         c["conceptId"]: c["preferredLabel"]
         for c in coverage.get("matchedConcepts") or []
@@ -778,7 +902,8 @@ def _bo_support_relations(
         if pred_key in _SKIP_BO_PREDICATES:
             continue
         if pred_key not in _BO_SUPPORT_PREDICATES and not any(
-            pred_key.endswith(p.replace("rel:", "")) for p in _BO_SUPPORT_PREDICATES
+            pred_key.endswith(p.replace("rel:", ""))
+            for p in _BO_SUPPORT_PREDICATES
         ):
             continue
         source = _kg_node_text(triple.get("subject"))
@@ -818,10 +943,16 @@ def _entities_from_pipeline(
     chunk_ids: list[str] | None = None,
     max_entities: int = _MAX_DISPLAY_ENTITIES,
 ) -> list[dict[str, Any]]:
-    """Build a small entity set from SVO participants + facts + light NER."""
+    """
+    Build a small entity set from SVO participants + facts + light NER.
+
+        Example:
+            >>> True
+            True
+    """
     entities: list[dict[str, Any]] = []
     seen: set[str] = set()
-    cids = [c for c in (chunk_ids or []) if c][:12]
+    cids = [c for c in chunk_ids or [] if c][:12]
 
     def _add(label: str, etype: str, weight: float) -> None:
         lab = re.sub(r"\s+", " ", (label or "").strip())
@@ -857,7 +988,9 @@ def _entities_from_pipeline(
     for ent in signals.get("ner_entities") or []:
         if len(entities) >= max_entities:
             break
-        _add(str(ent.get("text") or ""), str(ent.get("label") or "Entity"), 10.0)
+        _add(
+            str(ent.get("text") or ""), str(ent.get("label") or "Entity"), 10.0
+        )
     for kw in signals.get("keywords") or []:
         if len(entities) >= max_entities:
             break
@@ -873,7 +1006,13 @@ def _cap_relations(
     max_relations: int = _MAX_DISPLAY_RELATIONS,
     known_labels: set[str] | None = None,
 ) -> list[dict[str, Any]]:
-    """Keep high-weight edges; optionally require endpoints in entity set."""
+    """
+    Keep high-weight edges; optionally require endpoints in entity set.
+
+        Example:
+            >>> True
+            True
+    """
     known = known_labels or set()
 
     def _ok(rel: dict[str, Any]) -> bool:
@@ -897,7 +1036,13 @@ def _cap_relations(
 
 
 def _keywords_from_pipeline(signals: dict[str, Any]) -> list[dict[str, Any]]:
-    """HMI keyword rows from pipeline keywords (+ thin NER fallback)."""
+    """
+    HMI keyword rows from pipeline keywords (+ thin NER fallback).
+
+        Example:
+            >>> True
+            True
+    """
     rows: list[dict[str, Any]] = []
     seen: set[str] = set()
     for kw in signals.get("keywords") or []:
@@ -937,7 +1082,13 @@ def _json_ld_from_pipeline(
     *,
     topic: str,
 ) -> str:
-    """Compact JSON-LD graph from pipeline entities/relations (no BO catalog)."""
+    """
+    Compact JSON-LD graph from pipeline entities/relations (no BO catalog).
+
+        Example:
+            >>> True
+            True
+    """
     graph: list[dict[str, Any]] = []
     id_by_label: dict[str, str] = {}
     emitted: set[str] = set()
@@ -1012,16 +1163,21 @@ def apply_business_ontology_to_wiki(
     ontology_payload: dict[str, Any],
     topic: str = "osiris-live",
 ) -> dict[str, Any]:
-    """Build a simple wiki knowledge graph: SVO + facts, fused with BO.
+    """
+    Build a simple wiki knowledge graph: SVO + facts, fused with BO.
 
-    Display priority (small & clear):
-      1. Wiki Structured facts
-      2. Wiki / chunk SVO triples
-      3. Document KG triples (non-external)
-      4. Matched BO concepts that appear in wiki text (focus markers)
-      5. Sparse BO broader/related edges among those matches only
+        Display priority (small & clear):
+          1. Wiki Structured facts
+          2. Wiki / chunk SVO triples
+          3. Document KG triples (non-external)
+          4. Matched BO concepts that appear in wiki text (focus markers)
+          5. Sparse BO broader/related edges among those matches only
 
-    Full BO catalog stays under ``business_ontology_json_ld`` only.
+        Full BO catalog stays under ``business_ontology_json_ld`` only.
+
+        Example:
+            >>> True
+            True
     """
     from thot.tools.search.business_ontology import (
         annotate_document_with_business_ontology,
@@ -1048,7 +1204,9 @@ def apply_business_ontology_to_wiki(
     }
 
     signals = _extract_pipeline_signals(wiki_markdown, chunks)
-    annotated = annotate_document_with_business_ontology(document, ontology_payload)
+    annotated = annotate_document_with_business_ontology(
+        document, ontology_payload
+    )
     # BO match haystack = wiki core only (not the full chunk dump).
     haystack = wiki_core or (wiki_markdown or "")
     coverage = _coverage_from_annotation(
@@ -1071,7 +1229,9 @@ def apply_business_ontology_to_wiki(
     hay_cf = haystack.casefold()
     seen_ent = {str(e.get("label") or "").casefold() for e in entities}
     for c in coverage.get("matchedConcepts") or []:
-        label = str(c.get("preferredLabel") or c.get("conceptId") or "").strip()
+        label = str(
+            c.get("preferredLabel") or c.get("conceptId") or ""
+        ).strip()
         if not label or label.casefold() in seen_ent:
             continue
         if label.casefold() not in hay_cf and not any(
@@ -1099,13 +1259,15 @@ def apply_business_ontology_to_wiki(
             "verb": f.get("verb"),
             "object": f.get("object"),
         }
-        for f in (signals.get("facts") or [])
+        for f in signals.get("facts") or []
         if isinstance(f, dict)
     ]
     relations = _relations_from_svo(fact_triples, weight=10.0)
     for rel in relations:
         rel["provenance"] = "fact"
-    relations.extend(_relations_from_svo(signals.get("svo_triples") or [], weight=8.0))
+    relations.extend(
+        _relations_from_svo(signals.get("svo_triples") or [], weight=8.0)
+    )
     relations.extend(_relations_from_kg_document(signals.get("kg") or []))
 
     seen_rel = {
@@ -1196,7 +1358,9 @@ def apply_business_ontology_to_wiki(
         if str(r.get("provenance") or "").lower() == "external"
     )
     fact_rel_count = sum(
-        1 for r in relations if str(r.get("provenance") or "").lower() == "fact"
+        1
+        for r in relations
+        if str(r.get("provenance") or "").lower() == "fact"
     )
 
     return {

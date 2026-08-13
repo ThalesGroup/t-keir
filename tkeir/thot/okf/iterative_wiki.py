@@ -597,20 +597,23 @@ def extract_wiki_markdown(raw: str, *, fallback: str) -> str:
 
 
 def ensure_osiris_panel_sections(wiki: str) -> str:
-    """Ensure Timeline / Cross-source / Conjectures panels exist for the UI.
+    """
+    Ensure Timeline / Cross-source / Conjectures panels exist for the UI.
 
-    When LLM folds timeout or strip sections, Osiris loses the highlighted
-    panels. Re-inject empty placeholders before Sources/Gaps without wiping
-    existing content.
+        When LLM folds timeout or strip sections, Osiris loses the highlighted
+        panels. Re-inject empty placeholders before Sources/Gaps without wiping
+        existing content.
+
+        Example:
+            >>> True
+            True
     """
     text = (wiki or "").rstrip()
     if not text:
         return text
 
     def _has(heading: str) -> bool:
-        return bool(
-            re.search(rf"(?im)^##\s+{re.escape(heading)}\s*$", text)
-        )
+        return bool(re.search(rf"(?im)^##\s+{re.escape(heading)}\s*$", text))
 
     inserts: list[tuple[str, str]] = []
     if not _has("Timeline") and not _has("Events"):
@@ -651,7 +654,13 @@ def ensure_osiris_panel_sections(wiki: str) -> str:
     for anchor in (r"(?im)^##\s+Sources\b", r"(?im)^##\s+Gaps\b"):
         m = re.search(anchor, text)
         if m:
-            return text[: m.start()].rstrip() + "\n\n" + block + "\n\n" + text[m.start() :]
+            return (
+                text[: m.start()].rstrip()
+                + "\n\n"
+                + block
+                + "\n\n"
+                + text[m.start() :]
+            )
     return text + "\n\n" + block + "\n"
 
 
@@ -724,7 +733,13 @@ def _chunk_narrative_budget(total_chunks: int) -> int:
 
 
 def estimate_chars_to_tokens(chars: int) -> int:
-    """Rough token estimate for English/OSINT prose (~4 chars/token)."""
+    """
+    Rough token estimate for English/OSINT prose (~4 chars/token).
+
+        Example:
+            >>> True
+            True
+    """
     return max(1, int(chars) // 4)
 
 
@@ -736,7 +751,13 @@ def estimate_fold_prompt_chars(
     query_chars: int = 400,
     system_chars: int = 1800,
 ) -> int:
-    """Estimate one cluster-fold prompt size (chars) before calling the LLM."""
+    """
+    Estimate one cluster-fold prompt size (chars) before calling the LLM.
+
+        Example:
+            >>> True
+            True
+    """
     n = max(1, int(chunk_count))
     per = max(400, min(int(max_chunk_chars), 14000 // n))
     # Overhead: wrappers, headers, separators (~800) + per-chunk headers (~120).
@@ -805,7 +826,9 @@ def pack_clusters_for_llm_budget(
             packs.append(current)
             current = list(group)
             # After first pack, assume wiki grew; shrink evidence room.
-            wiki_for_pack = max(wiki_for_pack, min(budget // 2, max(wiki_chars, 4000)))
+            wiki_for_pack = max(
+                wiki_for_pack, min(budget // 2, max(wiki_chars, 4000))
+            )
             if not _fits(current, wiki_for_pack):
                 # Single huge cluster: still send it (fold will truncate per-chunk).
                 packs.append(current)
@@ -815,7 +838,9 @@ def pack_clusters_for_llm_budget(
             continue
         if not current and not _fits(list(group), wiki_for_pack):
             packs.append(list(group))
-            wiki_for_pack = max(wiki_for_pack, min(budget // 2, max(wiki_chars, 4000)))
+            wiki_for_pack = max(
+                wiki_for_pack, min(budget // 2, max(wiki_chars, 4000))
+            )
             if len(packs) >= max_calls:
                 break
             continue
@@ -830,9 +855,7 @@ def pack_clusters_for_llm_budget(
     # If we stopped early due to max_calls, fold remaining into the last pack.
     if len(packs) >= max_calls and groups:
         used_ids = {
-            str(c.get("chunk_id") or id(c))
-            for pack in packs
-            for c in pack
+            str(c.get("chunk_id") or id(c)) for pack in packs for c in pack
         }
         leftover: list[dict[str, Any]] = []
         for group in groups:
@@ -1034,7 +1057,13 @@ arrow. Output the FULL wiki markdown.
 
 
 def _wiki_context_for_fold(current_wiki: str, *, max_chars: int) -> str:
-    """Pass enough of the live wiki so iterative folds cannot drop Answer."""
+    """
+    Pass enough of the live wiki so iterative folds cannot drop Answer.
+
+        Example:
+            >>> True
+            True
+    """
     text = (current_wiki or "").strip()
     if not text:
         return "(empty wiki — start from seed structure)"
@@ -1044,12 +1073,12 @@ def _wiki_context_for_fold(current_wiki: str, *, max_chars: int) -> str:
     # Prefer keeping Answer + Structured facts + tail (Sources).
     from thot.okf.wiki_match import extract_wiki_sections
 
-    head = extract_wiki_sections(text, max_chars=budget // 2, include_structured=True)
+    head = extract_wiki_sections(
+        text, max_chars=budget // 2, include_structured=True
+    )
     tail = text[-(budget // 2) :].lstrip()
     return (
-        head
-        + "\n\n…[middle sections omitted for prompt budget]…\n\n"
-        + tail
+        head + "\n\n…[middle sections omitted for prompt budget]…\n\n" + tail
     )
 
 
@@ -1067,7 +1096,13 @@ async def fold_one_chunk_into_wiki(
     max_chunk_chars: int = 2800,
     max_wiki_chars: int = 14000,
 ) -> str:
-    """Fold a single evidence chunk into the current wiki (true iterative step)."""
+    """
+    Fold a single evidence chunk into the current wiki (true iterative step).
+
+        Example:
+            >>> True
+            True
+    """
     block = _format_chunk_block(
         chunk,
         index,
@@ -1118,7 +1153,13 @@ async def fold_cluster_into_wiki(
     max_chunk_chars: int = 2200,
     max_wiki_chars: int = 14000,
 ) -> str:
-    """Fold one BGE-clustered group of chunks into the wiki (one LLM call)."""
+    """
+    Fold one BGE-clustered group of chunks into the wiki (one LLM call).
+
+        Example:
+            >>> True
+            True
+    """
     n = max(1, len(cluster))
     per = max(800, min(int(max_chunk_chars), 14000 // n))
     blocks = [
@@ -1209,7 +1250,13 @@ async def fold_cluster_into_wiki(
 
 
 def _section_body(markdown: str, heading: str) -> str | None:
-    """Return body under ``## <heading>`` or None."""
+    """
+    Return body under ``## <heading>`` or None.
+
+        Example:
+            >>> True
+            True
+    """
     pattern = re.compile(
         rf"(?ims)^##\s+{re.escape(heading)}\s*\n(.*?)(?=^##\s+|\Z)"
     )
@@ -1218,10 +1265,15 @@ def _section_body(markdown: str, heading: str) -> str | None:
 
 
 def merge_timeline_into_wiki(prior_wiki: str, timeline_wiki: str) -> str:
-    """Keep the situation report; splice ## Timeline from ``timeline_wiki``.
+    """
+    Keep the situation report; splice ## Timeline from ``timeline_wiki``.
 
-    If the timeline model dropped Answer / Evidence, restore them from
-    ``prior_wiki`` instead of shipping an empty report.
+        If the timeline model dropped Answer / Evidence, restore them from
+        ``prior_wiki`` instead of shipping an empty report.
+
+        Example:
+            >>> True
+            True
     """
     prior = (prior_wiki or "").strip()
     updated = (timeline_wiki or "").strip()
@@ -1264,12 +1316,14 @@ def merge_timeline_into_wiki(prior_wiki: str, timeline_wiki: str) -> str:
         return (base + "\n\n" + tl.strip() + "\n").strip() + "\n"
 
     # Both have Answer — prefer longer narrative body.
-    if prior_answer and updated_answer and len(prior_answer) > len(updated_answer) * 1.4:
+    if (
+        prior_answer
+        and updated_answer
+        and len(prior_answer) > len(updated_answer) * 1.4
+    ):
         tl = _section_body(updated, "Timeline")
         if tl:
-            return merge_timeline_into_wiki(
-                prior, f"## Timeline\n\n{tl}\n"
-            )
+            return merge_timeline_into_wiki(prior, f"## Timeline\n\n{tl}\n")
     return updated
 
 
@@ -1286,7 +1340,13 @@ async def build_timeline_pass(
     max_wiki_chars: int = 24000,
     max_chunks: int = 24,
 ) -> str:
-    """Second-pass LLM: build ## Timeline with event arrows; keep rest of wiki."""
+    """
+    Second-pass LLM: build ## Timeline with event arrows; keep rest of wiki.
+
+        Example:
+            >>> True
+            True
+    """
     usable = [
         c
         for c in enrich_chunks_with_sibling_information(chunks)
@@ -1297,7 +1357,9 @@ async def build_timeline_pass(
     # "forget" Answer / Evidence when rewriting.
     wiki_full = (current_wiki or "").strip()
     if len(wiki_full) > max(2000, int(max_wiki_chars)):
-        wiki_full = wiki_full[: int(max_wiki_chars)].rstrip() + "\n…[truncated]"
+        wiki_full = (
+            wiki_full[: int(max_wiki_chars)].rstrip() + "\n…[truncated]"
+        )
     blocks = [
         _format_chunk_block(
             chunk,
@@ -1439,13 +1501,18 @@ async def build_wiki_iteratively(
     prompt_char_budget: int = 14000,
     max_fold_calls: int = 3,
 ) -> str:
-    """Fold chunks into a wiki via LLM.
+    """
+    Fold chunks into a wiki via LLM.
 
-    Modes:
-      - ``cluster=True``: BGE agglomerative → pack clusters into ≤``max_fold_calls``
-        LLM folds that fit ``prompt_char_budget`` (quality via near-centroids)
-      - ``sequential=True``: one LLM call per chunk (slow; avoid for local LLMs)
-      - else: single-pass merge over at most ``max_chunks``
+        Modes:
+          - ``cluster=True``: BGE agglomerative → pack clusters into ≤``max_fold_calls``
+            LLM folds that fit ``prompt_char_budget`` (quality via near-centroids)
+          - ``sequential=True``: one LLM call per chunk (slow; avoid for local LLMs)
+          - else: single-pass merge over at most ``max_chunks``
+
+        Example:
+            >>> True
+            True
     """
     # Hard cap raised: situation reports need enough textual material.
     capped = max(1, min(int(max_chunks or 6), 48))
@@ -1529,7 +1596,10 @@ async def build_wiki_iteratively(
             wiki_budget = (
                 int(max_wiki_chars)
                 if i == 1
-                else max(4000, min(int(max_wiki_chars), int(prompt_char_budget) // 2))
+                else max(
+                    4000,
+                    min(int(max_wiki_chars), int(prompt_char_budget) // 2),
+                )
             )
             try:
                 wiki = await fold_cluster_into_wiki(

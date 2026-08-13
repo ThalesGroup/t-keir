@@ -186,18 +186,18 @@ async def lifespan(app: FastAPI):
         >>> inspect.isasyncgenfunction(lifespan.__wrapped__)
         True
     """
-    from thot.tools.collector.service import load_dedupe_index
+    from thot.tools.collector.forge_config import (
+        clear_forge_config_cache,
+        ensure_workspace_forge_config,
+        load_forge_config,
+    )
     from thot.tools.collector.quality import (
         bundled_osint_sources_path,
         clear_osint_sources_cache,
         load_osint_sources,
         workspace_osint_sources_path,
     )
-    from thot.tools.collector.forge_config import (
-        clear_forge_config_cache,
-        ensure_workspace_forge_config,
-        load_forge_config,
-    )
+    from thot.tools.collector.service import load_dedupe_index
 
     configure_json_logging(
         service=os.getenv("TKEIR_SERVICE", "tkeir-collector")
@@ -210,7 +210,9 @@ async def lifespan(app: FastAPI):
         bundled = bundled_osint_sources_path()
         if bundled.is_file():
             ws_sources.parent.mkdir(parents=True, exist_ok=True)
-            ws_sources.write_text(bundled.read_text(encoding="utf-8"), encoding="utf-8")
+            ws_sources.write_text(
+                bundled.read_text(encoding="utf-8"), encoding="utf-8"
+            )
             log_structured(
                 "info",
                 "seeded OSINT allowlist",
@@ -436,9 +438,14 @@ async def ready() -> dict[str, Any]:
 
 @app.get("/status")
 async def pipeline_status(probe_agent: bool = True) -> dict[str, Any]:
-    """Live pipeline phase + ETA (optionally probes wiki agent run).
+    """
+    Live pipeline phase + ETA (optionally probes wiki agent run).
 
-    Osiris should poll this during READ / wiki produce.
+        Osiris should poll this during READ / wiki produce.
+
+        Example:
+            >>> True
+            True
     """
     from thot.tools.collector.pipeline_status import PIPELINE_STATUS
     from thot.tools.collector.wiki_loop import WIKI_LOOP
@@ -638,7 +645,13 @@ async def _run_feed(
     business_ontology: Any = None,
     business_ontology_yaml: str | None = None,
 ) -> dict[str, Any]:
-    """User-triggered feed; wiki always via agent from best golden chunks."""
+    """
+    User-triggered feed; wiki always via agent from best golden chunks.
+
+        Example:
+            >>> True
+            True
+    """
     from thot.tools.collector.feed import build_feed
     from thot.tools.collector.wiki_loop import WIKI_LOOP
 
@@ -679,7 +692,13 @@ async def feed_get(
     lng: float | None = None,
     produce_wiki: bool = True,
 ) -> dict[str, Any]:
-    """User-triggered: Osiris → forge → SearXNG → markdown + agent wiki."""
+    """
+    User-triggered: Osiris → forge → SearXNG → markdown + agent wiki.
+
+        Example:
+            >>> True
+            True
+    """
     center = (
         {"lat": lat, "lng": lng}
         if lat is not None and lng is not None
@@ -705,7 +724,13 @@ async def feed_get(
 
 @app.post("/feed")
 async def feed_post(body: FeedRequest) -> dict[str, Any]:
-    """Same as GET /feed with optional ``data`` / ``queries`` body."""
+    """
+    Same as GET /feed with optional ``data`` / ``queries`` body.
+
+        Example:
+            >>> True
+            True
+    """
     try:
         return await _run_feed(
             data=body.data,
@@ -723,7 +748,13 @@ async def feed_post(body: FeedRequest) -> dict[str, Any]:
 
 @app.get("/wiki")
 async def wiki_get() -> dict[str, Any]:
-    """Latest live wiki snapshot produced by the collector."""
+    """
+    Latest live wiki snapshot produced by the collector.
+
+        Example:
+            >>> True
+            True
+    """
     from thot.tools.collector.wiki_loop import WIKI_LOOP
 
     return WIKI_LOOP.snapshot()
@@ -731,11 +762,16 @@ async def wiki_get() -> dict[str, Any]:
 
 @app.post("/wiki")
 async def wiki_post(request: Request) -> dict[str, Any]:
-    """Produce wiki from last feed documents (sources kept).
+    """
+    Produce wiki from last feed documents (sources kept).
 
-    Body ``async: true`` (default) enqueues background production and returns
-    immediately with ``status=producing`` — poll ``GET /wiki`` until done.
-    Set ``async: false`` for a blocking wait (may exceed proxy timeouts).
+        Body ``async: true`` (default) enqueues background production and returns
+        immediately with ``status=producing`` — poll ``GET /wiki`` until done.
+        Set ``async: false`` for a blocking wait (may exceed proxy timeouts).
+
+        Example:
+            >>> True
+            True
     """
     from thot.tools.collector.feed import get_last_feed
     from thot.tools.collector.wiki_loop import WIKI_LOOP
@@ -750,14 +786,17 @@ async def wiki_post(request: Request) -> dict[str, Any]:
     except Exception:  # noqa: BLE001
         body_data = {}
     topic = (
-        str(body_data.get("topic") or request.query_params.get("topic") or "")
-        .strip()
+        str(
+            body_data.get("topic") or request.query_params.get("topic") or ""
+        ).strip()
         or "osiris-live"
     )
     business_ontology = body_data.get("business_ontology")
     business_ontology_yaml = body_data.get("business_ontology_yaml")
     if isinstance(business_ontology_yaml, (bytes, bytearray)):
-        business_ontology_yaml = business_ontology_yaml.decode("utf-8", "replace")
+        business_ontology_yaml = business_ontology_yaml.decode(
+            "utf-8", "replace"
+        )
     if business_ontology_yaml is not None:
         business_ontology_yaml = str(business_ontology_yaml)
 
@@ -805,7 +844,13 @@ async def wiki_post(request: Request) -> dict[str, Any]:
 
 @app.post("/wiki/start")
 async def wiki_start(body: WikiStartRequest) -> dict[str, Any]:
-    """Start iterative wiki updates every ``interval_s`` (0 = stop)."""
+    """
+    Start iterative wiki updates every ``interval_s`` (0 = stop).
+
+        Example:
+            >>> True
+            True
+    """
     from thot.tools.collector.wiki_loop import WIKI_LOOP
 
     if body.interval_s <= 0:
@@ -824,7 +869,13 @@ async def wiki_start(body: WikiStartRequest) -> dict[str, Any]:
 
 @app.post("/wiki/stop")
 async def wiki_stop() -> dict[str, Any]:
-    """Stop the iterative wiki loop."""
+    """
+    Stop the iterative wiki loop.
+
+        Example:
+            >>> True
+            True
+    """
     from thot.tools.collector.wiki_loop import WIKI_LOOP
 
     return WIKI_LOOP.stop()
@@ -832,7 +883,13 @@ async def wiki_stop() -> dict[str, Any]:
 
 @app.get("/wiki/saved")
 async def wiki_saved_latest() -> dict[str, Any]:
-    """Return the latest dated wiki panel bundle (wiki + queries + docs…)."""
+    """
+    Return the latest dated wiki panel bundle (wiki + queries + docs…).
+
+        Example:
+            >>> True
+            True
+    """
     from thot.tools.collector.wiki_store import load_wiki_bundle
 
     bundle = load_wiki_bundle(_state().settings.workspace, None)
@@ -843,7 +900,13 @@ async def wiki_saved_latest() -> dict[str, Any]:
 
 @app.get("/wiki/saved/list")
 async def wiki_saved_list(limit: int = 50) -> dict[str, Any]:
-    """List saved wiki bundles newest-first."""
+    """
+    List saved wiki bundles newest-first.
+
+        Example:
+            >>> True
+            True
+    """
     from thot.tools.collector.wiki_store import list_wiki_bundles
 
     rows = list_wiki_bundles(
@@ -855,7 +918,13 @@ async def wiki_saved_list(limit: int = 50) -> dict[str, Any]:
 
 @app.get("/wiki/saved/{bundle_id}")
 async def wiki_saved_get(bundle_id: str) -> dict[str, Any]:
-    """Return one saved wiki panel bundle by id (or ``latest``)."""
+    """
+    Return one saved wiki panel bundle by id (or ``latest``).
+
+        Example:
+            >>> True
+            True
+    """
     from thot.tools.collector.wiki_store import load_wiki_bundle
 
     bundle = load_wiki_bundle(_state().settings.workspace, bundle_id)

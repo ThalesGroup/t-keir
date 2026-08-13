@@ -62,12 +62,16 @@ def collector_settings() -> CollectorSettings:
         >>> s.port > 0
         True
     """
-    from thot.tools.collector.quality import resolve_osint_sources_path
     from thot.tools.collector.forge_config import ensure_workspace_forge_config
+    from thot.tools.collector.quality import resolve_osint_sources_path
 
     wiki_interval = max(0, int(os.getenv("COLLECTOR_WIKI_INTERVAL_S", "0")))
-    wiki_enabled_env = os.getenv("COLLECTOR_WIKI_ENABLED", "false").strip().lower()
-    wiki_enabled = wiki_enabled_env in {"1", "true", "yes", "on"} and wiki_interval > 0
+    wiki_enabled_env = (
+        os.getenv("COLLECTOR_WIKI_ENABLED", "false").strip().lower()
+    )
+    wiki_enabled = (
+        wiki_enabled_env in {"1", "true", "yes", "on"} and wiki_interval > 0
+    )
 
     ws = workspace_root()
     ensure_workspace_forge_config(ws)

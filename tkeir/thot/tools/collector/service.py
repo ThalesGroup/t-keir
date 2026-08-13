@@ -144,13 +144,15 @@ async def collect_markdown(
     index = dedupe or load_dedupe_index(settings)
     limit = max_results if max_results is not None else settings.max_results
     cats = (categories or settings.searx_categories or "").strip() or None
-    engs = (engines if engines is not None else settings.searx_engines or "").strip() or None
-    safe = (
-        safesearch
-        if safesearch is not None
-        else settings.searx_safesearch
-    )
-    tr = (time_range if time_range is not None else settings.searx_time_range or "").strip() or None
+    engs = (
+        engines if engines is not None else settings.searx_engines or ""
+    ).strip() or None
+    safe = safesearch if safesearch is not None else settings.searx_safesearch
+    tr = (
+        time_range
+        if time_range is not None
+        else settings.searx_time_range or ""
+    ).strip() or None
     raw_hits = await searxng_search(
         query,
         base_url=settings.searxng_url,
@@ -190,20 +192,31 @@ async def collect_markdown(
             )
             if not body.strip():
                 # Fall back to SearXNG snippet so the wiki still gets prose.
-                snippet = str(hit.get("content") or hit.get("snippet") or "").strip()
+                snippet = str(
+                    hit.get("content") or hit.get("snippet") or ""
+                ).strip()
                 if len(snippet) >= 80:
                     body = snippet
                 else:
                     errors.append(
-                        {"url": url, "error": "empty markdown after conversion"}
+                        {
+                            "url": url,
+                            "error": "empty markdown after conversion",
+                        }
                     )
                     continue
             from thot.tools.collector.convert import is_substantive_markdown
 
             if not is_substantive_markdown(body, min_chars=120):
-                snippet = str(hit.get("content") or hit.get("snippet") or "").strip()
+                snippet = str(
+                    hit.get("content") or hit.get("snippet") or ""
+                ).strip()
                 if len(snippet) >= 80:
-                    body = f"{body}\n\n{snippet}".strip() if body.strip() else snippet
+                    body = (
+                        f"{body}\n\n{snippet}".strip()
+                        if body.strip()
+                        else snippet
+                    )
                 if not is_substantive_markdown(body, min_chars=80):
                     errors.append(
                         {
@@ -269,7 +282,9 @@ async def collect_markdown(
         except Exception as exc:  # noqa: BLE001
             LOGGER.info("collect failed for %s: %s", url, exc)
             # Still try to keep the SearXNG snippet as a thin document.
-            snippet = str(hit.get("content") or hit.get("snippet") or "").strip()
+            snippet = str(
+                hit.get("content") or hit.get("snippet") or ""
+            ).strip()
             title = (hit.get("title") or "").strip() or url
             if len(snippet) >= 80:
                 collected_at = utc_now_rfc3339()

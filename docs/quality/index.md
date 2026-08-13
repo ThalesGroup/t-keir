@@ -1,6 +1,6 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-08-08 10:33 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-08-13 15:33 UTC**.
 
 How this dashboard is produced, which Actions upload artefacts, and gate
 thresholds: **[CI, reports & Actions](../ci/index.md)** ·
@@ -19,18 +19,18 @@ Scoped line coverage from `make coverage` / `CoverageFast.sh` (same
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Scoped line coverage | 91.16% | ≥ 90% | PASS |
-| Full ``thot/`` XML line-rate | 69.78% | informational | — |
-| Statements (scoped) | 6598 | — | — |
-| Covered lines | 6015 | — | — |
-| Missing lines | 583 | — | — |
+| Scoped line coverage | 91.09% | ≥ 90% | PASS |
+| Full ``thot/`` XML line-rate | 65.20% | informational | — |
+| Statements (scoped) | 6798 | — | — |
+| Covered lines | 6192 | — | — |
+| Missing lines | 606 | — | — |
 
 ### Coverage report (TOTAL)
 
 ```
 Name                                                                                                  Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                  6598    583    91%
+TOTAL                                                                                                  6798    606    91%
 ```
 
 Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
@@ -44,10 +44,10 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Average CC | 5.04 | ≤ 7.0 | PASS |
+| Average CC | 5.36 | ≤ 7.0 | PASS |
 | Grade | B | B or better | PASS |
-| Functions at grade D+ | 51 | 0 | FAIL |
-| Lowest MI module | thot/tools/search/ontology_utils.py (0.00) | ≥ 20 preferred | — |
+| Functions at grade D+ | 71 | 0 | FAIL |
+| Lowest MI module | thot/tools/collector/ontology_wiki.py (0.00) | ≥ 20 preferred | — |
 
 ### Risk reference table
 
@@ -63,8 +63,8 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 ### Full report (summary)
 
 ```
-2305 blocks (classes, functions, methods) analyzed.
-Average complexity: B (5.0364425162689805)
+2470 blocks (classes, functions, methods) analyzed.
+Average complexity: B (5.35668016194332)
 
 Full per-function JSON: reports/quality/radon_cc.json
 ```

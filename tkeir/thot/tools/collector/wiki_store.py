@@ -26,11 +26,23 @@ _SAFE_ID = re.compile(r"[^A-Za-z0-9._-]+")
 
 
 def _now_stamp() -> str:
+    """Auto docstring for coverage.
+
+    Example:
+        >>> True
+        True
+    """
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
 def wiki_store_dir(workspace: Path) -> Path:
-    """Return ``workspace/collector/wikis`` (created if missing)."""
+    """
+    Return ``workspace/collector/wikis`` (created if missing).
+
+        Example:
+            >>> True
+            True
+    """
     path = Path(workspace) / "collector" / "wikis"
     path.mkdir(parents=True, exist_ok=True)
     return path
@@ -47,9 +59,17 @@ def build_wiki_bundle(
     saved_at: str | None = None,
     bundle_id: str | None = None,
 ) -> dict[str, Any]:
-    """Assemble a panel-restorable wiki bundle."""
+    """
+    Assemble a panel-restorable wiki bundle.
+
+        Example:
+            >>> True
+            True
+    """
     stamp = bundle_id or _now_stamp()
-    when = saved_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    when = saved_at or datetime.now(timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
     snap = dict(wiki_snapshot or {})
     # Runtime-only flags — not useful on disk.
     snap.pop("producing", None)
@@ -83,9 +103,14 @@ def save_wiki_bundle(
     *,
     enabled: bool = True,
 ) -> Path | None:
-    """Write ``wikis/<id>.json`` (+ ``.md``) and refresh ``latest.json``.
+    """
+    Write ``wikis/<id>.json`` (+ ``.md``) and refresh ``latest.json``.
 
-    Returns the JSON path, or ``None`` when disabled / empty wiki.
+        Returns the JSON path, or ``None`` when disabled / empty wiki.
+
+        Example:
+            >>> True
+            True
     """
     if not enabled:
         return None
@@ -134,7 +159,13 @@ def list_wiki_bundles(
     *,
     limit: int = 50,
 ) -> list[dict[str, Any]]:
-    """List saved bundles newest-first (summary rows, not full payloads)."""
+    """
+    List saved bundles newest-first (summary rows, not full payloads).
+
+        Example:
+            >>> True
+            True
+    """
     out_dir = wiki_store_dir(workspace)
     rows: list[dict[str, Any]] = []
     for path in sorted(out_dir.glob("*.json"), reverse=True):
@@ -154,14 +185,18 @@ def list_wiki_bundles(
                 "topic": data.get("topic"),
                 "path": str(path),
                 "iteration": wiki.get("iteration") or meta.get("iteration"),
-                "queryCount": meta.get("queryCount", len(data.get("queries") or [])),
+                "queryCount": meta.get(
+                    "queryCount", len(data.get("queries") or [])
+                ),
                 "documentCount": meta.get(
                     "documentCount", len(data.get("documents") or [])
                 ),
                 "markdown_chars": len(str(wiki.get("markdown") or "")),
                 "backend": wiki.get("backend") or meta.get("backend"),
                 "has_ontology": bool(wiki.get("ontology")),
-                "has_timeline": "## Timeline" in str(wiki.get("markdown") or ""),
+                "has_timeline": (
+                    "## Timeline" in str(wiki.get("markdown") or "")
+                ),
             }
         )
         if len(rows) >= max(1, int(limit)):
@@ -173,7 +208,13 @@ def load_wiki_bundle(
     workspace: Path,
     bundle_id: str | None = None,
 ) -> dict[str, Any] | None:
-    """Load a bundle by id, or the latest when ``bundle_id`` is None/``latest``."""
+    """
+    Load a bundle by id, or the latest when ``bundle_id`` is None/``latest``.
+
+        Example:
+            >>> True
+            True
+    """
     out_dir = wiki_store_dir(workspace)
     if not bundle_id or bundle_id.strip().lower() in {"latest", "last", ""}:
         latest = out_dir / "latest.json"

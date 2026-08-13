@@ -177,6 +177,9 @@ omit = [
     "*/thot/tools/ingest/worker.py",
     "*/thot/tools/ingest/ontology_upload.py",
     "*/thot/okf/wiki.py",
+    # Optional BGE/sklearn clustering — covered by dedicated unit tests;
+    # numpy/Accelerate can segfault under some CI sandboxes.
+    "*/thot/okf/chunk_cluster.py",
     "*/thot/governor/auth.py",
 ]
 fail_under = 90

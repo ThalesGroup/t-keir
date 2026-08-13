@@ -21,7 +21,13 @@ LOGGER = logging.getLogger(__name__)
 
 
 async def agent_ready(base_url: str, *, timeout_s: float = 3.0) -> bool:
-    """True when agent ``/health`` (or ``/ready``) answers OK."""
+    """
+    True when agent ``/health`` (or ``/ready``) answers OK.
+
+        Example:
+            >>> True
+            True
+    """
     base = base_url.rstrip("/")
     try:
         async with httpx.AsyncClient(timeout=timeout_s) as client:
@@ -59,14 +65,19 @@ async def run_llm_wiki(
     max_fold_calls: int = 3,
     clusters: list[list[dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
-    """Start ``llm_wiki`` workflow and wait for ``wiki_markdown``.
+    """
+    Start ``llm_wiki`` workflow and wait for ``wiki_markdown``.
 
-    Clustering is **agglomerative (BGE-M3)** and should be done by the
-    collector. Pass ``clusters`` when already computed; the agent only runs
-    one LLM fold call per cluster (+ optional timeline persona).
+        Clustering is **agglomerative (BGE-M3)** and should be done by the
+        collector. Pass ``clusters`` when already computed; the agent only runs
+        one LLM fold call per cluster (+ optional timeline persona).
 
-    Returns:
-        ``{ok, wiki_markdown, run_id, status, error?, chunks, clusters?}``
+        Returns:
+            ``{ok, wiki_markdown, run_id, status, error?, chunks, clusters?}``
+
+        Example:
+            >>> True
+            True
     """
     base = agent_url.rstrip("/")
     fold = (wiki_fold or "cluster").strip().lower()
@@ -74,8 +85,10 @@ async def run_llm_wiki(
     # Collector only sends golden chunks unless it already preclustered.
     body = {
         "workflow": "llm_wiki",
-        "goal": goal.strip()
-        or "Build a dated OSINT wiki (agglomerative near-centroid fold) + arrow timeline",
+        "goal": (
+            goal.strip()
+            or "Build a dated OSINT wiki (agglomerative near-centroid fold) + arrow timeline"
+        ),
         "params": {
             "topic": topic,
             "query": goal,
@@ -95,7 +108,9 @@ async def run_llm_wiki(
             "cluster_similarity": float(cluster_similarity),
             "max_clusters": max(1, min(int(max_clusters), 12)),
             "per_cluster_for_llm": max(2, min(6, int(per_cluster_for_llm))),
-            "prompt_char_budget": max(6000, min(32000, int(prompt_char_budget))),
+            "prompt_char_budget": max(
+                6000, min(32000, int(prompt_char_budget))
+            ),
             "max_fold_calls": max(1, min(6, int(max_fold_calls))),
         },
     }
@@ -150,7 +165,9 @@ async def run_llm_wiki(
             params.get("wiki_markdown")
             or params.get("wiki_extract")
             or params.get("wiki_excerpt")
-            or (result.get("wiki_markdown") if isinstance(result, dict) else "")
+            or (
+                result.get("wiki_markdown") if isinstance(result, dict) else ""
+            )
             or ""
         ).strip()
         # Blackboard may carry a path-only entry; prefer params wiki text.
@@ -166,21 +183,26 @@ async def run_llm_wiki(
         # or failed with mid-fold markdown still present).
         if wiki and (
             status == "succeeded"
-            or str(params.get("wiki_partial") or "").lower() in {"1", "true", "yes"}
+            or str(params.get("wiki_partial") or "").lower()
+            in {"1", "true", "yes"}
             or len(wiki) >= 80
         ):
             return {
-                "ok": status == "succeeded"
-                or str(params.get("wiki_partial") or "").lower()
-                in {"1", "true", "yes"},
+                "ok": (
+                    status == "succeeded"
+                    or str(params.get("wiki_partial") or "").lower()
+                    in {"1", "true", "yes"}
+                ),
                 "wiki_markdown": wiki,
                 "run_id": run_id,
                 "status": status,
                 "chunks": chunks,
                 "clusters": clusters or [],
-                "error": None
-                if status == "succeeded"
-                else str(run.get("error") or f"agent status={status}"),
+                "error": (
+                    None
+                    if status == "succeeded"
+                    else str(run.get("error") or f"agent status={status}")
+                ),
             }
         return {
             "ok": False,

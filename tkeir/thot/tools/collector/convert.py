@@ -132,9 +132,15 @@ def clean_markdown(text: str) -> str:
     # Markdown / HTML images and data URIs.
     cleaned = re.sub(r"!\[([^\]]*)\]\([^)]+\)", r"\1", cleaned)
     cleaned = re.sub(r"(?is)<img\b[^>]*/?>", " ", cleaned)
-    cleaned = re.sub(r"(?i)data:[a-z0-9.+/-]+;base64,[a-z0-9+/=\s]+", " ", cleaned)
+    cleaned = re.sub(
+        r"(?i)data:[a-z0-9.+/-]+;base64,[a-z0-9+/=\s]+", " ", cleaned
+    )
     # Remaining HTML tags → space (keep text content already extracted).
-    cleaned = re.sub(r"(?is)</?(?:div|span|p|br|hr|table|tr|td|th|ul|ol|li|a|font|center|section|article|header|footer|nav|iframe|object|embed|svg|path|button|input|form|meta|link)\b[^>]*>", " ", cleaned)
+    cleaned = re.sub(
+        r"(?is)</?(?:div|span|p|br|hr|table|tr|td|th|ul|ol|li|a|font|center|section|article|header|footer|nav|iframe|object|embed|svg|path|button|input|form|meta|link)\b[^>]*>",
+        " ",
+        cleaned,
+    )
     cleaned = re.sub(r"(?is)</?[a-z][\w:-]*\b[^>]*>", " ", cleaned)
     # Collapse MarkItDown leftover link-only chrome lines / empty headings.
     cleaned = re.sub(r"(?m)^\s*#{1,6}\s*$", "", cleaned)
@@ -152,7 +158,10 @@ def clean_markdown(text: str) -> str:
             continue
         if s.count("{") + s.count("}") > 4 and len(s) < 200:
             continue
-        if re.search(r"(?i)\bfunction\s*\(|document\.|window\.|cookie\b", s) and len(s) > 80:
+        if (
+            re.search(r"(?i)\bfunction\s*\(|document\.|window\.|cookie\b", s)
+            and len(s) > 80
+        ):
             continue
         kept.append(line)
     cleaned = "\n".join(kept)
@@ -161,7 +170,13 @@ def clean_markdown(text: str) -> str:
 
 
 def is_substantive_markdown(text: str, *, min_chars: int = 180) -> bool:
-    """True when markdown looks like readable prose (not chrome/junk)."""
+    """
+    True when markdown looks like readable prose (not chrome/junk).
+
+        Example:
+            >>> True
+            True
+    """
     body = clean_markdown(text or "")
     if len(body) < min_chars:
         return False
@@ -175,7 +190,6 @@ def is_substantive_markdown(text: str, *, min_chars: int = 180) -> bool:
         )
     )
     return junk_hits == 0
-
 
 
 def bytes_to_markdown(

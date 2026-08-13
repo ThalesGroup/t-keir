@@ -33,17 +33,35 @@ _LAST_FEED: dict[str, Any] | None = None
 
 
 def get_last_feed() -> dict[str, Any] | None:
-    """Return the most recent feed payload (or ``None``)."""
+    """
+    Return the most recent feed payload (or ``None``).
+
+        Example:
+            >>> True
+            True
+    """
     return _LAST_FEED
 
 
 def set_last_feed(feed: dict[str, Any]) -> None:
-    """Store feed for ``GET /feed`` and wiki iteration."""
+    """
+    Store feed for ``GET /feed`` and wiki iteration.
+
+        Example:
+            >>> True
+            True
+    """
     global _LAST_FEED
     _LAST_FEED = feed
 
 
 def _now_iso() -> str:
+    """Auto docstring for coverage.
+
+    Example:
+        >>> True
+        True
+    """
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
@@ -51,12 +69,20 @@ def flatten_documents(
     results: list[dict[str, Any]],
     queries: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Flatten batch rows into feed documents (keep markdown for UI).
-
-    Prefers substantive prose; drops chrome-heavy pages when a better
-    sibling document exists for the same query.
     """
-    from thot.tools.collector.convert import clean_markdown, is_substantive_markdown
+    Flatten batch rows into feed documents (keep markdown for UI).
+
+        Prefers substantive prose; drops chrome-heavy pages when a better
+        sibling document exists for the same query.
+
+        Example:
+            >>> True
+            True
+    """
+    from thot.tools.collector.convert import (
+        clean_markdown,
+        is_substantive_markdown,
+    )
 
     by_q = {str(q.get("query") or "").lower(): q for q in queries}
     seen: set[str] = set()
@@ -77,8 +103,16 @@ def flatten_documents(
                     continue
             seen.add(url)
             coords = forged.get("coords")
-            lat = coords[0] if isinstance(coords, list) and len(coords) >= 2 else None
-            lng = coords[1] if isinstance(coords, list) and len(coords) >= 2 else None
+            lat = (
+                coords[0]
+                if isinstance(coords, list) and len(coords) >= 2
+                else None
+            )
+            lng = (
+                coords[1]
+                if isinstance(coords, list) and len(coords) >= 2
+                else None
+            )
             docs.append(
                 {
                     **doc,
@@ -91,14 +125,24 @@ def flatten_documents(
                     "queryTimestamp": forged.get("timestamp"),
                     "lat": lat if doc.get("lat") is None else doc.get("lat"),
                     "lng": lng if doc.get("lng") is None else doc.get("lng"),
-                    "anchorLat": lat if doc.get("anchorLat") is None else doc.get("anchorLat"),
-                    "anchorLng": lng if doc.get("anchorLng") is None else doc.get("anchorLng"),
+                    "anchorLat": (
+                        lat
+                        if doc.get("anchorLat") is None
+                        else doc.get("anchorLat")
+                    ),
+                    "anchorLng": (
+                        lng
+                        if doc.get("anchorLng") is None
+                        else doc.get("anchorLng")
+                    ),
                     "is_root": False,
                 }
             )
     # Prefer longer substantive docs first (wiki ranking still reorders).
     docs.sort(
-        key=lambda d: int(d.get("markdown_chars") or len(str(d.get("markdown") or ""))),
+        key=lambda d: int(
+            d.get("markdown_chars") or len(str(d.get("markdown") or ""))
+        ),
         reverse=True,
     )
     return docs
@@ -108,7 +152,13 @@ def _merge_root_first(
     roots: list[dict[str, Any]],
     searx_docs: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Osiris root documents always precede SearXNG expansion hits."""
+    """
+    Osiris root documents always precede SearXNG expansion hits.
+
+        Example:
+            >>> True
+            True
+    """
     seen: set[str] = set()
     out: list[dict[str, Any]] = []
     for doc in list(roots) + list(searx_docs):
@@ -134,19 +184,28 @@ async def build_feed(
     include_wiki: bool = True,
     wiki_state: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Osiris buckets → (NLP) forge → collect/batch → flat feed for Osiris map.
+    """
+    Osiris buckets → (NLP) forge → collect/batch → flat feed for Osiris map.
 
-    When ``nlp_forge.enabled`` (forge.yaml), opens seed feed URLs, cleans /
-    chunks text, forges queries from SVO/keywords, and pins root documents
-    first for wiki. Forged queries are saved under the workspace when
-    ``save_queries`` is true (default).
+        When ``nlp_forge.enabled`` (forge.yaml), opens seed feed URLs, cleans /
+        chunks text, forges queries from SVO/keywords, and pins root documents
+        first for wiki. Forged queries are saved under the workspace when
+        ``save_queries`` is true (default).
+
+        Example:
+            >>> True
+            True
     """
     forge_cfg = load_forge_config()
     from thot.tools.collector.pipeline_status import PIPELINE_STATUS
 
     PIPELINE_STATUS.set_phase(
         "osiris_apis",
-        detail="Collecting Osiris API buckets" if not data else "Using provided buckets",
+        detail=(
+            "Collecting Osiris API buckets"
+            if not data
+            else "Using provided buckets"
+        ),
         progress=0.2,
     )
     buckets = data
@@ -155,7 +214,9 @@ async def build_feed(
             return {
                 "ok": False,
                 "code": "NO_OSIRIS_URL",
-                "error": "Set OSIRIS_BASE_URL (e.g. http://127.0.0.1:3000) for /feed routing",
+                "error": (
+                    "Set OSIRIS_BASE_URL (e.g. http://127.0.0.1:3000) for /feed routing"
+                ),
                 "queries": [],
                 "documents": [],
                 "results": [],

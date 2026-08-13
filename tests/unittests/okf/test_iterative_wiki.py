@@ -468,3 +468,264 @@ def test_build_wiki_empty_chunks_and_progress_error():
     assert (
         "## Answer" in wiki2 or "fact" in wiki2.lower() or "Sources" in wiki2
     )
+
+
+def test_estimate_and_pack_clusters_fit_budget():
+    from thot.okf.iterative_wiki import (
+        estimate_chars_to_tokens,
+        estimate_fold_prompt_chars,
+        pack_clusters_for_llm_budget,
+    )
+
+    assert estimate_chars_to_tokens(4000) == 1000
+    est = estimate_fold_prompt_chars(
+        wiki_chars=500, chunk_count=4, max_chunk_chars=1000
+    )
+    assert 2000 < est < 20000
+    clusters = [
+        [{"chunk_id": f"c{i}", "text_raw": "x" * 200}] for i in range(5)
+    ]
+    packs = pack_clusters_for_llm_budget(
+        clusters,
+        wiki_chars=400,
+        max_chunk_chars=800,
+        prompt_char_budget=14000,
+        max_fold_calls=2,
+    )
+    assert 1 <= len(packs) <= 2
+    assert sum(len(p) for p in packs) == 5
+
+    # Overflow / max_fold_calls: every chunk is kept (folded into last pack).
+    big = [[{"chunk_id": f"b{i}", "text_raw": "y" * 2500}] for i in range(6)]
+    packed = pack_clusters_for_llm_budget(
+        big,
+        wiki_chars=2000,
+        max_chunk_chars=2200,
+        prompt_char_budget=8000,
+        max_fold_calls=1,
+    )
+    assert 1 <= len(packed) <= 2
+    assert sum(len(p) for p in packed) == 6
+    assert (
+        pack_clusters_for_llm_budget([], wiki_chars=100, max_chunk_chars=800)
+        == []
+    )
+
+    # Force pack split then leftover merge into the last pack.
+    many = [[{"chunk_id": f"m{i}", "text_raw": "z" * 1800}] for i in range(8)]
+    forced = pack_clusters_for_llm_budget(
+        many,
+        wiki_chars=5000,
+        max_chunk_chars=2000,
+        prompt_char_budget=7000,
+        max_fold_calls=2,
+    )
+    assert len(forced) == 2
+    assert sum(len(p) for p in forced) == 8
+
+
+def test_ensure_osiris_panel_sections_injects_missing():
+    from thot.okf.iterative_wiki import ensure_osiris_panel_sections
+
+    assert ensure_osiris_panel_sections("") == ""
+    md = "## Answer\n\nHello\n\n## Sources\n\n- a\n"
+    out = ensure_osiris_panel_sections(md)
+    assert "## Timeline" in out
+    assert "## Cross-source synthesis" in out
+    assert "## Conjectures" in out
+    assert out.index("## Answer") < out.index("## Timeline")
+    assert out.index("## Timeline") < out.index("## Sources")
+
+    # Events alias skips Timeline inject; Gaps anchors when Sources missing.
+    with_events = (
+        "## Answer\n\nx\n\n## Events\n\n- e\n\n"
+        "## Cross-source synthesis\n\n- c\n\n"
+        "## Conjectures\n\n- n\n\n## Gaps\n\n- g\n"
+    )
+    kept = ensure_osiris_panel_sections(with_events)
+    assert kept.count("## Timeline") == 0
+    assert "## Gaps" in kept
+    no_anchor = ensure_osiris_panel_sections("## Answer\n\nOnly answer\n")
+    assert "## Timeline" in no_anchor
+    assert "## Conjectures" in no_anchor
+
+
+def test_merge_timeline_preserves_answer():
+    from thot.okf.iterative_wiki import (
+        _section_body,
+        _wiki_context_for_fold,
+        merge_timeline_into_wiki,
+    )
+
+    prior = (
+        "## Answer\n\nSituation is tense.\n\n"
+        "## Timeline\n\n- old\n\n"
+        "## Sources\n\n- s1\n"
+    )
+    timeline_only = (
+        "## Timeline\n\n"
+        "- event_id=E1 | when=2024-01-01 | where=Izmir | what=quake\n"
+        "- E1 --> E2 | kind=sequence\n"
+    )
+    merged = merge_timeline_into_wiki(prior, timeline_only)
+    assert "Situation is tense" in merged
+    assert "event_id=E1" in merged
+    assert "## Sources" in merged
+    assert merge_timeline_into_wiki(prior, "") == prior.strip()
+    assert merge_timeline_into_wiki("", timeline_only) == timeline_only.strip()
+    assert _section_body(prior, "Missing") is None
+
+    long_prior = (
+        "## Answer\n\n"
+        + ("Long narrative sentence. " * 40)
+        + "\n\n## Timeline\n\n- old\n\n## Sources\n\n- s\n"
+    )
+    short_updated = "## Answer\n\nShort.\n\n## Timeline\n\n- new event\n\n## Sources\n\n- s\n"
+    prefer_prior = merge_timeline_into_wiki(long_prior, short_updated)
+    assert "Long narrative" in prefer_prior
+    assert "new event" in prefer_prior
+
+    empty_ctx = _wiki_context_for_fold("", max_chars=1000)
+    assert "empty wiki" in empty_ctx
+    long_wiki = "## Answer\n\n" + ("para " * 2000) + "\n\n## Sources\n\n- z\n"
+    truncated = _wiki_context_for_fold(long_wiki, max_chars=3000)
+    assert "omitted for prompt budget" in truncated
+
+
+def test_fold_cluster_timeout_retries_leaner(monkeypatch):
+    from thot.okf import iterative_wiki as iw
+
+    calls: list[str] = []
+
+    class _Flaky:
+        async def generate(self, prompt, system=None, temperature=0.1):
+            calls.append(prompt)
+            if len(calls) == 1:
+                raise TimeoutError("slow ollama")
+            return (
+                "## Answer\n\nRecovered after lean retry.\n\n"
+                "## Sources\n\n- c1\n"
+            )
+
+    out = asyncio.run(
+        iw.fold_cluster_into_wiki(
+            llm=_Flaky(),
+            query="quake",
+            cluster=[
+                {"chunk_id": "c1", "text_raw": "Magnitude 5.8 near Izmir"}
+            ],
+            current_wiki="## Answer\n\nSeed.\n\n## Sources\n\n",
+            index=1,
+            total=1,
+            max_chunk_chars=1200,
+            max_wiki_chars=5000,
+        )
+    )
+    assert len(calls) == 2
+    assert "Recovered after lean retry" in out
+
+
+def test_build_wiki_iteratively_cluster_packs_with_fake_llm(monkeypatch):
+    from thot.okf import iterative_wiki as iw
+
+    class _FakeLlm:
+        async def generate(self, prompt, system=None, temperature=0.1):
+            return (
+                "## Answer\n\nFolded situation.\n\n"
+                "## Structured facts\n\n- ok\n\n"
+                "## Evidence\n\n- claim\n\n"
+                "## Timeline\n\n- event_id=E1 | when=unknown | where=x | what=y\n\n"
+                "## Cross-source synthesis\n\n- link\n\n"
+                "## Conjectures\n\n- _none grounded_\n\n"
+                "## Sources\n\n"
+            )
+
+    def _fake_cluster(chunks, **_kwargs):
+        mid = max(1, len(chunks) // 2)
+        return [list(chunks[:mid]), list(chunks[mid:]) or list(chunks[:1])]
+
+    monkeypatch.setattr(
+        "thot.okf.chunk_cluster.cluster_chunks_agglomerative",
+        _fake_cluster,
+    )
+
+    chunks = [
+        {
+            "chunk_id": f"c{i}",
+            "parent_doc_id": f"d{i}",
+            "title": f"t{i}",
+            "text_raw": (
+                ("earthquake Izmir " if i < 3 else "malware botnet ")
+                + ("word " * 40)
+            ),
+        }
+        for i in range(6)
+    ]
+    wiki = asyncio.run(
+        build_wiki_iteratively(
+            llm=_FakeLlm(),
+            query="osiris live",
+            chunks=chunks,
+            cluster=True,
+            max_clusters=4,
+            per_cluster_for_llm=2,
+            max_chunk_chars=600,
+            max_wiki_chars=4000,
+            prompt_char_budget=12000,
+            max_fold_calls=2,
+        )
+    )
+    assert "## Answer" in wiki
+    assert "Folded situation" in wiki or "## Sources" in wiki
+
+    # Pack timeout keeps prior wiki + panel sections.
+    class _TimeoutLlm:
+        async def generate(self, prompt, system=None, temperature=0.1):
+            raise TimeoutError("fold pack stalled")
+
+    timed = asyncio.run(
+        build_wiki_iteratively(
+            llm=_TimeoutLlm(),
+            query="q",
+            chunks=chunks[:3],
+            cluster=True,
+            max_fold_calls=1,
+            prompt_char_budget=14000,
+        )
+    )
+    assert "## Answer" in timed
+    assert "timed out" in timed.lower() or "## Timeline" in timed
+
+    # Sequential fold path (no agglomerative).
+    seq = asyncio.run(
+        build_wiki_iteratively(
+            llm=_FakeLlm(),
+            query="seq",
+            chunks=chunks[:2],
+            cluster=False,
+            sequential=True,
+            max_chunk_chars=500,
+        )
+    )
+    assert "## Answer" in seq
+
+    # Prebuilt clusters path.
+    def _fake_centroids(full, per_cluster=3):
+        return [g[:per_cluster] for g in full if g]
+
+    monkeypatch.setattr(
+        "thot.okf.chunk_cluster.select_near_centroids",
+        _fake_centroids,
+    )
+    prebuilt = asyncio.run(
+        build_wiki_iteratively(
+            llm=_FakeLlm(),
+            query="pre",
+            chunks=chunks[:2],
+            cluster=True,
+            prebuilt_clusters=[chunks[:2], chunks[2:4]],
+            max_fold_calls=2,
+        )
+    )
+    assert "## Answer" in prebuilt
+    assert callable(iw.fold_cluster_into_wiki)

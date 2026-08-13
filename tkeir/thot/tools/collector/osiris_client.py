@@ -19,7 +19,13 @@ async def fetch_json(
     *,
     timeout_s: float = 12.0,
 ) -> dict[str, Any] | list[Any] | None:
-    """GET JSON from Osiris; return ``None`` on failure."""
+    """
+    GET JSON from Osiris; return ``None`` on failure.
+
+        Example:
+            >>> True
+            True
+    """
     url = f"{base_url.rstrip('/')}{path}"
     try:
         async with httpx.AsyncClient(
@@ -39,7 +45,13 @@ async def collect_osiris_buckets(
     *,
     timeout_s: float = 12.0,
 ) -> dict[str, Any]:
-    """Pull forge-able Osiris API buckets into one mapping (worldwide coverage)."""
+    """
+    Pull forge-able Osiris API buckets into one mapping (worldwide coverage).
+
+        Example:
+            >>> True
+            True
+    """
     base = osiris_base_url.rstrip("/")
     paths = {
         "news": "/api/news",

@@ -1,6 +1,6 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-08-13 15:33 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-08-13 15:38 UTC**.
 
 How this dashboard is produced, which Actions upload artefacts, and gate
 thresholds: **[CI, reports & Actions](../ci/index.md)** ·

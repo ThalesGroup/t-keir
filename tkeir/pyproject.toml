@@ -27,7 +27,7 @@ dependencies = [
     "opentelemetry-api>=1.27.0",
     "opentelemetry-sdk>=1.27.0",
     "opentelemetry-exporter-prometheus>=0.48b0",
-    "protobuf>=5.29.6,<6.0",
+    "protobuf>=6.31.1,<8.0",
     "fastapi>=0.100.0",
     "python-multipart>=0.0.9",
     "uvicorn[standard]>=0.23.0",
@@ -64,9 +64,9 @@ owl = [
     "owlapy>=1.6.3; python_full_version >= '3.11'",
 ]
 # Optional Workload API client (import guarded in thot.agent.spiffe).
-# PyPI package is currently 0.3.x; env/file SPIFFE_ID works without it.
+# 0.3.x needs protobuf>=6.31 and supports cryptography>=46 (incl. 50.x).
 spiffe = [
-    "spiffe>=0.2.0,<0.4",
+    "spiffe>=0.3.0,<0.4",
 ]
 
 [project.urls]
@@ -98,7 +98,8 @@ dev = [
     "pytest>=7.0",
     "liccheck",
     "pip",
-    "setuptools<81",
+    # CVE-2026-59890 (MANIFEST.in NFC/NFD) fixed in 83.0.0+
+    "setuptools>=83.0.0",
     "radon>=6.0.1",
     "xenon>=0.9.1",
     "pip-licenses>=4.0",
@@ -119,6 +120,30 @@ models = [
     "fr-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.6.0/fr_core_news_sm-3.6.0-py3-none-any.whl",
     "fr-core-news-md @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl",
     "xx-ent-wiki-sm @ https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.6.0/xx_ent_wiki_sm-3.6.0-py3-none-any.whl",
+]
+
+# Force patched transitive versions (Dependabot / GHSA). owl→dspy pulls
+# litellm/diskcache; requests pulls urllib3; azure-identity pulls cryptography.
+[tool.uv]
+constraint-dependencies = [
+    # LiteLLM proxy CVEs (SQLi, Host-header auth bypass, MCP OAuth2, SSTI, …)
+    "litellm>=1.98.0",
+    # urllib3 decompression bombs + cross-origin redirect header leak
+    "urllib3>=2.7.0",
+    # OpenSSL wheels, wildcard DNS NameConstraints, PKCS#7 Bleichenbacher
+    "cryptography>=50.0.0",
+    # OOB C parser / WebSocket smuggling / compressed frames
+    "aiohttp>=3.14.3",
+    # Quadratic DoS + XSS / include issues (if pulled transitively)
+    "mistune>=3.3.4",
+    # Django security releases for DomainNameValidator / cache / GDALRaster
+    "django>=5.2.17",
+    # Improper regex in try_match()
+    "sanic-cors>=2.2.0",
+    # HuggingFace datasets path traversal in folder builders
+    "datasets>=5.0.1",
+    # pip doubly-encoded package URL install path
+    "pip>=26.2",
 ]
 
 [build-system]

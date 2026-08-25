@@ -12,7 +12,10 @@ from thot.tools.ingest.user_workspace import sanitize_relative_path
 
 pytestmark = pytest.mark.filterwarnings("ignore::DeprecationWarning")
 
-SAFE_SEGMENT = st.from_regex(r"[A-Za-z0-9._@+=\-]{1,24}", fullmatch=True)
+# Exclude "." / ".." — sanitize_relative_path treats those as empty/traversal.
+SAFE_SEGMENT = st.from_regex(r"[A-Za-z0-9._@+=\-]{1,24}", fullmatch=True).filter(
+    lambda s: s not in {".", ".."}
+)
 
 
 @settings(max_examples=500, deadline=None)
@@ -28,6 +31,7 @@ def test_sha256_hex_is_stable_digest(payload: bytes) -> None:
 def test_sanitize_relative_path_roundtrip(segments: list[str]) -> None:
     relative = "/".join(segments)
     cleaned = sanitize_relative_path(relative, allow_empty=False)
+    assert cleaned
     assert ".." not in cleaned.split("/")
     assert cleaned == cleaned.strip("/")
 

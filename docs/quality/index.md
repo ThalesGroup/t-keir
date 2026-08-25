@@ -1,6 +1,6 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-08-13 15:38 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-08-25 06:32 UTC**.
 
 How this dashboard is produced, which Actions upload artefacts, and gate
 thresholds: **[CI, reports & Actions](../ci/index.md)** ·
@@ -105,11 +105,11 @@ All runtime and optional Python dependencies from the locked dependency set
 | coloredlogs | 15.0.1 | MIT License | https://coloredlogs.readthedocs.io |
 | confection | 0.1.5 | MIT License | https://github.com/explosion/confection |
 | coverage | 7.15.0 | Apache-2.0 | https://github.com/coveragepy/coveragepy |
-| cryptography | 46.0.7 | Apache-2.0 OR BSD-3-Clause | https://github.com/pyca/cryptography |
+| cryptography | 50.0.0 | Apache-2.0 OR BSD-3-Clause | https://github.com/pyca/cryptography |
 | cyclonedx-bom | 7.3.0 | Apache Software License | https://github.com/CycloneDX/cyclonedx-python/#readme |
 | cyclonedx-python-lib | 11.11.0 | Apache Software License | https://github.com/CycloneDX/cyclonedx-python-lib/#readme |
 | cymem | 2.0.13 | MIT License | https://github.com/explosion/cymem |
-| datasets | 5.0.0 | Apache Software License | https://github.com/huggingface/datasets |
+| datasets | 5.0.1 | Apache Software License | https://github.com/huggingface/datasets |
 | defusedxml | 0.7.1 | Python Software Foundation License | https://github.com/tiran/defusedxml |
 | dill | 0.4.1 | BSD License | https://github.com/uqfoundation/dill |
 | emoji | 2.0.0 | BSD License | https://github.com/carpedm20/emoji/ |
@@ -135,7 +135,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | huggingface_hub | 1.23.0 | Apache Software License | https://github.com/huggingface/huggingface_hub |
 | humanfriendly | 10.0 | MIT License | https://humanfriendly.readthedocs.io |
 | idna | 3.18 | BSD-3-Clause | https://github.com/kjd/idna |
-| importlib_metadata | 9.0.0 | Apache-2.0 | https://github.com/python/importlib_metadata |
+| importlib_metadata | 8.9.0 | Apache-2.0 | https://github.com/python/importlib_metadata |
 | iniconfig | 2.3.0 | MIT | https://github.com/pytest-dev/iniconfig |
 | ir_datasets | 0.6.3 | MIT License | https://ir-datasets.com/ |
 | isodate | 0.7.2 | BSD License | https://github.com/gweis/isodate/ |
@@ -194,7 +194,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | preshed | 3.0.13 | MIT License | https://github.com/explosion/preshed |
 | prometheus-client | 0.14.1 | Apache Software License | https://github.com/prometheus/client_python |
 | propcache | 0.5.2 | Apache Software License | https://github.com/aio-libs/propcache |
-| protobuf | 5.29.6 | 3-Clause BSD License | https://developers.google.com/protocol-buffers/ |
+| protobuf | 7.36.0 | 3-Clause BSD License | https://developers.google.com/protocol-buffers/ |
 | psutil | 7.2.2 | BSD-3-Clause | https://github.com/giampaolo/psutil |
 | py-serializable | 2.1.0 | Apache Software License | https://github.com/madpah/serializable#readme |
 | pyarrow | 25.0.0 | Apache-2.0 | https://arrow.apache.org/ |
@@ -258,7 +258,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | typing_extensions | 4.16.0 | PSF-2.0 | https://github.com/python/typing_extensions |
 | tzdata | 2026.3 | Apache-2.0 | https://github.com/python/tzdata |
 | uri-template | 1.3.0 | MIT License | https://gitlab.linss.com/open-source/python/uri-template |
-| urllib3 | 1.26.20 | MIT License | https://urllib3.readthedocs.io/ |
+| urllib3 | 2.7.0 | MIT | https://github.com/urllib3/urllib3/blob/main/CHANGES.rst |
 | uvicorn | 0.51.0 | BSD-3-Clause | https://uvicorn.dev/ |
 | uvloop | 0.22.1 | Apache Software License; MIT License | UNKNOWN |
 | wasabi | 1.1.3 | MIT | https://github.com/explosion/wasabi |

@@ -472,13 +472,20 @@ liccheck: ci-deps ## Verify dependency licenses (liccheck.ini)
 		echo "Create this file with the approved license list (see comment in Makefile)."; \
 		exit 1; \
 	fi
-	cd $(TKEIR_DIR) && $(UV) export --frozen --no-dev --no-emit-project \
+	cd $(TKEIR_DIR) && $(UV) export --frozen --no-dev --no-emit-project --no-hashes \
 		-o .requirements-liccheck.txt
-	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) \
+	# liccheck 0.9.2 still imports pkg_resources; setuptools>=82 removed it.
+	# Run in an isolated tool env and drop the project setuptools==84 pin so
+	# setuptools<81 (needed for pkg_resources) does not VersionConflict.
+	cd $(TKEIR_DIR) && grep -vE '^setuptools[=<>!~@]' \
+		.requirements-liccheck.txt > .requirements-liccheck.filtered.txt
+	cd $(TKEIR_DIR) && $(UV) run --no-project --python $(PYTHON) \
+		--with liccheck --with "setuptools>=70,<81" \
 		liccheck -l PARANOID \
 		-s "$(LICCHECK_CONFIG)" \
-		-r .requirements-liccheck.txt
-	rm -f $(TKEIR_DIR)/.requirements-liccheck.txt
+		-r .requirements-liccheck.filtered.txt
+	rm -f $(TKEIR_DIR)/.requirements-liccheck.txt \
+		$(TKEIR_DIR)/.requirements-liccheck.filtered.txt
 
 complexity: ci-deps ## radon + xenon complexity gates (avg ≤ 7.0 on thot/, no grade D+)
 	$(UV) run --directory $(TKEIR_DIR) --python $(PYTHON) \

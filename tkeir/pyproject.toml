@@ -124,25 +124,29 @@ models = [
 
 # Force patched transitive versions (Dependabot / GHSA). owl→dspy pulls
 # litellm/diskcache; requests pulls urllib3; azure-identity pulls cryptography.
+# override-dependencies wins over all transitive pins; constraints are a floor.
+# diskcache (owl→dspy) has no upstream fix (PYSEC-2026-2447) — dismiss or avoid `owl`.
+# sanic-cors has no patched release (GHSA-94jw-hqvj-vw74 affects <=2.2.0).
 [tool.uv]
-constraint-dependencies = [
-    # LiteLLM proxy CVEs (SQLi, Host-header auth bypass, MCP OAuth2, SSTI, …)
+override-dependencies = [
     "litellm>=1.98.0",
-    # urllib3 decompression bombs + cross-origin redirect header leak
     "urllib3>=2.7.0",
-    # OpenSSL wheels, wildcard DNS NameConstraints, PKCS#7 Bleichenbacher
     "cryptography>=50.0.0",
-    # OOB C parser / WebSocket smuggling / compressed frames
     "aiohttp>=3.14.3",
-    # Quadratic DoS + XSS / include issues (if pulled transitively)
     "mistune>=3.3.4",
-    # Django security releases for DomainNameValidator / cache / GDALRaster
     "django>=5.2.17",
-    # Improper regex in try_match()
-    "sanic-cors>=2.2.0",
-    # HuggingFace datasets path traversal in folder builders
     "datasets>=5.0.1",
-    # pip doubly-encoded package URL install path
+    "pip>=26.2",
+    "setuptools>=83.0.0",
+]
+constraint-dependencies = [
+    "litellm>=1.98.0",
+    "urllib3>=2.7.0",
+    "cryptography>=50.0.0",
+    "aiohttp>=3.14.3",
+    "mistune>=3.3.4",
+    "django>=5.2.17",
+    "datasets>=5.0.1",
     "pip>=26.2",
 ]
 

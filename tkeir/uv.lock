@@ -19,7 +19,17 @@ constraints = [
     { name = "litellm", specifier = ">=1.98.0" },
     { name = "mistune", specifier = ">=3.3.4" },
     { name = "pip", specifier = ">=26.2" },
-    { name = "sanic-cors", specifier = ">=2.2.0" },
+    { name = "urllib3", specifier = ">=2.7.0" },
+]
+overrides = [
+    { name = "aiohttp", specifier = ">=3.14.3" },
+    { name = "cryptography", specifier = ">=50.0.0" },
+    { name = "datasets", specifier = ">=5.0.1" },
+    { name = "django", specifier = ">=5.2.17" },
+    { name = "litellm", specifier = ">=1.98.0" },
+    { name = "mistune", specifier = ">=3.3.4" },
+    { name = "pip", specifier = ">=26.2" },
+    { name = "setuptools", specifier = ">=83.0.0" },
     { name = "urllib3", specifier = ">=2.7.0" },
 ]
 

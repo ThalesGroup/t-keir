@@ -13,7 +13,7 @@ packages = [
 classifiers = [
     "Environment :: Console",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 homepage = "https://github.com/ThalesGroup/t-keir"
@@ -31,20 +31,24 @@ include = [
 Releases = "https://github.com/ThalesGroup/t-keir/releases"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
+# Django 5.2.x security fixes require Python >=3.10
+python = ">=3.10,<4.0"
 beautifulsoup4="4.11.1"
 elasticsearch="7.14.0"
-mistune="2.0.4"
+# mistune 2.x: DoS/XSS advisories; fixed in 3.3.4+
+mistune=">=3.3.4"
 emoji="2.0.0"
 fold-to-ascii="1.0.2.post1"
-Django=">=4.2.26,<5.0"
+# Django 4.2 line is unsupported for current advisories; use 5.2.17+
+Django=">=5.2.17,<6.0"
 Jinja2="^3.1.4"
 nltk="^3.7"
 pandas="1.4.3"
 prometheus-client="0.14.1"
 protobuf=">=5.29.6,<6.0"
 sanic="22.6.2"
-Sanic-Cors="2.1.0"
+# Sanic-Cors removed: GHSA-94jw-hqvj-vw74 has no patched release (<=2.2.0
+# still affected) and nothing in this tree imports sanic_cors.
 spacy="3.6.1"
 en-core-web-sm = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl"}
 en-core-web-md = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl"}
@@ -101,7 +105,7 @@ profile = "black"
 
 [tool.black]
 line-length = 79
-target-version = ["py38"]
+target-version = ["py310"]
 preview = true
 
 include = '\.pyi?$'

@@ -4,6 +4,7 @@ import { LogIn, LogOut, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/src/auth/AuthProvider";
+import { getUsecaseConfig, hasAnyRole } from "@/lib/usecase-config";
 
 /** Sign-in / sign-out controls when AUTH_ENABLED=true. */
 export function AuthButton() {
@@ -41,9 +42,7 @@ export function AuthButton() {
     <div className="flex items-center gap-2">
       <span className="hidden items-center gap-1 text-xs text-muted-foreground sm:flex">
         <User className="h-3.5 w-3.5" />
-        {roles.includes("c2-admin") || roles.includes("tkeir-admin")
-          ? "Admin"
-          : "User"}
+        {hasAnyRole(roles, getUsecaseConfig().adminRoles) ? "Admin" : "User"}
         {clearance ? ` (${clearance})` : ""}
       </span>
       <Button variant="outline" size="sm" onClick={() => void signOut()}>

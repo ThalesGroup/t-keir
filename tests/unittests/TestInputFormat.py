@@ -11,8 +11,6 @@ Licensed under the MIT License.
 import os
 import tempfile
 
-import pytest
-
 from thot.tasks.converters.InputFormat import (
     AUTO_DATATYPE,
     detect_input_format,
@@ -104,16 +102,37 @@ class TestInputFormat:
         finally:
             os.unlink(path)
 
-    def test_rejects_unknown_binary_without_extension(self):
+    def test_unknown_binary_without_extension(self):
         data = b"\x00\x01\x02\x03\xff"
         with tempfile.NamedTemporaryFile(delete=False) as handle:
             handle.write(data)
             path = handle.name
         try:
-            with pytest.raises(
-                ValueError, match="Unable to detect input format"
-            ):
-                detect_input_format(path, data, AUTO_DATATYPE)
+            assert detect_input_format(path, data, AUTO_DATATYPE) == "unknown"
+        finally:
+            os.unlink(path)
+
+    def test_detects_jpeg_image(self):
+        data = b"\xff\xd8\xff\xe0" + b"\x00" * 16
+        with tempfile.NamedTemporaryFile(
+            suffix=".jpg", delete=False
+        ) as handle:
+            handle.write(data)
+            path = handle.name
+        try:
+            assert detect_input_format(path, data, AUTO_DATATYPE) == "image"
+        finally:
+            os.unlink(path)
+
+    def test_detects_zip_without_office_extension(self):
+        data = b"PK\x03\x04" + b"\x00" * 32
+        with tempfile.NamedTemporaryFile(
+            suffix=".zip", delete=False
+        ) as handle:
+            handle.write(data)
+            path = handle.name
+        try:
+            assert detect_input_format(path, data, AUTO_DATATYPE) == "zip"
         finally:
             os.unlink(path)
 

@@ -34,7 +34,6 @@ from thot.tools.search.business_ontology import (
     annotate_document_with_business_ontology,
     resolve_index_ontology_payload,
 )
-from thot.tools.search.chunk_ontology import chunk_ontology_fields
 from thot.tools.search.dual_hybrid_config import IndexDumpConfig
 from thot.tools.search.rag_config import load_rag_config
 from thot.tools.search.vespa_client import (
@@ -125,48 +124,45 @@ def _ontology_fields_for_chunk(
     chunk: dict[str, Any],
     document: dict[str, Any],
     ontology_payload: dict[str, Any] | None,
-) -> tuple[list[str], list[str]]:
-    """Return ``(ontology_concepts, expansion_labels)`` for a chunk.
+    *,
+    service: Any | None = None,
+) -> tuple[list[str], list[str], list[dict[str, Any]], Any]:
+    """Return concept ids, expansion labels, relation structs, catalog delta.
 
-    Concept ids feed Vespa ``ontology_concepts``. Expansion labels are kept for
-    dumps / analysis only — sparse vectors stay pure BGE-M3. Document
-    ``core_concepts`` stay on the analyzed dump, not on every passage.
+    Concept ids feed Vespa ``ontology_concepts`` / ``ontology_concept_ids``.
+    Expansion labels are kept for dumps / analysis only — sparse vectors stay
+    pure BGE-M3.
 
     Example:
         >>> chunk = {"text_raw": "Maritime analytics"}
         >>> document = {
         ...     "document_ontology": {"json_ld": '[{"identifier": "MARITIME"}]'},
         ... }
-        >>> concepts, _labels = _ontology_fields_for_chunk(chunk, document, None)
+        >>> concepts, _labels, _rels, _cat = _ontology_fields_for_chunk(
+        ...     chunk, document, None
+        ... )
         >>> "MARITIME" in concepts
         True
     """
-    fields = chunk_ontology_fields(
+    from thot.ontology.service import OntologyService
+    from thot.ontology.vespa import chunk_ontology_vespa_fields
+
+    svc = service or OntologyService.from_business_payload(ontology_payload)
+    enrichment = svc.enrich_chunk(
         chunk, document, ontology_payload=ontology_payload
     )
-    concepts: list[str] = []
-    seen: set[str] = set()
-    for cid in list(fields.get("concept_ids") or []) + list(
-        fields.get("linked_concept_ids") or []
-    ):
-        key = str(cid).strip()
-        if not key or key.casefold() in seen:
-            continue
-        seen.add(key.casefold())
-        concepts.append(key)
-    # Structured JSON-record attributes promoted to ontology concepts.
-    for cid in document.get("record_concept_ids") or []:
-        key = str(cid).strip()
-        if not key or key.casefold() in seen:
-            continue
-        seen.add(key.casefold())
-        concepts.append(key)
-    labels = [
-        str(lab).strip()
-        for lab in fields.get("expansion_labels") or []
-        if lab and str(lab).strip()
-    ]
-    return concepts[:64], labels[:96]
+    vespa_fields = chunk_ontology_vespa_fields(
+        enrichment.concept_ids,
+        enrichment.relations,
+        max_concepts=svc.max_concepts,
+        max_relations=svc.max_relations,
+    )
+    return (
+        list(vespa_fields["ontology_concept_ids"]),
+        list(enrichment.expansion_labels)[:96],
+        list(vespa_fields["ontology_relations"]),
+        enrichment.catalog,
+    )
 
 
 def _ontology_concept_list(
@@ -184,7 +180,7 @@ def _ontology_concept_list(
         >>> "MARITIME" in _ontology_concept_list(chunk, document, None)
         True
     """
-    concepts, _labels = _ontology_fields_for_chunk(
+    concepts, _labels, _rels, _cat = _ontology_fields_for_chunk(
         chunk, document, ontology_payload
     )
     return concepts
@@ -280,6 +276,7 @@ def _passage_fields(
     ontology_concepts: list[str],
     embedding_dim: int,
     userspace_id: str | None = None,
+    ontology_relations: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Build Vespa passage field dict for one golden chunk.
 
@@ -294,6 +291,8 @@ def _passage_fields(
         ... )
         >>> fields["source_ref"]
         'doc1'
+        >>> fields["freshness_ttl_seconds"]
+        0
     """
     text = chunk_embedding_text(chunk) or str(chunk.get("text_raw") or "")
     source_ref = str(
@@ -302,14 +301,50 @@ def _passage_fields(
         or chunk.get("parent_doc_id")
         or ""
     )
+    from thot.ontology.model import OntologyRelation
+    from thot.ontology.vespa import chunk_ontology_vespa_fields
+
+    rel_models = [
+        OntologyRelation(
+            subject_id=str(row.get("subject_id") or ""),
+            predicate_id=str(row.get("predicate_id") or ""),
+            object_id=str(row.get("object_id") or ""),
+            confidence=float(row.get("confidence") or 1.0),
+        )
+        for row in ontology_relations or []
+        if row
+    ]
+    extra = chunk_ontology_vespa_fields(
+        ontology_concepts,
+        rel_models,
+        max_concepts=max(len(ontology_concepts), 1),
+        max_relations=max(len(rel_models), 1),
+    )
     fields: dict[str, Any] = {
         "source_ref": sanitize_vespa_string(source_ref),
         "chunk_text": sanitize_vespa_string(text),
         "dense_vector": vespa_dense_tensor(dense, embedding_dim),
         "sparse_vector": vespa_sparse_tensor(sparse),
         "ontology_concepts": [
-            sanitize_vespa_string(cid) for cid in ontology_concepts if cid
+            sanitize_vespa_string(cid)
+            for cid in extra["ontology_concepts"]
+            if cid
         ],
+        "ontology_concept_ids": [
+            sanitize_vespa_string(cid)
+            for cid in extra["ontology_concept_ids"]
+            if cid
+        ],
+        "ontology_relations": list(extra["ontology_relations"]),
+        "ontology_rel_keys": [
+            sanitize_vespa_string(key) for key in extra["ontology_rel_keys"]
+        ],
+        # Explicit keep: unset int attributes can confuse GC selection on
+        # the ``global`` cluster (ontology_concept has no TTL selection).
+        "freshness_ttl_seconds": 0,
+        "pinned": False,
+        "doc_timestamp": int(time.time()),
+        "source_type": "ingest",
     }
     if userspace_id:
         fields["userspace_id"] = sanitize_vespa_string(userspace_id)
@@ -399,13 +434,32 @@ async def index_pipeline_document(
     )
     embed_ms = (time.perf_counter() - t_emb) * 1000
 
+    from thot.ontology.service import OntologyService
+    from thot.ontology.vespa import (
+        concept_to_vespa_fields,
+        ontology_concept_docid,
+    )
+
+    layer = rag.dual_hybrid.ontology_layer
+    ont_service = OntologyService.from_business_payload(
+        ontology_payload,
+        json_structural=bool(layer.json_structural_concepts),
+        max_concepts=int(layer.max_concepts_per_chunk),
+        max_relations=int(layer.max_relations_per_chunk),
+    )
     space = normalize_user_space(user_space or resolve_vespa_user_space(None))
     t_vespa = time.perf_counter()
     written = 0
     dump_passages: list[dict[str, Any]] = []
+    catalog_seen: set[str] = set()
     for chunk, emb in zip(chunks, embeddings, strict=True):
-        concepts, expansion_labels = _ontology_fields_for_chunk(
-            chunk, document, ontology_payload
+        concepts, expansion_labels, relations, catalog = (
+            _ontology_fields_for_chunk(
+                chunk,
+                document,
+                ontology_payload,
+                service=ont_service,
+            )
         )
         passage_id = str(chunk.get("chunk_id"))
         chunk_text = chunk_embedding_text(chunk) or str(
@@ -422,6 +476,7 @@ async def index_pipeline_document(
                 sparse=sparse,
                 ontology_concepts=concepts,
                 embedding_dim=embedding_dim,
+                ontology_relations=relations,
             )
             await vespa.upsert_global_passage(fields, passage_id)
         if target in ("user", "both"):
@@ -433,10 +488,27 @@ async def index_pipeline_document(
                 ontology_concepts=concepts,
                 embedding_dim=embedding_dim,
                 userspace_id=space,
+                ontology_relations=relations,
             )
             await vespa.upsert_user_passage(
                 fields, passage_id, user_space=space
             )
+        if layer.index_concepts:
+            for concept in catalog.concepts.values():
+                if concept.concept_id in catalog_seen:
+                    continue
+                catalog_seen.add(concept.concept_id)
+                try:
+                    await vespa.upsert_ontology_concept(
+                        concept_to_vespa_fields(concept),
+                        ontology_concept_docid(concept.concept_id),
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    LOGGER.warning(
+                        "ontology_concept upsert failed id=%s: %s",
+                        concept.concept_id,
+                        exc,
+                    )
         dump_passages.append(
             {
                 "chunk_id": passage_id,
@@ -444,6 +516,8 @@ async def index_pipeline_document(
                 "document_ref": str(source_doc_id),
                 "sparse_vector": dict(sparse),
                 "ontology_concepts": list(concepts),
+                "ontology_concept_ids": list(concepts),
+                "ontology_relations": list(relations),
                 "expansion_labels": list(expansion_labels),
             }
         )

@@ -108,15 +108,27 @@ make setup
 
 This creates the `tkeir` uv environment (default **Python 3.11**; supported
 range **3.10–3.12**, see [Python versions](installation.md#python-versions)),
-installs the package, pulls spaCy models, builds the MWE trie if missing, and
-downloads BGE-M3 into `tkeir/resources/modeling/net/bge-m3` (skipped when
-already present). Use `make setup PYTHON=3.12` for another supported minor.
+installs the package, and ships models under `tkeir/resources/modeling/`:
+
+| Artifact | Path | Target |
+|----------|------|--------|
+| spaCy pipelines (EU languages + `xx` NER) | `resources/modeling/spacy/` | Tokenizer / morphosyntax / NER. Arabic uses `spacy.blank("ar")` (no Explosion 3.6 wheel). |
+| Tesseract traineddata | `resources/modeling/tesseract/` | Multilingual OCR (`eng` … `ara`) |
+| BLIP-base | `resources/modeling/net/blip-image-captioning-base/` | Converter image captions |
+| BGE-M3 | `resources/modeling/net/bge-m3/` | Dense + sparse embeddings |
+| MWE trie | `resources/modeling/tokenizer/en/tkeir_mwe.pkl` | Optional compound-word tagging |
+
+`make setup` also pulls the **Vespa Docker image only if it is not already
+local** (`make pull-vespa`; `FORCE_VESPA=1` to refresh). Docker is not required
+for the NLP-only path (`make quickstart`). Use `make setup PYTHON=3.12` for
+another supported minor.
 
 **Checkpoint:**
 
 ```bash
 cd tkeir && uv run --python "${PYTHON:-3.11}" python -c "import thot; print(thot.__version__)"
 ls resources/modeling/net/bge-m3/config.json
+ls resources/modeling/tesseract/eng.traineddata
 ```
 ### 3.2 Run the bundled quickstart
 
@@ -142,7 +154,19 @@ make pipeline \
 - Use `-t auto` / `PIPELINE_TYPE=auto` for PDF and Office.
 - Use `raw` only for plain text.
 
-More detail: [NLP](ready_to_run.md).
+To compile a mixed-format folder into ingest JSON (`{dataset, records}`)
+instead of the pipeline:
+
+```bash
+tkeir-corpus \
+  -i /path/to/mixed-files \
+  -m /path/to/mixed-files-markdown \
+  -o ./datasets/mixed.json \
+  --name mixed \
+  --skip-empty
+```
+
+See [Corpus tools](tools/corpus.md). More detail: [NLP](ready_to_run.md).
 
 **Checkpoint:** Your output directory contains `*.json` with `content_tokens` /
 NER fields.
@@ -154,8 +178,8 @@ OSINT and enterprise demo data ship in the repo under `datasets/` — you do
 
 | Dataset | Theme | Default user | Versioned artifacts |
 |---------|-------|--------------|---------------------|
-| `datasets/osint/` | NATO C4ISR OSINT (SITREP, INTSUM, OPORD…) | `demo-user` | `VERSION`, `corpus.jsonl`, `business_ontology.yaml`, C2SIM ontologies |
-| `datasets/enterprise/` | AcmeSystems (+ optional EnterpriseRAG slice) | `demo-admin` | `VERSION`, `corpus.jsonl`, `business_ontology.yaml` |
+| `datasets/osint/` | NATO C4ISR OSINT (SITREP, INTSUM, OPORD…) | `analyst` / `c2-admin` | `hmi.json`, `keycloak.json`, `business_ontology.yaml` |
+| `datasets/enterprise/` | Project MERIDIAN (C-suite) | `ceo` / `enterprise-admin` | `enterprise.json`, `hmi.json`, `keycloak.json`, `business_ontology.yaml` |
 
 **Checkpoint:** `cat datasets/osint/VERSION` and
 `cat datasets/enterprise/VERSION` (currently `1.1.0`);
@@ -511,6 +535,7 @@ each target in its own window, and wait for health checks before continuing:
 
 ```bash
 ./start_services.sh
+# or: USECASE=enterprise ./start_services.sh
 ```
 
 Details, shortcuts (`TAB` / `CTRL+R` / `ESC`), and failure behaviour

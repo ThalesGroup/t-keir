@@ -173,6 +173,28 @@ class QueryRequest(BaseModel):
             "(typically user:<space>:<path>). Forces search_mode=user."
         ),
     )
+    concept_ids: list[str] | None = Field(
+        default=None,
+        description="Optional ontology concept IDs (OR-joined with hybrid search).",
+    )
+    relations: list[dict[str, Any]] | None = Field(
+        default=None,
+        description=(
+            "Optional relation filters "
+            "({subject_id, predicate_id, object_id}; partial or exact)."
+        ),
+    )
+    ontology_expand: dict[str, Any] | None = Field(
+        default=None,
+        description=(
+            "Optional neighborhood expansion: include_children / include_parents "
+            "/ include_related / predicates / max_depth / max_ids."
+        ),
+    )
+    ranking_profile: str | None = Field(
+        default=None,
+        description="Override Vespa ranking profile (hybrid | hybrid_ontology).",
+    )
     agent_id: str | None = Field(
         default=None,
         description=(
@@ -284,6 +306,28 @@ class SearchRequest(BaseModel):
             "Restrict retrieval to these Vespa/workspace source_ref values "
             "(typically user:<space>:<path>). Forces search_mode=user."
         ),
+    )
+    concept_ids: list[str] | None = Field(
+        default=None,
+        description="Optional ontology concept IDs (OR-joined with hybrid search).",
+    )
+    relations: list[dict[str, Any]] | None = Field(
+        default=None,
+        description=(
+            "Optional relation filters "
+            "({subject_id, predicate_id, object_id}; partial or exact)."
+        ),
+    )
+    ontology_expand: dict[str, Any] | None = Field(
+        default=None,
+        description=(
+            "Optional neighborhood expansion: include_children / include_parents "
+            "/ include_related / predicates / max_depth / max_ids."
+        ),
+    )
+    ranking_profile: str | None = Field(
+        default=None,
+        description="Override Vespa ranking profile (hybrid | hybrid_ontology).",
     )
 
 
@@ -1066,9 +1110,15 @@ def _resolve_request_business_ontology(
         >>> isinstance(_resolve_request_business_ontology(AppState()), dict)
         True
     """
+    from thot.tools.search.dual_hybrid_config import (
+        env_business_ontology_dataset,
+    )
+
     bo_cfg = state.rag_config.dual_hybrid.business_ontology
+
     dataset = (
         (business_ontology_dataset or "").strip()
+        or env_business_ontology_dataset()
         or (bo_cfg.default_dataset or "osint").strip()
         or "osint"
     )
@@ -1498,6 +1548,10 @@ async def _retrieve_and_rerank(
     user_space: str | None = None,
     business_ontology: Any | None = None,
     search_mode: str | None = None,
+    concept_ids: list[str] | None = None,
+    relations: list[dict[str, Any]] | None = None,
+    ontology_expand: dict[str, Any] | None = None,
+    ranking_profile: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any] | None, dict[str, Any] | None, str]:
     """Run query analysis, Vespa search, and optional second-stage rerank.
 
@@ -1538,6 +1592,10 @@ async def _retrieve_and_rerank(
             business_ontology=business_ontology,
             mode=pipeline_mode,
             top_k=hits,
+            concept_ids=concept_ids,
+            relations=relations,
+            ontology_expand=ontology_expand,
+            ranking_profile=ranking_profile,
         )
         # Shape as Vespa-like response for downstream enrichers.
         # Must include chunk_id — _enrich_hits skips hits without it.
@@ -1555,6 +1613,8 @@ async def _retrieve_and_rerank(
                         "chunk_text": hit.chunk_text,
                         "text_raw": hit.chunk_text,
                         "ontology_concepts": hit.ontology_concepts,
+                        "ontology_concept_ids": hit.ontology_concept_ids,
+                        "ontology_relations": hit.ontology_relations,
                         "schema": hit.schema,
                     },
                 }
@@ -1821,6 +1881,7 @@ def _preload_pipeline_runner(runner: PipelineRunner, language: str) -> None:
     )
     document = {
         "content": ["warmup"],
+        "source_doc_id": f"warmup://{language}",
         "language-detection": {"language": language},
     }
     try:
@@ -2032,6 +2093,104 @@ async def parse_business_ontology_file(
         "business_ontology": merged,
         "concept_count": len(concepts) if isinstance(concepts, list) else 0,
         "filename": getattr(business_ontology, "filename", None),
+    }
+
+
+class OntologyExportRequest(BaseModel):
+    """Paginated corpus ontology export.
+
+    Example:
+        >>> OntologyExportRequest().max_docs
+        5000
+    """
+
+    max_docs: int = Field(default=5000, ge=1, le=50000)
+    vespa_schema: str = Field(default="global")
+
+
+class OntologyExpandRequestBody(BaseModel):
+    """Expand seed concept IDs through the expert / catalog graph.
+
+    Example:
+        >>> OntologyExpandRequestBody(concept_ids=['C1']).concept_ids
+        ['C1']
+    """
+
+    concept_ids: list[str] = Field(default_factory=list)
+    include_children: bool = False
+    include_parents: bool = False
+    include_related: bool = False
+    predicates: list[str] = Field(default_factory=list)
+    max_depth: int = Field(default=1, ge=0, le=8)
+    max_ids: int = Field(default=32, ge=1, le=256)
+    business_ontology: list[dict[str, Any]] | dict[str, Any] | None = None
+    business_ontology_dataset: str | None = None
+
+
+@app.post("/ontology/export")
+async def export_ontology(request: OntologyExportRequest) -> dict[str, Any]:
+    """Reconstruct the indexed corpus ontology (concepts + relations).
+
+    Uses the ``ontology_concept`` catalog when present; otherwise Vespa
+    grouping on chunk concept/relation fields (no full-chunk load).
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(export_ontology)
+        True
+    """
+    state: AppState = app.state.rag
+    if state.vespa is None:
+        raise HTTPException(
+            status_code=503, detail="Application is not initialized"
+        )
+    from thot.ontology.vespa import export_corpus_ontology
+
+    return await export_corpus_ontology(
+        state.vespa,
+        max_docs=request.max_docs,
+        schema=request.vespa_schema,
+    )
+
+
+@app.post("/ontology/expand")
+async def expand_ontology(
+    request: OntologyExpandRequestBody,
+    authorization: str | None = Header(default=None),
+) -> dict[str, Any]:
+    """Expand concept IDs (parents / children / related / predicates).
+
+    Example:
+        >>> import inspect
+        >>> inspect.iscoroutinefunction(expand_ontology)
+        True
+    """
+    del authorization
+    state: AppState = app.state.rag
+    from thot.ontology.expansion import ExpansionSpec
+    from thot.ontology.service import OntologyService
+
+    payload = _resolve_request_business_ontology(
+        state,
+        business_ontology=request.business_ontology,
+        business_ontology_dataset=request.business_ontology_dataset,
+    )
+    svc = OntologyService.from_business_payload(payload)
+    result = svc.expand(
+        request.concept_ids,
+        ExpansionSpec(
+            include_children=request.include_children,
+            include_parents=request.include_parents,
+            include_related=request.include_related,
+            predicates=tuple(request.predicates or ()),
+            max_depth=request.max_depth,
+            max_ids=request.max_ids,
+        ),
+    )
+    return {
+        "concept_ids": result.concept_ids,
+        "seed_ids": result.seed_ids,
+        "expanded_ids": result.expanded_ids,
     }
 
 
@@ -2345,6 +2504,10 @@ async def search(
             user_space=user_space,
             business_ontology=business_ontology_payload,
             search_mode=search_mode,
+            concept_ids=request.concept_ids,
+            relations=request.relations,
+            ontology_expand=request.ontology_expand,
+            ranking_profile=request.ranking_profile,
         )
         parsed_hits = _filter_hits_by_source_refs(
             _parse_hits(search_response),
@@ -3099,6 +3262,10 @@ async def rag_query(
             user_space=user_space,
             business_ontology=business_ontology_payload,
             search_mode=search_mode,
+            concept_ids=request.concept_ids,
+            relations=request.relations,
+            ontology_expand=request.ontology_expand,
+            ranking_profile=request.ranking_profile,
         )
     except Exception as error:
         LOGGER.exception("Query generation failed")

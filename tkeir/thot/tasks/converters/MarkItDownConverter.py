@@ -14,6 +14,7 @@ from io import BytesIO
 
 from thot.core.Constants import exception_error_and_trace
 from thot.core.ThotLogger import ThotLogger
+from thot.tasks.converters.MarkdownSections import text_to_content
 from thot.tasks.converters.PdfImageOcr import build_pdf_content_with_ocr
 
 DATATYPE_EXTENSIONS = {
@@ -55,7 +56,8 @@ class MarkItDownConverter:
             Lazily initialized ``MarkItDown`` converter.
 
         Example:
-            >>> MarkItDownConverter._engine is None
+            >>> engine = MarkItDownConverter.get_engine()
+            >>> engine is not None
             True
         """
         if cls._engine is None:
@@ -139,7 +141,31 @@ class MarkItDownConverter:
             "scanned-pages": 0,
         }
 
-        if extension == ".pdf" and ocr_config and ocr_config.get("enabled"):
+        if extension == ".pdf":
+            from thot.tasks.converters.UniversalConverter import (
+                _extract_pdf,
+            )
+
+            try:
+                inline = _extract_pdf(data, ocr_config)
+            except Exception:
+                inline = ""
+            if inline.strip():
+                content = inline
+                try:
+                    import fitz
+
+                    with fitz.open(stream=data, filetype="pdf") as document:
+                        title = (document.metadata or {}).get("title") or title
+                except Exception:
+                    title = title
+
+        if (
+            content is None
+            and extension == ".pdf"
+            and ocr_config
+            and ocr_config.get("enabled")
+        ):
             content, ocr_info = build_pdf_content_with_ocr(
                 data, ocr_config=ocr_config, call_context=call_context
             )
@@ -178,16 +204,25 @@ class MarkItDownConverter:
 
             content = result.text_content or result.markdown or ""
             title = result.title or title
+
+        extracted_title, blocks, text_fmt = text_to_content(
+            content or "", document_title=title or None
+        )
+        title = title or extracted_title
+        if not blocks and (content or "").strip():
+            blocks = [content.strip()]
         return {
             "data_source": "converter-service",
             "source_doc_id": source_doc_id,
             "title": title,
-            "content": [content],
+            "content": blocks,
             "kg": [],
             "error": False,
             "conversion-info": {
                 "datatype": data_type,
                 "source-size-bytes": len(data),
                 "image-extraction": ocr_info,
+                "text-format": text_fmt,
+                "content-blocks": len(blocks),
             },
         }

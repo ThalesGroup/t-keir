@@ -7,11 +7,18 @@
 # \`docker logs -f\` after start instead of dropping to a shell.
 #
 # Usage:
-#   ./start_services.sh              # create session and attach
+#   ./start_services.sh              # create session and attach (USECASE=osint)
+#   USECASE=enterprise ./start_services.sh
+#   TKEIR_USECASE=my_pack ./start_services.sh
+#   ./start_services.sh --usecase enterprise
 #   ./start_services.sh --no-attach  # create only (CI / nested tmux)
 #   ./start_services.sh --skip-check-install
 #   SESSION=tkeir-demo ./start_services.sh
 #   TMUX_BIN=/opt/homebrew/bin/tmux ./start_services.sh
+#
+# Usecase pack (datasets/<name>/): --usecase, USECASE, or TKEIR_USECASE.
+# Default osint. Exported into every tmux pane so Keycloak, ingest, RAG,
+# agent, and HMI stay on the same pack (see docs/tools/usecase.md).
 #
 # Shortcuts (no prefix):
 #   TAB     next window
@@ -36,6 +43,7 @@ ATTACH="${ATTACH:-1}"
 HEALTH_POLL_SECONDS="${HEALTH_POLL_SECONDS:-2}"
 KEEP_DATA="${KEEP_DATA:-0}"
 SKIP_CHECK_INSTALL="${SKIP_CHECK_INSTALL:-0}"
+USECASE_CLI=""
 TMUX_CMD=""
 
 # Per-service readiness timeouts (seconds).
@@ -100,6 +108,54 @@ Or set TMUX_BIN=/path/to/tmux"
 
 log() {
   printf '[%s] %s\n' "$(date '+%H:%M:%S')" "$*"
+}
+
+# Resolve datasets/<name>/ pack. CLI --usecase wins, then USECASE / TKEIR_*.
+resolve_usecase() {
+  local raw
+  raw="${USECASE_CLI:-${USECASE:-${TKEIR_USECASE:-${TKEIR_AGENT_USECASE:-${TKEIR_DATASET:-${TKEIR_BUSINESS_ONTOLOGY_DATASET:-osint}}}}}}"
+  raw="$(printf '%s' "$raw" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
+  [[ -n "$raw" ]] || raw="osint"
+  USECASE="$raw"
+  TKEIR_USECASE="$raw"
+  TKEIR_AGENT_USECASE="$raw"
+  TKEIR_BUSINESS_ONTOLOGY_DATASET="$raw"
+  export USECASE TKEIR_USECASE TKEIR_AGENT_USECASE TKEIR_BUSINESS_ONTOLOGY_DATASET
+  export NEXT_PUBLIC_TKEIR_USECASE="$raw"
+}
+
+validate_usecase_pack() {
+  local pack="$ROOT/datasets/$USECASE"
+  [[ -d "$pack" ]] || die "usecase pack not found: ${pack}
+Set USECASE / TKEIR_USECASE to a folder under datasets/ (default osint).
+See docs/tools/usecase.md"
+  [[ -f "$pack/agent_orchestrator.yaml" ]] || die "missing ${pack}/agent_orchestrator.yaml
+Every usecase pack needs agent_orchestrator.yaml (see docs/tools/usecase.md)"
+  [[ -f "$pack/keycloak.json" ]] || die "missing ${pack}/keycloak.json
+Keycloak sync loads datasets/<usecase>/keycloak.json (see docs/tools/usecase.md)"
+  if [[ ! -f "$pack/hmi.json" ]]; then
+    log "warn: ${pack}/hmi.json missing — HMI will fall back to OSINT presets"
+  fi
+}
+
+# Exports baked into tmux panes so bash -lc / CTRL+R keep the selected pack.
+usecase_export_block() {
+  cat <<EOF
+export USECASE=$(printf '%q' "$USECASE")
+export TKEIR_USECASE=$(printf '%q' "$TKEIR_USECASE")
+export TKEIR_AGENT_USECASE=$(printf '%q' "$TKEIR_AGENT_USECASE")
+export TKEIR_BUSINESS_ONTOLOGY_DATASET=$(printf '%q' "$TKEIR_BUSINESS_ONTOLOGY_DATASET")
+export NEXT_PUBLIC_TKEIR_USECASE=$(printf '%q' "$TKEIR_USECASE")
+EOF
+}
+
+# Prefix for make in this process (keycloak-sync, and any host-side make).
+make_with_usecase() {
+  USECASE="$USECASE" \
+    TKEIR_USECASE="$TKEIR_USECASE" \
+    TKEIR_AGENT_USECASE="$TKEIR_AGENT_USECASE" \
+    TKEIR_BUSINESS_ONTOLOGY_DATASET="$TKEIR_BUSINESS_ONTOLOGY_DATASET" \
+    make "$@"
 }
 
 # Tear down the whole demo stack when a service fails to become ready.
@@ -187,11 +243,16 @@ configure_session() {
   "$TMUX_CMD" set-option -t "$SESSION" -g status on
   "$TMUX_CMD" set-option -t "$SESSION" -g status-interval 5
   "$TMUX_CMD" set-option -t "$SESSION" -g status-justify left
-  "$TMUX_CMD" set-option -t "$SESSION" -g status-left-length 40
+  "$TMUX_CMD" set-option -t "$SESSION" -g status-left-length 56
   "$TMUX_CMD" set-option -t "$SESSION" -g status-right-length 140
   "$TMUX_CMD" set-option -t "$SESSION" -g status-style "bg=colour235,fg=colour250"
   "$TMUX_CMD" set-option -t "$SESSION" -g window-status-current-style "bg=colour238,fg=colour220,bold"
-  "$TMUX_CMD" set-option -t "$SESSION" -g status-left "#[bold] ${SESSION} "
+  "$TMUX_CMD" set-option -t "$SESSION" -g status-left "#[bold] ${SESSION} #[fg=colour117]${USECASE} "
+  "$TMUX_CMD" set-environment -t "$SESSION" USECASE "$USECASE"
+  "$TMUX_CMD" set-environment -t "$SESSION" TKEIR_USECASE "$TKEIR_USECASE"
+  "$TMUX_CMD" set-environment -t "$SESSION" TKEIR_AGENT_USECASE "$TKEIR_AGENT_USECASE"
+  "$TMUX_CMD" set-environment -t "$SESSION" TKEIR_BUSINESS_ONTOLOGY_DATASET "$TKEIR_BUSINESS_ONTOLOGY_DATASET"
+  "$TMUX_CMD" set-environment -t "$SESSION" NEXT_PUBLIC_TKEIR_USECASE "$TKEIR_USECASE"
   "$TMUX_CMD" set-option -t "$SESSION" -g status-right "#[fg=colour117][ TAB: Next Service ]#[fg=colour245] | #[fg=colour214][ CTRL+R: Restart Active Service ]#[fg=colour245] | #[fg=colour203][ ESC: Global Shutdown (make down) ] "
 
   # No-prefix shortcuts (session-scoped where supported; -n = root table).
@@ -228,6 +289,7 @@ start_window() {
   # shellcheck disable=SC2016
   pane_script="$(cat <<EOF
 cd $(printf '%q' "$ROOT") || exit 1
+$(usecase_export_block)
 printf '\\n==> %s\\n\\n' $(printf '%q' "$cmd")
 ${cmd}
 status=\$?
@@ -257,6 +319,7 @@ start_docker_window() {
   # shellcheck disable=SC2016
   pane_script="$(cat <<EOF
 cd $(printf '%q' "$ROOT") || exit 1
+$(usecase_export_block)
 printf '\\n==> %s\\n\\n' $(printf '%q' "$cmd")
 ${cmd}
 status=\$?
@@ -313,8 +376,17 @@ main() {
       --no-attach) ATTACH=0 ;;
       --attach) ATTACH=1 ;;
       --skip-check-install) SKIP_CHECK_INSTALL=1 ;;
+      --usecase)
+        [[ $# -ge 2 ]] || die "--usecase requires a pack name (osint, enterprise, …)"
+        USECASE_CLI="$2"
+        shift
+        ;;
+      --usecase=*)
+        USECASE_CLI="${1#--usecase=}"
+        [[ -n "$USECASE_CLI" ]] || die "--usecase requires a pack name"
+        ;;
       -h|--help)
-        sed -n '1,35p' "$0"
+        sed -n '1,45p' "$0"
         exit 0
         ;;
       *) die "unknown argument: $1" ;;
@@ -332,6 +404,10 @@ main() {
   [[ -f "$ROOT/Makefile" ]] || die "Makefile not found in $ROOT"
 
   cd "$ROOT"
+
+  resolve_usecase
+  validate_usecase_pack
+  log "usecase=$USECASE (datasets/${USECASE}/)"
 
   if [[ "$SKIP_CHECK_INSTALL" == "1" ]]; then
     log "skipping make check-install (SKIP_CHECK_INSTALL=1)"
@@ -353,7 +429,7 @@ main() {
   fi
 
   log "orchestrating hybrid demo into tmux session '$SESSION'"
-  log "root=$ROOT KEEP_DATA=$KEEP_DATA"
+  log "root=$ROOT KEEP_DATA=$KEEP_DATA USECASE=$USECASE"
 
   # Container first (no image pull), then deploy schemas so :8080 serves the app.
   # Docker panes follow container logs (CTRL+R re-runs up + logs).
@@ -362,14 +438,14 @@ main() {
   wait_http "Vespa query" "http://127.0.0.1:8080/state/v1/health" "$TIMEOUT_VESPA"
   wait_http "Vespa application" "http://127.0.0.1:19071/application/v2/tenant/default/application/default" "$TIMEOUT_VESPA"
 
-  start_docker_window "[KEYCLOAK]" "make keycloak-up" tkeir-keycloak tkeir-keycloak-db
+  start_docker_window "[KEYCLOAK]" "make keycloak-up USECASE=${USECASE}" tkeir-keycloak tkeir-keycloak-db
   wait_http "Keycloak" "http://127.0.0.1:8082/realms/tkeir" "$TIMEOUT_KEYCLOAK"
   # Re-sync personas/roles/clearance after Keycloak is healthy (idempotent).
-  log "registering Keycloak demo personas (make keycloak-sync-demo-users)…"
-  if ! make keycloak-sync-demo-users; then
-    abort_stack "Keycloak demo persona sync failed"
+  log "registering Keycloak personas for USECASE=${USECASE} (make keycloak-sync-demo-users)…"
+  if ! make_with_usecase keycloak-sync-demo-users; then
+    abort_stack "Keycloak persona sync failed (USECASE=${USECASE})"
   fi
-  log "Keycloak demo personas registered"
+  log "Keycloak personas registered (USECASE=${USECASE})"
 
   start_docker_window "[SPIRE]" "make spire-up" tkeir-spire-server tkeir-spire-agent
   wait_spire "$TIMEOUT_SPIRE"
@@ -381,10 +457,10 @@ main() {
   wait_http "Collector" "http://127.0.0.1:8096/health" "$TIMEOUT_COLLECTOR"
 
   # index-up = schema init + long-running ingest (:8091)
-  start_window "[INDEX]" "make index-up"
+  start_window "[INDEX]" "make index-up USECASE=${USECASE}"
   wait_http "Ingest" "http://127.0.0.1:8091/health" "$TIMEOUT_INGEST"
 
-  start_window "[RAG]" "make rag-up"
+  start_window "[RAG]" "make rag-up USECASE=${USECASE}"
   wait_http "RAG" "http://127.0.0.1:8090/health" "$TIMEOUT_RAG"
 
   start_window "[GOVERNOR]" "make governor-up"
@@ -397,14 +473,14 @@ main() {
   wait_http "OKF" "http://127.0.0.1:8095/health" "$TIMEOUT_OKF"
 
   # make agent also ensures SPIRE (idempotent if already up)
-  start_window "[AGENT]" "make agent"
+  start_window "[AGENT]" "make agent USECASE=${USECASE}"
   wait_http "Agent" "http://127.0.0.1:8092/health" "$TIMEOUT_AGENT"
 
-  start_window "[HMI]" "make hmi-up"
+  start_window "[HMI]" "make hmi-up USECASE=${USECASE}"
   wait_http "HMI" "http://127.0.0.1:3000" "$TIMEOUT_HMI"
 
   log "all services reported ready"
-  log "HMI: http://127.0.0.1:3000"
+  log "usecase=$USECASE  HMI: http://127.0.0.1:3000"
   log "shortcuts: TAB=next | CTRL+R=restart pane | ESC=make down + exit"
 
   if [[ "$ATTACH" == "1" ]]; then

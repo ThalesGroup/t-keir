@@ -43,4 +43,7 @@ schema user inherits doc_base {
             expression: closeness(field, dense_vector)
         }
     }
+
+    rank-profile hybrid_ontology inherits hybrid {
+    }
 }

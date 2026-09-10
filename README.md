@@ -153,6 +153,7 @@ agent, and HMI on the host, with health gates between windows.
 ```bash
 # Prerequisites: make setup (pulls Vespa + SearXNG), Docker, tmux, Ollama on host
 ./start_services.sh
+# or: USECASE=enterprise ./start_services.sh
 # or: bash start_services.sh --no-attach
 ```
 
@@ -237,10 +238,11 @@ MarkItDown extracts the PDF **text layer** by default. Text trapped in images
 
 | Mode | Requirement |
 |---|---|
-| `tesseract` | [Tesseract](https://github.com/tesseract-ocr/tesseract) on `PATH` (`eng` + `fra` in devcontainer) |
+| `tesseract` | [Tesseract](https://github.com/tesseract-ocr/tesseract) on `PATH` plus `resources/modeling/tesseract/` (`eng` … `ara`; `make install-converter-models`) |
 | `llm` | `"mode": "llm"` + `OPENAI_API_KEY` (or `ocr.llm-api-key`) for vision-based extraction |
 
-The devcontainer and `make setup` install Tesseract for PDF OCR in the pipeline.
+The devcontainer and `make setup` install Tesseract and tessdata for PDF OCR
+in the pipeline. BLIP captions are optional (`resources/modeling/net/blip-image-captioning-base/`).
 
 Details: [docs/tools/converter.md](docs/tools/converter.md)
 
@@ -254,12 +256,15 @@ setup, pipeline, tests, docs, Vespa, indexing, and RAG.
 | Target | Description |
 |---|---|
 | `make help` | List common targets and variables |
-| `make setup` | Full local setup: `install` + spaCy + Tesseract + `init-models` + BGE-M3 download |
+| `make setup` | Full local setup: `install` + spaCy + Tesseract + converter models (tessdata/BLIP) + `init-models` + BGE-M3; Vespa image pulled only if missing |
 | `make install` | `uv sync` in `tkeir/` (dev dependency group) |
-| `make install-spacy-models` | Download spaCy language models used by the pipeline |
-| `make install-tesseract` | Install Tesseract OCR (PDF image text) |
+| `make install-spacy-models` | Extract spaCy pipelines into `tkeir/resources/modeling/spacy` |
+| `make install-tesseract` | Install Tesseract OCR binary |
+| `make install-converter-models` | Tessdata + BLIP into `resources/modeling` (skip if present) |
+| `make pull-vespa` | Pull Vespa image only when missing (`FORCE_VESPA=1` refresh) |
 | `make init-models` | Build `tkeir_mwe.pkl` from annotation resources (optional MWE) |
 | `make pipeline` | Run `tkeir-pipeline` on `PIPELINE_INPUT` → `PIPELINE_OUTPUT` |
+| `make corpus` | Source/markdown dir → `{dataset, records}` JSON (`CORPUS_INPUT`, `CORPUS_OUTPUT`, optional `CORPUS_MARKDOWN_DIR`) |
 | `make quickstart` | Pipeline demo on bundled fixtures → `output/quickstart/` |
 | `make devcontainer` | Start devcontainer and open a shell (`/workspace`) |
 | `make build` | Build Python wheel → `dist/` |
@@ -283,6 +288,25 @@ make pipeline \
   PIPELINE_INPUT=docs/ \
   PIPELINE_OUTPUT=output/my-run/ \
   PIPELINE_TYPE=auto
+```
+
+### Corpus JSON from files
+
+Markdown-only or a **heterogeneous** directory (PDF, Office, HTML, images, ZIP, JSON, CSV, …) → `{dataset, records}` for ingest. See [Corpus tools](docs/tools/corpus.md).
+
+```bash
+tkeir-corpus \
+  -i /path/to/mixed-files \
+  -m /path/to/mixed-files-markdown \
+  -o ./datasets/mixed.json \
+  --name mixed \
+  --skip-empty
+
+make corpus \
+  CORPUS_INPUT=/path/to/mixed-files \
+  CORPUS_MARKDOWN_DIR=/path/to/mixed-files-markdown \
+  CORPUS_OUTPUT=./datasets/mixed.json \
+  CORPUS_NAME=mixed
 ```
 
 ### Quality & docs

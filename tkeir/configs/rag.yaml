@@ -121,17 +121,39 @@ dual_hybrid:
       xx: xx_ent_wiki_sm
       en: en_core_web_md
       fr: fr_core_news_md
-      de: de_core_news_md
-      es: es_core_news_md
-      it: it_core_news_md
-      pt: pt_core_news_md
-      nl: nl_core_news_md
-      zh: zh_core_web_md
-      ja: ja_core_news_md
+      de: de_core_news_sm
+      es: es_core_news_sm
+      it: it_core_news_sm
+      pt: pt_core_news_sm
+      nl: nl_core_news_sm
+      da: da_core_news_sm
+      el: el_core_news_sm
+      fi: fi_core_news_sm
+      nb: nb_core_news_sm
+      pl: pl_core_news_sm
+      ro: ro_core_news_sm
+      sv: sv_core_news_sm
+      ar: blank:ar
+      zh: zh_core_web_sm
+      ja: ja_core_news_sm
   retrieval:
     # Hits per Vespa schema (global and/or user).
     hits: 200
     ranking_profile: hybrid
+  # First-class ontology catalog + chunk associations (optional).
+  ontology_layer:
+    index_concepts: true
+    embed_concepts: false
+    json_structural_concepts: true
+    max_concepts_per_chunk: 64
+    max_relations_per_chunk: 32
+    relation_match: partial   # exact | partial
+    expansion:
+      include_children: false
+      include_parents: false
+      include_related: false
+      max_depth: 1
+      max_ids: 32
   rank_profiles:
     # Feeds `make schemas` first-phase weights on global.sd / user.sd.
     # Local BGE-M3 alone ≈ SPLADE on SciFact; bias hybrid toward dense.
@@ -140,6 +162,14 @@ dual_hybrid:
         dense: 0.70
         sparse: 0.20
         bm25: 0.10
+      # Application-side ontology overlap (does not change Vespa `hybrid`).
+      # Vespa profile `hybrid_ontology` inherits `hybrid` first-phase.
+      hybrid_ontology:
+        dense: 0.70
+        sparse: 0.20
+        bm25: 0.10
+        concept: 0.15
+        relation: 0.10
   # Tag passages with datasets/<name>/business_ontology.yaml at index time /
   # auto-load that YAML on /search and /rag/query (merge with request payload).
   # See docs/configuration/rag.yaml.md → dual_hybrid.business_ontology

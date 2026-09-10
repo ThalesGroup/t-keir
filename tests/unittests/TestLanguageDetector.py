@@ -49,3 +49,10 @@ class TestLanguageDetector:
         assert "language-detection" in result
         assert "tasks-info" in result
         assert result["language-detection"]["language"] == "en"
+
+    def test_detect_arabic(self):
+        result = LanguageDetector.detect(
+            "الجيش اللبناني أعلن حالة التأهب في العاصمة بيروت بعد الحادث الأمني."
+        )
+        assert result.language == "ar"
+        assert result.confidence > 0.5

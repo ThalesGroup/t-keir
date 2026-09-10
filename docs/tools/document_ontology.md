@@ -153,6 +153,25 @@ axioms).
 
 ---
 
+## SHACL self-heal (speed caps)
+
+Large documents can produce thousands of `sh:minCount` violations if every
+typed property seen once is required on every instance. The heal loop then
+runs `pyshacl` repeatedly and stalls ingest.
+
+| Guard | Config key | Default | Effect |
+|-------|------------|---------|--------|
+| Graph size | `max-heal-triples` | 12000 | Skip SHACL (`SKIPPED_TOO_LARGE`); still write JSON-LD |
+| Violation cap | `max-violations-to-repair` | 48 | Skip repair if more minCount gaps (`SKIPPED_TOO_MANY_VIOLATIONS`); pyshacl is not run |
+| Time budget | `max-heal-seconds` | 8 | Stop further repair attempts |
+| Repair rounds | `max-repair-attempts` | 2 | Max validate/repair cycles after the cheap minCount scan |
+| Induced minCount | (code) | 75% coverage | `sh:minCount 1` only when most class instances already have that property |
+
+A linear scan of `rdf:type` vs shape paths lists minCount gaps and either
+repairs that small set or skips. JSON-LD is always serialized.
+
+---
+
 ## How matching works
 
 Label similarity (`_score_labels` in `OntologyDerivation`):

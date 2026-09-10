@@ -20,8 +20,30 @@ schema doc_base {
         field sparse_vector type tensor<float>(token{}) {
             indexing: summary | attribute
         }
-        # Ontology / SVO-derived concept ids (Graph-RAG style).
+        # Ontology concept IDs associated with this chunk (legacy field name).
+        # Values are stable concept IDs, not human-readable labels.
         field ontology_concepts type array<string> {
+            indexing: summary | attribute
+        }
+        # Canonical alias of ontology_concepts (populated identically on write).
+        field ontology_concept_ids type array<string> {
+            indexing: summary | attribute
+        }
+        struct ontology_relation {
+            field subject_id type string {}
+            field predicate_id type string {}
+            field object_id type string {}
+            field confidence type float {}
+        }
+        # Structured SVO / JSON / expert assertions (summary + filterable slots).
+        field ontology_relations type array<ontology_relation> {
+            indexing: summary
+            struct-field subject_id { indexing: attribute }
+            struct-field predicate_id { indexing: attribute }
+            struct-field object_id { indexing: attribute }
+        }
+        # Compact "subject|predicate|object" keys for exact relation match.
+        field ontology_rel_keys type array<string> {
             indexing: summary | attribute
         }
         # Unix epoch seconds when the document was authored / ingested (TTL base).

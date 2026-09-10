@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { AdminPanel } from "@/components/admin-panel";
 import { RequireRole } from "@/src/auth/RequireRole";
+import { usecaseAdminRoles } from "@/lib/usecase-roles";
 
 /**
  * Oversight panel — kill switch, budgets, approvals (Phase 5).
@@ -15,7 +16,7 @@ export default async function AdminPage({
   const cid = params.correlation_id?.trim() || null;
 
   return (
-    <RequireRole allowedRoles={["c2-admin", "tkeir-admin"]}>
+    <RequireRole allowedRoles={usecaseAdminRoles()}>
       <div className="mx-auto max-w-3xl space-y-6 px-4 py-10">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-primary">

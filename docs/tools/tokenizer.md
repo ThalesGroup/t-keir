@@ -4,6 +4,26 @@ The tokenizer segments **title** and **content** fields of a T-KEIR document.
 Tokenizer resources are compiled with `tkeir-create-annotation-resource`
 (`thot/tools/annotation/create_annotation_resource.py`).
 
+## Languages
+
+Language detection (`langdetect`) runs after conversion. Tagging uses spaCy
+pipelines shipped under `tkeir/resources/modeling/spacy/` (`make
+install-spacy-models` / `make setup`):
+
+| Language | Model |
+|----------|--------|
+| English | `en_core_web_sm` / `en_core_web_md` |
+| French | `fr_core_news_sm` / `fr_core_news_md` |
+| German, Spanish, Italian, Portuguese, Dutch, Polish, Danish, Swedish | `*_core_news_sm` |
+| Other / fallback NER | `xx_ent_wiki_sm` |
+| Arabic | `spacy.blank("ar")` (no Explosion 3.6 trained pipeline). Surface forms are kept when lemmas are empty so hybrid indexing still matches Arabic text. |
+
+Tokenizer lexical resources (`resources/modeling/tokenizer/<lang>/`) exist for
+`en` and `fr`; other languages fall back to those tries while spaCy still
+tags in the detected language.
+
+See [Converter](converter.md) for OCR languages (Tesseract `eng+…+ara`).
+
 ## Tokenizer configuration
 
 Example of Configuration:

@@ -72,7 +72,10 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/src/auth/AuthProvider";
 import { apiFetch } from "@/src/auth/useApiClient";
 
-const SHARE_ROLES = ["c2-j2-analyst", "c2-moc-watch", "c2-j2x-humint"];
+import {
+  getUsecaseConfig,
+  hasAnyRole,
+} from "@/lib/usecase-config";
 
 /** Default node budget for Reporter Grab+Wiki ontology (by weight). */
 const DEFAULT_GRAPH_MAX_NODES = 24;
@@ -98,7 +101,8 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
     [roles, activePersonaId],
   );
   const canShareToCommander =
-    !authEnabled || SHARE_ROLES.some((role) => roles.includes(role));
+    !authEnabled ||
+    hasAnyRole(roles, getUsecaseConfig().shareRoles);
 
   const [query, setQuery] = useState(persona.goal);
   const [hits, setHits] = useState(20);

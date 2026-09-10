@@ -4,6 +4,8 @@
 config.yaml
 .DS_Store
 .idea/
+.cursor/
+.vscode/
 *.iml
 **/__pycache__
 **/*.log
@@ -22,6 +24,14 @@ site/
 tkeir/resources/modeling/net/**
 !tkeir/resources/modeling/net/README.md
 !tkeir/resources/modeling/net/.gitkeep
+# spaCy pipelines (downloaded by `make install-spacy-models` / `make setup`)
+tkeir/resources/modeling/spacy/**
+!tkeir/resources/modeling/spacy/README.md
+!tkeir/resources/modeling/spacy/.gitkeep
+# Tesseract traineddata (downloaded by `make install-converter-models`)
+tkeir/resources/modeling/tesseract/**
+!tkeir/resources/modeling/tesseract/README.md
+!tkeir/resources/modeling/tesseract/.gitkeep
 .pytest_cache/
 .coverage
 .coverage.*
@@ -61,6 +71,10 @@ datasets/enterprise/pdf/
 datasets/enterprise/docx/
 datasets/ingest_*.json
 datasets/*.zip
+# Restricted / local-only usecase packs (not shipped). See docs/tools/usecase.md
+datasets/geomaps.json
+datasets/geomaps/
+tkeir-hmi/public/usecase.json
 # SciDocs BEIR dump is ~250 MiB — download via datasets/scidocs/download.sh
 datasets/scidocs/corpus.jsonl
 datasets/scidocs/queries.jsonl

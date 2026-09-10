@@ -1,0 +1,78 @@
+{
+  "roles": [
+    {
+      "name": "c2-j2-analyst",
+      "description": "NATO C2 J2 analyst persona"
+    },
+    {
+      "name": "c2-moc-watch",
+      "description": "NATO C2 MOC watch persona"
+    },
+    {
+      "name": "c2-j2x-humint",
+      "description": "NATO C2 J2X HUMINT persona"
+    },
+    {
+      "name": "c2-ctf-commander",
+      "description": "NATO C2 CTF commander persona"
+    },
+    {
+      "name": "c2-admin",
+      "description": "NATO C2 admin persona",
+      "composites": ["tkeir-admin", "tkeir-user", "tkeir-operator", "tkeir-auditor"]
+    }
+  ],
+  "users": [
+    {
+      "username": "analyst",
+      "email": "analyst@tkeir",
+      "firstName": "J2",
+      "lastName": "Analyst",
+      "clearance": "SECRET",
+      "password": "analyst",
+      "roles": ["c2-j2-analyst", "tkeir-user"]
+    },
+    {
+      "username": "moc-watch",
+      "email": "moc-watch@tkeir",
+      "firstName": "MOC",
+      "lastName": "Watch",
+      "clearance": "FOUO",
+      "password": "moc-watch",
+      "roles": ["c2-moc-watch", "tkeir-user"]
+    },
+    {
+      "username": "humint",
+      "email": "humint@tkeir",
+      "firstName": "J2X",
+      "lastName": "HUMINT",
+      "clearance": "SECRET",
+      "password": "humint",
+      "roles": ["c2-j2x-humint", "tkeir-user"]
+    },
+    {
+      "username": "commander",
+      "email": "commander@tkeir",
+      "firstName": "CTF",
+      "lastName": "Commander",
+      "clearance": "SECRET",
+      "password": "commander",
+      "roles": ["c2-ctf-commander", "tkeir-user"]
+    },
+    {
+      "username": "c2-admin",
+      "email": "c2-admin@tkeir",
+      "firstName": "C2",
+      "lastName": "Admin",
+      "clearance": "SECRET",
+      "password": "c2-admin",
+      "roles": ["c2-admin", "tkeir-admin"]
+    }
+  ],
+  "verify": {
+    "username": "analyst",
+    "password": "analyst",
+    "role": "c2-j2-analyst",
+    "clearance": "SECRET"
+  }
+}

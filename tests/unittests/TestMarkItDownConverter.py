@@ -30,10 +30,8 @@ class TestMarkItDownConverter:
         document = MarkItDownConverter.convert(
             data, "file://mail1.txt", "email", call_context=log_context
         )
-        assert (
-            "Access to UBSWenergy Production Environment"
-            in document["content"][0]
-        )
+        joined = "\n".join(document["content"])
+        assert "Access to UBSWenergy Production Environment" in joined
         assert not document["error"]
 
     def test_extension_for(self):

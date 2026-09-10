@@ -215,9 +215,12 @@ export interface DocumentGroup {
 }
 
 export function formatDocumentName(parentDocId: string): string {
-  const withoutScheme = parentDocId.replace(/^file:\/\//, "");
-  const segments = withoutScheme.split("/");
-  return segments[segments.length - 1] || parentDocId;
+  const withoutScheme = parentDocId
+    .replace(/^(?:file:\/\/|ingest:\/\/)/i, "")
+    .replace(/^user:[^:]+:/i, "");
+  const segments = withoutScheme.split("/").filter(Boolean);
+  const last = segments[segments.length - 1] || parentDocId;
+  return last.replace(/(\.md)+$/i, "").replace(/[_]+/g, " ") || parentDocId;
 }
 
 export function chunkRelevanceScore(chunk: RetrievedChunk): number {

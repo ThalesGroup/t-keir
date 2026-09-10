@@ -14,6 +14,11 @@ import {
   type AnalyzedDocumentPayload,
 } from "@/lib/api";
 import type { OntologyCoverage } from "@/lib/ontology-coverage";
+import {
+  explicitChunkTitle,
+  formatSourceLabel,
+  passageSnippet,
+} from "@/lib/search-display";
 import type {
   FusedOntology,
   SearchChunkHit,
@@ -99,6 +104,14 @@ interface ReporterChunkCardProps {
   ontologyTitle?: string;
   /** External business-ontology coverage for this chunk. */
   boCoverage?: OntologyCoverage | null;
+  /** Override the computed document / passage title. */
+  displayTitle?: string;
+  /** Show the source path under the title. */
+  showSource?: boolean;
+  rank?: number;
+  /** Relative match 0–1 against the strongest hit in this result set. */
+  strength?: number;
+  nested?: boolean;
 }
 
 export function ReporterChunkCard({
@@ -108,6 +121,11 @@ export function ReporterChunkCard({
   defaultOpen = false,
   ontologyTitle = "Analyzed ontology graph",
   boCoverage = null,
+  displayTitle,
+  showSource = true,
+  rank,
+  strength,
+  nested = false,
 }: ReporterChunkCardProps) {
   const { runtimeConfig } = useAuth();
   const [open, setOpen] = useState(defaultOpen);
@@ -185,13 +203,23 @@ export function ReporterChunkCard({
     ],
   );
 
+  const title =
+    displayTitle?.trim() ||
+    explicitChunkTitle(chunk, {
+      entityLabels: linkedEntities.map((entity) => entity.label),
+    });
+  const sourceLabel = formatSourceLabel(chunk.parent_doc_id);
+  const snippet = passageSnippet(chunk.text_raw, 200);
+  const strengthPct = Math.round((strength ?? 0) * 100);
+
   return (
-    <li
+    <article
       data-chunk-id={chunk.chunk_id}
       className={cn(
         "rounded-lg border bg-card/40 transition-opacity",
+        nested && "border-border/70 shadow-none",
         !active && "opacity-40",
-        active && "border-primary/30",
+        active && !nested && "border-primary/30",
       )}
     >
       <button
@@ -206,37 +234,73 @@ export function ReporterChunkCard({
           <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
         )}
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="truncate font-medium">
-              {chunk.title?.trim() ||
-                chunk.parent_doc_id.split("/").pop() ||
-                chunk.chunk_id}
-            </span>
-            <Badge variant="outline" className="font-mono text-[10px]">
-              {chunk.score.toFixed(3)}
-            </Badge>
-            {(linkedEntities.length > 0 || linkedKeywords.length > 0) && (
-              <Badge variant="secondary" className="text-[10px]">
-                <Network className="mr-1 h-3 w-3" />
-                {linkedEntities.length} ent · {linkedKeywords.length} kw
-              </Badge>
+          <div className="flex items-start gap-2">
+            {rank != null && (
+              <span className="mt-0.5 w-6 shrink-0 text-[11px] font-medium tabular-nums text-muted-foreground">
+                {rank}
+              </span>
             )}
-            {boCoverage && boCoverage.total > 0 && (
-              <OntologyCoverageMeter
-                coverage={boCoverage}
-                title="BO"
-                compact
-              />
-            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="break-words font-medium leading-snug tracking-tight">
+                  {title}
+                </span>
+                {(linkedEntities.length > 0 || linkedKeywords.length > 0) && (
+                  <Badge variant="secondary" className="text-[10px] font-normal">
+                    <Network className="mr-1 h-3 w-3" />
+                    {linkedEntities.length} ent · {linkedKeywords.length} kw
+                  </Badge>
+                )}
+                {boCoverage && boCoverage.total > 0 && (
+                  <OntologyCoverageMeter
+                    coverage={boCoverage}
+                    title="BO"
+                    compact
+                  />
+                )}
+              </div>
+              {showSource &&
+                sourceLabel &&
+                sourceLabel.localeCompare(title, undefined, {
+                  sensitivity: "accent",
+                }) !== 0 && (
+                  <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+                    {sourceLabel}
+                  </p>
+                )}
+              {strength != null && (
+                <div
+                  className="mt-1.5 flex items-center gap-2"
+                  title={`Relative match ${strengthPct}%`}
+                >
+                  <span
+                    className="h-1.5 w-20 overflow-hidden rounded-full bg-muted"
+                    aria-hidden
+                  >
+                    <span
+                      className="block h-full rounded-full bg-primary"
+                      style={{ width: `${strengthPct}%` }}
+                    />
+                  </span>
+                  <span className="text-[10px] tabular-nums text-muted-foreground">
+                    {strengthPct}% match
+                  </span>
+                </div>
+              )}
+              {!open &&
+                snippet &&
+                snippet.localeCompare(title, undefined, {
+                  sensitivity: "accent",
+                }) !== 0 &&
+                !snippet
+                  .toLowerCase()
+                  .startsWith(title.slice(0, 48).toLowerCase()) && (
+                  <p className="mt-1.5 line-clamp-2 text-[13px] leading-relaxed text-muted-foreground">
+                    {snippet}
+                  </p>
+                )}
+            </div>
           </div>
-          <p className="mt-0.5 truncate font-mono text-[10px] text-muted-foreground">
-            {chunk.chunk_id}
-          </p>
-          {!open && (
-            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-              {chunk.text_raw.replace(/\s+/g, " ").trim().slice(0, 220)}
-            </p>
-          )}
         </div>
       </button>
 
@@ -314,7 +378,7 @@ export function ReporterChunkCard({
                 width={520}
                 height={320}
                 className="w-full"
-                title={`Analyzed SPO — ${chunk.parent_doc_id}`}
+                title={`${title} — ${sourceLabel || chunk.parent_doc_id}`}
                 expandable
               />
             )}
@@ -336,6 +400,6 @@ export function ReporterChunkCard({
           </div>
         </div>
       )}
-    </li>
+    </article>
   );
 }

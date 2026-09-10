@@ -21,7 +21,12 @@ function validateRuntimeConfig(payload: any): RuntimeConfig {
   const ragBaseUrl = cfg.ragBaseUrl;
   const analyzedDocumentsPath =
     cfg.analyzedDocumentsPath ?? "workspace/ingest";
-  const businessOntologyDataset = cfg.businessOntologyDataset ?? "osint";
+  const fromUsecase =
+    (typeof process !== "undefined" &&
+      process.env.NEXT_PUBLIC_TKEIR_USECASE?.trim()) ||
+    "";
+  const businessOntologyDataset =
+    fromUsecase || cfg.businessOntologyDataset || "osint";
 
   if (
     !isNonEmptyString(keycloakUrl) ||

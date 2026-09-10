@@ -20,28 +20,36 @@ from thot.tasks.converters.ConverterConfiguration import ConverterConfiguration
 
 class TestConverter:
     def test_listType(self):
-        assert set(Converter().listTypes()) == set(
-            [
-                "csv",
-                "docx",
-                "email",
-                "epub",
-                "htm",
-                "html",
-                "ipynb",
-                "msg",
-                "pdf",
-                "ppt",
-                "pptx",
-                "raw",
-                "rss",
-                "rtf",
-                "tkeir",
-                "xls",
-                "xlsx",
-                "xml",
-            ]
-        )
+        types = set(Converter().listTypes())
+        assert {
+            "csv",
+            "docx",
+            "email",
+            "epub",
+            "htm",
+            "html",
+            "ipynb",
+            "msg",
+            "pdf",
+            "ppt",
+            "pptx",
+            "raw",
+            "rss",
+            "rtf",
+            "tkeir",
+            "xls",
+            "xlsx",
+            "xml",
+        }.issubset(types)
+        assert {
+            "auto",
+            "image",
+            "zip",
+            "md",
+            "json",
+            "doc",
+            "unknown",
+        }.issubset(types)
 
     def test_convert_raw(self):
         data = base64.b64encode(b"Hello converter").decode()
@@ -51,6 +59,21 @@ class TestConverter:
         assert document["content"] == ["Hello converter"]
         assert document["source_doc_id"] == "file://sample.txt"
         assert document["error"] is False
+        assert document["conversion-info"]["text-format"] == "raw"
+
+    def test_convert_raw_markdown_sections(self):
+        payload = (
+            "# Report\n\nIntro.\n\n## Ports\n\nSuez is busy.\n"
+        ).encode()
+        data = base64.b64encode(payload).decode()
+        document = Converter().convert(
+            data_type="raw", data=data, source="file://note.md"
+        )
+        assert document["title"] == "Report"
+        assert document["content"][0] == "Intro."
+        assert "Ports" in document["content"][1]
+        assert "Suez is busy." in document["content"][1]
+        assert document["conversion-info"]["text-format"] == "markdown"
 
     def test_convert_tkeir_fills_defaults(self):
         payload = {"content": ["Body only"]}
@@ -104,7 +127,23 @@ class TestConverter:
     def test_convert_rejects_unknown_type(self):
         data = base64.b64encode(b"hello").decode()
         with pytest.raises(ValueError, match="not managed"):
-            Converter().convert(data_type="unknown", data=data)
+            Converter().convert(data_type="not-a-format", data=data)
+
+    def test_convert_auto_raw_text(self):
+        data = base64.b64encode(b"Auto detected text").decode()
+        document = Converter().convert(
+            data_type="auto", data=data, source="file://note.txt"
+        )
+        assert document["content"] == ["Auto detected text"]
+        assert document["conversion-info"]["datatype"] == "raw"
+
+    def test_convert_unknown_binary_emits_preview(self):
+        data = base64.b64encode(b"\x00\x01\x02\x03\xff").decode()
+        document = Converter().convert(
+            data_type="unknown", data=data, source="file://blob.bin"
+        )
+        assert document["content"]
+        assert document["conversion-info"]["converter"] == "universal"
 
     def test_convert_requires_data(self):
         with pytest.raises(ValueError, match="mandatory"):

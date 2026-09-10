@@ -129,6 +129,34 @@ def _infer_numeric_value(graph: Graph, node: URIRef) -> str | None:
     return None
 
 
+def _first_typed_object_by_predicate(graph: Graph) -> dict[URIRef, URIRef]:
+    """Index the first typed object seen for each predicate.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> related = URIRef('http://example.org/related')
+        >>> _ = graph.add((related, RDF.type, TKEIR.Organization))
+        >>> _ = graph.add((URIRef('http://example.org/a'), TKEIR.worksFor, related))
+        >>> _first_typed_object_by_predicate(graph)[TKEIR.worksFor] == related
+        True
+    """
+    typed = {
+        node
+        for node, _pred, _obj in graph.triples((None, RDF.type, None))
+        if isinstance(node, URIRef)
+    }
+    found: dict[URIRef, URIRef] = {}
+    for _subject, predicate, obj in graph:
+        if predicate in found or not isinstance(obj, URIRef):
+            continue
+        if obj in typed:
+            found[predicate] = obj
+    return found
+
+
 def _repair_missing_typed_link(
     graph: Graph,
     violations: Iterable[dict],
@@ -150,6 +178,7 @@ def _repair_missing_typed_link(
         >>> (focus, TKEIR.worksFor, related) in graph
         True
     """
+    typed_object = _first_typed_object_by_predicate(graph)
     for violation in violations:
         focus_text = str(violation.get("focus_node", "")).strip()
         result_path = _local_name_from_uri(
@@ -165,13 +194,9 @@ def _repair_missing_typed_link(
         predicate = TKEIR[result_path]
         if any(graph.objects(focus_node, predicate)):
             continue
-        for _subject, path, obj in graph:
-            if path != predicate or not isinstance(obj, URIRef):
-                continue
-            if graph.value(obj, RDF.type) is None:
-                continue
-            graph.add((focus_node, predicate, obj))
-            break
+        related = typed_object.get(predicate)
+        if related is not None:
+            graph.add((focus_node, predicate, related))
 
 
 def _repair_numeric_values(

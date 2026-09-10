@@ -810,6 +810,20 @@ wheels = [
 ]
 
 [[package]]
+name = "da-core-news-sm"
+version = "3.6.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/da_core_news_sm-3.6.0/da_core_news_sm-3.6.0-py3-none-any.whl" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/da_core_news_sm-3.6.0/da_core_news_sm-3.6.0-py3-none-any.whl", hash = "sha256:f8063dd4b8d961d697fc9b3a1a22677b5493ab9cf4ba4f41146a3ad878212eb4" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "spacy", specifier = ">=3.6.0,<3.7.0" }]
+
+[[package]]
 name = "datasets"
 version = "5.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -833,6 +847,20 @@ sdist = { url = "https://files.pythonhosted.org/packages/0a/5b/836516269d4f618ef
 wheels = [
     { url = "https://files.pythonhosted.org/packages/44/0b/98fc6eb83333508ca5f44c52b3e287ea8137a0ad582714e2cbc67a02154b/datasets-5.0.1-py3-none-any.whl", hash = "sha256:9fbf73688f8c18f7529b4fe592abd04015f81d1e58001e4bac73ffb2b39d7cc4", size = 559079, upload-time = "2026-07-28T11:09:10.266Z" },
 ]
+
+[[package]]
+name = "de-core-news-sm"
+version = "3.6.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.6.0/de_core_news_sm-3.6.0-py3-none-any.whl" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.6.0/de_core_news_sm-3.6.0-py3-none-any.whl", hash = "sha256:cdded59f89eacf348c30a79f9a2485ab21e154ef300cc02c7ebe87dea149c457" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "spacy", specifier = ">=3.6.0,<3.7.0" }]
 
 [[package]]
 name = "defusedxml"
@@ -928,6 +956,20 @@ dependencies = [
 ]
 wheels = [
     { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl", hash = "sha256:83276fc78a70045627144786b52e1f2728ad5e29e5e43916ec37ea9c26a11212" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "spacy", specifier = ">=3.6.0,<3.7.0" }]
+
+[[package]]
+name = "es-core-news-sm"
+version = "3.6.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.6.0/es_core_news_sm-3.6.0-py3-none-any.whl" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.6.0/es_core_news_sm-3.6.0-py3-none-any.whl", hash = "sha256:917d0b6359b27b222ccd616c47b43ee951f05da7402fdccce99364a465fa95d6" },
 ]
 
 [package.metadata]
@@ -1436,6 +1478,20 @@ sdist = { url = "https://files.pythonhosted.org/packages/7c/1a/3c8edc664e06e6bd0
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7b/55/e5326141505c5d5e34c5e0935d2908a74e4561eca44108fbfb9c13d2911a/isoduration-20.11.0-py3-none-any.whl", hash = "sha256:b2904c2a4228c3d44f409c8ae8e2370eb21a26f7ac2ec5446df141dde3452042", size = 11321, upload-time = "2020-11-01T10:59:58.02Z" },
 ]
+
+[[package]]
+name = "it-core-news-sm"
+version = "3.6.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/it_core_news_sm-3.6.0/it_core_news_sm-3.6.0-py3-none-any.whl" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/it_core_news_sm-3.6.0/it_core_news_sm-3.6.0-py3-none-any.whl", hash = "sha256:ad0748799d33a5115864ef5dbf24413428c31c8fee11f24eea0deac819ed7972" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "spacy", specifier = ">=3.6.0,<3.7.0" }]
 
 [[package]]
 name = "jinja2"
@@ -2213,6 +2269,20 @@ wheels = [
 ]
 
 [[package]]
+name = "nl-core-news-sm"
+version = "3.6.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/nl_core_news_sm-3.6.0/nl_core_news_sm-3.6.0-py3-none-any.whl" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/nl_core_news_sm-3.6.0/nl_core_news_sm-3.6.0-py3-none-any.whl", hash = "sha256:f16218e19d8cfaae17e4e70b49ef5da617c83d1e28851ef1505ce27330a1b8df" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "spacy", specifier = ">=3.6.0,<3.7.0" }]
+
+[[package]]
 name = "numpy"
 version = "1.26.4"
 source = { registry = "https://pypi.org/simple" }
@@ -2852,6 +2922,20 @@ wheels = [
 ]
 
 [[package]]
+name = "pl-core-news-sm"
+version = "3.6.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.6.0/pl_core_news_sm-3.6.0-py3-none-any.whl" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.6.0/pl_core_news_sm-3.6.0-py3-none-any.whl", hash = "sha256:6c7403e7e124d55b672d1a418f7e0fa9c388cb804e000c9ad315cf317837eb27" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "spacy", specifier = ">=3.6.0,<3.7.0" }]
+
+[[package]]
 name = "platformdirs"
 version = "4.10.0"
 source = { registry = "https://pypi.org/simple" }
@@ -3074,6 +3158,20 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/cd/68/d190ef0c0c5b16ded07831dabc8ddd412f4cdab07ec6e30ed38d9bda0e1f/psycopg_binary-3.3.4-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:71e55ccbdfae79a2ed9c6369c3008a3025817ff9d7e27b32a2d84e2a4267e66e", size = 4236627, upload-time = "2026-05-01T23:29:05.336Z" },
     { url = "https://files.pythonhosted.org/packages/25/8f/81dcbc2e8454b74d14881275ea45f00791052dac531a9fa8be1730d1685b/psycopg_binary-3.3.4-cp312-cp312-win_amd64.whl", hash = "sha256:494ca54901be8cf9eb7e02c25b731f2317c378efa44f43e8f9bd0e1184ae7be4", size = 3560782, upload-time = "2026-05-01T23:29:11.967Z" },
 ]
+
+[[package]]
+name = "pt-core-news-sm"
+version = "3.6.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.6.0/pt_core_news_sm-3.6.0-py3-none-any.whl" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.6.0/pt_core_news_sm-3.6.0-py3-none-any.whl", hash = "sha256:61a9193dd1cb7ae1a65a85f7c98f4b14077a8bd3dc34a486aa620a54b353a1d9" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "spacy", specifier = ">=3.6.0,<3.7.0" }]
 
 [[package]]
 name = "py-serializable"
@@ -3381,6 +3479,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/66/c0/0c8b6ad9f17a802ee498c46e004a0eb49bc148f2fd230864601a86dcf6db/python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3", size = 342432, upload-time = "2024-03-01T18:36:20.211Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427", size = 229892, upload-time = "2024-03-01T18:36:18.57Z" },
+]
+
+[[package]]
+name = "python-docx"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "lxml" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a9/f7/eddfe33871520adab45aaa1a71f0402a2252050c14c7e3009446c8f4701c/python_docx-1.2.0.tar.gz", hash = "sha256:7bc9d7b7d8a69c9c02ca09216118c86552704edc23bac179283f2e38f86220ce", size = 5723256, upload-time = "2025-06-16T20:46:27.921Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/00/1e03a4989fa5795da308cd774f05b704ace555a70f9bf9d3be057b680bcf/python_docx-1.2.0-py3-none-any.whl", hash = "sha256:3fd478f3250fbbbfd3b94fe1e985955737c145627498896a8a6bf81f4baf66c7", size = 252987, upload-time = "2025-06-16T20:46:22.506Z" },
 ]
 
 [[package]]
@@ -4300,6 +4411,20 @@ wheels = [
 ]
 
 [[package]]
+name = "sv-core-news-sm"
+version = "3.6.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/sv_core_news_sm-3.6.0/sv_core_news_sm-3.6.0-py3-none-any.whl" }
+dependencies = [
+    { name = "spacy" },
+]
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/sv_core_news_sm-3.6.0/sv_core_news_sm-3.6.0-py3-none-any.whl", hash = "sha256:819da19d7e91ff424b300898cecfe5e235541710c0a4d70d45f0b041aef5fd22" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "spacy", specifier = ">=3.6.0,<3.7.0" }]
+
+[[package]]
 name = "sympy"
 version = "1.14.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4309,6 +4434,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/83/d3/803453b36afefb7c2bb238361cd4ae6125a569b4db67cd9e79846ba2d68c/sympy-1.14.0.tar.gz", hash = "sha256:d3d3fe8df1e5a0b42f0e7bdf50541697dbe7d23746e894990c030e2b05e72517", size = 7793921, upload-time = "2025-04-27T18:05:01.611Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a2/09/77d55d46fd61b4a135c444fc97158ef34a095e5681d0a6c10b75bf356191/sympy-1.14.0-py3-none-any.whl", hash = "sha256:e091cc3e99d2141a0ba2847328f5479b05d94a6635cb96148ccb3f34671bd8f5", size = 6299353, upload-time = "2025-04-27T18:04:59.103Z" },
+]
+
+[[package]]
+name = "tabulate"
+version = "0.10.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/46/58/8c37dea7bbf769b20d58e7ace7e5edfe65b849442b00ffcdd56be88697c6/tabulate-0.10.0.tar.gz", hash = "sha256:e2cfde8f79420f6deeffdeda9aaec3b6bc5abce947655d17ac662b126e48a60d", size = 91754, upload-time = "2026-03-04T18:55:34.402Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/99/55/db07de81b5c630da5cbf5c7df646580ca26dfaefa593667fc6f2fe016d2e/tabulate-0.10.0-py3-none-any.whl", hash = "sha256:f0b0622e567335c8fabaaa659f1b33bcb6ddfe2e496071b743aa113f8774f2d3", size = 39814, upload-time = "2026-03-04T18:55:31.284Z" },
 ]
 
 [[package]]
@@ -4409,8 +4543,11 @@ dependencies = [
     { name = "jinja2" },
     { name = "joblib" },
     { name = "langdetect" },
+    { name = "lxml" },
+    { name = "mammoth" },
     { name = "markitdown", extra = ["all"] },
     { name = "numpy" },
+    { name = "openpyxl" },
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-prometheus" },
     { name = "opentelemetry-sdk" },
@@ -4421,7 +4558,9 @@ dependencies = [
     { name = "pysbd" },
     { name = "pyshacl" },
     { name = "pytesseract" },
+    { name = "python-docx" },
     { name = "python-multipart" },
+    { name = "python-pptx" },
     { name = "pyyaml" },
     { name = "rdflib" },
     { name = "requests" },
@@ -4430,10 +4569,12 @@ dependencies = [
     { name = "sentence-transformers" },
     { name = "sentencepiece" },
     { name = "spacy" },
+    { name = "tabulate" },
     { name = "torch" },
     { name = "transformers" },
     { name = "uvicorn", extra = ["standard"] },
     { name = "websockets" },
+    { name = "xlrd" },
 ]
 
 [package.optional-dependencies]
@@ -4469,10 +4610,18 @@ dev = [
     { name = "xenon" },
 ]
 models = [
+    { name = "da-core-news-sm" },
+    { name = "de-core-news-sm" },
     { name = "en-core-web-md" },
     { name = "en-core-web-sm" },
+    { name = "es-core-news-sm" },
     { name = "fr-core-news-md" },
     { name = "fr-core-news-sm" },
+    { name = "it-core-news-sm" },
+    { name = "nl-core-news-sm" },
+    { name = "pl-core-news-sm" },
+    { name = "pt-core-news-sm" },
+    { name = "sv-core-news-sm" },
     { name = "xx-ent-wiki-sm" },
 ]
 
@@ -4488,9 +4637,12 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "joblib", specifier = ">=1.0.0" },
     { name = "langdetect", specifier = ">=1.0.9" },
+    { name = "lxml", specifier = ">=4.9.0" },
+    { name = "mammoth", specifier = ">=1.8.0" },
     { name = "markitdown", extras = ["all"], specifier = "==0.1.2" },
     { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.0.0" },
     { name = "numpy", specifier = ">=1.19.0,<2.0" },
+    { name = "openpyxl", specifier = ">=3.1.0" },
     { name = "opentelemetry-api", specifier = ">=1.27.0" },
     { name = "opentelemetry-exporter-prometheus", specifier = ">=0.48b0" },
     { name = "opentelemetry-sdk", specifier = ">=1.27.0" },
@@ -4502,7 +4654,9 @@ requires-dist = [
     { name = "pysbd", specifier = ">=0.3.4" },
     { name = "pyshacl", specifier = ">=0.26.0" },
     { name = "pytesseract", specifier = ">=0.3.13" },
+    { name = "python-docx", specifier = ">=1.1.0" },
     { name = "python-multipart", specifier = ">=0.0.9" },
+    { name = "python-pptx", specifier = ">=0.6.23" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "rdflib", specifier = ">=7.0.0" },
     { name = "requests", specifier = ">=2.28.0" },
@@ -4511,10 +4665,12 @@ requires-dist = [
     { name = "sentencepiece", specifier = ">=0.2.1" },
     { name = "spacy", specifier = "==3.6.1" },
     { name = "spiffe", marker = "extra == 'spiffe'", specifier = ">=0.3.0,<0.4" },
+    { name = "tabulate", specifier = ">=0.9.0" },
     { name = "torch", specifier = ">=2.2.0" },
     { name = "transformers", specifier = ">=5.0.0rc3,<6.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.23.0" },
     { name = "websockets", specifier = ">=10.4" },
+    { name = "xlrd", specifier = ">=2.0.1" },
 ]
 provides-extras = ["mcp", "owl", "spiffe"]
 
@@ -4538,10 +4694,18 @@ dev = [
     { name = "xenon", specifier = ">=0.9.1" },
 ]
 models = [
+    { name = "da-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/da_core_news_sm-3.6.0/da_core_news_sm-3.6.0-py3-none-any.whl" },
+    { name = "de-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.6.0/de_core_news_sm-3.6.0-py3-none-any.whl" },
     { name = "en-core-web-md", url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl" },
     { name = "en-core-web-sm", url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl" },
+    { name = "es-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.6.0/es_core_news_sm-3.6.0-py3-none-any.whl" },
     { name = "fr-core-news-md", url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl" },
     { name = "fr-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.6.0/fr_core_news_sm-3.6.0-py3-none-any.whl" },
+    { name = "it-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/it_core_news_sm-3.6.0/it_core_news_sm-3.6.0-py3-none-any.whl" },
+    { name = "nl-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/nl_core_news_sm-3.6.0/nl_core_news_sm-3.6.0-py3-none-any.whl" },
+    { name = "pl-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.6.0/pl_core_news_sm-3.6.0-py3-none-any.whl" },
+    { name = "pt-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.6.0/pt_core_news_sm-3.6.0-py3-none-any.whl" },
+    { name = "sv-core-news-sm", url = "https://github.com/explosion/spacy-models/releases/download/sv_core_news_sm-3.6.0/sv_core_news_sm-3.6.0-py3-none-any.whl" },
     { name = "xx-ent-wiki-sm", url = "https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.6.0/xx_ent_wiki_sm-3.6.0-py3-none-any.whl" },
 ]
 

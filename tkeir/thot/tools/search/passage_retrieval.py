@@ -53,7 +53,6 @@ from thot.tools.search.text_normalizer import normalizer_for_language
 from thot.tools.search.vespa_client import (
     VespaClient,
     build_multi_field_contains_or_clause,
-    escape_yql_literal,
 )
 
 if TYPE_CHECKING:
@@ -249,7 +248,7 @@ class PassageHit:
 
     Example:
         >>> PassageHit("p1", "ref", "text", 0.8)
-        PassageHit(passage_id='p1', source_ref='ref', chunk_text='text', score=0.8, schema='global', ontology_concepts=[])
+        PassageHit(passage_id='p1', source_ref='ref', chunk_text='text', score=0.8, schema='global', ontology_concepts=[], ontology_relations=[], ontology_rel_keys=[])
     """
 
     passage_id: str
@@ -258,6 +257,18 @@ class PassageHit:
     score: float
     schema: str = "global"
     ontology_concepts: list[str] = field(default_factory=list)
+    ontology_relations: list[dict[str, Any]] = field(default_factory=list)
+    ontology_rel_keys: list[str] = field(default_factory=list)
+
+    @property
+    def ontology_concept_ids(self) -> list[str]:
+        """Canonical alias of :attr:`ontology_concepts`.
+
+        Example:
+            >>> PassageHit('p', 'r', 't', 1.0, ontology_concepts=['C1']).ontology_concept_ids
+            ['C1']
+        """
+        return self.ontology_concepts
 
 
 @dataclass
@@ -429,6 +440,64 @@ def choose_search_mode(
     return "both"
 
 
+def _passage_ontology(
+    row: dict[str, Any],
+) -> tuple[list[str], list[dict[str, Any]], list[str]]:
+    """Extract concept ids / relations from a Vespa hit row.
+
+    Example:
+        >>> _passage_ontology({"ontology_concepts": ["C1"]})[0]
+        ['C1']
+    """
+    from thot.ontology.identity import relation_key
+
+    ids = [
+        str(x)
+        for x in (
+            row.get("ontology_concept_ids")
+            or row.get("ontology_concepts")
+            or []
+        )
+        if x
+    ]
+    rels = [
+        dict(item)
+        for item in row.get("ontology_relations") or []
+        if isinstance(item, dict)
+    ]
+    keys = [str(x) for x in row.get("ontology_rel_keys") or [] if x]
+    if not keys:
+        keys = [
+            relation_key(
+                str(item.get("subject_id") or ""),
+                str(item.get("predicate_id") or ""),
+                str(item.get("object_id") or ""),
+            )
+            for item in rels
+        ]
+    return ids, rels, keys
+
+
+def _clone_hit(base: PassageHit, *, score: float | None = None) -> PassageHit:
+    """Copy a hit, optionally replacing the score.
+
+    Example:
+        >>> h = PassageHit('p', 'r', 't', 0.5, ontology_concepts=['C1'])
+        >>> _clone_hit(h, score=0.9).score
+        0.9
+    """
+    return PassageHit(
+        passage_id=base.passage_id,
+        source_ref=base.source_ref,
+        chunk_text=base.chunk_text,
+        score=float(base.score if score is None else score),
+        schema=base.schema,
+        ontology_concepts=list(base.ontology_concepts),
+        ontology_relations=list(base.ontology_relations),
+        ontology_rel_keys=list(base.ontology_rel_keys),
+    )
+
+
 class PassageRetrievalPipeline:
     """Hybrid dense+sparse+BM25 retrieval for global/user schemas.
 
@@ -545,8 +614,15 @@ class PassageRetrievalPipeline:
         business_ontology: Any | None = None,
         mode: SearchMode | None = None,
         top_k: int | None = None,
+        concept_ids: list[str] | None = None,
+        relations: list[dict[str, Any]] | None = None,
+        ontology_expand: dict[str, Any] | None = None,
+        ranking_profile: str | None = None,
     ) -> PassageSearchResult:
         """Run retrieval for one query (NLP → expand → embed → Vespa).
+
+        Optional ``concept_ids`` / ``relations`` are extra recall signals
+        (OR-joined, never AND-filters). Existing text-only clients are unchanged.
 
         Example:
             >>> import inspect
@@ -565,8 +641,32 @@ class PassageRetrievalPipeline:
         # Always fetch a deep first-stage pool; trim to return_k after rerank.
         hits_n = max(return_k, configured_hits)
         profile = str(
-            getattr(self.config.retrieval, "ranking_profile", None) or "hybrid"
+            ranking_profile
+            or getattr(self.config.retrieval, "ranking_profile", None)
+            or "hybrid"
         )
+        request_concept_ids = [
+            str(cid).strip()
+            for cid in concept_ids or []
+            if cid and str(cid).strip()
+        ]
+        request_relations = [
+            row
+            for row in relations or []
+            if isinstance(row, dict)
+            and any(
+                str(row.get(k) or "").strip()
+                for k in (
+                    "subject_id",
+                    "predicate_id",
+                    "object_id",
+                    "subject",
+                    "predicate",
+                    "object",
+                )
+            )
+        ]
+        layer = getattr(self.config, "ontology_layer", None)
 
         query_analysis, nlp_terms, nlp_ms = self._analyze_query(
             query, language=language
@@ -683,6 +783,104 @@ class PassageRetrievalPipeline:
                     )
             timings["expand"] = (time.perf_counter() - t_exp) * 1000
 
+        for cid in request_concept_ids:
+            if cid not in concept_ids:
+                concept_ids.append(cid)
+        if ontology_expand or (
+            layer is not None
+            and (
+                layer.expansion.include_children
+                or layer.expansion.include_parents
+                or layer.expansion.include_related
+            )
+        ):
+            from thot.ontology.expansion import ExpansionSpec
+            from thot.ontology.service import OntologyService
+
+            spec_raw = ontology_expand or {}
+            exp_cfg = layer.expansion if layer is not None else None
+            spec = ExpansionSpec(
+                include_children=bool(
+                    spec_raw.get(
+                        "include_children",
+                        exp_cfg.include_children if exp_cfg else False,
+                    )
+                ),
+                include_parents=bool(
+                    spec_raw.get(
+                        "include_parents",
+                        exp_cfg.include_parents if exp_cfg else False,
+                    )
+                ),
+                include_related=bool(
+                    spec_raw.get(
+                        "include_related",
+                        exp_cfg.include_related if exp_cfg else False,
+                    )
+                ),
+                predicates=tuple(spec_raw.get("predicates") or ()),
+                max_depth=int(
+                    spec_raw.get(
+                        "max_depth", exp_cfg.max_depth if exp_cfg else 1
+                    )
+                ),
+                max_ids=int(
+                    spec_raw.get("max_ids", exp_cfg.max_ids if exp_cfg else 32)
+                ),
+            )
+            if (
+                spec.include_children
+                or spec.include_parents
+                or spec.include_related
+                or spec.predicates
+            ):
+                svc = OntologyService.from_business_payload(business_ontology)
+                expanded_graph = svc.expand(concept_ids, spec)
+                concept_ids = list(expanded_graph.concept_ids)
+                LOGGER.info(
+                    "ontology expand seeds=%d expanded=%d ids=%s",
+                    len(expanded_graph.seed_ids),
+                    len(expanded_graph.expanded_ids),
+                    concept_ids[:16],
+                )
+                try:
+                    from thot.core.ThotMetrics import ThotMetrics
+
+                    ThotMetrics.create_counter(
+                        short_name="ontology_expand",
+                        function_name="tkeir_ontology_expand_total",
+                        counter_description="Ontology retrieval expansions",
+                    )
+                    ThotMetrics.increment_counter(
+                        short_name="ontology_expand",
+                        method="search",
+                        path="ontology.expand",
+                    )
+                except Exception:  # noqa: BLE001
+                    pass
+
+        if request_concept_ids or request_relations:
+            LOGGER.info(
+                "ontology retrieval concepts=%d relations=%d",
+                len(concept_ids),
+                len(request_relations),
+            )
+            try:
+                from thot.core.ThotMetrics import ThotMetrics
+
+                ThotMetrics.create_counter(
+                    short_name="ontology_search",
+                    function_name="tkeir_ontology_search_total",
+                    counter_description="Search requests with ontology filters",
+                )
+                ThotMetrics.increment_counter(
+                    short_name="ontology_search",
+                    method="search",
+                    path="ontology.search",
+                )
+            except Exception:  # noqa: BLE001
+                pass
+
         if not expansion_terms and query.strip():
             expansion_terms = [query.strip()]
 
@@ -709,6 +907,8 @@ class PassageRetrievalPipeline:
             (query_analysis or {}).get("lexical_query")
             or " ".join(expansion_terms[:12])
             or query
+            or " ".join(concept_ids[:8])
+            or " "
         )
         emb = encode_one(str(embed_text), model_id=model_id, dense_dim=dim)
         # Pure BGE-M3 sparse; BM25 probe + ontology_concepts handle lexical /
@@ -729,6 +929,7 @@ class PassageRetrievalPipeline:
                 dim=dim,
                 user_space=None,
                 concept_ids=concept_ids,
+                relations=request_relations,
             )
             timings["vespa_global"] = meta.get("ms", 0.0)
             hits = self._to_hits(ranked, meta.get("fields") or {}, "global")
@@ -743,6 +944,7 @@ class PassageRetrievalPipeline:
                 dim=dim,
                 user_space=user_space,
                 concept_ids=concept_ids,
+                relations=request_relations,
             )
             timings["vespa_user"] = meta.get("ms", 0.0)
             hits = self._to_hits(ranked, meta.get("fields") or {}, "user")
@@ -758,6 +960,7 @@ class PassageRetrievalPipeline:
                 dim=dim,
                 user_space=None,
                 concept_ids=concept_ids,
+                relations=request_relations,
             )
             timings["vespa_global"] = (time.perf_counter() - t_g) * 1000
             t_u = time.perf_counter()
@@ -771,6 +974,7 @@ class PassageRetrievalPipeline:
                 dim=dim,
                 user_space=user_space,
                 concept_ids=concept_ids,
+                relations=request_relations,
             )
             timings["vespa_user"] = (time.perf_counter() - t_u) * 1000
             fused = reciprocal_rank_fusion(
@@ -802,11 +1006,49 @@ class PassageRetrievalPipeline:
                         chunk_text=str(row.get("chunk_text") or ""),
                         score=float(scores.get(pid, 0.0)),
                         schema=schema_map.get(pid, "global"),
-                        ontology_concepts=list(
-                            row.get("ontology_concepts") or []
-                        ),
+                        ontology_concepts=_passage_ontology(row)[0],
+                        ontology_relations=_passage_ontology(row)[1],
+                        ontology_rel_keys=_passage_ontology(row)[2],
                     )
                 )
+
+        if (request_concept_ids or request_relations) and hits:
+            from thot.ontology.expansion import overlap_score
+            from thot.ontology.identity import relation_key
+
+            ont_weights = (
+                (self.config.rank_profiles or {}).get("passage") or {}
+            ).get("hybrid_ontology") or {}
+            q_rel_keys = []
+            for row in request_relations:
+                subj = str(row.get("subject_id") or row.get("subject") or "")
+                pred = str(
+                    row.get("predicate_id") or row.get("predicate") or ""
+                )
+                obj = str(row.get("object_id") or row.get("object") or "")
+                if subj and pred and obj:
+                    q_rel_keys.append(relation_key(subj, pred, obj))
+            rescored: list[PassageHit] = []
+            for hit in hits:
+                bonus = overlap_score(
+                    hit_concept_ids=hit.ontology_concept_ids,
+                    hit_relation_keys=hit.ontology_rel_keys,
+                    query_concept_ids=concept_ids,
+                    query_relation_keys=q_rel_keys,
+                    concept_weight=float(ont_weights.get("concept", 0.15)),
+                    relation_weight=float(ont_weights.get("relation", 0.10)),
+                )
+                rescored.append(
+                    _clone_hit(hit, score=float(hit.score) + bonus)
+                )
+            rescored.sort(key=lambda item: item.score, reverse=True)
+            hits = rescored
+            LOGGER.info(
+                "ontology overlap rerank hits=%d concept_w=%s relation_w=%s",
+                len(hits),
+                ont_weights.get("concept", 0.15),
+                ont_weights.get("relation", 0.10),
+            )
 
         # Optional OntologyRescorer (Graph-RAG overlap on ontology_concepts).
         ont_cfg = self.config.ontology_scoring
@@ -866,16 +1108,7 @@ class PassageRetrievalPipeline:
                 base = by_id.get(pid)
                 if base is None:
                     continue
-                rescored.append(
-                    PassageHit(
-                        passage_id=base.passage_id,
-                        source_ref=base.source_ref,
-                        chunk_text=base.chunk_text,
-                        score=float(score),
-                        schema=base.schema,
-                        ontology_concepts=list(base.ontology_concepts),
-                    )
-                )
+                rescored.append(_clone_hit(base, score=float(score)))
             if rescored:
                 hits = rescored
             timings["ontology_rescore"] = (time.perf_counter() - t_ont) * 1000
@@ -923,16 +1156,7 @@ class PassageRetrievalPipeline:
                     base = by_id.get(pid)
                     if base is None:
                         continue
-                    reranked_hits.append(
-                        PassageHit(
-                            passage_id=base.passage_id,
-                            source_ref=base.source_ref,
-                            chunk_text=base.chunk_text,
-                            score=float(score),
-                            schema=base.schema,
-                            ontology_concepts=list(base.ontology_concepts),
-                        )
-                    )
+                    reranked_hits.append(_clone_hit(base, score=float(score)))
                 hits = reranked_hits
             timings["colbert"] = (time.perf_counter() - t_cb) * 1000
         else:
@@ -960,6 +1184,7 @@ class PassageRetrievalPipeline:
         dim: int,
         user_space: str | None,
         concept_ids: list[str],
+        relations: list[dict[str, Any]] | None = None,
     ) -> tuple[list[str], dict[str, Any]]:
         """Execute one Vespa schema arm and return ranked passage ids.
 
@@ -970,23 +1195,29 @@ class PassageRetrievalPipeline:
         """
         assert self.vespa is not None
         t0 = time.perf_counter()
-        parts: list[str] = [
-            f'({{"targetNumHits": {hits}}}nearestNeighbor(dense_vector, q_dense))'
-        ]
+        from thot.ontology.vespa import build_passage_yql
+
         text_clause = build_multi_field_contains_or_clause(
             list(probe_terms or []),
             fields=("chunk_text",),
         )
-        if text_clause:
-            parts.append(text_clause)
-        # Expanded neighborhood (synonym/narrower/related/broader ids).
-        # OR-joined with NN + BM25 — expands recall via ontology_concepts,
-        # never ANDed (would filter).
-        for cid in concept_ids[:16]:
-            lit = escape_yql_literal(str(cid))
-            if lit:
-                parts.append(f'ontology_concepts contains "{lit}"')
-        yql = f"select * from {schema} where " + " or ".join(parts)
+        include_nn = bool(dense) and any(abs(float(x)) > 1e-12 for x in dense)
+        yql = build_passage_yql(
+            schema,
+            hits=hits,
+            probe_terms_clause=text_clause or "",
+            concept_ids=concept_ids,
+            relations=list(relations or []),
+            relation_match=str(
+                getattr(
+                    getattr(self.config, "ontology_layer", None),
+                    "relation_match",
+                    "partial",
+                )
+                or "partial"
+            ),
+            include_nearest_neighbor=include_nn,
+        )
         payload: dict[str, Any] = {
             "yql": yql,
             "hits": hits,
@@ -1040,6 +1271,7 @@ class PassageRetrievalPipeline:
         n = max(len(ranked), 1)
         for index, pid in enumerate(ranked):
             row = fields_map.get(pid) or {}
+            ids, rels, keys = _passage_ontology(row)
             hits.append(
                 PassageHit(
                     passage_id=pid,
@@ -1047,7 +1279,9 @@ class PassageRetrievalPipeline:
                     chunk_text=str(row.get("chunk_text") or ""),
                     score=1.0 - (index / n),
                     schema=schema,
-                    ontology_concepts=list(row.get("ontology_concepts") or []),
+                    ontology_concepts=ids,
+                    ontology_relations=rels,
+                    ontology_rel_keys=keys,
                 )
             )
         return hits

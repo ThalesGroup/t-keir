@@ -25,8 +25,85 @@ from thot.tools.search.dual_hybrid_config import PreprocessingConfig
 
 LOGGER = logging.getLogger(__name__)
 
+# Do not ASCII-fold scripts where diacritic stripping is harmful or useless.
+_NO_ASCIIFOLD = frozenset({"ar", "he", "fa", "ur", "zh", "ja", "ko", "th", "hi"})
+_NORMALIZER_DISABLE = ("parser", "ner")
+
 # Cache TextNormalizer instances by (model, asciifold, min_len, drop_numbers).
 _NORMALIZER_CACHE: dict[tuple[Any, ...], "TextNormalizer"] = {}
+
+
+def _blank_nlp(language: str) -> Language:
+    """Build a blank spaCy pipeline for indexing (not the tokenizer cache).
+
+    Example:
+        >>> from thot.tools.search.text_normalizer import _blank_nlp
+        >>> _blank_nlp("ar").lang
+        'ar'
+    """
+    nlp = spacy.blank(language)
+    if "sentencizer" not in nlp.pipe_names:
+        nlp.add_pipe("sentencizer")
+    return nlp
+
+
+def _load_normalizer_nlp(
+    lang: str, model: str
+) -> tuple[Language, str]:
+    """Load a spaCy pipeline for BM25 normalization without sharing caches.
+
+    Args:
+        lang: ISO language code.
+        model: Configured model name (``blank:ar`` or a trained package).
+
+    Returns:
+        Language object and the model name that was loaded.
+
+    Example:
+        >>> from thot.tools.search.text_normalizer import _load_normalizer_nlp
+        >>> nlp, name = _load_normalizer_nlp("ar", "blank:ar")
+        >>> name
+        'blank:ar'
+        >>> nlp.lang
+        'ar'
+    """
+    if model.startswith("blank:"):
+        code = model.split(":", 1)[1] or lang
+        return _blank_nlp(code), model
+    from thot.core.SpacyModelLoader import (
+        BLANK_PREFERRED_LANGUAGES,
+        model_name_candidates,
+        resolve_spacy_load_name,
+    )
+
+    try:
+        return (
+            spacy.load(
+                resolve_spacy_load_name(model),
+                disable=list(_NORMALIZER_DISABLE),
+            ),
+            model,
+        )
+    except OSError:
+        pass
+
+    if lang in BLANK_PREFERRED_LANGUAGES:
+        return _blank_nlp(lang), "blank:" + lang
+    last_error: OSError | None = None
+    for name in model_name_candidates(lang, size="sm"):
+        try:
+            return (
+                spacy.load(
+                    resolve_spacy_load_name(name),
+                    disable=list(_NORMALIZER_DISABLE),
+                ),
+                name,
+            )
+        except OSError as error:
+            last_error = error
+    raise OSError(
+        "No spaCy model available for indexing language " + lang
+    ) from last_error
 
 
 class TextNormalizer:
@@ -66,7 +143,16 @@ class TextNormalizer:
         self.min_token_length = min_token_length
         self.drop_numbers = drop_numbers
         self.asciifold_enabled = asciifold
-        self.nlp: Language = nlp or spacy.load(model, disable=list(disable))
+        if nlp is not None:
+            self.nlp = nlp
+        elif model.startswith("blank:"):
+            self.nlp = _blank_nlp(model.split(":", 1)[1] or "xx")
+        else:
+            from thot.core.SpacyModelLoader import resolve_spacy_load_name
+
+            self.nlp = spacy.load(
+                resolve_spacy_load_name(model), disable=list(disable)
+            )
         if extra_stopwords:
             self.nlp.Defaults.stop_words |= set(extra_stopwords)
         LOGGER.info(
@@ -98,9 +184,13 @@ class TextNormalizer:
             >>> TextNormalizer.for_language(DualHybridConfig(), "en")  # doctest: +SKIP
         """
         entry = prep.resolve_model(language)
+        lang = (language or "en").strip().lower().replace("_", "-")
+        if "-" in lang:
+            lang = lang.split("-", 1)[0]
         cache_key = (
+            lang,
             entry.model,
-            prep.asciifold,
+            prep.asciifold and lang not in _NO_ASCIIFOLD,
             prep.min_token_length,
             prep.drop_numbers,
             tuple(sorted(prep.extra_stopwords)),
@@ -108,12 +198,18 @@ class TextNormalizer:
         cached = _NORMALIZER_CACHE.get(cache_key)
         if cached is not None:
             return cached
+        try:
+            nlp, loaded = _load_normalizer_nlp(lang, entry.model)
+        except OSError:
+            nlp, loaded = _load_normalizer_nlp("xx", "xx_ent_wiki_sm")
+        fold = bool(prep.asciifold) and lang not in _NO_ASCIIFOLD
         normalizer = cls(
-            entry.model,
+            loaded,
             extra_stopwords=set(prep.extra_stopwords),
             min_token_length=prep.min_token_length,
             drop_numbers=prep.drop_numbers,
-            asciifold=prep.asciifold,
+            asciifold=fold,
+            nlp=nlp,
         )
         _NORMALIZER_CACHE[cache_key] = normalizer
         return normalizer
@@ -166,7 +262,7 @@ class TextNormalizer:
                 continue
             if self.drop_numbers and tok.like_num:
                 continue
-            lemma = (tok.lemma_ or "").lower().strip()
+            lemma = (tok.lemma_ or tok.text or "").lower().strip()
             if len(lemma) < self.min_token_length:
                 continue
             tokens.append(lemma)

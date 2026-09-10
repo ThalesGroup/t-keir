@@ -3,14 +3,7 @@
 import { LogIn, ShieldAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-
-const DEMO_ACCOUNTS = [
-  { user: "analyst", password: "analyst", clearance: "SECRET", role: "J2 Analyst" },
-  { user: "moc-watch", password: "moc-watch", clearance: "FOUO", role: "MOC Watch" },
-  { user: "humint", password: "humint", clearance: "SECRET", role: "HUMINT" },
-  { user: "commander", password: "commander", clearance: "SECRET", role: "Commander" },
-  { user: "c2-admin", password: "c2-admin", clearance: "SECRET", role: "Admin" },
-] as const;
+import { getUsecaseConfig } from "@/lib/usecase-config";
 
 export function LoginGate({
   error,
@@ -21,6 +14,7 @@ export function LoginGate({
   onSignIn: () => void;
   busy?: boolean;
 }) {
+  const demoAccounts = getUsecaseConfig().demoAccounts;
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6">
@@ -56,34 +50,36 @@ export function LoginGate({
           {busy ? "Opening Keycloak…" : "Sign in"}
         </Button>
 
-        <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Demo accounts
-          </p>
-          <div className="overflow-hidden rounded-md border text-sm">
-            <table className="w-full">
-              <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 font-medium">User</th>
-                  <th className="px-3 py-2 font-medium">Password</th>
-                  <th className="px-3 py-2 font-medium">Clearance</th>
-                </tr>
-              </thead>
-              <tbody>
-                {DEMO_ACCOUNTS.map((a) => (
-                  <tr key={a.user} className="border-t">
-                    <td className="px-3 py-2 font-mono text-xs">{a.user}</td>
-                    <td className="px-3 py-2 font-mono text-xs">{a.password}</td>
-                    <td className="px-3 py-2 text-xs">{a.clearance}</td>
+        {demoAccounts.length > 0 ? (
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Demo accounts
+            </p>
+            <div className="overflow-hidden rounded-md border text-sm">
+              <table className="w-full">
+                <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2 font-medium">User</th>
+                    <th className="px-3 py-2 font-medium">Password</th>
+                    <th className="px-3 py-2 font-medium">Clearance</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {demoAccounts.map((a) => (
+                    <tr key={a.user} className="border-t">
+                      <td className="px-3 py-2 font-mono text-xs">{a.user}</td>
+                      <td className="px-3 py-2 font-mono text-xs">{a.password}</td>
+                      <td className="px-3 py-2 text-xs">{a.clearance}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Password equals username for each demo account unless noted.
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Password equals username for each demo account.
-          </p>
-        </div>
+        ) : null}
       </div>
     </div>
   );

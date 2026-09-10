@@ -7,6 +7,11 @@ converter:
     ocr:
       enabled: true
       mode: tesseract
-      min-image-pixels: 10000
+      languages: eng+fra+deu+spa+ita+nld+por+pol+ara
+      min-image-pixels: 65536
       min-page-text-chars: 40
       render-dpi: 200
+      analyze-images: true
+      captions: true
+      max-embedded-images: 256
+      max-pdf-images-per-page: 32

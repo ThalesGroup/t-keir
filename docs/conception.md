@@ -139,18 +139,21 @@ email, …) into a T-KEIR document (`content`, `title`, `source_doc_id`,
 
 | | |
 |--|--|
-| **Modules** | `thot.tasks.converters.Converter`, `MarkItDownConverter`, `RawTextConverter`, `PdfImageOcr`, `InputFormat` |
+| **Modules** | `thot.tasks.converters.Converter`, `UniversalConverter`, `MarkItDownConverter`, `RawTextConverter`, `PdfImageOcr`, `InputFormat` |
 | **Config** | `configs/converter.yaml` |
-| **Libraries** | **markitdown** (Office/HTML/…), **pymupdf** (PDF), **pytesseract** + **pillow** (OCR), optional vision via `UnifiedLLMWrapper` |
+| **Libraries** | **markitdown**, **pymupdf**, **pytesseract** + **pillow** (OCR), **transformers** BLIP (optional captions), optional LLM vision via `UnifiedLLMWrapper` |
 
 **Algorithms / custom logic**
 
 - **Input format auto-detect** (`InputFormat`) — sniff by extension and magic
   bytes; supports `auto` datatype for CLI/ingest.
-- **MarkItDown conversion path** — delegate rich formats, then normalize to
-  T-KEIR JSON fields.
+- **Universal conversion path** — classify + extract Markdown for images,
+  ZIP, JSON, markdown, SVG, unknown binary; MarkItDown first for Office/PDF
+  with universal fallback.
 - **PDF OCR orchestration** (`PdfImageOcr`) — decide when page text is too
-  sparse; run Tesseract and/or LLM vision; merge regions into `content`.
+  sparse; run Tesseract (bundled tessdata under
+  `resources/modeling/tesseract/`) and/or LLM vision; merge regions into
+  `content`.
 - **`source_doc_id` stamping** — converter and ingest ensure a stable id for
   Vespa (ingest also stamps ids for pre-converted corpus JSON).
 
@@ -159,7 +162,8 @@ email, …) into a T-KEIR document (`content`, `title`, `source_doc_id`,
 ### 3.2 Language detection & resource selection
 
 **Purpose.** Choose processing language and tokenizer resource directory
-(`en` / `fr`).
+(`en` / `fr` tries; spaCy pipelines for European languages and Arabic
+`blank:ar`).
 
 | | |
 |--|--|
@@ -370,8 +374,11 @@ Vespa (`document_ontology` / `json_ld`).
    **lemma Jaccard / containment** matching; emit `rdfs:subClassOf`, extra
    `rdf:type`, `owl:sameAs`; optional axiom copy.
 5. **SHACL** — built-in / induced shapes; **`run_self_healing_validation`** +
-   **OntologyRepairer** (e.g. Metric numeric literals) with capped repair
-   attempts.
+   **OntologyRepairer**. `sh:minCount 1` is induced only when most instances
+   already have the property. Graphs above `max-heal-triples`, or more than
+   `max-violations-to-repair` minCount gaps, skip pyshacl/repair
+   (`SKIPPED_TOO_LARGE` / `SKIPPED_TOO_MANY_VIOLATIONS`) and still serialize
+   JSON-LD. Repair is capped by `max-repair-attempts` and `max-heal-seconds`.
 6. Serialize JSON-LD + incoherence / text-coverage reports for HMI and Vespa.
 
 Relative `derive-from.paths` resolve **only** via
@@ -612,9 +619,9 @@ jobs/ dlq/ publishes/
 
 | Concern | Libraries |
 |---------|-----------|
-| NLP tagging | **spaCy 3.6**, language models `en`/`fr`/`xx` |
+| NLP tagging | **spaCy 3.6**, EU pipelines + `xx_ent_wiki_sm`; Arabic `blank:ar` |
 | Sentence split | **pysbd** |
-| Conversion / OCR | **markitdown**, **pymupdf**, **pytesseract**, **pillow** |
+| Conversion / OCR | **markitdown**, **pymupdf**, **pytesseract**, **pillow**, tessdata under `resources/modeling/tesseract/`, optional **BLIP** |
 | Language ID | **langdetect** |
 | RDF / SHACL | **rdflib**, **pyshacl** |
 | Clustering / vectors | **scikit-learn**, **numpy**, **sentence-transformers**, **torch**, **transformers** |
@@ -646,7 +653,7 @@ jobs/ dlq/ publishes/
 | **Label TF-IDF + clustering** | `OntologyAlignment` | Synonym class/property merge |
 | **Triple-context clustering** | `triple_context_vectorizer` | Entity clusters from SVO neighborhoods |
 | **OntologyDerivation** | `OntologyDerivation` | Lemma Jaccard/containment → subclass/type/sameAs |
-| **SHACL self-heal** | `run_self_healing_validation`, `OntologyRepairer` | Validate → repair → re-validate |
+| **SHACL self-heal** | `run_self_healing_validation`, `OntologyRepairer` | Validate → repair with size/violation/time caps; skip when too large |
 | **Synthetic questions** | `QuestionBuilder` | Template EN/FR chunk questions |
 | **QueryAnalyzerTask** | `query_analyzer` | NLP-driven Vespa profile/YQL selection |
 | **SVO-ontology RAG prompt** | `rag_report` / `app` | Passages + triples prompting |

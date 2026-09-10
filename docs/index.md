@@ -6,10 +6,11 @@ tool-using research, ontology-driven document composition, and governed publicat
 
 ## Features
 
-- **Document conversion** — raw text, PDF, Office, HTML via MarkItDown
-- **Tokenizer** — configurable multi-word expressions per language
+- **Document conversion** — universal extract (PDF, Office, HTML, images, ZIP, JSON, markdown) plus MarkItDown; multilingual Tesseract OCR and optional BLIP captions
+- **Tokenizer** — configurable multi-word expressions; European spaCy pipelines and Arabic `blank:ar`
 - **Morphosyntax, NER, syntax** — spaCy-based tagging and knowledge-graph triples
 - **Keywords** — RAKE extraction
+- **Corpus JSON** — `tkeir-corpus` builds `{dataset, records}` for `POST /ingest/json-records` from markdown or a mixed-format source tree
 - **Ontology export** — RDF graphs and HMI-friendly entity/keyword views
 - **Vespa RAG** — passage schemas (`global` index + `user` streaming),
   per-user spaces (Keycloak / `dev@tkeir`), and FastAPI query API
@@ -33,6 +34,8 @@ tool-using research, ontology-driven document composition, and governed publicat
 | **Configuration (all YAML)** | [configuration/index.md](configuration/index.md) |
 | Deployment profiles | [deployment/index.md](deployment/index.md) |
 | Pipeline tools | [tools/tools_overview.md](tools/tools_overview.md) |
+| Corpus (markdown or mixed files → ingest JSON) | [tools/corpus.md](tools/corpus.md) |
+| Converter | [tools/converter.md](tools/converter.md) |
 | Vespa RAG | [tools/vespa_rag.md](tools/vespa_rag.md) |
 | MCP server | [tools/mcp.md](tools/mcp.md) |
 | Agents & workflows | [tools/agents.md](tools/agents.md) |

@@ -112,6 +112,11 @@ class DocumentOntologyBuilder:
         )
         self._healing_settings = SelfHealingSettings(
             max_repair_attempts=int(builder_cfg.get("max-repair-attempts", 2)),
+            max_violations_to_repair=int(
+                builder_cfg.get("max-violations-to-repair", 48)
+            ),
+            max_graph_triples=int(builder_cfg.get("max-heal-triples", 12000)),
+            max_seconds=float(builder_cfg.get("max-heal-seconds", 8.0)),
         )
         alignment_cfg = builder_cfg.get("alignment") or {}
         if not isinstance(alignment_cfg, dict):
@@ -301,6 +306,17 @@ class DocumentOntologyBuilder:
                 "Document ontology SHACL validation passed after "
                 + str(correction_attempts)
                 + " repair attempt(s).",
+                context=call_context,
+            )
+        elif shacl_status.startswith("SKIPPED_"):
+            ThotLogger.info(
+                "Document ontology SHACL "
+                + shacl_status
+                + " ("
+                + str(incoherence_summary.get("heal_skipped") or "")
+                + ", triples="
+                + str(incoherence_summary.get("graph_triple_count") or 0)
+                + ")",
                 context=call_context,
             )
 

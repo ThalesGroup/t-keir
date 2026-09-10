@@ -35,6 +35,7 @@ def _load_context() -> dict:
     dual = payload.get("dual_hybrid") or {}
     ranks = (dual.get("rank_profiles") or {}).get("passage") or {}
     hybrid = ranks.get("hybrid") or {}
+    hybrid_ont = ranks.get("hybrid_ontology") or {}
     dim = int(models.get("embedding_dim", DEFAULT_EMBEDDING_DIM))
     return {
         "config_path": "tkeir/configs/rag.yaml",
@@ -42,6 +43,8 @@ def _load_context() -> dict:
         "w_dense": float(hybrid.get("dense", 0.55)),
         "w_sparse": float(hybrid.get("sparse", 0.30)),
         "w_bm25": float(hybrid.get("bm25", 0.15)),
+        "w_concept": float(hybrid_ont.get("concept", 0.15)),
+        "w_relation": float(hybrid_ont.get("relation", 0.10)),
     }
 
 
@@ -58,9 +61,14 @@ def render_all() -> dict[str, str]:
         f"# Source: scripts/generate_vespa_schemas.py\n"
     )
     return {
-        "doc_base.sd": header + env.get_template("doc_base.sd.j2").render(**ctx),
+        "doc_base.sd": (
+            header + env.get_template("doc_base.sd.j2").render(**ctx)
+        ),
         "global.sd": header + env.get_template("global.sd.j2").render(**ctx),
         "user.sd": header + env.get_template("user.sd.j2").render(**ctx),
+        "ontology_concept.sd": (
+            header + env.get_template("ontology_concept.sd.j2").render(**ctx)
+        ),
     }
 
 
@@ -86,7 +94,9 @@ def check_stale(rendered: dict[str, str]) -> int:
     for legacy in ("chunk.sd", "tkeir_document.sd"):
         legacy_path = OUTPUT_DIR / legacy
         if legacy_path.is_file():
-            print(f"LEGACY schema still present: {legacy_path}", file=sys.stderr)
+            print(
+                f"LEGACY schema still present: {legacy_path}", file=sys.stderr
+            )
             stale = True
     return 1 if stale else 0
 

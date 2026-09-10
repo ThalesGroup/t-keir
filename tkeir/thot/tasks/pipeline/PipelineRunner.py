@@ -310,26 +310,111 @@ class PipelineRunner:
         return self._chunk_questions
 
     @staticmethod
+    def _compact_log_label(text: str, *, max_len: int = 72) -> str:
+        """Collapse whitespace and clip text for pipeline log labels.
+
+        Args:
+            text: Raw title, path, or content.
+            max_len: Maximum label length (ASCII ellipsis if clipped).
+
+        Returns:
+            Single-line label, or empty string when ``text`` is blank.
+
+        Example:
+            >>> PipelineRunner._compact_log_label("  OSINT   Report  ")
+            'OSINT Report'
+        """
+        collapsed = " ".join((text or "").split())
+        if not collapsed:
+            return ""
+        if len(collapsed) <= max_len:
+            return collapsed
+        return collapsed[: max_len - 3] + "..."
+
+    @staticmethod
+    def _document_text_preview(document: dict, *, max_len: int = 72) -> str:
+        """First content/title snippet for in-memory pipeline documents.
+
+        Args:
+            document: Pipeline document (query, passage, or converted doc).
+            max_len: Maximum label length.
+
+        Returns:
+            Compact preview, or empty string when no text is present.
+
+        Example:
+            >>> PipelineRunner._document_text_preview(
+            ...     {"content": ["OSINT Report Suez Gulf Approach"]}
+            ... )
+            'OSINT Report Suez Gulf Approach'
+        """
+        chunks: list[str] = []
+        content = document.get("content")
+        if isinstance(content, str) and content.strip():
+            chunks.append(content)
+        elif isinstance(content, list):
+            for part in content:
+                if isinstance(part, str) and part.strip():
+                    chunks.append(part)
+                    break
+                if isinstance(part, dict):
+                    nested = part.get("text") or part.get("content") or ""
+                    if isinstance(nested, str) and nested.strip():
+                        chunks.append(nested)
+                        break
+        if not chunks:
+            title = document.get("title")
+            if isinstance(title, str) and title.strip():
+                chunks.append(title)
+        return PipelineRunner._compact_log_label(
+            " ".join(chunks), max_len=max_len
+        )
+
+    @staticmethod
     def _input_file_label(document: dict, call_context=None) -> str:
-        """Resolve a human-readable input file label for logging.
+        """Resolve a path or text preview for pipeline timing logs.
+
+        Prefers ``call_context['input-file']``, then ``source`` /
+        ``source_doc_id``, then a content/title snippet. Query and passage
+        NLP no longer log as ``unknown``.
 
         Args:
             document: Pipeline document dictionary.
             call_context: Optional call context with ``input-file``.
 
         Returns:
-            Input file path or fallback label.
+            Input file path or compact text label.
 
         Example:
             >>> PipelineRunner._input_file_label({"source": "file:///tmp/a.txt"})
             '/tmp/a.txt'
+            >>> PipelineRunner._input_file_label(
+            ...     {"content": ["OSINT Report Suez Gulf Approach"]}
+            ... )
+            'OSINT Report Suez Gulf Approach'
         """
         if call_context and call_context.get("input-file"):
-            return call_context["input-file"]
-        source = document.get("source") or document.get("source_doc_id") or ""
-        if isinstance(source, str) and source.startswith("file://"):
-            return source[len("file://") :]
-        return source or "unknown"
+            return str(call_context["input-file"])
+        for key in ("source", "source_doc_id", "doc_id", "chunk_id"):
+            raw = document.get(key)
+            if not isinstance(raw, str):
+                continue
+            value = raw.strip()
+            if not value:
+                continue
+            if value.startswith("file://"):
+                value = value[len("file://") :]
+            return value
+        metadata = document.get("metadata")
+        if isinstance(metadata, dict):
+            for key in ("source_doc_id", "source", "doc_id"):
+                raw = metadata.get(key)
+                if isinstance(raw, str) and raw.strip():
+                    return raw.strip()
+        preview = PipelineRunner._document_text_preview(document)
+        if preview:
+            return preview
+        return "in-memory"
 
     def _run_timed_step(
         self,

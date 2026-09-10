@@ -9,6 +9,7 @@ Licensed under the MIT License.
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -19,6 +20,35 @@ _SPACY_WHEEL = (
     "https://github.com/explosion/spacy-models/releases/download/"
     "{tag}/{tag}-py3-none-any.whl"
 )
+
+
+def env_business_ontology_dataset() -> str:
+    """Return dataset folder from usecase env vars, or ``\"\"``.
+
+    Checked in order: ``TKEIR_BUSINESS_ONTOLOGY_DATASET``, ``TKEIR_USECASE``,
+    ``USECASE``, ``TKEIR_AGENT_USECASE``. Empty when none are set so rag.yaml
+    can apply.
+
+    Returns:
+        Lowercase dataset name, or ``\"\"``.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import (
+        ...     env_business_ontology_dataset,
+        ... )
+        >>> isinstance(env_business_ontology_dataset(), str)
+        True
+    """
+    for env_key in (
+        "TKEIR_BUSINESS_ONTOLOGY_DATASET",
+        "TKEIR_USECASE",
+        "USECASE",
+        "TKEIR_AGENT_USECASE",
+    ):
+        value = os.getenv(env_key, "").strip()
+        if value:
+            return value.lower()
+    return ""
 
 
 def _wheel(tag: str) -> str:
@@ -72,32 +102,64 @@ def _default_spacy_models() -> dict[str, SpacyModelEntry]:
             download=_wheel("fr_core_news_md-3.6.0"),
         ),
         "de": SpacyModelEntry(
-            model="de_core_news_md",
-            download=_wheel("de_core_news_md-3.6.0"),
+            model="de_core_news_sm",
+            download=_wheel("de_core_news_sm-3.6.0"),
         ),
         "es": SpacyModelEntry(
-            model="es_core_news_md",
-            download=_wheel("es_core_news_md-3.6.0"),
+            model="es_core_news_sm",
+            download=_wheel("es_core_news_sm-3.6.0"),
         ),
         "it": SpacyModelEntry(
-            model="it_core_news_md",
-            download=_wheel("it_core_news_md-3.6.0"),
+            model="it_core_news_sm",
+            download=_wheel("it_core_news_sm-3.6.0"),
         ),
         "pt": SpacyModelEntry(
-            model="pt_core_news_md",
-            download=_wheel("pt_core_news_md-3.6.0"),
+            model="pt_core_news_sm",
+            download=_wheel("pt_core_news_sm-3.6.0"),
         ),
         "nl": SpacyModelEntry(
-            model="nl_core_news_md",
-            download=_wheel("nl_core_news_md-3.6.0"),
+            model="nl_core_news_sm",
+            download=_wheel("nl_core_news_sm-3.6.0"),
         ),
         "zh": SpacyModelEntry(
-            model="zh_core_web_md",
-            download=_wheel("zh_core_web_md-3.6.0"),
+            model="zh_core_web_sm",
+            download=_wheel("zh_core_web_sm-3.6.0"),
         ),
         "ja": SpacyModelEntry(
-            model="ja_core_news_md",
-            download=_wheel("ja_core_news_md-3.6.0"),
+            model="ja_core_news_sm",
+            download=_wheel("ja_core_news_sm-3.6.0"),
+        ),
+        "da": SpacyModelEntry(
+            model="da_core_news_sm",
+            download=_wheel("da_core_news_sm-3.6.0"),
+        ),
+        "el": SpacyModelEntry(
+            model="el_core_news_sm",
+            download=_wheel("el_core_news_sm-3.6.0"),
+        ),
+        "fi": SpacyModelEntry(
+            model="fi_core_news_sm",
+            download=_wheel("fi_core_news_sm-3.6.0"),
+        ),
+        "nb": SpacyModelEntry(
+            model="nb_core_news_sm",
+            download=_wheel("nb_core_news_sm-3.6.0"),
+        ),
+        "pl": SpacyModelEntry(
+            model="pl_core_news_sm",
+            download=_wheel("pl_core_news_sm-3.6.0"),
+        ),
+        "ro": SpacyModelEntry(
+            model="ro_core_news_sm",
+            download=_wheel("ro_core_news_sm-3.6.0"),
+        ),
+        "sv": SpacyModelEntry(
+            model="sv_core_news_sm",
+            download=_wheel("sv_core_news_sm-3.6.0"),
+        ),
+        "ar": SpacyModelEntry(
+            model="blank:ar",
+            download="",
         ),
     }
 
@@ -159,6 +221,47 @@ class PreprocessingConfig:
         raise KeyError(
             "preprocessing.spacy_models must define a 'default' (or 'xx') entry"
         )
+
+
+@dataclass(frozen=True)
+class OntologyExpansionYaml:
+    """Default ontology neighborhood expansion at query time.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import OntologyExpansionYaml
+        >>> OntologyExpansionYaml().max_ids
+        32
+    """
+
+    include_children: bool = False
+    include_parents: bool = False
+    include_related: bool = False
+    max_depth: int = 1
+    max_ids: int = 32
+
+
+@dataclass(frozen=True)
+class OntologyLayerConfig:
+    """First-class ontology catalog + chunk associations.
+
+    Ontology is optional: indexing and search work with no expert YAML and
+    with empty concept/relation query fields.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import OntologyLayerConfig
+        >>> OntologyLayerConfig().relation_match
+        'partial'
+    """
+
+    index_concepts: bool = True
+    embed_concepts: bool = False
+    json_structural_concepts: bool = True
+    max_concepts_per_chunk: int = 64
+    max_relations_per_chunk: int = 32
+    relation_match: str = "partial"
+    expansion: OntologyExpansionYaml = field(
+        default_factory=OntologyExpansionYaml
+    )
 
 
 @dataclass(frozen=True)
@@ -377,6 +480,9 @@ class DualHybridConfig:
         default_factory=PreprocessingConfig
     )
     retrieval: DualRetrievalArms = field(default_factory=DualRetrievalArms)
+    ontology_layer: OntologyLayerConfig = field(
+        default_factory=OntologyLayerConfig
+    )
     rank_profiles: dict[str, Any] = field(default_factory=dict)
     average_field_length: dict[str, Any] = field(default_factory=dict)
     business_ontology: BusinessOntologyConfig = field(
@@ -465,6 +571,8 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
     fb = cfg.get("fallback") or {}
     bo = cfg.get("business_ontology") or {}
     dump = cfg.get("index_dump") or {}
+    olayer = cfg.get("ontology_layer") or {}
+    oexp = olayer.get("expansion") or {}
 
     qe_weights = dict(
         QueryExpansionConfig().weights,
@@ -516,6 +624,30 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
                 retrieval.get("ranking_profile")
                 or chunk.get("profile")
                 or "hybrid"
+            ),
+        ),
+        ontology_layer=OntologyLayerConfig(
+            index_concepts=bool(olayer.get("index_concepts", True)),
+            embed_concepts=bool(olayer.get("embed_concepts", False)),
+            json_structural_concepts=bool(
+                olayer.get("json_structural_concepts", True)
+            ),
+            max_concepts_per_chunk=max(
+                1, int(olayer.get("max_concepts_per_chunk", 64))
+            ),
+            max_relations_per_chunk=max(
+                1, int(olayer.get("max_relations_per_chunk", 32))
+            ),
+            relation_match=str(olayer.get("relation_match") or "partial")
+            .strip()
+            .lower()
+            or "partial",
+            expansion=OntologyExpansionYaml(
+                include_children=bool(oexp.get("include_children", False)),
+                include_parents=bool(oexp.get("include_parents", False)),
+                include_related=bool(oexp.get("include_related", False)),
+                max_depth=max(0, int(oexp.get("max_depth", 1))),
+                max_ids=max(1, int(oexp.get("max_ids", 32))),
             ),
         ),
         rank_profiles=dict(cfg.get("rank_profiles") or {}),

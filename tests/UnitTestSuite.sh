@@ -18,6 +18,8 @@ ACTIVE_TESTS=(
     unittests/TestTkeirPaths.py
     unittests/TestVespaClient.py
     unittests/TestOntologyUtils.py
+    unittests/TestDocumentOntology.py
+    unittests/TestOntologyAlignment.py
     unittests/TestToolsDocExamples.py
     unittests/TestAllDocExamples.py
     unittests/TestDocExampleCoverage.py
@@ -32,11 +34,16 @@ ACTIVE_TESTS=(
     unittests/TestPipeline.py
     unittests/TestSyntacticTagger.py
     unittests/TestConverter.py
+    unittests/TestUniversalConverter.py
+    unittests/TestImageAnalysis.py
+    unittests/TestInputFormat.py
     unittests/TestMarkItDownConverter.py
     unittests/TestPdfImageOcr.py
+    unittests/TestInstallConverterModels.py
     unittests/TestKeywordsExtractor.py
     unittests/TestMorphoSyntacticTagger.py
     unittests/TestTokenizerMultilingual.py
+    unittests/TestTokenizerArabic.py
     unittests/TestRawConverter.py
     unittests/TestThotLogger.py
     unittests/TestUtils.py

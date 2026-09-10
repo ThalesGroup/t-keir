@@ -25,6 +25,11 @@ ontologies with `COMPOSE_TURTLE_DIR=/path/to/ttl`.
 
 Slot types: `entity`, `svo_pattern`, `keyword`, `sparql`, `freeform_grounded`.
 
+A usecase pack may also ship templates under `datasets/<usecase>/templates/`
+(searched before `tkeir/configs/templates/`). The enterprise pack includes
+`ent_risk_summary`, `ent_field_report`, `ent_board_sitrep`, and
+`ent_decision_brief`. See [Create a usecase pack](usecase.md).
+
 Seed the fused knowledge graph with the NATO C2SIM ontologies from Zero-to-Hero §3.4:
 
 ```bash

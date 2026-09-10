@@ -20,6 +20,8 @@
     <documents garbage-collection="true" garbage-collection-interval="3600">
       <document type="global" mode="index"
                 selection="global.pinned = true or global.freshness_ttl_seconds = null or global.freshness_ttl_seconds &lt;= 0 or (global.freshness_ttl_seconds &gt; 0 and now() &lt; global.doc_timestamp + global.freshness_ttl_seconds)" />
+      <!-- Concept catalog: no TTL (source of graph export / expansion). -->
+      <document type="ontology_concept" mode="index" />
     </documents>
     <nodes>
       <node distribution-key="0" hostalias="node1" />

@@ -19,6 +19,7 @@ import {
   type DocumentGroup,
   type RetrievedChunk,
 } from "@/lib/types";
+import { displayHitTitle, displayPassageTitle, formatSourceLabel } from "@/lib/search-display";
 import { cn } from "@/lib/utils";
 
 interface DocumentResultsProps {
@@ -106,18 +107,30 @@ const DocumentCard = memo(function DocumentCard({
 
   const hasFilter = activeChunkIds !== null && activeChunkIds.size > 0;
 
+  const docTitle = displayHitTitle({
+    text: group.chunks[0]?.text_raw,
+    parentDocId: group.parentDocId,
+    title: group.displayName,
+  });
+  const sourceLabel = formatSourceLabel(group.parentDocId);
+
   return (
     <Card>
       <CardHeader className="pb-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <FileText className="h-4 w-4 text-primary" />
-              {group.displayName}
+          <div className="min-w-0 space-y-1">
+            <CardTitle className="flex items-start gap-2 text-base leading-snug tracking-tight">
+              <FileText className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>{docTitle}</span>
             </CardTitle>
-            <p className="break-all font-mono text-xs text-muted-foreground">
-              {group.parentDocId}
-            </p>
+            {sourceLabel &&
+              sourceLabel.localeCompare(docTitle, undefined, {
+                sensitivity: "accent",
+              }) !== 0 && (
+                <p className="truncate text-xs text-muted-foreground">
+                  {sourceLabel}
+                </p>
+              )}
           </div>
           <Badge>
             {hasFilter
@@ -134,7 +147,7 @@ const DocumentCard = memo(function DocumentCard({
           }
           className="w-full"
         >
-          {group.chunks.map((chunk) => {
+          {group.chunks.map((chunk, index) => {
             const isMatch = chunkMatchesFilter(chunk.chunk_id, activeChunkIds);
             const dimmed = hasFilter && !isMatch;
             const highlighted = hasFilter && isMatch;
@@ -142,10 +155,10 @@ const DocumentCard = memo(function DocumentCard({
             return (
               <AccordionItem key={chunk.chunk_id} value={chunk.chunk_id}>
                 <AccordionTrigger className="hover:no-underline">
-                  <span className="flex items-center gap-2 text-left">
+                  <span className="flex min-w-0 items-center gap-2 text-left">
                     <Layers className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="truncate font-mono text-xs">
-                      {chunk.chunk_id}
+                    <span className="truncate text-xs font-medium">
+                      {displayPassageTitle(chunk, docTitle, index)}
                     </span>
                     {chunk.relevance !== null && (
                       <Badge variant="outline" className="ml-2 shrink-0">

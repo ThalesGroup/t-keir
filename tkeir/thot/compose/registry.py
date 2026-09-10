@@ -15,7 +15,34 @@ from pathlib import Path
 import yaml
 
 from thot.compose.template_models import TemplateSpec
-from thot.core.TkeirPaths import configs_dir
+from thot.core.TkeirPaths import configs_dir, package_root, repo_root
+
+
+def extra_template_dirs() -> list[Path]:
+    """Return pack ``templates/`` dirs for the active usecase.
+
+    Searches ``datasets/<usecase>/templates/`` then
+    ``packs/<usecase>/templates/`` (container images).
+
+    Example:
+        >>> from thot.compose.registry import extra_template_dirs
+        >>> isinstance(extra_template_dirs(), list)
+        True
+    """
+    from thot.agent.orchestrator_config import resolve_usecase
+
+    selected = resolve_usecase()
+    if not selected:
+        return []
+    out: list[Path] = []
+    for base in (
+        Path(repo_root()) / "datasets",
+        Path(package_root()) / "packs",
+    ):
+        pack = base / selected / "templates"
+        if pack.is_dir():
+            out.append(pack)
+    return out
 
 
 def templates_dir() -> Path:
@@ -32,6 +59,9 @@ def templates_dir() -> Path:
 def load_template(name: str, *, directory: Path | None = None) -> TemplateSpec:
     """Load ``<name>.yaml`` into a :class:`TemplateSpec`.
 
+    Searches ``datasets/<usecase>/templates/`` then
+    ``packs/<usecase>/templates/``, then ``tkeir/configs/templates/``.
+
     Example:
         >>> from thot.compose.registry import load_template
         >>> spec = load_template("synthesis_note")
@@ -40,10 +70,22 @@ def load_template(name: str, *, directory: Path | None = None) -> TemplateSpec:
         >>> any(s.name == "executive_summary" for s in spec.slots)
         True
     """
-    root = directory or templates_dir()
-    path = root / f"{name}.yaml"
-    if not path.is_file():
-        raise FileNotFoundError(f"template not found: {path}")
+    roots = (
+        [directory]
+        if directory is not None
+        else extra_template_dirs() + [templates_dir()]
+    )
+    path: Path | None = None
+    for root in roots:
+        candidate = root / f"{name}.yaml"
+        if candidate.is_file():
+            path = candidate
+            break
+    if path is None:
+        searched = ", ".join(str(root) for root in roots) or "(none)"
+        raise FileNotFoundError(
+            f"template not found: {name}.yaml (searched {searched})"
+        )
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     if not isinstance(raw, dict):
         raise ValueError(f"template must be a mapping: {path}")
@@ -59,7 +101,14 @@ def list_template_names(*, directory: Path | None = None) -> list[str]:
         >>> "entity_profile" in list_template_names()
         True
     """
-    root = directory or templates_dir()
-    if not root.is_dir():
-        return []
-    return sorted(p.stem for p in root.glob("*.yaml"))
+    roots = (
+        [directory]
+        if directory is not None
+        else extra_template_dirs() + [templates_dir()]
+    )
+    names: set[str] = set()
+    for root in roots:
+        if not root.is_dir():
+            continue
+        names.update(p.stem for p in root.glob("*.yaml"))
+    return sorted(names)

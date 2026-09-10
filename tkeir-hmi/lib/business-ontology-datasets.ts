@@ -14,6 +14,11 @@ export const BUSINESS_ONTOLOGY_DATASETS: BusinessOntologyDatasetOption[] = [
     description: "Maritime / C2 OSINT business ontology",
   },
   {
+    id: "enterprise",
+    label: "Enterprise",
+    description: "Project MERIDIAN / financial-risk business ontology",
+  },
+  {
     id: "scifact",
     label: "SciFact",
     description: "Scientific claims",

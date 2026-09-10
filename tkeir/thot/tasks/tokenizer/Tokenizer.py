@@ -28,12 +28,56 @@ from spacy.util import (
 
 from thot.core.Constants import exception_error_and_trace
 from thot.core.DictionaryTrie import Trie, end_trie, make_trie, prefix_trie
-from thot.core.SentenceSegmenter import SentenceSegmenter
+from thot.core.SentenceSegmenter import SentenceSegmenter, normalize_language_code
 from thot.core.SpacyModelLoader import load_spacy_model
 from thot.core.ThotLogger import ThotLogger
 from thot.tasks.TaskInfo import TaskInfo
 from thot.tasks.tokenizer import __date_tokenizer__, __version_tokenizer__
 from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
+
+# Latin-script languages: T-KEIR infix/prefix tuning is safe. Arabic, CJK,
+# and other native tokenizers must keep spaCy language defaults.
+LATIN_TOKENIZER_LANGUAGES = frozenset(
+    {
+        "ca",
+        "cs",
+        "da",
+        "de",
+        "en",
+        "es",
+        "et",
+        "fi",
+        "fr",
+        "hr",
+        "hu",
+        "id",
+        "it",
+        "lt",
+        "lv",
+        "nb",
+        "nl",
+        "pl",
+        "pt",
+        "ro",
+        "sk",
+        "sl",
+        "sv",
+        "tr",
+    }
+)
+
+
+def uses_custom_latin_tokenizer(language: str | None) -> bool:
+    """Return True when Latin infix/prefix tokenizer tuning should run.
+
+    Example:
+        >>> from thot.tasks.tokenizer.Tokenizer import uses_custom_latin_tokenizer
+        >>> uses_custom_latin_tokenizer("fr")
+        True
+        >>> uses_custom_latin_tokenizer("ar")
+        False
+    """
+    return normalize_language_code(language) in LATIN_TOKENIZER_LANGUAGES
 
 
 class SpacyTokenizerPipe:
@@ -452,40 +496,47 @@ class SpacyTokenizer:
         )
         self._sent_segmenter = SentenceSegmenter(language)
 
-        inf = list(self._nlp.Defaults.infixes)  # Default infixes
-        inf.remove(
-            r"(?<=[0-9])[+\-\*^](?=[0-9-])"
-        )  # Remove the generic op between numbers or between a number and a -
-        inf = tuple(inf)  # Convert inf to tuple
-        infixes = inf + tuple(
-            [r"(?<=[0-9])[+*^](?=[0-9-])", r"(?<=[0-9])-(?=-)"]
-        )  # Add the removed rule after subtracting (?<=[0-9])-(?=[0-9]) pattern
-        infixes = inf + tuple([r"\.\.\.+", r"[!&,()/;]"])
-        infixes = [
-            x for x in infixes if "-|–|—|--|---|——|~" not in x
-        ]  # Remove - between letters rule
-        infix_re = compile_infix_regex(infixes)
+        if uses_custom_latin_tokenizer(language):
+            inf = list(self._nlp.Defaults.infixes)
+            number_op = r"(?<=[0-9])[+\-\*^](?=[0-9-])"
+            if number_op in inf:
+                inf.remove(number_op)
+            inf = tuple(inf)
+            infixes = inf + tuple(
+                [r"(?<=[0-9])[+*^](?=[0-9-])", r"(?<=[0-9])-(?=-)"]
+            )
+            infixes = inf + tuple([r"\.\.\.+", r"[!&,()/;]"])
+            infixes = [
+                x for x in infixes if "-|–|—|--|---|——|~" not in x
+            ]
+            infix_re = compile_infix_regex(infixes)
 
-        suf = list(self._nlp.Defaults.suffixes)  # Default infixes
-        suf = tuple(suf)
-        suffixes = suf + tuple(
-            [r"--+", r"~~+", r",,+", r"__+" r"\\\\+", r";;+", r"\?\?+", r"!!+"]
-        )
-        suffix_re = compile_suffix_regex(suffixes)
+            suf = tuple(self._nlp.Defaults.suffixes)
+            suffixes = suf + tuple(
+                [
+                    r"--+",
+                    r"~~+",
+                    r",,+",
+                    r"__+" r"\\\\+",
+                    r";;+",
+                    r"\?\?+",
+                    r"!!+",
+                ]
+            )
+            suffix_re = compile_suffix_regex(suffixes)
 
-        pref = list(self._nlp.Defaults.prefixes)  # Default infixes
-        pref = tuple(pref)
-        prefixes = pref + tuple([r"[\\\-!?%~,;/_]+"])
-        prefix_re = compile_prefix_regex(prefixes)
+            pref = tuple(self._nlp.Defaults.prefixes)
+            prefixes = pref + tuple([r"[\\\-!?%~,;/_]+"])
+            prefix_re = compile_prefix_regex(prefixes)
 
-        self._nlp.tokenizer = spacy.tokenizer.Tokenizer(
-            self._nlp.vocab,
-            prefix_search=prefix_re.search,
-            suffix_search=suffix_re.search,  # self._nlp.tokenizer.suffix_search, #
-            infix_finditer=infix_re.finditer,
-            token_match=self._nlp.tokenizer.token_match,
-            rules=self._nlp.Defaults.tokenizer_exceptions,
-        )
+            self._nlp.tokenizer = spacy.tokenizer.Tokenizer(
+                self._nlp.vocab,
+                prefix_search=prefix_re.search,
+                suffix_search=suffix_re.search,
+                infix_finditer=infix_re.finditer,
+                token_match=self._nlp.tokenizer.token_match,
+                rules=self._nlp.Defaults.tokenizer_exceptions,
+            )
 
         Token.set_extension(
             "compound_word",

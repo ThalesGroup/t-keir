@@ -5,9 +5,10 @@ Python **indexing** lives in `tkeir/thot/tools/ingest/`; **search / RAG** in
 `tkeir/thot/tools/search/`; **BEIR eval** in `tkeir/thot/tools/eval/`.
 All Make targets live in the **repository root** `Makefile` — run them from the repo root.
 
-- **`doc_base`** — shared fields (`source_ref`, `chunk_text`, sparse, `ontology_concepts`)
+- **`doc_base`** — shared fields (`source_ref`, `chunk_text`, sparse, `ontology_concepts` / `ontology_concept_ids`, relations)
 - **`global`** — index-mode catalog; `dense_vector` with HNSW
 - **`user`** — streaming-mode tenant passages (`userspace_id` + attribute-only `dense_vector`)
+- **`ontology_concept`** — concept catalog (labels, aliases, graph links, optional embedding)
 
 Schemas are generated from `tkeir/configs/rag.yaml` (`make schemas`).
 BGE-M3 weights for FlagEmbedding: `tkeir/resources/modeling/net/bge-m3`
@@ -16,17 +17,14 @@ BGE-M3 weights for FlagEmbedding: `tkeir/resources/modeling/net/bge-m3`
 ## Quick start
 
 ```bash
-# From repository root
-make install
+# From repository root — empty Vespa, no sample index
+make clean-db
 make bootstrap
+make vespa-check
+make test-vespa    # counts for global / ontology_concept / user (all 0)
 
-export PROVIDER=ollama
-export EMBEDDING_MODEL=BAAI/bge-m3
-make index-fixtures
-make index
-
-make rag
-make rag-query RAG_QUERY="Who is Rob Brown?"
+# Index only when you choose to (not part of bootstrap):
+# make ingest   # then POST /ingest/json-records or HMI
 ```
 
 ## Health checks

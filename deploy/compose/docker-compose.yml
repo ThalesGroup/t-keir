@@ -84,6 +84,9 @@ services:
       VESPA_URL: http://vespa:8080
       VESPA_CONFIG_URL: http://vespa:19071
       VESPA_USER_SPACE: ${VESPA_USER_SPACE:-dev@tkeir}
+      TKEIR_USECASE: ${TKEIR_USECASE:-osint}
+      TKEIR_AGENT_USECASE: ${TKEIR_AGENT_USECASE:-osint}
+      TKEIR_BUSINESS_ONTOLOGY_DATASET: ${TKEIR_BUSINESS_ONTOLOGY_DATASET:-osint}
       PROVIDER: ${PROVIDER:-ollama}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-bge-m3}
       LLM_MODEL: ${LLM_MODEL:-mistral-nemo}
@@ -206,6 +209,9 @@ services:
       INGEST_DEV_TOKEN: ${INGEST_DEV_TOKEN:-}
       # Mounted host workspace (optional local mounts; OSINT ontologies live under datasets/osint/)
       TKEIR_WORKSPACE: /workspace
+      TKEIR_USECASE: ${TKEIR_USECASE:-osint}
+      TKEIR_AGENT_USECASE: ${TKEIR_AGENT_USECASE:-osint}
+      TKEIR_BUSINESS_ONTOLOGY_DATASET: ${TKEIR_BUSINESS_ONTOLOGY_DATASET:-osint}
       VESPA_URL: http://vespa:8080
       VESPA_CONFIG_URL: http://vespa:19071
       VESPA_USER_SPACE: ${VESPA_USER_SPACE:-dev@tkeir}
@@ -554,7 +560,9 @@ services:
       AGENT_ROOT: /var/tkeir/agent
       TKEIR_WORKSPACE: /workspace
       # Report-form maps: packs/<usecase>/agent_orchestrator.yaml (default osint)
+      TKEIR_USECASE: ${TKEIR_USECASE:-osint}
       TKEIR_AGENT_USECASE: ${TKEIR_AGENT_USECASE:-osint}
+      TKEIR_BUSINESS_ONTOLOGY_DATASET: ${TKEIR_BUSINESS_ONTOLOGY_DATASET:-osint}
       VESPA_URL: http://vespa:8080
       VESPA_CONFIG_URL: http://vespa:19071
       VESPA_USER_SPACE: ${VESPA_USER_SPACE:-dev@tkeir}

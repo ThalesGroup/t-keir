@@ -238,13 +238,18 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 
 
 def resolve_usecase(explicit: str | None = None) -> str:
-    """Resolve active usecase pack name (``osint``, ``enterprise``, …).
+    """Resolve active usecase pack name (``osint``, ``enterprise``, or any
+    ``datasets/<name>/`` pack).
+
+    Env order when ``explicit`` is empty: ``TKEIR_USECASE``, ``USECASE``,
+    ``TKEIR_AGENT_USECASE``, ``TKEIR_DATASET``,
+    ``TKEIR_BUSINESS_ONTOLOGY_DATASET``. Defaults to ``osint``.
 
     Args:
         explicit: Optional override (for example from run ``params.usecase``).
 
     Returns:
-        Lowercase pack name, or ``\"\"`` when unset.
+        Lowercase pack name. ``osint`` when no explicit value or env is set.
 
     Example:
         >>> resolve_usecase("OSINT")
@@ -255,6 +260,8 @@ def resolve_usecase(explicit: str | None = None) -> str:
     if explicit and str(explicit).strip():
         return str(explicit).strip().lower()
     for env_key in (
+        "TKEIR_USECASE",
+        "USECASE",
         "TKEIR_AGENT_USECASE",
         "TKEIR_DATASET",
         "TKEIR_BUSINESS_ONTOLOGY_DATASET",
@@ -262,7 +269,7 @@ def resolve_usecase(explicit: str | None = None) -> str:
         value = os.getenv(env_key, "").strip()
         if value:
             return value.lower()
-    return ""
+    return "osint"
 
 
 def load_orchestrator_config(

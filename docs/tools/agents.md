@@ -200,6 +200,10 @@ and dataset packs (OSINT personas live under `datasets/osint/agents/`).
 | **`<persona>_prompt`** | OKF wiki seed + merge system for `wiki_upsert` (not a tool-loop agent) |
 | **`wiki_writer`** | Answer-first OKF LLMWiki writer used by `otan_c2_brief` |
 
+To add another pack (private corpus, extra personas, Keycloak users), follow
+[Create a usecase pack](usecase.md). Do not add unit tests against restricted
+packs.
+
 ### Shipped workflows (core — `tkeir/configs/workflows/`)
 
 | Workflow | Pipeline | Deliverable |
@@ -238,9 +242,10 @@ hardcoded in the orchestrator:
 - [`datasets/osint/agent_orchestrator.yaml`](../../datasets/osint/agent_orchestrator.yaml)
 - [`datasets/enterprise/agent_orchestrator.yaml`](../../datasets/enterprise/agent_orchestrator.yaml)
 
-Select with `params.usecase` / `params.dataset`, or env `TKEIR_AGENT_USECASE`
+Select with `params.usecase` / `params.dataset`, Makefile `USECASE=` (default
+`osint`), or env `TKEIR_USECASE` / `TKEIR_AGENT_USECASE`
 (also `TKEIR_DATASET` / `TKEIR_BUSINESS_ONTOLOGY_DATASET`). Override path:
-`TKEIR_AGENT_ORCHESTRATOR_CONFIG`.
+`TKEIR_AGENT_ORCHESTRATOR_CONFIG`. New packs: [Create a usecase](usecase.md).
 
 The same usecase also **prefers** that pack when agent/workflow YAML stems
 collide across packs (e.g. `wiki_writer`, `llm_wiki`):

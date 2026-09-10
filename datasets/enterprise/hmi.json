@@ -1,0 +1,98 @@
+{
+  "personas": [
+    { "id": "ceo", "label": "CEO", "roles": ["ent-ceo"] },
+    { "id": "cfo", "label": "CFO", "roles": ["ent-cfo"] },
+    { "id": "cto", "label": "CTO", "roles": ["ent-cto"] },
+    { "id": "ciso", "label": "CISO", "roles": ["ent-ciso"] },
+    { "id": "cdo", "label": "CDO", "roles": ["ent-cdo"] },
+    { "id": "admin", "label": "Admin", "roles": ["ent-admin", "tkeir-admin"] }
+  ],
+  "workflowPresets": [
+    {
+      "role": "ent-ceo",
+      "personaId": "ceo",
+      "label": "CEO",
+      "reportForm": "board_sitrep",
+      "goal": "Board SITREP: material risks and KRIs this period for NEXUS ENERGY HOLDINGS.",
+      "topic": "NEXUS ENERGY HOLDINGS",
+      "workflow": "persona_ceo",
+      "wikiPrompt": "ceo_prompt",
+      "answerTemplate": "ent_board_sitrep"
+    },
+    {
+      "role": "ent-cfo",
+      "personaId": "cfo",
+      "label": "CFO",
+      "reportForm": "decision_brief",
+      "goal": "Decision brief: capital exposure and outstanding decisions on NEH.",
+      "topic": "NEH financial exposure",
+      "workflow": "persona_cfo",
+      "wikiPrompt": "cfo_prompt",
+      "answerTemplate": "ent_decision_brief"
+    },
+    {
+      "role": "ent-cto",
+      "personaId": "cto",
+      "label": "CTO",
+      "reportForm": "risk_summary",
+      "goal": "Risk summary: what the indexed corpus contains on platform and entity risk.",
+      "topic": "Corpus coverage / NEH",
+      "workflow": "persona_cto",
+      "wikiPrompt": "cto_prompt",
+      "answerTemplate": "ent_risk_summary"
+    },
+    {
+      "role": "ent-ciso",
+      "personaId": "ciso",
+      "label": "CISO",
+      "reportForm": "field_report",
+      "goal": "Field report: source access and security posture on the NEH investigation.",
+      "topic": "Source security",
+      "workflow": "persona_ciso",
+      "wikiPrompt": "ciso_prompt",
+      "answerTemplate": "ent_field_report"
+    },
+    {
+      "role": "ent-cdo",
+      "personaId": "cdo",
+      "label": "CDO",
+      "reportForm": "risk_summary",
+      "goal": "Data risk summary: quality gaps and recommendations for the MERIDIAN corpus.",
+      "topic": "Data risk",
+      "workflow": "persona_cdo",
+      "wikiPrompt": "cdo_prompt",
+      "answerTemplate": "ent_risk_summary"
+    },
+    {
+      "role": "ent-admin",
+      "personaId": "admin",
+      "label": "Admin",
+      "reportForm": "risk_summary",
+      "goal": "Report what the shared corpus knows about NEXUS ENERGY HOLDINGS.",
+      "topic": "NEXUS ENERGY HOLDINGS",
+      "workflow": "persona_cto",
+      "wikiPrompt": "cto_prompt",
+      "answerTemplate": "ent_risk_summary"
+    }
+  ],
+  "pageRoles": [
+    "ent-ceo",
+    "ent-cfo",
+    "ent-cto",
+    "ent-ciso",
+    "ent-cdo",
+    "ent-admin",
+    "tkeir-admin"
+  ],
+  "adminRoles": ["ent-admin", "tkeir-admin"],
+  "ingestRoles": ["ent-admin", "tkeir-admin"],
+  "shareRoles": ["ent-ceo", "ent-cfo", "ent-cto", "ent-ciso", "ent-cdo"],
+  "demoAccounts": [
+    { "user": "ceo", "password": "ceo", "clearance": "SECRET", "role": "CEO" },
+    { "user": "cfo", "password": "cfo", "clearance": "SECRET", "role": "CFO" },
+    { "user": "cto", "password": "cto", "clearance": "SECRET", "role": "CTO" },
+    { "user": "ciso", "password": "ciso", "clearance": "SECRET", "role": "CISO" },
+    { "user": "cdo", "password": "cdo", "clearance": "SECRET", "role": "CDO" },
+    { "user": "enterprise-admin", "password": "enterprise-admin", "clearance": "SECRET", "role": "Admin" }
+  ]
+}

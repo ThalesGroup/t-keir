@@ -112,10 +112,13 @@ make setup
 This runs, in order:
 
 1. `uv sync` (dev dependencies into `tkeir/.venv`)
-2. spaCy language models (skips if already importable; `FORCE_SPACY_MODELS=1` to force)
-3. Tesseract OCR check / install helper
-4. tokenizer MWE resource (`tkeir_mwe.pkl`; skips if present)
-5. BGE-M3 into `tkeir/resources/modeling/net/bge-m3` (skips if ready; `FORCE_BGE=1` to refresh)
+2. spaCy language models into `tkeir/resources/modeling/spacy/` (skips if already present; `FORCE_SPACY_MODELS=1` to force). European `sm` pipelines plus `en`/`fr` `md` and `xx_ent_wiki_sm`. Arabic has no Explosion 3.6 wheel — runtime uses `spacy.blank("ar")`.
+3. Tesseract OCR binary (`make install-tesseract`)
+4. Converter models into `resources/modeling/`: tessdata language packs + BLIP captions (`make install-converter-models`; `FORCE_CONVERTER_MODELS=1` to refresh)
+5. tokenizer MWE resource (`tkeir_mwe.pkl`; skips if present)
+6. BGE-M3 into `tkeir/resources/modeling/net/bge-m3` (skips if ready; `FORCE_BGE=1` to refresh)
+7. Vespa Docker image **only when it is not already local** (`make pull-vespa`; `FORCE_VESPA=1` to refresh). Skipped with a message if Docker is missing or the daemon is down — NLP still works; `make bootstrap` needs the image.
+8. SearXNG image + SciDocs (eval) downloads
 
 Verify:
 
@@ -167,6 +170,9 @@ Prefer **Option A** (`make setup`) for development. Models: `make init-models`
 | `tkeir/resources/modeling/tokenizer/<lang>/` | Lexicons, rules, `annotation-resources.json` |
 | `tkeir/resources/modeling/tokenizer/en/tkeir_mwe.pkl` | Compiled MWE trie (`make init-models`) |
 | `tkeir/resources/modeling/net/bge-m3/` | Local BGE-M3 weights (`make pull-bge-model` / `make setup`) |
+| `tkeir/resources/modeling/net/blip-image-captioning-base/` | BLIP captions for the converter (`make install-converter-models`) |
+| `tkeir/resources/modeling/spacy/` | spaCy language pipelines (`make install-spacy-models` / `make setup`) |
+| `tkeir/resources/modeling/tesseract/` | Tesseract `*.traineddata` for multilingual OCR |
 
 Resource paths inside configs are resolved relative to the `tkeir/` package root.
 BGE-M3 is **not** loaded from the Hugging Face hub cache; FlagEmbedding reads
@@ -202,16 +208,18 @@ bash .devcontainer/ensure-venv.sh
 make install
 ```
 
-**Missing spaCy models** — pipeline or RAG query refinement fails:
+**Missing spaCy models** — pipeline or RAG query refinement fails. Models are
+extracted into `tkeir/resources/modeling/spacy/` (not the venv):
 
 ```bash
 make install-spacy-models
 ```
 
-**Tesseract / PDF OCR** — scanned PDFs need OCR:
+**Tesseract / PDF OCR** — scanned PDFs and images need the binary plus language packs:
 
 ```bash
 make install-tesseract
+make install-converter-models
 ```
 
 **`.env` secrets** — never commit `.env`. CI runs `make check-secrets` to block

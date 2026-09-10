@@ -78,8 +78,8 @@ def refine_search_query_text(
 ) -> str:
     """Run tokenizer and morphosyntax on a query and drop stopword-like tokens.
 
-    Requires spaCy models installed via ``make install-spacy-models``. The
-    original ``query_text`` is preserved for embedding and generation; this
+    Requires spaCy models extracted into ``resources/modeling/spacy``
+    via ``make install-spacy-models``. The original ``query_text`` is preserved for embedding and generation; this
     helper returns a keyword-oriented variant for Vespa ``text_raw`` retrieval.
 
     Args:

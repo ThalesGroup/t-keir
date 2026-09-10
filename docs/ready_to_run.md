@@ -29,8 +29,11 @@ Set a model cache if you use Hugging Face / transformer-backed steps
 ```bash
 export TRANSFORMERS_CACHE=$PWD/.cache/models
 ```
-Use **`-t auto`** for mixed or binary inputs (PDF, Office). Use **`-t raw`** for plain
-text only.
+Use **`-t auto`** for mixed or binary inputs (PDF, Office, images, ZIP). Use
+**`-t raw`** for plain text only. Conversion, OCR languages, and captions:
+[Converter](tools/converter.md). Building ingest JSON from markdown:
+[Corpus tools](tools/corpus.md). Multilingual tagging (EU spaCy + Arabic):
+[Tokenizer](tools/tokenizer.md).
 
 Via Make:
 
@@ -57,6 +60,20 @@ morphosyntax → NER → syntax → keywords. Each stage adds fields to the outp
 
 JSON inputs that already contain `content` or `content_tokens` skip conversion and
 start at language detection.
+
+To build **ingest JSON** (`{dataset, records}`) from a folder of mixed formats
+instead of running the full NLP pipeline first:
+
+```bash
+tkeir-corpus \
+  -i /path/to/mixed-files \
+  -m /path/to/mixed-files-markdown \
+  -o ./datasets/mixed.json \
+  --name mixed \
+  --skip-empty
+```
+
+See [Corpus tools](tools/corpus.md).
 
 ## Next
 

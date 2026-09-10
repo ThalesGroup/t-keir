@@ -18,7 +18,7 @@ endif
 
 .PHONY: help setup install check-uv check-docker check-git check-jq check-curl check-python-version check-secrets \
 	check-install \
-	install-tesseract install-spacy-models build wheel init-models \
+	install-tesseract install-spacy-models install-converter-models build wheel init-models \
 	test test-unit test-functional test-coverage coverage \
 	test-integration test-integration-ci \
 	test-fuzz-hypothesis test-fuzz-atheris test-fuzz-radamsa test-fuzz fuzz-report \
@@ -31,7 +31,7 @@ endif
 	bom sbom aibom trivy owasp-dependency-check security-report \
 	docs docs-build docs-pdf pipeline quickstart ci-deps ci pre-commit clean devcontainer \
 	sync pull-models pull-bge-model pull-vespa pull-searxng start init bootstrap vespa-check test-vespa test-vespa-py \
-	index index-fixtures rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
+	index index-fixtures corpus rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
 	beir-eval beir-smoke generate-eval rag-eval beir-rag-eval eval eval-smoke clean-db vespa-clean logs \
 	images images-push images-sign \
 	compose-up compose-down compose-bootstrap compose-logs compose-smoke wipe-runtime down all-down \
@@ -45,7 +45,7 @@ endif
 	keycloak-export-realm keycloak-sync-demo-users keycloak-purge-demo-users seal kubeflow-install kubeflow-uninstall kubeflow-register-models kubeflow-run-ingest \
 	lineage-report audit-evidence annex-iv \
 	datasets datasets-ontologies datasets-download datasets-ingest datasets-ingest-user datasets-ingest-admin \
-	scidocs-download \
+	datasets-ingest-json scidocs-download \
 	datasets-ingest-web datasets-demo datasets-clean \
 	schemas schemas-check
 
@@ -101,6 +101,16 @@ DIST_DIR := $(ROOT)/dist
 BUILD_STAMP := $(DIST_DIR)/.build_timestamp
 
 WORKSPACE ?= $(ROOT)/workspace
+# Demo usecase pack (osint | enterprise | datasets/<name>/). Selects agents,
+# ontology, Keycloak personas, and HMI presets. OSINT is the default.
+USECASE ?= osint
+TKEIR_USECASE ?= $(USECASE)
+TKEIR_AGENT_USECASE ?= $(TKEIR_USECASE)
+TKEIR_BUSINESS_ONTOLOGY_DATASET ?= $(TKEIR_USECASE)
+USECASE_HOST_ENV = \
+	TKEIR_USECASE="$(TKEIR_USECASE)" \
+	TKEIR_AGENT_USECASE="$(TKEIR_AGENT_USECASE)" \
+	TKEIR_BUSINESS_ONTOLOGY_DATASET="$(TKEIR_BUSINESS_ONTOLOGY_DATASET)"
 # Flat OKF fallback (default_okf_root when OKF_ROOT unset). Per-user bundles:
 # $(WORKSPACE)/users/<space>/okf/<bundle_id>/
 OKF_FLAT_ROOT ?= $(WORKSPACE)/.tkeir-okf
@@ -116,6 +126,8 @@ HF_HOME ?= $(TRANSFORMERS_CACHE)
 HUGGINGFACE_HUB_CACHE ?= $(TRANSFORMERS_CACHE)/hub
 BGE_MODEL ?= BAAI/bge-m3
 FORCE_BGE ?= 0
+FORCE_VESPA ?= 0
+FORCE_CONVERTER_MODELS ?= 0
 DOCS_PORT ?= 8000
 DOCS_PDF_OUTPUT ?= $(ROOT)/output/docs/tkeir-docs.pdf
 
@@ -270,8 +282,9 @@ help: ## Show available targets (VERBOSE=1 prints recipes)
 		| awk 'BEGIN {FS = ":.*?##[[:space:]]*"}; {printf "  \033[36mmake %-28s\033[0m %s\n", $$1, $$2}' \
 		| sort
 	$(Q)printf '%s\n' ""
-	$(Q)printf '%s\n' "Python packages: thot.tools.ingest | thot.tools.search | thot.tools.collector | thot.tools.okf | thot.tools.eval"
-	$(Q)printf '%s\n' "Common vars: PIPELINE_* INDEX_INPUT RAG_QUERY COLLECTOR_QUERY BEIR_* COVERAGE_FAIL_UNDER VERSION WORKSPACE VERBOSE"
+	$(Q)printf '%s\n' "Python packages: thot.tools.ingest | thot.tools.search | thot.tools.collector | thot.tools.corpus | thot.tools.okf | thot.tools.eval"
+	$(Q)printf '%s\n' "Common vars: PIPELINE_* INDEX_INPUT CORPUS_INPUT CORPUS_OUTPUT RAG_QUERY COLLECTOR_QUERY BEIR_* COVERAGE_FAIL_UNDER VERSION WORKSPACE VERBOSE"
+	$(Q)printf '%s\n' "Usecase:    USECASE=$(USECASE) (osint | enterprise | <pack>) — see docs/tools/usecase.md"
 	$(Q)printf '%s\n' "Workspace:   WORKSPACE=$(WORKSPACE)  OKF_FLAT_ROOT=$(OKF_FLAT_ROOT)  AGENT_ROOT=$(AGENT_ROOT)"
 	$(Q)printf '%s\n' "Image vars:  IMAGE_REGISTRY IMAGE_TAG PLATFORMS MODEL_MODE"
 	$(Q)printf '%s\n' "Compose:     PROFILES=$(PROFILES) (core,auth,ingest,audit,governor,observability,objectstore,mcp,agents,spire)"
@@ -360,7 +373,7 @@ verify-lockfile: check-uv ## Fail if uv.lock is out of sync with pyproject.toml
 hmi-install: ## Install HMI dependencies from package-lock.json
 	cd $(HMI_DIR) && npm ci
 
-install-spacy-models: check-uv ## Install spaCy language models (skip if present; FORCE_SPACY_MODELS=1)
+install-spacy-models: check-uv ## Extract spaCy pipelines into tkeir/resources/modeling/spacy
 	$(Q)chmod +x "$(SCRIPTS_DIR)/install_spacy_models.sh"
 	$(Q)bash "$(SCRIPTS_DIR)/install_spacy_models.sh"
 
@@ -368,16 +381,24 @@ install-tesseract: ## Install Tesseract OCR via helper script
 	$(Q)chmod +x "$(SCRIPTS_DIR)/install_tesseract.sh"
 	$(Q)bash "$(SCRIPTS_DIR)/install_tesseract.sh"
 
+install-converter-models: install ## Tessdata + BLIP into resources/modeling (skip if present)
+	$(Q)mkdir -p "$(TKEIR_DIR)/resources/modeling/tesseract" \
+		"$(TKEIR_DIR)/resources/modeling/net"
+	cd $(TKEIR_DIR) && \
+		$(UV) run --python $(PYTHON) python -m thot.tools.install_converter_models \
+			$(if $(filter 1,$(FORCE_CONVERTER_MODELS)),--force,)
+
 init-models: install ## Build tkeir_mwe.pkl from annotation resources (skip if present)
 	$(Q)mkdir -p "$(TRANSFORMERS_CACHE)"
 	$(Q)chmod +x "$(TKEIR_DIR)/scripts/init-models.sh"
 	$(Q)cd $(TKEIR_DIR) && TRANSFORMERS_CACHE="$(TRANSFORMERS_CACHE)" \
 		bash scripts/init-models.sh "$(TRANSFORMERS_CACHE)"
 
-setup: ## Full local setup (install → spaCy → Tesseract → MWE → BGE-M3 → Vespa → SearXNG → SciDocs)
+setup: ## Full local setup (install → spaCy → Tesseract → converter models → MWE → BGE-M3 → Vespa if needed)
 	$(MAKE) install
 	$(MAKE) install-spacy-models
 	$(MAKE) install-tesseract
+	$(MAKE) install-converter-models
 	$(MAKE) init-models
 	$(MAKE) pull-bge-model
 	$(MAKE) pull-vespa
@@ -869,6 +890,7 @@ compose-up: check-docker ## Start Compose profiles (PROFILES=core,auth); build l
 	$(Q)PROFILE_ARGS=$$(printf -- '--profile %s ' $$(echo "$(COMPOSE_PROFILES)" | tr ',' ' ')); \
 		IMAGE_REGISTRY="$(IMAGE_REGISTRY)" IMAGE_TAG="$(IMAGE_TAG)" \
 		VERSION="$(VERSION)" GIT_COMMIT="$(GIT_COMMIT)" BUILD_DATE="$(BUILD_DATE)" \
+		$(USECASE_HOST_ENV) \
 		$(COMPOSE) -f "$(COMPOSE_FILE)" --env-file "$(COMPOSE_DIR)/.env" \
 			$$PROFILE_ARGS up -d --remove-orphans
 	$(Q)echo "Compose up (PROFILES=$(COMPOSE_PROFILES) IMAGE_REGISTRY=$(IMAGE_REGISTRY)). HMI http://localhost:3000"
@@ -1169,17 +1191,37 @@ pull-models: install ## Ensure local BGE-M3 under resources/modeling/net + optio
 		$(UV) run --python $(PYTHON) python -m thot.tools.search.pull_models \
 			$(if $(filter 1,$(FORCE_BGE)),--force-bge,)
 
-pull-vespa: check-docker ## Pull Vespa Docker image (VESPA_IMAGE=$(VESPA_IMAGE))
-	$(Q)echo "Pulling $(VESPA_IMAGE)…"
-	docker pull "$(VESPA_IMAGE)"
+pull-vespa: ## Pull Vespa image only when missing (FORCE_VESPA=1 refresh; skip if Docker unavailable)
+	$(Q)if ! command -v docker >/dev/null 2>&1; then \
+		echo "Docker not found — skip pull-vespa (needed later for make bootstrap)"; \
+		exit 0; \
+	fi
+	$(Q)if ! docker info >/dev/null 2>&1; then \
+		echo "Docker daemon not running — skip pull-vespa (start Docker, then: make pull-vespa)"; \
+		exit 0; \
+	fi
+	$(Q)if [ "$(FORCE_VESPA)" != "1" ] && docker image inspect "$(VESPA_IMAGE)" >/dev/null 2>&1; then \
+		echo "Vespa image already local: $(VESPA_IMAGE) — skip pull (FORCE_VESPA=1 to refresh)"; \
+	else \
+		echo "Pulling $(VESPA_IMAGE)…"; \
+		docker pull "$(VESPA_IMAGE)"; \
+	fi
 
-pull-searxng: check-docker ## Pull SearXNG Docker image (SEARXNG_IMAGE=$(SEARXNG_IMAGE))
-	$(Q)echo "Pulling $(SEARXNG_IMAGE)…"
-	docker pull "$(SEARXNG_IMAGE)"
+pull-searxng: ## Pull SearXNG image only when missing (skip if Docker unavailable)
 	$(Q)mkdir -p "$(WORKSPACE)/searxng/config" "$(WORKSPACE)/searxng/data"
 	$(Q)if [ ! -f "$(WORKSPACE)/searxng/config/settings.yml" ]; then \
 		cp "$(TKEIR_DIR)/resources/searxng/settings.yml" "$(WORKSPACE)/searxng/config/settings.yml"; \
 		echo "Installed default SearXNG settings → $(WORKSPACE)/searxng/config/settings.yml"; \
+	fi
+	$(Q)if ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then \
+		echo "Docker not available — skip pull-searxng (needed later for make searxng-up)"; \
+		exit 0; \
+	fi
+	$(Q)if docker image inspect "$(SEARXNG_IMAGE)" >/dev/null 2>&1; then \
+		echo "SearXNG image already local: $(SEARXNG_IMAGE) — skip pull"; \
+	else \
+		echo "Pulling $(SEARXNG_IMAGE)…"; \
+		docker pull "$(SEARXNG_IMAGE)"; \
 	fi
 
 searxng-up: check-docker ## Start SearXNG on :$(SEARXNG_PORT) (volumes under WORKSPACE/searxng)
@@ -1277,6 +1319,33 @@ index-fixtures: ## [ingest] Build indexing fixtures (PDF → *.pipeline.json)
 		exit 1; \
 	}
 
+CORPUS_INPUT ?=
+CORPUS_OUTPUT ?=
+CORPUS_NAME ?=
+
+CORPUS_MARKDOWN_DIR ?=
+CORPUS_CONVERT ?=
+CORPUS_WORKERS ?=
+CORPUS_FORCE ?=
+
+corpus: install ## [ingest] Source/markdown dir → {dataset,records} JSON (CORPUS_INPUT, CORPUS_OUTPUT)
+	$(Q)test -n "$(CORPUS_INPUT)" || { \
+		echo "Set CORPUS_INPUT=/path/to/source-or-markdown-dir"; \
+		exit 1; \
+	}
+	$(Q)test -n "$(CORPUS_OUTPUT)" || { \
+		echo "Set CORPUS_OUTPUT=/path/to/corpus.json"; \
+		exit 1; \
+	}
+	cd $(TKEIR_DIR) && $(UV) run --python $(PYTHON) python -m thot.tools.corpus \
+		-i "$(CORPUS_INPUT)" \
+		-o "$(CORPUS_OUTPUT)" \
+		$(if $(CORPUS_NAME),--name "$(CORPUS_NAME)",) \
+		$(if $(CORPUS_MARKDOWN_DIR),--markdown-dir "$(CORPUS_MARKDOWN_DIR)",) \
+		$(if $(CORPUS_CONVERT),--convert,) \
+		$(if $(CORPUS_WORKERS),--workers "$(CORPUS_WORKERS)",) \
+		$(if $(CORPUS_FORCE),--force,)
+
 index: install init ## [ingest] Embed + index pipeline JSON (thot.tools.ingest.index_documents)
 	$(Q)test -d "$(INDEX_INPUT)" || { \
 		echo "Missing indexing fixtures: $(INDEX_INPUT)"; \
@@ -1310,6 +1379,7 @@ ingest: install install-spacy-models ## [ingest] Start tkeir-ingest API on host 
 		VESPA_USER_SPACE="$(or $(VESPA_USER_SPACE),dev@tkeir)" \
 		TKEIR_WORKSPACE="$(WORKSPACE)" \
 		TKEIR_REPO_ROOT="$(ROOT)" \
+		$(USECASE_HOST_ENV) \
 		$(AUDIT_HOST_ENV) \
 		$(UV) run --python $(PYTHON) tkeir-ingest
 
@@ -1321,6 +1391,7 @@ rag: install install-spacy-models ## [search] Start FastAPI RAG API on host (:80
 	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)" "$(INGEST_ROOT_HOST)" "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)"
 	cd $(TKEIR_DIR) && GOVERNOR_STATE_ROOT="$(GOVERNOR_STATE_ROOT)" \
 		INGEST_ROOT="$(INGEST_ROOT_HOST)" \
+		$(USECASE_HOST_ENV) \
 		$(AUDIT_HOST_ENV) \
 		$(UV) run --python $(PYTHON) python -m thot.tools.search.app
 
@@ -1362,8 +1433,7 @@ AGENT_POLL_SECONDS ?= 2
 AGENT_POLL_ATTEMPTS ?= 90
 WORKFLOW_POLL_ATTEMPTS ?= 180
 # Orchestrator report-form maps: datasets/<usecase>/agent_orchestrator.yaml
-# Override for enterprise: make agent TKEIR_AGENT_USECASE=enterprise
-TKEIR_AGENT_USECASE ?= osint
+# Override: make agent USECASE=<pack>  (or TKEIR_AGENT_USECASE=enterprise)
 TKEIR_AGENT_ORCHESTRATOR_CONFIG ?= $(ROOT)/datasets/$(TKEIR_AGENT_USECASE)/agent_orchestrator.yaml
 # Persona wiki merges often need >5m on local Ollama; override with
 # LLM_GENERATE_TIMEOUT_SECONDS=…
@@ -1373,12 +1443,12 @@ agent: spire-up ## Start tkeir-agent HTTP service (:8092)
 	$(Q)mkdir -p "$(AUDIT_ROOT)" "$(AUDIT_WORM_ROOT)" "$(WORKSPACE)/users" "$(AGENT_ROOT)"
 	$(Q)test -f "$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" || { \
 		echo "Missing agent orchestrator config: $(TKEIR_AGENT_ORCHESTRATOR_CONFIG)"; \
-		echo "Set TKEIR_AGENT_USECASE=osint|enterprise or TKEIR_AGENT_ORCHESTRATOR_CONFIG=…"; \
+		echo "Set USECASE=<pack> (osint|enterprise|…) or TKEIR_AGENT_ORCHESTRATOR_CONFIG=…"; \
 		exit 1; \
 	}
 	cd $(TKEIR_DIR) && AGENT_ROOT="$(AGENT_ROOT)" \
 		TKEIR_WORKSPACE="$(WORKSPACE)" \
-		TKEIR_AGENT_USECASE="$(TKEIR_AGENT_USECASE)" \
+		$(USECASE_HOST_ENV) \
 		TKEIR_AGENT_ORCHESTRATOR_CONFIG="$(TKEIR_AGENT_ORCHESTRATOR_CONFIG)" \
 		SPIFFE_ENFORCE="$${SPIFFE_ENFORCE:-true}" \
 		LLM_GENERATE_TIMEOUT_SECONDS="$(LLM_GENERATE_TIMEOUT_SECONDS)" \
@@ -1493,6 +1563,7 @@ keycloak-sync-demo-users: check-curl ## Ensure demo persona users/roles/clearanc
 		KEYCLOAK_ADMIN="$(KEYCLOAK_ADMIN)" \
 		KEYCLOAK_ADMIN_PASSWORD="$(KEYCLOAK_ADMIN_PASSWORD)" \
 		KEYCLOAK_REALM="$(KEYCLOAK_REALM)" \
+		$(USECASE_HOST_ENV) \
 		python3 "$(SCRIPTS_DIR)/cluster/keycloak-sync-demo-users.py"
 
 keycloak-purge-demo-users: ## Remove demo persona users from Keycloak (best-effort)
@@ -1546,7 +1617,13 @@ hmi-up: ## Start tkeir-hmi Next.js UI on host (:3000)
 	$(Q)test -d "$(HMI_DIR)/node_modules" || $(MAKE) hmi-install
 	$(Q)test -f "$(HMI_DIR)/.env.local" \
 		|| cp "$(HMI_DIR)/.env.local.example" "$(HMI_DIR)/.env.local"
-	cd $(HMI_DIR) && npm run dev
+	$(Q)USECASE_HMI="$(ROOT)/datasets/$(TKEIR_USECASE)/hmi.json"; \
+		if [ -f "$$USECASE_HMI" ]; then \
+		  cp "$$USECASE_HMI" "$(HMI_DIR)/public/usecase.json"; \
+		else \
+		  cp "$(ROOT)/datasets/osint/hmi.json" "$(HMI_DIR)/public/usecase.json"; \
+		fi
+	cd $(HMI_DIR) && NEXT_PUBLIC_TKEIR_USECASE="$(TKEIR_USECASE)" npm run dev
 
 governor-up: ## Start governor API on host (:8094)
 	$(Q)mkdir -p "$(GOVERNOR_STATE_ROOT)"
@@ -1607,6 +1684,9 @@ INGEST_API_URL         ?= http://localhost:8091
 INGEST_TOKEN_URL       ?= http://localhost:8082/realms/tkeir/protocol/openid-connect/token
 INGEST_WORKERS         ?= 1
 INGEST_FLAGS           ?=
+# JSON-records ingest for a custom pack: datasets/<usecase>/<usecase>.json
+JSON_RECORDS_PATH      ?= $(TKEIR_USECASE)/$(TKEIR_USECASE).json
+JSON_RECORDS_LIMIT     ?= 100
 # Appended when STOP_ON_FAILED=1 (see ingest target too).
 _STOP_ON_FAILED_FLAG = $(if $(filter 1 true TRUE yes YES,$(STOP_ON_FAILED)),--stop-on-failed,)
 
@@ -1661,7 +1741,8 @@ define _require_datasets_ontologies
 	fi
 endef
 
-datasets-ingest: ## [datasets] Ingest OSINT+Enterprise via :8091 (OSINT with ontologies; enterprise without)
+datasets-ingest: ## [datasets] Ingest the selected USECASE via :8091 (osint default: OSINT+Enterprise)
+ifeq ($(TKEIR_USECASE),osint)
 	$(call _require_datasets_ontologies)
 	$(_DATASETS_RUN) $(_INGEST_PY) \
 	  --datasets-dir $(DATASETS_OUT) \
@@ -1688,6 +1769,29 @@ datasets-ingest: ## [datasets] Ingest OSINT+Enterprise via :8091 (OSINT with ont
 	@echo "If API was down (P1): make images && make compose-up PROFILES=core,ingest"
 	@echo "OSINT ingested with ontologies; enterprise ingested without"
 	@echo "Debug tip: make ingest STOP_ON_FAILED=1  &&  make datasets-ingest STOP_ON_FAILED=1"
+else ifeq ($(TKEIR_USECASE),enterprise)
+	$(MAKE) datasets-ingest-json
+	@echo "Enterprise json-records queued (datasets/enterprise/enterprise.json)."
+	@echo "Generated AcmeSystems tree (manifest.json): make datasets && make datasets-ingest-admin"
+else
+	$(MAKE) datasets-ingest-json
+endif
+
+datasets-ingest-json: check-curl ## [datasets] POST /ingest/json-records for datasets/<usecase>/<usecase>.json
+	$(Q)test -e "$(DATASETS_OUT)/$(JSON_RECORDS_PATH)" || { \
+	  echo "Missing $(DATASETS_OUT)/$(JSON_RECORDS_PATH)"; \
+	  echo "See docs/tools/usecase.md (corpus layout)."; \
+	  exit 1; \
+	}
+	$(Q)echo "Ingesting $(JSON_RECORDS_PATH) via $(INGEST_API_URL)/ingest/json-records (limit=$(JSON_RECORDS_LIMIT))"
+	$(Q)JSON_RECORDS_PATH="$(JSON_RECORDS_PATH)" \
+		JSON_RECORDS_LIMIT="$(JSON_RECORDS_LIMIT)" \
+		TKEIR_USECASE="$(TKEIR_USECASE)" \
+		python3 -c 'import json,os; limit=os.environ.get("JSON_RECORDS_LIMIT","100").strip(); path=os.environ["JSON_RECORDS_PATH"]; ds=os.environ.get("TKEIR_USECASE","osint"); body={"dataset_path":path,"index_target":"global","business_ontology_dataset":ds}; body.update({"limit":int(limit)} if limit and limit.lower() not in {"0","all","none"} else {}); print(json.dumps(body))' \
+	  | curl -fsS -X POST "$(INGEST_API_URL)/ingest/json-records" \
+	      -H "Content-Type: application/json" \
+	      --data-binary @-
+	@echo "Queued. Full corpus: JSON_RECORDS_LIMIT=all. Custom file: JSON_RECORDS_PATH=pack/file.json"
 
 datasets-ingest-user: ## [datasets] Ingest OSINT as demo-user (P1, Keycloak required)
 	$(call _require_datasets_ontologies)

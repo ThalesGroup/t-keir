@@ -18,10 +18,10 @@ python3 -m thot.tools.pipeline -c tkeir/configs/pipeline.yaml -i <input> -o <out
 
 ### Pipeline steps
 
-1. **converter** — raw text or office/PDF/HTML via MarkItDown into a T-KEIR document
+1. **converter** — universal extract (PDF/Office/HTML/image/ZIP/JSON/markdown) plus MarkItDown, into a T-KEIR document. OCR uses tessdata under `resources/modeling/tesseract/`; optional BLIP captions from `resources/modeling/net/blip-image-captioning-base/`.
 2. **language-detection** — detected language and confidence (`langdetect`)
 3. **resource-selection** — tokenizer trie path for the detected language (`None` when missing; processing falls back to `en` or `fr`)
-4. **tokenizer** — `content_tokens` / `title_tokens`
+4. **tokenizer** — `content_tokens` / `title_tokens` (European spaCy pipelines + Arabic `blank:ar`; see [Tokenizer](tokenizer.md))
 5. **morphosyntax** — POS and lemmas
 6. **ner** — named entities
 7. **syntax** — dependencies and knowledge-graph triples
@@ -36,6 +36,32 @@ python3 -m thot.tools.pipeline -c tkeir/configs/pipeline.yaml -i <input> -o <out
 After pipeline output is produced, index fixtures or your own JSON under
 `tests/indexing/` and start the RAG stack — see [Vespa RAG](vespa_rag.md).
 
+To turn a directory of markdown files — or a mixed-format source tree — into
+the `{dataset, records}` JSON that `POST /ingest/json-records` accepts:
+
+```shell
+# Markdown-only
+tkeir-corpus -i ./notes -o ./datasets/notes.json --name notes
+
+# Heterogeneous tree (PDF, Office, HTML, images, ZIP, JSON, CSV, …)
+tkeir-corpus \
+  -i /path/to/mixed-files \
+  -m /path/to/mixed-files-markdown \
+  -o ./datasets/mixed.json \
+  --name mixed \
+  --skip-empty
+# logs elapsed / remaining time and a conversion summary; --workers 0 is adaptive
+
+# or:
+make corpus \
+  CORPUS_INPUT=/path/to/mixed-files \
+  CORPUS_MARKDOWN_DIR=/path/to/mixed-files-markdown \
+  CORPUS_OUTPUT=./datasets/mixed.json \
+  CORPUS_NAME=mixed
+```
+
+See [Corpus tools](corpus.md) for markdown layout, CLI flags, and ingest.
+
 ### Agentic layer (MCP, agents, templates)
 
 T-KEIR also exposes the indexed corpus to **agents** and external **MCP**
@@ -47,6 +73,7 @@ needed for external MCP hosts (see [MCP](mcp.md)).
 |---|---|
 | MCP read-only tools (external clients) | `make mcp` — [MCP server](mcp.md) |
 | Single-agent / workflows | `make agent`, `make workflow-run` — [Agents](agents.md) |
+| New usecase pack | [Create a usecase pack](usecase.md) |
 | Ontology templates | `make compose TEMPLATE=synthesis_note` — [Templates](templates.md) |
 | HMI run monitor | `/agents` — [HMI](../hmi.md) |
 

@@ -12,6 +12,7 @@ import os
 
 from thot.core.ConfigurationUtils import load_json_configuration
 from thot.core.TkeirPaths import (
+    blip_model_dir,
     configs_dir,
     effective_resources_path,
     package_root,
@@ -20,6 +21,8 @@ from thot.core.TkeirPaths import (
     resolve_path,
     resolve_tkeir_paths,
     resources_dir,
+    spacy_models_dir,
+    tessdata_dir,
     vespa_dir,
 )
 
@@ -67,3 +70,8 @@ class TestTkeirPaths:
         assert os.path.isfile(rag_prompts_path())
         assert rag_prompts_path().startswith(configs_dir())
         assert vespa_dir().startswith(repo_root())
+        assert spacy_models_dir().endswith("resources/modeling/spacy")
+        assert tessdata_dir().endswith("resources/modeling/tesseract")
+        assert blip_model_dir().endswith(
+            "resources/modeling/net/blip-image-captioning-base"
+        )

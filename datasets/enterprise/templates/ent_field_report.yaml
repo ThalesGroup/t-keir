@@ -1,0 +1,50 @@
+name: ent_field_report
+version: 1
+title: Enterprise Field Report + Tasking
+description: >
+  Coverage / gap analysis and source tasking for CISO (Project MERIDIAN).
+slots:
+  - name: coverage_analysis
+    type: freeform_grounded
+    description: COVERAGE ANALYSIS — gap vs known field / open-source coverage.
+    constraints: { required: true }
+  - name: recommended_source
+    type: freeform_grounded
+    description: RECOMMENDED SOURCE — access, reliability, jurisdiction.
+    constraints: { required: false }
+  - name: suggested_tasking
+    type: freeform_grounded
+    description: SUGGESTED TASKING — requirement, deadline, KRI reference.
+    constraints: { required: false }
+  - name: supporting_keywords
+    type: keyword
+    description: Collection / source keywords
+    constraints: { min_items: 0, max_items: 12, required: false }
+markdown_template: |
+  # COVERAGE ANALYSIS / FIELD REPORT — {{ topic or "untitled" }}
+  Classification: CONFIDENTIAL — C-SUITE
+  Form: Enterprise Field Report + Tasking
+
+  {% if coverage_analysis %}
+  ## COVERAGE ANALYSIS
+
+  {{ coverage_analysis }}
+  {% endif %}
+
+  {% if recommended_source %}
+  ## RECOMMENDED SOURCE
+
+  {{ recommended_source }}
+  {% endif %}
+
+  {% if suggested_tasking %}
+  ## SUGGESTED TASKING
+
+  {{ suggested_tasking }}
+  {% endif %}
+
+  {% if supporting_keywords %}
+  ## Keywords
+
+  {{ supporting_keywords | join(", ") }}
+  {% endif %}

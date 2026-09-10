@@ -114,6 +114,26 @@ def test_enterprise_persona_workflows() -> None:
         assert any(s.compose is not None for s in wf.steps)
 
 
+def test_usecase_keycloak_packs() -> None:
+    import json
+
+    for pack in ("osint", "enterprise"):
+        root = Path(repo_root()) / "datasets" / pack
+        keycloak = json.loads(
+            (root / "keycloak.json").read_text(encoding="utf-8")
+        )
+        assert keycloak.get("users")
+        assert keycloak.get("roles")
+        verify = keycloak.get("verify") or {}
+        assert verify.get("username")
+        usernames = {u.get("username") for u in keycloak["users"]}
+        assert verify["username"] in usernames
+        hmi = json.loads((root / "hmi.json").read_text(encoding="utf-8"))
+        assert hmi.get("personas")
+        assert hmi.get("workflowPresets")
+        assert hmi.get("pageRoles")
+
+
 def test_osint_and_enterprise_briefs() -> None:
     otan = load_workflow("otan_c2_brief")
     assert any(s.agent == "wiki_writer" for s in otan.steps)

@@ -185,6 +185,17 @@ erDiagram
     string chunk_text
     tensor sparse_vector
     array_string ontology_concepts
+    array_string ontology_concept_ids
+    array_struct ontology_relations
+    array_string ontology_rel_keys
+  }
+  ONTOLOGY_CONCEPT {
+    string concept_id
+    string preferred_label
+    array_string aliases
+    array_string broader_ids
+    array_string narrower_ids
+    tensor embedding
   }
   GLOBAL {
     tensor dense_vector_hnsw
@@ -193,7 +204,11 @@ erDiagram
     string userspace_id
     tensor dense_vector
   }
+  DOC_BASE }o--o{ ONTOLOGY_CONCEPT : concept_ids
 ```
+
+`ontology_concepts` is the legacy field name (still written). Values are
+**stable concept IDs**, not labels. See [Ontology layer](ontology.md).
 
 `dense_vector` is declared on each child (not in `doc_base`): Vespa forbids
 overriding parent fields, and `global` needs HNSW while `user` needs

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight, Layers } from "lucide-react";
 
-import { ReporterChunkCard } from "@/components/reporter-chunk-card";
+import { SearchHitList } from "@/components/search-hit-list";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { OntologyCoverage } from "@/lib/ontology-coverage";
@@ -100,36 +100,13 @@ export function ReporterChunkPanel({
               .
             </p>
           ) : (
-            <ul className="space-y-2">
-              {filtered.map((chunk, index) => {
-                const cited = Boolean(
-                  highlightChunkIds?.has(chunk.chunk_id),
-                );
-                return (
-                  <div key={chunk.chunk_id} className="space-y-1">
-                    {cited && (
-                      <Badge
-                        variant="outline"
-                        className="border-primary/40 text-[10px] text-primary"
-                      >
-                        wiki citation
-                      </Badge>
-                    )}
-                    <ReporterChunkCard
-                      chunk={chunk}
-                      ontology={ontology}
-                      active={
-                        !activeChunkIds ||
-                        activeChunkIds.size === 0 ||
-                        activeChunkIds.has(chunk.chunk_id)
-                      }
-                      defaultOpen={index === 0 || cited}
-                      boCoverage={chunkCoverageById?.get(chunk.chunk_id) ?? null}
-                    />
-                  </div>
-                );
-              })}
-            </ul>
+            <SearchHitList
+              chunks={filtered}
+              ontology={ontology}
+              activeChunkIds={activeChunkIds}
+              highlightChunkIds={highlightChunkIds}
+              chunkCoverageById={chunkCoverageById}
+            />
           )}
         </div>
       )}

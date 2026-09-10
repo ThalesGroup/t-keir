@@ -80,6 +80,26 @@ def net_models_dir() -> str:
     return os.path.join(package_root(), "resources", "modeling", "net")
 
 
+def spacy_models_dir() -> str:
+    """Return the on-disk spaCy pipeline directory.
+
+    Override with ``TKEIR_SPACY_MODELS_DIR`` (tests / custom layouts).
+    Models are downloaded by ``make install-spacy-models`` / ``make setup``.
+
+    Returns:
+        Absolute path to ``resources/modeling/spacy``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import spacy_models_dir
+        >>> spacy_models_dir().endswith("resources/modeling/spacy")
+        True
+    """
+    override = os.environ.get("TKEIR_SPACY_MODELS_DIR", "").strip()
+    if override:
+        return os.path.abspath(override)
+    return os.path.join(package_root(), "resources", "modeling", "spacy")
+
+
 def bge_m3_model_dir() -> str:
     """Return the on-disk BGE-M3 directory under ``resources/modeling/net``.
 
@@ -92,6 +112,42 @@ def bge_m3_model_dir() -> str:
         True
     """
     return os.path.join(net_models_dir(), "bge-m3")
+
+
+def tessdata_dir() -> str:
+    """Return the bundled Tesseract ``*.traineddata`` directory.
+
+    Override with ``TKEIR_TESSDATA_DIR``. Downloaded by
+    ``make install-converter-models`` / ``make setup``.
+
+    Returns:
+        Absolute path to ``resources/modeling/tesseract``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import tessdata_dir
+        >>> tessdata_dir().endswith("resources/modeling/tesseract")
+        True
+    """
+    override = os.environ.get("TKEIR_TESSDATA_DIR", "").strip()
+    if override:
+        return os.path.abspath(override)
+    return os.path.join(package_root(), "resources", "modeling", "tesseract")
+
+
+def blip_model_dir() -> str:
+    """Return the local BLIP captioning directory under ``net``.
+
+    Returns:
+        Absolute path to ``resources/modeling/net/blip-image-captioning-base``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import blip_model_dir
+        >>> blip_model_dir().endswith(
+        ...     "resources/modeling/net/blip-image-captioning-base"
+        ... )
+        True
+    """
+    return os.path.join(net_models_dir(), "blip-image-captioning-base")
 
 
 def ontologies_dir() -> str:

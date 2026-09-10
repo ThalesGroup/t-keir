@@ -56,7 +56,7 @@ Options: `--build` (rebuild image), `--rebuild` (destroy and recreate). Install 
 5. Wait until the status bar shows **Dev Container: T-Keir Dev Environment** and the
    terminal prompt is inside `/workspace`.
 6. On first create, `post-create.sh` runs `make install` automatically. When it finishes,
-   run `make setup` for spaCy models and a full environment check.
+   run `make setup` for spaCy, converter models (tessdata/BLIP), BGE-M3, and a Vespa image pull if needed.
 
 ### VS Code
 
@@ -134,7 +134,7 @@ tkeir-pipeline   # runs uv run tkeir-pipeline from tkeir/
 ## Typical workflow inside the container
 
 ```bash
-# 1. Full setup (deps, spaCy models, tokenizer pickle, Tesseract check)
+# 1. Full setup (deps, spaCy, tessdata/BLIP, tokenizer pickle, Vespa image if missing)
 make setup
 
 # 2. Run pipeline on fixtures
@@ -168,7 +168,10 @@ PDFs and `tests/indexing/output` pipeline JSON).
 
 BGE-M3 for FlagEmbedding is downloaded by `make setup` /
 `make pull-bge-model` into `tkeir/resources/modeling/net/bge-m3`
-(shared with the host mount). Ollama’s `bge-m3` pull is separate and only
+(shared with the host mount). Converter tessdata and BLIP live under
+`resources/modeling/tesseract/` and
+`resources/modeling/net/blip-image-captioning-base/`
+(`make install-converter-models`). Ollama’s `bge-m3` pull is separate and only
 needed when `PROVIDER=ollama` uses the Ollama embedding backend.
 
 Ollama must run on the **host** when using `PROVIDER=ollama`:

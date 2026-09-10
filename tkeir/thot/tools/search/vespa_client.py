@@ -691,6 +691,62 @@ class VespaClient:
             "default", "user", key, payload, user_space=space
         )
 
+    async def upsert_ontology_concept(
+        self,
+        fields: dict[str, Any],
+        document_key: str,
+    ) -> None:
+        """Create or update one ``ontology_concept`` catalog document.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.upsert_ontology_concept)
+            True
+        """
+        await self._upsert_fields(
+            "default",
+            "ontology_concept",
+            document_key,
+            fields,
+            streaming=False,
+        )
+
+    async def visit_documents(
+        self,
+        document_type: str,
+        *,
+        cluster: str = "global",
+        wanted: int = 400,
+        continuation: str | None = None,
+        field_set: str | None = None,
+    ) -> dict[str, Any]:
+        """Visit documents of one type (paginated, no full corpus in memory).
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.visit_documents)
+            True
+        """
+        params: dict[str, Any] = {
+            "cluster": cluster,
+            "wantedDocumentCount": int(wanted),
+            "selection": "true",
+        }
+        if continuation:
+            params["continuation"] = continuation
+        if field_set:
+            params["fieldSet"] = field_set
+        url = f"{self._config.document_api_url}/default/{document_type}/docid/"
+        response = await self._client.get(url, params=params)
+        if response.is_error:
+            ThotLogger.error(
+                "Vespa visit failed "
+                + f"status={response.status_code} "
+                + f"body={response.text[:500]}"
+            )
+        response.raise_for_status()
+        return response.json()
+
     async def delete_user_passage(
         self,
         passage_id: str,

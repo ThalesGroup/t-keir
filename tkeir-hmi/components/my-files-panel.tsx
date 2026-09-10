@@ -29,6 +29,7 @@ import {
   type BasketItem,
 } from "@/components/my-files-basket-brief";
 import { resolveBusinessOntologyDataset } from "@/lib/business-ontology-datasets";
+import { getUsecaseConfig, hasAnyRole } from "@/lib/usecase-config";
 import { useAuth } from "@/src/auth/AuthProvider";
 import { apiFetch } from "@/src/auth/useApiClient";
 import { cn } from "@/lib/utils";
@@ -68,7 +69,6 @@ type IndexProgress = {
   active: boolean;
 };
 
-const SHARE_ROLES = ["c2-j2-analyst", "c2-moc-watch", "c2-j2x-humint"];
 const INDEX_POLL_MS = 2000;
 
 function isMarkdownPath(path: string): boolean {
@@ -109,7 +109,8 @@ export function MyFilesPanel() {
     useState<BusinessOntologyFileValue>(EMPTY_BUSINESS_ONTOLOGY_FILE);
 
   const canShareToCommander =
-    !authEnabled || SHARE_ROLES.some((role) => roles.includes(role));
+    !authEnabled ||
+    hasAnyRole(roles, getUsecaseConfig().shareRoles);
   // Every authenticated persona can index into their personal Vespa user index.
   const canIndexSelected = true;
 

@@ -17,7 +17,7 @@ The script lives at the **repository root** next to the `Makefile`:
 | Window | Command | Pane stays on | Ready when |
 |--------|---------|---------------|------------|
 | `[VESPA]` | `make vespa-up && make bootstrap` | `docker logs -f vespa` | config `:19071`, query `:8080`, app deployed |
-| `[KEYCLOAK]` | `make keycloak-up` + demo sync | `docker logs -f` keycloak (+ db) | realm + demo personas (`analyst`, `humint`, …) |
+| `[KEYCLOAK]` | `make keycloak-up` + pack sync | `docker logs -f` keycloak (+ db) | realm + `datasets/<USECASE>/keycloak.json` personas |
 | `[SPIRE]` | `make spire-up` | `docker logs -f` server + agent | SPIRE server healthy + agent running |
 | `[SEARXNG]` | `make searxng-up` | `docker logs -f searxng` | SearXNG `:8888/healthz` |
 | `[COLLECTOR]` | `make collector-up` | host process (bash on exit) | collector `:8096/health` |
@@ -39,13 +39,34 @@ On **macOS**, tmux is resolved from Homebrew first
 
 `make hmi-up` ensures `tkeir-hmi/node_modules` (via `make hmi-install` if
 needed) and copies `.env.local.example` → `.env.local` when missing, then runs
-`npm run dev` on port **3000**.
+`npm run dev` on port **3000**. It also copies `datasets/<USECASE>/hmi.json` to
+`tkeir-hmi/public/usecase.json` and sets `NEXT_PUBLIC_TKEIR_USECASE`.
+
+## Usecase pack
+
+The launcher selects `datasets/<name>/` the same way as Make:
+
+| Source | Example |
+|--------|---------|
+| env `USECASE` | `USECASE=enterprise ./start_services.sh` |
+| env `TKEIR_USECASE` | `TKEIR_USECASE=enterprise ./start_services.sh` |
+| flag `--usecase` | `./start_services.sh --usecase enterprise` |
+
+Default is **osint**. The resolved name is exported as `USECASE`,
+`TKEIR_USECASE`, `TKEIR_AGENT_USECASE`, `TKEIR_BUSINESS_ONTOLOGY_DATASET`, and
+`NEXT_PUBLIC_TKEIR_USECASE` into every tmux pane (so `CTRL+R` keeps the pack).
+The pack must contain `agent_orchestrator.yaml` and `keycloak.json`. See
+[Create a usecase pack](../tools/usecase.md).
+
+Shipped packs: **osint** (`analyst` / `c2-admin`, …) and **enterprise**
+(`ceo` / `enterprise-admin`, …).
 
 ## Prerequisites
 
 - Same host tools as [Zero to Hero §2](../zero_to_hero.md#2-prerequisites)
 - `tmux` installed (`brew install tmux` on macOS)
-- Vespa image already local (`make pull-vespa`) — `vespa-up` does **not** pull
+- Vespa image already local (`make pull-vespa`, also run by `make setup` when
+  the image is missing) — `vespa-up` does **not** pull
 - Docker daemon running (Vespa / Keycloak / SPIRE)
 
 Quick gate:
@@ -57,8 +78,13 @@ make check-install
 ## Usage
 
 ```bash
-# From the repo root — creates session tkeir-demo and attaches
+# From the repo root — creates session tkeir-demo and attaches (USECASE=osint)
 ./start_services.sh
+
+# Enterprise (or any datasets/<name>/ pack) — same launcher
+USECASE=enterprise ./start_services.sh
+# equivalent: TKEIR_USECASE=enterprise ./start_services.sh
+# equivalent: ./start_services.sh --usecase enterprise
 
 # Create windows but do not attach (nested tmux / CI)
 ./start_services.sh --no-attach

@@ -6,9 +6,12 @@ T-KEIR uses two Vespa schemas sharing `doc_base`:
 - **`user`** — streaming-mode per-tenant passages (`userspace_id` + `streaming.groupname`)
 
 Both store BGE-M3 **dense** (1024-d) + **sparse** tensors, BM25 on `chunk_text`,
-and `ontology_concepts`. Runtime search is
+and ontology concept IDs (`ontology_concepts` / `ontology_concept_ids`) plus
+optional relations. A separate `ontology_concept` schema holds the concept
+catalog. Runtime search is
 `thot.tools.search.passage_retrieval.PassageRetrievalPipeline` (modes:
-`global` | `user` | `both` | `auto`). When `search.enabled` in `rag.yaml`,
+`global` | `user` | `both` | `auto`). Ontology is an extra OR recall signal —
+see [Ontology layer](../architecture/ontology.md). When `search.enabled` in `rag.yaml`,
 each query runs the T-KEIR linguistic pipeline (NER / lemmas / keywords)
 before BGE-M3 embed and Vespa hybrid search — including BEIR smoke/eval.
 
@@ -61,6 +64,7 @@ Default index input: `tests/indexing/output`.
 | Command | Module |
 |---|---|
 | `tkeir-init-vespa` | `thot.tools.search.init_vespa` |
+| `tkeir-corpus` | `thot.tools.corpus` — [Corpus tools](corpus.md) |
 | `tkeir-index-documents` | `thot.tools.ingest.index_documents` (→ `index_passages`) |
 | `tkeir-rag` | `thot.tools.search.app` |
 
@@ -74,9 +78,15 @@ Hybrid Vespa search + optional second-stage rerank. No LLM answer generation.
 {
   "query": "Who founded Acme?",
   "language": "en",
-  "hits": 20
+  "hits": 20,
+  "concept_ids": ["technology:kubernetes"],
+  "relations": [{"predicate_id": "pred:implements"}],
+  "ontology_expand": {"include_children": false}
 }
 ```
+
+`concept_ids`, `relations`, and `ontology_expand` are optional. Text-only
+bodies keep working. Complete corpus export: `POST /ontology/export`.
 
 Response fields:
 

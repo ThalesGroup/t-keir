@@ -34,6 +34,12 @@ def test_load_rag_config_includes_dual_hybrid():
     assert config.dual_hybrid.retrieval.ranking_profile
     assert config.dual_hybrid.search_mode in {"auto", "global", "user", "both"}
     assert "default" in config.dual_hybrid.preprocessing.spacy_models
+    assert config.dual_hybrid.preprocessing.resolve_model("ar").model == (
+        "blank:ar"
+    )
+    assert config.dual_hybrid.preprocessing.resolve_model("de").model.startswith(
+        "de_"
+    )
     assert config.dual_hybrid.preprocessing.asciifold is True
     assert not hasattr(config.search, "use_parent_content")
     assert not hasattr(config.search, "use_parent_title")
@@ -46,6 +52,14 @@ def test_load_rag_config_includes_dual_hybrid():
     assert config.dual_hybrid.ontology_scoring.enabled is False
     assert config.dual_hybrid.ontology_scoring.rescore_weight > 0
     assert config.dual_hybrid.final_fusion.top_k_returned >= 1
+    assert config.dual_hybrid.ontology_layer.index_concepts is True
+    assert config.dual_hybrid.ontology_layer.relation_match in {
+        "partial",
+        "exact",
+    }
+    assert "hybrid_ontology" in (
+        config.dual_hybrid.rank_profiles.get("passage") or {}
+    )
 
 
 def test_spacy_model_resolves_by_language():
@@ -219,3 +233,19 @@ def test_text_normalizer_lemmatize_then_fold():
     out = normalizer.normalize("The cats were sitting")
     assert "cat" in out
     assert TextNormalizer.asciifold(out) == out
+
+
+def test_arabic_indexing_keeps_script_and_skips_fold():
+    from thot.tools.search.dual_hybrid_config import DualHybridConfig
+    from thot.tools.search.text_normalizer import TextNormalizer
+
+    normalizer = TextNormalizer.for_language(
+        DualHybridConfig().preprocessing, "ar"
+    )
+    assert normalizer.model == "blank:ar"
+    assert normalizer.asciifold_enabled is False
+    text = "الجيش اللبناني في بيروت"
+    out = normalizer.normalize(text)
+    assert "الجيش" in out
+    assert "اللبناني" in out
+    assert TextNormalizer.asciifold("café") == "cafe"

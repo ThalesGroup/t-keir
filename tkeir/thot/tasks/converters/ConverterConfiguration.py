@@ -59,7 +59,9 @@ class ConverterConfiguration:
             >>> cfg = ConverterConfiguration()
             >>> cfg.loads({"logger": {}, "converter": {"settings": {}}})
             >>> cfg.configuration["settings"]["ocr"]["enabled"]
-            False
+            True
+            >>> cfg.configuration["settings"]["ocr"]["captions"]
+            True
         """
         if not configuration:
             raise ValueError("Converter configuration is mandatory")
@@ -70,15 +72,27 @@ class ConverterConfiguration:
         configuration["converter"]["settings"] = {
             "output": {"zip": output.get("zip", False)},
             "ocr": {
-                "enabled": ocr.get("enabled", False),
+                "enabled": ocr.get("enabled", True),
                 "mode": ocr.get("mode", "tesseract"),
-                "min-image-pixels": ocr.get("min-image-pixels", 10000),
+                "analyze-images": ocr.get("analyze-images", True),
+                "captions": ocr.get("captions", ocr.get("blip", True)),
+                "min-image-pixels": ocr.get("min-image-pixels", 256 * 256),
                 "min-page-text-chars": ocr.get("min-page-text-chars", 40),
                 "render-dpi": ocr.get("render-dpi", 200),
                 "llm-model": ocr.get("llm-model"),
                 "llm-base-url": ocr.get("llm-base-url"),
                 "llm-api-key": ocr.get("llm-api-key"),
                 "llm-prompt": ocr.get("llm-prompt"),
+                "languages": ocr.get(
+                    "languages",
+                    "eng+fra+deu+spa+ita+nld+por+pol+ara",
+                ),
+                "max-embedded-images": ocr.get(
+                    "max-embedded-images", 256
+                ),
+                "max-pdf-images-per-page": ocr.get(
+                    "max-pdf-images-per-page", 32
+                ),
             },
         }
         self.configuration = configuration["converter"]

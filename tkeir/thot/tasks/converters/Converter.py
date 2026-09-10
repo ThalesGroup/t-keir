@@ -14,11 +14,14 @@ import json
 from thot.core.ThotLogger import ThotLogger
 from thot.tasks.converters import __date_converter__, __version_converter__
 from thot.tasks.converters.InputFormat import (
+    AUTO_DATATYPE,
+    detect_input_format,
     has_extractable_text,
     is_binary_document,
 )
 from thot.tasks.converters.MarkItDownConverter import MarkItDownConverter
 from thot.tasks.converters.RawTextConverter import RawTextConverter
+from thot.tasks.converters.UniversalConverter import UniversalConverter
 from thot.tasks.TaskInfo import TaskInfo
 
 
@@ -85,10 +88,14 @@ class Converter:
         Example:
             >>> "raw" in Converter().listTypes()
             True
+            >>> "auto" in Converter().listTypes()
+            True
         """
         self.config = config
-        self._managed_type = set(["tkeir", "raw"]) | set(
-            MarkItDownConverter.managed_types()
+        self._managed_type = (
+            set(["tkeir", "raw", AUTO_DATATYPE])
+            | set(MarkItDownConverter.managed_types())
+            | set(UniversalConverter.managed_types())
         )
 
     def listTypes(self) -> list:
@@ -183,10 +190,15 @@ class Converter:
         tkeir_doc = RawTextConverter.convert(
             data_decode, source, call_context=call_context
         )
+        extra = {"fallback-from": data_type}
+        prior = tkeir_doc.get("conversion-info") or {}
+        for key in ("text-format", "content-blocks"):
+            if key in prior:
+                extra[key] = prior[key]
         tkeir_doc["conversion-info"] = _conversion_info(
             "raw",
             len(data_decode),
-            **{"fallback-from": data_type},
+            **extra,
         )
         if image_extraction is not None:
             tkeir_doc["conversion-info"]["image-extraction"] = image_extraction
@@ -228,7 +240,9 @@ class Converter:
             )
         except ValueError as error:
             if not has_extractable_text(data_decode):
-                raise
+                return self._convert_universal_type(
+                    data_decode, source, data_type, call_context
+                )
             ThotLogger.warning(
                 "Converter could not read '"
                 + data_type
@@ -265,6 +279,36 @@ class Converter:
             )
         return tkeir_doc
 
+    def _convert_universal_type(
+        self,
+        data_decode: bytes,
+        source: str,
+        data_type: str,
+        call_context,
+    ) -> dict:
+        """Convert via the universal extractor.
+
+        Args:
+            data_decode: Raw document bytes.
+            source: Source identifier.
+            data_type: Datatype name.
+            call_context: Optional logger context.
+
+        Returns:
+            Converted T-KEIR document.
+
+        Example:
+            >>> Converter()._convert_universal_type.__name__
+            '_convert_universal_type'
+        """
+        return UniversalConverter.convert(
+            data_decode,
+            source,
+            data_type,
+            call_context=call_context,
+            ocr_config=self._ocr_config(),
+        )
+
     def convert(
         self,
         data_type: str = "raw",
@@ -292,7 +336,7 @@ class Converter:
             >>> import base64
             >>> payload = base64.b64encode(b"x").decode()
             >>> try:
-            ...     Converter().convert("unknown", payload)
+            ...     Converter().convert("not-a-format", payload)
             ... except ValueError as exc:
             ...     "not managed" in str(exc)
             ... else:
@@ -304,6 +348,12 @@ class Converter:
         if data is None:
             raise ValueError("Converter data is mandatory.")
         data_decode = base64.b64decode(data)
+        markitdown_types = set(MarkItDownConverter.managed_types())
+
+        if data_type == AUTO_DATATYPE:
+            data_type = detect_input_format(
+                source, data_decode, AUTO_DATATYPE
+            )
 
         if data_type == "tkeir":
             tkeir_doc = self._convert_tkeir_payload(data_decode, data_type)
@@ -316,11 +366,20 @@ class Converter:
             tkeir_doc = RawTextConverter.convert(
                 data_decode, source, call_context=call_context
             )
+            extra = {}
+            prior = tkeir_doc.get("conversion-info") or {}
+            for key in ("text-format", "content-blocks"):
+                if key in prior:
+                    extra[key] = prior[key]
             tkeir_doc["conversion-info"] = _conversion_info(
-                data_type, len(data_decode)
+                data_type, len(data_decode), **extra
+            )
+        elif data_type in markitdown_types:
+            tkeir_doc = self._convert_markitdown_type(
+                data_decode, source, data_type, call_context
             )
         else:
-            tkeir_doc = self._convert_markitdown_type(
+            tkeir_doc = self._convert_universal_type(
                 data_decode, source, data_type, call_context
             )
 
@@ -383,7 +442,7 @@ class Converter:
             >>> payload = base64.b64encode(b"x").decode()
             >>> try:
             ...     Converter().run(
-            ...         {"datatype": "unknown", "data": payload, "source": "file://x"}
+            ...         {"datatype": "not-a-format", "data": payload, "source": "file://x"}
             ...     )
             ... except ValueError as exc:
             ...     "not managed" in str(exc)

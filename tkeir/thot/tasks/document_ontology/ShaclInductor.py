@@ -153,16 +153,75 @@ def _collect_typed_property_constraints(
     return constraints
 
 
+MIN_COUNT_COVERAGE = 0.75
+
+
+def _property_min_count_coverage(
+    graph: Graph,
+    node_classes: frozenset[str],
+) -> dict[tuple[str, str], float]:
+    """Fraction of class instances that already have each typed property.
+
+    Example:
+        >>> from rdflib import Graph, URIRef
+        >>> from rdflib.namespace import RDF
+        >>> from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+        >>> graph = Graph()
+        >>> person = URIRef('http://ex/p')
+        >>> org = URIRef('http://ex/o')
+        >>> _ = graph.add((person, RDF.type, TKEIR.Person))
+        >>> _ = graph.add((org, RDF.type, TKEIR.Organization))
+        >>> _ = graph.add((person, TKEIR.worksFor, org))
+        >>> _property_min_count_coverage(
+        ...     graph, frozenset({'Person', 'Organization'})
+        ... )[('Person', 'worksFor')]
+        1.0
+    """
+    type_of: dict[URIRef, str] = {}
+    for subject, _pred, obj in graph.triples((None, RDF.type, None)):
+        if not isinstance(subject, URIRef) or not isinstance(obj, URIRef):
+            continue
+        name = _local_name(obj)
+        if name in node_classes:
+            type_of[subject] = name
+    instance_count: dict[str, int] = {}
+    for name in type_of.values():
+        instance_count[name] = instance_count.get(name, 0) + 1
+    holders: dict[tuple[str, str], set[URIRef]] = {}
+    for subject, predicate, obj in graph:
+        if subject not in type_of or obj not in type_of:
+            continue
+        if not isinstance(predicate, URIRef) or not isinstance(obj, URIRef):
+            continue
+        if not str(predicate).startswith(str(TKEIR)):
+            continue
+        key = (type_of[subject], _local_name(predicate))
+        holders.setdefault(key, set()).add(subject)
+    coverage: dict[tuple[str, str], float] = {}
+    for key, subjects in holders.items():
+        total = instance_count.get(key[0], 0)
+        coverage[key] = (len(subjects) / total) if total else 0.0
+    return coverage
+
+
 def _induced_property_shape_lines(
     class_label: str,
     property_label: str,
     object_classes: set[str],
+    *,
+    require_min_count: bool = True,
 ) -> list[str]:
     """Induced property shape lines helper.
 
     Example:
         >>> _induced_property_shape_lines('Person', 'worksFor', {'Organization'})[0]
         'tkeir:PersonInducedWorksForShape a sh:NodeShape ;'
+        >>> 'minCount' not in '\\n'.join(
+        ...     _induced_property_shape_lines(
+        ...         'Person', 'worksFor', {'Organization'}, require_min_count=False
+        ...     )
+        ... )
+        True
     """
     class_name = sanitize_rdf_class_name(class_label, fallback="Entity")
     property_name = sanitize_rdf_property_name(
@@ -176,16 +235,22 @@ def _induced_property_shape_lines(
         if property_name
         else "RelatedTo"
     )
-    return [
+    lines = [
         f"tkeir:{class_name}Induced{shape_property}Shape a sh:NodeShape ;",
         f"  sh:targetClass tkeir:{class_name} ;",
         "  sh:property [",
         f"    sh:path tkeir:{property_name} ;",
         f"    sh:class tkeir:{object_class} ;",
-        "    sh:minCount 1 ;",
-        "  ] .",
-        "",
     ]
+    if require_min_count:
+        lines.append("    sh:minCount 1 ;")
+    lines.extend(
+        [
+            "  ] .",
+            "",
+        ]
+    )
+    return lines
 
 
 def _metric_numeric_shape_lines() -> list[str]:
@@ -215,7 +280,9 @@ def induce_document_shacl_shapes(
 
     Starts from prefix-only base shapes, rewrites them with canonical class/property
     names from alignment, then appends induced node shapes for typed properties
-    observed in the graph.
+    observed in the graph. ``sh:minCount 1`` is only emitted when most instances
+    of the class already have that property (avoids thousands of false
+    violations on large documents).
 
     Example:
         >>> from rdflib import Graph
@@ -237,6 +304,7 @@ def induce_document_shacl_shapes(
     )
 
     constraints = _collect_typed_property_constraints(graph, node_classes)
+    coverage = _property_min_count_coverage(graph, node_classes)
     induced_lines = [
         "@prefix sh: <http://www.w3.org/ns/shacl#> .",
         "@prefix tkeir: <http://tkeir.local/ontology/> .",
@@ -264,6 +332,10 @@ def induce_document_shacl_shapes(
                     canonical_class,
                     canonical_property,
                     canonical_objects,
+                    require_min_count=(
+                        coverage.get((class_label, property_label), 0.0)
+                        >= MIN_COUNT_COVERAGE
+                    ),
                 )
             )
 

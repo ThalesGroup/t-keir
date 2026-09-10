@@ -223,11 +223,57 @@ class TestSelfHealingLoop:
             "PASSED",
             "PASSED_AFTER_REPAIR",
             "FAILED_WITH_INCOHERENCES",
+            "SKIPPED_TOO_LARGE",
+            "SKIPPED_TOO_MANY_VIOLATIONS",
         }
         assert attempts in {0, 1, 2}
         assert isinstance(incoherence_summary, dict)
         assert "total" in incoherence_summary
         assert "unresolved" in incoherence_summary
+
+    def test_skip_heal_when_graph_too_large(self):
+        graph = build_document_graph(_document_with_kg())
+        _graph, status, attempts, summary = run_self_healing_validation(
+            graph,
+            settings=SelfHealingSettings(max_graph_triples=0),
+        )
+        assert status == "SKIPPED_TOO_LARGE"
+        assert attempts == 0
+        assert summary["heal_skipped"] == "too_large"
+
+    def test_skip_heal_when_too_many_violations(self):
+        from rdflib import Graph, URIRef
+        from rdflib.namespace import RDF
+
+        from thot.tasks.document_ontology.OntologyBuilder import TKEIR
+
+        graph = Graph()
+        org = URIRef("http://ex/org")
+        graph.add((org, RDF.type, TKEIR.Organization))
+        for index in range(8):
+            person = URIRef(f"http://ex/person-{index}")
+            graph.add((person, RDF.type, TKEIR.Person))
+        shapes = (
+            "@prefix sh: <http://www.w3.org/ns/shacl#> .\n"
+            "@prefix tkeir: <http://tkeir.local/ontology/> .\n"
+            "tkeir:PersonShape a sh:NodeShape ;\n"
+            "  sh:targetClass tkeir:Person ;\n"
+            "  sh:property [\n"
+            "    sh:path tkeir:worksFor ;\n"
+            "    sh:minCount 1 ;\n"
+            "  ] .\n"
+        )
+        _graph, status, attempts, summary = run_self_healing_validation(
+            graph,
+            settings=SelfHealingSettings(
+                max_violations_to_repair=3,
+                max_repair_attempts=2,
+            ),
+            shapes_ttl=shapes,
+        )
+        assert status == "SKIPPED_TOO_MANY_VIOLATIONS"
+        assert attempts == 0
+        assert summary["heal_skipped"] == "too_many_violations"
 
 
 class TestDocumentOntologyBuilder:
@@ -255,6 +301,8 @@ class TestDocumentOntologyBuilder:
             "PASSED",
             "PASSED_AFTER_REPAIR",
             "FAILED_WITH_INCOHERENCES",
+            "SKIPPED_TOO_LARGE",
+            "SKIPPED_TOO_MANY_VIOLATIONS",
         }
         assert ontology["correction_attempts"] in {0, 1, 2}
         assert isinstance(ontology["incoherences"], dict)

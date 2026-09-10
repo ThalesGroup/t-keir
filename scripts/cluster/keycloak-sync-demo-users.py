@@ -11,6 +11,8 @@ Env:
   KEYCLOAK_ADMIN_PASSWORD   default admin
   KEYCLOAK_REALM            default tkeir
   KEYCLOAK_WAIT_SECS        default 180
+  TKEIR_USECASE             default osint (also TKEIR_AGENT_USECASE)
+                            loads datasets/<usecase>/keycloak.json
 """
 
 from __future__ import annotations
@@ -23,7 +25,16 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from pathlib import Path
 from typing import Any
+
+REPO = Path(__file__).resolve().parents[2]
+USECASE = (
+    os.environ.get("TKEIR_USECASE")
+    or os.environ.get("USECASE")
+    or os.environ.get("TKEIR_AGENT_USECASE")
+    or "osint"
+).strip().lower() or "osint"
 
 BASE = os.environ.get("KEYCLOAK_URL", "http://localhost:8082").rstrip("/")
 ADMIN = os.environ.get("KEYCLOAK_ADMIN", "admin")
@@ -31,19 +42,7 @@ PASSWORD = os.environ.get("KEYCLOAK_ADMIN_PASSWORD", "admin")
 REALM = os.environ.get("KEYCLOAK_REALM", "tkeir")
 WAIT_SECS = int(os.environ.get("KEYCLOAK_WAIT_SECS", "180"))
 
-ROLES: list[tuple[str, str, list[str] | None]] = [
-    ("c2-j2-analyst", "NATO C2 J2 analyst persona", None),
-    ("c2-moc-watch", "NATO C2 MOC watch persona", None),
-    ("c2-j2x-humint", "NATO C2 J2X HUMINT persona", None),
-    ("c2-ctf-commander", "NATO C2 CTF commander persona", None),
-    (
-        "c2-admin",
-        "NATO C2 admin persona",
-        ["tkeir-admin", "tkeir-user", "tkeir-operator", "tkeir-auditor"],
-    ),
-]
-
-USERS: list[dict[str, Any]] = [
+PLATFORM_USERS: list[dict[str, Any]] = [
     {
         "username": "demo-user",
         "email": "demo-user@tkeir",
@@ -69,54 +68,48 @@ USERS: list[dict[str, Any]] = [
         "lastName": "Admin",
         "clearance": "SECRET",
         "password": "demo-admin",
-        "roles": ["tkeir-admin", "c2-admin"],
-    },
-    {
-        "username": "analyst",
-        "email": "analyst@tkeir",
-        "firstName": "J2",
-        "lastName": "Analyst",
-        "clearance": "SECRET",
-        "password": "analyst",
-        "roles": ["c2-j2-analyst", "tkeir-user"],
-    },
-    {
-        "username": "moc-watch",
-        "email": "moc-watch@tkeir",
-        "firstName": "MOC",
-        "lastName": "Watch",
-        "clearance": "FOUO",
-        "password": "moc-watch",
-        "roles": ["c2-moc-watch", "tkeir-user"],
-    },
-    {
-        "username": "humint",
-        "email": "humint@tkeir",
-        "firstName": "J2X",
-        "lastName": "HUMINT",
-        "clearance": "SECRET",
-        "password": "humint",
-        "roles": ["c2-j2x-humint", "tkeir-user"],
-    },
-    {
-        "username": "commander",
-        "email": "commander@tkeir",
-        "firstName": "CTF",
-        "lastName": "Commander",
-        "clearance": "SECRET",
-        "password": "commander",
-        "roles": ["c2-ctf-commander", "tkeir-user"],
-    },
-    {
-        "username": "c2-admin",
-        "email": "c2-admin@tkeir",
-        "firstName": "C2",
-        "lastName": "Admin",
-        "clearance": "SECRET",
-        "password": "c2-admin",
-        "roles": ["c2-admin", "tkeir-admin"],
+        "roles": ["tkeir-admin"],
     },
 ]
+
+
+def load_usecase_keycloak(usecase: str) -> dict[str, Any]:
+    """Load ``datasets/<usecase>/keycloak.json`` (roles, users, verify)."""
+    path = REPO / "datasets" / usecase / "keycloak.json"
+    if not path.is_file():
+        raise SystemExit(
+            f"Missing Keycloak pack {path}. "
+            "Set TKEIR_USECASE to a pack that has datasets/<name>/keycloak.json."
+        )
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise SystemExit(f"Invalid Keycloak pack (not an object): {path}")
+    return payload
+
+
+def pack_roles(pack: dict[str, Any]) -> list[tuple[str, str, list[str] | None]]:
+    """Turn pack role rows into (name, description, composites)."""
+    out: list[tuple[str, str, list[str] | None]] = []
+    for row in pack.get("roles") or []:
+        if not isinstance(row, dict) or not row.get("name"):
+            continue
+        composites = row.get("composites")
+        names = (
+            [str(x) for x in composites]
+            if isinstance(composites, list) and composites
+            else None
+        )
+        out.append(
+            (str(row["name"]), str(row.get("description") or ""), names)
+        )
+    return out
+
+
+def pack_users(pack: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return persona user specs from a usecase pack."""
+    users = pack.get("users") or []
+    return [u for u in users if isinstance(u, dict) and u.get("username")]
+
 
 CLIENTS_NEEDING_CLEARANCE = ("tkeir-hmi", "tkeir-cli")
 CLIENTS_NEEDING_ROLES_SCOPE = ("tkeir-hmi", "tkeir-cli")
@@ -623,44 +616,64 @@ def ensure_user(token: str, spec: dict[str, Any]) -> None:
             print(f"  warn: roles for {username}: {st} {body}", file=sys.stderr)
 
 
-def verify_analyst() -> None:
+def verify_pack_user(spec: dict[str, Any]) -> None:
+    """Password-grant a pack user and check required roles/clearance."""
+    username = str(spec.get("username") or "")
+    password = str(spec.get("password") or username)
+    required_role = str(spec.get("role") or "")
+    required_clearance = spec.get("clearance")
+    if not username:
+        raise SystemExit("keycloak.json verify block missing username")
     st, body = _request(
         "POST",
         f"/realms/{REALM}/protocol/openid-connect/token",
         form={
             "client_id": "tkeir-cli",
-            "username": "analyst",
-            "password": "analyst",
+            "username": username,
+            "password": password,
             "grant_type": "password",
         },
     )
     if st != 200 or not isinstance(body, dict) or not body.get("access_token"):
-        raise SystemExit(f"Verify analyst login failed: {st} {body}")
+        raise SystemExit(f"Verify {username} login failed: {st} {body}")
     payload = body["access_token"].split(".")[1]
     payload += "=" * (-len(payload) % 4)
     claims = json.loads(base64.urlsafe_b64decode(payload))
     roles = (claims.get("realm_access") or {}).get("roles") or claims.get("roles") or []
     clearance = claims.get("clearance")
-    print(
-        f"verify analyst: clearance={clearance!r} roles={sorted(r for r in roles if r.startswith('c2-') or r.startswith('tkeir-'))}"
+    tagged = sorted(
+        r
+        for r in roles
+        if r.startswith("c2-")
+        or r.startswith("tkeir-")
+        or r.startswith("ent-")
     )
-    if "c2-j2-analyst" not in roles:
-        raise SystemExit("analyst token missing c2-j2-analyst role")
-    if clearance != "SECRET":
-        raise SystemExit(f"analyst token missing clearance=SECRET (got {clearance!r})")
+    print(f"verify {username}: clearance={clearance!r} roles={tagged}")
+    if required_role and required_role not in roles:
+        raise SystemExit(f"{username} token missing {required_role} role")
+    if required_clearance is not None and clearance != required_clearance:
+        raise SystemExit(
+            f"{username} token missing clearance={required_clearance!r} "
+            f"(got {clearance!r})"
+        )
 
 
 def main() -> int:
-    print(f"Syncing demo users on {BASE} realm={REALM} …")
+    pack = load_usecase_keycloak(USECASE)
+    roles = pack_roles(pack)
+    users = PLATFORM_USERS + pack_users(pack)
+    print(f"Syncing demo users on {BASE} realm={REALM} usecase={USECASE} …")
     token = wait_for_admin_token()
     ensure_unmanaged_attributes(token)
-    for name, desc, composites in ROLES:
+    for name, desc, composites in roles:
         ensure_role(token, name, desc, composites)
     roles_scope_id = ensure_roles_client_scope(token)
     ensure_clients(token, roles_scope_id)
-    for user in USERS:
+    for user in users:
         ensure_user(token, user)
-    verify_analyst()
+    verify = pack.get("verify") or {}
+    if isinstance(verify, dict) and verify.get("username"):
+        verify_pack_user(verify)
     print("Demo users ready (password = username for each account).")
     return 0
 

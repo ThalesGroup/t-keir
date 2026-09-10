@@ -8,10 +8,13 @@ Licensed under the MIT License.
 
 from pathlib import Path
 
+import pytest
+
 from thot.agent.orchestrator_config import (
     clear_orchestrator_config_cache,
     load_orchestrator_config,
     orchestrator_config_paths,
+    resolve_usecase,
 )
 
 
@@ -37,6 +40,24 @@ def test_load_enterprise_orchestrator_config():
     assert cfg.template_for("field_report") == "ent_field_report"
     assert cfg.template_for("decision_brief") == "ent_decision_brief"
     assert "ent_board_sitrep slots" in cfg.slot_hint_for("board_sitrep")
+
+
+def test_resolve_usecase_prefers_tkeir_usecase(monkeypatch: pytest.MonkeyPatch):
+    for key in (
+        "TKEIR_USECASE",
+        "TKEIR_AGENT_USECASE",
+        "TKEIR_DATASET",
+        "TKEIR_BUSINESS_ONTOLOGY_DATASET",
+        "USECASE",
+    ):
+        monkeypatch.delenv(key, raising=False)
+    assert resolve_usecase() == "osint"
+    monkeypatch.setenv("USECASE", "enterprise")
+    assert resolve_usecase() == "enterprise"
+    monkeypatch.setenv("TKEIR_AGENT_USECASE", "osint")
+    monkeypatch.setenv("TKEIR_USECASE", "osint")
+    assert resolve_usecase() == "osint"
+    assert resolve_usecase("enterprise") == "enterprise"
 
 
 def test_merged_config_keeps_both_usecase_forms(tmp_path: Path):

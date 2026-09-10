@@ -1,0 +1,60 @@
+name: ent_decision_brief
+version: 1
+title: Enterprise Decision Briefing
+description: >
+  Decision-oriented briefing for CFO (Project MERIDIAN).
+slots:
+  - name: situation
+    type: freeform_grounded
+    description: SITUATION synthesis across indexes.
+    constraints: { required: true }
+  - name: kri_status
+    type: freeform_grounded
+    description: KRI STATUS and open CCIRs.
+    constraints: { required: false }
+  - name: prior_decisions
+    type: freeform_grounded
+    description: PRIOR DECISIONS from personal decision log / wiki.
+    constraints: { required: false }
+  - name: decisions_required
+    type: freeform_grounded
+    description: DECISIONS REQUIRED NOW with policy and capital context.
+    constraints: { required: true }
+  - name: constraints
+    type: freeform_grounded
+    description: CONSTRAINTS — policies, General Counsel, capital availability.
+    constraints: { required: false }
+markdown_template: |
+  # CFO DECISION BRIEFING — {{ topic or "untitled" }}
+  Classification: CONFIDENTIAL — C-SUITE
+  Form: Enterprise Decision Briefing
+
+  {% if situation %}
+  ## SITUATION
+
+  {{ situation }}
+  {% endif %}
+
+  {% if kri_status %}
+  ## KRI STATUS
+
+  {{ kri_status }}
+  {% endif %}
+
+  {% if prior_decisions %}
+  ## PRIOR DECISIONS
+
+  {{ prior_decisions }}
+  {% endif %}
+
+  {% if decisions_required %}
+  ## DECISIONS REQUIRED NOW
+
+  {{ decisions_required }}
+  {% endif %}
+
+  {% if constraints %}
+  ## CONSTRAINTS
+
+  {{ constraints }}
+  {% endif %}

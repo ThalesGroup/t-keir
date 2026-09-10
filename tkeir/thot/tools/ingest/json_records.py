@@ -19,6 +19,8 @@ import re
 from pathlib import Path
 from typing import Any, Iterator
 
+from thot.tasks.converters.MarkdownSections import looks_like_markdown
+
 # Fields treated as primary narrative — not promoted to ontology concepts.
 _NARRATIVE_KEYS = frozenset(
     {
@@ -231,17 +233,9 @@ def _concept_token(path: str, value: Any) -> str | None:
         >>> _concept_token("domain", "osint")
         'DOMAIN:osint'
     """
-    text = _scalar_to_str(value)
-    if not text or len(text) > 120:
-        return None
-    # Skip pure free-text blobs.
-    if len(text) > 64 and " " in text:
-        return None
-    path_key = re.sub(r"[^\w]+", "_", path).strip("_").upper()
-    val_key = re.sub(r"[^\w.\-]+", "_", text).strip("._")
-    if not path_key or not val_key:
-        return None
-    return f"{path_key}:{val_key}"[:180]
+    from thot.ontology.identity import legacy_json_value_id
+
+    return legacy_json_value_id(path, _scalar_to_str(value))
 
 
 def extract_record_concepts(
@@ -252,42 +246,23 @@ def extract_record_concepts(
 ) -> list[str]:
     """Promote non-narrative attribute values to ontology concept ids.
 
+    Canonical JSON IDs (``json:attribute:`` / ``json:value:``) plus legacy
+    ``PATH:value`` tokens so existing indexes keep matching.
+
     Example:
         >>> from thot.tools.ingest.json_records import extract_record_concepts
-        >>> "DOMAIN:osint" in extract_record_concepts({"domain": "osint"})
+        >>> ids = extract_record_concepts({"domain": "osint"})
+        >>> "DOMAIN:osint" in ids
+        True
+        >>> any(i.startswith("json:attribute:") for i in ids)
         True
     """
-    concepts: list[str] = []
-    seen: set[str] = set()
+    from thot.ontology.json_concepts import extract_json_concepts
 
-    def _walk(node: Any, path: str) -> None:
-        if len(concepts) >= max_concepts:
-            return
-        if isinstance(node, dict):
-            for key, child in node.items():
-                key_s = str(key)
-                leaf = f"{path}.{key_s}" if path else key_s
-                if key_s.casefold() in _NARRATIVE_KEYS:
-                    continue
-                _walk(child, leaf)
-            return
-        if isinstance(node, list):
-            for idx, child in enumerate(node):
-                if isinstance(child, (dict, list)):
-                    _walk(child, f"{path}[{idx}]")
-                else:
-                    cid = _concept_token(path, child)
-                    if cid and cid.casefold() not in seen:
-                        seen.add(cid.casefold())
-                        concepts.append(cid)
-            return
-        cid = _concept_token(path, node)
-        if cid and cid.casefold() not in seen:
-            seen.add(cid.casefold())
-            concepts.append(cid)
-
-    _walk(record, prefix)
-    return concepts[:max_concepts]
+    extracted = extract_json_concepts(
+        record, prefix=prefix, max_concepts=max_concepts
+    )
+    return extracted.chunk_ids()[:max_concepts]
 
 
 def _record_structured_metadata(record: dict[str, Any]) -> dict[str, Any]:
@@ -356,6 +331,15 @@ def split_record_documents(
         source = source_name(filename, doc_id)
         title = _scalar_to_str(record.get("title")) or doc_id
         markdown = record_to_markdown(record, source=source)
+        narrative = _scalar_to_str(
+            record.get("text")
+            or record.get("body")
+            or record.get("content")
+            or ""
+        )
+        text_format = (
+            "markdown" if looks_like_markdown(narrative) else "raw"
+        )
         concepts = extract_record_concepts(record)
         meta: dict[str, Any] = {
             "corpus": stem,
@@ -370,6 +354,7 @@ def split_record_documents(
         }
         # Domain-agnostic: OSINT pir_ref, enterprise kri_ref, nested location, …
         meta.update(_record_structured_metadata(record))
+        meta["text_format"] = text_format
         safe_id = re.sub(r"[^\w.\-]+", "_", doc_id)
         out.append(
             {
@@ -380,6 +365,7 @@ def split_record_documents(
                 "markdown": markdown,
                 "filename": f"{stem}__{safe_id}.md",
                 "record_concept_ids": concepts,
+                "record": record,
                 "metadata": meta,
             }
         )

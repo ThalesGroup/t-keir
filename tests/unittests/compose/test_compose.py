@@ -12,6 +12,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from thot.agent.registry import list_agent_names, load_agent_spec
 from thot.compose.composer import compose, fill_slot
 from thot.compose.demo_data import demo_turtles
@@ -127,6 +129,20 @@ def test_otan_templates_registered():
     ):
         assert name in list_template_names()
         spec = load_template(name)
+        assert spec.slots
+        assert spec.markdown_template.strip()
+
+
+def test_enterprise_pack_templates(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("TKEIR_USECASE", "enterprise")
+    for name in (
+        "ent_risk_summary",
+        "ent_field_report",
+        "ent_board_sitrep",
+        "ent_decision_brief",
+    ):
+        spec = load_template(name)
+        assert spec.name == name
         assert spec.slots
         assert spec.markdown_template.strip()
 

@@ -61,7 +61,9 @@ Published HTML (when available): [ThalesGroup.github.io/t-keir](https://thalesgr
 | `thot/tools/ingest` | Passage indexing into Vespa |
 | `thot/tools/search` | Retrieval / RAG API |
 | `thot/tools/eval` | BEIR smoke + full evaluation |
-| `resources/modeling/net` | Local neural weights (BGE-M3 via `make pull-bge-model`) |
+| `resources/modeling/net` | Local neural weights (BGE-M3 via `make pull-bge-model`; BLIP via `make install-converter-models`) |
+| `resources/modeling/spacy` | spaCy language pipelines (`make install-spacy-models`) |
+| `resources/modeling/tesseract` | Tesseract traineddata (`make install-converter-models`) |
 
 ## Installation
 

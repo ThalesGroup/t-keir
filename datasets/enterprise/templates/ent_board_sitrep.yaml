@@ -1,0 +1,60 @@
+name: ent_board_sitrep
+version: 1
+title: Enterprise Board SITREP
+description: >
+  Board-level situation report for CEO (Project MERIDIAN).
+slots:
+  - name: situation
+    type: freeform_grounded
+    description: SITUATION timeline of entity contacts and alerts by jurisdiction.
+    constraints: { required: true }
+  - name: entities_in_scope
+    type: freeform_grounded
+    description: ENTITIES IN SCOPE — counterparties, teams, legal exposure.
+    constraints: { required: false }
+  - name: kri_activated
+    type: freeform_grounded
+    description: KRIs activated via ontology / wiki evidence.
+    constraints: { required: false }
+  - name: recommended_action
+    type: freeform_grounded
+    description: RECOMMENDED ACTION / board escalation.
+    constraints: { required: false }
+  - name: supporting_keywords
+    type: keyword
+    description: Jurisdictional / entity keywords
+    constraints: { min_items: 0, max_items: 12, required: false }
+markdown_template: |
+  # BOARD SITREP — {{ topic or "untitled" }}
+  Classification: CONFIDENTIAL — C-SUITE
+  Form: Enterprise Board SITREP
+
+  {% if situation %}
+  ## SITUATION
+
+  {{ situation }}
+  {% endif %}
+
+  {% if entities_in_scope %}
+  ## ENTITIES IN SCOPE
+
+  {{ entities_in_scope }}
+  {% endif %}
+
+  {% if kri_activated %}
+  ## KRIs ACTIVATED
+
+  {{ kri_activated }}
+  {% endif %}
+
+  {% if recommended_action %}
+  ## RECOMMENDED ACTION
+
+  {{ recommended_action }}
+  {% endif %}
+
+  {% if supporting_keywords %}
+  ## Keywords
+
+  {{ supporting_keywords | join(", ") }}
+  {% endif %}

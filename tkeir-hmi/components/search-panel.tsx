@@ -14,7 +14,7 @@ import { BusinessOntologySelect } from "@/components/business-ontology-select";
 import { OntologyCoverageMeter } from "@/components/ontology-coverage-meter";
 import { OntologyNavigator } from "@/components/ontology-navigator";
 import { OntologyReasonGraph } from "@/components/ontology-reason-graph";
-import { ReporterChunkCard } from "@/components/reporter-chunk-card";
+import { SearchHitList } from "@/components/search-hit-list";
 import {
   SearchHeader,
   type SearchParams,
@@ -38,6 +38,7 @@ import {
   type BoConceptSurface,
 } from "@/lib/ontology-coverage";
 import { weightMapsFromOntology } from "@/lib/ontology-graph";
+import { groupSearchHits } from "@/lib/search-display";
 import type {
   FusedOntology,
   SearchChunkHit,
@@ -130,6 +131,11 @@ export function SearchPanel({
       activeChunkIds.has(chunk.chunk_id),
     );
   }, [retrievedChunks, activeChunkIds]);
+
+  const visibleGroups = useMemo(
+    () => groupSearchHits(visibleChunks, response?.documents ?? []),
+    [visibleChunks, response?.documents],
+  );
 
   const displayOntology = useMemo(() => {
     if (ontologyView === "query") return queryOntology;
@@ -525,13 +531,17 @@ export function SearchPanel({
 
         <div className="min-h-[28rem] space-y-3 rounded-lg border p-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium">Retrieved chunks</span>
+            <span className="text-sm font-medium">Search results</span>
             {response && (
-              <Badge variant="outline">
-                {visibleChunks.length}
+              <Badge variant="outline" className="tabular-nums">
+                {visibleGroups.length}{" "}
+                {visibleGroups.length === 1 ? "document" : "documents"}
+                {" · "}
+                {visibleChunks.length}{" "}
+                {visibleChunks.length === 1 ? "passage" : "passages"}
                 {activeChunkIds && activeChunkIds.size > 0
-                  ? ` / ${retrievedChunks.length} filtered`
-                  : ` / ${retrievedChunks.length}`}
+                  ? ` of ${retrievedChunks.length}`
+                  : ""}
               </Badge>
             )}
             {!loading && correlationId && (
@@ -550,29 +560,20 @@ export function SearchPanel({
           {!loading && response && visibleChunks.length === 0 && (
             <p className="text-sm text-muted-foreground">
               {retrievedChunks.length === 0
-                ? "No chunks retrieved for this query."
-                : "No chunks match the current ontology filter."}
+                ? "No passages retrieved for this query."
+                : "No passages match the current ontology filter."}
             </p>
           )}
 
           {!loading && visibleChunks.length > 0 && (
-            <ul className="space-y-2">
-              {visibleChunks.map((chunk, index) => (
-                <ReporterChunkCard
-                  key={chunk.chunk_id}
-                  chunk={chunk}
-                  ontology={ontology}
-                  active={
-                    !activeChunkIds ||
-                    activeChunkIds.size === 0 ||
-                    activeChunkIds.has(chunk.chunk_id)
-                  }
-                  defaultOpen={index === 0}
-                  ontologyTitle="Chunk ontology"
-                  boCoverage={chunkCoverageById.get(chunk.chunk_id) ?? null}
-                />
-              ))}
-            </ul>
+            <SearchHitList
+              chunks={visibleChunks}
+              documents={response?.documents ?? []}
+              ontology={ontology}
+              activeChunkIds={activeChunkIds}
+              chunkCoverageById={chunkCoverageById}
+              ontologyTitle="Chunk ontology"
+            />
           )}
 
           {!loading && !response && (

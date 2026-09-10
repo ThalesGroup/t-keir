@@ -16,25 +16,15 @@ import {
 import type { RuntimeConfig } from "../config/runtimeConfig";
 import { loadRuntimeConfig } from "../config/runtimeConfig";
 import { LoginGate } from "./LoginGate";
+import {
+  getUsecaseConfig,
+  loadUsecaseConfig,
+  type PersonaDef,
+} from "@/lib/usecase-config";
 
 export type Clearance = "UNCLASSIFIED" | "FOUO" | "SECRET";
 
-export type PersonaId = "analyst" | "moc-watch" | "humint" | "commander" | "admin";
-
-type PersonaDef = {
-  id: PersonaId;
-  label: string;
-  roles: string[];
-};
-
-const PERSONAS: PersonaDef[] = [
-  { id: "analyst", label: "Analyst", roles: ["c2-j2-analyst"] },
-  { id: "moc-watch", label: "MOC Watch", roles: ["c2-moc-watch"] },
-  { id: "humint", label: "HUMINT", roles: ["c2-j2x-humint"] },
-  { id: "commander", label: "Commander", roles: ["c2-ctf-commander"] },
-  // Admin persona is allowed to operate kill switches.
-  { id: "admin", label: "Admin", roles: ["c2-admin", "tkeir-admin"] },
-];
+export type PersonaId = string;
 
 type AuthState = {
   authEnabled: boolean;
@@ -85,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function boot() {
       let cfg: RuntimeConfig | null = null;
       try {
+        await loadUsecaseConfig();
         cfg = await loadRuntimeConfig();
         if (cancelled) return;
         setRuntimeConfig(cfg);
@@ -138,7 +129,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const availablePersonas = useMemo(() => {
     if (!roles.length) return [];
-    return PERSONAS.filter((p) => p.roles.some((r) => roles.includes(r)));
+    return getUsecaseConfig().personas.filter((p) =>
+      p.roles.some((r) => roles.includes(r)),
+    );
   }, [roles]);
 
   useEffect(() => {

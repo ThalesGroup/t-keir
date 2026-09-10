@@ -24,6 +24,23 @@ TEXT_EXTENSIONS = {
     ".log",
 }
 
+UNIVERSAL_EXTENSIONS = {
+    ".jpg": "image",
+    ".jpeg": "image",
+    ".gif": "image",
+    ".png": "image",
+    ".bmp": "image",
+    ".webp": "image",
+    ".tif": "image",
+    ".tiff": "image",
+    ".svg": "svg",
+    ".zip": "zip",
+    ".json": "json",
+    ".doc": "doc",
+    ".md": "md",
+    ".markdown": "md",
+}
+
 ZIP_BASED_TYPES = frozenset({"csv", "docx", "epub", "ipynb", "pptx", "xlsx"})
 
 OLE_BASED_TYPES = frozenset({"ppt", "xls", "msg"})
@@ -32,6 +49,10 @@ BINARY_MAGIC_CHECKS = (
     (b"%PDF", "pdf"),
     (b"PK\x03\x04", "zip"),
     (b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1", "ole"),
+    (b"\xff\xd8\xff", "image"),
+    (b"\x89PNG\r\n\x1a\n", "image"),
+    (b"GIF87a", "image"),
+    (b"GIF89a", "image"),
 )
 
 EXTENSION_TO_DATATYPE = {
@@ -39,6 +60,7 @@ EXTENSION_TO_DATATYPE = {
 }
 for extension in TEXT_EXTENSIONS:
     EXTENSION_TO_DATATYPE[extension] = "raw"
+EXTENSION_TO_DATATYPE.update(UNIVERSAL_EXTENSIONS)
 
 
 def _extension_datatype(path: str) -> str | None:
@@ -165,8 +187,28 @@ def _magic_matches(data_type: str, data: bytes) -> bool:
     if data_type == "rtf":
         return data.lstrip().startswith(b"{\\rtf")
 
+    if data_type == "zip":
+        return data.startswith(b"PK\x03\x04")
+
     if data_type in ZIP_BASED_TYPES:
         return data.startswith(b"PK\x03\x04")
+
+    if data_type in {"image", "tiff", "tif"}:
+        return (
+            data.startswith(b"\xff\xd8\xff")
+            or data.startswith(b"\x89PNG\r\n\x1a\n")
+            or data.startswith(b"GIF87a")
+            or data.startswith(b"GIF89a")
+            or data.startswith(b"II*\x00")
+            or data.startswith(b"MM\x00*")
+        )
+
+    if data_type == "svg":
+        head = data[:512].lstrip().lower()
+        return b"<svg" in head or head.startswith(b"<?xml")
+
+    if data_type in {"json", "md"}:
+        return has_extractable_text(data)
 
     if data_type in OLE_BASED_TYPES:
         return data.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1")
@@ -221,10 +263,8 @@ def _guess_from_content(path: str, data: bytes) -> str:
         data: File content bytes.
 
     Returns:
-        Best-effort converter datatype name.
-
-    Raises:
-        ValueError: When format cannot be detected.
+        Best-effort converter datatype name, or ``unknown`` for
+        unrecognized binary.
 
     Example:
         >>> _guess_from_content("/tmp/note.txt", b"Hello world")
@@ -238,6 +278,7 @@ def _guess_from_content(path: str, data: bytes) -> str:
         ("email", lambda: _magic_matches("email", data)),
         ("html", lambda: _magic_matches("html", data)),
         ("xml", lambda: _magic_matches("xml", data)),
+        ("image", lambda: _magic_matches("image", data)),
     )
     for data_type, matcher in checks:
         if matcher():
@@ -245,6 +286,8 @@ def _guess_from_content(path: str, data: bytes) -> str:
 
     if data.startswith(b"PK\x03\x04") and extension_type in ZIP_BASED_TYPES:
         return extension_type
+    if data.startswith(b"PK\x03\x04"):
+        return "zip"
 
     if extension_type and extension_type != "raw":
         if _compatible_with_magic(extension_type, data):
@@ -258,11 +301,7 @@ def _guess_from_content(path: str, data: bytes) -> str:
 
     if not data:
         return "raw"
-    raise ValueError(
-        "Unable to detect input format for "
-        + os.path.basename(path)
-        + "; file does not look like text or a supported binary format"
-    )
+    return "unknown"
 
 
 def detect_input_format(

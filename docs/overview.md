@@ -8,8 +8,8 @@ templates).
 
 ## Pipeline stages
 
-1. **Converter** — raw text / PDF / Office → plain content (`MarkItDown`, optional OCR)
-2. **Language detection** — select language-specific resources
+1. **Converter** — raw text / PDF / Office / image / ZIP → content (`UniversalConverter` + MarkItDown, Tesseract OCR, optional BLIP captions)
+2. **Language detection** — select language-specific resources (European spaCy + Arabic blank pipeline)
 3. **Tokenizer** — sentences, tokens, optional MWE compounds
 4. **Morphosyntax** — POS tags and lemmas (spaCy)
 5. **NER** — named entities with validation rules
@@ -43,6 +43,7 @@ generated content is approval-gated (`origin=agent-generated`).
 | Component | Entry point | Module |
 |---|---|---|
 | Document pipeline | `tkeir-pipeline` | `thot.tools.pipeline` |
+| Corpus JSON | `tkeir-corpus` | `thot.tools.corpus` |
 | Vespa indexing | `tkeir-index-documents` | `thot.tools.ingest.index_documents` |
 | Vespa RAG API | `tkeir-rag` | `thot.tools.search.app` |
 | Vespa bootstrap | `tkeir-init-vespa` | `thot.tools.search.init_vespa` |

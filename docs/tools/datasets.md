@@ -11,18 +11,23 @@ regenerate or re-download.
 
 | Dataset | Directory | Default Keycloak user | Docs |
 |--------|-----------|----------------------|------|
-| OSINT / NATO C4ISR | `datasets/osint/` | `demo-user` | 1 500 (+ versioned `corpus.jsonl`) |
-| Enterprise (AcmeSystems) | `datasets/enterprise/` | `demo-admin` | 500 gen + up to 500 downloaded |
+| OSINT / NATO C4ISR | `datasets/osint/` | `analyst` / `c2-admin` | 1 500 (+ versioned `corpus.jsonl`) |
+| Enterprise (MERIDIAN) | `datasets/enterprise/` | `ceo` / `enterprise-admin` | 1 000 json-records (`enterprise.json`) |
 
-P0 (auth off) indexes both into `dev@tkeir`. P1 Compose routes each dataset
-to its Keycloak principal so cross-user RAG returns zero hits.
+Select the demo pack with **`USECASE`** (default `osint`). That value is
+exported as `TKEIR_USECASE`, `TKEIR_AGENT_USECASE`, and
+`TKEIR_BUSINESS_ONTOLOGY_DATASET`, and Keycloak sync loads
+`datasets/<usecase>/keycloak.json`. Additional / private packs:
+[Create a usecase pack](usecase.md).
 
 ```bash
-make bootstrap && make ingest  # P0: Vespa + host ingest (:8091)
-make datasets-ingest           # ingest versioned datasets/
-make datasets-ingest-user      # P1 OSINT → demo-user
-make datasets-ingest-admin     # P1 Enterprise → demo-admin
-make datasets-ingest-web       # HMI + curl guide
+make bootstrap && make ingest              # P0: Vespa + host ingest (:8091)
+make datasets-ingest                       # OSINT+Enterprise (USECASE=osint)
+make keycloak-up                           # OSINT personas (default USECASE)
+make datasets-ingest USECASE=enterprise    # MERIDIAN json-records only
+make datasets-ingest-user                  # P1 OSINT → demo-user
+make datasets-ingest-admin                 # P1 generated AcmeSystems → demo-admin
+make datasets-ingest-web                   # HMI + curl guide
 
 # Optional (maintainers): regenerate / re-download
 make datasets
@@ -54,6 +59,9 @@ Optional `make datasets` (with download) refreshes `corpus.jsonl` /
 
 Formats (seed=42, 1 500 docs): txt, md, html, json, pdf, docx, csv under
 `raw/`, `markdown/`, `html/`, `json/`, `pdf/`, `docx/`, `csv/`.
+A markdown directory — or a mixed-format tree converted to markdown — can
+also be compiled into ingest JSON with
+`tkeir-corpus` / `make corpus` (see [Corpus tools](corpus.md)).
 
 | `topic_id` | Document types |
 |------------|----------------|
@@ -94,9 +102,25 @@ helper: `ingest_dataset.py --ontology-dir`. Details:
 
 ## Dataset B — Enterprise
 
-Fictional company **AcmeSystems** (B2B software, Paris / Berlin / Montreal).
-Offline generators cover meetings, specs, ISO procedures, HR, email, invoices,
-and KB articles. Prefer EnterpriseRAG-Bench when online:
+The **shipped demo pack** (`USECASE=enterprise`) is Project MERIDIAN: json-records
+in `datasets/enterprise/enterprise.json` (symlink to
+`enterprise_intelligence_corpus.json`), C-suite Keycloak users in
+`keycloak.json`, and HMI presets in `hmi.json`. Ontology:
+`business_ontology.yaml` → `enterprise_ontology.yaml`.
+
+```bash
+USECASE=enterprise ./start_services.sh
+make datasets-ingest USECASE=enterprise    # json-records, default 100 hits
+```
+
+Log in as `enterprise-admin` to index global data, or `ceo` / `cfo` / `cto` /
+`ciso` / `cdo` to query and wiki.
+
+A separate **generated** tree (after `make datasets`) is fictional company
+**AcmeSystems** (B2B software, Paris / Berlin / Montreal). Offline generators
+cover meetings, specs, ISO procedures, HR, email, invoices, and KB articles.
+Ingest that tree with `make datasets-ingest-admin`. Prefer EnterpriseRAG-Bench
+when online:
 
 - HuggingFace: `https://huggingface.co/datasets/onyx-dot-app/EnterpriseRAG-Bench`
 - GitHub: `https://github.com/onyx-dot-app/EnterpriseRAG-Bench`

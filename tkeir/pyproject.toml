@@ -51,6 +51,15 @@ dependencies = [
     "pyyaml>=6.0",
     "sentence-transformers>=3.0.0",
     "FlagEmbedding>=1.2.10",
+    # Universal converter (office / HTML / XML / tables). MarkItDown covers
+    # a subset; these are the extractors used by UniversalConverter.
+    "mammoth>=1.8.0",
+    "python-pptx>=0.6.23",
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.0",
+    "xlrd>=2.0.1",
+    "lxml>=4.9.0",
+    "tabulate>=0.9.0",
 ]
 
 [project.optional-dependencies]
@@ -91,6 +100,7 @@ tkeir-compose = "thot.compose.__main__:main"
 tkeir-okf = "thot.tools.okf.app:main"
 tkeir-okf-export = "thot.okf.exporter:cli_main"
 tkeir-collector = "thot.tools.collector.app:main"
+tkeir-corpus = "thot.tools.corpus.cli:main"
 
 [dependency-groups]
 dev = [
@@ -114,11 +124,22 @@ beir = [
     "rank-bm25>=0.2.2",
     "sentence-transformers>=3.0.0",
 ]
+# Optional pip fallback. Preferred install is `make install-spacy-models`,
+# which extracts these wheels into tkeir/resources/modeling/spacy/ (not the
+# venv). Arabic uses spaCy blank:ar (no Explosion 3.6 wheel).
 models = [
     "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.6.0/en_core_web_sm-3.6.0-py3-none-any.whl",
     "en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
     "fr-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.6.0/fr_core_news_sm-3.6.0-py3-none-any.whl",
     "fr-core-news-md @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.6.0/fr_core_news_md-3.6.0-py3-none-any.whl",
+    "de-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.6.0/de_core_news_sm-3.6.0-py3-none-any.whl",
+    "es-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.6.0/es_core_news_sm-3.6.0-py3-none-any.whl",
+    "it-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/it_core_news_sm-3.6.0/it_core_news_sm-3.6.0-py3-none-any.whl",
+    "pt-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.6.0/pt_core_news_sm-3.6.0-py3-none-any.whl",
+    "nl-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/nl_core_news_sm-3.6.0/nl_core_news_sm-3.6.0-py3-none-any.whl",
+    "pl-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/pl_core_news_sm-3.6.0/pl_core_news_sm-3.6.0-py3-none-any.whl",
+    "da-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/da_core_news_sm-3.6.0/da_core_news_sm-3.6.0-py3-none-any.whl",
+    "sv-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/sv_core_news_sm-3.6.0/sv_core_news_sm-3.6.0-py3-none-any.whl",
     "xx-ent-wiki-sm @ https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.6.0/xx_ent_wiki_sm-3.6.0-py3-none-any.whl",
 ]
 
@@ -163,8 +184,8 @@ directory = ".."
 [tool.hatch.build.targets.wheel]
 packages = ["thot"]
 
-# Do not force-include ``resources/modeling`` (multi-GB embedding caches).
-# Runtime resolves resources via TkeirPaths against the repo / workspace.
+# Do not force-include ``resources/modeling`` (BGE-M3 + spaCy pipelines).
+# Runtime resolves net/ and spacy/ via TkeirPaths; `make setup` downloads them.
 [tool.hatch.build.targets.wheel.force-include]
 "configs" = "tkeir/configs"
 "resources/searxng" = "tkeir/resources/searxng"
@@ -404,6 +425,22 @@ en-core-web-md = "*"
 en-core-web-sm = "*"
 fr-core-news-md = "*"
 fr-core-news-sm = "*"
+de-core-news-sm = "*"
+es-core-news-sm = "*"
+it-core-news-sm = "*"
+pt-core-news-sm = "*"
+nl-core-news-sm = "*"
+pl-core-news-sm = "*"
+da-core-news-sm = "*"
+sv-core-news-sm = "*"
+xx-ent-wiki-sm = "*"
+mammoth = "*"
+python-pptx = "*"
+python-docx = "*"
+openpyxl = "*"
+xlrd = "*"
+lxml = "*"
+tabulate = "*"
 pillow = "*"
 pymupdf = "*"
 regex = "*"

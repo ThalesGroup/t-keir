@@ -1510,12 +1510,19 @@ def _received_path_taken(target: UserWorkspace, relative_path: str) -> bool:
 
 
 def _default_business_ontology_dataset() -> str:
-    """Return rag.yaml ``dual_hybrid.business_ontology.default_dataset`` (osint).
+    """Return business-ontology dataset from env, then rag.yaml, else osint.
 
     Example:
         >>> isinstance(_default_business_ontology_dataset(), str)
         True
     """
+    from thot.tools.search.dual_hybrid_config import (
+        env_business_ontology_dataset,
+    )
+
+    env_name = env_business_ontology_dataset()
+    if env_name:
+        return env_name
     try:
         from thot.tools.search.rag_config import load_rag_config
 

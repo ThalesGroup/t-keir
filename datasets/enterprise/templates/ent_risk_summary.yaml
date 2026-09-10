@@ -1,0 +1,60 @@
+name: ent_risk_summary
+version: 1
+title: Enterprise Risk Summary
+description: >
+  Corpus-coverage / data-risk summary for CTO and CDO (Project MERIDIAN).
+slots:
+  - name: situation
+    type: freeform_grounded
+    description: SITUATION — what the corpus/wiki contains for the request.
+    constraints: { required: true }
+  - name: entity_tracking
+    type: freeform_grounded
+    description: ENTITY TRACKING — indexed entities and KRI linkages.
+    constraints: { required: false }
+  - name: evaluation
+    type: freeform_grounded
+    description: Coverage and confidence evaluation grounded in evidence.
+    constraints: { required: false }
+  - name: recommendation
+    type: freeform_grounded
+    description: RECOMMENDATION — ingest gaps, ontology fixes, CCIRs.
+    constraints: { required: false }
+  - name: supporting_keywords
+    type: keyword
+    description: Corpus / ontology keywords
+    constraints: { min_items: 0, max_items: 12, required: false }
+markdown_template: |
+  # RISK SUMMARY — {{ topic or "untitled" }}
+  Classification: CONFIDENTIAL — C-SUITE
+  Form: Enterprise Risk Summary | Period: as retrieved
+
+  {% if situation %}
+  ## SITUATION
+
+  {{ situation }}
+  {% endif %}
+
+  {% if entity_tracking %}
+  ## ENTITY TRACKING
+
+  {{ entity_tracking }}
+  {% endif %}
+
+  {% if evaluation %}
+  ## EVALUATION
+
+  {{ evaluation }}
+  {% endif %}
+
+  {% if recommendation %}
+  ## RECOMMENDATION
+
+  {{ recommendation }}
+  {% endif %}
+
+  {% if supporting_keywords %}
+  ## Keywords
+
+  {{ supporting_keywords | join(", ") }}
+  {% endif %}

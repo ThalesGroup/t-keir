@@ -79,6 +79,7 @@ def test_split_and_load():
     assert doc["metadata"]["tags"] == ["maritime", "suez"]
     # title is an ingest promo field; narrative body is excluded
     assert doc["metadata"]["title"] == "OSINT Report - Suez"
+    assert doc["metadata"]["text_format"] == "raw"
     assert "text" not in doc["metadata"]
 
     loaded = load_and_split(

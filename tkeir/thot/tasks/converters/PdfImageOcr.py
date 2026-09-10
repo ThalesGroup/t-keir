@@ -10,9 +10,12 @@ Licensed under the MIT License.
 
 import base64
 import os
+import shlex
 from io import BytesIO
+from pathlib import Path
 
 from thot.core.ThotLogger import ThotLogger
+from thot.core.TkeirPaths import tessdata_dir
 
 _OCR_PROMPT = (
     "Extract all readable text from this image. "
@@ -20,8 +23,74 @@ _OCR_PROMPT = (
 )
 
 
-def _ocr_tesseract(image_bytes: bytes) -> str:
+def tessdata_tesseract_config() -> str:
+    """Return a pytesseract ``config`` snippet for bundled tessdata.
+
+    Uses ``resources/modeling/tesseract`` when ``*.traineddata`` files
+    were installed by ``make install-converter-models``.
+
+    Returns:
+        ``--tessdata-dir …`` or an empty string.
+
+    Example:
+        >>> from thot.tasks.converters.PdfImageOcr import tessdata_tesseract_config
+        >>> isinstance(tessdata_tesseract_config(), str)
+        True
+    """
+    root = Path(tessdata_dir())
+    if not root.is_dir():
+        return ""
+    if not any(root.glob("*.traineddata")):
+        return ""
+    return "--tessdata-dir " + shlex.quote(str(root))
+
+
+def ocr_image_bytes(image_bytes: bytes, languages: str | None = None) -> str:
     """Run Tesseract OCR on image bytes.
+
+    Args:
+        image_bytes: PNG/JPEG or other image payload.
+        languages: Tesseract ``-l`` value (e.g. ``eng+ara``).
+
+    Returns:
+        Stripped OCR text.
+
+    Raises:
+        RuntimeError: When pytesseract or pillow is not installed.
+
+    Example:
+        >>> callable(ocr_image_bytes)
+        True
+    """
+    try:
+        import pytesseract
+        from PIL import Image
+    except ImportError as error:
+        raise RuntimeError(
+            "pytesseract and pillow are required for tesseract OCR mode"
+        ) from error
+
+    image = Image.open(BytesIO(image_bytes))
+    kwargs = {}
+    if languages:
+        kwargs["lang"] = languages
+    tessdata = tessdata_tesseract_config()
+    if tessdata:
+        kwargs["config"] = tessdata
+    try:
+        text = pytesseract.image_to_string(image, **kwargs)
+    except pytesseract.TesseractError:
+        fallback = dict(kwargs)
+        fallback.pop("lang", None)
+        try:
+            text = pytesseract.image_to_string(image, **fallback)
+        except pytesseract.TesseractError:
+            text = pytesseract.image_to_string(image)
+    return text.strip()
+
+
+def _ocr_tesseract(image_bytes: bytes) -> str:
+    """Run Tesseract OCR on image bytes (English default).
 
     Args:
         image_bytes: PNG or other image payload.
@@ -36,17 +105,7 @@ def _ocr_tesseract(image_bytes: bytes) -> str:
         >>> isinstance(_ocr_tesseract, type(lambda: None))
         True
     """
-    try:
-        import pytesseract
-        from PIL import Image
-    except ImportError as error:
-        raise RuntimeError(
-            "pytesseract and pillow are required for tesseract OCR mode"
-        ) from error
-
-    image = Image.open(BytesIO(image_bytes))
-    text = pytesseract.image_to_string(image)
-    return text.strip()
+    return ocr_image_bytes(image_bytes)
 
 
 def _ocr_llm(image_bytes: bytes, ocr_config: dict) -> str:
@@ -131,7 +190,8 @@ def _run_ocr(image_bytes: bytes, ocr_config: dict) -> str:
     mode = (ocr_config.get("mode") or "tesseract").lower()
     if mode == "llm":
         return _ocr_llm(image_bytes, ocr_config)
-    return _ocr_tesseract(image_bytes)
+    languages = ocr_config.get("languages")
+    return ocr_image_bytes(image_bytes, languages=languages)
 
 
 def _bbox_is_large_enough(bbox: tuple, ocr_config: dict) -> bool:
@@ -148,7 +208,7 @@ def _bbox_is_large_enough(bbox: tuple, ocr_config: dict) -> bool:
         >>> _bbox_is_large_enough((0, 0, 200, 200), {"min-image-pixels": 100})
         True
     """
-    min_pixels = int(ocr_config.get("min-image-pixels", 10000))
+    min_pixels = int(ocr_config.get("min-image-pixels", 256 * 256))
     width = max(0.0, bbox[2] - bbox[0])
     height = max(0.0, bbox[3] - bbox[1])
     return width * height >= min_pixels
@@ -204,6 +264,8 @@ def _ocr_image_region(
         clip = fitz.Rect(bbox)
         render_dpi = int(ocr_config.get("render-dpi", 200))
         pixmap = page.get_pixmap(dpi=render_dpi, clip=clip)
+        if pixmap.width < 256 and pixmap.height < 256:
+            return ""
         return _run_ocr(pixmap.tobytes("png"), ocr_config)
     except Exception as error:
         ThotLogger.warning(
@@ -288,6 +350,24 @@ def _page_elements(
     return [text for _, text in elements]
 
 
+def _ocr_is_enabled(ocr_config: dict | None) -> bool:
+    """Return True when PDF image OCR should run.
+
+    ``None`` means default on. Pass ``{"enabled": False}`` to skip.
+
+    Example:
+        >>> _ocr_is_enabled(None)
+        True
+        >>> _ocr_is_enabled({"enabled": False})
+        False
+        >>> _ocr_is_enabled({})
+        True
+    """
+    if ocr_config is None:
+        return True
+    return bool(ocr_config.get("enabled", True))
+
+
 def build_pdf_content_with_ocr(
     pdf_bytes: bytes, ocr_config: dict | None = None, call_context=None
 ) -> tuple[str, dict]:
@@ -295,7 +375,8 @@ def build_pdf_content_with_ocr(
 
     Args:
         pdf_bytes: Raw PDF file bytes.
-        ocr_config: OCR settings; disabled configs return empty content.
+        ocr_config: OCR settings. ``None`` enables Tesseract; pass
+            ``{"enabled": False}`` to skip.
         call_context: Optional logger context.
 
     Returns:
@@ -309,13 +390,13 @@ def build_pdf_content_with_ocr(
         False
     """
     ocr_stats = {
-        "enabled": bool(ocr_config and ocr_config.get("enabled")),
+        "enabled": _ocr_is_enabled(ocr_config),
         "used": False,
         "mode": (ocr_config or {}).get("mode"),
         "image-regions": 0,
         "scanned-pages": 0,
     }
-    if not ocr_config or not ocr_config.get("enabled"):
+    if not _ocr_is_enabled(ocr_config):
         return "", ocr_stats
 
     try:
@@ -334,7 +415,7 @@ def build_pdf_content_with_ocr(
             parts = _page_elements(
                 page,
                 page_number,
-                ocr_config,
+                ocr_config or {},
                 call_context=call_context,
                 ocr_stats=ocr_stats,
             )
@@ -355,7 +436,8 @@ def extract_pdf_image_text(
 
     Args:
         pdf_bytes: Raw PDF file bytes.
-        ocr_config: OCR settings; disabled configs return an empty list.
+        ocr_config: OCR settings. ``None`` enables Tesseract; pass
+            ``{"enabled": False}`` to skip.
         call_context: Optional logger context.
 
     Returns:
@@ -365,7 +447,7 @@ def extract_pdf_image_text(
         >>> extract_pdf_image_text(b"%PDF", {"enabled": False})
         []
     """
-    if not ocr_config or not ocr_config.get("enabled"):
+    if not _ocr_is_enabled(ocr_config):
         return []
 
     try:

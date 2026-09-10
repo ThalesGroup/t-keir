@@ -30,7 +30,7 @@ pipeline:
 |-------|------|-------------|
 | `logger.logging-level` | string | Process log level for the pipeline run |
 | `pipeline.default-language` | string | ISO-ish language code used when detection is missing / low confidence |
-| `pipeline.configs.converter` | path | Raw / PDF / Office → T-KEIR document ([Converter](../tools/converter.md)) |
+| `pipeline.configs.converter` | path | Raw / PDF / Office / image / ZIP → T-KEIR document ([Converter](../tools/converter.md)) |
 | `pipeline.configs.tokenizer` | path | Tokens + MWE ([Tokenizer](../tools/tokenizer.md)) |
 | `pipeline.configs.morphosyntax` | path | POS / lemmas ([MS tagger](../tools/mstagger.md)) |
 | `pipeline.configs.ner` | path | Named entities ([NER](../tools/nertagger.md)) |

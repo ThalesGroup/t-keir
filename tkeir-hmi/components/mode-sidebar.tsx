@@ -52,7 +52,7 @@ const INGEST_MODE = {
   id: "ingest" as const,
   title: "Ingest",
   blurb:
-    "Queue global corpus ingest (JSON records → NLP → Vespa). Visible to c2-admin.",
+    "Queue global corpus ingest (JSON records → NLP → Vespa). Visible to corpus admins.",
   icon: Upload,
 };
 

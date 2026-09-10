@@ -1,0 +1,76 @@
+{# First-class ontology concept catalog (not duplicated into every chunk). #}
+schema ontology_concept {
+    document ontology_concept {
+        field concept_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field concept_type type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field preferred_label type string {
+            indexing: summary | index
+            index: enable-bm25
+        }
+        field aliases type array<string> {
+            indexing: summary | index
+            index: enable-bm25
+        }
+        field definition type string {
+            indexing: summary | index
+            index: enable-bm25
+        }
+        field parent_ids type array<string> {
+            indexing: summary | attribute
+        }
+        field broader_ids type array<string> {
+            indexing: summary | attribute
+        }
+        field narrower_ids type array<string> {
+            indexing: summary | attribute
+        }
+        field related_ids type array<string> {
+            indexing: summary | attribute
+        }
+        field provenance type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field source_ref type string {
+            indexing: summary | attribute
+        }
+        # Optional dense embedding of preferred label + definition.
+        field embedding type tensor<float>(x[{{ embedding_dim }}]) {
+            indexing: attribute | index
+            attribute {
+                distance-metric: angular
+            }
+            index {
+                hnsw {
+                    max-links-per-node: 16
+                    neighbors-to-explore-at-insert: 200
+                }
+            }
+        }
+    }
+
+    fieldset default {
+        fields: preferred_label, aliases, definition
+    }
+
+    rank-profile lexical {
+        first-phase {
+            expression: bm25(preferred_label) + bm25(definition)
+        }
+    }
+
+    rank-profile semantic {
+        inputs {
+            query(q_dense) tensor<float>(x[{{ embedding_dim }}])
+        }
+        first-phase {
+            expression: closeness(field, embedding)
+        }
+    }
+}

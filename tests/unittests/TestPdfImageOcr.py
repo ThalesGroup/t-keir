@@ -33,8 +33,8 @@ class TestPdfImageOcr:
         )
         assert content == ""
         assert stats["enabled"] is False
-        content, _stats = build_pdf_content_with_ocr(pdf_bytes, None)
-        assert content == ""
+        content, stats = build_pdf_content_with_ocr(pdf_bytes, None)
+        assert stats["enabled"] is True
 
     @patch("thot.tasks.converters.PdfImageOcr._run_ocr")
     def test_page_image_ocr_comes_before_page_text(
@@ -82,10 +82,9 @@ class TestPdfImageOcr:
             "pdf",
             ocr_config={"enabled": True},
         )
-        assert "Diagram labels" in document["content"][0]
-        assert document["content"][0].find("Diagram labels") < document[
-            "content"
-        ][0].find("Title text")
+        joined = "\n\n".join(document["content"])
+        assert "Diagram labels" in joined
+        assert joined.find("Diagram labels") < joined.find("Title text")
 
     @patch("pytesseract.image_to_string", return_value="  hello world  ")
     @patch("PIL.Image.open")

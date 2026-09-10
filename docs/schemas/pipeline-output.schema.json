@@ -713,8 +713,14 @@
         },
         "shacl_status": {
           "type": "string",
-          "enum": ["PASSED", "PASSED_AFTER_REPAIR", "FAILED_WITH_INCOHERENCES"],
-          "description": "Outcome of SHACL validation after optional rule-based self-healing."
+          "enum": [
+            "PASSED",
+            "PASSED_AFTER_REPAIR",
+            "FAILED_WITH_INCOHERENCES",
+            "SKIPPED_TOO_LARGE",
+            "SKIPPED_TOO_MANY_VIOLATIONS"
+          ],
+          "description": "Outcome of SHACL validation after optional rule-based self-healing. SKIPPED_* means the graph was still serialized; repair was not run because the graph or violation count exceeded caps."
         },
         "correction_attempts": {
           "type": "integer",

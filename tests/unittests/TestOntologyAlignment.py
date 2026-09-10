@@ -154,3 +154,29 @@ def test_induce_document_shacl_shapes_uses_canonical_paths():
     canonical_property = report["property_map"]["writtenBy"]
     assert f"tkeir:{canonical_property}" in shapes_ttl
     assert "Induced" in shapes_ttl
+
+
+def _person_org_graph(person_count: int, with_works_for: int) -> Graph:
+    graph = Graph()
+    org = URIRef("http://ex/org")
+    graph.add((org, RDF.type, TKEIR.Organization))
+    graph.add((org, RDFS.label, Literal("Org")))
+    for index in range(person_count):
+        person = URIRef(f"http://ex/person-{index}")
+        graph.add((person, RDF.type, TKEIR.Person))
+        graph.add((person, RDFS.label, Literal(f"Person {index}")))
+        if index < with_works_for:
+            graph.add((person, TKEIR.worksFor, org))
+    return graph
+
+
+def test_induce_omits_min_count_for_sparse_properties():
+    shapes_ttl = induce_document_shacl_shapes(_person_org_graph(10, 1))
+    assert "tkeir:worksFor" in shapes_ttl
+    assert "sh:minCount 1" not in shapes_ttl
+
+
+def test_induce_adds_min_count_when_coverage_is_high():
+    shapes_ttl = induce_document_shacl_shapes(_person_org_graph(10, 8))
+    assert "tkeir:worksFor" in shapes_ttl
+    assert "sh:minCount 1" in shapes_ttl

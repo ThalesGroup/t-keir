@@ -150,13 +150,13 @@ Text normalization for the **query** (and for indexing-side ontology / expansion
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `asciifold` | bool | `true` | Strip diacritics after lemmatization (`unicodedata` NFKD) |
+| `asciifold` | bool | `true` | Strip Latin diacritics after lemmatization (`unicodedata` NFKD). **Disabled automatically for Arabic** (and other non-Latin scripts: `he`, `fa`, `ur`, `zh`, `ja`, `ko`) |
 | `min_token_length` | int | `3` | Drop shorter lemmas |
 | `drop_numbers` | bool | `true` | Drop spaCy `like_num` tokens |
 | `extra_stopwords` | list[str] | `[]` | Added to the spaCy model stop list (domain terms only; prefer empty) |
-| `spacy_models` | map | — | Per-language model name (string) or `{model: …}`. **`default` (or `xx`) is mandatory** |
+| `spacy_models` | map | — | Per-language model name (string) or `{model: …}`. **`default` (or `xx`) is mandatory**. European languages use spaCy `*_sm` pipelines; **Arabic is `blank:ar`** (no Explosion 3.6 trained model) |
 
-Language selection: request `language` / detected document language → matching key → else `default`.
+Language selection: request `language` / detected document language → matching key → else `default`. Missing language-specific wheels fall back to `xx_ent_wiki_sm`. Tokenizer Latin infix rules are **not** applied to Arabic.
 
 Implementation: `thot.tools.search.text_normalizer.TextNormalizer`.
 
@@ -213,6 +213,41 @@ hybrid biases toward dense; T-KEIR must not dilute it with BM25/ontology noise).
 
 There is **no** question-embedding arm and **no** separate document schema.
 
+#### `hybrid_ontology`
+
+Vespa profile **inherits** `hybrid` (same first-phase). When the request
+includes `concept_ids` / `relations`, the application adds overlap terms
+using `concept` / `relation` weights (defaults 0.15 / 0.10). Text-only
+queries do not use these weights.
+
+See [Ontology layer](../architecture/ontology.md).
+
+### `ontology_layer`
+
+```yaml
+dual_hybrid:
+  ontology_layer:
+    index_concepts: true
+    embed_concepts: false
+    json_structural_concepts: true
+    max_concepts_per_chunk: 64
+    max_relations_per_chunk: 32
+    relation_match: partial   # exact | partial
+    expansion:
+      include_children: false
+      include_parents: false
+      include_related: false
+      max_depth: 1
+      max_ids: 32
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `index_concepts` | true | Upsert `ontology_concept` catalog docs at index time |
+| `embed_concepts` | false | Off by default (index throughput); lexical concept lookup still works |
+| `json_structural_concepts` | true | Mint JSON attribute/value concepts |
+| `relation_match` | partial | Exact compact-key vs partial struct-slot YQL |
+
 ### `business_ontology`
 
 External SKOS-like catalog loaded from
@@ -245,7 +280,8 @@ dual_hybrid:
 | Ingest | `business_ontology_dataset` on `/ingest/json-records`, `/workspace/index` | Stamped into NLP extras for annotation |
 
 Known catalogs on disk (also listed in the HMI picker): `osint`, `scifact`,
-`fiqa`, `arguana`, `scidocs`. Collector topics map to the same ids via
+`fiqa`, `arguana`, `scidocs`. Add a private pack with
+[Create a usecase pack](../tools/usecase.md). Collector topics map to the same ids via
 `configs/collector/topics.yaml`.
 
 When `search_enabled` is true and the client sends neither a dataset nor a
@@ -383,7 +419,7 @@ Loaded alongside `rag.yaml` by the RAG FastAPI app. Edit strings carefully: they
 ## Operational checklist
 
 1. Change passage rank weights → `make schemas` → redeploy Vespa → reindex if fieldset / linguistics change.
-2. Change spaCy models → install the named model (`python -m spacy download <model>`).
+2. Change spaCy models → `make install-spacy-models` (extracts wheels into `tkeir/resources/modeling/spacy`).
 3. Change `embedding_dim` → regenerate schemas **and** re-embed the corpus (BGE-M3 dim is 1024).
 4. Validate with `make beir-smoke` / `make eval-smoke` (production config only; no smoke-local fusion retunes).
 5. Rollback to QueryAnalyzer path: `dual_hybrid.enabled: false` (see [migration runbook](../runbooks/dual-hybrid-migration.md)).

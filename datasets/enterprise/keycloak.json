@@ -1,0 +1,91 @@
+{
+  "roles": [
+    {
+      "name": "ent-ceo",
+      "description": "Enterprise CEO persona"
+    },
+    {
+      "name": "ent-cfo",
+      "description": "Enterprise CFO persona"
+    },
+    {
+      "name": "ent-cto",
+      "description": "Enterprise CTO persona"
+    },
+    {
+      "name": "ent-ciso",
+      "description": "Enterprise CISO persona"
+    },
+    {
+      "name": "ent-cdo",
+      "description": "Enterprise CDO persona"
+    },
+    {
+      "name": "ent-admin",
+      "description": "Enterprise corpus administrator (index shared / global data)",
+      "composites": ["tkeir-admin", "tkeir-user", "tkeir-operator", "tkeir-auditor"]
+    }
+  ],
+  "users": [
+    {
+      "username": "ceo",
+      "email": "ceo@tkeir",
+      "firstName": "Chief",
+      "lastName": "Executive",
+      "clearance": "SECRET",
+      "password": "ceo",
+      "roles": ["ent-ceo", "tkeir-user"]
+    },
+    {
+      "username": "cfo",
+      "email": "cfo@tkeir",
+      "firstName": "Chief",
+      "lastName": "Financial",
+      "clearance": "SECRET",
+      "password": "cfo",
+      "roles": ["ent-cfo", "tkeir-user"]
+    },
+    {
+      "username": "cto",
+      "email": "cto@tkeir",
+      "firstName": "Chief",
+      "lastName": "Technology",
+      "clearance": "SECRET",
+      "password": "cto",
+      "roles": ["ent-cto", "tkeir-user"]
+    },
+    {
+      "username": "ciso",
+      "email": "ciso@tkeir",
+      "firstName": "Chief",
+      "lastName": "Security",
+      "clearance": "SECRET",
+      "password": "ciso",
+      "roles": ["ent-ciso", "tkeir-user"]
+    },
+    {
+      "username": "cdo",
+      "email": "cdo@tkeir",
+      "firstName": "Chief",
+      "lastName": "Data",
+      "clearance": "SECRET",
+      "password": "cdo",
+      "roles": ["ent-cdo", "tkeir-user"]
+    },
+    {
+      "username": "enterprise-admin",
+      "email": "enterprise-admin@tkeir",
+      "firstName": "Enterprise",
+      "lastName": "Admin",
+      "clearance": "SECRET",
+      "password": "enterprise-admin",
+      "roles": ["ent-admin", "tkeir-admin"]
+    }
+  ],
+  "verify": {
+    "username": "ceo",
+    "password": "ceo",
+    "role": "ent-ceo",
+    "clearance": "SECRET"
+  }
+}

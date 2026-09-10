@@ -37,9 +37,40 @@ Default port: **8091**.
 ### JSON record corpora (admin / OSINT)
 
 For files such as `datasets/osint/c2_middle_east_multi_source_1000_v3_en.json`
-(`{ "records": [ … ] }`):
+(`{ "dataset": {…}, "records": [ … ] }`). Each record needs `doc_id`,
+`title`, and `text`; extra fields become ontology concepts.
+
+Build that JSON from a markdown directory (`# title` + body, optional YAML
+frontmatter and `## Information` bullets) or from a mixed-format tree
+(UniversalConverter → parallel markdown, then the same JSON). Full examples:
+[Corpus tools](../tools/corpus.md).
+
+```bash
+# Markdown-only
+make corpus CORPUS_INPUT=./notes CORPUS_OUTPUT=./datasets/notes.json CORPUS_NAME=notes
+tkeir-corpus -i ./notes -o ./datasets/notes.json --name notes
+
+# Heterogeneous files (PDF, Office, HTML, images, ZIP, JSON, CSV, …)
+tkeir-corpus \
+  -i /path/to/mixed-files \
+  -m /path/to/mixed-files-markdown \
+  -o ./datasets/mixed.json \
+  --name mixed \
+  --skip-empty
+
+make corpus \
+  CORPUS_INPUT=/path/to/mixed-files \
+  CORPUS_MARKDOWN_DIR=/path/to/mixed-files-markdown \
+  CORPUS_OUTPUT=./datasets/mixed.json \
+  CORPUS_NAME=mixed
+```
+
+Then ingest the file:
 
 1. Each record becomes one Markdown document (title, text, and every attribute).
+   The converter detects whether the record body is markdown or raw prose and
+   splits T-KEIR `content` on paragraphs / headings (`Parent / Child` for
+   subsections). Structured fields stay in `## Information` as their own block.
 2. Source id is `{filename_stem}/{doc_id}` (e.g. `c2_middle_east_…/C2-202606-0001`).
 3. Non-narrative fields are promoted to `record_concept_ids` → Vespa
    `ontology_concepts`, and copied into document `metadata` (domain-agnostic:

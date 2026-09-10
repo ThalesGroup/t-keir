@@ -13,11 +13,11 @@
 | `tkeir-indexer-slim` | same, `INSTALL_OCR=0` | `PYTHON_BASE` | same without Tesseract |
 | `tkeir-hmi` | `Dockerfile.tkeir-hmi` | `NODE_BASE` | Next.js standalone (:3000) |
 
-`tkeir-lib` runs `uv sync` **once** (including `--group audit` and
-`--group models` so `tkeir-ingest` can run the spaCy pipeline). Python service
-images are thin layers (`FROM tkeir-lib`) so the base is not rebuilt per
-container. HMI is Node-only; indexer keeps a separate tree (also `models` +
-optional OCR).
+`tkeir-lib` runs `uv sync` **once** (including `--group audit`) and extracts
+spaCy pipelines into `resources/modeling/spacy` so `tkeir-ingest` can run the
+NLP pipeline. Python service images are thin layers (`FROM tkeir-lib`) so the
+base is not rebuilt per container. HMI is Node-only; indexer keeps a separate
+tree (also spaCy resources + optional OCR).
 
 Registry (local default): `local` — see `deploy/versions.lock.yaml`.
 Publish: `make images-push IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir`.

@@ -290,6 +290,24 @@ class TestPipelineRunner:
         mock_syntax_cls.assert_called_once()
         mock_keywords_cls.assert_called_once()
 
+    def test_input_file_label_uses_content_not_unknown(self):
+        assert (
+            PipelineRunner._input_file_label(
+                {"content": ["OSINT Report Suez Gulf Approach"]}
+            )
+            == "OSINT Report Suez Gulf Approach"
+        )
+        assert PipelineRunner._input_file_label({}) == "in-memory"
+        assert (
+            PipelineRunner._input_file_label({"source": "file:///tmp/a.txt"})
+            == "/tmp/a.txt"
+        )
+        long_query = "A" * 90
+        label = PipelineRunner._input_file_label({"content": [long_query]})
+        assert label.endswith("...")
+        assert len(label) == 72
+        assert "unknown" not in label
+
     @patch("thot.tasks.pipeline.PipelineRunner.MorphoSyntacticTagger")
     def test_morphosyntax_not_reloaded_for_same_language(
         self, mock_morphosyntax_cls

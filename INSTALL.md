@@ -19,8 +19,10 @@ This file is the **root pointer** to the canonical guides.
 Vespa uses **`global`** (shared) + **`user`** (streaming) with local group
 **`dev@tkeir`**; Keycloak isolation starts at P1 — see
 [Zero to Hero §4–5](docs/zero_to_hero.md#4-p0--vespa-rag--hmi).
-`make setup` also places BGE-M3 under `tkeir/resources/modeling/net/bge-m3`
-and pulls the Vespa Docker image (`make pull-vespa`).
+`make setup` also places BGE-M3 under `tkeir/resources/modeling/net/bge-m3`,
+converter tessdata / BLIP under `resources/modeling/`, and pulls the Vespa
+Docker image **only if it is not already local** (`make pull-vespa`;
+`FORCE_VESPA=1` to refresh).
 Keep using the [dev container](docs/devcontainer.md) when you prefer that.
 
 Version pins for third-party images and charts live in

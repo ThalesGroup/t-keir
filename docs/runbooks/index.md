@@ -9,6 +9,7 @@ Operational procedures for the platform layer:
 | [Injection incident](injection-incident.md) | Prompt injection in corpus/tools |
 | [Retract generated content](retract-generated.md) | Unpublish agent-generated docs |
 | [Passage schema migration](dual-hybrid-migration.md) | Reindex after `doc_base` / `global` / `user` deploy |
+| [Ontology schema migration](ontology-migration.md) | Additive concept catalog + chunk relation fields |
 | [Configuration → rag.yaml](../configuration/rag.yaml.md) | Passage retrieval / RAG config reference |
 | Incident / early-warning templates | Phase 9 (`tkeir-audit incident`) |
 | Rollback index | `make rollback-index RUN=…` |

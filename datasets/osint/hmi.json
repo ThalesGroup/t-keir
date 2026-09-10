@@ -1,0 +1,84 @@
+{
+  "personas": [
+    { "id": "analyst", "label": "Analyst", "roles": ["c2-j2-analyst"] },
+    { "id": "moc-watch", "label": "MOC Watch", "roles": ["c2-moc-watch"] },
+    { "id": "humint", "label": "HUMINT", "roles": ["c2-j2x-humint"] },
+    { "id": "commander", "label": "Commander", "roles": ["c2-ctf-commander"] },
+    { "id": "admin", "label": "Admin", "roles": ["c2-admin", "tkeir-admin"] }
+  ],
+  "workflowPresets": [
+    {
+      "role": "c2-j2-analyst",
+      "personaId": "analyst",
+      "label": "J2 Analyst",
+      "reportForm": "intsum",
+      "goal": "Tell me everything the system knows about MT RED SEA EAGLE.",
+      "topic": "MT RED SEA EAGLE",
+      "workflow": "persona_j2_analyst",
+      "wikiPrompt": "j2_analyst_prompt",
+      "answerTemplate": "otan_intsum"
+    },
+    {
+      "role": "c2-moc-watch",
+      "personaId": "moc-watch",
+      "label": "MOC Watch",
+      "reportForm": "sitrep",
+      "goal": "Summarise the Gulf of Aden situation for the 08:00 SITREP.",
+      "topic": "Gulf of Aden / Bab-el-Mandeb",
+      "workflow": "persona_moc_watch",
+      "wikiPrompt": "moc_watch_prompt",
+      "answerTemplate": "otan_sitrep"
+    },
+    {
+      "role": "c2-j2x-humint",
+      "personaId": "humint",
+      "label": "J2X HUMINT",
+      "reportForm": "spotrep",
+      "goal": "Which sources can I task on Fujairah OPL to cover PIR-02?",
+      "topic": "PIR-02 / Fujairah OPL",
+      "workflow": "persona_j2x_humint",
+      "wikiPrompt": "j2x_humint_prompt",
+      "answerTemplate": "otan_spotrep"
+    },
+    {
+      "role": "c2-ctf-commander",
+      "personaId": "commander",
+      "label": "CTF Commander",
+      "reportForm": "commander_brief",
+      "goal": "Brief me — RED SEA EAGLE situation, decisions outstanding.",
+      "topic": "MT RED SEA EAGLE",
+      "workflow": "persona_ctf_commander",
+      "wikiPrompt": "ctf_commander_prompt",
+      "answerTemplate": "otan_commander_brief"
+    },
+    {
+      "role": "c2-admin",
+      "personaId": "admin",
+      "label": "Admin",
+      "reportForm": "intsum",
+      "goal": "Report what the shared corpus knows about MT RED SEA EAGLE.",
+      "topic": "MT RED SEA EAGLE",
+      "workflow": "persona_admin",
+      "wikiPrompt": "admin_prompt",
+      "answerTemplate": "otan_intsum"
+    }
+  ],
+  "pageRoles": [
+    "c2-j2-analyst",
+    "c2-moc-watch",
+    "c2-j2x-humint",
+    "c2-ctf-commander",
+    "c2-admin",
+    "tkeir-admin"
+  ],
+  "adminRoles": ["c2-admin", "tkeir-admin"],
+  "ingestRoles": ["c2-admin", "tkeir-admin"],
+  "shareRoles": ["c2-j2-analyst", "c2-moc-watch", "c2-j2x-humint"],
+  "demoAccounts": [
+    { "user": "analyst", "password": "analyst", "clearance": "SECRET", "role": "J2 Analyst" },
+    { "user": "moc-watch", "password": "moc-watch", "clearance": "FOUO", "role": "MOC Watch" },
+    { "user": "humint", "password": "humint", "clearance": "SECRET", "role": "HUMINT" },
+    { "user": "commander", "password": "commander", "clearance": "SECRET", "role": "CTF Commander" },
+    { "user": "c2-admin", "password": "c2-admin", "clearance": "SECRET", "role": "Admin" }
+  ]
+}

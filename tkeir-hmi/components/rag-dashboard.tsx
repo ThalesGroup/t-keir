@@ -20,6 +20,7 @@ import type {
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/src/auth/AuthProvider";
+import { getUsecaseConfig, hasAnyRole } from "@/lib/usecase-config";
 
 const VALID_MODES = new Set<WorkspaceMode>([
   "search",
@@ -51,8 +52,7 @@ export function RagDashboard({
   initialMode?: string | null;
 } = {}) {
   const { roles } = useAuth();
-  const canIngest =
-    roles.includes("c2-admin") || roles.includes("tkeir-admin");
+  const canIngest = hasAnyRole(roles, getUsecaseConfig().ingestRoles);
   const [mode, setMode] = useState<WorkspaceMode>(() =>
     parseInitialMode(initialMode),
   );

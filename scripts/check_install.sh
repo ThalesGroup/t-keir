@@ -277,26 +277,30 @@ elif ! have "$UV" || [[ ! -d "${TKEIR_DIR}/.venv" ]]; then
 else
   models_out="$(
     cd "${TKEIR_DIR}" && "$UV" run --no-sync --python "$PYTHON" python - <<'PY' 2>/dev/null || true
-import importlib.util
-models = [
-    "en_core_web_sm",
-    "en_core_web_md",
-    "fr_core_news_sm",
-    "fr_core_news_md",
-    "xx_ent_wiki_sm",
-]
-missing = [m for m in models if importlib.util.find_spec(m) is None]
-print("MISSING=" + ",".join(missing))
-print("PRESENT=" + ",".join(m for m in models if importlib.util.find_spec(m) is not None))
+from thot.core.SpacyModelLoader import spacy_model_is_available
+from thot.tools.install_spacy_models import CORE_SPACY_MODELS, EXTRA_SPACY_MODELS
+
+core_missing = [m for m in CORE_SPACY_MODELS if not spacy_model_is_available(m)]
+core_present = [m for m in CORE_SPACY_MODELS if spacy_model_is_available(m)]
+extra_missing = [m for m in EXTRA_SPACY_MODELS if not spacy_model_is_available(m)]
+print("MISSING=" + ",".join(core_missing))
+print("PRESENT=" + ",".join(core_present))
+print("EXTRA_MISSING=" + ",".join(extra_missing))
 PY
   )"
   missing="$(printf '%s\n' "$models_out" | sed -n 's/^MISSING=//p' | tail -n 1)"
   present="$(printf '%s\n' "$models_out" | sed -n 's/^PRESENT=//p' | tail -n 1)"
+  extra_missing="$(printf '%s\n' "$models_out" | sed -n 's/^EXTRA_MISSING=//p' | tail -n 1)"
   if [[ -z "$missing" ]]; then
-    pass "spaCy models: ${present:-all}"
+    pass "spaCy models (resources/modeling/spacy or venv): ${present:-all}"
   else
     fail "spaCy models missing: ${missing} — run: make install-spacy-models"
     [[ -n "$present" ]] && warn "spaCy models present: ${present}"
+  fi
+  if [[ -z "$extra_missing" ]]; then
+    pass "extra European spaCy sm models installed"
+  else
+    warn "extra European spaCy models missing: ${extra_missing} (indexing falls back to xx_ent_wiki_sm)"
   fi
 fi
 
@@ -319,6 +323,20 @@ if [[ -d "$bge_dir" ]] && find "$bge_dir" -type f >/dev/null 2>&1 \
   pass "embedding model cache under resources/modeling/net"
 else
   warn "BGE-M3 / embedding cache not found — run: make pull-bge-model"
+fi
+
+tess_dir="${TKEIR_DIR}/resources/modeling/tesseract"
+if [[ -f "${tess_dir}/eng.traineddata" && -f "${tess_dir}/ara.traineddata" ]]; then
+  pass "Tesseract traineddata under resources/modeling/tesseract"
+else
+  warn "converter tessdata missing — run: make install-converter-models"
+fi
+
+blip_cfg="${TKEIR_DIR}/resources/modeling/net/blip-image-captioning-base/config.json"
+if [[ -f "$blip_cfg" ]]; then
+  pass "BLIP caption model under resources/modeling/net"
+else
+  warn "BLIP caption model not found — run: make install-converter-models"
 fi
 
 # ---------------------------------------------------------------------------
@@ -353,7 +371,7 @@ else
   if docker image inspect "$vespa_image" >/dev/null 2>&1; then
     pass "Vespa image present: $vespa_image"
   else
-    warn "Vespa image not pulled yet: $vespa_image — run: make pull-vespa"
+    warn "Vespa image not pulled yet: $vespa_image — run: make pull-vespa (needed for make bootstrap; skipped by setup when already local)"
   fi
 fi
 

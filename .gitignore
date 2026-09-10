@@ -32,6 +32,8 @@ tkeir/resources/modeling/spacy/**
 tkeir/resources/modeling/tesseract/**
 !tkeir/resources/modeling/tesseract/README.md
 !tkeir/resources/modeling/tesseract/.gitkeep
+# Compiled tokenizer MWE trie (`make init-models`)
+**/tkeir_mwe.pkl
 .pytest_cache/
 .coverage
 .coverage.*

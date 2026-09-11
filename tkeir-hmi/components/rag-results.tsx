@@ -68,6 +68,7 @@ export const RagResults = memo(function RagResults({
         highlightEntities={highlightEntities}
         highlightKeywords={highlightKeywords}
         highlightQueryTerms={highlightQueryTerms}
+        ontology={response?.ontology ?? null}
       />
 
       <p className="flex items-center gap-2 text-xs text-muted-foreground">

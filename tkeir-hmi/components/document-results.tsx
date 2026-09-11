@@ -9,14 +9,21 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { DocumentPlacesMap } from "@/components/document-places-map";
 import { MarkdownContent } from "@/components/markdown-content";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  collectLocationCandidates,
+  locationsForDocument,
+  type LocationCandidate,
+} from "@/lib/document-locations";
+import {
   chunkMatchesFilter,
   groupChunksByDocument,
   type DocumentGroup,
+  type FusedOntology,
   type RetrievedChunk,
 } from "@/lib/types";
 import { displayHitTitle, displayPassageTitle, formatSourceLabel } from "@/lib/search-display";
@@ -29,6 +36,16 @@ interface DocumentResultsProps {
   highlightEntities?: string[];
   highlightKeywords?: string[];
   highlightQueryTerms?: string[];
+  ontology?: FusedOntology | null;
+}
+
+function scrollToChunk(chunkIds: string[]) {
+  const chunkId = chunkIds[0];
+  if (!chunkId) return;
+  const element = document.querySelector(
+    `[data-chunk-id="${CSS.escape(chunkId)}"]`,
+  );
+  element?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 const ChunkBlock = memo(function ChunkBlock({
@@ -85,6 +102,7 @@ const DocumentCard = memo(function DocumentCard({
   highlightEntities,
   highlightKeywords,
   highlightQueryTerms,
+  placeCandidates,
 }: {
   group: DocumentGroup;
   activeChunkIds: Set<string> | null;
@@ -92,6 +110,7 @@ const DocumentCard = memo(function DocumentCard({
   highlightEntities: string[];
   highlightKeywords: string[];
   highlightQueryTerms: string[];
+  placeCandidates: LocationCandidate[];
 }) {
   const visibleChunks = useMemo(
     () =>
@@ -139,7 +158,14 @@ const DocumentCard = memo(function DocumentCard({
           </Badge>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
+        {placeCandidates.length > 0 && (
+          <DocumentPlacesMap
+            candidates={placeCandidates}
+            title="Places in this document"
+            onSelectChunkIds={scrollToChunk}
+          />
+        )}
         <Accordion
           type="multiple"
           defaultValue={
@@ -212,10 +238,23 @@ export const DocumentResults = memo(function DocumentResults({
   highlightEntities = [],
   highlightKeywords = [],
   highlightQueryTerms = [],
+  ontology = null,
 }: DocumentResultsProps) {
   const groups = useMemo(
     () => groupChunksByDocument(chunks),
     [chunks],
+  );
+  const placeCandidates = useMemo(
+    () => collectLocationCandidates(ontology, chunks),
+    [ontology, chunks],
+  );
+  const docsWithPlaces = useMemo(
+    () =>
+      groups.filter(
+        (group) =>
+          locationsForDocument(placeCandidates, group.parentDocId).length > 0,
+      ).length,
+    [groups, placeCandidates],
   );
   const hasFilter = activeChunkIds !== null && activeChunkIds.size > 0;
   const topOpenChunkId = groups[0]?.chunks[0]?.chunk_id ?? null;
@@ -246,6 +285,14 @@ export const DocumentResults = memo(function DocumentResults({
         </Badge>
       </div>
 
+      {docsWithPlaces > 1 && (
+        <DocumentPlacesMap
+          candidates={placeCandidates}
+          title="Where these documents take place"
+          onSelectChunkIds={scrollToChunk}
+        />
+      )}
+
       {groups.map((group, index) => (
         <DocumentCard
           key={group.parentDocId}
@@ -255,6 +302,10 @@ export const DocumentResults = memo(function DocumentResults({
           highlightEntities={highlightEntities}
           highlightKeywords={highlightKeywords}
           highlightQueryTerms={highlightQueryTerms}
+          placeCandidates={locationsForDocument(
+            placeCandidates,
+            group.parentDocId,
+          )}
         />
       ))}
     </div>

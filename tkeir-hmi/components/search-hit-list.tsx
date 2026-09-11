@@ -1,9 +1,15 @@
 "use client";
 
 import { FileText } from "lucide-react";
+import { useMemo } from "react";
 
+import { DocumentPlacesMap } from "@/components/document-places-map";
 import { ReporterChunkCard } from "@/components/reporter-chunk-card";
 import { Badge } from "@/components/ui/badge";
+import {
+  collectLocationCandidates,
+  locationsForDocument,
+} from "@/lib/document-locations";
 import type { OntologyCoverage } from "@/lib/ontology-coverage";
 import {
   displayPassageTitle,
@@ -16,6 +22,15 @@ import type {
   SearchChunkHit,
   SearchDocumentHit,
 } from "@/lib/types";
+
+function scrollToChunk(chunkIds: string[]) {
+  const chunkId = chunkIds[0];
+  if (!chunkId) return;
+  const element = document.querySelector(
+    `[data-chunk-id="${CSS.escape(chunkId)}"]`,
+  );
+  element?.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 
 function entityLabelsForChunk(
   ontology: FusedOntology | null,
@@ -52,24 +67,65 @@ export function SearchHitList({
   chunkCoverageById = null,
   ontologyTitle = "Chunk ontology",
 }: SearchHitListProps) {
-  const groups = groupSearchHits(chunks, documents);
+  const groups = useMemo(
+    () => groupSearchHits(chunks, documents),
+    [chunks, documents],
+  );
+  const placeCandidates = useMemo(
+    () => collectLocationCandidates(ontology, chunks),
+    [ontology, chunks],
+  );
+  const rankByChunkId = useMemo(() => {
+    const ranks = new Map<string, number>();
+    let next = 0;
+    for (const group of groups) {
+      for (const chunk of group.chunks) {
+        next += 1;
+        ranks.set(chunk.chunk_id, next);
+      }
+    }
+    return ranks;
+  }, [groups]);
+  const docsWithPlaces = groups.filter(
+    (group) =>
+      locationsForDocument(placeCandidates, group.parentDocId).length > 0,
+  ).length;
   const maxScore = chunks.reduce(
     (max, chunk) => Math.max(max, chunk.score || 0),
     0,
   );
-  let rank = 0;
 
   return (
     <div className="space-y-3">
+      {docsWithPlaces > 1 && (
+        <DocumentPlacesMap
+          candidates={placeCandidates}
+          title="Where these documents take place"
+          onSelectChunkIds={scrollToChunk}
+        />
+      )}
       {groups.map((group) => {
         const nested = group.chunks.length > 1;
+        const docPlaces = locationsForDocument(
+          placeCandidates,
+          group.parentDocId,
+        );
+        const docMap =
+          docPlaces.length > 0 ? (
+            <DocumentPlacesMap
+              candidates={docPlaces}
+              title="Places in this document"
+              onSelectChunkIds={scrollToChunk}
+            />
+          ) : null;
         if (!nested) {
           const chunk = group.chunks[0];
-          rank += 1;
+          const rank = rankByChunkId.get(chunk.chunk_id) ?? 1;
           const cited = Boolean(highlightChunkIds?.has(chunk.chunk_id));
           const entityLabels = entityLabelsForChunk(ontology, chunk.chunk_id);
           return (
-            <div key={group.parentDocId} className="space-y-1">
+            <div key={group.parentDocId} className="space-y-2">
+              {docMap}
               {cited && (
                 <Badge
                   variant="outline"
@@ -124,9 +180,10 @@ export function SearchHitList({
                 {group.chunks.length} passages
               </Badge>
             </header>
+            {docMap ? <div className="px-2 pt-2">{docMap}</div> : null}
             <ul className="space-y-2 p-2">
               {group.chunks.map((chunk, index) => {
-                rank += 1;
+                const rank = rankByChunkId.get(chunk.chunk_id) ?? 1;
                 const cited = Boolean(highlightChunkIds?.has(chunk.chunk_id));
                 const entityLabels = entityLabelsForChunk(
                   ontology,

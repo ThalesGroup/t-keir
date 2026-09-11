@@ -111,4 +111,30 @@
   .chunk-dimmed {
     @apply opacity-40;
   }
+
+  .tkeir-map-pin {
+    background: transparent;
+    border: none;
+  }
+
+  .tkeir-map-pin-dot {
+    display: block;
+    width: 14px;
+    height: 14px;
+    margin: 2px;
+    border-radius: 9999px;
+    background: hsl(var(--primary));
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 1px 4px rgb(0 0 0 / 0.35);
+  }
+
+  .leaflet-container {
+    font-family: inherit;
+    background: hsl(var(--muted));
+  }
+
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip {
+    background: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
 }

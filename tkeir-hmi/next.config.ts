@@ -1,3 +1,4 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 
 /**
@@ -6,10 +7,21 @@ import type { NextConfig } from "next";
  *
  * API access stays server-side via `API_URL` + the App Router proxy — do not
  * switch containers to `NEXT_PUBLIC_API_URL`.
+ *
+ * turbopack.root must be this app directory. A lockfile in a parent folder
+ * (repo root or $HOME) makes Turbopack treat that parent as [project] and
+ * then fail to resolve next/dist/client/components/builtin/global-error.js
+ * in the React Client Manifest.
  */
+const hmiRoot = path.resolve(__dirname);
+
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  outputFileTracingRoot: hmiRoot,
+  turbopack: {
+    root: hmiRoot,
+  },
   async headers() {
     return [
       {
@@ -31,7 +43,7 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob:",
+              "img-src 'self' data: blob: https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org",
               "font-src 'self' data:",
               // Keycloak token refresh / discovery happens in-browser.
               "connect-src 'self' http://localhost:8082 https://kc.local",

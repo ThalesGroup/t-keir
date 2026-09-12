@@ -18,7 +18,7 @@ endif
 
 .PHONY: help setup install check-uv check-docker check-git check-npm check-jq check-curl check-python-version check-secrets \
 	check-install \
-	install-tesseract install-spacy-models install-converter-models build wheel init-models geo-gazetteers \
+	install-tesseract install-spacy-models install-converter-models build wheel init-models geo-gazetteers otan-gazetteers \
 	test test-unit test-functional test-coverage coverage \
 	test-integration test-integration-ci \
 	test-fuzz-hypothesis test-fuzz-atheris test-fuzz-radamsa test-fuzz fuzz-report \
@@ -418,6 +418,9 @@ init-models: install ## Build tkeir_mwe.pkl from annotation resources (skip if p
 
 geo-gazetteers: ## Expand tokenizer/any lakes/rivers/mountains/regions from Natural Earth + GeoNames
 	python3 "$(ROOT)/scripts/build_geo_gazetteers.py"
+
+otan-gazetteers: ## Split NATO/OTAN C2 gazetteer into tokenizer/any/otan list files
+	python3 "$(ROOT)/scripts/build_otan_gazetteers.py"
 
 setup: ## Full local setup (install → spaCy → Tesseract → converter models → MWE → BGE-M3 → HMI/Node → Vespa if needed)
 	$(MAKE) install

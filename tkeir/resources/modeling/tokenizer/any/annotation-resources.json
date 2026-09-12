@@ -250,6 +250,358 @@
                     "add-ascii-folding": true,
                     "label": "os",
                     "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-area",
+                    "path": "otan/area.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.area",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-authority",
+                    "path": "otan/authority.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.authority",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-branch",
+                    "path": "otan/branch.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.branch",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-capability",
+                    "path": "otan/capability.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.capability",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-cmd",
+                    "path": "otan/cmd.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "otan.cmd",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-concept",
+                    "path": "otan/concept.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.concept",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-ctrl-measure",
+                    "path": "otan/ctrl-measure.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.ctrl_measure",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-doc",
+                    "path": "otan/doc.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.doc",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-facility",
+                    "path": "otan/facility.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "otan.facility",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-forum",
+                    "path": "otan/forum.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "otan.forum",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-info-req",
+                    "path": "otan/info-req.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.info_req",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-legal",
+                    "path": "otan/legal.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.legal",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-metric",
+                    "path": "otan/metric.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.metric",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-org",
+                    "path": "otan/org.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "otan.org",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-picture",
+                    "path": "otan/picture.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.picture",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-process",
+                    "path": "otan/process.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.process",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-resp-measure",
+                    "path": "otan/resp-measure.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.resp_measure",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-role",
+                    "path": "otan/role.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "otan.role",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-standard",
+                    "path": "otan/standard.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.standard",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-system",
+                    "path": "otan/system.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "otan.system",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-target",
+                    "path": "otan/target.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "otan.target",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "otan-unit",
+                    "path": "otan/unit.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "otan.unit",
+                    "type": "named-entity",
+                    "weight": 10
                 }
             ]
         }

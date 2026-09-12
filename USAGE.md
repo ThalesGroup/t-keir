@@ -21,6 +21,7 @@ REST `_svc.py` / `_client.py` services were removed.
   **3.11** (`make setup PYTHON=3.12` to override). **3.13+** not supported yet.
   See [Installation — Python versions](docs/installation.md#python-versions).
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- Node.js **20+** (`make setup` / `make hmi-install` installs `tkeir-hmi` deps including Cytoscape.js)
 - Docker (Vespa, Compose, dev container)
 - Tesseract OCR (optional, scanned PDFs)
 - Ollama on the host when `PROVIDER=ollama` (default)
@@ -45,7 +46,7 @@ REST `_svc.py` / `_client.py` services were removed.
 ## Setup
 
 ```bash
-make setup          # uv sync, spaCy, Tesseract, MWE, BGE-M3 → resources/modeling/net
+make setup          # uv sync, spaCy, Tesseract, MWE, BGE-M3, HMI/Node (Cytoscape)
 make init-models    # annotation pickle only (optional MWE; skipped if present)
 ```
 
@@ -70,8 +71,10 @@ make pipeline \
   PIPELINE_OUTPUT=/tmp/out
 ```
 
-`make pipeline` installs spaCy models automatically. MWE compounds are off by
-default; pass `--use-mwe` only when needed.
+`make pipeline` installs spaCy models automatically. MWE compounds are **on**
+by default (`use-mwe: true` in tokenizer/NER configs). Run `make init-models`
+so `tkeir/resources/modeling/tokenizer/any/tkeir_mwe.pkl` exists.
+Hydro/relief/region gazetteers can be refreshed with `make geo-gazetteers`.
 
 ## Vespa indexing and RAG
 

@@ -1,0 +1,257 @@
+{
+    "logger": {
+        "logging-level": "debug"
+    },
+    "resources-base-path": "resources/modeling/tokenizer/any",
+    "data": [
+        {
+            "lists": [
+                {
+                    "format": {
+                        "type": "csv",
+                        "header": false,
+                        "sep": "\t",
+                        "columns": [
+                            {
+                                "id": 4
+                            }
+                        ]
+                    },
+                    "name": "geoname-country",
+                    "path": "countryInfo.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "location.country",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "csv",
+                        "header": false,
+                        "sep": "\t",
+                        "columns": [
+                            {
+                                "id": 1
+                            },
+                            {
+                                "id": 3,
+                                "split-on": ","
+                            }
+                        ]
+                    },
+                    "download": {
+                        "url": "http://download.geonames.org/export/dump/cities5000.zip",
+                        "format": "zip"
+                    },
+                    "name": "geoname-city",
+                    "path": "cities5000.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "label": "location.city",
+                    "type": "named-entity",
+                    "add-ascii-folding": true,
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "geoname-river",
+                    "path": "rivers.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "location.river",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "geoname-mountain",
+                    "path": "mountains.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "location.mountain",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "geoname-waterbody",
+                    "path": "lakes.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "location.waterbody",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "geoname-region",
+                    "path": "regions.txt",
+                    "exceptions": [
+                        "stopwords.txt",
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "location.region",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "csv",
+                        "header": true,
+                        "sep": ",",
+                        "columns": [
+                            {
+                                "id": 2
+                            }
+                        ]
+                    },
+                    "name": "fortune500-company",
+                    "path": "../en/fortune500.csv",
+                    "exceptions": [
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "organization",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "csv",
+                        "header": true,
+                        "sep": ",",
+                        "columns": [
+                            {
+                                "id": 4
+                            }
+                        ]
+                    },
+                    "name": "fortune500-industry",
+                    "path": "../en/fortune500.csv",
+                    "exceptions": [
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "PROPN",
+                    "add-ascii-folding": true,
+                    "label": "industry",
+                    "type": "named-entity",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "csv",
+                        "header": true,
+                        "sep": ",",
+                        "columns": [
+                            {
+                                "id": 0,
+                                "concept-type": "instance"
+                            },
+                            {
+                                "id": 1,
+                                "concept-type": "parent-instance"
+                            }
+                        ]
+                    },
+                    "name": "job-title",
+                    "path": "../en/job_titles.txt",
+                    "exceptions": [
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "jobtitle",
+                    "type": "concept",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "algorithms",
+                    "path": "../en/algorithms.txt",
+                    "exceptions": [
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "algorithms",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "computer-science-terms",
+                    "path": "../en/computer-science-term.txt",
+                    "exceptions": [
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "computer-science-term",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "license",
+                    "path": "../en/licenses.txt",
+                    "exceptions": [
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "licenses",
+                    "weight": 10
+                },
+                {
+                    "format": {
+                        "type": "list"
+                    },
+                    "name": "os",
+                    "path": "../en/os.txt",
+                    "exceptions": [
+                        "../en/stopwords.txt"
+                    ],
+                    "pos": "NOUN",
+                    "add-ascii-folding": true,
+                    "label": "os",
+                    "weight": 10
+                }
+            ]
+        }
+    ]
+}

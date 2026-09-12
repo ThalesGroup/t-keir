@@ -10,7 +10,7 @@ templates).
 
 1. **Converter** — raw text / PDF / Office / image / ZIP → content (`UniversalConverter` + MarkItDown, Tesseract OCR, optional BLIP captions)
 2. **Language detection** — select language-specific resources (European spaCy + Arabic blank pipeline)
-3. **Tokenizer** — sentences, tokens, optional MWE compounds
+3. **Tokenizer** — sentences, tokens, MWE compounds (shared `tokenizer/any` gazetteers)
 4. **Morphosyntax** — POS tags and lemmas (spaCy)
 5. **NER** — named entities with validation rules
 6. **Syntax** — dependencies and Subject–Verb–Object triples

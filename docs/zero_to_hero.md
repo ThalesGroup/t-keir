@@ -116,12 +116,13 @@ installs the package, and ships models under `tkeir/resources/modeling/`:
 | Tesseract traineddata | `resources/modeling/tesseract/` | Multilingual OCR (`eng` … `ara`) |
 | BLIP-base | `resources/modeling/net/blip-image-captioning-base/` | Converter image captions |
 | BGE-M3 | `resources/modeling/net/bge-m3/` | Dense + sparse embeddings |
-| MWE trie | `resources/modeling/tokenizer/en/tkeir_mwe.pkl` | Optional compound-word tagging |
+| MWE trie | `resources/modeling/tokenizer/any/tkeir_mwe.pkl` | Compound-word tagging (cities, rivers, mountains, …) |
+| HMI Node deps | `tkeir-hmi/node_modules/` | `npm ci` including **Cytoscape.js** + fCoSE (`make hmi-install`) |
 
-`make setup` also pulls the **Vespa Docker image only if it is not already
-local** (`make pull-vespa`; `FORCE_VESPA=1` to refresh). Docker is not required
-for the NLP-only path (`make quickstart`). Use `make setup PYTHON=3.12` for
-another supported minor.
+`make setup` also runs **`make hmi-install`** (`npm ci` in `tkeir-hmi/`) and pulls
+the **Vespa Docker image only if it is not already local** (`make pull-vespa`;
+`FORCE_VESPA=1` to refresh). Docker is not required for the NLP-only path
+(`make quickstart`). Use `make setup PYTHON=3.12` for another supported minor.
 
 **Checkpoint:**
 
@@ -536,6 +537,8 @@ each target in its own window, and wait for health checks before continuing:
 ```bash
 ./start_services.sh
 # or: USECASE=enterprise ./start_services.sh
+# persist Vespa index across make down:
+# INDEX_SNAPSHOT=1 ./start_services.sh
 ```
 
 Details, shortcuts (`TAB` / `CTRL+R` / `ESC`), and failure behaviour
@@ -597,6 +600,8 @@ agent state and Compose volumes):
 make down
 # optional: stop services but keep databases
 KEEP_DATA=1 make down
+# optional: tar the Vespa volume before wipe (also used by start_services.sh)
+INDEX_SNAPSHOT=1 make save-index
 ```
 
 **Corpus loading (user + global) — through the interface**
@@ -977,6 +982,8 @@ make audit-compliance # OPA EU article audit → reports/compliance/eu-audit/
 
 Compliance mappings (engineering, **not legal advice**):
 [Compliance overview](compliance/index.md) ·
+[OPA, Rego, and OSCAL](compliance/opa-rego-oscal.md) (what the engine,
+policy language, and NIST documents are) ·
 [EU Compliance OPA Audit](compliance/eu-audit.md) (category gates,
 `NOT_MANDATORY`, full article catalogues).
 
@@ -1063,7 +1070,7 @@ make docs-build # rebuilds the full MkDocs site
 | Audit / WORM | [Audit store](deployment/audit.md) |
 | Governor | [Governor](deployment/governor.md) |
 | Security model | [Security](security.md) |
-| EU compliance OPA | [EU Compliance OPA Audit](compliance/eu-audit.md) |
+| EU compliance (OPA / Rego / OSCAL) | [OPA, Rego, and OSCAL](compliance/opa-rego-oscal.md) · [audit](compliance/eu-audit.md) |
 
 ```bash
 make help # every Make target with a one-line description

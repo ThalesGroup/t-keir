@@ -8,7 +8,7 @@ Copyright (c) 2026 Thales
 Licensed under the MIT License.
 """
 
-from thot.core.TkeirPaths import resources_dir
+from thot.core.TkeirPaths import resources_dir, shared_resources_dir
 from thot.tasks.pipeline.ResourceSelector import ResourceSelector
 
 
@@ -32,6 +32,10 @@ class TestResourceSelector:
     def test_select_empty_language(self):
         assert ResourceSelector.select("") is None
 
+    def test_select_shared_pack_is_not_a_language(self):
+        assert ResourceSelector.select("any") is None
+        assert "any" not in ResourceSelector.list_available_languages()
+
     def test_annotate_document(self):
         document = {"content": ["sample"]}
         result = ResourceSelector.annotate_document(document, "en")
@@ -39,6 +43,9 @@ class TestResourceSelector:
         assert result["resource-selection"][
             "resources-base-path"
         ] == resources_dir("en")
+        assert result["resource-selection"][
+            "shared-resources-path"
+        ] == shared_resources_dir()
 
     def test_annotate_document_missing_language_falls_back(self):
         document = {"content": ["sample"]}

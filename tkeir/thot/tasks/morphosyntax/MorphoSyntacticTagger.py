@@ -11,7 +11,7 @@ Licensed under the MIT License.
 import gc
 
 from thot.core.SpacyModelLoader import load_spacy_model
-from thot.core.Utils import ThotTokenizerToSpacy
+from thot.core.Utils import ThotTokenizerToSpacy, config_use_mwe
 from thot.tasks.morphosyntax import (
     __date_morphosyntax__,
     __version_morphosyntax__,
@@ -81,6 +81,7 @@ class MorphoSyntacticTagger:
             self._nlp.vocab,
             config.configuration["taggers"],
             call_context=call_context,
+            use_mwe=config_use_mwe(config.configuration["taggers"][0]),
         )
         self._count_run = 0
 

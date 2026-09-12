@@ -21,6 +21,8 @@ import time
 
 from spacy.tokens import Doc, Token
 
+from thot.core.TkeirPaths import DEFAULT_MWE_FILENAME
+
 
 def timeit(f):  # pragma: no cover
     """Decorator that prints the elapsed runtime of the wrapped function.
@@ -345,9 +347,6 @@ def config_use_mwe(config_entry: dict | None) -> bool:
     if not config_entry:
         return False
     return bool(config_entry.get("use-mwe", False))
-
-
-DEFAULT_MWE_FILENAME = "tkeir_mwe.pkl"
 
 
 def apply_use_mwe_to_entries(entries: list, use_mwe: bool) -> None:

@@ -73,7 +73,8 @@ needed for external MCP hosts (see [MCP](mcp.md)).
 |---|---|
 | MCP read-only tools (external clients) | `make mcp` — [MCP server](mcp.md) |
 | Single-agent / workflows | `make agent`, `make workflow-run` — [Agents](agents.md) |
-| New usecase pack | [Create a usecase pack](usecase.md) |
+| New usecase pack | [Create a usecase pack](usecase.md) (OSINT walkthrough) |
+| YAML field effects | [Configuration](../configuration/index.md) |
 | Ontology templates | `make compose TEMPLATE=synthesis_note` — [Templates](templates.md) |
 | HMI run monitor | `/agents` — [HMI](../hmi.md) |
 
@@ -90,16 +91,16 @@ Before the first run, build the multi-word expression pickle (`thot/tools/annota
 
 ```shell
 tkeir-create-annotation-resource \
-  --entries-file resources/modeling/tokenizer/en/annotation-resources.json \
-  --output resources/modeling/tokenizer/en/tkeir_mwe.pkl
+  --entries-file resources/modeling/tokenizer/any/annotation-resources.json \
+  --output resources/modeling/tokenizer/any/tkeir_mwe.pkl
 ```
 
 Or from source:
 
 ```shell
 python3 -m thot.tools.annotation.create_annotation_resource \
-  --entries-file resources/modeling/tokenizer/en/annotation-resources.json \
-  --output resources/modeling/tokenizer/en/tkeir_mwe.pkl
+  --entries-file resources/modeling/tokenizer/any/annotation-resources.json \
+  --output resources/modeling/tokenizer/any/tkeir_mwe.pkl
 ```
 
 ### Per-task configuration

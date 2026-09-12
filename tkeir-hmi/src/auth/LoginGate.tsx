@@ -19,8 +19,8 @@ export function LoginGate({
     <div className="flex min-h-[70vh] items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">T-KEIR</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-3xl font-semibold tracking-tight">T-KEIR</h1>
+          <p className="text-base text-muted-foreground">
             Sign in with Keycloak to continue. Username and password are entered
             on the identity provider page.
           </p>

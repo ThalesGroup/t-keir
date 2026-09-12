@@ -10,9 +10,11 @@ Canonical Python package: [`thot.ontology`](../../tkeir/thot/ontology/).
 
 | Layer | Meaning | Storage |
 |-------|---------|---------|
-| **Ontology concept** | First-class entity with a stable `concept_id` (label is only a property) | Vespa `ontology_concept` documents |
+| **Ontology concept** | First-class entity with a stable `concept_id` (label is only a property) | Vespa `ontology_concept` documents (corpus catalog, insert-if-absent) |
+| **Ontology triple** | Corpus-level `(subject, predicate, object)` | Vespa `ontology_triple` (GET before PUT; never duplicated) |
 | **Chunk → concept** | IDs of concepts associated with a passage | `ontology_concept_ids` (and legacy `ontology_concepts`) |
-| **Relation / assertion** | `(subject_id, predicate_id, object_id, confidence)` extracted from SVO / JSON / expert links | `ontology_relations` + compact `ontology_rel_keys` |
+| **Chunk → document** | Indexed parent document this chunk was extracted from | `parent_doc_id` = `corpus_doc.document_id` |
+| **Relation / assertion** | `(subject_id, predicate_id, object_id, confidence)` extracted from SVO / JSON / expert links | Chunk pointers `ontology_rel_keys`; graph in `ontology_triple` |
 
 Do **not** duplicate the full concept graph on every chunk.
 
@@ -57,11 +59,16 @@ Indexing and search work with **no** expert ontology.
 
 ```text
 source → parse → chunk → BGE-M3 dense/sparse
-                      → OntologyService.enrich_chunk
-                            (map / extract / JSON / SVO)
-                      → Vespa global/user passage
-                      → optional ontology_concept upsert
+                      → OntologyService.enrich_chunk (union per document)
+                      → corpus catalog GET/PUT ontology_concept + ontology_triple
+                        (skip triples/concepts already stored in any corpus)
+                      → Vespa global/user passage (parent_doc_id → corpus_doc)
+                      → corpus_doc (BM25 + tags + author + simhash + concept pointers)
 ```
+
+Search / RAG run the chunk hybrid arm, then a weighted ``corpus_doc`` arm
+(`dual_hybrid.document_index.chunk_weight` / `document_weight`) and blend
+scores by `parent_doc_id` before ColBERT.
 
 Ontology enrichment is a dedicated stage in
 `thot.tools.ingest.index_passages` (`OntologyService`). It does not change
@@ -104,7 +111,8 @@ runs **in the application** before Vespa, not inside every rank expression.
 `POST /ontology/export` reconstructs the concept graph for the indexed corpus:
 
 1. Visit `ontology_concept` documents (paginated; no full chunk load).
-2. If the catalog is empty (legacy index), Vespa **grouping** on
+2. Visit `ontology_triple` documents (corpus-level SPO, insert-if-absent).
+3. If the catalog is empty (legacy index), Vespa **grouping** on
    `ontology_concepts` / `ontology_rel_keys`.
 
 `POST /ontology/expand` walks the expert/catalog graph then you can retrieve
@@ -128,10 +136,7 @@ dual_hybrid:
         dense: 0.70
         sparse: 0.20
         bm25: 0.10
-      hybrid_ontology:   # application overlap when concept/relation filters are set
-        dense: 0.70
-        sparse: 0.20
-        bm25: 0.10
+      hybrid_ontology:   # application overlap only (Vespa inherits hybrid)
         concept: 0.15
         relation: 0.10
   retrieval:

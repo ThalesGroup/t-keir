@@ -51,6 +51,9 @@ pipeline:
 
 See [Tools overview](../tools/tools_overview.md) for CLI flags (`-t auto|raw`, `-i`, `-o`).
 
+Field-level effects for each referenced file:
+[NLP pipeline YAML](nlp.yaml.md) · [Indexing YAML](indexing.yaml.md).
+
 ## Related
 
 - Catalog: [Configuration overview](index.md)  

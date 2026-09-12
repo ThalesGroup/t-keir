@@ -27,10 +27,21 @@ from spacy.util import (
 )
 
 from thot.core.Constants import exception_error_and_trace
-from thot.core.DictionaryTrie import Trie, end_trie, make_trie, prefix_trie
-from thot.core.SentenceSegmenter import SentenceSegmenter, normalize_language_code
+from thot.core.DictionaryTrie import (
+    Trie,
+    end_trie,
+    make_trie,
+    prefix_trie,
+    trie_get,
+)
+from thot.core.SentenceSegmenter import (
+    SentenceSegmenter,
+    normalize_language_code,
+)
 from thot.core.SpacyModelLoader import load_spacy_model
 from thot.core.ThotLogger import ThotLogger
+from thot.core.TkeirPaths import DEFAULT_MWE_FILENAME, resolve_mwe_path
+from thot.core.Utils import config_use_mwe
 from thot.tasks.TaskInfo import TaskInfo
 from thot.tasks.tokenizer import __date_tokenizer__, __version_tokenizer__
 from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
@@ -108,12 +119,16 @@ class SpacyTokenizerPipe:
         self._nlp = nlp
         segmenter = config["segmenters"][0]
         mwe_file = segmenter.get("mwe")
-        if mwe_file:
+        if config_use_mwe(segmenter):
+            mwe_file = mwe_file or DEFAULT_MWE_FILENAME
+        if config_use_mwe(segmenter) and mwe_file:
             try:
-                mwefile = os.path.join(
-                    segmenter["resources-base-path"],
+                mwefile = resolve_mwe_path(
+                    segmenter.get("resources-base-path"),
                     mwe_file,
                 )
+                if not mwefile:
+                    raise FileNotFoundError(mwe_file)
                 ThotLogger.info(
                     "Load tokenizer:" + mwefile, context=call_context
                 )
@@ -248,11 +263,14 @@ class SpacyTokenizerPipe:
                 compound_word = doc[token_i : compound_table[-1] + 1]
                 words.append(compound_word.text.replace(" ", ""))
                 token_i = compound_table[-1]
+                node = trie_get(trie, words[-1].lower())
                 token_compounds.append(
                     {
-                        "data": trie[words[-1].lower()][Trie.LEAF][
-                            "label_info"
-                        ],
+                        "data": (
+                            node[Trie.LEAF]["label_info"]
+                            if node is not None and Trie.LEAF in node
+                            else {}
+                        ),
                         "is-compound": False,
                     }
                 )
@@ -316,16 +334,18 @@ class SpacyTokenizerPipe:
                     hyphen_toks = lower_text.split("-")
                 for doc_text in hyphen_toks:
                     last_trie = trie
-                    if doc_text in trie:
-                        trie = trie[doc_text]
+                    child = trie_get(trie, doc_text)
+                    if child is not None:
+                        trie = child
                         if Trie.LEAF in trie:
                             leaf_at.append(
                                 {"data": trie[Trie.LEAF], "idx": j + 1}
                             )
                     elif (i != j) and ("-" in trie):
                         trie = trie["-"]
-                        if doc_text in trie:
-                            trie = trie[doc_text]
+                        child = trie_get(trie, doc_text)
+                        if child is not None:
+                            trie = child
                             if Trie.LEAF in trie:
                                 leaf_at.append(
                                     {
@@ -354,7 +374,7 @@ class SpacyTokenizerPipe:
             >>> callable(SpacyTokenizerPipe._try_merge_mwe_match)
             True
         """
-        if doc[i].text.lower() not in self._mwes["trie"]:
+        if trie_get(self._mwes["trie"], doc[i].text.lower()) is None:
             return 1
         leaf_at, last_is_hyphen = self._walk_mwe_trie(
             doc, i, max_pattern_length

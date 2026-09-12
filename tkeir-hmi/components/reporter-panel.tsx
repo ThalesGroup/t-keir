@@ -839,15 +839,15 @@ export function ReporterPanel({ agentAvailable }: ReporterPanelProps) {
   const grabBusy = busy && pipelinePhase === "grab";
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+    <div className="flex w-full flex-col gap-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+        <p className="text-sm font-semibold uppercase tracking-wider text-primary">
           Reporter
         </p>
         <h2 className="mt-1 text-2xl font-semibold tracking-tight">
           Grab &amp; persona wiki
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-base text-muted-foreground">
           Retrieve grounded passages, generate an editable OKF persona wiki (
           <code>{persona.wikiPrompt}</code>), then save to My files or send to
           the commander.

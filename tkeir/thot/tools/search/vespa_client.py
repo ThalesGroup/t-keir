@@ -711,6 +711,111 @@ class VespaClient:
             streaming=False,
         )
 
+    async def upsert_ontology_triple(
+        self,
+        fields: dict[str, Any],
+        document_key: str,
+    ) -> None:
+        """Create one ``ontology_triple`` catalog document (insert-if-absent caller).
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.upsert_ontology_triple)
+            True
+        """
+        await self._upsert_fields(
+            "default",
+            "ontology_triple",
+            document_key,
+            fields,
+            streaming=False,
+        )
+
+    async def upsert_corpus_doc(
+        self,
+        fields: dict[str, Any],
+        document_key: str,
+    ) -> None:
+        """Create or update one document-level ``corpus_doc`` row.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.upsert_corpus_doc)
+            True
+        """
+        await self._upsert_fields(
+            "default",
+            "corpus_doc",
+            document_key,
+            fields,
+            streaming=False,
+        )
+
+    async def get_index_document(
+        self,
+        document_type: str,
+        document_key: str,
+    ) -> dict[str, Any] | None:
+        """GET an index-mode document by type and key. ``None`` if missing.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(VespaClient.get_index_document)
+            True
+        """
+        url = (
+            f"{self._config.document_api_url}/default/{document_type}/"
+            f"docid/{quote(document_key, safe='')}"
+        )
+        try:
+            response = await self._client.get(url)
+        except httpx.HTTPError:
+            return None
+        if response.status_code == 404:
+            return None
+        if response.is_error:
+            return None
+        payload = response.json() if response.content else {}
+        fields = payload.get("fields") if isinstance(payload, dict) else None
+        return fields if isinstance(fields, dict) else None
+
+    async def find_corpus_docs_by_simhash_prefix(
+        self,
+        prefix: int,
+        *,
+        hits: int = 32,
+    ) -> list[dict[str, Any]]:
+        """Return ``corpus_doc`` rows sharing a simhash prefix bucket.
+
+        Example:
+            >>> import inspect
+            >>> inspect.iscoroutinefunction(
+            ...     VespaClient.find_corpus_docs_by_simhash_prefix
+            ... )
+            True
+        """
+        yql = (
+            "select source_ref, simhash_hex, document_id from corpus_doc "
+            f"where simhash_prefix = {int(prefix)}"
+        )
+        try:
+            payload = await self.search(
+                {
+                    "yql": yql,
+                    "hits": max(1, int(hits)),
+                    "ranking.profile": "unranked",
+                }
+            )
+        except Exception:  # noqa: BLE001
+            return []
+        children = ((payload.get("root") or {}).get("children") or [])
+        rows: list[dict[str, Any]] = []
+        for child in children:
+            fields = child.get("fields") or {}
+            if isinstance(fields, dict):
+                rows.append(fields)
+        return rows
+
     async def visit_documents(
         self,
         document_type: str,

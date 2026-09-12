@@ -74,7 +74,7 @@ const ChunkBlock = memo(function ChunkBlock({
       )}
     >
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <Badge variant="outline" className="font-mono text-[10px]">
+        <Badge variant="outline" className="font-mono text-xs">
           <Hash className="mr-1 h-3 w-3" />
           {chunk.chunk_id.split("#").pop() ?? chunk.chunk_id}
         </Badge>
@@ -138,7 +138,7 @@ const DocumentCard = memo(function DocumentCard({
       <CardHeader className="pb-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
-            <CardTitle className="flex items-start gap-2 text-base leading-snug tracking-tight">
+            <CardTitle className="flex items-start gap-2 text-lg leading-snug tracking-tight">
               <FileText className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>{docTitle}</span>
             </CardTitle>
@@ -146,7 +146,7 @@ const DocumentCard = memo(function DocumentCard({
               sourceLabel.localeCompare(docTitle, undefined, {
                 sensitivity: "accent",
               }) !== 0 && (
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="truncate text-sm text-muted-foreground">
                   {sourceLabel}
                 </p>
               )}

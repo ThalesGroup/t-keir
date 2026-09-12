@@ -12,7 +12,8 @@ Example of Configuration:
 ```
 
 NER tagger configuration contains a top-level `logger` section and named-entity-specific `label` settings.
-The label configuration allows to define validation rules file:
+
+**Every key and its effect:** [NLP pipeline YAML](../configuration/nlp.yaml.md#nertaggeryaml).
 
 - **language** :the language of tokenizer
 - **resources-base-path**: path to resources (see `tkeir-create-annotation-resource`)

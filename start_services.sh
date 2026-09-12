@@ -15,6 +15,7 @@
 #   ./start_services.sh --skip-check-install
 #   SESSION=tkeir-demo ./start_services.sh
 #   TMUX_BIN=/opt/homebrew/bin/tmux ./start_services.sh
+#   INDEX_SNAPSHOT=1 ./start_services.sh
 #
 # Usecase pack (datasets/<name>/): --usecase, USECASE, or TKEIR_USECASE.
 # Default osint. Exported into every tmux pane so Keycloak, ingest, RAG,
@@ -23,11 +24,17 @@
 # Shortcuts (no prefix):
 #   TAB     next window
 #   CTRL+R  restart active pane (respawn-pane -k)
-#   ESC     make down + kill session
+#   ESC     save index if INDEX_SNAPSHOT is set, then make down + kill session
 #
 # If any service fails its health check, the script runs make down and exits.
 # Preserve runtime DBs on ESC shutdown:
 #   KEEP_DATA=1 ./start_services.sh
+#
+# Save/restore the Vespa index (tar of the data volume) across make down:
+#   INDEX_SNAPSHOT=1 ./start_services.sh
+#   INDEX_SNAPSHOT=/path/to/osint.tar.gz ./start_services.sh
+# Restore runs when the live volume is empty; save runs on ESC / abort.
+# Default archive: .vespa-snapshots/<USECASE>/index.tar.gz
 #
 # Dev install gate (make check-install) runs first unless skipped:
 #   SKIP_CHECK_INSTALL=1 ./start_services.sh
@@ -42,6 +49,8 @@ SESSION="${SESSION:-tkeir-demo}"
 ATTACH="${ATTACH:-1}"
 HEALTH_POLL_SECONDS="${HEALTH_POLL_SECONDS:-2}"
 KEEP_DATA="${KEEP_DATA:-0}"
+INDEX_SNAPSHOT="${INDEX_SNAPSHOT:-${TKEIR_INDEX_SNAPSHOT:-}}"
+INDEX_SNAPSHOT_PATH=""
 SKIP_CHECK_INSTALL="${SKIP_CHECK_INSTALL:-0}"
 USECASE_CLI=""
 TMUX_CMD=""
@@ -158,15 +167,39 @@ make_with_usecase() {
     make "$@"
 }
 
-# Tear down the whole demo stack when a service fails to become ready.
-abort_stack() {
-  local reason="$*"
-  log "ABORT: ${reason}"
+# Tar the Vespa volume when INDEX_SNAPSHOT is set. If save fails, keep the
+# live volume so make down does not wipe an unsaved index.
+save_index_snapshot() {
+  [[ -n "${INDEX_SNAPSHOT_PATH:-}" ]] || return 0
+  log "saving Vespa index to ${INDEX_SNAPSHOT_PATH}"
+  if (
+    cd "$ROOT" \
+      && INDEX_SNAPSHOT="$(printf '%s' "$INDEX_SNAPSHOT_PATH")" \
+      USECASE="$USECASE" \
+      TKEIR_USECASE="$TKEIR_USECASE" \
+      ./vespa/snapshot_index.sh save
+  ); then
+    return 0
+  fi
+  log "index snapshot failed — keeping Vespa volume (KEEP_DATA=1)"
+  KEEP_DATA=1
+  return 0
+}
+
+teardown_stack() {
+  save_index_snapshot
   log "stopping all services via make down…"
   (
     cd "$ROOT" \
       && KEEP_DATA="${KEEP_DATA:-0}" make down
   ) || log "make down returned non-zero (continuing cleanup)"
+}
+
+# Tear down the whole demo stack when a service fails to become ready.
+abort_stack() {
+  local reason="$*"
+  log "ABORT: ${reason}"
+  teardown_stack
   if [[ -n "${TMUX_CMD:-}" ]] && "$TMUX_CMD" has-session -t "$SESSION" 2>/dev/null; then
     log "killing tmux session '${SESSION}'"
     "$TMUX_CMD" kill-session -t "$SESSION" || true
@@ -253,13 +286,14 @@ configure_session() {
   "$TMUX_CMD" set-environment -t "$SESSION" TKEIR_AGENT_USECASE "$TKEIR_AGENT_USECASE"
   "$TMUX_CMD" set-environment -t "$SESSION" TKEIR_BUSINESS_ONTOLOGY_DATASET "$TKEIR_BUSINESS_ONTOLOGY_DATASET"
   "$TMUX_CMD" set-environment -t "$SESSION" NEXT_PUBLIC_TKEIR_USECASE "$TKEIR_USECASE"
+  "$TMUX_CMD" set-environment -t "$SESSION" INDEX_SNAPSHOT "${INDEX_SNAPSHOT_PATH:-}"
   "$TMUX_CMD" set-option -t "$SESSION" -g status-right "#[fg=colour117][ TAB: Next Service ]#[fg=colour245] | #[fg=colour214][ CTRL+R: Restart Active Service ]#[fg=colour245] | #[fg=colour203][ ESC: Global Shutdown (make down) ] "
 
   # No-prefix shortcuts (session-scoped where supported; -n = root table).
   "$TMUX_CMD" bind-key -n Tab next-window
   "$TMUX_CMD" bind-key -n C-r respawn-pane -k
-  # ESC → wipe-or-keep via KEEP_DATA, then kill this session.
-  "$TMUX_CMD" bind-key -n Escape run-shell "cd $(printf '%q' "$ROOT") && KEEP_DATA=$(printf '%q' "$KEEP_DATA") make down; $(printf '%q' "$TMUX_CMD") kill-session -t $(printf '%q' "$SESSION") || true"
+  # ESC → save Vespa snapshot (if INDEX_SNAPSHOT is set), then wipe-or-keep via KEEP_DATA.
+  "$TMUX_CMD" bind-key -n Escape run-shell "cd $(printf '%q' "$ROOT") && { INDEX_SNAPSHOT=$(printf '%q' "${INDEX_SNAPSHOT_PATH:-}") USECASE=$(printf '%q' "$USECASE") TKEIR_USECASE=$(printf '%q' "$TKEIR_USECASE") ./vespa/snapshot_index.sh save || export KEEP_DATA=1; KEEP_DATA=\${KEEP_DATA:-$(printf '%q' "$KEEP_DATA")} make down; }; $(printf '%q' "$TMUX_CMD") kill-session -t $(printf '%q' "$SESSION") || true"
 }
 
 # Create (or append) a window whose pane command is the make target.
@@ -409,6 +443,18 @@ main() {
   validate_usecase_pack
   log "usecase=$USECASE (datasets/${USECASE}/)"
 
+  INDEX_SNAPSHOT_PATH="$(
+    INDEX_SNAPSHOT="$INDEX_SNAPSHOT" \
+      USECASE="$USECASE" \
+      TKEIR_USECASE="$TKEIR_USECASE" \
+      "$ROOT/vespa/snapshot_index.sh" resolve
+  )"
+  if [[ -n "$INDEX_SNAPSHOT_PATH" ]]; then
+    log "index snapshot: ${INDEX_SNAPSHOT_PATH}"
+  else
+    log "index snapshot: off (set INDEX_SNAPSHOT=1 to persist the Vespa index)"
+  fi
+
   if [[ "$SKIP_CHECK_INSTALL" == "1" ]]; then
     log "skipping make check-install (SKIP_CHECK_INSTALL=1)"
   else
@@ -429,7 +475,16 @@ main() {
   fi
 
   log "orchestrating hybrid demo into tmux session '$SESSION'"
-  log "root=$ROOT KEEP_DATA=$KEEP_DATA USECASE=$USECASE"
+  log "root=$ROOT KEEP_DATA=$KEEP_DATA USECASE=$USECASE INDEX_SNAPSHOT=${INDEX_SNAPSHOT_PATH:-off}"
+
+  if [[ -n "$INDEX_SNAPSHOT_PATH" ]]; then
+    log "restoring Vespa index if the live volume is empty"
+    INDEX_SNAPSHOT="$INDEX_SNAPSHOT_PATH" \
+      USECASE="$USECASE" \
+      TKEIR_USECASE="$TKEIR_USECASE" \
+      "$ROOT/vespa/snapshot_index.sh" restore-if-empty \
+      || abort_stack "Vespa index restore failed (${INDEX_SNAPSHOT_PATH})"
+  fi
 
   # Container first (no image pull), then deploy schemas so :8080 serves the app.
   # Docker panes follow container logs (CTRL+R re-runs up + logs).

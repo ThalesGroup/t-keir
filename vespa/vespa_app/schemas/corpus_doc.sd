@@ -1,0 +1,143 @@
+# Generated from tkeir/configs/rag.yaml via `make schemas`.
+# DO NOT hand-edit — change rag.yaml and regenerate.
+# Source: scripts/generate_vespa_schemas.py
+
+schema corpus_doc {
+    document corpus_doc {
+        field source_ref type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        # Same value as the Vespa docid (sha256(source_ref)[:40]); chunks store this.
+        field document_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field title type string {
+            indexing: summary | index
+            index: enable-bm25
+        }
+        field doc_text type string {
+            indexing: summary | index
+            index: enable-bm25
+        }
+        field author type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field collection type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field doc_format type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field data_kind type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field location_tags type array<string> {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field time_tags type array<string> {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field tags type array<string> {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field simhash_hex type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field simhash_prefix type int {
+            indexing: summary | attribute
+            attribute: fast-search
+            rank: filter
+        }
+        field duplicate_of type string {
+            indexing: summary | attribute
+        }
+        field ontology_concept_ids type array<string> {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field ontology_rel_keys type array<string> {
+            indexing: summary | attribute
+        }
+        field chunk_ids type array<string> {
+            indexing: summary | attribute
+        }
+        field chunk_count type int {
+            indexing: summary | attribute
+        }
+        field sparse_vector type tensor<float>(token{}) {
+            indexing: summary | attribute
+        }
+        field dense_vector type tensor<float>(x[1024]) {
+            indexing: attribute | index
+            attribute {
+                distance-metric: angular
+            }
+            index {
+                hnsw {
+                    max-links-per-node: 16
+                    neighbors-to-explore-at-insert: 200
+                }
+            }
+        }
+        field doc_timestamp type long {
+            indexing: summary | attribute
+            attribute {
+                fast-search
+                fast-access
+            }
+            rank: filter
+        }
+        field freshness_ttl_seconds type int {
+            indexing: summary | attribute
+        }
+        field pinned type bool {
+            indexing: summary | attribute
+        }
+        field source_type type string {
+            indexing: summary | attribute
+        }
+    }
+
+    fieldset default {
+        fields: title, doc_text
+    }
+
+    rank-profile hybrid {
+        inputs {
+            query(q_dense) tensor<float>(x[1024])
+            query(q_sparse) tensor<float>(token{})
+        }
+        first-phase {
+            expression {
+                closeness(field, dense_vector) * 0.7 +
+                sum(query(q_sparse) * attribute(sparse_vector)) * 0.2 +
+                (bm25(title) + bm25(doc_text)) * 0.1
+            }
+        }
+    }
+
+    rank-profile lexical {
+        first-phase {
+            expression: bm25(title) + bm25(doc_text)
+        }
+    }
+
+    rank-profile dense_only {
+        inputs {
+            query(q_dense) tensor<float>(x[1024])
+        }
+        first-phase {
+            expression: closeness(field, dense_vector)
+        }
+    }
+}

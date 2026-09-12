@@ -458,7 +458,7 @@ export function LlmWikiPanel() {
   const wikiDirty = wikiDraft !== wikiSaved;
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-6">
+    <div className="w-full space-y-6">
       <div>
         <h2 className="text-lg font-semibold">LLM Wiki</h2>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -625,7 +625,7 @@ export function LlmWikiPanel() {
                     Concept
                   </TabsTrigger>
                 </TabsList>
-                <TabsContent value="index" className="prose prose-sm max-w-none">
+                <TabsContent value="index" className="prose max-w-none">
                   <MarkdownContent content={detail.index_md || ""} />
                 </TabsContent>
                 <TabsContent value="wiki" className="space-y-3">
@@ -725,7 +725,7 @@ export function LlmWikiPanel() {
                     </button>
                   ))}
                 </TabsContent>
-                <TabsContent value="concept" className="prose prose-sm max-w-none">
+                <TabsContent value="concept" className="prose max-w-none">
                   <MarkdownContent content={conceptMd} />
                 </TabsContent>
               </Tabs>

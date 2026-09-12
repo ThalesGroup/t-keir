@@ -23,7 +23,9 @@ technical hooks (kill switch, `/admin` panel, approval queue).
 2. **Intent–action alignment** — OAuth client scopes
    (`intent:search|ingest|index|delete|audit.read|admin.override`) mapped by
    the governor; Policy-as-Code (OPA/Rego in `deploy/policies/app/`). Mismatch →
-   deny + `blocked` ActionRecord + approval queue.
+   deny + `blocked` ActionRecord + approval queue. That runtime pack is
+   **not** the EU article audit under `compliance/opa/` — see
+   [OPA, Rego, and OSCAL](../compliance/opa-rego-oscal.md).
 3. **Operational-context validation** — probes (Vespa, index freshness,
    `PROVIDER` health, error rate) before privileged actions; out-of-band →
    freeze action class via `tkeir-runtime-flags` ConfigMap.

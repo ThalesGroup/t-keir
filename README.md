@@ -94,7 +94,7 @@ make devcontainer
 Inside the container (`/workspace`):
 
 ```bash
-make setup          # Python deps, spaCy, Tesseract, MWE pickle, BGE-M3
+make setup          # Python deps, spaCy, Tesseract, MWE pickle, BGE-M3, HMI/Node (Cytoscape)
 ```
 
 If `uv sync` fails because of a host-built `tkeir/.venv`, run
@@ -161,7 +161,7 @@ agent, and HMI on the host, with health gates between windows.
 |---|---|
 | `TAB` | Next tmux window |
 | `CTRL+R` | Restart the active pane |
-| `ESC` | `make down` + kill session (`KEEP_DATA=1` keeps DBs) |
+| `ESC` | `make down` + kill session (`KEEP_DATA=1` keeps DBs; `INDEX_SNAPSHOT=1` tars the Vespa index first) |
 
 Open [http://localhost:3000](http://localhost:3000) when the `[HMI]` window is
 ready. Skip the install gate with `--skip-check-install` if the toolchain is
@@ -256,13 +256,15 @@ setup, pipeline, tests, docs, Vespa, indexing, and RAG.
 | Target | Description |
 |---|---|
 | `make help` | List common targets and variables |
-| `make setup` | Full local setup: `install` + spaCy + Tesseract + converter models (tessdata/BLIP) + `init-models` + BGE-M3; Vespa image pulled only if missing |
+| `make setup` | Full local setup: `install` + spaCy + Tesseract + converter models (tessdata/BLIP) + `init-models` + BGE-M3 + HMI `npm ci` (Cytoscape.js); Vespa image pulled only if missing |
+| `make hmi-install` | `npm ci` in `tkeir-hmi/` from `package-lock.json` (includes `cytoscape` + `cytoscape-fcose`) |
 | `make install` | `uv sync` in `tkeir/` (dev dependency group) |
 | `make install-spacy-models` | Extract spaCy pipelines into `tkeir/resources/modeling/spacy` |
 | `make install-tesseract` | Install Tesseract OCR binary |
 | `make install-converter-models` | Tessdata + BLIP into `resources/modeling` (skip if present) |
 | `make pull-vespa` | Pull Vespa image only when missing (`FORCE_VESPA=1` refresh) |
-| `make init-models` | Build `tkeir_mwe.pkl` from annotation resources (optional MWE) |
+| `make init-models` | Build `tokenizer/any/tkeir_mwe.pkl` (cities, rivers, mountains, lakes, regions, …) |
+| `make geo-gazetteers` | Expand hydro/relief/region lists from Natural Earth + GeoNames |
 | `make pipeline` | Run `tkeir-pipeline` on `PIPELINE_INPUT` → `PIPELINE_OUTPUT` |
 | `make corpus` | Source/markdown dir → `{dataset, records}` JSON (`CORPUS_INPUT`, `CORPUS_OUTPUT`, optional `CORPUS_MARKDOWN_DIR`) |
 | `make quickstart` | Pipeline demo on bundled fixtures → `output/quickstart/` |

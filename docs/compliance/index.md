@@ -12,6 +12,9 @@ T-KEIR ships two complementary layers:
    `NOT_MANDATORY` when out of scope, and produce HTML **plus** OSCAL
    Assessment Results / POA&M under `reports/compliance/eu-audit/<version>/`.
 
+**What OPA, Rego, and OSCAL are** (engine vs policy language vs NIST exchange
+format): [OPA, Rego, and OSCAL](opa-rego-oscal.md).
+
 After `make ci` (or `make audit-compliance`), the **full** article outcomes are
 also published into MkDocs — see [Compliance status (one page)](status.md) and
 [Latest audit results](latest-results.md).
@@ -29,6 +32,7 @@ make annex-iv           # reports/compliance/annex-iv/
 
 | Doc | Regulation | OPA package |
 |-----|------------|-------------|
+| [OPA, Rego, and OSCAL](opa-rego-oscal.md) | Engine, policy language, NIST documents | — |
 | [EU Compliance OPA Audit](eu-audit.md) | Tool, result model, category gates | all |
 | [Compliance status (one page)](status.md) | Colored status · criticality · remediation | all |
 | [Latest audit results](latest-results.md) | Last CI / audit snapshot (full outcomes) | all |

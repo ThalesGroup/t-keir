@@ -36,7 +36,7 @@ if [ ! -d "$fixtures_path" ]; then
     exit 1
 fi
 
-if [ ! -f "$tkeir_path/resources/modeling/tokenizer/en/tkeir_mwe.pkl" ]; then
+if [ ! -f "$tkeir_path/resources/modeling/tokenizer/any/tkeir_mwe.pkl" ]; then
     echo "Tokenizer resources missing. Run: make setup" >&2
     exit 1
 fi

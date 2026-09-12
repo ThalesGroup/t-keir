@@ -4,5 +4,6 @@ syntax:
   taggers:
   - language: en
     resources-base-path: resources/modeling/tokenizer/en
-    use-mwe: false
+    use-mwe: true
+    mwe: tkeir_mwe.pkl
     syntactic-rules: syntactic-rules.json

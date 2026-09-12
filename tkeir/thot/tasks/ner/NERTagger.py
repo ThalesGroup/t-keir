@@ -18,10 +18,11 @@ import traceback
 from spacy.tokens import Span
 
 import thot.core.Constants as Constants
-from thot.core.DictionaryTrie import Trie
+from thot.core.DictionaryTrie import Trie, trie_get
 from thot.core.SpacyModelLoader import load_spacy_model
 from thot.core.ThotLogger import ThotLogger
-from thot.core.Utils import ThotTokenizerToSpacy
+from thot.core.TkeirPaths import DEFAULT_MWE_FILENAME, resolve_mwe_path
+from thot.core.Utils import ThotTokenizerToSpacy, config_use_mwe
 from thot.tasks.ner import __date_ner__, __version_ner__
 from thot.tasks.ner.NERTaggerConfiguration import NERTaggerConfiguration
 from thot.tasks.TaskInfo import TaskInfo
@@ -52,12 +53,16 @@ class SpacyNERFromMWE:
 
         label = config["label"][0]
         mwe_file = label.get("mwe")
-        if mwe_file:
+        if config_use_mwe(label):
+            mwe_file = mwe_file or DEFAULT_MWE_FILENAME
+        if config_use_mwe(label) and mwe_file:
             try:
-                mwefile = os.path.join(
-                    label["resources-base-path"],
+                mwefile = resolve_mwe_path(
+                    label.get("resources-base-path"),
                     mwe_file,
                 )
+                if not mwefile:
+                    raise FileNotFoundError(mwe_file)
                 ThotLogger.info("Load mwe:" + mwefile, context=call_context)
                 with open(mwefile, "rb") as pattern_f:
                     self._mwes = pickle.load(pattern_f)
@@ -106,8 +111,9 @@ class SpacyNERFromMWE:
                 trie = self._mwes["trie"]
                 mwe_found = True
                 for tok_i in toks:
-                    if tok_i.lower() in trie:
-                        trie = trie[tok_i.lower()]
+                    child = trie_get(trie, tok_i.lower())
+                    if child is not None:
+                        trie = child
                     else:
                         mwe_found = False
                         break
@@ -243,6 +249,7 @@ class NERTagger:
             self._nlp.vocab,
             config.configuration["label"],
             call_context=call_context,
+            use_mwe=config_use_mwe(config.configuration["label"][0]),
         )
         self._ner_from_mwe = SpacyNERFromMWE(
             config=self._config.configuration, call_context=call_context

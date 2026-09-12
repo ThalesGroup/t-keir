@@ -277,8 +277,12 @@ def _passage_fields(
     embedding_dim: int,
     userspace_id: str | None = None,
     ontology_relations: list[dict[str, Any]] | None = None,
+    parent_doc_id: str = "",
 ) -> dict[str, Any]:
     """Build Vespa passage field dict for one golden chunk.
+
+    ``parent_doc_id`` is the indexed ``corpus_doc`` key this chunk was
+    extracted from.
 
     Example:
         >>> fields = _passage_fields(
@@ -288,9 +292,14 @@ def _passage_fields(
         ...     sparse={"3": 0.5},
         ...     ontology_concepts=["c1"],
         ...     embedding_dim=2,
+        ...     parent_doc_id="abc",
         ... )
         >>> fields["source_ref"]
         'doc1'
+        >>> fields["parent_doc_id"]
+        'abc'
+        >>> fields["chunk_id"]
+        'c1'
         >>> fields["freshness_ttl_seconds"]
         0
     """
@@ -320,8 +329,16 @@ def _passage_fields(
         max_concepts=max(len(ontology_concepts), 1),
         max_relations=max(len(rel_models), 1),
     )
+    chunk_id = str(chunk.get("chunk_id") or "")
+    indexed_parent = parent_doc_id or ""
+    if not indexed_parent and source_ref:
+        from thot.tools.ingest.document_index import corpus_doc_docid
+
+        indexed_parent = corpus_doc_docid(source_ref)
     fields: dict[str, Any] = {
         "source_ref": sanitize_vespa_string(source_ref),
+        "parent_doc_id": sanitize_vespa_string(indexed_parent),
+        "chunk_id": sanitize_vespa_string(chunk_id),
         "chunk_text": sanitize_vespa_string(text),
         "dense_vector": vespa_dense_tensor(dense, embedding_dim),
         "sparse_vector": vespa_sparse_tensor(sparse),
@@ -349,6 +366,80 @@ def _passage_fields(
     if userspace_id:
         fields["userspace_id"] = sanitize_vespa_string(userspace_id)
     return fields
+
+
+async def _index_corpus_doc(
+    vespa: VespaClient,
+    *,
+    document: dict[str, Any],
+    source_ref: str,
+    parent_doc_id: str,
+    chunks: list[dict[str, Any]],
+    embeddings: list[Any],
+    embedding_dim: int,
+    concept_ids: list[str],
+    rel_keys: list[str],
+    cfg: Any,
+) -> None:
+    """Write one ``corpus_doc`` row (classical index + tags + simhash).
+
+    Example:
+        >>> import inspect
+        >>> from thot.tools.ingest.index_passages import _index_corpus_doc
+        >>> inspect.iscoroutinefunction(_index_corpus_doc)
+        True
+    """
+    from thot.tools.ingest.document_index import (
+        DocumentIndexMeta,
+        build_corpus_doc_fields,
+        mean_dense,
+        merge_sparse,
+        pick_near_duplicate,
+    )
+
+    chunk_texts = [
+        chunk_embedding_text(chunk) or str(chunk.get("text_raw") or "")
+        for chunk in chunks
+    ]
+    meta = DocumentIndexMeta.from_document(
+        document,
+        chunk_texts,
+        prefix_bits=int(cfg.simhash_prefix_bits),
+        max_doc_text_chars=int(cfg.max_doc_text_chars),
+    )
+    duplicate_of = ""
+    try:
+        neighbors = await vespa.find_corpus_docs_by_simhash_prefix(
+            meta.simhash_prefix
+        )
+        duplicate_of = pick_near_duplicate(
+            meta.simhash,
+            neighbors,
+            source_ref=source_ref,
+            max_hamming=int(cfg.simhash_max_hamming),
+        )
+    except Exception as exc:  # noqa: BLE001
+        LOGGER.debug("simhash neighbor lookup skipped: %s", exc)
+    dense = mean_dense(
+        [list(emb.dense) for emb in embeddings], embedding_dim
+    )
+    fields = build_corpus_doc_fields(
+        meta,
+        dense=dense,
+        sparse=merge_sparse([dict(emb.sparse) for emb in embeddings]),
+        embedding_dim=embedding_dim,
+        chunk_ids=[str(chunk.get("chunk_id") or "") for chunk in chunks],
+        ontology_concept_ids=concept_ids,
+        ontology_rel_keys=rel_keys,
+        duplicate_of=duplicate_of,
+    )
+    await vespa.upsert_corpus_doc(fields, parent_doc_id)
+    if duplicate_of:
+        LOGGER.info(
+            "corpus_doc near-duplicate source=%s of=%s",
+            source_ref,
+            duplicate_of,
+        )
 
 
 async def index_pipeline_document(
@@ -434,13 +525,14 @@ async def index_pipeline_document(
     )
     embed_ms = (time.perf_counter() - t_emb) * 1000
 
+    from thot.ontology.catalog_sync import sync_corpus_ontology
+    from thot.ontology.identity import relation_key
+    from thot.ontology.model import Ontology
     from thot.ontology.service import OntologyService
-    from thot.ontology.vespa import (
-        concept_to_vespa_fields,
-        ontology_concept_docid,
-    )
+    from thot.tools.ingest.document_index import corpus_doc_docid
 
     layer = rag.dual_hybrid.ontology_layer
+    doc_index_cfg = rag.dual_hybrid.document_index
     ont_service = OntologyService.from_business_payload(
         ontology_payload,
         json_structural=bool(layer.json_structural_concepts),
@@ -448,10 +540,10 @@ async def index_pipeline_document(
         max_relations=int(layer.max_relations_per_chunk),
     )
     space = normalize_user_space(user_space or resolve_vespa_user_space(None))
-    t_vespa = time.perf_counter()
-    written = 0
-    dump_passages: list[dict[str, Any]] = []
-    catalog_seen: set[str] = set()
+    parent_doc_id = corpus_doc_docid(str(source_doc_id))
+
+    merged_catalog = Ontology()
+    prepared = []
     for chunk, emb in zip(chunks, embeddings, strict=True):
         concepts, expansion_labels, relations, catalog = (
             _ontology_fields_for_chunk(
@@ -461,12 +553,35 @@ async def index_pipeline_document(
                 service=ont_service,
             )
         )
+        merged_catalog = merged_catalog.extend(catalog)
+        prepared.append(
+            (chunk, emb, concepts, expansion_labels, relations)
+        )
+
+    t_vespa = time.perf_counter()
+    if layer.index_concepts or layer.index_triples:
+        try:
+            await sync_corpus_ontology(
+                vespa,
+                merged_catalog,
+                source_ref=str(source_doc_id),
+                index_concepts=bool(layer.index_concepts),
+                index_triples=bool(layer.index_triples),
+            )
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.warning("corpus ontology catalog sync failed: %s", exc)
+
+    written = 0
+    dump_passages: list[dict[str, Any]] = []
+    all_concept_ids: list[str] = []
+    all_rel_keys: list[str] = []
+    seen_concepts: set[str] = set()
+    seen_rels: set[str] = set()
+    for chunk, emb, concepts, expansion_labels, relations in prepared:
         passage_id = str(chunk.get("chunk_id"))
         chunk_text = chunk_embedding_text(chunk) or str(
             chunk.get("text_raw") or ""
         )
-        # Pure BGE-M3 sparse (no content/ontology merge — BM25 + attributes
-        # cover lexical/ontology; enrichment previously hurt SciFact).
         sparse = emb.sparse
         if target in ("global", "both"):
             fields = _passage_fields(
@@ -477,6 +592,7 @@ async def index_pipeline_document(
                 ontology_concepts=concepts,
                 embedding_dim=embedding_dim,
                 ontology_relations=relations,
+                parent_doc_id=parent_doc_id,
             )
             await vespa.upsert_global_passage(fields, passage_id)
         if target in ("user", "both"):
@@ -489,31 +605,32 @@ async def index_pipeline_document(
                 embedding_dim=embedding_dim,
                 userspace_id=space,
                 ontology_relations=relations,
+                parent_doc_id=parent_doc_id,
             )
             await vespa.upsert_user_passage(
                 fields, passage_id, user_space=space
             )
-        if layer.index_concepts:
-            for concept in catalog.concepts.values():
-                if concept.concept_id in catalog_seen:
-                    continue
-                catalog_seen.add(concept.concept_id)
-                try:
-                    await vespa.upsert_ontology_concept(
-                        concept_to_vespa_fields(concept),
-                        ontology_concept_docid(concept.concept_id),
-                    )
-                except Exception as exc:  # noqa: BLE001
-                    LOGGER.warning(
-                        "ontology_concept upsert failed id=%s: %s",
-                        concept.concept_id,
-                        exc,
-                    )
+        for cid in concepts:
+            key = str(cid).strip()
+            folded = key.casefold()
+            if key and folded not in seen_concepts:
+                seen_concepts.add(folded)
+                all_concept_ids.append(key)
+        for row in relations:
+            rel_key = relation_key(
+                str(row.get("subject_id") or ""),
+                str(row.get("predicate_id") or ""),
+                str(row.get("object_id") or ""),
+            )
+            if rel_key not in seen_rels and "|" in rel_key:
+                seen_rels.add(rel_key)
+                all_rel_keys.append(rel_key)
         dump_passages.append(
             {
                 "chunk_id": passage_id,
                 "chunk": chunk_text,
                 "document_ref": str(source_doc_id),
+                "parent_doc_id": parent_doc_id,
                 "sparse_vector": dict(sparse),
                 "ontology_concepts": list(concepts),
                 "ontology_concept_ids": list(concepts),
@@ -522,6 +639,32 @@ async def index_pipeline_document(
             }
         )
         written += 1
+
+    if (
+        doc_index_cfg.enabled
+        and target in ("global", "both")
+        and written
+    ):
+        try:
+            await _index_corpus_doc(
+                vespa,
+                document=document,
+                source_ref=str(source_doc_id),
+                parent_doc_id=parent_doc_id,
+                chunks=chunks,
+                embeddings=embeddings,
+                embedding_dim=embedding_dim,
+                concept_ids=all_concept_ids[: doc_index_cfg.max_concept_ids],
+                rel_keys=all_rel_keys,
+                cfg=doc_index_cfg,
+            )
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.warning(
+                "corpus_doc index failed source=%s: %s",
+                source_doc_id,
+                exc,
+            )
+
     vespa_ms = (time.perf_counter() - t_vespa) * 1000
 
     dump_cfg = rag.dual_hybrid.index_dump

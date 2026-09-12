@@ -3,7 +3,8 @@ logger:
 tokenizers:
   segmenters:
   - language: en
-    resources-base-path: /Users/blaudez/resources/modeling/tokenizer/en
+    resources-base-path: resources/modeling/tokenizer/en
+    use-mwe: true
     mwe: tkeir_mwe.pkl
     normalization-rules: tokenizer-rules.json
     annotation-resources-reference: annotation-resources.json

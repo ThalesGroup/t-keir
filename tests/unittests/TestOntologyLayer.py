@@ -262,9 +262,68 @@ def test_index_passage_fields_include_concept_alias():
     assert fields["ontology_rel_keys"]
     assert fields["freshness_ttl_seconds"] == 0
     assert fields["source_type"] == "ingest"
+    assert fields["chunk_id"] == "c1"
+    from thot.tools.ingest.document_index import corpus_doc_docid
+
+    assert fields["parent_doc_id"] == corpus_doc_docid("doc1")
 
 
 def test_text_only_yql_still_uses_nearest_neighbor():
     yql = build_passage_yql("global", hits=10, include_nearest_neighbor=True)
     assert "nearestNeighbor(dense_vector, q_dense)" in yql
     assert "ontology_concepts contains" not in yql
+
+
+def test_ontology_triple_fields_and_yql():
+    from thot.ontology.model import OntologyRelation
+    from thot.ontology.vespa import (
+        build_corpus_doc_yql,
+        ontology_triple_docid,
+        triple_to_vespa_fields,
+    )
+
+    rel = OntologyRelation("a", "pred:has_value", "b")
+    fields = triple_to_vespa_fields(rel, first_source_ref="doc1")
+    assert fields["triple_key"] == "a|pred:has_value|b"
+    assert len(ontology_triple_docid("a", "pred:has_value", "b")) == 40
+    yql = build_corpus_doc_yql(
+        hits=5, concept_ids=["C1"], include_nearest_neighbor=False
+    )
+    assert "from corpus_doc" in yql
+    assert "ontology_concept_ids contains" in yql
+
+
+def test_catalog_sync_skips_existing_triples():
+    import asyncio
+
+    from thot.ontology.catalog_sync import sync_corpus_ontology
+    from thot.ontology.model import Ontology, OntologyConcept, OntologyRelation
+    from thot.ontology.vespa import ontology_concept_docid, ontology_triple_docid
+
+    class _Fake:
+        def __init__(self) -> None:
+            self.store: dict[tuple[str, str], dict] = {}
+
+        async def get_index_document(self, document_type, document_key):
+            return self.store.get((document_type, document_key))
+
+        async def upsert_ontology_concept(self, fields, document_key):
+            self.store[("ontology_concept", document_key)] = fields
+
+        async def upsert_ontology_triple(self, fields, document_key):
+            self.store[("ontology_triple", document_key)] = fields
+
+    fake = _Fake()
+    cid = ontology_concept_docid("C1")
+    tid = ontology_triple_docid("C1", "pred:related", "C2")
+    fake.store[("ontology_concept", cid)] = {"concept_id": "C1"}
+    fake.store[("ontology_triple", tid)] = {"triple_key": "C1|pred:related|C2"}
+    ont = Ontology()
+    ont.add_concept(OntologyConcept("C1"))
+    ont.add_concept(OntologyConcept("C2"))
+    ont.add_relation(OntologyRelation("C1", "pred:related", "C2"))
+    result = asyncio.run(sync_corpus_ontology(fake, ont))
+    assert result.concepts_inserted == 1
+    assert result.concepts_skipped == 1
+    assert result.triples_inserted == 0
+    assert result.triples_skipped == 1

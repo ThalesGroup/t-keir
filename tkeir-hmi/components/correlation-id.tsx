@@ -38,10 +38,10 @@ export function CorrelationIdBadge({
   const auditHref = `${auditBaseUrl}?correlation_id=${encodeURIComponent(correlationId)}`;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+    <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
       <Fingerprint className="h-3.5 w-3.5 shrink-0" aria-hidden />
       <span className="font-medium">Correlation ID</span>
-      <code className="max-w-[14rem] truncate rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] sm:max-w-none">
+      <code className="max-w-[14rem] truncate rounded bg-muted px-1.5 py-0.5 font-mono text-xs sm:max-w-none">
         {correlationId}
       </code>
       <Button

@@ -10,7 +10,13 @@ Licensed under the MIT License.
 
 import unittest
 
-from thot.core.DictionaryTrie import Trie, end_trie, make_trie, prefix_trie
+from thot.core.DictionaryTrie import (
+    Trie,
+    end_trie,
+    make_trie,
+    prefix_trie,
+    trie_get,
+)
 
 
 class TestDictionaryTrie(unittest.TestCase):
@@ -65,7 +71,17 @@ class TestDictionaryTrie(unittest.TestCase):
             end_trie({"c": {"_end_": "_end_"}, "d": {"_end_": "_end_"}})
         )
 
-    def test_insert(self):
+    def test_trie_get_ascii_folds_diacritics(self):
+        t = Trie()
+        t.insert(("sao",), "LOC", True, "PROPN", {}, 1.0)
+        self.assertIsNotNone(trie_get(t, "são"))
+        self.assertIsNotNone(trie_get(t, "sao"))
+        self.assertIsNone(trie_get(t, "missing"))
+
+    def test_prefix_trie_ascii_folds_diacritics(self):
+        t = make_trie({"cafe"})
+        self.assertIsNotNone(prefix_trie(t, "café"))
+        self.assertEqual(prefix_trie(t, "café"), prefix_trie(t, "cafe"))
         t = Trie()
         t.insert(["a", "b", "c"], "l", True, "POS", {"data": "1"}, 1.0)
         t.insert(["a", "b", "d"], "l", True, "POS2", {"data": "2"}, 2.0)

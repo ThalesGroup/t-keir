@@ -35,6 +35,8 @@ Example of Configuration:
 
 Converter is a pipeline task that converts document formats into T-KEIR JSON. Configuration contains a top-level `logger` section and converter-specific `settings` (output and OCR options).
 
+**Every key and its effect:** [NLP pipeline YAML](../configuration/nlp.yaml.md#converteryaml).
+
 ### Configure converter logger
 
 Logger is configuration at top level of json in *logger* field.

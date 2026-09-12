@@ -5,7 +5,8 @@ content (KG / NER / keywords / SVO), optionally **links it to external
 reference ontologies**, validates with SHACL, and stores JSON-LD on the
 document for Vespa (`document_ontology.json_ld`).
 
-Config: `tkeir/configs/document-ontology.yaml`.  
+Config: `tkeir/configs/document-ontology.yaml`
+([field effects](../configuration/indexing.yaml.md#document-ontologyyaml)).  
 Implementation: `thot.tasks.document_ontology`.
 
 ---

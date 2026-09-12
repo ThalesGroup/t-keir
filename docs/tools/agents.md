@@ -14,6 +14,8 @@ LLM is `UnifiedLLMWrapper` (Ollama / OpenAI / vLLM). Tools reuse the same MCP
 RAG — see [MCP — Who uses it](mcp.md#who-uses-it-external-vs-agents).
 
 > Related: [MCP](mcp.md), [Templates](templates.md),
+> [YAML field effects](../configuration/agents.yaml.md),
+> [Create a usecase pack](usecase.md) (OSINT as the worked example),
 > [Zero to Hero §4.4](../zero_to_hero.md#44-agents-on-osint-and-enterprise-demo-data-p0).
 
 ---
@@ -168,6 +170,9 @@ answer generation when ``use_wiki`` is set.
 
 Each file is one role. Loaded by `load_agent_spec(name)` from core configs
 and dataset packs (OSINT personas live under `datasets/osint/agents/`).
+
+**Every key and its effect:** [Agents, workflows, and templates](../configuration/agents.yaml.md).
+How to add a pack: [Create a usecase pack](usecase.md).
 
 | Field | Meaning |
 |-------|---------|

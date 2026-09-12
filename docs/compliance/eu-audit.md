@@ -2,7 +2,12 @@
 
 > **Not legal advice.** This page describes the machine-checkable audit tool
 > under `compliance/opa/`. It maps repository evidence and manual attestations
-> to EU regulation articles via OPA (Open Policy Agent).
+> to EU regulation articles via **OPA** (Open Policy Agent). Policies are
+> written in **Rego**; results are also exported as **OSCAL** (NIST Open
+> Security Controls Assessment Language) for auditor / GRC exchange.
+>
+> Concepts (what each acronym is, and how the three layers fit):
+> [OPA, Rego, and OSCAL](opa-rego-oscal.md).
 
 ## Why it exists
 
@@ -48,11 +53,12 @@ docs-only republish: `make compliance-doc-results`.
 |------|----------------|
 | 1 | `input_generator.py` scans the repo + merges `compliance/opa/overrides.yaml` |
 | 2 | Writes `compliance/opa/input/generated_<timestamp>.json` (gitignored) |
-| 3 | `opa check --v0-compatible` on `compliance/opa/policies/` |
-| 4 | `opa eval` of `data.eu.<reg>.summary` for each regulation |
-| 5 | `opa_to_oscal.py` → OSCAL Assessment Results + POA&M under `…/oscal/` |
-| 6 | `report_generator.py` → HTML + JSON (includes OSCAL download links + posture trend) |
-| 7 | `gen_doc_results.py` → full outcomes + **one-page status table** into `docs/compliance/generated/` |
+| 3 | `opa check --v0-compatible` — compile **Rego** under `compliance/opa/policies/` |
+| 4 | `opa eval` — **OPA** evaluates `data.eu.<reg>.summary` for each regulation |
+| 5 | `opa_to_oscal.py` → **OSCAL** Assessment Results + POA&M under `…/oscal/` |
+| 6 | `validate_oscal.py` — NIST OSCAL **v1.1.2** JSON Schema |
+| 7 | `report_generator.py` → HTML + JSON (includes OSCAL download links + posture trend) |
+| 8 | `gen_doc_results.py` → full outcomes + **one-page status table** into `docs/compliance/generated/` |
 
 Without OPA:
 
@@ -69,10 +75,13 @@ produced, then rebuilds MkDocs so [Compliance status](status.md) and
 
 ## OSCAL layer (regulator / GRC exchange)
 
+Primer: [OPA, Rego, and OSCAL](opa-rego-oscal.md).
+
 OPA answers “does control X pass **today**?”. **OSCAL** (NIST Open Security
 Controls Assessment Language, 1.1.2) answers the auditor questions: which
 exact requirement, which component implements it, what evidence, and what
-changed over time.
+changed over time. OSCAL is not a second policy engine — `opa_to_oscal.py`
+translates the same OPA summaries into NIST JSON.
 
 | Artefact | Path | Role |
 |----------|------|------|
@@ -81,16 +90,20 @@ changed over time.
 | Component Definition | `…/component-definitions/tkeir_components.json` | governor / audit / pipeline / Keycloak / CI / NetworkPolicy → `control-id` + evidence |
 | SSP | `…/ssp/tkeir_ssp.json` | System Security Plan template |
 | Assessment Plan | `…/assessments/assessment_plan.json` | Maps `make audit-compliance` to OSCAL tasks |
-| Assessment Results | `reports/compliance/eu-audit/<ver>/oscal/assessment_results.json` | OPA pass/fail/NA → observations + findings |
-| POA&M | `…/oscal/poam.json` | Open findings with remediation milestones |
+| Assessment Results | `reports/compliance/eu-audit/<ver>/oscal/assessment_results.json` | OPA pass/fail/NA → observations + findings + risks |
+| POA&M | `…/oscal/poam.json` | One POA&M item per open finding (NIST `poam-items`) |
+| JSON Schema | `compliance/opa/oscal/schemas/nist-v1.1.2/` | NIST OSCAL **v1.1.2** production schemas ([GitHub release](https://github.com/usnistgov/OSCAL/releases/tag/v1.1.2)) |
 
 Bridge: `compliance/opa/oscal/opa_to_oscal.py` (deterministic **UUID v5** so
-diffs show real posture changes, not regenerated ids).
+diffs show real posture changes, not regenerated ids). The audit copies the
+assessment plan and SSP next to the results so `import-ap` / `import-ssp` hrefs
+resolve. `validate_oscal.py` then checks every generated file against the
+vendored NIST JSON Schema (Draft-07).
 
 ```bash
-make audit-compliance          # produces HTML + OSCAL under reports/…
+make audit-compliance          # OPA + OSCAL + NIST schema validation
 make oscal-catalogs            # regenerate catalogs from Rego
-make oscal-validate            # oscal-cli if installed; else warning + exit 0
+make oscal-validate            # NIST JSON Schema (static layer + reports/)
 make oscal-diff BASELINE=… CURRENT=…   # posture delta between two runs
 ```
 
@@ -107,6 +120,8 @@ Pipeline:
 Repo artefacts → input_generator → OPA eval
                                       ↓
                          opa_to_oscal.py → assessment_results.json + poam.json
+                                      ↓
+                         validate_oscal.py (NIST v1.1.2 JSON Schema)
                                       ↓
                          report.html (human) + GRC ingestion (machine)
 ```

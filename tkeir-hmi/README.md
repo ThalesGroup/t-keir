@@ -3,8 +3,15 @@
 See [docs/hmi.md](../docs/hmi.md) for full documentation.
 
 ```bash
+make setup          # includes make hmi-install (npm ci + Cytoscape.js)
+make hmi-up         # Next.js on :3000
+```
+
+Or from this directory:
+
+```bash
 cd tkeir-hmi
-npm install
+npm ci
 npm run dev
 ```
 

@@ -17,6 +17,7 @@ from typing import Any
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, Namespace
 
+from thot.core.DictionaryTrie import ascii_fold
 from thot.core.KeywordRules import is_valid_keyword_label
 from thot.tools.search.chunk_index_labels import is_chunk_protocol_sentence
 from thot.tools.search.vespa_client import (
@@ -1502,9 +1503,13 @@ def build_hmi_ontology(
 def _surface_in_text(label: str, text: str) -> bool:
     """True when ``label`` appears in chunk text (case-insensitive phrase).
 
+    Also compares ASCII-folded forms so ``São Paulo`` matches ``Sao Paulo``.
+
     Example:
         >>> from thot.tools.search.ontology_utils import _surface_in_text
         >>> _surface_in_text("Paris", "The capital is Paris.")
+        True
+        >>> _surface_in_text("São Paulo", "Landed in Sao Paulo.")
         True
     """
     needle = (label or "").strip()
@@ -1512,6 +1517,10 @@ def _surface_in_text(label: str, text: str) -> bool:
     if len(needle) < 2 or not hay:
         return False
     if needle.casefold() in hay.casefold():
+        return True
+    folded_needle = ascii_fold(needle).casefold()
+    folded_hay = ascii_fold(hay).casefold()
+    if folded_needle and folded_needle in folded_hay:
         return True
     return _keyword_in_chunk_text(needle, hay)
 
@@ -1531,15 +1540,16 @@ def _surface_tokens_in_text(
     """
     if _surface_in_text(label, text):
         return True
-    hay = (text or "").casefold()
+    hay = ascii_fold(text or "").casefold()
     if not hay:
         return False
+    folded_label = ascii_fold(label or "")
     tokens = [
-        tok
-        for tok in re.findall(r"[A-Za-z0-9][A-Za-z0-9'%-]*", label or "")
+        tok.casefold()
+        for tok in re.findall(r"[A-Za-z0-9][A-Za-z0-9'%-]*", folded_label)
         if len(tok) >= min_token_len
     ]
-    return any(tok.casefold() in hay for tok in tokens)
+    return any(tok in hay for tok in tokens)
 
 
 def _ner_type_label(raw: str) -> str:

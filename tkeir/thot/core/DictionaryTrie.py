@@ -8,7 +8,51 @@ Copyright (c) 2026 Thales
 Licensed under the MIT License.
 """
 
+from fold_to_ascii import fold
+
 from thot.core.ThotLogger import ThotLogger
+
+
+def ascii_fold(text: str) -> str:
+    """Fold diacritics to ASCII (same mapping as gazetteer compile).
+
+    Example:
+        >>> from thot.core.DictionaryTrie import ascii_fold
+        >>> ascii_fold("são")
+        'sao'
+        >>> ascii_fold("café")
+        'cafe'
+    """
+    if not text:
+        return text
+    folded = fold(text)
+    return folded if folded else text
+
+
+def trie_get(trie, token: str):
+    """Return the child node for ``token``, then an ASCII-folded fallback.
+
+    Token-level MWE tries store lowercased gazetteer forms. Folding the
+    query token captures diacritic variants (``São`` → ``sao``) without
+    requiring every surface form in the gazetteer.
+
+    Example:
+        >>> from thot.core.DictionaryTrie import Trie, trie_get
+        >>> t = Trie()
+        >>> t.insert(("sao",), "LOC", True, "PROPN", {}, 1.0)
+        >>> trie_get(t, "são") is not None
+        True
+        >>> trie_get(t, "missing") is None
+        True
+    """
+    if not isinstance(trie, dict) or not token:
+        return None
+    if token in trie:
+        return trie[token]
+    folded = ascii_fold(token)
+    if folded != token and folded in trie:
+        return trie[folded]
+    return None
 
 
 def make_trie(words: set) -> dict:
@@ -38,6 +82,9 @@ def make_trie(words: set) -> dict:
 def prefix_trie(trie: dict, word: str) -> dict | None:
     """Return the trie subtree that follows a prefix.
 
+    When the exact prefix is missing, retries after ASCII-folding so
+    diacritic query tokens (``café``) match folded gazetteer keys (``cafe``).
+
     Args:
         trie: Source trie structure.
         word: Prefix to resolve.
@@ -51,7 +98,20 @@ def prefix_trie(trie: dict, word: str) -> dict | None:
         >>> subtree = prefix_trie(trie, "ab")
         >>> subtree["c"]["_end_"]
         '_end_'
+        >>> prefix_trie(make_trie({"cafe"}), "café")["e"]["_end_"]
+        '_end_'
     """
+    found = _prefix_trie_exact(trie, word)
+    if found is not None:
+        return found
+    folded = ascii_fold(word)
+    if folded != word:
+        return _prefix_trie_exact(trie, folded)
+    return None
+
+
+def _prefix_trie_exact(trie: dict, word: str) -> dict | None:
+    """Walk ``trie`` with ``word`` as-is (no diacritic folding)."""
     current_dict = trie
     for letter in word:
         if letter not in current_dict:

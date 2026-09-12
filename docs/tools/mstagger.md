@@ -13,7 +13,8 @@ Example of Configuration:
 ```
 
 Morphosyntactic tagger configuration contains a top-level `logger` section and morphosyntax-specific `taggers` settings.
-The segmenter configuration is a table containing path to Multiple Word Expression entries (MWE):
+
+**Every key and its effect:** [NLP pipeline YAML](../configuration/nlp.yaml.md#mstaggeryaml-morphosyntax).
 
 - **language** :the language of tokenizer
 - **resources-base-path**: path to resources (see `tkeir-create-annotation-resource`)

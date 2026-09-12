@@ -209,8 +209,9 @@ def main(args=None):
         action="store_true",
         help=(
             "Enable MWE compound-word detection and concept pre-tagging in "
-            "tokenizer, morphosyntax, NER, and syntax (slower; disabled by "
-            "default)."
+            "tokenizer, morphosyntax, NER, and syntax. Default configs now "
+            "enable this; use the flag to force it on when a custom YAML "
+            "has use-mwe: false."
         ),
     )
     parsed = parser.parse_args(args)

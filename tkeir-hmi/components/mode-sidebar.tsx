@@ -81,7 +81,7 @@ export function ModeSidebar({
     <aside
       className={cn(
         "flex shrink-0 flex-col border-r bg-card/90 transition-[width] duration-200",
-        collapsed ? "w-14" : "w-72",
+        collapsed ? "w-16" : "w-80",
       )}
     >
       <div
@@ -92,10 +92,10 @@ export function ModeSidebar({
       >
         {!collapsed && (
           <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
               Workspace
             </p>
-            <p className="truncate text-sm font-medium">Choose a mode</p>
+            <p className="truncate text-base font-medium">Choose a mode</p>
           </div>
         )}
         <Button
@@ -161,12 +161,12 @@ export function ModeSidebar({
                     mode === item.id && "bg-primary/10 text-primary",
                   )}
                 >
-                  <span className="flex items-center gap-2 text-sm font-medium">
-                    <Icon className="h-4 w-4 shrink-0" />
+                  <span className="flex items-center gap-2 text-base font-medium">
+                    <Icon className="h-5 w-5 shrink-0" />
                     {item.title}
                   </span>
                 </AccordionTrigger>
-                <AccordionContent className="px-2 pb-3 text-xs leading-relaxed text-muted-foreground">
+                <AccordionContent className="px-2 pb-3 text-sm leading-relaxed text-muted-foreground">
                   {item.blurb}
                   {item.id === "reporter" && !agentAvailable && (
                     <p className="mt-2 text-amber-700 dark:text-amber-400">

@@ -18,9 +18,11 @@ from thot.core.TkeirPaths import (
     package_root,
     rag_prompts_path,
     repo_root,
+    resolve_mwe_path,
     resolve_path,
     resolve_tkeir_paths,
     resources_dir,
+    shared_resources_dir,
     spacy_models_dir,
     tessdata_dir,
     vespa_dir,
@@ -33,6 +35,21 @@ class TestTkeirPaths:
         assert os.path.isdir(root)
         assert os.path.isdir(configs_dir())
         assert os.path.isdir(resources_dir())
+        assert os.path.isdir(shared_resources_dir())
+        assert os.path.isfile(
+            os.path.join(shared_resources_dir(), "rivers.txt")
+        )
+        assert os.path.isfile(
+            os.path.join(shared_resources_dir(), "lakes.txt")
+        )
+        assert os.path.isfile(
+            os.path.join(shared_resources_dir(), "mountains.txt")
+        )
+        assert os.path.isfile(
+            os.path.join(shared_resources_dir(), "regions.txt")
+        )
+        found = resolve_mwe_path(resources_dir("en"))
+        assert found is None or found.endswith("tkeir_mwe.pkl")
 
     def test_resolve_path(self):
         root = package_root()

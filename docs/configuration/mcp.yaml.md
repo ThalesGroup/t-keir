@@ -22,9 +22,33 @@ See also [MCP server](../tools/mcp.md) for tool contracts and auth flows.
 | `tools.ontology_query` | bool | `true` | Expose ontology reasoner tool |
 | `tools.document_get` | bool | `true` | Expose document fetch by id / ref |
 
-## `mcp-client.yaml` (client)
+## `mcp-client.yaml` (outbound client)
 
-Client connection settings for agents / CLI that call the MCP server (URL, timeouts, optional auth header). Field-level detail and examples: [MCP](../tools/mcp.md).
+Path: `tkeir/configs/mcp-client.yaml`  
+Used by **agents** for **external** MCP servers (egress). Internal T-KEIR
+tools (`search`, `rag_query`, …) never go through this file — they call
+`McpHandlers` in-process. See [MCP](../tools/mcp.md).
+
+```yaml
+governor_mode: observe
+egress_allowlist:
+  - host: "127.0.0.1"
+    ports: [8099]
+    tools: ["echo_cite"]
+servers: {}
+```
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| `governor_mode` | `observe` | `observe` logs disallowed egress; `enforce` **denies** the tool call. Independent of `mcp.yaml` `governor_mode`. |
+| `egress_allowlist[]` | shipped localhost `echo_cite` | Empty list = **deny all** remote HTTP MCP. Each row must match host **and** port **and** tool name. |
+| `egress_allowlist[].host` | required | Exact host (`127.0.0.1` and `localhost` are separate rows). |
+| `egress_allowlist[].ports` | required | Allowed TCP ports for that host. |
+| `egress_allowlist[].tools` | required | Tool names the agent may invoke on that host:port. |
+| `servers` | `{}` | Named remote MCP servers. Tests inject in-process transports. Production example: `servers.echo.base_url` + `servers.echo.tools`. |
+
+Workflow YAML `external_tools:` must list the same tool names
+(`echo_cite`, …) or the orchestrator will not offer them.
 
 ## Related
 

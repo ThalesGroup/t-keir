@@ -53,6 +53,8 @@ Edit the workspace copy to add/remove domains. Matching is by host suffix
 (`nasa.gov` allows `firms.modaps.eosdis.nasa.gov`). Set `enabled: false` to
 disable allowlisting (not recommended).
 
+**Every collector YAML key:** [Collector YAML](../configuration/collector.yaml.md).
+
 ## Feed routing (`/feed`) — user-triggered only
 
 Default flow (no auto listen; wiki always via agent):

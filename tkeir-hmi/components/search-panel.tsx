@@ -318,15 +318,15 @@ export function SearchPanel({
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+    <div className="flex w-full flex-col gap-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+        <p className="text-sm font-semibold uppercase tracking-wider text-primary">
           Search
         </p>
-        <h2 className="mt-1 text-xl font-semibold tracking-tight">
+        <h2 className="mt-1 text-2xl font-semibold tracking-tight">
           Retrieval &amp; ontology
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-base text-muted-foreground">
           Hybrid retrieval only (no RAG answer). Left panel: global chunk
           fusion, query NLP (+ BO), and their merge. Expand a chunk for its
           analyzed ontology.
@@ -342,11 +342,11 @@ export function SearchPanel({
           disabled={loading || boBusy}
           label="Dataset"
           className="min-w-[10rem]"
-          triggerClassName="h-9"
+          triggerClassName="h-11"
         />
         <label
           className={cn(
-            "inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-md border px-3 text-sm",
+            "inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-md border px-3 text-base",
             (boBusy || loading) && "pointer-events-none opacity-50",
           )}
         >
@@ -411,8 +411,8 @@ export function SearchPanel({
         </Alert>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-        <aside className="flex min-h-[28rem] flex-col gap-3 rounded-lg border p-3">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        <aside className="flex min-h-[min(70vh,42rem)] flex-col gap-3 rounded-lg border p-4">
           <div className="flex flex-wrap items-center gap-2">
             <Network className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">Ontology</span>
@@ -423,7 +423,7 @@ export function SearchPanel({
                   type="button"
                   onClick={() => setOntologyView(view)}
                   className={cn(
-                    "rounded-md border px-2 py-0.5 text-[11px]",
+                    "rounded-md border px-2.5 py-1 text-sm",
                     ontologyView === view
                       ? "border-primary bg-primary/10 text-primary"
                       : "text-muted-foreground hover:bg-muted",
@@ -448,7 +448,7 @@ export function SearchPanel({
                 )}
               </>
             )}
-            <label className="ml-auto flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <label className="ml-auto flex items-center gap-1.5 text-sm text-muted-foreground">
               Nodes
               <Input
                 type="number"
@@ -471,7 +471,7 @@ export function SearchPanel({
               />
             </label>
           </div>
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {viewMeta[ontologyView].blurb}
           </p>
 
@@ -483,13 +483,13 @@ export function SearchPanel({
                 showDetails
               />
             ) : (
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 External BO loaded ({boConcepts.length} concepts) — run search
                 to measure coverage against the fused graph.
               </p>
             )
           ) : (
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Upload a business ontology file to measure coverage of the
               extended request against this graph and each chunk.
             </p>
@@ -516,7 +516,7 @@ export function SearchPanel({
               weights={displayWeights}
               relations={displayOntology.relations}
               fill
-              height={420}
+              height={560}
               title={viewMeta[ontologyView].title}
               className="flex-1"
             />
@@ -529,7 +529,7 @@ export function SearchPanel({
           )}
         </aside>
 
-        <div className="min-h-[28rem] space-y-3 rounded-lg border p-3">
+        <div className="min-h-[min(70vh,42rem)] space-y-3 rounded-lg border p-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-medium">Search results</span>
             {response && (

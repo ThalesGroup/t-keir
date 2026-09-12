@@ -12,7 +12,7 @@ interface AgentPanelProps {
 export function AgentPanel({ available }: AgentPanelProps) {
   if (!available) {
     return (
-      <div className="mx-auto max-w-3xl">
+      <div className="w-full">
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Agent service unavailable</AlertTitle>
@@ -29,7 +29,7 @@ export function AgentPanel({ available }: AgentPanelProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <div>
         <h2 className="text-xl font-semibold tracking-tight">Agent dialog</h2>
         <p className="text-sm text-muted-foreground">

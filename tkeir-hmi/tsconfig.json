@@ -33,6 +33,7 @@
   },
   "include": [
     "next-env.d.ts",
+    "lib/cytoscape-fcose.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",

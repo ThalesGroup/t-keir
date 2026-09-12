@@ -18,9 +18,16 @@ install-spacy-models` / `make setup`):
 | Other / fallback NER | `xx_ent_wiki_sm` |
 | Arabic | `spacy.blank("ar")` (no Explosion 3.6 trained pipeline). Surface forms are kept when lemmas are empty so hybrid indexing still matches Arabic text. |
 
-Tokenizer lexical resources (`resources/modeling/tokenizer/<lang>/`) exist for
-`en` and `fr`; other languages fall back to those tries while spaCy still
-tags in the detected language.
+Tokenizer lexical resources:
+
+- `resources/modeling/tokenizer/any/` — language-agnostic gazetteers (GeoNames
+  cities/countries, rivers, mountains, lakes, and regions) compiled into
+  `tkeir_mwe.pkl` (`make init-models`). Hydro/relief/region lists are seeded
+  with multilingual exonyms, then expanded from Natural Earth 10m and GeoNames
+  admin-1 (`make geo-gazetteers` / `scripts/build_geo_gazetteers.py`).
+- `resources/modeling/tokenizer/<lang>/` — language-specific rules and
+  stopwords (`en` today; other languages fall back to `en` for rules while
+  spaCy still tags in the detected language)
 
 See [Converter](converter.md) for OCR languages (Tesseract `eng+…+ara`).
 
@@ -33,12 +40,13 @@ Example of Configuration:
 ```
 
 Tokenizer configuration contains a top-level `logger` section and tokenizer-specific `segmenters` settings.
-The segmenter configuration is a table containing path to Multiple Word Expression entries (MWE):
+
+**Every key and its effect:** [NLP pipeline YAML](../configuration/nlp.yaml.md#tokenizeryaml--tokenizer-mweyaml).
 
 - **language** :the language of tokenizer
 - **resources-base-path**: path to resources (see `tkeir-create-annotation-resource`)
-- **use-mwe** (optional): set to `true` to enable MWE compound-word detection and concept pre-tagging (slower; disabled by default)
-- **mwe** : the file containing MWE entries (required when `use-mwe` is `true`)
+- **use-mwe** (optional): set to `true` to enable MWE compound-word detection and concept pre-tagging (on by default; the pickle is loaded from `tokenizer/any/` then the language directory)
+- **mwe** : the file containing MWE entries (required when `use-mwe` is `true`; default `tkeir_mwe.pkl`)
 - **normalization-rules** : the file containing normalization rules
 - **annotation-resources-reference** : reference to annotation file, needs on tokenizer init
 

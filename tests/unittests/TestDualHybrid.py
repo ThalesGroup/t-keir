@@ -53,6 +53,9 @@ def test_load_rag_config_includes_dual_hybrid():
     assert config.dual_hybrid.ontology_scoring.rescore_weight > 0
     assert config.dual_hybrid.final_fusion.top_k_returned >= 1
     assert config.dual_hybrid.ontology_layer.index_concepts is True
+    assert config.dual_hybrid.ontology_layer.index_triples is True
+    assert config.dual_hybrid.document_index.enabled is True
+    assert config.dual_hybrid.document_index.document_weight > 0
     assert config.dual_hybrid.ontology_layer.relation_match in {
         "partial",
         "exact",
@@ -83,17 +86,21 @@ def test_spacy_model_resolves_by_language():
     assert cfg.preprocessing.resolve_model("unknown").model == "xx_ent_wiki_sm"
 
 
-def test_spacy_models_require_default():
-    with pytest.raises(ValueError, match="default"):
-        dual_hybrid_from_mapping(
-            {
-                "preprocessing": {
-                    "spacy_models": {
-                        "en": {"model": "en_core_web_md"},
-                    }
+def test_spacy_yaml_overlays_builtin_defaults():
+    cfg = dual_hybrid_from_mapping(
+        {
+            "preprocessing": {
+                "spacy_models": {
+                    "en": "en_core_web_lg",
                 }
             }
-        )
+        }
+    )
+    assert cfg.preprocessing.resolve_model("en").model == "en_core_web_lg"
+    assert cfg.preprocessing.resolve_model("ar").model == "blank:ar"
+    assert cfg.preprocessing.resolve_model("unknown").model == (
+        "xx_ent_wiki_sm"
+    )
 
 
 def test_index_dump_from_mapping():

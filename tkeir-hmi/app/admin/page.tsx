@@ -17,13 +17,13 @@ export default async function AdminPage({
 
   return (
     <RequireRole allowedRoles={usecaseAdminRoles()}>
-      <div className="mx-auto max-w-3xl space-y-6 px-4 py-10">
+      <div className="w-full space-y-6 px-4 py-8 sm:px-8 lg:px-10">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
             T-KEIR
           </p>
-          <h1 className="text-2xl font-bold tracking-tight">Admin oversight</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight">Admin oversight</h1>
+          <p className="mt-1 text-base text-muted-foreground">
             Runtime governor controls, budgets, and audit deep-links. Corpus
             ingest is in the workspace sidebar as Ingest.
           </p>

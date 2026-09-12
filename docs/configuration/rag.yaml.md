@@ -8,6 +8,19 @@ Runtime pipeline: `thot.tools.search.passage_retrieval.PassageRetrievalPipeline`
 This page describes **every field**, defaults, units, and the algorithms each knob controls.  
 Companion prompt file: [`rag-prompts.yaml`](#rag-promptsyaml).
 
+The committed [`tkeir/configs/rag.yaml`](../../tkeir/configs/rag.yaml) is an
+**override file**. Omitted keys use Python defaults
+(`RagConfig`, `DualHybridConfig`). Do not copy the same weight into two
+blocks — they are different stages:
+
+| Looks similar | Actually |
+|---------------|----------|
+| `search.*` vs `dual_hybrid.*` | Legacy QueryAnalyzer vs production `PassageRetrievalPipeline`. Only `search.enabled` is used when dual-hybrid is on (query NLP). |
+| `rank_profiles.passage.hybrid` vs `hybrid_ontology` | Vespa first-phase vs application concept/relation overlap. `hybrid_ontology` inherits Vespa `hybrid`; YAML only needs `concept` / `relation`. |
+| `query_expansion.weights` vs `ontology_scoring.match_weights` vs `ontology_layer.expansion` | BM25/YQL expansion vs post-rank Graph-RAG rescore vs request-time neighborhood walk. |
+| `retrieval.hits` vs `document_index.hits` vs `search.hits` vs `final_fusion.top_k_returned` | First-stage pool vs document arm vs legacy arm vs returned top-k. |
+| spaCy language list | Built-in `_default_spacy_models()` (`ar` is `blank:ar`). YAML overlays one language if needed. |
+
 ---
 
 ## Override order
@@ -228,6 +241,7 @@ See [Ontology layer](../architecture/ontology.md).
 dual_hybrid:
   ontology_layer:
     index_concepts: true
+    index_triples: true
     embed_concepts: false
     json_structural_concepts: true
     max_concepts_per_chunk: 64
@@ -243,10 +257,38 @@ dual_hybrid:
 
 | Field | Default | Description |
 |-------|---------|-------------|
-| `index_concepts` | true | Upsert `ontology_concept` catalog docs at index time |
+| `index_concepts` | true | Insert-if-absent `ontology_concept` catalog docs (corpus-wide GET then PUT) |
+| `index_triples` | true | Insert-if-absent `ontology_triple` SPO rows (skip triples already stored) |
 | `embed_concepts` | false | Off by default (index throughput); lexical concept lookup still works |
 | `json_structural_concepts` | true | Mint JSON attribute/value concepts |
 | `relation_match` | partial | Exact compact-key vs partial struct-slot YQL |
+
+### `document_index`
+
+One Vespa `corpus_doc` per source document (not named `document` — reserved).
+Chunks store `parent_doc_id` = `sha256(source_ref)[:40]`. Search and RAG blend
+chunk scores with this arm (`chunk_weight` + `document_weight`).
+
+```yaml
+dual_hybrid:
+  document_index:
+    enabled: true
+    search_enabled: true
+    hits: 50
+    ranking_profile: hybrid
+    chunk_weight: 0.65
+    document_weight: 0.35
+    simhash_max_hamming: 3
+    simhash_prefix_bits: 16
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `enabled` | true | Write `corpus_doc` at index time (`global` / `both` targets) |
+| `search_enabled` | true | Run the document arm on `/search` and RAG |
+| `chunk_weight` | 0.65 | Passage hybrid weight after min-max normalize |
+| `document_weight` | 0.35 | `corpus_doc` hybrid weight (title + body + vectors + concept ids) |
+| `simhash_max_hamming` | 3 | Near-duplicate Hamming distance; sets `duplicate_of` |
 
 ### `business_ontology`
 
@@ -411,8 +453,22 @@ Smoke / eval reports alert when stage averages exceed budgets (see [Evaluation](
 
 ## `rag-prompts.yaml`
 
-Prompt templates for `/rag/query` generation (system / user skeletons, citation instructions).  
-Loaded alongside `rag.yaml` by the RAG FastAPI app. Edit strings carefully: they affect answer style, not retrieval ranking.
+Path: `tkeir/configs/rag-prompts.yaml`.  
+Prompt templates for `/rag/query` generation. Loaded alongside `rag.yaml`.
+**Does not change ranking** — only answer text. Field-level placeholders:
+[Agents, workflows, and templates](agents.yaml.md#rag-promptsyaml).
+
+Top-level keys are language codes (`en`, `fr`). Per-language fields:
+
+| Field | Effect |
+|-------|--------|
+| `unavailable_answer` | Exact short answer when nothing in the passages supports a reply |
+| `no_chunks_message` | Message when retrieval is empty |
+| `system` | System prompt (`{unavailable_answer}` interpolated) |
+| `user` | User skeleton for `prompt.chunk_context_mode: chunk_excerpts` |
+| `user_svo` | User skeleton for shipped `svo_ontology` mode |
+
+Keep `SHORT_ANSWER:` / `DETAILED_REPORT:` markers; the parser splits on them.
 
 ---
 

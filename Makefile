@@ -16,9 +16,9 @@ else
 Q := @
 endif
 
-.PHONY: help setup install check-uv check-docker check-git check-jq check-curl check-python-version check-secrets \
+.PHONY: help setup install check-uv check-docker check-git check-npm check-jq check-curl check-python-version check-secrets \
 	check-install \
-	install-tesseract install-spacy-models install-converter-models build wheel init-models \
+	install-tesseract install-spacy-models install-converter-models build wheel init-models geo-gazetteers \
 	test test-unit test-functional test-coverage coverage \
 	test-integration test-integration-ci \
 	test-fuzz-hypothesis test-fuzz-atheris test-fuzz-radamsa test-fuzz fuzz-report \
@@ -32,7 +32,8 @@ endif
 	docs docs-build docs-pdf pipeline quickstart ci-deps ci pre-commit clean devcontainer \
 	sync pull-models pull-bge-model pull-vespa pull-searxng start init bootstrap vespa-check test-vespa test-vespa-py \
 	index index-fixtures corpus rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
-	beir-eval beir-smoke generate-eval rag-eval beir-rag-eval eval eval-smoke clean-db vespa-clean logs \
+	beir-eval beir-smoke generate-eval rag-eval beir-rag-eval eval eval-smoke clean-db vespa-clean \
+	save-index restore-index logs \
 	images images-push images-sign \
 	compose-up compose-down compose-bootstrap compose-logs compose-smoke wipe-runtime down all-down \
 	audit-report audit-summary audit-verify audit-archive \
@@ -130,6 +131,13 @@ FORCE_VESPA ?= 0
 FORCE_CONVERTER_MODELS ?= 0
 DOCS_PORT ?= 8000
 DOCS_PDF_OUTPUT ?= $(ROOT)/output/docs/tkeir-docs.pdf
+# Material for MkDocs requires MkDocs 1.x. MkDocs 2.0 (pre-release) drops
+# plugins/themes T-KEIR uses. Material ≥9.7.2 prints a banner unless this is set.
+# https://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/
+NO_MKDOCS_2_WARNING ?= 1
+export NO_MKDOCS_2_WARNING
+MKDOCS_UV_WITH := --with 'mkdocs>=1.6,<2' --with 'mkdocs-material>=9.7.5,<10' \
+	--with mkdocs-render-swagger-plugin
 
 INDEX_INPUT ?= $(ROOT)/tests/indexing/output
 INDEX_FIXTURES_INPUT := $(ROOT)/tests/indexing/input
@@ -314,6 +322,16 @@ check-git: ## Require a git working tree
 	$(Q)git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { \
 		echo "This directory is not inside a git repository"; exit 1; }
 
+check-npm: ## Require Node.js 20+ and npm (tkeir-hmi, Cytoscape.js)
+	$(Q)command -v node >/dev/null 2>&1 || { \
+		echo "Node.js 20+ is required for tkeir-hmi: https://nodejs.org/"; \
+		exit 1; \
+	}
+	$(Q)command -v npm >/dev/null 2>&1 || { \
+		echo "npm is required for tkeir-hmi (comes with Node.js)"; \
+		exit 1; \
+	}
+
 check-jq: ## Require jq (rag-query / collector-query / smoke-test)
 	$(Q)command -v jq >/dev/null 2>&1 || { \
 		echo "jq is required (used by rag-query / collector-query / smoke-test). Install: https://stedolan.github.io/jq/"; \
@@ -370,8 +388,12 @@ verify-lockfile: check-uv ## Fail if uv.lock is out of sync with pyproject.toml
 	cd $(TKEIR_DIR) && $(UV) lock --check
 	$(Q)echo "Lock file OK."
 
-hmi-install: ## Install HMI dependencies from package-lock.json
+hmi-install: check-npm ## Install HMI Node deps from package-lock.json (Cytoscape.js + fCoSE)
 	cd $(HMI_DIR) && npm ci
+	$(Q)test -d "$(HMI_DIR)/node_modules/cytoscape" \
+		&& test -d "$(HMI_DIR)/node_modules/cytoscape-fcose" \
+		|| { echo "HMI npm ci did not install cytoscape / cytoscape-fcose"; exit 1; }
+	$(Q)echo "HMI Node deps installed (cytoscape + cytoscape-fcose)."
 
 install-spacy-models: check-uv ## Extract spaCy pipelines into tkeir/resources/modeling/spacy
 	$(Q)chmod +x "$(SCRIPTS_DIR)/install_spacy_models.sh"
@@ -394,7 +416,10 @@ init-models: install ## Build tkeir_mwe.pkl from annotation resources (skip if p
 	$(Q)cd $(TKEIR_DIR) && TRANSFORMERS_CACHE="$(TRANSFORMERS_CACHE)" \
 		bash scripts/init-models.sh "$(TRANSFORMERS_CACHE)"
 
-setup: ## Full local setup (install → spaCy → Tesseract → converter models → MWE → BGE-M3 → Vespa if needed)
+geo-gazetteers: ## Expand tokenizer/any lakes/rivers/mountains/regions from Natural Earth + GeoNames
+	python3 "$(ROOT)/scripts/build_geo_gazetteers.py"
+
+setup: ## Full local setup (install → spaCy → Tesseract → converter models → MWE → BGE-M3 → HMI/Node → Vespa if needed)
 	$(MAKE) install
 	$(MAKE) install-spacy-models
 	$(MAKE) install-tesseract
@@ -404,12 +429,14 @@ setup: ## Full local setup (install → spaCy → Tesseract → converter models
 	$(MAKE) pull-vespa
 	$(MAKE) pull-searxng
 	$(MAKE) scidocs-download
+	$(MAKE) hmi-install
 	$(Q)echo ""
 	$(Q)echo "Setup complete."
 	$(Q)echo "  Run pipeline: make pipeline"
 	$(Q)echo "  Or demo:      make quickstart"
 	$(Q)echo "  Vespa:        make bootstrap   # start container + deploy schemas"
 	$(Q)echo "  SearXNG:      make searxng-up  # meta-search on :$(SEARXNG_PORT)"
+	$(Q)echo "  HMI:          make hmi-up      # Next.js UI on :3000 (Cytoscape ontology graph)"
 	$(Q)echo "  Collector:    make collector && make collector-query COLLECTOR_QUERY=\"maritime AIS\""
 	$(Q)echo "  Index:        make index          # thot.tools.ingest"
 	$(Q)echo "  Search/RAG:   make rag            # thot.tools.search"
@@ -742,12 +769,12 @@ docs: ci-deps ## MkDocs dev server (override DOCS_PORT; default 8000)
 		exit 1; \
 	fi
 	cd $(ROOT) && $(UV) run --project $(TKEIR_DIR) --python $(PYTHON) \
-		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger-plugin \
+		$(MKDOCS_UV_WITH) \
 		mkdocs serve -f "$(ROOT)/mkdocs.yml" -a 127.0.0.1:$(DOCS_PORT)
 
 docs-build: ci-deps quality-docs ## Build static MkDocs site under site/
 	cd $(ROOT) && $(UV) run --project $(TKEIR_DIR) --python $(PYTHON) \
-		--with mkdocs --with mkdocs-material --with mkdocs-render-swagger-plugin \
+		$(MKDOCS_UV_WITH) \
 		mkdocs build -f "$(ROOT)/mkdocs.yml"
 	$(Q)echo "Built static site: $(ROOT)/site/index.html"
 
@@ -1614,7 +1641,7 @@ okf-up: ## Start OKF server on host (make okf)
 .PHONY: okf-migrate-workspace
 
 hmi-up: ## Start tkeir-hmi Next.js UI on host (:3000)
-	$(Q)test -d "$(HMI_DIR)/node_modules" || $(MAKE) hmi-install
+	$(Q)test -d "$(HMI_DIR)/node_modules/cytoscape" || $(MAKE) hmi-install
 	$(Q)test -f "$(HMI_DIR)/.env.local" \
 		|| cp "$(HMI_DIR)/.env.local.example" "$(HMI_DIR)/.env.local"
 	$(Q)USECASE_HMI="$(ROOT)/datasets/$(TKEIR_USECASE)/hmi.json"; \
@@ -1938,6 +1965,21 @@ vespa-clean: check-docker ## Stop/remove Vespa container (keeps volume)
 	docker stop vespa || true
 	docker rm vespa || true
 
+# INDEX_SNAPSHOT=1 → .vespa-snapshots/<USECASE>/index.tar.gz ; or set a file path.
+INDEX_SNAPSHOT ?=
+.PHONY: save-index restore-index
+save-index: check-docker ## Tar the Vespa data volume (INDEX_SNAPSHOT=1 or /path/to.tar.gz)
+	$(Q)INDEX_SNAPSHOT="$(if $(INDEX_SNAPSHOT),$(INDEX_SNAPSHOT),1)" \
+		USECASE="$(USECASE)" TKEIR_USECASE="$(TKEIR_USECASE)" \
+		VESPA_IMAGE="$(VESPA_IMAGE)" \
+		$(VESPA_DIR)/snapshot_index.sh save
+
+restore-index: check-docker ## Replace the Vespa volume from INDEX_SNAPSHOT (always overwrites)
+	$(Q)INDEX_SNAPSHOT="$(if $(INDEX_SNAPSHOT),$(INDEX_SNAPSHOT),1)" \
+		USECASE="$(USECASE)" TKEIR_USECASE="$(TKEIR_USECASE)" \
+		VESPA_IMAGE="$(VESPA_IMAGE)" \
+		$(VESPA_DIR)/snapshot_index.sh restore
+
 logs: check-docker ## Tail Vespa Docker logs
 	docker logs -f vespa
 
@@ -1978,19 +2020,10 @@ compliance-doc-tables:
 oscal-catalogs:
 	python3 compliance/opa/oscal/gen_oscal_catalogs.py
 
-## oscal-validate: validate generated OSCAL documents with oscal-cli (if installed)
+## oscal-validate: validate OSCAL JSON against NIST v1.1.2 production schemas
 .PHONY: oscal-validate
 oscal-validate:
-	@if command -v oscal-cli >/dev/null 2>&1; then \
-	  for f in reports/compliance/eu-audit/*/oscal/assessment_results.json; do \
-	    [ -f "$$f" ] || continue; \
-	    echo "[oscal] Validating $$f"; \
-	    oscal-cli validate "$$f" || oscal-cli ar validate "$$f" || true; \
-	  done; \
-	else \
-	  echo "[oscal] WARNING: oscal-cli not found — skipping OSCAL validation"; \
-	  echo "[oscal] Install: https://github.com/usnistgov/oscal-cli"; \
-	fi
+	python3 compliance/opa/oscal/validate_oscal.py
 
 ## oscal-diff: diff two OSCAL assessment results (BASELINE=… CURRENT=…)
 .PHONY: oscal-diff

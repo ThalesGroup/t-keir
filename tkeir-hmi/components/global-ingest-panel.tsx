@@ -346,7 +346,7 @@ export function GlobalIngestPanel() {
   const previewStatuses = statuses.slice(0, STATUS_PREVIEW);
 
   return (
-    <section className="mx-auto w-full max-w-5xl rounded-md border bg-card p-4">
+    <section className="w-full rounded-md border bg-card p-6">
       <h2 className="text-lg font-semibold">Global corpus ingest</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Split a JSON record corpus into one Markdown document per record

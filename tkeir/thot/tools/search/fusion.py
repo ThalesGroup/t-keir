@@ -124,3 +124,45 @@ def weighted_fusion(
         for doc_id, score in mapping.items():
             combined[doc_id] = combined.get(doc_id, 0.0) + weight * score
     return combined
+
+
+def blend_chunk_and_document_scores(
+    chunk_scores: dict[str, float],
+    passage_parent_keys: dict[str, list[str]],
+    document_scores: dict[str, float],
+    *,
+    chunk_weight: float = 0.65,
+    document_weight: float = 0.35,
+) -> dict[str, float]:
+    """Blend passage scores with the parent ``corpus_doc`` arm.
+
+    Each passage may list several join keys (``parent_doc_id``,
+    ``source_ref``). The best matching document score is used.
+
+    Example:
+        >>> from thot.tools.search.fusion import blend_chunk_and_document_scores
+        >>> blend_chunk_and_document_scores(
+        ...     {'c1': 1.0, 'c2': 0.0},
+        ...     {'c1': ['docA'], 'c2': ['docB']},
+        ...     {'docA': 0.0, 'docB': 1.0},
+        ...     chunk_weight=0.5,
+        ...     document_weight=0.5,
+        ... )['c2'] > 0.4
+        True
+    """
+    if not chunk_scores:
+        return {}
+    if not document_scores or document_weight <= 0:
+        return dict(chunk_scores)
+    parent_for_passage: dict[str, float] = {}
+    for pid, keys in passage_parent_keys.items():
+        best = 0.0
+        for key in keys:
+            value = document_scores.get(key)
+            if value is not None and value > best:
+                best = value
+        parent_for_passage[pid] = best
+    return weighted_fusion(
+        {"chunk": chunk_scores, "document": parent_for_passage},
+        {"chunk": float(chunk_weight), "document": float(document_weight)},
+    )

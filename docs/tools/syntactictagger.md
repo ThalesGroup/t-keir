@@ -15,6 +15,8 @@ Example of Configuration:
 
 Syntactic tagger configuration contains a top-level `logger` section and syntax-specific `taggers` settings.
 
+**Every key and its effect:** [NLP pipeline YAML](../configuration/nlp.yaml.md#syntactic-taggeryaml).
+
 Syntactic Rules allows to define rule for triple Subject, Predicate, Object extraction
 
 Example of Configuration:

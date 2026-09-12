@@ -9,6 +9,9 @@ on:
       - "deploy/images/**"
       - "tkeir/**"
       - "tkeir-hmi/**"
+      - "datasets/osint/**"
+      - "datasets/enterprise/**"
+      - ".dockerignore"
       - ".github/workflows/images.yml"
   workflow_dispatch:
 
@@ -52,6 +55,13 @@ jobs:
             tkeir-lib \
             --progress=plain \
             $EXTRA
+
+      - name: Verify MWE pickle and usecase packs
+        if: github.event_name == 'pull_request'
+        env:
+          REGISTRY: ghcr.io/${{ github.repository_owner }}/t-keir
+          TAG: ${{ github.sha }}
+        run: bash deploy/images/verify-image.sh "${REGISTRY}/tkeir-lib:${TAG}" lib
 
       - name: Install cosign
         if: github.event_name != 'pull_request'
@@ -110,6 +120,20 @@ jobs:
             "${{ matrix.target }}" \
             --progress=plain \
             $EXTRA
+
+      - name: Verify image artefacts
+        if: github.event_name == 'pull_request'
+        env:
+          REGISTRY: ghcr.io/${{ github.repository_owner }}/t-keir
+          TAG: ${{ github.sha }}
+        run: |
+          case "${{ matrix.target }}" in
+            tkeir-indexer) kind=indexer ;;
+            tkeir-hmi) kind=hmi ;;
+            tkeir-api|tkeir-ingest|tkeir-audit|tkeir-governor|tkeir-mcp|tkeir-agent) kind=lib ;;
+            *) exit 0 ;;
+          esac
+          bash deploy/images/verify-image.sh "${REGISTRY}/${{ matrix.target }}:${TAG}" "$kind"
 
       - name: Install cosign
         if: github.event_name != 'pull_request'

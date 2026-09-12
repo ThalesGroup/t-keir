@@ -15,7 +15,31 @@ tkeir/dist
 tkeir-hmi/.next
 coverage-reports
 reports
-datasets
+# Corpora and bulky artifacts stay out of the build context. Un-ignore the
+# usecase contract files that images COPY into /opt/tkeir/packs (and HMI public).
+datasets/**
+!datasets/osint/
+!datasets/osint/agents/
+!datasets/osint/agents/**
+!datasets/osint/workflows/
+!datasets/osint/workflows/**
+!datasets/osint/agent_orchestrator.yaml
+!datasets/osint/business_ontology.yaml
+!datasets/osint/hmi.json
+!datasets/osint/keycloak.json
+!datasets/enterprise/
+!datasets/enterprise/agents/
+!datasets/enterprise/agents/**
+!datasets/enterprise/workflows/
+!datasets/enterprise/workflows/**
+!datasets/enterprise/templates/
+!datasets/enterprise/templates/**
+!datasets/enterprise/agent_orchestrator.yaml
+!datasets/enterprise/enterprise_ontology.yaml
+!datasets/enterprise/hmi.json
+!datasets/enterprise/keycloak.json
+# Host-built tries are gitignored; images always regenerate tkeir_mwe.pkl.
+**/*.pkl
 output
 dist
 build

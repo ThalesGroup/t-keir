@@ -53,6 +53,32 @@ def test_load_beir_business_ontologies():
         assert all(c.get("concept_id") for c in payload["concepts"])
 
 
+def test_dataset_business_ontology_pack_fallback(tmp_path, monkeypatch):
+    from thot.core import TkeirPaths
+    from thot.tools.search.business_ontology import (
+        dataset_business_ontology_path,
+        load_dataset_business_ontology_payload,
+    )
+
+    pack = tmp_path / "pkg" / "packs" / "demo"
+    pack.mkdir(parents=True)
+    (pack / "business_ontology.yaml").write_text(
+        "concepts:\n  - concept_id: DEMO\n    preferred_label: Demo\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        TkeirPaths, "repo_root", lambda: str(tmp_path / "empty")
+    )
+    monkeypatch.setattr(
+        TkeirPaths, "package_root", lambda: str(tmp_path / "pkg")
+    )
+    path = dataset_business_ontology_path("demo")
+    assert path == pack / "business_ontology.yaml"
+    payload = load_dataset_business_ontology_payload("demo")
+    assert payload is not None
+    assert payload["concepts"][0]["concept_id"] == "DEMO"
+
+
 def test_require_beir_business_ontology_and_force_stages():
     from thot.tools.eval.beir_tkeir import (
         beir_ontology_for_index,

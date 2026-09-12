@@ -48,6 +48,13 @@ class TestTkeirPaths:
         assert os.path.isfile(
             os.path.join(shared_resources_dir(), "regions.txt")
         )
+        assert os.path.isfile(
+            os.path.join(
+                shared_resources_dir(),
+                "otan",
+                "concept.txt",
+            )
+        )
         found = resolve_mwe_path(resources_dir("en"))
         assert found is None or found.endswith("tkeir_mwe.pkl")
 

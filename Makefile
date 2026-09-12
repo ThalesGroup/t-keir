@@ -34,7 +34,7 @@ endif
 	index index-fixtures corpus rag ingest rag-query search-query mcp mcp-tools agent agent-run smoke-test \
 	beir-eval beir-smoke generate-eval rag-eval beir-rag-eval eval eval-smoke clean-db vespa-clean \
 	save-index restore-index logs \
-	images images-push images-sign \
+	images images-push images-sign images-verify \
 	compose-up compose-down compose-bootstrap compose-logs compose-smoke wipe-runtime down all-down \
 	audit-report audit-summary audit-verify audit-archive \
 	governor-flags governor-kill rollback-index check-secrets-staged \
@@ -873,6 +873,7 @@ images: check-docker ## Build all images (lib once, then api/ingest/…); also: 
 			$(if $(PLATFORMS),--set "*.platform=$(PLATFORMS)",) \
 			--progress=plain default
 	$(Q)echo "Built images under $(IMAGE_REGISTRY)/*:$(IMAGE_TAG) (shared base: tkeir-lib)"
+	$(MAKE) images-verify
 
 image-%: check-docker ## Build one image target (lib|api|indexer|indexer-slim|hmi|ingest|…)
 	$(Q)docker buildx version >/dev/null
@@ -884,6 +885,16 @@ image-%: check-docker ## Build one image target (lib|api|indexer|indexer-slim|hm
 			$(if $(PLATFORMS),--set "*.platform=$(PLATFORMS)",) \
 			--progress=plain tkeir-$*
 	$(Q)echo "Built $(IMAGE_REGISTRY)/tkeir-$*:$(IMAGE_TAG)"
+	$(Q)kind=""; \
+	case "$*" in \
+	  lib|api|ingest|audit|governor|mcp|agent) kind=lib ;; \
+	  indexer|indexer-slim) kind=indexer ;; \
+	  hmi) kind=hmi ;; \
+	esac; \
+	if [ -n "$$kind" ]; then \
+	  bash "$(ROOT)/deploy/images/verify-image.sh" \
+	    "$(IMAGE_REGISTRY)/tkeir-$*:$(IMAGE_TAG)" "$$kind"; \
+	fi
 
 images-push: check-docker ## Push bake targets (defaults to linux/amd64,linux/arm64)
 	$(Q)docker buildx version >/dev/null
@@ -905,6 +916,19 @@ images-sign: ## Cosign keyless sign images (requires cosign + OIDC identity)
 		echo "Signing $(IMAGE_REGISTRY)/$${name}:$(IMAGE_TAG)"; \
 		cosign sign --yes "$(IMAGE_REGISTRY)/$${name}:$(IMAGE_TAG)"; \
 	done
+
+images-verify: check-docker ## Confirm MWE pickle, spaCy, and usecase packs in built images
+	$(Q)bash "$(ROOT)/deploy/images/verify-image.sh" \
+		"$(IMAGE_REGISTRY)/tkeir-lib:$(IMAGE_TAG)" lib
+	$(Q)if docker image inspect "$(IMAGE_REGISTRY)/tkeir-indexer:$(IMAGE_TAG)" >/dev/null 2>&1; then \
+		bash "$(ROOT)/deploy/images/verify-image.sh" \
+			"$(IMAGE_REGISTRY)/tkeir-indexer:$(IMAGE_TAG)" indexer; \
+	fi
+	$(Q)if docker image inspect "$(IMAGE_REGISTRY)/tkeir-hmi:$(IMAGE_TAG)" >/dev/null 2>&1; then \
+		bash "$(ROOT)/deploy/images/verify-image.sh" \
+			"$(IMAGE_REGISTRY)/tkeir-hmi:$(IMAGE_TAG)" hmi; \
+	fi
+	$(Q)echo "Image usecase/MWE checks passed ($(IMAGE_REGISTRY)/*:$(IMAGE_TAG))"
 
 # ---------------------------------------------------------------------------
 # Docker Compose (P1+) — tkeir images from IMAGE_REGISTRY (default: local)

@@ -13,18 +13,24 @@
 | `tkeir-indexer-slim` | same, `INSTALL_OCR=0` | `PYTHON_BASE` | same without Tesseract |
 | `tkeir-hmi` | `Dockerfile.tkeir-hmi` | `NODE_BASE` | Next.js standalone (:3000) |
 
-`tkeir-lib` runs `uv sync` **once** (including `--group audit`) and extracts
-spaCy pipelines into `resources/modeling/spacy` so `tkeir-ingest` can run the
-NLP pipeline. Python service images are thin layers (`FROM tkeir-lib`) so the
-base is not rebuilt per container. HMI is Node-only; indexer keeps a separate
-tree (also spaCy resources + optional OCR).
+`tkeir-lib` runs `uv sync` **once** (including `--group audit`), extracts
+spaCy pipelines into `resources/modeling/spacy`, and compiles
+`resources/modeling/tokenizer/any/tkeir_mwe.pkl` from
+`annotation-resources.json` (geo gazetteers + OTAN lists). It also copies
+OSINT/enterprise **usecase packs** (agents, workflows, templates, business
+ontology) to `/opt/tkeir/packs/` so ingest/agent/RAG can run without a git
+checkout. Python service images are thin layers (`FROM tkeir-lib`) so the
+base is not rebuilt per container. HMI is Node-only and bakes
+`datasets/osint/hmi.json` as `/app/public/usecase.json`. Indexer keeps a
+separate tree (spaCy + MWE pickle + optional OCR).
 
 Registry (local default): `local` — see `deploy/versions.lock.yaml`.
 Publish: `make images-push IMAGE_REGISTRY=ghcr.io/thalesgroup/t-keir`.
 
 ```bash
 make images              # all targets (lib first), native platform
-make image-lib           # shared Python base only
+make image-lib           # shared Python base only (includes MWE pickle)
+make images-verify       # assert pickle + usecase packs in local tags
 make image-api           # also builds tkeir-lib via bake context
 make image-hmi
 make images-push         # multi-arch + push

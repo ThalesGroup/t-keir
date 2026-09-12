@@ -99,6 +99,13 @@ class AnnotationResources:
         """
         if "download" not in list_item:
             return
+        dest_name = list_item.get("path") or ""
+        dest = (
+            os.path.join(resources_base_path, dest_name) if dest_name else ""
+        )
+        if dest and os.path.isfile(dest):
+            ThotLogger.info("Using existing list resource '" + dest + "'")
+            return
         if "url" not in list_item["download"]:
             ThotLogger.error("With download option you must give url")
             return

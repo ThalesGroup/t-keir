@@ -32,17 +32,27 @@ COPY tkeir/resources ./resources
 COPY datasets/osint/agents ./packs/osint/agents
 COPY datasets/osint/workflows ./packs/osint/workflows
 COPY datasets/osint/agent_orchestrator.yaml ./packs/osint/agent_orchestrator.yaml
+COPY datasets/osint/business_ontology.yaml ./packs/osint/business_ontology.yaml
+COPY datasets/osint/hmi.json ./packs/osint/hmi.json
+COPY datasets/osint/keycloak.json ./packs/osint/keycloak.json
 COPY datasets/enterprise/agents ./packs/enterprise/agents
 COPY datasets/enterprise/workflows ./packs/enterprise/workflows
 COPY datasets/enterprise/templates ./packs/enterprise/templates
 COPY datasets/enterprise/agent_orchestrator.yaml ./packs/enterprise/agent_orchestrator.yaml
+COPY datasets/enterprise/enterprise_ontology.yaml ./packs/enterprise/enterprise_ontology.yaml
+COPY datasets/enterprise/hmi.json ./packs/enterprise/hmi.json
+COPY datasets/enterprise/keycloak.json ./packs/enterprise/keycloak.json
+COPY deploy/images/build-mwe.sh /tmp/build-mwe.sh
 
 # audit (psycopg) is shared so ingest can run the pipeline in-container.
 # spaCy + Tesseract traineddata into resources/modeling (same as make setup).
+# Compile tkeir_mwe.pkl so tokenizer/NER use-mwe works without host pickles.
 RUN uv sync --frozen --no-dev --group audit \
     && uv run --frozen --no-sync python -m thot.tools.install_spacy_models \
     && uv run --frozen --no-sync python -m thot.tools.install_converter_models \
          --tessdata-only \
+    && chmod +x /tmp/build-mwe.sh \
+    && PATH="/opt/tkeir/.venv/bin:$PATH" /tmp/build-mwe.sh \
     && find /opt/tkeir/.venv -type d \( -name tests -o -name test -o -name __pycache__ \) \
          -print0 | xargs -0 rm -rf \
     && find /opt/tkeir/.venv -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
@@ -61,7 +71,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH=/opt/tkeir/.venv/bin:$PATH \
     TRANSFORMERS_CACHE=/tmp/transformers \
-    HF_HOME=/tmp/huggingface
+    HF_HOME=/tmp/huggingface \
+    TKEIR_USECASE=osint \
+    TKEIR_AGENT_USECASE=osint \
+    TKEIR_BUSINESS_ONTOLOGY_DATASET=osint
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
       curl ca-certificates \

@@ -25,12 +25,16 @@ COPY tkeir/pyproject.toml tkeir/uv.lock tkeir/README.md ./
 COPY tkeir/thot ./thot
 COPY tkeir/configs ./configs
 COPY tkeir/resources ./resources
+COPY deploy/images/build-mwe.sh /tmp/build-mwe.sh
 
 # Pipeline + indexer: spaCy + Tesseract traineddata under resources/modeling.
+# Compile tkeir_mwe.pkl so pipeline-index can run with use-mwe: true.
 RUN uv sync --frozen --no-dev \
     && uv run --frozen --no-sync python -m thot.tools.install_spacy_models \
     && uv run --frozen --no-sync python -m thot.tools.install_converter_models \
          --tessdata-only \
+    && chmod +x /tmp/build-mwe.sh \
+    && PATH="/opt/tkeir/.venv/bin:$PATH" /tmp/build-mwe.sh \
     && find /opt/tkeir/.venv -type d \( -name tests -o -name test -o -name __pycache__ \) \
          -print0 | xargs -0 rm -rf \
     && find /opt/tkeir/.venv -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete

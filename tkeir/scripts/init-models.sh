@@ -20,7 +20,7 @@ tkeir_root="$(cd "${script_path}/.." && pwd)"
 usage() {
     echo "Usage: init-models.sh [MODEL_CACHE_PATH]" >&2
     echo "  Builds resources/modeling/tokenizer/any/tkeir_mwe.pkl" >&2
-    echo "  (cities, countries, rivers, mountains, lakes, regions, …)" >&2
+    echo "  (cities, countries, rivers, mountains, lakes, regions, OTAN, …)" >&2
     exit 1
 }
 

@@ -60,11 +60,7 @@ def test_raw_converter_splits_record_markdown():
     record = {
         "doc_id": "C2-1",
         "title": "OSINT Report - Suez",
-        "text": (
-            "Cautious calm.\n\n"
-            "## Ports\n\n"
-            "Suez Gulf Approach is watched."
-        ),
+        "text": "Cautious calm.\n\n## Ports\n\nSuez Gulf Approach is watched.",
         "domain": "OSINT_SOCMINT",
         "location": {"country": "Egypt"},
     }

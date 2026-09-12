@@ -43,9 +43,10 @@ class TestResourceSelector:
         assert result["resource-selection"][
             "resources-base-path"
         ] == resources_dir("en")
-        assert result["resource-selection"][
-            "shared-resources-path"
-        ] == shared_resources_dir()
+        assert (
+            result["resource-selection"]["shared-resources-path"]
+            == shared_resources_dir()
+        )
 
     def test_annotate_document_missing_language_falls_back(self):
         document = {"content": ["sample"]}

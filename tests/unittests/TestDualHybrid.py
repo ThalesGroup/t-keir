@@ -37,9 +37,9 @@ def test_load_rag_config_includes_dual_hybrid():
     assert config.dual_hybrid.preprocessing.resolve_model("ar").model == (
         "blank:ar"
     )
-    assert config.dual_hybrid.preprocessing.resolve_model("de").model.startswith(
-        "de_"
-    )
+    assert config.dual_hybrid.preprocessing.resolve_model(
+        "de"
+    ).model.startswith("de_")
     assert config.dual_hybrid.preprocessing.asciifold is True
     assert not hasattr(config.search, "use_parent_content")
     assert not hasattr(config.search, "use_parent_title")

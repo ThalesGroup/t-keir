@@ -56,6 +56,97 @@ def parse_validation_report(
     return violations
 
 
+def _parse_shapes_graph(shapes_ttl: str | None) -> Graph | None:
+    """Parse induced SHACL turtle, or None on failure.
+
+    Example:
+        >>> callable(_parse_shapes_graph)
+        True
+    """
+    shapes_graph = Graph()
+    try:
+        shapes_graph.parse(
+            data=shapes_ttl or DOCUMENT_SHACL_SHAPES_TTL,
+            format="turtle",
+        )
+    except Exception:
+        return None
+    return shapes_graph
+
+
+def _instances_by_type(data_graph: Graph) -> dict[URIRef, list[URIRef]]:
+    """Index URI subjects by rdf:type.
+
+    Example:
+        >>> from rdflib import Graph
+        >>> _instances_by_type(Graph())
+        {}
+    """
+    instances_by_type: dict[URIRef, list[URIRef]] = {}
+    for subject, _pred, obj in data_graph.triples((None, RDF.type, None)):
+        if isinstance(subject, URIRef) and isinstance(obj, URIRef):
+            instances_by_type.setdefault(obj, []).append(subject)
+    return instances_by_type
+
+
+def _min_count_need(shapes_graph: Graph, prop_node) -> tuple | None:
+    """Return ``(path, need)`` for a property shape, or None.
+
+    Example:
+        >>> callable(_min_count_need)
+        True
+    """
+    path = shapes_graph.value(prop_node, SH.path)
+    min_count = shapes_graph.value(prop_node, SH.minCount)
+    if path is None or min_count is None:
+        return None
+    try:
+        need = int(str(min_count))
+    except (TypeError, ValueError):
+        return None
+    if need < 1:
+        return None
+    return path, need
+
+
+def _append_min_count_gaps(
+    data_graph: Graph,
+    nodes: list,
+    path,
+    need: int,
+    shape,
+    violations: list[dict],
+    limit: int | None,
+) -> bool:
+    """Append minCount gaps; return True when ``limit`` is reached.
+
+    Example:
+        >>> callable(_append_min_count_gaps)
+        True
+    """
+    for node in nodes:
+        held = 0
+        for _obj in data_graph.objects(node, path):
+            held += 1
+            if held >= need:
+                break
+        if held >= need:
+            continue
+        violations.append(
+            {
+                "focus_node": str(node),
+                "result_path": str(path),
+                "value": "",
+                "result_severity": str(SH.Violation),
+                "source_shape": str(shape),
+                "message": "minCount " + str(need),
+            }
+        )
+        if limit is not None and len(violations) >= limit:
+            return True
+    return False
+
+
 def collect_min_count_violations(
     data_graph: Graph,
     shapes_ttl: str | None = None,
@@ -89,20 +180,10 @@ def collect_min_count_violations(
         >>> rows[0]["focus_node"]
         'http://ex/p'
     """
-    shapes_graph = Graph()
-    try:
-        shapes_graph.parse(
-            data=shapes_ttl or DOCUMENT_SHACL_SHAPES_TTL,
-            format="turtle",
-        )
-    except Exception:
+    shapes_graph = _parse_shapes_graph(shapes_ttl)
+    if shapes_graph is None:
         return []
-
-    instances_by_type: dict[URIRef, list[URIRef]] = {}
-    for subject, _pred, obj in data_graph.triples((None, RDF.type, None)):
-        if isinstance(subject, URIRef) and isinstance(obj, URIRef):
-            instances_by_type.setdefault(obj, []).append(subject)
-
+    instances_by_type = _instances_by_type(data_graph)
     limit = (
         max_results if max_results is not None and max_results > 0 else None
     )
@@ -112,36 +193,21 @@ def collect_min_count_violations(
         if not isinstance(target, URIRef):
             continue
         for prop_node in shapes_graph.objects(shape, SH.property):
-            path = shapes_graph.value(prop_node, SH.path)
-            min_count = shapes_graph.value(prop_node, SH.minCount)
-            if path is None or min_count is None:
+            parsed = _min_count_need(shapes_graph, prop_node)
+            if parsed is None:
                 continue
-            try:
-                need = int(min_count)
-            except (TypeError, ValueError):
-                continue
-            if need < 1:
-                continue
-            for node in instances_by_type.get(target, ()):
-                held = 0
-                for _obj in data_graph.objects(node, path):
-                    held += 1
-                    if held >= need:
-                        break
-                if held >= need:
-                    continue
-                violations.append(
-                    {
-                        "focus_node": str(node),
-                        "result_path": str(path),
-                        "value": "",
-                        "result_severity": str(SH.Violation),
-                        "source_shape": str(shape),
-                        "message": "minCount " + str(need),
-                    }
-                )
-                if limit is not None and len(violations) >= limit:
-                    return violations
+            path, need = parsed
+            capped = _append_min_count_gaps(
+                data_graph,
+                instances_by_type.get(target, []),
+                path,
+                need,
+                shape,
+                violations,
+                limit,
+            )
+            if capped:
+                return violations
     return violations
 
 

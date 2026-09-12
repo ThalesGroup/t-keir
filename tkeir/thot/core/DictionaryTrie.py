@@ -98,7 +98,7 @@ def prefix_trie(trie: dict, word: str) -> dict | None:
         >>> subtree = prefix_trie(trie, "ab")
         >>> subtree["c"]["_end_"]
         '_end_'
-        >>> prefix_trie(make_trie({"cafe"}), "café")["e"]["_end_"]
+        >>> prefix_trie(make_trie({"cafe"}), "café")["_end_"]
         '_end_'
     """
     found = _prefix_trie_exact(trie, word)
@@ -111,7 +111,15 @@ def prefix_trie(trie: dict, word: str) -> dict | None:
 
 
 def _prefix_trie_exact(trie: dict, word: str) -> dict | None:
-    """Walk ``trie`` with ``word`` as-is (no diacritic folding)."""
+    """Walk ``trie`` with ``word`` as-is (no diacritic folding).
+
+    Example:
+        >>> from thot.core.DictionaryTrie import make_trie, _prefix_trie_exact
+        >>> _prefix_trie_exact(make_trie({"cafe"}), "cafe")["_end_"]
+        '_end_'
+        >>> _prefix_trie_exact(make_trie({"cafe"}), "café") is None
+        True
+    """
     current_dict = trie
     for letter in word:
         if letter not in current_dict:

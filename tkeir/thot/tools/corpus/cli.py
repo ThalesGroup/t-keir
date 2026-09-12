@@ -172,8 +172,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--force",
         action="store_true",
         help=(
-            "Re-convert sources even when the markdown sidecar already "
-            "exists"
+            "Re-convert sources even when the markdown sidecar already exists"
         ),
     )
     return parser

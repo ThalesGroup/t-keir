@@ -219,6 +219,52 @@ def _push_heading(
     return [item[1] for item in stack]
 
 
+def _extend_paragraphs(blocks: list[str], body: str) -> None:
+    """Append unwrapped paragraph pieces to ``blocks``.
+
+    Example:
+        >>> out = []
+        >>> _extend_paragraphs(out, "Hi.")
+        >>> out
+        ['Hi.']
+    """
+    blocks.extend(
+        unwrap_inline_markdown(part) for part in split_paragraphs(body)
+    )
+
+
+def _strip_title_crumb(
+    crumb_titles: list[str], title: str, drop: bool
+) -> list[str]:
+    """Drop a leading breadcrumb that duplicates the document title.
+
+    Example:
+        >>> _strip_title_crumb(["Report", "Ports"], "Report", True)
+        ['Ports']
+    """
+    if (
+        drop
+        and crumb_titles
+        and crumb_titles[0].casefold() == title.casefold()
+    ):
+        return crumb_titles[1:]
+    return crumb_titles
+
+
+def _heading_content_piece(breadcrumb: str, body: str) -> str:
+    """Join breadcrumb and body into one content item.
+
+    Example:
+        >>> _heading_content_piece("Ports", "Suez.")
+        'Ports\\n\\nSuez.'
+    """
+    if not body and not breadcrumb:
+        return ""
+    if body:
+        return f"{breadcrumb}\n\n{body}" if breadcrumb else body
+    return breadcrumb
+
+
 def markdown_to_content(
     text: str,
     *,
@@ -258,20 +304,14 @@ def markdown_to_content(
     for level, heading, raw_body in _iter_section_raw(text):
         body = raw_body.strip()
         if level == 0:
-            blocks.extend(
-                unwrap_inline_markdown(part)
-                for part in split_paragraphs(body)
-            )
+            _extend_paragraphs(blocks, body)
             continue
         heading_cf = heading.casefold()
         if level == 1 and not title:
             title = heading
             title_from_h1 = True
             stack = [(1, heading)]
-            blocks.extend(
-                unwrap_inline_markdown(part)
-                for part in split_paragraphs(body)
-            )
+            _extend_paragraphs(blocks, body)
             continue
         if (
             level == 1
@@ -280,31 +320,12 @@ def markdown_to_content(
             and (title_from_h1 or known)
         ):
             stack = [(1, heading)]
-            blocks.extend(
-                unwrap_inline_markdown(part)
-                for part in split_paragraphs(body)
-            )
+            _extend_paragraphs(blocks, body)
             continue
         crumb_titles = _push_heading(stack, level, heading)
-        if (
-            known
-            and crumb_titles
-            and crumb_titles[0].casefold() == known.casefold()
-        ):
-            crumb_titles = crumb_titles[1:]
-        if (
-            title_from_h1
-            and crumb_titles
-            and crumb_titles[0].casefold() == title.casefold()
-        ):
-            crumb_titles = crumb_titles[1:]
-        breadcrumb = " / ".join(crumb_titles)
-        if not body and not breadcrumb:
-            continue
-        if body:
-            piece = f"{breadcrumb}\n\n{body}" if breadcrumb else body
-        else:
-            piece = breadcrumb
+        crumb_titles = _strip_title_crumb(crumb_titles, known, bool(known))
+        crumb_titles = _strip_title_crumb(crumb_titles, title, title_from_h1)
+        piece = _heading_content_piece(" / ".join(crumb_titles), body)
         cleaned = unwrap_inline_markdown(piece).strip()
         if cleaned:
             blocks.append(cleaned)

@@ -298,7 +298,10 @@ def test_catalog_sync_skips_existing_triples():
 
     from thot.ontology.catalog_sync import sync_corpus_ontology
     from thot.ontology.model import Ontology, OntologyConcept, OntologyRelation
-    from thot.ontology.vespa import ontology_concept_docid, ontology_triple_docid
+    from thot.ontology.vespa import (
+        ontology_concept_docid,
+        ontology_triple_docid,
+    )
 
     class _Fake:
         def __init__(self) -> None:

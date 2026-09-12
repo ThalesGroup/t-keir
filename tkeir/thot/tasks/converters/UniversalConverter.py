@@ -20,6 +20,7 @@ import re
 import tempfile
 import zipfile
 from pathlib import Path
+from typing import Any
 
 from thot.tasks.converters.MarkdownSections import text_to_content
 
@@ -75,6 +76,63 @@ UNIVERSAL_TYPES = frozenset(
     }
 )
 
+SUFFIX_KIND = {
+    ".svg": "svg",
+    ".pdf": "pdf",
+    ".docx": "docx",
+    ".doc": "doc",
+    ".pptx": "pptx",
+    ".ppt": "ppt",
+    ".xlsx": "xlsx",
+    ".xls": "xls",
+    ".md": "md",
+    ".markdown": "md",
+    ".json": "json",
+    ".html": "html",
+    ".htm": "html",
+}
+
+
+def _classify_from_magic(data: bytes, suffix: str) -> str:
+    """Return a datatype from content signatures, or empty.
+
+    Example:
+        >>> _classify_from_magic(b"%PDF-1.4", ".bin")
+        'pdf'
+    """
+    if data.startswith(b"%PDF"):
+        return "pdf"
+    if data.lstrip().startswith(b"{\\rtf"):
+        return "rtf"
+    head = data[:512].lstrip().lower()
+    if head.startswith(b"<!doctype html") or head.startswith(b"<html"):
+        return "html"
+    if head.startswith(b"<?xml") or suffix in {".xml", ".gml", ".rss"}:
+        return "rss" if suffix == ".rss" else "xml"
+    for magic, kind in IMAGE_MAGIC:
+        if data.startswith(magic):
+            return kind
+    return ""
+
+
+def _classify_printable(data: bytes) -> str:
+    """Return ``raw`` for printable UTF-8, else ``unknown``.
+
+    Example:
+        >>> _classify_printable(b"hello")
+        'raw'
+    """
+    sample = data[:8192]
+    if b"\x00" in sample:
+        return "unknown"
+    try:
+        text = sample.decode("utf-8")
+    except UnicodeDecodeError:
+        return "unknown"
+    if text and _mostly_printable(text):
+        return "raw"
+    return "unknown"
+
 
 def classify_kind(path: str, data: bytes) -> str:
     """Return a converter datatype for ``path`` and ``data``.
@@ -96,65 +154,23 @@ def classify_kind(path: str, data: bytes) -> str:
     lower = Path(path or "").name.lower()
     if not data:
         return "raw"
-    if data.startswith(b"%PDF"):
-        return "pdf"
-    if data.lstrip().startswith(b"{\\rtf"):
-        return "rtf"
-    head = data[:512].lstrip().lower()
-    if head.startswith(b"<!doctype html") or head.startswith(b"<html"):
-        return "html"
-    if head.startswith(b"<?xml") or suffix in {".xml", ".gml", ".rss"}:
-        return "xml" if suffix != ".rss" else "rss"
-    for magic, kind in IMAGE_MAGIC:
-        if data.startswith(magic):
-            return kind
+    magic = _classify_from_magic(data, suffix)
+    if magic:
+        return magic
     if suffix in IMAGE_SUFFIXES or suffix in {".tif", ".tiff"}:
         return "image"
-    if suffix == ".svg":
-        return "svg"
-    if suffix == ".pdf":
-        return "pdf"
-    if suffix == ".docx":
-        return "docx"
-    if suffix == ".doc":
-        return "doc"
-    if suffix == ".pptx":
-        return "pptx"
-    if suffix in {".ppt"}:
-        return "ppt"
-    if suffix == ".xlsx":
-        return "xlsx"
-    if suffix in {".xls"}:
-        return "xls"
+    mapped = SUFFIX_KIND.get(suffix)
+    if mapped:
+        return mapped
     if suffix in TABULAR_SUFFIXES:
         return "csv"
-    if suffix in {".md", ".markdown"}:
-        return "md"
-    if suffix == ".json":
-        return "json"
     if suffix in ARCHIVE_SUFFIXES:
         return "zip"
-    if suffix in {".html", ".htm"}:
-        return "html"
     if suffix in TEXT_SUFFIXES or lower in {"readme", "version"}:
         return "raw"
     if data.startswith(b"PK\x03\x04"):
-        if suffix == ".docx":
-            return "docx"
-        if suffix == ".pptx":
-            return "pptx"
-        if suffix == ".xlsx":
-            return "xlsx"
         return "zip"
-    sample = data[:8192]
-    if b"\x00" not in sample:
-        try:
-            text = sample.decode("utf-8")
-        except UnicodeDecodeError:
-            text = ""
-        if text and _mostly_printable(text):
-            return "raw"
-    return "unknown"
+    return _classify_printable(data)
 
 
 def _mostly_printable(text: str) -> bool:
@@ -426,6 +442,94 @@ def _legacy_doc_text(data: bytes) -> str:
             return ""
 
 
+def _pptx_shape_text(shape) -> str:
+    """Return visible text from a PowerPoint shape.
+
+    Example:
+        >>> _pptx_shape_text(type("S", (), {"has_text_frame": False})())
+        ''
+    """
+    if not getattr(shape, "has_text_frame", False):
+        return ""
+    return "\n".join(
+        paragraph.text
+        for paragraph in shape.text_frame.paragraphs
+        if paragraph.text
+    ).strip()
+
+
+def _pptx_picture_markdown(
+    shape,
+    index: int,
+    ocr_config: dict | None,
+    picture_type,
+) -> tuple[str, bytes]:
+    """Analyse a PICTURE shape; return markdown and blob.
+
+    Example:
+        >>> callable(_pptx_picture_markdown)
+        True
+    """
+    if not _analyze_images_enabled(ocr_config):
+        return "", b""
+    if getattr(shape, "shape_type", None) != picture_type:
+        return "", b""
+    try:
+        blob = shape.image.blob
+    except Exception:
+        return "", b""
+    extra = _image_analysis_markdown(
+        blob,
+        title=f"Slide {index} picture",
+        ocr_config=ocr_config,
+        min_side=EMBEDDED_MIN_SIDE,
+    )
+    return extra.strip(), blob
+
+
+def _pptx_slide_markdown(
+    slide,
+    index: int,
+    ocr_config: dict | None,
+    picture_type,
+    pictures: int,
+    limit: int,
+    seen: set[tuple[int, bytes]],
+) -> tuple[str, int]:
+    """Render one slide's text and pictures as Markdown.
+
+    Example:
+        >>> callable(_pptx_slide_markdown)
+        True
+    """
+    lines = [f"## Slide {index}"]
+    shapes = sorted(
+        list(slide.shapes),
+        key=lambda shape: (
+            int(getattr(shape, "top", 0) or 0),
+            int(getattr(shape, "left", 0) or 0),
+        ),
+    )
+    for shape in shapes:
+        text = _pptx_shape_text(shape)
+        if text:
+            lines.append(text)
+        if pictures >= limit:
+            continue
+        extra, blob = _pptx_picture_markdown(
+            shape, index, ocr_config, picture_type
+        )
+        if not blob:
+            continue
+        seen.add(_payload_key(blob))
+        if extra:
+            pictures += 1
+            lines.append(extra)
+    if len(lines) <= 1:
+        return "", pictures
+    return "\n".join(lines), pictures
+
+
 def _extract_pptx(data: bytes, ocr_config: dict | None = None) -> str:
     """Collect slide text and analyse embedded pictures as Markdown.
 
@@ -438,12 +542,16 @@ def _extract_pptx(data: bytes, ocr_config: dict | None = None) -> str:
     """
     chunks: list[str] = []
     seen: set[tuple[int, bytes]] = set()
+    Presentation: Any = None
+    MSO_SHAPE_TYPE: Any = None
     try:
-        from pptx import Presentation
-        from pptx.enum.shapes import MSO_SHAPE_TYPE
+        from pptx import Presentation as PptxPresentation
+        from pptx.enum.shapes import MSO_SHAPE_TYPE as PptxShapeType
+
+        Presentation = PptxPresentation
+        MSO_SHAPE_TYPE = PptxShapeType
     except ImportError:
-        Presentation = None  # type: ignore[assignment]
-        MSO_SHAPE_TYPE = None  # type: ignore[assignment]
+        pass
     if Presentation is not None:
         try:
             with tempfile.NamedTemporaryFile(suffix=".pptx") as handle:
@@ -453,46 +561,17 @@ def _extract_pptx(data: bytes, ocr_config: dict | None = None) -> str:
             pictures = 0
             limit = _embedded_image_limit(ocr_config)
             for index, slide in enumerate(presentation.slides, start=1):
-                lines = [f"## Slide {index}"]
-                shapes = sorted(
-                    list(slide.shapes),
-                    key=lambda shape: (
-                        int(getattr(shape, "top", 0) or 0),
-                        int(getattr(shape, "left", 0) or 0),
-                    ),
+                body, pictures = _pptx_slide_markdown(
+                    slide,
+                    index,
+                    ocr_config,
+                    MSO_SHAPE_TYPE.PICTURE,
+                    pictures,
+                    limit,
+                    seen,
                 )
-                for shape in shapes:
-                    if getattr(shape, "has_text_frame", False):
-                        text = "\n".join(
-                            paragraph.text
-                            for paragraph in shape.text_frame.paragraphs
-                            if paragraph.text
-                        ).strip()
-                        if text:
-                            lines.append(text)
-                    if (
-                        _analyze_images_enabled(ocr_config)
-                        and pictures < limit
-                        and getattr(shape, "shape_type", None)
-                        == MSO_SHAPE_TYPE.PICTURE
-                    ):
-                        try:
-                            blob = shape.image.blob
-                        except Exception:
-                            continue
-                        seen.add(_payload_key(blob))
-                        extra = _image_analysis_markdown(
-                            blob,
-                            title=f"Slide {index} picture",
-                            ocr_config=ocr_config,
-                            min_side=EMBEDDED_MIN_SIDE,
-                        )
-                        if not extra.strip():
-                            continue
-                        pictures += 1
-                        lines.append(extra)
-                if len(lines) > 1:
-                    chunks.append("\n".join(lines))
+                if body:
+                    chunks.append(body)
         except Exception:
             chunks = []
     leftover = [
@@ -526,10 +605,13 @@ def _extract_xlsx(
     """
     chunks: list[str] = []
     placed_images = False
+    pd: Any = None
     try:
-        import pandas as pd
+        import pandas as pandas_mod
+
+        pd = pandas_mod
     except ImportError:
-        pd = None  # type: ignore[assignment]
+        pass
     if pd is not None:
         engine = "openpyxl" if kind == "xlsx" else "xlrd"
         suffix = ".xlsx" if kind == "xlsx" else ".xls"
@@ -967,6 +1049,360 @@ def _pdf_block_text(block: dict) -> str:
     return "\n".join(lines).strip()
 
 
+def _pdf_limits(
+    ocr_config: dict | None,
+) -> tuple[bool, int, int, int, int]:
+    """Return analyze flag, per-page cap, total cap, render budget, min chars.
+
+    Example:
+        >>> _pdf_limits(None)[0]
+        True
+    """
+    analyze = _analyze_images_enabled(ocr_config)
+    max_per_page = _pdf_images_per_page(ocr_config)
+    limit = _embedded_image_limit(ocr_config)
+    render_budget = 0
+    min_page_chars = 40
+    if ocr_config:
+        render_budget = int(ocr_config.get("max-pdf-render-pages", 0) or 0)
+        min_page_chars = int(
+            ocr_config.get("min-page-text-chars", min_page_chars)
+        )
+    return analyze, max_per_page, limit, render_budget, min_page_chars
+
+
+def _pdf_figure_markdown(
+    payload: bytes,
+    page_index: int,
+    image_index: int,
+    ocr_config: dict | None,
+) -> str:
+    """Analyse one PDF raster and return Markdown, or empty.
+
+    Example:
+        >>> callable(_pdf_figure_markdown)
+        True
+    """
+    extra = _image_analysis_markdown(
+        payload,
+        title=f"Embedded image {image_index} on page {page_index}",
+        ocr_config=ocr_config,
+        min_side=EMBEDDED_MIN_SIDE,
+    )
+    return extra.strip()
+
+
+def _pdf_text_item(block: dict, seq: int) -> tuple[int, tuple | None]:
+    """Turn a text block into a reading-order item.
+
+    Example:
+        >>> seq, item = _pdf_text_item({"bbox": [1, 2, 3, 4], "lines": []}, 0)
+        >>> seq
+        0
+    """
+    bbox = block.get("bbox")
+    if not bbox:
+        return seq, None
+    text = _pdf_block_text(block)
+    if not text:
+        return seq, None
+    item = (float(bbox[1]), float(bbox[0]), seq, text)
+    return seq + 1, item
+
+
+def _pdf_block_image_item(
+    block: dict,
+    document,
+    page_index: int,
+    page_images: int,
+    ocr_config: dict | None,
+    seq: int,
+) -> tuple[int, int, bytes, tuple | None]:
+    """Turn a dict image block into markdown plus xref payload.
+
+    Example:
+        >>> callable(_pdf_block_image_item)
+        True
+    """
+    bbox = block.get("bbox")
+    if not bbox:
+        return seq, page_images, b"", None
+    payload = None
+    xref = block.get("xref")
+    if isinstance(block.get("image"), (bytes, bytearray)):
+        payload = bytes(block["image"])
+    if xref is not None:
+        payload = payload or _pdf_xref_image_bytes(document, int(xref))
+    if not payload or not _payload_is_analysable_raster(payload):
+        return seq, page_images, payload or b"", None
+    extra = _pdf_figure_markdown(
+        payload, page_index, page_images + 1, ocr_config
+    )
+    if not extra:
+        return seq, page_images, payload, None
+    item = (float(bbox[1]), float(bbox[0]), seq, extra)
+    return seq + 1, page_images + 1, payload, item
+
+
+def _pdf_collect_dict_blocks(
+    page,
+    document,
+    page_index: int,
+    ocr_config: dict | None,
+    analyze: bool,
+    max_per_page: int,
+    limit: int,
+    analysed: int,
+) -> tuple[
+    list[tuple[float, float, int, str]],
+    int,
+    int,
+    int,
+    set[int],
+    set,
+]:
+    """Collect text and in-flow images from ``page.get_text('dict')``.
+
+    Example:
+        >>> callable(_pdf_collect_dict_blocks)
+        True
+    """
+    items: list[tuple[float, float, int, str]] = []
+    seq = 0
+    page_images = 0
+    seen_xrefs: set[int] = set()
+    seen_payloads: set[tuple[int, bytes]] = set()
+    for block in page.get_text("dict").get("blocks") or []:
+        if block.get("type") == 0:
+            seq, item = _pdf_text_item(block, seq)
+            if item:
+                items.append(item)
+            continue
+        if (
+            not analyze
+            or block.get("type") != 1
+            or analysed >= limit
+            or page_images >= max_per_page
+        ):
+            continue
+        xref = block.get("xref")
+        if xref is not None:
+            seen_xrefs.add(int(xref))
+        seq, page_images, payload, item = _pdf_block_image_item(
+            block, document, page_index, page_images, ocr_config, seq
+        )
+        if item is None:
+            continue
+        items.append(item)
+        analysed += 1
+        if payload:
+            seen_payloads.add(_payload_key(payload))
+    return items, seq, page_images, analysed, seen_xrefs, seen_payloads
+
+
+def _pdf_leftover_xobjects(
+    page,
+    document,
+    page_index: int,
+    ocr_config: dict | None,
+    items: list,
+    seq: int,
+    page_images: int,
+    analysed: int,
+    max_per_page: int,
+    limit: int,
+    seen_xrefs: set[int],
+    seen_payloads: set,
+) -> tuple[int, int, int]:
+    """Append Image XObjects not already seen in text dict blocks.
+
+    Example:
+        >>> callable(_pdf_leftover_xobjects)
+        True
+    """
+    for img in page.get_images(full=True):
+        if page_images >= max_per_page or analysed >= limit:
+            break
+        xref = int(img[0])
+        if xref in seen_xrefs:
+            continue
+        payload = _pdf_xref_image_bytes(document, xref)
+        if not payload or not _payload_is_analysable_raster(payload):
+            continue
+        if _payload_key(payload) in seen_payloads:
+            continue
+        try:
+            rects = list(page.get_image_rects(xref) or [])
+        except Exception:
+            rects = []
+        extra = _pdf_figure_markdown(
+            payload, page_index, page_images + 1, ocr_config
+        )
+        if not extra:
+            continue
+        seen_xrefs.add(xref)
+        seen_payloads.add(_payload_key(payload))
+        if rects:
+            y0, x0 = float(rects[0].y0), float(rects[0].x0)
+        else:
+            y0, x0 = 1e9, 0.0
+        items.append((y0, x0, seq, extra))
+        seq += 1
+        page_images += 1
+        analysed += 1
+    return seq, page_images, analysed
+
+
+def _pdf_scan_sparse_page(
+    page,
+    page_index: int,
+    body: str,
+    ocr_config: dict | None,
+    analyze: bool,
+    page_images: int,
+    text_len: int,
+    min_page_chars: int,
+    index_ok: bool,
+    analysed: int,
+    limit: int,
+) -> tuple[str, int]:
+    """Render a low-text page as a full-page raster when needed.
+
+    Example:
+        >>> callable(_pdf_scan_sparse_page)
+        True
+    """
+    need_scan = (
+        analyze
+        and page_images == 0
+        and text_len < min_page_chars
+        and index_ok
+        and analysed < limit
+    )
+    if not need_scan:
+        return body, analysed
+    try:
+        dpi = 200
+        if ocr_config:
+            dpi = int(ocr_config.get("render-dpi", 200) or 200)
+        pix = page.get_pixmap(dpi=min(max(dpi, 72), 300))
+        payload = _pixmap_png_bytes(pix)
+        extra = _image_analysis_markdown(
+            payload,
+            title=f"Full-page analysis (page {page_index})",
+            ocr_config=ocr_config,
+            min_side=EMBEDDED_MIN_SIDE,
+        ).strip()
+        if extra:
+            body = (body + "\n\n" + extra).strip() if body else extra
+            analysed += 1
+    except Exception:
+        pass
+    return body, analysed
+
+
+def _pdf_page_markdown(
+    page,
+    document,
+    page_index: int,
+    ocr_config: dict | None,
+    analyze: bool,
+    max_per_page: int,
+    limit: int,
+    analysed: int,
+    page_cap: int,
+    min_page_chars: int,
+) -> tuple[str, int]:
+    """Build reading-order Markdown for one PDF page.
+
+    Example:
+        >>> callable(_pdf_page_markdown)
+        True
+    """
+    (
+        items,
+        seq,
+        page_images,
+        analysed,
+        seen_xrefs,
+        seen_payloads,
+    ) = _pdf_collect_dict_blocks(
+        page,
+        document,
+        page_index,
+        ocr_config,
+        analyze,
+        max_per_page,
+        limit,
+        analysed,
+    )
+    if analyze and analysed < limit:
+        seq, page_images, analysed = _pdf_leftover_xobjects(
+            page,
+            document,
+            page_index,
+            ocr_config,
+            items,
+            seq,
+            page_images,
+            analysed,
+            max_per_page,
+            limit,
+            seen_xrefs,
+            seen_payloads,
+        )
+    items.sort(key=lambda row: (row[0], row[1], row[2]))
+    body = "\n\n".join(part for _, _, _, part in items).strip()
+    text_len = len((page.get_text("text") or "").strip())
+    return _pdf_scan_sparse_page(
+        page,
+        page_index,
+        body,
+        ocr_config,
+        analyze,
+        page_images,
+        text_len,
+        min_page_chars,
+        page_index <= page_cap,
+        analysed,
+        limit,
+    )
+
+
+def _pdf_document_markdown(document, ocr_config: dict | None) -> str:
+    """Render all pages of an open PyMuPDF document.
+
+    Example:
+        >>> callable(_pdf_document_markdown)
+        True
+    """
+    analyze, max_per_page, limit, render_budget, min_page_chars = _pdf_limits(
+        ocr_config
+    )
+    pages: list[str] = []
+    analysed = 0
+    title = (document.metadata or {}).get("title") or ""
+    if title:
+        pages.append(f"# {title}")
+    page_cap = document.page_count if render_budget <= 0 else render_budget
+    for index, page in enumerate(document, start=1):
+        body, analysed = _pdf_page_markdown(
+            page,
+            document,
+            index,
+            ocr_config,
+            analyze,
+            max_per_page,
+            limit,
+            analysed,
+            page_cap,
+            min_page_chars,
+        )
+        if body:
+            pages.append(body)
+    return "\n\n".join(pages)
+
+
 def _pdf_image_sections(data: bytes, ocr_config: dict | None) -> str:
     """Markdown for a PDF with figures spliced in reading order.
 
@@ -982,160 +1418,14 @@ def _pdf_image_sections(data: bytes, ocr_config: dict | None) -> str:
         import fitz
     except ImportError:
         return ""
-    analyze = _analyze_images_enabled(ocr_config)
-    max_per_page = _pdf_images_per_page(ocr_config)
-    limit = _embedded_image_limit(ocr_config)
-    render_budget = 0
-    if ocr_config:
-        render_budget = int(ocr_config.get("max-pdf-render-pages", 0) or 0)
-    min_page_chars = 40
-    if ocr_config:
-        min_page_chars = int(
-            ocr_config.get("min-page-text-chars", min_page_chars)
-        )
-    pages: list[str] = []
-    analysed = 0
     try:
         document = fitz.open(stream=data, filetype="pdf")
     except Exception:
         return ""
     try:
-        title = (document.metadata or {}).get("title") or ""
-        if title:
-            pages.append(f"# {title}")
-        page_cap = document.page_count if render_budget <= 0 else render_budget
-        for index, page in enumerate(document, start=1):
-            items: list[tuple[float, float, int, str]] = []
-            seq = 0
-            page_images = 0
-            seen_xrefs: set[int] = set()
-            seen_payloads: set[tuple[int, bytes]] = set()
-            for block in page.get_text("dict").get("blocks") or []:
-                bbox = block.get("bbox")
-                if not bbox:
-                    continue
-                y0, x0 = float(bbox[1]), float(bbox[0])
-                if block.get("type") == 0:
-                    text = _pdf_block_text(block)
-                    if text:
-                        items.append((y0, x0, seq, text))
-                        seq += 1
-                    continue
-                if (
-                    not analyze
-                    or block.get("type") != 1
-                    or analysed >= limit
-                    or page_images >= max_per_page
-                ):
-                    continue
-                xref = block.get("xref")
-                payload = None
-                if isinstance(block.get("image"), (bytes, bytearray)):
-                    payload = bytes(block["image"])
-                if xref is not None:
-                    seen_xrefs.add(int(xref))
-                    payload = payload or _pdf_xref_image_bytes(
-                        document, int(xref)
-                    )
-                if not payload or not _payload_is_analysable_raster(payload):
-                    continue
-                extra = _image_analysis_markdown(
-                    payload,
-                    title=(
-                        f"Embedded image {page_images + 1} " f"on page {index}"
-                    ),
-                    ocr_config=ocr_config,
-                    min_side=EMBEDDED_MIN_SIDE,
-                )
-                if not extra.strip():
-                    continue
-                items.append((y0, x0, seq, extra.strip()))
-                seq += 1
-                page_images += 1
-                analysed += 1
-                seen_payloads.add(_payload_key(payload))
-            if analyze and analysed < limit:
-                for img in page.get_images(full=True):
-                    if page_images >= max_per_page or analysed >= limit:
-                        break
-                    xref = int(img[0])
-                    if xref in seen_xrefs:
-                        continue
-                    payload = _pdf_xref_image_bytes(document, xref)
-                    if not payload or not _payload_is_analysable_raster(
-                        payload
-                    ):
-                        continue
-                    if _payload_key(payload) in seen_payloads:
-                        continue
-                    try:
-                        rects = list(page.get_image_rects(xref) or [])
-                    except Exception:
-                        rects = []
-                    if not rects:
-                        rects = [fitz.Rect(0, 1e9, 1, 1e9 + 1)]
-                    extra = _image_analysis_markdown(
-                        payload,
-                        title=(
-                            f"Embedded image {page_images + 1} "
-                            f"on page {index}"
-                        ),
-                        ocr_config=ocr_config,
-                        min_side=EMBEDDED_MIN_SIDE,
-                    )
-                    if not extra.strip():
-                        continue
-                    seen_xrefs.add(xref)
-                    seen_payloads.add(_payload_key(payload))
-                    rect = rects[0]
-                    items.append(
-                        (
-                            float(rect.y0),
-                            float(rect.x0),
-                            seq,
-                            extra.strip(),
-                        )
-                    )
-                    seq += 1
-                    page_images += 1
-                    analysed += 1
-            items.sort(key=lambda row: (row[0], row[1], row[2]))
-            body = "\n\n".join(part for _, _, _, part in items).strip()
-            text_len = len((page.get_text("text") or "").strip())
-            need_scan = (
-                analyze
-                and page_images == 0
-                and text_len < min_page_chars
-                and index <= page_cap
-                and analysed < limit
-            )
-            if need_scan:
-                try:
-                    dpi = 200
-                    if ocr_config:
-                        dpi = int(ocr_config.get("render-dpi", 200) or 200)
-                    pix = page.get_pixmap(dpi=min(max(dpi, 72), 300))
-                    payload = _pixmap_png_bytes(pix)
-                    extra = _image_analysis_markdown(
-                        payload,
-                        title=f"Full-page analysis (page {index})",
-                        ocr_config=ocr_config,
-                        min_side=EMBEDDED_MIN_SIDE,
-                    )
-                    if extra.strip():
-                        body = (
-                            (body + "\n\n" + extra.strip()).strip()
-                            if body
-                            else extra.strip()
-                        )
-                        analysed += 1
-                except Exception:
-                    pass
-            if body:
-                pages.append(body)
+        return _pdf_document_markdown(document, ocr_config)
     finally:
         document.close()
-    return "\n\n".join(pages)
 
 
 def pdf_images_analysis_markdown(

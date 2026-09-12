@@ -290,7 +290,9 @@ def infer_data_kind(document: dict[str, Any]) -> str:
     return KIND_TEXT
 
 
-def extract_location_tags(document: dict[str, Any], *, limit: int = 16) -> list[str]:
+def extract_location_tags(
+    document: dict[str, Any], *, limit: int = 16
+) -> list[str]:
     """Location tags from NER (GPE / LOC / location).
 
     Example:
@@ -312,7 +314,9 @@ def extract_location_tags(document: dict[str, Any], *, limit: int = 16) -> list[
     return unique_strings(values, limit=limit)
 
 
-def extract_time_tags(document: dict[str, Any], *, limit: int = 16) -> list[str]:
+def extract_time_tags(
+    document: dict[str, Any], *, limit: int = 16
+) -> list[str]:
     """Time tags from DATE NER and metadata.
 
     Example:
@@ -604,7 +608,10 @@ def build_corpus_doc_fields(
     """
     import time
 
-    from thot.tools.search.bge_m3 import vespa_dense_tensor, vespa_sparse_tensor
+    from thot.tools.search.bge_m3 import (
+        vespa_dense_tensor,
+        vespa_sparse_tensor,
+    )
 
     return {
         "source_ref": sanitize_vespa_string(meta.source_ref),

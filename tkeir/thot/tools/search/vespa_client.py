@@ -808,7 +808,7 @@ class VespaClient:
             )
         except Exception:  # noqa: BLE001
             return []
-        children = ((payload.get("root") or {}).get("children") or [])
+        children = (payload.get("root") or {}).get("children") or []
         rows: list[dict[str, Any]] = []
         for child in children:
             fields = child.get("fields") or {}

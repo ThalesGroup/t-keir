@@ -1,6 +1,6 @@
 # Code quality
 
-Generated automatically by `make quality-docs` — last updated **2026-08-25 06:32 UTC**.
+Generated automatically by `make quality-docs` — last updated **2026-09-12 13:36 UTC**.
 
 How this dashboard is produced, which Actions upload artefacts, and gate
 thresholds: **[CI, reports & Actions](../ci/index.md)** ·
@@ -19,18 +19,18 @@ Scoped line coverage from `make coverage` / `CoverageFast.sh` (same
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Scoped line coverage | 91.09% | ≥ 90% | PASS |
-| Full ``thot/`` XML line-rate | 65.20% | informational | — |
-| Statements (scoped) | 6798 | — | — |
-| Covered lines | 6192 | — | — |
-| Missing lines | 606 | — | — |
+| Scoped line coverage | 90.22% | ≥ 90% | PASS |
+| Full ``thot/`` XML line-rate | 67.69% | informational | — |
+| Statements (scoped) | 8434 | — | — |
+| Covered lines | 7609 | — | — |
+| Missing lines | 825 | — | — |
 
 ### Coverage report (TOTAL)
 
 ```
 Name                                                                                                  Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------------------------------------------------------------------
-TOTAL                                                                                                  6798    606    91%
+TOTAL                                                                                                  8434    825    90%
 ```
 
 Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
@@ -44,9 +44,9 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 
 | Metric | Value | Target | Status |
 |--------|-------|--------|--------|
-| Average CC | 5.36 | ≤ 7.0 | PASS |
+| Average CC | 5.42 | ≤ 7.0 | PASS |
 | Grade | B | B or better | PASS |
-| Functions at grade D+ | 71 | 0 | FAIL |
+| Functions at grade D+ | 80 | 0 | FAIL |
 | Lowest MI module | thot/tools/collector/ontology_wiki.py (0.00) | ≥ 20 preferred | — |
 
 ### Risk reference table
@@ -63,8 +63,8 @@ Artefacts: `reports/quality/coverage_summary.txt`, `coverage.json`,
 ### Full report (summary)
 
 ```
-2470 blocks (classes, functions, methods) analyzed.
-Average complexity: B (5.35668016194332)
+2799 blocks (classes, functions, methods) analyzed.
+Average complexity: B (5.424794569489103)
 
 Full per-function JSON: reports/quality/radon_cc.json
 ```
@@ -78,7 +78,7 @@ All runtime and optional Python dependencies from the locked dependency set
 
 | Package | Version | Licence | URL |
 |---------|---------|---------|-----|
-| accelerate | 1.14.0 | Apache Software License | https://github.com/huggingface/accelerate |
+| accelerate | 1.15.0 | Apache Software License | https://github.com/huggingface/accelerate |
 | aiohappyeyeballs | 2.7.1 | Python Software Foundation License | https://github.com/aio-libs/aiohappyeyeballs |
 | aiohttp | 3.14.3 | Apache-2.0 AND MIT | https://github.com/aio-libs/aiohttp |
 | aiosignal | 1.4.0 | Apache Software License | https://github.com/aio-libs/aiosignal |
@@ -109,12 +109,15 @@ All runtime and optional Python dependencies from the locked dependency set
 | cyclonedx-bom | 7.3.0 | Apache Software License | https://github.com/CycloneDX/cyclonedx-python/#readme |
 | cyclonedx-python-lib | 11.11.0 | Apache Software License | https://github.com/CycloneDX/cyclonedx-python-lib/#readme |
 | cymem | 2.0.13 | MIT License | https://github.com/explosion/cymem |
+| da-core-news-sm | 3.6.0 | CC BY-SA 4.0 | https://explosion.ai |
 | datasets | 5.0.1 | Apache Software License | https://github.com/huggingface/datasets |
+| de-core-news-sm | 3.6.0 | MIT | https://explosion.ai |
 | defusedxml | 0.7.1 | Python Software Foundation License | https://github.com/tiran/defusedxml |
 | dill | 0.4.1 | BSD License | https://github.com/uqfoundation/dill |
 | emoji | 2.0.0 | BSD License | https://github.com/carpedm20/emoji/ |
 | en-core-web-md | 3.6.0 | MIT | https://explosion.ai |
 | en-core-web-sm | 3.6.0 | MIT | https://explosion.ai |
+| es-core-news-sm | 3.6.0 | GNU GPL 3.0 | https://explosion.ai |
 | et_xmlfile | 2.0.0 | MIT License | https://foss.heptapod.net/openpyxl/et_xmlfile |
 | fastapi | 0.139.0 | MIT | https://github.com/fastapi/fastapi |
 | filelock | 3.29.7 | MIT | https://github.com/tox-dev/py-filelock |
@@ -140,6 +143,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | ir_datasets | 0.6.3 | MIT License | https://ir-datasets.com/ |
 | isodate | 0.7.2 | BSD License | https://github.com/gweis/isodate/ |
 | isoduration | 20.11.0 | ISC License (ISCL) | https://github.com/bolsote/isoduration |
+| it-core-news-sm | 3.6.0 | CC BY-NC-SA 3.0 | https://explosion.ai |
 | Jinja2 | 3.1.6 | BSD License | https://github.com/pallets/jinja/ |
 | joblib | 1.5.3 | BSD-3-Clause | https://joblib.readthedocs.io |
 | jsonpointer | 3.1.1 | BSD License | https://github.com/stefankoegl/python-json-pointer |
@@ -169,6 +173,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | murmurhash | 1.0.15 | MIT License | https://github.com/explosion/murmurhash |
 | narwhals | 2.23.0 | MIT | https://github.com/narwhals-dev/narwhals |
 | networkx | 3.6.1 | BSD-3-Clause | https://networkx.org/ |
+| nl-core-news-sm | 3.6.0 | CC BY-SA 4.0 | https://explosion.ai |
 | numpy | 1.26.4 | BSD License | https://numpy.org |
 | olefile | 0.47 | BSD License | https://www.decalage.info/python/olefileio |
 | onnxruntime | 1.20.1 | MIT License | https://onnxruntime.ai |
@@ -189,6 +194,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | pip-api | 0.0.34 | Apache Software License | http://github.com/di/pip-api |
 | pip-requirements-parser | 32.0.1 | MIT | https://github.com/nexB/pip-requirements-parser |
 | pip_audit | 2.10.1 | Apache Software License | https://pypi.org/project/pip-audit/ |
+| pl-core-news-sm | 3.6.0 | GNU GPL 3.0 | https://explosion.ai |
 | platformdirs | 4.10.0 | MIT | https://github.com/tox-dev/platformdirs |
 | pluggy | 1.6.0 | MIT License | UNKNOWN |
 | preshed | 3.0.13 | MIT License | https://github.com/explosion/preshed |
@@ -196,6 +202,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | propcache | 0.5.2 | Apache Software License | https://github.com/aio-libs/propcache |
 | protobuf | 7.36.0 | 3-Clause BSD License | https://developers.google.com/protocol-buffers/ |
 | psutil | 7.2.2 | BSD-3-Clause | https://github.com/giampaolo/psutil |
+| pt-core-news-sm | 3.6.0 | CC BY-SA 4.0 | https://explosion.ai |
 | py-serializable | 2.1.0 | Apache Software License | https://github.com/madpah/serializable#readme |
 | pyarrow | 25.0.0 | Apache-2.0 | https://arrow.apache.org/ |
 | pycparser | 3.0 | BSD-3-Clause | https://github.com/eliben/pycparser |
@@ -211,6 +218,7 @@ All runtime and optional Python dependencies from the locked dependency set
 | pytesseract | 0.3.13 | Apache Software License | https://github.com/madmaze/pytesseract |
 | pytest | 9.1.1 | MIT | https://docs.pytest.org/en/latest/ |
 | python-dateutil | 2.9.0.post0 | Apache Software License; BSD License | https://github.com/dateutil/dateutil |
+| python-docx | 1.2.0 | MIT License | https://github.com/python-openxml/python-docx |
 | python-dotenv | 1.2.2 | BSD-3-Clause | https://github.com/theskumar/python-dotenv |
 | python-multipart | 0.0.32 | Apache-2.0 | https://github.com/Kludex/python-multipart |
 | python-pptx | 1.0.2 | MIT License | https://github.com/scanny/python-pptx |
@@ -242,7 +250,9 @@ All runtime and optional Python dependencies from the locked dependency set
 | SpeechRecognition | 3.17.0 | BSD-3-Clause | https://github.com/Uberi/speech_recognition#readme |
 | srsly | 2.5.3 | MIT License | https://github.com/explosion/srsly |
 | starlette | 1.3.1 | BSD-3-Clause | https://github.com/Kludex/starlette |
+| sv-core-news-sm | 3.6.0 | CC BY-SA 4.0 | https://explosion.ai |
 | sympy | 1.14.0 | BSD License | https://sympy.org |
+| tabulate | 0.10.0 | MIT | https://github.com/astanin/python-tabulate |
 | thinc | 8.1.12 | MIT License | https://github.com/explosion/thinc |
 | threadpoolctl | 3.6.0 | BSD License | https://github.com/joblib/threadpoolctl |
 | tkeir | 2.0.0 | MIT | https://github.com/ThalesGroup/t-keir |

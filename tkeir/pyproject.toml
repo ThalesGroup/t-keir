@@ -156,6 +156,7 @@ models = [
 # override-dependencies wins over all transitive pins; constraints are a floor.
 # diskcache (owl→dspy) has no upstream fix (PYSEC-2026-2447) — dismiss or avoid `owl`.
 # sanic-cors has no patched release (GHSA-94jw-hqvj-vw74 affects <=2.2.0).
+# accelerate>=1.15.0 — PYSEC-2026-3804 / CVE-2026-69112 (weight_map path traversal).
 [tool.uv]
 override-dependencies = [
     "litellm>=1.98.0",
@@ -167,6 +168,7 @@ override-dependencies = [
     "datasets>=5.0.1",
     "pip>=26.2",
     "setuptools>=83.0.0",
+    "accelerate>=1.15.0",
 ]
 constraint-dependencies = [
     "litellm>=1.98.0",
@@ -177,6 +179,7 @@ constraint-dependencies = [
     "django>=5.2.17",
     "datasets>=5.0.1",
     "pip>=26.2",
+    "accelerate>=1.15.0",
 ]
 
 [build-system]

@@ -721,7 +721,7 @@ class PassageRetrievalPipeline:
             seen_terms.add(key)
             expansion_terms.append(cleaned)
 
-        concept_ids: list[str] = []
+        query_concept_ids: list[str] = []
         ontology_graph = None
         text_normalizer = None
         use_search_ont = self.config.business_ontology.search_enabled and (
@@ -777,21 +777,21 @@ class PassageRetrievalPipeline:
                 expanded = expander.expand(
                     query, seed_labels=seed_labels or None
                 )
-                concept_ids = list(expanded.concept_ids or [])
+                query_concept_ids = list(expanded.concept_ids or [])
                 for term in expanded.terms:
                     if term.text:
                         _add_term(term.text)
-                if concept_ids:
+                if query_concept_ids:
                     LOGGER.info(
                         "query expand ontology_concepts OR ids=%s seeds=%d",
-                        concept_ids[:16],
+                        query_concept_ids[:16],
                         len(seed_labels),
                     )
             timings["expand"] = (time.perf_counter() - t_exp) * 1000
 
         for cid in request_concept_ids:
-            if cid not in concept_ids:
-                concept_ids.append(cid)
+            if cid not in query_concept_ids:
+                query_concept_ids.append(cid)
         if ontology_expand or (
             layer is not None
             and (
@@ -841,13 +841,13 @@ class PassageRetrievalPipeline:
                 or spec.predicates
             ):
                 svc = OntologyService.from_business_payload(business_ontology)
-                expanded_graph = svc.expand(concept_ids, spec)
-                concept_ids = list(expanded_graph.concept_ids)
+                expanded_graph = svc.expand(query_concept_ids, spec)
+                query_concept_ids = list(expanded_graph.concept_ids)
                 LOGGER.info(
                     "ontology expand seeds=%d expanded=%d ids=%s",
                     len(expanded_graph.seed_ids),
                     len(expanded_graph.expanded_ids),
-                    concept_ids[:16],
+                    query_concept_ids[:16],
                 )
                 try:
                     from thot.core.ThotMetrics import ThotMetrics
@@ -868,7 +868,7 @@ class PassageRetrievalPipeline:
         if request_concept_ids or request_relations:
             LOGGER.info(
                 "ontology retrieval concepts=%d relations=%d",
-                len(concept_ids),
+                len(query_concept_ids),
                 len(request_relations),
             )
             try:
@@ -902,7 +902,7 @@ class PassageRetrievalPipeline:
             query,
             requested=requested_mode,
             has_user_space=bool(user_space),
-            expansion_concept_ids=concept_ids,
+            expansion_concept_ids=query_concept_ids,
             language=language,
         )
 
@@ -913,7 +913,7 @@ class PassageRetrievalPipeline:
             (query_analysis or {}).get("lexical_query")
             or " ".join(expansion_terms[:12])
             or query
-            or " ".join(concept_ids[:8])
+            or " ".join(query_concept_ids[:8])
             or " "
         )
         emb = encode_one(str(embed_text), model_id=model_id, dense_dim=dim)
@@ -934,7 +934,7 @@ class PassageRetrievalPipeline:
                 profile=profile,
                 dim=dim,
                 user_space=None,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
                 relations=request_relations,
             )
             timings["vespa_global"] = meta.get("ms", 0.0)
@@ -949,7 +949,7 @@ class PassageRetrievalPipeline:
                 profile=profile,
                 dim=dim,
                 user_space=user_space,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
                 relations=request_relations,
             )
             timings["vespa_user"] = meta.get("ms", 0.0)
@@ -965,7 +965,7 @@ class PassageRetrievalPipeline:
                 profile=profile,
                 dim=dim,
                 user_space=None,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
                 relations=request_relations,
             )
             timings["vespa_global"] = (time.perf_counter() - t_g) * 1000
@@ -979,7 +979,7 @@ class PassageRetrievalPipeline:
                 profile=profile,
                 dim=dim,
                 user_space=user_space,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
                 relations=request_relations,
             )
             timings["vespa_user"] = (time.perf_counter() - t_u) * 1000
@@ -1033,7 +1033,7 @@ class PassageRetrievalPipeline:
                 dense=emb.dense,
                 sparse=query_sparse,
                 dim=dim,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
             )
             timings["vespa_document"] = (time.perf_counter() - t_doc) * 1000
 
@@ -1058,7 +1058,7 @@ class PassageRetrievalPipeline:
                 bonus = overlap_score(
                     hit_concept_ids=hit.ontology_concept_ids,
                     hit_relation_keys=hit.ontology_rel_keys,
-                    query_concept_ids=concept_ids,
+                    query_concept_ids=query_concept_ids,
                     query_relation_keys=q_rel_keys,
                     concept_weight=float(ont_weights.get("concept", 0.15)),
                     relation_weight=float(ont_weights.get("relation", 0.10)),
@@ -1079,7 +1079,7 @@ class PassageRetrievalPipeline:
         ont_cfg = self.config.ontology_scoring
         if (
             bool(ont_cfg.enabled)
-            and concept_ids
+            and query_concept_ids
             and hits
             and ontology_graph is not None
             and text_normalizer is not None
@@ -1117,7 +1117,7 @@ class PassageRetrievalPipeline:
             weight = float(getattr(ont_cfg, "rescore_weight", 0.13) or 0.13)
             rescorer = OntologyRescorer(scorer, weight=weight)
             ranked_ont = rescorer.rescore(
-                concept_ids,
+                query_concept_ids,
                 [
                     (
                         hit.passage_id,
@@ -1128,14 +1128,14 @@ class PassageRetrievalPipeline:
                 ],
             )
             by_id = {hit.passage_id: hit for hit in hits}
-            rescored: list[PassageHit] = []
+            ont_rescored: list[PassageHit] = []
             for pid, score in ranked_ont:
                 base = by_id.get(pid)
                 if base is None:
                     continue
-                rescored.append(_clone_hit(base, score=float(score)))
-            if rescored:
-                hits = rescored
+                ont_rescored.append(_clone_hit(base, score=float(score)))
+            if ont_rescored:
+                hits = ont_rescored
             timings["ontology_rescore"] = (time.perf_counter() - t_ont) * 1000
 
         # Prefer passages that actually mention content probe terms (e.g. Suez)
@@ -1320,11 +1320,7 @@ class PassageRetrievalPipeline:
         chunk_scores = {hit.passage_id: float(hit.score) for hit in hits}
         parents: dict[str, list[str]] = {}
         for hit in hits:
-            keys = [
-                key
-                for key in (hit.parent_doc_id, hit.source_ref)
-                if key
-            ]
+            keys = [key for key in (hit.parent_doc_id, hit.source_ref) if key]
             parents[hit.passage_id] = keys
         blended = blend_chunk_and_document_scores(
             normalize_scores(chunk_scores),
@@ -1334,7 +1330,9 @@ class PassageRetrievalPipeline:
             document_weight=float(getattr(cfg, "document_weight", 0.35)),
         )
         rescored = [
-            _clone_hit(hit, score=float(blended.get(hit.passage_id, hit.score)))
+            _clone_hit(
+                hit, score=float(blended.get(hit.passage_id, hit.score))
+            )
             for hit in hits
         ]
         rescored.sort(key=lambda item: item.score, reverse=True)

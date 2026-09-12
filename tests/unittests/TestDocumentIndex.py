@@ -28,7 +28,9 @@ def test_chunk_parent_matches_indexed_document_id():
     assert meta.data_kind == "carte"
     assert "Suez" in meta.location_tags
     assert meta.simhash_hex
-    assert infer_data_kind({"title": "Meeting notes", "metadata": {}}) == "texte"
+    assert (
+        infer_data_kind({"title": "Meeting notes", "metadata": {}}) == "texte"
+    )
 
 
 def test_simhash_skips_self_and_detects_neighbor():

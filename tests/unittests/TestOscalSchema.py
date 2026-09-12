@@ -89,17 +89,23 @@ class TestGeneratedAssessmentResults(unittest.TestCase):
                 json.dumps(fixture), encoding="utf-8"
             )
             ar = build_assessment_results(results, SSP_UUID, "test-1")
-            findings = ar["assessment-results"]["results"][0].get("findings") or []
+            findings = (
+                ar["assessment-results"]["results"][0].get("findings") or []
+            )
             poam = build_poam(findings, "test-1")
 
         self.assertEqual(detect_model(ar), "assessment-results")
         self.assertEqual(detect_model(poam), "plan-of-action-and-milestones")
         ar_errors = iter_errors(ar, load_schema("assessment-results"))
-        poam_errors = iter_errors(poam, load_schema("plan-of-action-and-milestones"))
+        poam_errors = iter_errors(
+            poam, load_schema("plan-of-action-and-milestones")
+        )
         self.assertEqual(ar_errors, [], msg="\n".join(ar_errors))
         self.assertEqual(poam_errors, [], msg="\n".join(poam_errors))
 
-        methods = ar["assessment-results"]["results"][0]["observations"][0]["methods"]
+        methods = ar["assessment-results"]["results"][0]["observations"][0][
+            "methods"
+        ]
         self.assertEqual(methods, ["TEST"])
         finding = ar["assessment-results"]["results"][0]["findings"][0]
         self.assertNotIn("risks", finding)

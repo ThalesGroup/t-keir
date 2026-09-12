@@ -25,11 +25,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping
 
+from thot.tasks.converters.image_analysis import raster_is_below_analysis_size
 from thot.tasks.converters.UniversalConverter import (
     UniversalConverter,
     classify_kind,
 )
-from thot.tasks.converters.image_analysis import raster_is_below_analysis_size
 from thot.tools.corpus.adaptive import AdaptiveLimiter, plan_workers
 from thot.tools.corpus.markdown_records import (
     _MARKDOWN_SUFFIXES,
@@ -77,9 +77,10 @@ def default_ocr_config() -> dict[str, Any]:
     merged = dict(_DEFAULT_OCR)
     try:
         import yaml
+
         from thot.core.TkeirPaths import configs_dir
 
-        path = configs_dir() / "converter.yaml"
+        path = Path(configs_dir()) / "converter.yaml"
         payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     except (OSError, ValueError, TypeError):
         return merged

@@ -526,9 +526,7 @@ class SpacyTokenizer:
                 [r"(?<=[0-9])[+*^](?=[0-9-])", r"(?<=[0-9])-(?=-)"]
             )
             infixes = inf + tuple([r"\.\.\.+", r"[!&,()/;]"])
-            infixes = [
-                x for x in infixes if "-|–|—|--|---|——|~" not in x
-            ]
+            infixes = [x for x in infixes if "-|–|—|--|---|——|~" not in x]
             infix_re = compile_infix_regex(infixes)
 
             suf = tuple(self._nlp.Defaults.suffixes)

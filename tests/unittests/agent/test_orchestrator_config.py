@@ -42,7 +42,9 @@ def test_load_enterprise_orchestrator_config():
     assert "ent_board_sitrep slots" in cfg.slot_hint_for("board_sitrep")
 
 
-def test_resolve_usecase_prefers_tkeir_usecase(monkeypatch: pytest.MonkeyPatch):
+def test_resolve_usecase_prefers_tkeir_usecase(
+    monkeypatch: pytest.MonkeyPatch,
+):
     for key in (
         "TKEIR_USECASE",
         "TKEIR_AGENT_USECASE",

@@ -420,9 +420,7 @@ async def _index_corpus_doc(
         )
     except Exception as exc:  # noqa: BLE001
         LOGGER.debug("simhash neighbor lookup skipped: %s", exc)
-    dense = mean_dense(
-        [list(emb.dense) for emb in embeddings], embedding_dim
-    )
+    dense = mean_dense([list(emb.dense) for emb in embeddings], embedding_dim)
     fields = build_corpus_doc_fields(
         meta,
         dense=dense,
@@ -554,9 +552,7 @@ async def index_pipeline_document(
             )
         )
         merged_catalog = merged_catalog.extend(catalog)
-        prepared.append(
-            (chunk, emb, concepts, expansion_labels, relations)
-        )
+        prepared.append((chunk, emb, concepts, expansion_labels, relations))
 
     t_vespa = time.perf_counter()
     if layer.index_concepts or layer.index_triples:
@@ -640,11 +636,7 @@ async def index_pipeline_document(
         )
         written += 1
 
-    if (
-        doc_index_cfg.enabled
-        and target in ("global", "both")
-        and written
-    ):
+    if doc_index_cfg.enabled and target in ("global", "both") and written:
         try:
             await _index_corpus_doc(
                 vespa,

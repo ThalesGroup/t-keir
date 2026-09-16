@@ -10,13 +10,13 @@ import { personaPageRoles } from "@/lib/usecase-roles";
 export default function AgentsPage() {
   return (
     <RequireRole allowedRoles={personaPageRoles()}>
-      <div className="mx-auto max-w-3xl space-y-6 px-4 py-10">
+      <div className="w-full space-y-6 px-4 py-8 sm:px-8 lg:px-10">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary">
             T-KEIR
           </p>
-          <h1 className="text-2xl font-bold tracking-tight">Agent runs</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight">Agent runs</h1>
+          <p className="mt-1 text-base text-muted-foreground">
             Start a workflow, poll status / handoffs / compose output, and publish
             through the approval-gated re-ingest path.
           </p>

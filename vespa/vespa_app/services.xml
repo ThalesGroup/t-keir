@@ -22,6 +22,10 @@
                 selection="global.pinned = true or global.freshness_ttl_seconds = null or global.freshness_ttl_seconds &lt;= 0 or (global.freshness_ttl_seconds &gt; 0 and now() &lt; global.doc_timestamp + global.freshness_ttl_seconds)" />
       <!-- Concept catalog: no TTL (source of graph export / expansion). -->
       <document type="ontology_concept" mode="index" />
+      <!-- Corpus-level SPO triples: insert-if-absent across all corpora. -->
+      <document type="ontology_triple" mode="index" />
+      <!-- Document-level index (BM25 + tags + simhash + ontology pointers). -->
+      <document type="corpus_doc" mode="index" />
     </documents>
     <nodes>
       <node distribution-key="0" hostalias="node1" />

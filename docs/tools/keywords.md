@@ -13,7 +13,8 @@ Example of Configuration:
 ```
 
 Keywords extractor configuration contains a top-level `logger` section and keywords-specific `extractors` settings.
-The extractor allows to define validation rules for keywords:
+
+**Every key and its effect:** [NLP pipeline YAML](../configuration/nlp.yaml.md#keywordsyaml).
 
 - **language** :the language of tokenizer
 - **resources-base-path**: path to resources (see `tkeir-create-annotation-resource`)

@@ -27,7 +27,7 @@ from spacy.tokens import Doc, Span, Token
 
 from thot.core.SpacyModelLoader import load_spacy_model
 from thot.core.ThotLogger import ThotLogger
-from thot.core.Utils import ThotTokenizerToSpacy
+from thot.core.Utils import ThotTokenizerToSpacy, config_use_mwe
 from thot.tasks.syntax import __date_syntax__, __version_syntax__
 from thot.tasks.syntax.SyntacticTaggerConfiguration import (
     SyntacticTaggerConfiguration,
@@ -108,7 +108,9 @@ class SyntacticTagger:
         else:
             raise ValueError("Language is not managed")
         self._nlp.tokenizer = ThotTokenizerToSpacy(
-            self._nlp.vocab, config.configuration["taggers"]
+            self._nlp.vocab,
+            config.configuration["taggers"],
+            use_mwe=config_use_mwe(config.configuration["taggers"][0]),
         )
 
         self.NUMERIC_NE_TYPES = {

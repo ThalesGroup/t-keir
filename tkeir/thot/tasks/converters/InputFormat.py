@@ -161,6 +161,104 @@ def has_extractable_text(data: bytes) -> bool:
     return printable / len(text) >= 0.5
 
 
+def _magic_image(data: bytes) -> bool:
+    """Return True when bytes look like a raster.
+
+    Example:
+        >>> _magic_image(b"\\xff\\xd8\\xff")
+        True
+    """
+    return (
+        data.startswith(b"\xff\xd8\xff")
+        or data.startswith(b"\x89PNG\r\n\x1a\n")
+        or data.startswith(b"GIF87a")
+        or data.startswith(b"GIF89a")
+        or data.startswith(b"II*\x00")
+        or data.startswith(b"MM\x00*")
+    )
+
+
+def _magic_html(data: bytes) -> bool:
+    """Return True when bytes look like HTML.
+
+    Example:
+        >>> _magic_html(b"<html></html>")
+        True
+    """
+    head = data[:512].lstrip().lower()
+    return head.startswith(b"<!doctype html") or head.startswith(b"<html")
+
+
+def _magic_xml(data: bytes) -> bool:
+    """Return True when bytes look like XML or RSS.
+
+    Example:
+        >>> _magic_xml(b"<?xml version='1.0'?><a/>")
+        True
+    """
+    head = data[:512].lstrip().lower()
+    return head.startswith(b"<?xml") or head.startswith(b"<rss")
+
+
+def _magic_svg(data: bytes) -> bool:
+    """Return True when bytes look like SVG.
+
+    Example:
+        >>> _magic_svg(b"<svg></svg>")
+        True
+    """
+    head = data[:512].lstrip().lower()
+    return b"<svg" in head or head.startswith(b"<?xml")
+
+
+def _magic_email(data: bytes) -> bool:
+    """Return True when bytes look like a raw email.
+
+    Example:
+        >>> _magic_email(b"From: a@b.c\\n")
+        True
+    """
+    head = data[:4096].lower()
+    return (
+        head.lstrip().startswith(b"from:")
+        or b"mime-version:" in head
+        or b"content-type:" in head
+    )
+
+
+def _magic_checker_key(data_type: str) -> str:
+    """Normalize a datatype onto a magic-checker key.
+
+    Example:
+        >>> _magic_checker_key("tif")
+        'image'
+    """
+    if data_type in {"image", "tiff", "tif"}:
+        return "image"
+    if data_type in {"html", "htm"}:
+        return "html"
+    if data_type in {"xml", "rss"}:
+        return "xml"
+    if data_type in ZIP_BASED_TYPES:
+        return "zip"
+    if data_type in OLE_BASED_TYPES:
+        return "ole"
+    return data_type
+
+
+_MAGIC_CHECKERS = {
+    "pdf": lambda data: data.startswith(b"%PDF"),
+    "rtf": lambda data: data.lstrip().startswith(b"{\\rtf"),
+    "zip": lambda data: data.startswith(b"PK\x03\x04"),
+    "ole": lambda data: data.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"),
+    "image": _magic_image,
+    "svg": _magic_svg,
+    "html": _magic_html,
+    "xml": _magic_xml,
+    "email": _magic_email,
+}
+
+
 def _magic_matches(data_type: str, data: bytes) -> bool:
     """Return True when bytes match the expected magic for a datatype.
 
@@ -177,58 +275,13 @@ def _magic_matches(data_type: str, data: bytes) -> bool:
     """
     if not data:
         return data_type == "raw"
-
     if data_type == "raw":
         return has_extractable_text(data)
-
-    if data_type == "pdf":
-        return data.startswith(b"%PDF")
-
-    if data_type == "rtf":
-        return data.lstrip().startswith(b"{\\rtf")
-
-    if data_type == "zip":
-        return data.startswith(b"PK\x03\x04")
-
-    if data_type in ZIP_BASED_TYPES:
-        return data.startswith(b"PK\x03\x04")
-
-    if data_type in {"image", "tiff", "tif"}:
-        return (
-            data.startswith(b"\xff\xd8\xff")
-            or data.startswith(b"\x89PNG\r\n\x1a\n")
-            or data.startswith(b"GIF87a")
-            or data.startswith(b"GIF89a")
-            or data.startswith(b"II*\x00")
-            or data.startswith(b"MM\x00*")
-        )
-
-    if data_type == "svg":
-        head = data[:512].lstrip().lower()
-        return b"<svg" in head or head.startswith(b"<?xml")
-
     if data_type in {"json", "md"}:
         return has_extractable_text(data)
-
-    if data_type in OLE_BASED_TYPES:
-        return data.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1")
-
-    if data_type in {"html", "htm"}:
-        head = data[:512].lstrip().lower()
-        return head.startswith(b"<!doctype html") or head.startswith(b"<html")
-
-    if data_type in {"xml", "rss"}:
-        head = data[:512].lstrip().lower()
-        return head.startswith(b"<?xml") or head.startswith(b"<rss")
-
-    if data_type == "email":
-        head = data[:4096].lower()
-        return (
-            head.lstrip().startswith(b"from:")
-            or b"mime-version:" in head
-            or b"content-type:" in head
-        )
-
+    checker = _MAGIC_CHECKERS.get(_magic_checker_key(data_type))
+    if checker is not None:
+        return checker(data)
     return True
 
 

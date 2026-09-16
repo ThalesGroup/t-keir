@@ -11,11 +11,16 @@ Licensed under the MIT License.
 import os
 
 from thot.core.ThotLogger import ThotLogger
-from thot.core.TkeirPaths import package_root
+from thot.core.TkeirPaths import (
+    package_root,
+    resolve_mwe_path,
+    shared_resources_dir,
+)
 from thot.tasks.pipeline import __date_pipeline__, __version_pipeline__
 from thot.tasks.TaskInfo import TaskInfo
 
 SUPPORTED_PROCESSING_LANGUAGES = {"en", "fr"}
+SHARED_RESOURCE_DIR = "any"
 
 
 class ResourceSelector:
@@ -47,6 +52,7 @@ class ResourceSelector:
             entry
             for entry in os.listdir(base)
             if os.path.isdir(os.path.join(base, entry))
+            and entry != SHARED_RESOURCE_DIR
         )
 
     @staticmethod
@@ -63,7 +69,7 @@ class ResourceSelector:
             >>> ResourceSelector.select("en") is None or ResourceSelector.select("en").endswith("en")
             True
         """
-        if not language:
+        if not language or language == SHARED_RESOURCE_DIR:
             return None
         candidate = os.path.join(
             package_root(), "resources", "modeling", "tokenizer", language
@@ -130,6 +136,8 @@ class ResourceSelector:
             "processing-language": processing_language,
             "spacy-language": detected_language,
             "resources-base-path": resource_path,
+            "shared-resources-path": shared_resources_dir(),
+            "mwe-path": resolve_mwe_path(resource_path),
             "available-languages": ResourceSelector.list_available_languages(),
         }
         ThotLogger.debug(

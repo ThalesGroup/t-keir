@@ -12,7 +12,9 @@ and quality thresholds, start here:
 | [Quality gates](../ci/gates.md) | Coverage / complexity / SLSA thresholds |
 
 Those artefacts are **inputs** to `make audit-compliance` — see
-[EU Compliance OPA Audit](eu-audit.md).
+[OPA, Rego, and OSCAL](opa-rego-oscal.md) for the engine vs language vs
+NIST documents, and [EU Compliance OPA Audit](eu-audit.md) for how the
+audit runs.
 
 ## Quality gates (summary)
 

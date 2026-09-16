@@ -350,11 +350,11 @@ def test_cli_markdown_only_skips_convert(tmp_path: Path):
 
 def test_progress_formatters():
     from thot.tools.corpus.progress import (
+        RunStats,
         eta_seconds,
         format_bytes,
         format_duration,
         format_run_summary,
-        RunStats,
     )
 
     assert format_duration(None) == "estimating"

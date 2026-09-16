@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Render Vespa .sd files for doc_base / global / user from rag.yaml.
+"""Render Vespa .sd files from rag.yaml templates.
+
+Writes ``doc_base``, ``global``, ``user``, ``ontology_concept``,
+``ontology_triple``, and ``corpus_doc``.
 
 Retention / TTL fields (`doc_timestamp`, `freshness_ttl_seconds`, `pinned`,
 `pin_reason`, `source_type`) live in ``templates/doc_base.sd.j2`` so both
@@ -68,6 +71,12 @@ def render_all() -> dict[str, str]:
         "user.sd": header + env.get_template("user.sd.j2").render(**ctx),
         "ontology_concept.sd": (
             header + env.get_template("ontology_concept.sd.j2").render(**ctx)
+        ),
+        "ontology_triple.sd": (
+            header + env.get_template("ontology_triple.sd.j2").render(**ctx)
+        ),
+        "corpus_doc.sd": (
+            header + env.get_template("corpus_doc.sd.j2").render(**ctx)
         ),
     }
 

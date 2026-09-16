@@ -1,6 +1,6 @@
 {
   "assessment-plan": {
-    "uuid": "f6a7b8c9-d0e1-5f2a-3b4c-5d6e7f8091a2",
+    "uuid": "c35d3c1a-7e66-513c-87a7-0558ca4ef2ab",
     "metadata": {
       "title": "T-KEIR EU Compliance Assessment Plan (OPA automated)",
       "last-modified": "2026-07-18T00:00:00Z",
@@ -21,7 +21,7 @@
     "assessment-assets": {
       "components": [
         {
-          "uuid": "a7b8c9d0-e1f2-5a3b-4c5d-6e7f8091a2b3",
+          "uuid": "cb99ccb8-747a-5f2b-8b99-e78a1517b3c6",
           "type": "software",
           "title": "Open Policy Agent (OPA)",
           "description": "Evaluates compliance/opa/policies/*.rego against generated input JSON.",
@@ -31,16 +31,25 @@
             { "name": "policy-root", "value": "compliance/opa/policies/" }
           ]
         }
+      ],
+      "assessment-platforms": [
+        {
+          "uuid": "e1b2c3d4-a5f6-5478-8c9d-0e1f2a3b4c5d",
+          "title": "make audit-compliance",
+          "uses-components": [
+            { "component-uuid": "cb99ccb8-747a-5f2b-8b99-e78a1517b3c6" }
+          ]
+        }
       ]
     },
     "tasks": [
       {
-        "uuid": "b8c9d0e1-f2a3-5b4c-5d6e-7f8091a2b3c4",
+        "uuid": "f0d823d1-5886-53cd-98a5-c0ebf91f0904",
         "type": "action",
         "title": "Run OPA EU compliance evaluation",
-        "description": "make audit-compliance → opa eval of eu.ai_act, eu.cra, eu.gdpr, eu.nis2, eu.dora, eu.pld summaries; then opa_to_oscal.py.",
+        "description": "make audit-compliance → opa eval of eu.ai_act, eu.cra, eu.gdpr, eu.nis2, eu.dora, eu.pld summaries; then opa_to_oscal.py; then NIST JSON Schema validation.",
         "props": [
-          { "name": "method", "value": "AUTOMATED" },
+          { "name": "method", "value": "TEST" },
           { "name": "command", "value": "make audit-compliance" }
         ]
       }

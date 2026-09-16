@@ -237,18 +237,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthCtx.Provider value={value}>
+      <div className="flex min-h-dvh flex-col">
       <div className="fixed left-0 right-0 top-0 z-50 border-b bg-card/85 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
-          <div className="text-xs font-semibold uppercase tracking-wider text-primary">
+        <div className="flex w-full items-center justify-between gap-4 px-4 py-2 sm:px-6 lg:px-8">
+          <div className="text-sm font-semibold uppercase tracking-wider text-primary">
             {topLabel}
           </div>
           {authenticated && availablePersonas.length > 1 ? (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Persona</span>
+              <span className="text-sm text-muted-foreground">Persona</span>
               <select
                 value={activePersonaId ?? ""}
                 onChange={(e) => setActivePersonaId(e.target.value as PersonaId)}
-                className="rounded-md border bg-background px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-ring"
+                className="rounded-md border bg-background px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-ring"
               >
                 {availablePersonas.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -262,15 +263,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-card/85 backdrop-blur">
-        <div className="mx-auto px-4 py-2 text-center text-[11px] text-muted-foreground sm:px-6">
+        <div className="w-full px-4 py-2 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
           Access ceiling enforced to:{" "}
           <span className="font-semibold">{clearance ?? "N/A"}</span>
         </div>
       </div>
 
-      <div className="min-h-screen pt-10 pb-12">
+      <div className="flex min-h-0 flex-1 flex-col pt-[var(--hmi-banner-top)] pb-[var(--hmi-banner-bottom)]">
         {initializing ? (
-          <div className="flex min-h-[70vh] items-center justify-center text-sm text-muted-foreground">
+          <div className="flex min-h-[70vh] items-center justify-center text-base text-muted-foreground">
             Checking session…
           </div>
         ) : showLoginGate ? (
@@ -286,6 +287,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ) : (
           children
         )}
+      </div>
       </div>
     </AuthCtx.Provider>
   );

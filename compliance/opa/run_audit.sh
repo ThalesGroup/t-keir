@@ -59,12 +59,15 @@ eval_pkg "eu.pld"    "$OUT_DIR/opa-pld.json"
 cp "$INPUT_JSON" "$OUT_DIR/input.json"
 
 echo "[eu-audit] Generating OSCAL Assessment Results + POA&M"
-SSP_UUID="tkeir-ssp-$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 python3 "$OPA_DIR/oscal/opa_to_oscal.py" \
   --results-dir "$OUT_DIR" \
   --output-dir "$OUT_DIR/oscal" \
-  --ssp-uuid "$SSP_UUID" \
   --version "$VERSION"
+
+echo "[eu-audit] Validating OSCAL against NIST v1.1.2 JSON Schema"
+python3 "$OPA_DIR/oscal/validate_oscal.py" \
+  --skip-static \
+  --docs "$OUT_DIR/oscal"
 
 echo "[eu-audit] building report"
 set +e

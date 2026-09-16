@@ -310,7 +310,7 @@ fi
 
 section "Models / resources"
 
-mwe="${TKEIR_DIR}/resources/modeling/tokenizer/en/tkeir_mwe.pkl"
+mwe="${TKEIR_DIR}/resources/modeling/tokenizer/any/tkeir_mwe.pkl"
 if [[ -f "$mwe" ]]; then
   pass "MWE resource: $mwe"
 else
@@ -351,10 +351,12 @@ elif [[ ! -f "${HMI_DIR}/package.json" ]]; then
   fail "missing ${HMI_DIR}/package.json"
 else
   pass "tkeir-hmi/package.json present"
-  if [[ -d "${HMI_DIR}/node_modules" ]]; then
-    pass "tkeir-hmi/node_modules present"
+  if [[ -d "${HMI_DIR}/node_modules/cytoscape" && -d "${HMI_DIR}/node_modules/cytoscape-fcose" ]]; then
+    pass "tkeir-hmi Node deps present (cytoscape + cytoscape-fcose)"
+  elif [[ -d "${HMI_DIR}/node_modules" ]]; then
+    fail "cytoscape missing in tkeir-hmi/node_modules — run: make hmi-install  (or cd tkeir-hmi && npm ci)"
   else
-    warn "tkeir-hmi/node_modules missing — run: make hmi-install  (or cd tkeir-hmi && npm ci)"
+    warn "tkeir-hmi/node_modules missing — run: make setup  or  make hmi-install"
   fi
 fi
 

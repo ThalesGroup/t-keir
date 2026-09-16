@@ -72,6 +72,12 @@ mcp = [
 owl = [
     "owlapy>=1.6.3; python_full_version >= '3.11'",
 ]
+# MkDocs 1.x + Material. Do not install mkdocs 2.x (incompatible with Material).
+docs = [
+    "mkdocs>=1.6,<2",
+    "mkdocs-material>=9.7.5,<10",
+    "mkdocs-render-swagger-plugin",
+]
 # Optional Workload API client (import guarded in thot.agent.spiffe).
 # 0.3.x needs protobuf>=6.31 and supports cryptography>=46 (incl. 50.x).
 spiffe = [
@@ -106,6 +112,7 @@ tkeir-corpus = "thot.tools.corpus.cli:main"
 dev = [
     "coverage>=7.0",
     "pytest>=7.0",
+    "jsonschema>=4.18",
     "liccheck",
     "pip",
     # CVE-2026-59890 (MANIFEST.in NFC/NFD) fixed in 83.0.0+
@@ -118,6 +125,7 @@ dev = [
 ]
 audit = [
     "psycopg[binary]>=3.2",
+    "jsonschema>=4.18",
 ]
 beir = [
     "beir>=2.0.0",
@@ -148,6 +156,7 @@ models = [
 # override-dependencies wins over all transitive pins; constraints are a floor.
 # diskcache (owl→dspy) has no upstream fix (PYSEC-2026-2447) — dismiss or avoid `owl`.
 # sanic-cors has no patched release (GHSA-94jw-hqvj-vw74 affects <=2.2.0).
+# accelerate>=1.15.0 — PYSEC-2026-3804 / CVE-2026-69112 (weight_map path traversal).
 [tool.uv]
 override-dependencies = [
     "litellm>=1.98.0",
@@ -159,6 +168,7 @@ override-dependencies = [
     "datasets>=5.0.1",
     "pip>=26.2",
     "setuptools>=83.0.0",
+    "accelerate>=1.15.0",
 ]
 constraint-dependencies = [
     "litellm>=1.98.0",
@@ -169,6 +179,7 @@ constraint-dependencies = [
     "django>=5.2.17",
     "datasets>=5.0.1",
     "pip>=26.2",
+    "accelerate>=1.15.0",
 ]
 
 [build-system]

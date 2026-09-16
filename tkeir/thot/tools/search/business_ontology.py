@@ -354,23 +354,49 @@ def load_business_ontology(path: Path | str) -> BusinessOntology:
     return business_ontology_from_data(data)
 
 
+_ONTOLOGY_FILENAMES = (
+    "business_ontology.yaml",
+    "enterprise_ontology.yaml",
+)
+
+
 def dataset_business_ontology_path(
     dataset: str,
     datasets_dir: Path | str | None = None,
 ) -> Path:
-    """Return ``datasets/<dataset>/business_ontology.yaml``.
+    """Return the first existing business-ontology YAML for ``dataset``.
+
+    Search order when ``datasets_dir`` is omitted:
+
+    1. ``datasets/<dataset>/business_ontology.yaml`` (repo checkout)
+    2. ``packs/<dataset>/business_ontology.yaml`` (container images)
+    3. the same roots with ``enterprise_ontology.yaml`` (enterprise pack)
 
     Example:
         >>> from thot.tools.search.business_ontology import dataset_business_ontology_path
-        >>> str(dataset_business_ontology_path('osint')).endswith('datasets/osint/business_ontology.yaml')
+        >>> str(dataset_business_ontology_path('osint')).endswith('business_ontology.yaml')
         True
     """
-    from thot.core.TkeirPaths import repo_root
+    from thot.core.TkeirPaths import package_root, repo_root
 
-    root = (
-        Path(datasets_dir) if datasets_dir else Path(repo_root()) / "datasets"
+    name = str(dataset).strip()
+    roots: list[Path] = []
+    if datasets_dir:
+        roots.append(Path(datasets_dir) / name)
+    else:
+        roots.append(Path(repo_root()) / "datasets" / name)
+        roots.append(Path(package_root()) / "packs" / name)
+    for root in roots:
+        for filename in _ONTOLOGY_FILENAMES:
+            candidate = root / filename
+            if candidate.is_file():
+                return candidate
+    default_root = (
+        Path(datasets_dir) / name
+        if datasets_dir
+        else Path(repo_root()) / "datasets" / name
     )
-    return root / str(dataset).strip() / "business_ontology.yaml"
+    return default_root / "business_ontology.yaml"
 
 
 def load_dataset_business_ontology_payload(

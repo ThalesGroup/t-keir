@@ -335,7 +335,10 @@ def _dominant_colors(im: Image.Image, n: int = 5) -> list[str]:
     small = im.convert("RGB").copy()
     small.thumbnail((80, 80))
     pal = small.convert("P", palette=Image.Palette.ADAPTIVE, colors=n)
-    colors = pal.getpalette()[: n * 3]
+    palette = pal.getpalette()
+    if not palette:
+        return []
+    colors = palette[: n * 3]
     out: list[str] = []
     for index in range(0, len(colors), 3):
         out.append(
@@ -453,6 +456,7 @@ def _ocr(im: Image.Image, lang: str) -> tuple[str, float | None, str]:
     """
     try:
         import pytesseract
+
         from thot.tasks.converters.PdfImageOcr import tessdata_tesseract_config
     except Exception:
         return "", None, ""

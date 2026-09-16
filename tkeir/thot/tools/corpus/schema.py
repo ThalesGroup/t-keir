@@ -158,8 +158,7 @@ def validate_record(record: Mapping[str, Any], *, index: int) -> None:
     if missing:
         ident = _nonempty_str(record.get("doc_id")) or f"index {index}"
         raise ValueError(
-            f"record {ident} missing mandatory field(s): "
-            + ", ".join(missing)
+            f"record {ident} missing mandatory field(s): " + ", ".join(missing)
         )
 
 

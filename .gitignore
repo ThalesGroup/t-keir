@@ -83,4 +83,7 @@ datasets/scidocs/queries.jsonl
 datasets/scidocs/qrels/
 # RAG eval corpora — download via datasets/download_rag_datasets.py
 datasets/rag_benchmarks/
+# Local Vespa index tarballs (INDEX_SNAPSHOT=1 ./start_services.sh)
+.vespa-snapshot
+.vespa-snapshots/
 node_modules/

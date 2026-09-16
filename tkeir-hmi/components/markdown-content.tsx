@@ -45,22 +45,22 @@ function buildComponents(
       </p>
     ),
     h1: ({ children }) => (
-      <h1 className="mb-3 mt-4 border-b border-border/60 pb-2 text-base font-semibold tracking-tight first:mt-0">
+      <h1 className="mb-3 mt-4 border-b border-border/60 pb-2 text-xl font-semibold tracking-tight first:mt-0">
         {text(children)}
       </h1>
     ),
     h2: ({ children }) => (
-      <h2 className="mb-2 mt-5 text-sm font-semibold tracking-tight text-foreground first:mt-0">
+      <h2 className="mb-2 mt-5 text-lg font-semibold tracking-tight text-foreground first:mt-0">
         {text(children)}
       </h2>
     ),
     h3: ({ children }) => (
-      <h3 className="mb-2 mt-3 text-sm font-semibold first:mt-0">
+      <h3 className="mb-2 mt-3 text-base font-semibold first:mt-0">
         {text(children)}
       </h3>
     ),
     h4: ({ children }) => (
-      <h4 className="mb-1.5 mt-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground first:mt-0">
+      <h4 className="mb-1.5 mt-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground first:mt-0">
         {text(children)}
       </h4>
     ),
@@ -122,7 +122,7 @@ function buildComponents(
     ),
     table: ({ children }) => (
       <div className="my-3 overflow-x-auto">
-        <table className="w-full border-collapse text-left text-sm">
+        <table className="w-full border-collapse text-left text-base">
           {children}
         </table>
       </div>
@@ -177,7 +177,7 @@ export const MarkdownContent = memo(function MarkdownContent({
   return (
     <div
       className={cn(
-        "prose prose-sm max-w-none text-sm leading-relaxed dark:prose-invert",
+        "prose max-w-none text-base leading-relaxed dark:prose-invert",
         className,
       )}
     >

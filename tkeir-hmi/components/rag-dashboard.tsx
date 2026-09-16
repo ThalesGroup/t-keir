@@ -160,27 +160,27 @@ export function RagDashboard({
   }, [mode, canIngest]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-0 flex-1 flex-col bg-background">
       <header className="shrink-0 border-b bg-card/80 backdrop-blur">
-        <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+            <p className="text-sm font-semibold uppercase tracking-wider text-primary">
               T-KEIR
             </p>
-            <h1 className="text-lg font-bold tracking-tight sm:text-xl">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               Corpus workspace
             </h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <a
               href="/agents"
-              className="hidden text-sm text-muted-foreground underline-offset-2 hover:underline sm:inline"
+              className="hidden text-base text-muted-foreground underline-offset-2 hover:underline sm:inline"
             >
               Agents
             </a>
             <a
               href="/admin"
-              className="hidden text-sm text-muted-foreground underline-offset-2 hover:underline sm:inline"
+              className="hidden text-base text-muted-foreground underline-offset-2 hover:underline sm:inline"
             >
               Admin
             </a>
@@ -207,7 +207,7 @@ export function RagDashboard({
           showIngest={canIngest}
         />
 
-        <main className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 xl:px-10">
           {apiHealthy === false &&
             mode !== "reporter" &&
             mode !== "files" &&

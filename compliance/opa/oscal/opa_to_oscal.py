@@ -14,14 +14,24 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-# Fixed namespace for deterministic UUID v5
+# Fixed namespace for deterministic UUID v5 (RFC 4122 type 5 — NIST UUIDDatatype).
 NS = uuid.UUID("6ba7b810-9dad-11d1-80b4-00c04fd430c8")
 TKEIR_NS = uuid.uuid5(NS, "tkeir.eu.compliance.oscal.v1")
+
+# NIST SP 800-53A assessment methods (OSCAL observation.methods enum).
+OSCAL_METHOD_TEST = "TEST"
+
+# Stable document UUIDs (uuid5) shared with ssp/tkeir_ssp.json and
+# assessments/assessment_plan.json so import-ap / subjects resolve.
+SSP_UUID = str(uuid.uuid5(TKEIR_NS, "ssp|tkeir"))
+OPA_COMPONENT_UUID = str(uuid.uuid5(TKEIR_NS, "component|opa"))
+OSCAL_VERSION = "1.1.2"
 
 SEVERITY_MAP = {
     "CRITICAL": "very-high",
@@ -51,6 +61,15 @@ REG_PREFIX = {
 
 def det_uuid(*parts: str) -> str:
     return str(uuid.uuid5(TKEIR_NS, "|".join(parts)))
+
+
+def oscal_datetime(moment: datetime | None = None) -> str:
+    """NIST DateTimeWithTimezoneDatatype requires a ``Z`` offset, not ``+00:00``."""
+    stamp = moment or datetime.now(timezone.utc)
+    if stamp.tzinfo is None:
+        stamp = stamp.replace(tzinfo=timezone.utc)
+    stamp = stamp.astimezone(timezone.utc).replace(microsecond=0)
+    return stamp.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def opa_article_to_control_id(regulation: str, article: str) -> str:
@@ -107,12 +126,47 @@ def build_assessment_results(
     ssp_uuid: str,
     version: str,
 ) -> dict[str, Any]:
-    now = datetime.now(timezone.utc)
-    now_iso = now.isoformat()
+    now_iso = oscal_datetime()
     ar_uuid = det_uuid("assessment-results", version)
 
     findings: list[dict[str, Any]] = []
     observations: list[dict[str, Any]] = []
+    risks: list[dict[str, Any]] = []
+
+    def _observation(
+        *,
+        result: str,
+        title: str,
+        description: str,
+        control_id: str,
+        extra_props: list[dict[str, str]] | None = None,
+        include_subject: bool = True,
+    ) -> dict[str, Any]:
+        obs_uuid = det_uuid("obs", result, version, control_id)
+        props = [
+            {"name": "control-id", "value": control_id},
+            {"name": "result", "value": result},
+        ]
+        if extra_props:
+            props.extend(extra_props)
+        obs: dict[str, Any] = {
+            "uuid": obs_uuid,
+            "title": title,
+            "description": description or title,
+            "methods": [OSCAL_METHOD_TEST],
+            "types": ["finding"],
+            "collected": now_iso,
+            "props": props,
+        }
+        if include_subject and ssp_uuid:
+            obs["subjects"] = [
+                {
+                    "subject-uuid": ssp_uuid,
+                    "type": "component",
+                    "title": "T-KEIR system",
+                }
+            ]
+        return obs
 
     for reg_key, result_file in _discover_result_files(results_dir):
         data = json.loads(result_file.read_text(encoding="utf-8"))
@@ -121,42 +175,36 @@ def build_assessment_results(
         for p in summary.get("passed") or []:
             article = str(p.get("article") or "")
             control_id = opa_article_to_control_id(reg_key, article)
-            obs_uuid = det_uuid("obs", "pass", version, control_id)
             observations.append(
-                {
-                    "uuid": obs_uuid,
-                    "title": f"[PASS] {p.get('regulation', reg_key)} {article}",
-                    "description": p.get("message") or p.get("requirement") or "",
-                    "methods": ["AUTOMATED"],
-                    "types": ["finding"],
-                    "subjects": [{"subject-uuid": ssp_uuid, "type": "component"}],
-                    "collected": now_iso,
-                    "props": [
-                        {"name": "control-id", "value": control_id},
-                        {"name": "result", "value": "pass"},
-                        {"name": "regulation", "value": str(p.get("regulation") or reg_key)},
+                _observation(
+                    result="pass",
+                    title=f"[PASS] {p.get('regulation', reg_key)} {article}",
+                    description=p.get("message") or p.get("requirement") or "",
+                    control_id=control_id,
+                    extra_props=[
+                        {
+                            "name": "regulation",
+                            "value": str(p.get("regulation") or reg_key),
+                        }
                     ],
-                }
+                )
             )
 
         for na in summary.get("not_applicable") or []:
             article = str(na.get("article") or "")
             control_id = opa_article_to_control_id(reg_key, article)
-            obs_uuid = det_uuid("obs", "na", version, control_id)
             observations.append(
-                {
-                    "uuid": obs_uuid,
-                    "title": f"[NOT-APPLICABLE] {na.get('regulation', reg_key)} {article}",
-                    "description": na.get("reason") or "Not applicable to this system category",
-                    "methods": ["AUTOMATED"],
-                    "types": ["finding"],
-                    "collected": now_iso,
-                    "props": [
-                        {"name": "control-id", "value": control_id},
-                        {"name": "result", "value": "not-applicable"},
-                        {"name": "reason", "value": str(na.get("reason") or "")},
+                _observation(
+                    result="not-applicable",
+                    title=f"[NOT-APPLICABLE] {na.get('regulation', reg_key)} {article}",
+                    description=na.get("reason")
+                    or "Not applicable to this system category",
+                    control_id=control_id,
+                    extra_props=[
+                        {"name": "reason", "value": str(na.get("reason") or "n-a")}
                     ],
-                }
+                    include_subject=False,
+                )
             )
 
         for v in summary.get("violations") or []:
@@ -165,25 +213,48 @@ def build_assessment_results(
             severity = str(v.get("severity") or "MEDIUM")
             oscal_sev = SEVERITY_MAP.get(severity, "moderate")
             finding_uuid = det_uuid("finding", version, control_id)
-            obs_uuid = det_uuid("obs", "fail", version, control_id)
             risk_uuid = det_uuid("risk", version, control_id)
             rem_uuid = det_uuid("remediation", version, control_id)
             requirement = v.get("message") or v.get("requirement") or ""
-            remediation = v.get("remediation") or ""
+            remediation = v.get("remediation") or "See control guidance."
+            due = datetime.now(timezone.utc) + DEADLINES.get(
+                oscal_sev, timedelta(days=180)
+            )
 
-            observations.append(
+            obs = _observation(
+                result="fail",
+                title=f"[FAIL] {v.get('regulation', reg_key)} {article}",
+                description=requirement,
+                control_id=control_id,
+                extra_props=[
+                    {"name": "severity", "value": severity},
+                    {"name": "remediation", "value": remediation},
+                ],
+            )
+            observations.append(obs)
+
+            risks.append(
                 {
-                    "uuid": obs_uuid,
-                    "title": f"[FAIL] {v.get('regulation', reg_key)} {article}",
-                    "description": requirement,
-                    "methods": ["AUTOMATED"],
-                    "types": ["finding"],
-                    "collected": now_iso,
+                    "uuid": risk_uuid,
+                    "title": f"Risk: {article} not satisfied",
+                    "description": requirement or f"{control_id} failed automated test",
+                    "statement": remediation,
+                    "status": "open",
+                    "deadline": oscal_datetime(due),
                     "props": [
-                        {"name": "control-id", "value": control_id},
-                        {"name": "result", "value": "fail"},
-                        {"name": "severity", "value": severity},
-                        {"name": "remediation", "value": remediation},
+                        {"name": "likelihood", "value": oscal_sev},
+                        {"name": "impact", "value": oscal_sev},
+                    ],
+                    "related-observations": [
+                        {"observation-uuid": obs["uuid"]}
+                    ],
+                    "remediations": [
+                        {
+                            "uuid": rem_uuid,
+                            "lifecycle": "recommendation",
+                            "title": "Remediation",
+                            "description": remediation,
+                        }
                     ],
                 }
             )
@@ -191,55 +262,43 @@ def build_assessment_results(
             findings.append(
                 {
                     "uuid": finding_uuid,
-                    "title": f"{v.get('regulation', reg_key)} {article} — {str(requirement)[:80]}",
-                    "description": requirement,
+                    "title": (
+                        f"{v.get('regulation', reg_key)} {article} — "
+                        f"{str(requirement)[:80]}"
+                    ).strip(" —"),
+                    "description": requirement or f"{control_id} not satisfied",
                     "target": {
                         "type": "objective-id",
                         "target-id": control_id,
                         "status": {
                             "state": "not-satisfied",
                             "reason": "fail",
-                            "remarks": requirement,
+                            "remarks": requirement or control_id,
                         },
                     },
-                    "related-observations": [{"observation-uuid": obs_uuid}],
-                    "risks": [
-                        {
-                            "uuid": risk_uuid,
-                            "title": f"Risk: {article} not satisfied",
-                            "description": requirement,
-                            "statement": remediation,
-                            "status": "open",
-                            "characterizations": [
-                                {
-                                    "facets": [
-                                        {
-                                            "name": "likelihood",
-                                            "system": "https://nvd.nist.gov/vuln-metrics/cvss",
-                                            "value": oscal_sev,
-                                        },
-                                        {
-                                            "name": "impact",
-                                            "system": "https://nvd.nist.gov/vuln-metrics/cvss",
-                                            "value": oscal_sev,
-                                        },
-                                    ]
-                                }
-                            ],
-                            "remediations": [
-                                {
-                                    "uuid": rem_uuid,
-                                    "lifecycle": "recommendation",
-                                    "title": "Remediation",
-                                    "description": remediation,
-                                }
-                            ],
-                        }
-                    ],
+                    "related-observations": [{"observation-uuid": obs["uuid"]}],
+                    "related-risks": [{"risk-uuid": risk_uuid}],
                 }
             )
 
-    result_uuid = det_uuid("result", version)
+    result_body: dict[str, Any] = {
+        "uuid": det_uuid("result", version),
+        "title": f"Automated OPA Assessment — {version}",
+        "description": (
+            "Generated by compliance/opa/oscal/opa_to_oscal.py "
+            "from OPA policy evaluation (NIST OSCAL 1.1.2 Assessment Results)."
+        ),
+        "start": now_iso,
+        "end": now_iso,
+        "reviewed-controls": {"control-selections": [{"include-all": {}}]},
+    }
+    if observations:
+        result_body["observations"] = observations
+    if risks:
+        result_body["risks"] = risks
+    if findings:
+        result_body["findings"] = findings
+
     return {
         "assessment-results": {
             "uuid": ar_uuid,
@@ -247,64 +306,44 @@ def build_assessment_results(
                 "title": f"T-KEIR EU Compliance Assessment Results — {version}",
                 "last-modified": now_iso,
                 "version": version,
-                "oscal-version": "1.1.2",
+                "oscal-version": OSCAL_VERSION,
             },
-            "import-ap": {"href": "../../assessments/assessment_plan.json"},
-            "results": [
-                {
-                    "uuid": result_uuid,
-                    "title": f"Automated OPA Assessment — {version}",
-                    "description": (
-                        "Generated by compliance/opa/oscal/opa_to_oscal.py "
-                        "from OPA policy evaluation."
-                    ),
-                    "start": now_iso,
-                    "end": now_iso,
-                    "reviewed-controls": {
-                        "control-selections": [{"include-all": {}}]
-                    },
-                    "observations": observations,
-                    "findings": findings,
-                }
-            ],
+            "import-ap": {"href": "./assessment_plan.json"},
+            "results": [result_body],
         }
     }
 
 
 def build_poam(findings: list[dict[str, Any]], version: str) -> dict[str, Any]:
-    now = datetime.now(timezone.utc)
+    now_iso = oscal_datetime()
     items: list[dict[str, Any]] = []
 
     for finding in findings:
-        risk = (finding.get("risks") or [{}])[0]
-        facets = ((risk.get("characterizations") or [{}])[0].get("facets") or [{}])
-        severity = "moderate"
-        for facet in facets:
-            if facet.get("name") == "impact":
-                severity = str(facet.get("value") or "moderate")
-                break
-        due = (now + DEADLINES.get(severity, timedelta(days=180))).date().isoformat()
-        rem = ((risk.get("remediations") or [{}])[0]).get("description") or ""
         item_uuid = det_uuid("poam-item", version, finding["uuid"])
-        ms_uuid = det_uuid("milestone", version, finding["uuid"])
-
         items.append(
             {
                 "uuid": item_uuid,
                 "title": finding["title"],
-                "description": finding.get("description") or "",
+                "description": finding.get("description") or finding["title"],
                 "related-findings": [{"finding-uuid": finding["uuid"]}],
-                "origins": [],
-                "status": {"state": "open"},
-                "remarks": rem,
-                "milestones": [
-                    {
-                        "uuid": ms_uuid,
-                        "title": "Remediate finding",
-                        "description": rem,
-                        "due-date": due,
-                    }
-                ],
+            }
+        )
+        remarks = (
+            (finding.get("target") or {}).get("status", {}).get("remarks")
+            or finding.get("description")
+            or ""
+        ).strip()
+        if remarks:
+            items[-1]["remarks"] = remarks
+
+    if not items:
+        items.append(
+            {
+                "uuid": det_uuid("poam-item", version, "none"),
+                "title": "No open findings",
+                "description": (
+                    "Automated OPA assessment produced no unsatisfied controls."
+                ),
             }
         )
 
@@ -313,11 +352,11 @@ def build_poam(findings: list[dict[str, Any]], version: str) -> dict[str, Any]:
             "uuid": det_uuid("poam", version),
             "metadata": {
                 "title": f"T-KEIR EU Compliance POA&M — {version}",
-                "last-modified": now.isoformat(),
+                "last-modified": now_iso,
                 "version": version,
-                "oscal-version": "1.1.2",
+                "oscal-version": OSCAL_VERSION,
             },
-            "import-ssp": {"href": "../../ssp/tkeir_ssp.json"},
+            "import-ssp": {"href": "./tkeir_ssp.json"},
             "poam-items": items,
         }
     }
@@ -355,7 +394,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results-dir", type=Path)
     parser.add_argument("--output-dir", type=Path)
-    parser.add_argument("--ssp-uuid", default="tkeir-ssp-v2")
+    parser.add_argument("--ssp-uuid", default=SSP_UUID)
     parser.add_argument("--version", default="unknown")
     parser.add_argument("--diff", action="store_true")
     parser.add_argument("--baseline", type=Path)
@@ -374,7 +413,7 @@ def main(argv: list[str] | None = None) -> int:
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     ar = build_assessment_results(args.results_dir, args.ssp_uuid, args.version)
-    findings = ar["assessment-results"]["results"][0]["findings"]
+    findings = ar["assessment-results"]["results"][0].get("findings") or []
     poam = build_poam(findings, args.version)
 
     ar_path = args.output_dir / "assessment_results.json"
@@ -383,6 +422,14 @@ def main(argv: list[str] | None = None) -> int:
     poam_path.write_text(
         json.dumps(poam, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
+
+    oscal_root = Path(__file__).resolve().parent
+    for src, dest_name in (
+        (oscal_root / "assessments" / "assessment_plan.json", "assessment_plan.json"),
+        (oscal_root / "ssp" / "tkeir_ssp.json", "tkeir_ssp.json"),
+    ):
+        if src.is_file():
+            shutil.copy2(src, args.output_dir / dest_name)
 
     # Also mirror into tracked oscal/assessments/assessment_results for history hooks
     mirror = (

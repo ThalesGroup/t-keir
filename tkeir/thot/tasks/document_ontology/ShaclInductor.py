@@ -189,9 +189,11 @@ def _property_min_count_coverage(
         instance_count[name] = instance_count.get(name, 0) + 1
     holders: dict[tuple[str, str], set[URIRef]] = {}
     for subject, predicate, obj in graph:
+        if not isinstance(subject, URIRef) or not isinstance(obj, URIRef):
+            continue
         if subject not in type_of or obj not in type_of:
             continue
-        if not isinstance(predicate, URIRef) or not isinstance(obj, URIRef):
+        if not isinstance(predicate, URIRef):
             continue
         if not str(predicate).startswith(str(TKEIR)):
             continue

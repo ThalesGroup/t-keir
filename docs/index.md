@@ -31,7 +31,7 @@ tool-using research, ontology-driven document composition, and governed publicat
 | NLP (pipeline quickstart) | [ready_to_run.md](ready_to_run.md) |
 | Installation | [installation.md](installation.md) |
 | Dev container | [devcontainer.md](devcontainer.md) |
-| **Configuration (all YAML)** | [configuration/index.md](configuration/index.md) |
+| **Configuration (all YAML, field effects)** | [configuration/index.md](configuration/index.md) |
 | Deployment profiles | [deployment/index.md](deployment/index.md) |
 | Pipeline tools | [tools/tools_overview.md](tools/tools_overview.md) |
 | Corpus (markdown or mixed files → ingest JSON) | [tools/corpus.md](tools/corpus.md) |
@@ -43,7 +43,7 @@ tool-using research, ontology-driven document composition, and governed publicat
 | HMI | [hmi.md](hmi.md) |
 | Python API examples | [tools/api_reference.md](tools/api_reference.md) |
 | **CI, reports & Actions** | [ci/index.md](ci/index.md) |
-| EU compliance (OPA) | [compliance/eu-audit.md](compliance/eu-audit.md) |
+| EU compliance (OPA, Rego, OSCAL) | [OPA, Rego, and OSCAL](compliance/opa-rego-oscal.md) · [audit](compliance/eu-audit.md) |
 | Quality dashboard | [quality/index.md](quality/index.md) |
 
 ## Source

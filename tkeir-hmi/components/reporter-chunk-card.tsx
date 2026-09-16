@@ -224,7 +224,7 @@ export function ReporterChunkCard({
     >
       <button
         type="button"
-        className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-sm"
+        className="flex w-full items-start gap-2 px-3 py-2.5 text-left text-base"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
       >
@@ -236,7 +236,7 @@ export function ReporterChunkCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-start gap-2">
             {rank != null && (
-              <span className="mt-0.5 w-6 shrink-0 text-[11px] font-medium tabular-nums text-muted-foreground">
+              <span className="mt-0.5 w-6 shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
                 {rank}
               </span>
             )}
@@ -246,7 +246,7 @@ export function ReporterChunkCard({
                   {title}
                 </span>
                 {(linkedEntities.length > 0 || linkedKeywords.length > 0) && (
-                  <Badge variant="secondary" className="text-[10px] font-normal">
+                  <Badge variant="secondary" className="text-xs font-normal">
                     <Network className="mr-1 h-3 w-3" />
                     {linkedEntities.length} ent · {linkedKeywords.length} kw
                   </Badge>

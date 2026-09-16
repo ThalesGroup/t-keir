@@ -87,9 +87,7 @@ class ConverterConfiguration:
                     "languages",
                     "eng+fra+deu+spa+ita+nld+por+pol+ara",
                 ),
-                "max-embedded-images": ocr.get(
-                    "max-embedded-images", 256
-                ),
+                "max-embedded-images": ocr.get("max-embedded-images", 256),
                 "max-pdf-images-per-page": ocr.get(
                     "max-pdf-images-per-page", 32
                 ),

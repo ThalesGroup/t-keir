@@ -26,7 +26,9 @@ from thot.tools.search.dual_hybrid_config import PreprocessingConfig
 LOGGER = logging.getLogger(__name__)
 
 # Do not ASCII-fold scripts where diacritic stripping is harmful or useless.
-_NO_ASCIIFOLD = frozenset({"ar", "he", "fa", "ur", "zh", "ja", "ko", "th", "hi"})
+_NO_ASCIIFOLD = frozenset(
+    {"ar", "he", "fa", "ur", "zh", "ja", "ko", "th", "hi"}
+)
 _NORMALIZER_DISABLE = ("parser", "ner")
 
 # Cache TextNormalizer instances by (model, asciifold, min_len, drop_numbers).
@@ -47,9 +49,7 @@ def _blank_nlp(language: str) -> Language:
     return nlp
 
 
-def _load_normalizer_nlp(
-    lang: str, model: str
-) -> tuple[Language, str]:
+def _load_normalizer_nlp(lang: str, model: str) -> tuple[Language, str]:
     """Load a spaCy pipeline for BM25 normalization without sharing caches.
 
     Args:

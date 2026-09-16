@@ -337,9 +337,7 @@ def split_record_documents(
             or record.get("content")
             or ""
         )
-        text_format = (
-            "markdown" if looks_like_markdown(narrative) else "raw"
-        )
+        text_format = "markdown" if looks_like_markdown(narrative) else "raw"
         concepts = extract_record_concepts(record)
         meta: dict[str, Any] = {
             "corpus": stem,

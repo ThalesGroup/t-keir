@@ -467,7 +467,7 @@ def extract_pdf_image_text(
             for part in _page_elements(
                 page,
                 page_number,
-                ocr_config,
+                ocr_config or {},
                 call_context=call_context,
                 ocr_stats=ocr_stats,
             ):

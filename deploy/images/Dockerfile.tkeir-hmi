@@ -45,6 +45,10 @@ WORKDIR /app
 COPY --from=build --chown=10001:10001 /app/public ./public
 COPY --from=build --chown=10001:10001 /app/.next/standalone ./
 COPY --from=build --chown=10001:10001 /app/.next/static ./.next/static
+# Bake the default usecase (osint) into the standalone public dir. Compose can
+# still override via bind-mount; `make hmi-up` copies the same file locally.
+COPY --chown=10001:10001 datasets/osint/hmi.json ./public/usecase.json
+COPY --chown=10001:10001 datasets/enterprise/hmi.json ./public/usecase-enterprise.json
 
 USER 10001
 EXPOSE 3000

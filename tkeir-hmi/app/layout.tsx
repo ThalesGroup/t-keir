@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body className="min-h-screen font-sans">
+      <body className="min-h-dvh font-sans text-base">
         <AuthProvider>
           {children}
         </AuthProvider>

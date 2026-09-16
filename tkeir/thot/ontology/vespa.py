@@ -1,7 +1,7 @@
 """Title: Vespa adapter for the canonical ontology (not the ontology model).
 
-Maps domain concepts/relations to chunk fields and ``ontology_concept``
-documents, and builds YQL for concept/relation retrieval. Ontology
+Maps domain concepts/relations to chunk fields, ``ontology_concept`` /
+``ontology_triple`` catalog documents, and ``corpus_doc`` YQL. Ontology
 semantics live in :mod:`thot.ontology.model`.
 
 Author: Eric Blaudez
@@ -52,6 +52,54 @@ def ontology_concept_docid(concept_id: str) -> str:
     """
     digest = hashlib.sha256((concept_id or "").encode("utf-8")).hexdigest()
     return digest[:40]
+
+
+def ontology_triple_docid(
+    subject_id: str, predicate_id_value: str, object_id: str
+) -> str:
+    """Stable Vespa docid for one corpus-level SPO triple.
+
+    Example:
+        >>> from thot.ontology.vespa import ontology_triple_docid
+        >>> from thot.ontology.identity import PRED_HAS_VALUE
+        >>> key = ontology_triple_docid('a', PRED_HAS_VALUE, 'b')
+        >>> len(key) == 40
+        True
+        >>> key == ontology_triple_docid('a', PRED_HAS_VALUE, 'b')
+        True
+    """
+    compact = relation_key(subject_id, predicate_id_value, object_id)
+    digest = hashlib.sha256(compact.encode("utf-8")).hexdigest()
+    return digest[:40]
+
+
+def triple_to_vespa_fields(
+    relation: OntologyRelation, *, first_source_ref: str = ""
+) -> dict[str, Any]:
+    """Fields for one ``ontology_triple`` catalog document.
+
+    Example:
+        >>> from thot.ontology.model import OntologyRelation
+        >>> from thot.ontology.vespa import triple_to_vespa_fields
+        >>> fields = triple_to_vespa_fields(
+        ...     OntologyRelation('a', 'pred:has_value', 'b'),
+        ...     first_source_ref='doc1',
+        ... )
+        >>> fields['triple_key']
+        'a|pred:has_value|b'
+        >>> fields['first_source_ref']
+        'doc1'
+    """
+    source = first_source_ref or relation.provenance.source_ref or ""
+    return {
+        "triple_key": relation.key(),
+        "subject_id": relation.subject_id,
+        "predicate_id": relation.predicate_id,
+        "object_id": relation.object_id,
+        "confidence": float(relation.confidence),
+        "provenance": relation.provenance.kind.value,
+        "first_source_ref": source,
+    }
 
 
 def concept_to_vespa_fields(concept: OntologyConcept) -> dict[str, Any]:
@@ -371,6 +419,41 @@ def build_passage_yql(
     return f"select * from {schema} where " + " or ".join(parts)
 
 
+def build_corpus_doc_yql(
+    *,
+    hits: int,
+    probe_terms_clause: str = "",
+    concept_ids: list[str] | None = None,
+    include_nearest_neighbor: bool = True,
+) -> str:
+    """Hybrid YQL for the document-level ``corpus_doc`` schema.
+
+    Example:
+        >>> from thot.ontology.vespa import build_corpus_doc_yql
+        >>> yql = build_corpus_doc_yql(
+        ...     hits=8, concept_ids=['C1'], include_nearest_neighbor=False,
+        ... )
+        >>> yql.startswith('select * from corpus_doc where')
+        True
+        >>> 'ontology_concept_ids contains' in yql
+        True
+    """
+    parts: list[str] = []
+    if include_nearest_neighbor:
+        parts.append(
+            f'({{"targetNumHits": {int(hits)}}}nearestNeighbor(dense_vector, q_dense))'
+        )
+    if probe_terms_clause:
+        parts.append(probe_terms_clause)
+    for cid in list(concept_ids or [])[:MAX_CONCEPT_OR]:
+        lit = escape_yql_literal(str(cid).strip())
+        if lit:
+            parts.append(f'ontology_concept_ids contains "{lit}"')
+    if not parts:
+        parts.append("true")
+    return "select * from corpus_doc where " + " or ".join(parts)
+
+
 def parse_grouping_counts(
     response: dict[str, Any], field_name: str
 ) -> dict[str, int]:
@@ -484,10 +567,73 @@ async def export_corpus_ontology(
     except Exception as exc:  # noqa: BLE001
         LOGGER.warning("ontology_concept visit failed: %s", exc)
 
-    if documents:
+    triple_rows: list[dict[str, Any]] = []
+    continuation = None
+    remaining = max(1, int(max_docs))
+    try:
+        while remaining > 0:
+            wanted = min(400, remaining)
+            payload = await vespa.visit_documents(
+                "ontology_triple",
+                cluster="global",
+                wanted=wanted,
+                continuation=continuation,
+            )
+            batch = payload.get("documents") or []
+            for doc in batch:
+                fields = doc.get("fields") or doc
+                if isinstance(fields, dict) and fields.get("triple_key"):
+                    triple_rows.append(fields)
+            remaining -= len(batch)
+            continuation = payload.get("continuation")
+            if not continuation or not batch:
+                break
+    except Exception as exc:  # noqa: BLE001
+        LOGGER.warning("ontology_triple visit failed: %s", exc)
+
+    if documents or triple_rows:
         ont = vespa_fields_to_ontology(documents)
+        for row in triple_rows:
+            subj = str(row.get("subject_id") or "").strip()
+            pred = str(row.get("predicate_id") or "").strip()
+            obj = str(row.get("object_id") or "").strip()
+            if not (subj and pred and obj):
+                parsed = parse_relation_key(str(row.get("triple_key") or ""))
+                if parsed is None:
+                    continue
+                subj, pred, obj = parsed
+            for cid in (subj, obj):
+                if cid not in ont.concepts:
+                    from thot.ontology.model import (
+                        OntologyConcept,
+                        Provenance,
+                        ProvenanceKind,
+                    )
+
+                    ont.add_concept(
+                        OntologyConcept(
+                            concept_id=cid,
+                            preferred_label=cid,
+                            provenance=Provenance(
+                                kind=ProvenanceKind.INFERRED
+                            ),
+                        )
+                    )
+            ont.add_relation(
+                OntologyRelation(
+                    subj,
+                    pred,
+                    obj,
+                    confidence=float(row.get("confidence") or 1.0),
+                )
+            )
         exported = ont.to_export_dict()
-        exported["source"] = "ontology_concept"
+        if documents and triple_rows:
+            exported["source"] = "ontology_catalog"
+        elif documents:
+            exported["source"] = "ontology_concept"
+        else:
+            exported["source"] = "ontology_triple"
         return exported
 
     concept_counts: dict[str, int] = {}

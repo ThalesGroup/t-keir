@@ -66,7 +66,9 @@ class TestSpacyModelLoader:
 
     @patch("thot.tools.install_spacy_models.install_one_model")
     @patch("thot.core.SpacyModelLoader.spacy.load")
-    def test_downloads_primary_model_when_missing(self, mock_load, mock_install):
+    def test_downloads_primary_model_when_missing(
+        self, mock_load, mock_install
+    ):
         mock_load.side_effect = [OSError("missing"), object()]
         _, model_name = load_spacy_model(
             "en", size="md", download_if_missing=True, task_name="morphosyntax"

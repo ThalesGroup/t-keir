@@ -73,8 +73,9 @@ phrases as well as **generic** entities (cities, organizations, licenses, …).
 
 | Artifact | Location | Role |
 |----------|----------|------|
-| Annotation resource catalog | `resources/modeling/tokenizer/<lang>/annotation-resources.json` | Declares gazetteer files, POS/NER labels, ASCII folding |
-| Compiled MWE trie | `resources/modeling/tokenizer/<lang>/tkeir_mwe.pkl` | Runtime multi-word expression store |
+| Annotation resource catalog | `resources/modeling/tokenizer/any/annotation-resources.json` | Language-agnostic gazetteers (cities, countries, rivers, mountains, waterbodies, regions) plus shared domain lists |
+| Language rules | `resources/modeling/tokenizer/<lang>/` | Stopwords, tokenizer/NER/syntax/keyword JSON rules |
+| Compiled MWE trie | `resources/modeling/tokenizer/any/tkeir_mwe.pkl` | Runtime multi-word expression store (`make init-models`) |
 | NER / syntactic / keyword rules | `ner-rules.json`, `syntactic-rules.json`, `keywords-rules.json` | Pattern and validation overlays |
 | Bundled generic ontologies | `resources/ontologies/` | Optional `derive-from` defaults (product-neutral only) |
 
@@ -173,9 +174,10 @@ email, …) into a T-KEIR document (`content`, `title`, `source_doc_id`,
 **Algorithms / custom logic**
 
 - Short-text fallback to default language; code normalization (`en-US` → `en`).
-- `ResourceSelector` maps language → `resources/modeling/tokenizer/<lang>`;
-  missing languages fall back to `en`/`fr` processing language while recording
-  selection metadata on the document.
+- `ResourceSelector` maps language → `resources/modeling/tokenizer/<lang>`
+  (skipping the shared `any/` pack); missing languages fall back to `en`/`fr`.
+  Geo MWEs (cities, rivers, mountains, lakes, regions, …) are loaded from
+  `tokenizer/any/` for every language.
 
 ---
 
@@ -187,7 +189,7 @@ expressions). Writes `content_tokens` / `title_tokens`.
 | | |
 |--|--|
 | **Modules** | `Tokenizer`, `SentenceSegmenter`, `DictionaryTrie`, `SpacyTokenizerPipe` |
-| **Config** | `configs/tokenizer.yaml` (+ optional MWE) |
+| **Config** | `configs/tokenizer.yaml` (`use-mwe: true`; pickle from `tokenizer/any`) |
 | **Libraries** | **spaCy**, **pysbd** (sentence boundaries), **fold-to-ascii** |
 
 #### Segmentation principles

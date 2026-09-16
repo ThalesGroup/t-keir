@@ -17,8 +17,8 @@ regenerate or re-download.
 Select the demo pack with **`USECASE`** (default `osint`). That value is
 exported as `TKEIR_USECASE`, `TKEIR_AGENT_USECASE`, and
 `TKEIR_BUSINESS_ONTOLOGY_DATASET`, and Keycloak sync loads
-`datasets/<usecase>/keycloak.json`. Additional / private packs:
-[Create a usecase pack](usecase.md).
+`datasets/<usecase>/keycloak.json`. **How to add a pack** (OSINT as the
+worked example): [Create a usecase pack](usecase.md).
 
 ```bash
 make bootstrap && make ingest              # P0: Vespa + host ingest (:8091)

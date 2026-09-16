@@ -172,9 +172,11 @@ classDiagram
 
 ## Vespa storage ERD
 
-Schemas: `vespa/vespa_app/schemas/doc_base.sd`, `global.sd`, `user.sd`.
+Schemas: `vespa/vespa_app/schemas/doc_base.sd`, `global.sd`, `user.sd`,
+`ontology_concept.sd`, `ontology_triple.sd`, `corpus_doc.sd`.
 `user` uses streaming groups (`userspace_id` / `streaming.groupname`);
-`global` is index-mode (shared catalog).
+`global` is index-mode (shared catalog). `corpus_doc` is one row per source
+document; chunks store `parent_doc_id` equal to `corpus_doc.document_id`.
 
 ```mermaid
 erDiagram
@@ -182,6 +184,8 @@ erDiagram
   DOC_BASE ||--|| USER : inherits
   DOC_BASE {
     string source_ref
+    string parent_doc_id
+    string chunk_id
     string chunk_text
     tensor sparse_vector
     array_string ontology_concepts
@@ -197,6 +201,22 @@ erDiagram
     array_string narrower_ids
     tensor embedding
   }
+  ONTOLOGY_TRIPLE {
+    string triple_key
+    string subject_id
+    string predicate_id
+    string object_id
+  }
+  CORPUS_DOC {
+    string document_id
+    string source_ref
+    string title
+    string doc_text
+    string author
+    array_string tags
+    string simhash_hex
+    array_string ontology_concept_ids
+  }
   GLOBAL {
     tensor dense_vector_hnsw
   }
@@ -205,6 +225,9 @@ erDiagram
     tensor dense_vector
   }
   DOC_BASE }o--o{ ONTOLOGY_CONCEPT : concept_ids
+  DOC_BASE }o--|| CORPUS_DOC : parent_doc_id
+  CORPUS_DOC }o--o{ ONTOLOGY_CONCEPT : concept_ids
+  ONTOLOGY_TRIPLE }o--o{ ONTOLOGY_CONCEPT : spo
 ```
 
 `ontology_concepts` is the legacy field name (still written). Values are

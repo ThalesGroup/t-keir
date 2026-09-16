@@ -46,6 +46,145 @@ from thot.tasks.TaskInfo import TaskInfo
 from thot.tools.search.ontology_utils import serialize_graph_json_ld
 
 
+def _enabled_derivation_settings(
+    settings: DerivationSettings, derive_paths: list
+) -> DerivationSettings:
+    """Enable derivation when the document supplies paths.
+
+    Example:
+        >>> callable(_enabled_derivation_settings)
+        True
+    """
+    if settings.enabled or not derive_paths:
+        return settings
+    return DerivationSettings(
+        enabled=True,
+        paths=settings.paths,
+        similarity_threshold=settings.similarity_threshold,
+        match_classes=settings.match_classes,
+        match_individuals=settings.match_individuals,
+        match_properties=settings.match_properties,
+        add_subclass_links=settings.add_subclass_links,
+        add_type_links=settings.add_type_links,
+        add_same_as_links=settings.add_same_as_links,
+        include_matched_axioms=settings.include_matched_axioms,
+        min_label_length=settings.min_label_length,
+        save_report=settings.save_report,
+    )
+
+
+def _derive_document_ontology(
+    graph,
+    tkeir_doc: dict,
+    settings: DerivationSettings,
+    call_context,
+) -> tuple:
+    """Optionally derive links from configured reference ontologies.
+
+    Example:
+        >>> callable(_derive_document_ontology)
+        True
+    """
+    report: dict = {"enabled": settings.enabled, "status": "SKIPPED"}
+    derive_paths = derivation_paths_for_document(tkeir_doc, settings)
+    if not (settings.enabled or derive_paths):
+        return graph, report
+    if not derive_paths:
+        return graph, {"enabled": True, "status": "NO_PATHS", "matches": 0}
+    try:
+        reference = load_reference_graph(
+            derive_paths, call_context=call_context
+        )
+        graph, report = derive_document_graph(
+            graph,
+            reference,
+            settings=_enabled_derivation_settings(settings, derive_paths),
+            call_context=call_context,
+        )
+        report["paths"] = derive_paths
+    except FileNotFoundError as exc:
+        ThotLogger.warning(
+            f"Document ontology derive-from skipped: {exc}",
+            context=call_context,
+        )
+        report = {
+            "enabled": True,
+            "status": "MISSING_REFERENCE",
+            "error": str(exc),
+            "paths": derive_paths,
+        }
+    return graph, report
+
+
+def _log_shacl_status(
+    shacl_status: str,
+    correction_attempts: int,
+    incoherence_summary: dict,
+    call_context,
+) -> None:
+    """Log SHACL healing outcome.
+
+    Example:
+        >>> callable(_log_shacl_status)
+        True
+    """
+    if shacl_status == "FAILED_WITH_INCOHERENCES":
+        ThotLogger.info(
+            "Document ontology SHACL validation still failing after "
+            + str(correction_attempts)
+            + " repair attempt(s); "
+            + str(incoherence_summary.get("unresolved", 0))
+            + " unresolved incoherence(s).",
+            context=call_context,
+        )
+        return
+    if shacl_status == "PASSED_AFTER_REPAIR":
+        ThotLogger.info(
+            "Document ontology SHACL validation passed after "
+            + str(correction_attempts)
+            + " repair attempt(s).",
+            context=call_context,
+        )
+        return
+    if shacl_status.startswith("SKIPPED_"):
+        ThotLogger.info(
+            "Document ontology SHACL "
+            + shacl_status
+            + " ("
+            + str(incoherence_summary.get("heal_skipped") or "")
+            + ", triples="
+            + str(incoherence_summary.get("graph_triple_count") or 0)
+            + ")",
+            context=call_context,
+        )
+
+
+def _derivation_payload(save: bool, report: dict) -> dict | None:
+    """Compact or full derivation report for document_ontology.
+
+    Example:
+        >>> _derivation_payload(False, {"status": "SKIPPED"}) is None
+        True
+    """
+    if not save and report.get("status") in {"SKIPPED", None}:
+        return None
+    if save:
+        return report
+    return {
+        key: report.get(key)
+        for key in (
+            "enabled",
+            "status",
+            "matches",
+            "subclass_links",
+            "type_links",
+            "same_as_links",
+            "paths",
+        )
+        if key in report
+    }
+
+
 class DocumentOntologyBuilder:
     """Build and validate RDF document ontologies from T-KEIR analysis.
 
@@ -223,61 +362,12 @@ class DocumentOntologyBuilder:
             vocabulary_report,
             graph_alignment_report,
         )
-        derivation_report: dict = {
-            "enabled": self._derivation_settings.enabled,
-            "status": "SKIPPED",
-        }
-        derive_paths = derivation_paths_for_document(
-            tkeir_doc, self._derivation_settings
+        graph, derivation_report = _derive_document_ontology(
+            graph,
+            tkeir_doc,
+            self._derivation_settings,
+            call_context,
         )
-        if self._derivation_settings.enabled or derive_paths:
-            if not derive_paths:
-                derivation_report = {
-                    "enabled": True,
-                    "status": "NO_PATHS",
-                    "matches": 0,
-                }
-            else:
-                try:
-                    reference = load_reference_graph(
-                        derive_paths, call_context=call_context
-                    )
-                    settings = self._derivation_settings
-                    if not settings.enabled and derive_paths:
-                        # Per-document paths enable derivation even if config
-                        # flag is false.
-                        settings = DerivationSettings(
-                            enabled=True,
-                            paths=settings.paths,
-                            similarity_threshold=settings.similarity_threshold,
-                            match_classes=settings.match_classes,
-                            match_individuals=settings.match_individuals,
-                            match_properties=settings.match_properties,
-                            add_subclass_links=settings.add_subclass_links,
-                            add_type_links=settings.add_type_links,
-                            add_same_as_links=settings.add_same_as_links,
-                            include_matched_axioms=settings.include_matched_axioms,
-                            min_label_length=settings.min_label_length,
-                            save_report=settings.save_report,
-                        )
-                    graph, derivation_report = derive_document_graph(
-                        graph,
-                        reference,
-                        settings=settings,
-                        call_context=call_context,
-                    )
-                    derivation_report["paths"] = derive_paths
-                except FileNotFoundError as exc:
-                    ThotLogger.warning(
-                        f"Document ontology derive-from skipped: {exc}",
-                        context=call_context,
-                    )
-                    derivation_report = {
-                        "enabled": True,
-                        "status": "MISSING_REFERENCE",
-                        "error": str(exc),
-                        "paths": derive_paths,
-                    }
         shapes_ttl = induce_document_shacl_shapes(graph, alignment_report)
         text_coverage = compute_ontology_text_coverage(
             tkeir_doc,
@@ -291,35 +381,12 @@ class DocumentOntologyBuilder:
                 call_context=call_context,
             )
         )
-
-        if shacl_status == "FAILED_WITH_INCOHERENCES":
-            ThotLogger.info(
-                "Document ontology SHACL validation still failing after "
-                + str(correction_attempts)
-                + " repair attempt(s); "
-                + str(incoherence_summary.get("unresolved", 0))
-                + " unresolved incoherence(s).",
-                context=call_context,
-            )
-        elif shacl_status == "PASSED_AFTER_REPAIR":
-            ThotLogger.info(
-                "Document ontology SHACL validation passed after "
-                + str(correction_attempts)
-                + " repair attempt(s).",
-                context=call_context,
-            )
-        elif shacl_status.startswith("SKIPPED_"):
-            ThotLogger.info(
-                "Document ontology SHACL "
-                + shacl_status
-                + " ("
-                + str(incoherence_summary.get("heal_skipped") or "")
-                + ", triples="
-                + str(incoherence_summary.get("graph_triple_count") or 0)
-                + ")",
-                context=call_context,
-            )
-
+        _log_shacl_status(
+            shacl_status,
+            correction_attempts,
+            incoherence_summary,
+            call_context,
+        )
         document_ontology: dict[str, object] = {
             "json_ld": serialize_graph_json_ld(graph),
             "shacl_status": shacl_status,
@@ -329,28 +396,11 @@ class DocumentOntologyBuilder:
         }
         if self._save_alignment:
             document_ontology["alignment"] = alignment_report
-        if self._save_derivation or derivation_report.get("status") not in {
-            "SKIPPED",
-            None,
-        }:
-            # Always attach a compact derivation summary when enabled/attempted;
-            # full details when save-derivation is true.
-            if self._save_derivation:
-                document_ontology["derivation"] = derivation_report
-            else:
-                document_ontology["derivation"] = {
-                    k: derivation_report.get(k)
-                    for k in (
-                        "enabled",
-                        "status",
-                        "matches",
-                        "subclass_links",
-                        "type_links",
-                        "same_as_links",
-                        "paths",
-                    )
-                    if k in derivation_report
-                }
+        derivation = _derivation_payload(
+            self._save_derivation, derivation_report
+        )
+        if derivation is not None:
+            document_ontology["derivation"] = derivation
         tkeir_doc["document_ontology"] = document_ontology
         task_info = TaskInfo(
             task_name="document-ontology",

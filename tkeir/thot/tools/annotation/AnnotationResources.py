@@ -99,6 +99,13 @@ class AnnotationResources:
         """
         if "download" not in list_item:
             return
+        dest_name = list_item.get("path") or ""
+        dest = (
+            os.path.join(resources_base_path, dest_name) if dest_name else ""
+        )
+        if dest and os.path.isfile(dest):
+            ThotLogger.info("Using existing list resource '" + dest + "'")
+            return
         if "url" not in list_item["download"]:
             ThotLogger.error("With download option you must give url")
             return
@@ -153,8 +160,11 @@ class AnnotationResources:
         for except_i in list_item["exceptions"]:
             try:
                 with open(os.path.join(basepath, except_i)) as exc_f:
-                    pattern_exception = set(exc_f.read().split("\n"))
-                    exc_f.close()
+                    for line in exc_f.read().split("\n"):
+                        text = line.strip()
+                        if not text or text.startswith("#"):
+                            continue
+                        pattern_exception.add(text)
             except Exception:
                 ThotLogger.error("Cannot open file '" + except_i + "'")
         return pattern_exception
@@ -442,8 +452,12 @@ class AnnotationResources:
             ['Alpha', 'Beta']
         """
         with open(os.path.join(basepath, list_item["path"])) as list_f:
-            list_patterns = list_f.read().split("\n")
-            list_f.close()
+            list_patterns = []
+            for line in list_f.read().split("\n"):
+                text = line.strip()
+                if not text or text.startswith("#"):
+                    continue
+                list_patterns.append(text)
         return list_patterns, [], dict()
 
     @staticmethod
@@ -588,20 +602,21 @@ class AnnotationResources:
             >>> patterns[0]["pattern"]
             'cafe'
         """
-        duplicate_id = fold(pattern_i) + "#" + label + "#" + pos
+        fold_pattern = fold(pattern_i)
+        if not fold_pattern or fold_pattern == pattern_i:
+            return
+        duplicate_id = fold_pattern + "#" + label + "#" + pos
         if duplicate_id in remove_duplicate:
             return
-        fold_pattern = fold(pattern_i)
-        if len(fold_pattern) == len(pattern_i):
-            patterns.append(
-                {
-                    "pattern": fold_pattern,
-                    "label": label,
-                    "pos": pos,
-                    "data": {"type": data_type},
-                    "weight": weight,
-                }
-            )
+        patterns.append(
+            {
+                "pattern": fold_pattern,
+                "label": label,
+                "pos": pos,
+                "data": {"type": data_type},
+                "weight": weight,
+            }
+        )
         remove_duplicate.add(duplicate_id)
 
     @staticmethod

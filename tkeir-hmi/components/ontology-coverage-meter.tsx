@@ -37,7 +37,7 @@ export function OntologyCoverageMeter({
     return (
       <Badge
         variant="outline"
-        className={cn("tabular-nums text-[10px]", className)}
+        className={cn("tabular-nums text-xs", className)}
         title={`${coverage.matched}/${coverage.total} external BO concepts hit this surface`}
       >
         {title} {pct}
@@ -50,7 +50,7 @@ export function OntologyCoverageMeter({
 
   return (
     <div className={cn("space-y-2 rounded-md border bg-muted/20 px-3 py-2", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
         <span className="font-medium">{title}</span>
         <span className="tabular-nums text-muted-foreground">
           {pct} · {coverage.matched}/{coverage.total} concepts
@@ -63,7 +63,7 @@ export function OntologyCoverageMeter({
         />
       </div>
       {showDetails && (
-        <div className="space-y-1.5 text-[11px]">
+        <div className="space-y-1.5 text-sm">
           {coverage.matchedConcepts.length > 0 && (
             <div>
               <p className="mb-1 text-muted-foreground">Matched</p>
@@ -72,7 +72,7 @@ export function OntologyCoverageMeter({
                   <Badge
                     key={concept.conceptId}
                     variant="secondary"
-                    className="text-[10px]"
+                    className="text-xs"
                     title={concept.conceptId}
                   >
                     {concept.preferredLabel}
@@ -94,7 +94,7 @@ export function OntologyCoverageMeter({
                   <Badge
                     key={concept.conceptId}
                     variant="outline"
-                    className="text-[10px] opacity-70"
+                    className="text-xs opacity-70"
                     title={concept.conceptId}
                   >
                     {concept.preferredLabel}

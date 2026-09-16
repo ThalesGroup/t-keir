@@ -254,6 +254,7 @@ class OntologyLayerConfig:
     """
 
     index_concepts: bool = True
+    index_triples: bool = True
     embed_concepts: bool = False
     json_structural_concepts: bool = True
     max_concepts_per_chunk: int = 64
@@ -262,6 +263,31 @@ class OntologyLayerConfig:
     expansion: OntologyExpansionYaml = field(
         default_factory=OntologyExpansionYaml
     )
+
+
+@dataclass(frozen=True)
+class DocumentIndexConfig:
+    """Document-level Vespa index (``corpus_doc``) plus weighted search arm.
+
+    Chunks keep BM25/hybrid ranking; this arm searches one row per source
+    document and blends scores into the passage list used by search and RAG.
+
+    Example:
+        >>> from thot.tools.search.dual_hybrid_config import DocumentIndexConfig
+        >>> DocumentIndexConfig().document_weight
+        0.35
+    """
+
+    enabled: bool = True
+    search_enabled: bool = True
+    hits: int = 50
+    ranking_profile: str = "hybrid"
+    chunk_weight: float = 0.65
+    document_weight: float = 0.35
+    simhash_max_hamming: int = 3
+    simhash_prefix_bits: int = 16
+    max_doc_text_chars: int = 32000
+    max_concept_ids: int = 256
 
 
 @dataclass(frozen=True)
@@ -355,7 +381,7 @@ class OntologyScoringYaml:
         1.0
     """
 
-    enabled: bool = True
+    enabled: bool = False
     match_weights: dict[str, float] = field(
         default_factory=lambda: {
             "exact": 1.0,
@@ -483,6 +509,9 @@ class DualHybridConfig:
     ontology_layer: OntologyLayerConfig = field(
         default_factory=OntologyLayerConfig
     )
+    document_index: DocumentIndexConfig = field(
+        default_factory=DocumentIndexConfig
+    )
     rank_profiles: dict[str, Any] = field(default_factory=dict)
     average_field_length: dict[str, Any] = field(default_factory=dict)
     business_ontology: BusinessOntologyConfig = field(
@@ -504,17 +533,19 @@ class DualHybridConfig:
 def _spacy_models_from_mapping(
     raw: dict[str, Any] | None,
 ) -> dict[str, SpacyModelEntry]:
-    """Parse ``preprocessing.spacy_models``; require ``default`` or ``xx``.
+    """Parse ``preprocessing.spacy_models`` as overlays on built-in defaults.
 
     Example:
         >>> from thot.tools.search.dual_hybrid_config import _spacy_models_from_mapping
-        >>> models = _spacy_models_from_mapping({"default": "xx_ent_wiki_sm"})
-        >>> models["default"].model
-        'xx_ent_wiki_sm'
+        >>> models = _spacy_models_from_mapping({"en": "en_core_web_lg"})
+        >>> models["en"].model
+        'en_core_web_lg'
+        >>> models["ar"].model
+        'blank:ar'
     """
     if not raw:
         return _default_spacy_models()
-    merged: dict[str, SpacyModelEntry] = {}
+    merged: dict[str, SpacyModelEntry] = dict(_default_spacy_models())
     for lang, entry in raw.items():
         key = str(lang).strip().lower()
         if isinstance(entry, str):
@@ -573,6 +604,7 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
     dump = cfg.get("index_dump") or {}
     olayer = cfg.get("ontology_layer") or {}
     oexp = olayer.get("expansion") or {}
+    didx = cfg.get("document_index") or {}
 
     qe_weights = dict(
         QueryExpansionConfig().weights,
@@ -628,6 +660,7 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
         ),
         ontology_layer=OntologyLayerConfig(
             index_concepts=bool(olayer.get("index_concepts", True)),
+            index_triples=bool(olayer.get("index_triples", True)),
             embed_concepts=bool(olayer.get("embed_concepts", False)),
             json_structural_concepts=bool(
                 olayer.get("json_structural_concepts", True)
@@ -649,6 +682,27 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
                 max_depth=max(0, int(oexp.get("max_depth", 1))),
                 max_ids=max(1, int(oexp.get("max_ids", 32))),
             ),
+        ),
+        document_index=DocumentIndexConfig(
+            enabled=bool(didx.get("enabled", True)),
+            search_enabled=bool(didx.get("search_enabled", True)),
+            hits=max(1, int(didx.get("hits", 50))),
+            ranking_profile=str(
+                didx.get("ranking_profile") or "hybrid"
+            ).strip()
+            or "hybrid",
+            chunk_weight=float(didx.get("chunk_weight", 0.65)),
+            document_weight=float(didx.get("document_weight", 0.35)),
+            simhash_max_hamming=max(
+                0, int(didx.get("simhash_max_hamming", 3))
+            ),
+            simhash_prefix_bits=max(
+                1, int(didx.get("simhash_prefix_bits", 16))
+            ),
+            max_doc_text_chars=max(
+                256, int(didx.get("max_doc_text_chars", 32000))
+            ),
+            max_concept_ids=max(1, int(didx.get("max_concept_ids", 256))),
         ),
         rank_profiles=dict(cfg.get("rank_profiles") or {}),
         average_field_length=dict(cfg.get("average_field_length") or {}),
@@ -701,7 +755,7 @@ def dual_hybrid_from_mapping(raw: dict[str, Any] | None) -> DualHybridConfig:
             top_n_after_fusion=int(rrf.get("top_n_after_fusion", 50)),
         ),
         ontology_scoring=OntologyScoringYaml(
-            enabled=bool(ont.get("enabled", True)),
+            enabled=bool(ont.get("enabled", False)),
             match_weights=match_weights,
             max_traversal_depth=int(ont.get("max_traversal_depth", 1)),
             normalize_by_query_concepts=bool(

@@ -47,10 +47,11 @@ def configs_dir() -> str:
 
 
 def resources_dir(language: str = "en") -> str:
-    """Return tokenizer resources for a language.
+    """Return tokenizer resources for a language or the shared ``any`` pack.
 
     Args:
-        language: ISO language code (for example ``"en"`` or ``"fr"``).
+        language: ISO language code (for example ``"en"`` or ``"fr"``),
+            or ``"any"`` for language-agnostic gazetteers.
 
     Returns:
         Absolute path to ``resources/modeling/tokenizer/<language>``.
@@ -60,10 +61,64 @@ def resources_dir(language: str = "en") -> str:
         >>> from thot.core.TkeirPaths import resources_dir
         >>> os.path.isdir(resources_dir("en"))
         True
+        >>> os.path.isdir(resources_dir("any"))
+        True
     """
     return os.path.join(
         package_root(), "resources", "modeling", "tokenizer", language
     )
+
+
+SHARED_TOKENIZER_LANGUAGE = "any"
+DEFAULT_MWE_FILENAME = "tkeir_mwe.pkl"
+
+
+def shared_resources_dir() -> str:
+    """Return the language-agnostic tokenizer gazetteer directory.
+
+    Example:
+        >>> from thot.core.TkeirPaths import shared_resources_dir
+        >>> shared_resources_dir().endswith("tokenizer/any")
+        True
+    """
+    return resources_dir(SHARED_TOKENIZER_LANGUAGE)
+
+
+def resolve_mwe_path(
+    resources_base_path: str | None,
+    mwe_filename: str = DEFAULT_MWE_FILENAME,
+) -> str | None:
+    """Locate the compiled MWE pickle in ``tokenizer/any``, then a language dir.
+
+    The shared gazetteer trie is the default. A pickle in the language
+    directory is used only when the shared file is missing.
+
+    Args:
+        resources_base_path: Language-specific tokenizer resources directory.
+        mwe_filename: Pickle basename (default ``tkeir_mwe.pkl``).
+
+    Returns:
+        Absolute path of the first existing pickle, or ``None``.
+
+    Example:
+        >>> from thot.core.TkeirPaths import resolve_mwe_path, shared_resources_dir
+        >>> import os
+        >>> found = resolve_mwe_path(shared_resources_dir())
+        >>> found is None or found.endswith("tkeir_mwe.pkl")
+        True
+    """
+    name = mwe_filename or DEFAULT_MWE_FILENAME
+    candidates: list[str] = []
+    shared = os.path.join(shared_resources_dir(), name)
+    candidates.append(shared)
+    if resources_base_path:
+        lang_path = os.path.join(resources_base_path, name)
+        if lang_path not in candidates:
+            candidates.append(lang_path)
+    for path in candidates:
+        if os.path.isfile(path):
+            return path
+    return None
 
 
 def net_models_dir() -> str:

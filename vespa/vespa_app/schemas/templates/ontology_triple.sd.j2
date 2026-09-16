@@ -1,0 +1,32 @@
+{# Corpus-level SPO catalog. One document per (subject, predicate, object).
+ # Chunks/documents store relation keys as pointers; they do not own the graph. #}
+schema ontology_triple {
+    document ontology_triple {
+        field triple_key type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field subject_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field predicate_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field object_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field confidence type float {
+            indexing: summary | attribute
+        }
+        field provenance type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field first_source_ref type string {
+            indexing: summary | attribute
+        }
+    }
+}

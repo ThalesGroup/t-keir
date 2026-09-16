@@ -626,13 +626,13 @@ export function MyFilesPanel() {
   const selectedCount = selected.size;
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+    <div className="flex w-full flex-col gap-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+        <p className="text-sm font-semibold uppercase tracking-wider text-primary">
           Personal corpus
         </p>
         <h2 className="mt-1 text-2xl font-semibold tracking-tight">My files</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-base text-muted-foreground">
           Import documents into your private workspace (stored only — not
           indexed yet). Select files and use Index selected to run the NLP
           pipeline with the chosen business ontology into your Vespa user

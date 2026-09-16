@@ -210,20 +210,19 @@ MULTILINGUAL_FIXTURES: dict[str, MultilingualFixture] = {
                 ),
             ]
         ],
-        expected_model=MULTILINGUAL_MODEL,
+        expected_model="de_core_news_sm",
         expected_pysbd_sentences=3,
         must_contain_tokens=[
-            "Prof",
+            "Prof.",
             "Müller",
-            "z.",
-            "B.",
+            "z.B.",
             "Donaudampfschifffahrtsgesellschaftskapitänspension",
             "https:",
             "beispiel.de",
             "1.234",
             "€",
         ],
-        first_sentence_prefix=["Prof", ".", "Müller", "erklärte"],
+        first_sentence_prefix=["Prof.", "Müller", "erklärte", "z.B."],
     ),
     "es": MultilingualFixture(
         language="es",
@@ -238,7 +237,7 @@ MULTILINGUAL_FIXTURES: dict[str, MultilingualFixture] = {
                 ),
             ]
         ],
-        expected_model=MULTILINGUAL_MODEL,
+        expected_model="es_core_news_sm",
         expected_pysbd_sentences=4,
         must_contain_tokens=[
             "¿",
@@ -264,12 +263,12 @@ MULTILINGUAL_FIXTURES: dict[str, MultilingualFixture] = {
                 ),
             ]
         ],
-        expected_model=MULTILINGUAL_MODEL,
+        expected_model="it_core_news_sm",
         expected_pysbd_sentences=1,
         must_contain_tokens=[
             "Prof",
             "Rossi",
-            "L'Italia",
+            "Italia",
             "bella",
             "https:",
             "esempio.it",
@@ -312,7 +311,7 @@ MULTILINGUAL_FIXTURES: dict[str, MultilingualFixture] = {
                 ),
             ]
         ],
-        expected_model=MULTILINGUAL_MODEL,
+        expected_model="sv_core_news_sm",
         expected_pysbd_sentences=2,
         must_contain_tokens=[
             "Prof",
@@ -324,7 +323,7 @@ MULTILINGUAL_FIXTURES: dict[str, MultilingualFixture] = {
             "56",
             "kr",
         ],
-        first_sentence_prefix=["Prof", ".", "Andersson", "sa"],
+        first_sentence_prefix=["Prof.", "Andersson", "sa"],
     ),
 }
 
@@ -386,7 +385,10 @@ class TestTokenizerMultilingual:
                 token_found = expected_token in flat_tokens or any(
                     expected_token in token for token in flat_tokens
                 )
-                assert token_found
+                assert token_found, (
+                    f"{language}: missing {expected_token!r} in "
+                    f"{flat_tokens[:40]!r}"
+                )
 
             if fixture.first_sentence_prefix:
                 first_sentence = result["content_tokens"][0][0][0]
@@ -394,7 +396,7 @@ class TestTokenizerMultilingual:
                 assert (
                     first_tokens[: len(fixture.first_sentence_prefix)]
                     == fixture.first_sentence_prefix
-                )
+                ), f"{language}: {first_tokens[:12]!r}"
             assert len(result["title_tokens"][0]) > 0
 
     def test_english_detailed_sentence_and_url_boundaries(self):

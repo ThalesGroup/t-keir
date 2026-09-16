@@ -1,0 +1,34 @@
+# Generated from tkeir/configs/rag.yaml via `make schemas`.
+# DO NOT hand-edit — change rag.yaml and regenerate.
+# Source: scripts/generate_vespa_schemas.py
+
+schema ontology_triple {
+    document ontology_triple {
+        field triple_key type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field subject_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field predicate_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field object_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field confidence type float {
+            indexing: summary | attribute
+        }
+        field provenance type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        field first_source_ref type string {
+            indexing: summary | attribute
+        }
+    }
+}

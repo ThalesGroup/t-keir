@@ -12,6 +12,17 @@ schema doc_base {
         # Stable id / parent reference (e.g. beir:scifact:42 or ingest digest).
         field source_ref type string {
             indexing: summary | attribute
+            attribute: fast-search
+        }
+        # Indexed corpus_doc key this chunk was extracted from (sha256[:40]).
+        field parent_doc_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
+        }
+        # Logical golden-chunk id (unique among passages of one source_ref).
+        field chunk_id type string {
+            indexing: summary | attribute
+            attribute: fast-search
         }
         # Passage text (chunk body) for BM25.
         field chunk_text type string {

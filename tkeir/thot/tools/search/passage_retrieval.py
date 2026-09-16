@@ -14,11 +14,11 @@ Query path (when ``rag.search.enabled``):
      the external ontology, expand synonym / narrower / broader / related
      concept ids and labels
   3. BGE-M3 dense+sparse encode of the raw query
-  4. Vespa hybrid YQL (NN + BM25 probe + ``ontology_concepts`` OR)
-  5. Optional :class:`~thot.tools.search.ontology_scorer.OntologyRescorer`
+  4. Vespa hybrid YQL on ``global`` / ``user`` passages (NN + BM25 + concepts)
+  5. Weighted ``corpus_doc`` arm blended by ``parent_doc_id`` / ``source_ref``
+  6. Optional :class:`~thot.tools.search.ontology_scorer.OntologyRescorer`
      (``ontology_scoring.enabled``)
-  6. ColBERT MaxSim rerank of the top pool
-     (:func:`thot.tools.search.rerank.colbert_rerank`)
+  7. ColBERT MaxSim rerank of the top pool
 
 For offline / BEIR corpus scoring (multi-query leaderboard path), use
 :func:`thot.tools.eval.hybrid_retrieve.retrieve_hybrid`.
@@ -46,7 +46,11 @@ from thot.tools.search.bge_m3 import (
 )
 from thot.tools.search.business_ontology import business_ontology_from_data
 from thot.tools.search.dual_hybrid_config import DualHybridConfig
-from thot.tools.search.fusion import normalize_scores, reciprocal_rank_fusion
+from thot.tools.search.fusion import (
+    blend_chunk_and_document_scores,
+    normalize_scores,
+    reciprocal_rank_fusion,
+)
 from thot.tools.search.query_expander import ExpansionWeights, QueryExpander
 from thot.tools.search.rag_config import load_rag_config
 from thot.tools.search.text_normalizer import normalizer_for_language
@@ -248,7 +252,7 @@ class PassageHit:
 
     Example:
         >>> PassageHit("p1", "ref", "text", 0.8)
-        PassageHit(passage_id='p1', source_ref='ref', chunk_text='text', score=0.8, schema='global', ontology_concepts=[], ontology_relations=[], ontology_rel_keys=[])
+        PassageHit(passage_id='p1', source_ref='ref', chunk_text='text', score=0.8, schema='global', ontology_concepts=[], ontology_relations=[], ontology_rel_keys=[], parent_doc_id='')
     """
 
     passage_id: str
@@ -259,6 +263,7 @@ class PassageHit:
     ontology_concepts: list[str] = field(default_factory=list)
     ontology_relations: list[dict[str, Any]] = field(default_factory=list)
     ontology_rel_keys: list[str] = field(default_factory=list)
+    parent_doc_id: str = ""
 
     @property
     def ontology_concept_ids(self) -> list[str]:
@@ -495,6 +500,7 @@ def _clone_hit(base: PassageHit, *, score: float | None = None) -> PassageHit:
         ontology_concepts=list(base.ontology_concepts),
         ontology_relations=list(base.ontology_relations),
         ontology_rel_keys=list(base.ontology_rel_keys),
+        parent_doc_id=base.parent_doc_id,
     )
 
 
@@ -715,7 +721,7 @@ class PassageRetrievalPipeline:
             seen_terms.add(key)
             expansion_terms.append(cleaned)
 
-        concept_ids: list[str] = []
+        query_concept_ids: list[str] = []
         ontology_graph = None
         text_normalizer = None
         use_search_ont = self.config.business_ontology.search_enabled and (
@@ -771,21 +777,21 @@ class PassageRetrievalPipeline:
                 expanded = expander.expand(
                     query, seed_labels=seed_labels or None
                 )
-                concept_ids = list(expanded.concept_ids or [])
+                query_concept_ids = list(expanded.concept_ids or [])
                 for term in expanded.terms:
                     if term.text:
                         _add_term(term.text)
-                if concept_ids:
+                if query_concept_ids:
                     LOGGER.info(
                         "query expand ontology_concepts OR ids=%s seeds=%d",
-                        concept_ids[:16],
+                        query_concept_ids[:16],
                         len(seed_labels),
                     )
             timings["expand"] = (time.perf_counter() - t_exp) * 1000
 
         for cid in request_concept_ids:
-            if cid not in concept_ids:
-                concept_ids.append(cid)
+            if cid not in query_concept_ids:
+                query_concept_ids.append(cid)
         if ontology_expand or (
             layer is not None
             and (
@@ -835,13 +841,13 @@ class PassageRetrievalPipeline:
                 or spec.predicates
             ):
                 svc = OntologyService.from_business_payload(business_ontology)
-                expanded_graph = svc.expand(concept_ids, spec)
-                concept_ids = list(expanded_graph.concept_ids)
+                expanded_graph = svc.expand(query_concept_ids, spec)
+                query_concept_ids = list(expanded_graph.concept_ids)
                 LOGGER.info(
                     "ontology expand seeds=%d expanded=%d ids=%s",
                     len(expanded_graph.seed_ids),
                     len(expanded_graph.expanded_ids),
-                    concept_ids[:16],
+                    query_concept_ids[:16],
                 )
                 try:
                     from thot.core.ThotMetrics import ThotMetrics
@@ -862,7 +868,7 @@ class PassageRetrievalPipeline:
         if request_concept_ids or request_relations:
             LOGGER.info(
                 "ontology retrieval concepts=%d relations=%d",
-                len(concept_ids),
+                len(query_concept_ids),
                 len(request_relations),
             )
             try:
@@ -896,7 +902,7 @@ class PassageRetrievalPipeline:
             query,
             requested=requested_mode,
             has_user_space=bool(user_space),
-            expansion_concept_ids=concept_ids,
+            expansion_concept_ids=query_concept_ids,
             language=language,
         )
 
@@ -907,7 +913,7 @@ class PassageRetrievalPipeline:
             (query_analysis or {}).get("lexical_query")
             or " ".join(expansion_terms[:12])
             or query
-            or " ".join(concept_ids[:8])
+            or " ".join(query_concept_ids[:8])
             or " "
         )
         emb = encode_one(str(embed_text), model_id=model_id, dense_dim=dim)
@@ -928,7 +934,7 @@ class PassageRetrievalPipeline:
                 profile=profile,
                 dim=dim,
                 user_space=None,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
                 relations=request_relations,
             )
             timings["vespa_global"] = meta.get("ms", 0.0)
@@ -943,7 +949,7 @@ class PassageRetrievalPipeline:
                 profile=profile,
                 dim=dim,
                 user_space=user_space,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
                 relations=request_relations,
             )
             timings["vespa_user"] = meta.get("ms", 0.0)
@@ -959,7 +965,7 @@ class PassageRetrievalPipeline:
                 profile=profile,
                 dim=dim,
                 user_space=None,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
                 relations=request_relations,
             )
             timings["vespa_global"] = (time.perf_counter() - t_g) * 1000
@@ -973,7 +979,7 @@ class PassageRetrievalPipeline:
                 profile=profile,
                 dim=dim,
                 user_space=user_space,
-                concept_ids=concept_ids,
+                concept_ids=query_concept_ids,
                 relations=request_relations,
             )
             timings["vespa_user"] = (time.perf_counter() - t_u) * 1000
@@ -1009,8 +1015,27 @@ class PassageRetrievalPipeline:
                         ontology_concepts=_passage_ontology(row)[0],
                         ontology_relations=_passage_ontology(row)[1],
                         ontology_rel_keys=_passage_ontology(row)[2],
+                        parent_doc_id=str(row.get("parent_doc_id") or ""),
                     )
                 )
+
+        doc_cfg = getattr(self.config, "document_index", None)
+        if (
+            doc_cfg is not None
+            and bool(getattr(doc_cfg, "enabled", True))
+            and bool(getattr(doc_cfg, "search_enabled", True))
+            and hits
+        ):
+            t_doc = time.perf_counter()
+            hits = await self._rescore_with_corpus_docs(
+                hits,
+                probe_terms=probe_terms,
+                dense=emb.dense,
+                sparse=query_sparse,
+                dim=dim,
+                concept_ids=query_concept_ids,
+            )
+            timings["vespa_document"] = (time.perf_counter() - t_doc) * 1000
 
         if (request_concept_ids or request_relations) and hits:
             from thot.ontology.expansion import overlap_score
@@ -1033,7 +1058,7 @@ class PassageRetrievalPipeline:
                 bonus = overlap_score(
                     hit_concept_ids=hit.ontology_concept_ids,
                     hit_relation_keys=hit.ontology_rel_keys,
-                    query_concept_ids=concept_ids,
+                    query_concept_ids=query_concept_ids,
                     query_relation_keys=q_rel_keys,
                     concept_weight=float(ont_weights.get("concept", 0.15)),
                     relation_weight=float(ont_weights.get("relation", 0.10)),
@@ -1054,7 +1079,7 @@ class PassageRetrievalPipeline:
         ont_cfg = self.config.ontology_scoring
         if (
             bool(ont_cfg.enabled)
-            and concept_ids
+            and query_concept_ids
             and hits
             and ontology_graph is not None
             and text_normalizer is not None
@@ -1092,7 +1117,7 @@ class PassageRetrievalPipeline:
             weight = float(getattr(ont_cfg, "rescore_weight", 0.13) or 0.13)
             rescorer = OntologyRescorer(scorer, weight=weight)
             ranked_ont = rescorer.rescore(
-                concept_ids,
+                query_concept_ids,
                 [
                     (
                         hit.passage_id,
@@ -1103,14 +1128,14 @@ class PassageRetrievalPipeline:
                 ],
             )
             by_id = {hit.passage_id: hit for hit in hits}
-            rescored: list[PassageHit] = []
+            ont_rescored: list[PassageHit] = []
             for pid, score in ranked_ont:
                 base = by_id.get(pid)
                 if base is None:
                     continue
-                rescored.append(_clone_hit(base, score=float(score)))
-            if rescored:
-                hits = rescored
+                ont_rescored.append(_clone_hit(base, score=float(score)))
+            if ont_rescored:
+                hits = ont_rescored
             timings["ontology_rescore"] = (time.perf_counter() - t_ont) * 1000
 
         # Prefer passages that actually mention content probe terms (e.g. Suez)
@@ -1239,7 +1264,10 @@ class PassageRetrievalPipeline:
         for child in children:
             f = child.get("fields") or {}
             pid = str(
-                f.get("source_ref") or child.get("id") or f"hit-{len(ordered)}"
+                f.get("chunk_id")
+                or child.get("id")
+                or f.get("source_ref")
+                or f"hit-{len(ordered)}"
             )
             if pid in fields_map:
                 continue
@@ -1249,6 +1277,141 @@ class PassageRetrievalPipeline:
             "ms": (time.perf_counter() - t0) * 1000,
             "fields": fields_map,
         }
+
+    async def _rescore_with_corpus_docs(
+        self,
+        hits: list[PassageHit],
+        *,
+        probe_terms: list[str],
+        dense: list[float],
+        sparse: dict[str, float],
+        dim: int,
+        concept_ids: list[str],
+    ) -> list[PassageHit]:
+        """Blend chunk ranks with a weighted ``corpus_doc`` search arm.
+
+        Used by ``/search`` and RAG. Document scores join on ``parent_doc_id``
+        (indexed document id) and ``source_ref``.
+
+        Example:
+            >>> import inspect
+            >>> from thot.tools.search.passage_retrieval import (
+            ...     PassageRetrievalPipeline,
+            ... )
+            >>> inspect.iscoroutinefunction(
+            ...     PassageRetrievalPipeline._rescore_with_corpus_docs
+            ... )
+            True
+        """
+        cfg = getattr(self.config, "document_index", None)
+        if cfg is None or self.vespa is None or not hits:
+            return hits
+        doc_scores = await self._search_corpus_docs(
+            probe_terms=probe_terms,
+            dense=dense,
+            sparse=sparse,
+            dim=dim,
+            concept_ids=concept_ids,
+            hits=int(getattr(cfg, "hits", 50) or 50),
+            profile=str(getattr(cfg, "ranking_profile", None) or "hybrid"),
+        )
+        if not doc_scores:
+            return hits
+        chunk_scores = {hit.passage_id: float(hit.score) for hit in hits}
+        parents: dict[str, list[str]] = {}
+        for hit in hits:
+            keys = [key for key in (hit.parent_doc_id, hit.source_ref) if key]
+            parents[hit.passage_id] = keys
+        blended = blend_chunk_and_document_scores(
+            normalize_scores(chunk_scores),
+            parents,
+            normalize_scores(doc_scores),
+            chunk_weight=float(getattr(cfg, "chunk_weight", 0.65)),
+            document_weight=float(getattr(cfg, "document_weight", 0.35)),
+        )
+        rescored = [
+            _clone_hit(
+                hit, score=float(blended.get(hit.passage_id, hit.score))
+            )
+            for hit in hits
+        ]
+        rescored.sort(key=lambda item: item.score, reverse=True)
+        LOGGER.info(
+            "document-arm blend hits=%d docs=%d chunk_w=%.2f doc_w=%.2f",
+            len(rescored),
+            len(doc_scores),
+            float(getattr(cfg, "chunk_weight", 0.65)),
+            float(getattr(cfg, "document_weight", 0.35)),
+        )
+        return rescored
+
+    async def _search_corpus_docs(
+        self,
+        *,
+        probe_terms: list[str],
+        dense: list[float],
+        sparse: dict[str, float],
+        dim: int,
+        concept_ids: list[str],
+        hits: int,
+        profile: str,
+    ) -> dict[str, float]:
+        """Search ``corpus_doc`` and return scores keyed by document id / source_ref.
+
+        Example:
+            >>> import inspect
+            >>> from thot.tools.search.passage_retrieval import (
+            ...     PassageRetrievalPipeline,
+            ... )
+            >>> inspect.iscoroutinefunction(
+            ...     PassageRetrievalPipeline._search_corpus_docs
+            ... )
+            True
+        """
+        assert self.vespa is not None
+        from thot.ontology.vespa import build_corpus_doc_yql
+
+        text_clause = build_multi_field_contains_or_clause(
+            list(probe_terms or []),
+            fields=("title", "doc_text"),
+        )
+        include_nn = bool(dense) and any(abs(float(x)) > 1e-12 for x in dense)
+        yql = build_corpus_doc_yql(
+            hits=hits,
+            probe_terms_clause=text_clause or "",
+            concept_ids=concept_ids,
+            include_nearest_neighbor=include_nn,
+        )
+        payload: dict[str, Any] = {
+            "yql": yql,
+            "hits": hits,
+            "ranking.profile": profile,
+            "timeout": f"{max(1, int(self.vespa.config.timeout_seconds))}s",
+            "input.query(q_dense)": vespa_dense_tensor(dense, dim)["values"],
+            "input.query(q_sparse)": vespa_sparse_tensor(sparse),
+        }
+        try:
+            response = await self.vespa.search(payload)
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.warning("corpus_doc search arm failed: %s", exc)
+            return {}
+        children = (response.get("root") or {}).get("children") or []
+        scores: dict[str, float] = {}
+        n = max(len(children), 1)
+        for index, child in enumerate(children):
+            fields = child.get("fields") or {}
+            rank = 1.0 - (index / n)
+            relevance = child.get("relevance")
+            score = float(relevance) if relevance is not None else rank
+            for key in (
+                str(fields.get("document_id") or ""),
+                str(fields.get("source_ref") or ""),
+            ):
+                if key:
+                    prev = scores.get(key)
+                    if prev is None or score > prev:
+                        scores[key] = score
+        return scores
 
     @staticmethod
     def _to_hits(
@@ -1282,6 +1445,7 @@ class PassageRetrievalPipeline:
                     ontology_concepts=ids,
                     ontology_relations=rels,
                     ontology_rel_keys=keys,
+                    parent_doc_id=str(row.get("parent_doc_id") or ""),
                 )
             )
         return hits

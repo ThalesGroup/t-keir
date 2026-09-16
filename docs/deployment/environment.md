@@ -60,6 +60,7 @@ to `deploy/compose/.env` (never commit secrets). Deep tables also live on
 | `VESPA_URL` | `http://localhost:8080` (Compose: `http://vespa:8080`) | Document + search API |
 | `VESPA_CONFIG_URL` | `http://localhost:19071` | Config server |
 | `VESPA_TIMEOUT_SECONDS` | `60` | HTTP timeout |
+| `INDEX_SNAPSHOT` | unset | Hybrid demo: `1` saves/restores the Vespa volume (`.vespa-snapshots/<USECASE>/index.tar.gz`); or a tar path. Alias `TKEIR_INDEX_SNAPSHOT` |
 | `RAG_HOST` / `RAG_PORT` | `0.0.0.0` / `8090` | RAG listen |
 | `RAG_URL` | Make: `http://localhost:8090` | Clients / smoke / MCP fallback |
 

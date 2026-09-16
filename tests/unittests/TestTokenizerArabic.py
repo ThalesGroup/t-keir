@@ -20,9 +20,7 @@ from thot.tasks.tokenizer.Tokenizer import (
 )
 from thot.tasks.tokenizer.TokenizerConfiguration import TokenizerConfiguration
 
-ARABIC_TEXT = (
-    "الجيش اللبناني أعلن حالة التأهب في بيروت بعد الحادث."
-)
+ARABIC_TEXT = "الجيش اللبناني أعلن حالة التأهب في بيروت بعد الحادث."
 
 
 def _flatten_token_strings(node) -> list[str]:

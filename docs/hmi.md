@@ -21,10 +21,17 @@ navigator, and admin/agent run monitors.
 
 ## Install
 
+From the repo root, `make setup` already runs `make hmi-install` (`npm ci` in
+`tkeir-hmi/`, including **Cytoscape.js** + fCoSE for the ontology graph).
+
+Personas, Reporter presets, and the login-gate table come from
+`datasets/$USECASE/hmi.json` (copied to `tkeir-hmi/public/usecase.json` by
+`make hmi-up`). Default pack is OSINT. How to add another:
+[Create a usecase pack](tools/usecase.md).
+
 ```bash
-cd tkeir-hmi
-npm install
-cp .env.local.example .env.local # optional — defaults work for local dev
+make hmi-install   # Node deps only; equivalent: cd tkeir-hmi && npm ci
+cp tkeir-hmi/.env.local.example tkeir-hmi/.env.local  # optional
 ```
 
 ## Development
@@ -98,13 +105,22 @@ Toggle the same entity/keyword again to clear the filter.
 
 ### Ontology graph views
 
-Search / Reporter fuse graphs are built for analysts from verbal SPO and
-optional containment, not from Document/Chunk filename scaffolding:
+Search / Reporter fuse graphs are **Cytoscape.js** canvases (fCoSE force layout
+by default). They are built from verbal SPO and optional containment, not from
+Document/Chunk filename scaffolding:
 
 | View | Shows |
 |------|--------|
 | **SPO concepts** | Subject–predicate–object from analyzed `kg` / fused `relations` |
 | **Doc → chunk → ontology** | Document contains chunks; chunks link into concepts; multi-chunk concepts marked as shared (intersection) |
+
+Interactions:
+
+- Drag a node to tidy the layout; pan the canvas; scroll to zoom
+- Click a concept to highlight 1-hop neighbors; double-click (or **1-hop**) isolates that neighborhood
+- **Force / Radial / Tree** switch layout; **Fit** / **Reset** restore the view
+- Type in **Find a concept** or pick a name in the inspector list
+- **Expand** opens a fullscreen explorer (Esc to close)
 
 Underlying RDF shape and weights:
 [Document ontology — hypergraph](tools/document_ontology.md#hypergraph-shape-document--chunk--sub-ontology).
@@ -141,6 +157,7 @@ under the short answer (copy + “Audit this answer” → `/admin?correlation_i
 - Next.js 15 (App Router) + TypeScript
 - Auth.js (`next-auth` v5) + Keycloak (optional)
 - Tailwind CSS + Shadcn/ui (Accordion, Tabs, Cards, Badges, Select)
+- Cytoscape.js + cytoscape-fcose (ontology explorer)
 - Lucide React icons
 - React hooks + `fetch` with loading/error states
 

@@ -16,6 +16,7 @@ For Compose, Kubernetes, and secured cluster profiles, see
 | **Git** | Clone and version identity (`make build`, `make tag`) |
 | **[uv](https://docs.astral.sh/uv/getting-started/installation/)** | Python package manager (installs the selected Python if needed) |
 | **Make** | GNU Make or BSD Make (macOS Command Line Tools) |
+| **[Node.js](https://nodejs.org/) 20+** | Required by `make setup` / `make hmi-install` for `tkeir-hmi` (Cytoscape.js ontology graph) |
 | **Docker** (optional) | Required for the [dev container](devcontainer.md), Vespa, and security scans |
 | **curl** / **jq** (optional) | Required for `make rag-query` and `make smoke-test` |
 
@@ -167,8 +168,8 @@ Prefer **Option A** (`make setup`) for development. Models: `make init-models`
 | Path | Purpose |
 |---|---|
 | `tkeir/configs/` | Pipeline and task YAML (`pipeline.yaml`, taggers, `rag.yaml`, …) |
-| `tkeir/resources/modeling/tokenizer/<lang>/` | Lexicons, rules, `annotation-resources.json` |
-| `tkeir/resources/modeling/tokenizer/en/tkeir_mwe.pkl` | Compiled MWE trie (`make init-models`) |
+| `tkeir/resources/modeling/tokenizer/any/` | Language-agnostic gazetteers + compiled `tkeir_mwe.pkl` (`make init-models`) |
+| `tkeir/resources/modeling/tokenizer/<lang>/` | Language-specific lexicons and rules (`annotation-resources.json`, stopwords) |
 | `tkeir/resources/modeling/net/bge-m3/` | Local BGE-M3 weights (`make pull-bge-model` / `make setup`) |
 | `tkeir/resources/modeling/net/blip-image-captioning-base/` | BLIP captions for the converter (`make install-converter-models`) |
 | `tkeir/resources/modeling/spacy/` | spaCy language pipelines (`make install-spacy-models` / `make setup`) |
@@ -193,7 +194,7 @@ export TRANSFORMERS_CACHE=$PWD/.cache/models
 | Docs site | `make docs` |
 | Docs PDF | `make docs-pdf` → `output/docs/tkeir-docs.pdf` |
 | Environment variables | [Environment variables](deployment/environment.md) |
-| EU compliance OPA audit | `make audit-compliance` → [EU Compliance OPA Audit](compliance/eu-audit.md) |
+| EU compliance OPA / OSCAL | `make audit-compliance` → [OPA, Rego, and OSCAL](compliance/opa-rego-oscal.md) · [audit](compliance/eu-audit.md) |
 
 ## Troubleshooting
 
@@ -214,6 +215,12 @@ extracted into `tkeir/resources/modeling/spacy/` (not the venv):
 ```bash
 make install-spacy-models
 ```
+
+**MkDocs 2.0 warning from Material** — `make docs` uses **MkDocs 1.x** (`mkdocs>=1.6,<2`)
+plus Material. The yellow banner about MkDocs 2.0 is an upstream advisory (plugins
+and the Material theme do not work on MkDocs 2). It is not a T-KEIR build failure.
+`make docs` / `make docs-build` pin 1.x and set `NO_MKDOCS_2_WARNING=1`. To see
+the banner: `make docs NO_MKDOCS_2_WARNING=0`.
 
 **Tesseract / PDF OCR** — scanned PDFs and images need the binary plus language packs:
 

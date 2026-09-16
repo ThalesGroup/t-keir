@@ -17,7 +17,7 @@ make docs           # http://127.0.0.1:8000/  (override: DOCS_PORT=8001)
 Or from the repository root with uv:
 
 ```shell
-uv run --project tkeir --with mkdocs --with mkdocs-material \
+uv run --project tkeir --with 'mkdocs>=1.6,<2' --with 'mkdocs-material>=9.7.5,<10' \
   --with mkdocs-render-swagger-plugin \
   mkdocs serve -f mkdocs.yml -a 127.0.0.1:8000
 ```
@@ -111,8 +111,13 @@ Set `TRANSFORMERS_CACHE` to that model path before running model-backed tools.
 ### Resources
 
 Tokenizer resources live under
-`resources/modeling/tokenizer/[en|fr|…]`. See
-`resources/modeling/tokenizer/en/annotation-resources.json` for file roles.
+`resources/modeling/tokenizer/any/` (language-agnostic gazetteers and the
+compiled MWE trie) and `resources/modeling/tokenizer/<lang>/` (rules). See
+`resources/modeling/tokenizer/any/annotation-resources.json` for file roles.
+
+Pipeline order: converter → language → resources → tokenizer → morphosyntax →
+NER → syntax → keywords. MWE compounds are **on** by default (`use-mwe: true`);
+run `make init-models` so `tokenizer/any/tkeir_mwe.pkl` exists.
 
 ## Quick start
 
@@ -127,10 +132,6 @@ Analyse your own documents (`-t auto` for PDF/Office; `-t raw` for plain text):
 ```shell
 tkeir-pipeline -c tkeir/configs/pipeline.yaml -i <INPUT> -o <OUTPUT DIR> -t auto
 ```
-
-Pipeline order: converter → language → resources → tokenizer → morphosyntax →
-NER → syntax → keywords. MWE compounds are off by default; use `make init-models`
-and `--use-mwe` when needed.
 
 ### Vespa indexing and RAG
 

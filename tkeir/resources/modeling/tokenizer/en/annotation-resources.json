@@ -9,58 +9,6 @@
                 {
                     "format": {
                         "type": "csv",
-                        "header": false,
-                        "sep": "\t",
-                        "columns": [
-                            {
-                                "id": 4
-                            }
-                        ]
-                    },
-                    "name": "geoname-country",
-                    "path": "countryInfo.txt",
-                    "exceptions": [
-                        "stopwords.txt"
-                    ],
-                    "pos": "PROPN",
-                    "add-ascii-folding": true,
-                    "label": "location.country",
-                    "type": "named-entity",
-                    "weight": 10
-                },
-                {
-                    "format": {
-                        "type": "csv",
-                        "header": false,
-                        "sep": "\t",
-                        "columns": [
-                            {
-                                "id": 1
-                            },
-                            {
-                                "id": 3,
-                                "split-on": ","
-                            }
-                        ]
-                    },
-                    "download": {
-                        "url": "http://download.geonames.org/export/dump/cities5000.zip",
-                        "format": "zip"
-                    },
-                    "name": "geoname-city",
-                    "path": "cities5000.txt",
-                    "exceptions": [
-                        "stopwords.txt"
-                    ],
-                    "pos": "PROPN",
-                    "label": "location.city",
-                    "type": "named-entity",
-                    "add-ascii-folding": true,
-                    "weight": 10
-                },
-                {
-                    "format": {
-                        "type": "csv",
                         "header": true,
                         "sep": ",",
                         "columns": [

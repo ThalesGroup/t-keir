@@ -351,9 +351,7 @@ class Converter:
         markitdown_types = set(MarkItDownConverter.managed_types())
 
         if data_type == AUTO_DATATYPE:
-            data_type = detect_input_format(
-                source, data_decode, AUTO_DATATYPE
-            )
+            data_type = detect_input_format(source, data_decode, AUTO_DATATYPE)
 
         if data_type == "tkeir":
             tkeir_doc = self._convert_tkeir_payload(data_decode, data_type)

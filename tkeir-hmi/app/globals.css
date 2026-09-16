@@ -15,11 +15,11 @@
   }
 
   .prose ul {
-    @apply my-3 list-disc space-y-1 pl-5;
+    @apply my-3 list-disc space-y-1 pl-5 text-base;
   }
 
   .prose ol {
-    @apply my-3 list-decimal space-y-1 pl-5;
+    @apply my-3 list-decimal space-y-1 pl-5 text-base;
   }
 
   .prose blockquote {
@@ -39,7 +39,7 @@
   }
 
   .prose table {
-    @apply w-full border-collapse text-left text-sm;
+    @apply w-full border-collapse text-left text-base;
   }
 
   .prose th,
@@ -70,6 +70,8 @@
     --input: 214 32% 91%;
     --ring: 231 48% 48%;
     --radius: 0.625rem;
+    --hmi-banner-top: 2.75rem;
+    --hmi-banner-bottom: 2.5rem;
   }
 
   .dark {
@@ -98,8 +100,12 @@
     @apply border-border;
   }
 
+  html {
+    font-size: clamp(16px, 0.32vw + 13.5px, 19px);
+  }
+
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-base leading-relaxed text-foreground antialiased;
   }
 }
 

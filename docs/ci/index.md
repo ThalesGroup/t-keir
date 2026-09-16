@@ -13,6 +13,7 @@ Related:
 
 - [Code quality dashboard](../quality/index.md) — generated coverage / complexity / licences
 - [CI and evidence (compliance)](../compliance/ci-evidence.md) — how reports feed OPA
+- [OPA, Rego, and OSCAL](../compliance/opa-rego-oscal.md) — engine, policy language, NIST exchange
 - [EU compliance OPA audit](../compliance/eu-audit.md)
 
 ---

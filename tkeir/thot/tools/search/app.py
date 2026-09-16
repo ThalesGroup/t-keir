@@ -1610,6 +1610,8 @@ async def _retrieve_and_rerank(
                         "source_ref": hit.source_ref,
                         "source_doc_id": hit.source_ref,
                         "doc_ref": hit.source_ref,
+                        "parent_doc_id": hit.parent_doc_id or hit.source_ref,
+                        "corpus_doc_id": hit.parent_doc_id,
                         "chunk_text": hit.chunk_text,
                         "text_raw": hit.chunk_text,
                         "ontology_concepts": hit.ontology_concepts,

@@ -358,7 +358,7 @@ check-install: ## Verify local/dev install (tools, Python, spaCy, Docker, HMI)
 # ---------------------------------------------------------------------------
 
 install: check-uv check-python-version ## Sync Python env (dev + models groups) in tkeir/
-	$(UV) sync --directory $(TKEIR_DIR) --group dev --group models --python $(PYTHON)
+	$(UV) sync --directory $(TKEIR_DIR) --group dev --group models --python $(PYTHON) --system-certs
 
 sync: install ## Alias for install (legacy vespa workflow)
 

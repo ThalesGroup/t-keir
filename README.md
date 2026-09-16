@@ -15,6 +15,40 @@ templates) under the platform governor.
 
 Full documentation: [ThalesGroup.github.io/t-keir](https://thalesgroup.github.io/t-keir)
 
+
+### Quick installation for beginners
+
+#### Check if uv is install on your computer.
+Type the following command in your terminal:
+```bash
+#Linux
+uv --version
+```
+
+If uv is not installed, you will see a command not found error message.
+Then, install uv following the documentation at the following link:
+[uv installation](https://docs.astral.sh/uv/getting-started/installation/)
+
+#### Install python 3.11
+
+```bash
+# Linux
+uv python install 3.11 --system-certs
+```
+
+See section [Python versions](#Python versions) for more details on other
+supported versions of Python.
+
+#### Install T-Keir
+```bash
+#Linux`
+make install
+````
+
+You can now go to the [Quick start](#Quick start) section in order to run
+your first T-Keir pipeline.
+
+
 ### Python versions
 
 | Version | Status |
@@ -105,6 +139,14 @@ Details: [docs/devcontainer.md](docs/devcontainer.md)
 
 ### 2. Pipeline demo (local, no Vespa)
 
+
+Remember to export your certificate if it is not done:
+```bash
+#linux
+export SSL_CERT_FILE='your/path/to/certificates/certificate_file.crt'
+```
+
+Launch the setup and the demo:
 ```bash
 make setup
 make quickstart

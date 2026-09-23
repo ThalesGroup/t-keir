@@ -381,7 +381,7 @@ install: check-uv check-python-version ## Sync Python env (dev + models groups) 
 sync: install ## Alias for install (legacy vespa workflow)
 
 ci-deps: check-uv check-python-version ## Sync Python env (dev + models groups)
-	$(UV) sync --directory $(TKEIR_DIR) --group dev --group models --python $(PYTHON)
+	$(UV) sync --directory $(TKEIR_DIR) --group dev --group models --python $(PYTHON) --system-certs
 
 verify-lockfile: check-uv ## Fail if uv.lock is out of sync with pyproject.toml
 	$(Q)echo "Verifying lock file is up-to-date with pyproject.toml..."
@@ -771,7 +771,7 @@ docs: ci-deps ## MkDocs dev server (override DOCS_PORT; default 8000)
 		echo "  Stop:  kill \$$(lsof -tiTCP:$(DOCS_PORT) -sTCP:LISTEN)"; \
 		exit 1; \
 	fi
-	cd $(ROOT) && $(UV) run --project $(TKEIR_DIR) --python $(PYTHON) \
+	cd $(ROOT) && $(UV) run --project $(TKEIR_DIR) --python $(PYTHON) --system-certs \
 		$(MKDOCS_UV_WITH) \
 		mkdocs serve -f "$(ROOT)/mkdocs.yml" -a 127.0.0.1:$(DOCS_PORT)
 

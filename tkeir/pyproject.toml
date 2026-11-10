@@ -13,7 +13,7 @@ packages = [
 classifiers = [
     "Environment :: Console",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 homepage = "https://github.com/ThalesGroup/t-keir"
@@ -31,10 +31,11 @@ include = [
 Releases = "https://github.com/ThalesGroup/t-keir/releases"
 
 [tool.poetry.dependencies]
-# Django 5.2.x security fixes require Python >=3.10
-python = ">=3.10,<4.0"
-beautifulsoup4="4.11.1"
-elasticsearch="7.14.0"
+# filelock 4.2.1 (GHSA floor) and Django 5.2.x require Python >=3.11
+python = ">=3.11,<4.0"
+beautifulsoup4=">=4.15.0"
+# 7.x pins urllib3<2 (GHSA set fixed in 2.8.0). Nothing in this tree imports it.
+elasticsearch=">=8.18,<9"
 # mistune 2.x: DoS/XSS advisories; fixed in 3.3.4+
 mistune=">=3.3.4"
 emoji="2.0.0"
@@ -42,11 +43,29 @@ fold-to-ascii="1.0.2.post1"
 # Django 4.2 line is unsupported for current advisories; use 5.2.17+
 Django=">=5.2.17,<6.0"
 Jinja2="^3.1.4"
-nltk="^3.7"
+# 3.10.3 still allows pickle/JVM advisories; fixed in 3.10.4
+nltk=">=3.10.4"
 pandas="1.4.3"
 prometheus-client="0.14.1"
 protobuf=">=5.29.6,<6.0"
-sanic="22.6.2"
+# 22.6.2 is unpatched (GHSA-wmj6-g64g-j7q5). No sanic import remains in this tree.
+sanic=">=25.12.1,<26"
+# Transitive floors so Dependabot's poetry resolve cannot keep vulnerable pins.
+urllib3=">=2.8.0"
+certifi=">=2026.10.18"
+filelock=">=4.2.1"
+multidict=">=6.9.1"
+soupsieve=">=2.9.0"
+pillow=">=13.0.0"
+pyjwt=">=2.15.0"
+cryptography=">=50.0.2"
+anyio=">=4.14.2"
+aiohttp=">=3.14.4"
+pyasn1=">=0.6.5"
+msgpack=">=1.2.3"
+fsspec=">=2026.6.0"
+setuptools=">=84.1.0"
+pip=">=26.2"
 # Sanic-Cors removed: GHSA-94jw-hqvj-vw74 has no patched release (<=2.2.0
 # still affected) and nothing in this tree imports sanic_cors.
 spacy="3.6.1"
@@ -105,7 +124,7 @@ profile = "black"
 
 [tool.black]
 line-length = 79
-target-version = ["py310"]
+target-version = ["py311"]
 preview = true
 
 include = '\.pyi?$'
